@@ -1,0 +1,106 @@
+2019-05-08 13:59:13,143 | INFO  | Refreshing org.apache.activemq.xbean.XBeanBrokerFactory$1@7823a2f9: startup date [Wed May 08 13:59:13 UTC 2019]; root of context hierarchy | org.apache.activemq.xbean.XBeanBrokerFactory$1 | main
+2019-05-08 13:59:13,984 | INFO  | Using Persistence Adapter: KahaDBPersistenceAdapter[/data/activemq/kahadb] | org.apache.activemq.broker.BrokerService | main
+2019-05-08 13:59:14,187 | INFO  | PListStore:[/data/activemq/localhost/tmp_storage] started | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
+2019-05-08 13:59:14,329 | INFO  | JobSchedulerStore: /data/activemq/localhost/scheduler started. | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-08 13:59:14,488 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:5d3952c834cb-38916-1557323954339-0:1) is starting | org.apache.activemq.broker.BrokerService | main
+2019-05-08 13:59:14,505 | INFO  | Listening for connections at: tcp://5d3952c834cb:61616?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 13:59:14,506 | INFO  | Connector openwire started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,509 | INFO  | Listening for connections at: amqp://5d3952c834cb:5672?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 13:59:14,510 | INFO  | Connector amqp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,514 | INFO  | Listening for connections at: stomp://5d3952c834cb:61613?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 13:59:14,515 | INFO  | Connector stomp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,518 | INFO  | Listening for connections at: mqtt://5d3952c834cb:1883?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 13:59:14,520 | INFO  | Connector mqtt started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,699 | WARN  | ServletContext@o.e.j.s.ServletContextHandler@291a7e3c{/,null,STARTING} has uncovered http methods for path: / | org.eclipse.jetty.security.SecurityHandler | main
+2019-05-08 13:59:14,724 | INFO  | Listening for connections at ws://5d3952c834cb:61614?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.ws.WSTransportServer | main
+2019-05-08 13:59:14,725 | INFO  | Connector ws started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,726 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | main
+2019-05-08 13:59:14,737 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 13:59:14,743 | INFO  | Network Connector DiscoveryNetworkConnector:Remote1_To_Geneve:BrokerService[localhost] started | org.apache.activemq.network.NetworkConnector | main
+2019-05-08 13:59:14,744 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:5d3952c834cb-38916-1557323954339-0:1) started | org.apache.activemq.broker.BrokerService | main
+2019-05-08 13:59:14,745 | INFO  | For help or more information please see: http://activemq.apache.org | org.apache.activemq.broker.BrokerService | main
+2019-05-08 13:59:14,746 | WARN  | Store limit is 102400 mb (current store usage is 0 mb). The data directory: /data/activemq/kahadb only has 76003 mb of usable space. - resetting to maximum available disk space: 76003 mb | org.apache.activemq.broker.BrokerService | main
+2019-05-08 13:59:14,770 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:14,787 | INFO  | Network connection between vm://localhost#0 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#0
+2019-05-08 13:59:14,806 | WARN  | Network connection between vm://localhost#0 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37802
+2019-05-08 13:59:14,816 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:14,817 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:15,371 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /admin | main
+2019-05-08 13:59:15,561 | INFO  | ActiveMQ WebConsole available at http://0.0.0.0:8161/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-08 13:59:15,562 | INFO  | ActiveMQ Jolokia REST API available at http://0.0.0.0:8161/api/jolokia/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-08 13:59:15,624 | INFO  | Initializing Spring FrameworkServlet 'dispatcher' | /admin | main
+2019-05-08 13:59:15,809 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | ActiveMQ Task-1
+2019-05-08 13:59:15,811 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | ActiveMQ Task-1
+2019-05-08 13:59:15,815 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:15,826 | INFO  | Network connection between vm://localhost#2 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#2
+2019-05-08 13:59:15,838 | WARN  | Network connection between vm://localhost#2 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37804
+2019-05-08 13:59:15,841 | WARN  | Network connection between vm://localhost#2 and tcp://172.28.0.2:61616 shutdown due to a remote error: java.lang.IllegalStateException: Cannot add a producer to a connection that had not been registered: localhost->localhost-38916-1557323954339-8:2 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37804
+2019-05-08 13:59:15,849 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-3
+2019-05-08 13:59:15,850 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-3
+2019-05-08 13:59:15,918 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /api | main
+2019-05-08 13:59:15,945 | INFO  | jolokia-agent: Using policy access restrictor classpath:/jolokia-access.xml | /api | main
+2019-05-08 13:59:17,842 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | ActiveMQ Task-1
+2019-05-08 13:59:17,843 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | ActiveMQ Task-1
+2019-05-08 13:59:17,851 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:17,859 | INFO  | Network connection between vm://localhost#4 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#4
+2019-05-08 13:59:17,868 | WARN  | Network connection between vm://localhost#4 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37808
+2019-05-08 13:59:17,869 | WARN  | Network connection between vm://localhost#4 and tcp://172.28.0.2:61616 shutdown due to a remote error: java.lang.IllegalStateException: Cannot add a producer to a connection that had not been registered: localhost->localhost-38916-1557323954339-10:2 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37808
+2019-05-08 13:59:17,879 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-4
+2019-05-08 13:59:17,879 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-4
+2019-05-08 13:59:21,870 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | ActiveMQ Task-1
+2019-05-08 13:59:21,872 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | ActiveMQ Task-1
+2019-05-08 13:59:21,877 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:21,919 | INFO  | Network connection between vm://localhost#6 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#6
+2019-05-08 13:59:21,931 | WARN  | Network connection between vm://localhost#6 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37810
+2019-05-08 13:59:21,946 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:21,948 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:29,933 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | ActiveMQ Task-1
+2019-05-08 13:59:29,935 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | ActiveMQ Task-1
+2019-05-08 13:59:29,942 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:29,949 | INFO  | Network connection between vm://localhost#8 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#8
+2019-05-08 13:59:29,957 | WARN  | Network connection between vm://localhost#8 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37822
+2019-05-08 13:59:29,964 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:29,965 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:45,960 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | ActiveMQ Task-1
+2019-05-08 13:59:45,969 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | ActiveMQ Task-1
+2019-05-08 13:59:45,982 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 13:59:45,991 | INFO  | Network connection between vm://localhost#10 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#10
+2019-05-08 13:59:45,999 | WARN  | Network connection between vm://localhost#10 and tcp://172.28.0.2:61616 shutdown due to a remote error: javax.jms.InvalidClientIDException: Broker: localhost - Client: Remote1_To_Geneve_localhost_outbound already connected from tcp://172.28.0.3:48924 | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ Transport: tcp:///172.28.0.2:61616@37824
+2019-05-08 13:59:46,005 | INFO  | Connector vm://localhost stopped | org.apache.activemq.broker.TransportConnector | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 13:59:46,006 | INFO  | localhost bridge to localhost stopped | org.apache.activemq.network.DemandForwardingBridgeSupport | ActiveMQ BrokerService[localhost] Task-1
+2019-05-08 14:00:26,017 | INFO  | Refreshing org.apache.activemq.xbean.XBeanBrokerFactory$1@7823a2f9: startup date [Wed May 08 14:00:26 UTC 2019]; root of context hierarchy | org.apache.activemq.xbean.XBeanBrokerFactory$1 | main
+2019-05-08 14:00:26,754 | INFO  | Using Persistence Adapter: KahaDBPersistenceAdapter[/data/activemq/kahadb] | org.apache.activemq.broker.BrokerService | main
+2019-05-08 14:00:26,800 | INFO  | KahaDB is version 6 | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-08 14:00:26,886 | INFO  | Recovering from the journal @1:503 | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-08 14:00:26,888 | INFO  | Recovery replayed 6 operations from the journal in 0.078 seconds. | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-08 14:00:26,901 | INFO  | PListStore:[/data/activemq/localhost/tmp_storage] started | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
+2019-05-08 14:00:26,907 | INFO  | Scheduler Store version 1 loaded | org.apache.activemq.store.kahadb.scheduler.JobSchedulerKahaDBMetaData | main
+2019-05-08 14:00:27,015 | INFO  | Recovering from the scheduled job journal @1:28 | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-08 14:00:27,016 | INFO  | Recovery replayed 1 operations from the journal in 0.002 seconds. | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-08 14:00:27,017 | INFO  | JobSchedulerStore: /data/activemq/localhost/scheduler started. | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-08 14:00:27,116 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:5d3952c834cb-35259-1557324026911-1:1) is starting | org.apache.activemq.broker.BrokerService | main
+2019-05-08 14:00:27,128 | INFO  | Listening for connections at: tcp://5d3952c834cb:61616?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 14:00:27,129 | INFO  | Connector openwire started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,132 | INFO  | Listening for connections at: amqp://5d3952c834cb:5672?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 14:00:27,133 | INFO  | Connector amqp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,136 | INFO  | Listening for connections at: stomp://5d3952c834cb:61613?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 14:00:27,138 | INFO  | Connector stomp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,143 | INFO  | Listening for connections at: mqtt://5d3952c834cb:1883?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-08 14:00:27,144 | INFO  | Connector mqtt started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,234 | WARN  | ServletContext@o.e.j.s.ServletContextHandler@4426bff1{/,null,STARTING} has uncovered http methods for path: / | org.eclipse.jetty.security.SecurityHandler | main
+2019-05-08 14:00:27,268 | INFO  | Listening for connections at ws://5d3952c834cb:61614?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.ws.WSTransportServer | main
+2019-05-08 14:00:27,269 | INFO  | Connector ws started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,270 | INFO  | Establishing network connection from vm://localhost?async=false&create=false to failover:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)?randomize=false&maxReconnectAttempts=0 | org.apache.activemq.network.DiscoveryNetworkConnector | main
+2019-05-08 14:00:27,283 | INFO  | Connector vm://localhost started | org.apache.activemq.broker.TransportConnector | main
+2019-05-08 14:00:27,292 | INFO  | Network Connector DiscoveryNetworkConnector:Remote2_To_Geneve:BrokerService[localhost] started | org.apache.activemq.network.NetworkConnector | main
+2019-05-08 14:00:27,293 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:5d3952c834cb-35259-1557324026911-1:1) started | org.apache.activemq.broker.BrokerService | main
+2019-05-08 14:00:27,294 | INFO  | For help or more information please see: http://activemq.apache.org | org.apache.activemq.broker.BrokerService | main
+2019-05-08 14:00:27,295 | WARN  | Store limit is 102400 mb (current store usage is 0 mb). The data directory: /data/activemq/kahadb only has 76003 mb of usable space. - resetting to maximum available disk space: 76003 mb | org.apache.activemq.broker.BrokerService | main
+2019-05-08 14:00:27,318 | INFO  | Successfully connected to tcp://172.28.0.2:61616 | org.apache.activemq.transport.failover.FailoverTransport | ActiveMQ Task-1
+2019-05-08 14:00:27,334 | INFO  | Network connection between vm://localhost#0 and tcp://172.28.0.2:61616 (localhost) has been established. | org.apache.activemq.network.DemandForwardingBridgeSupport | triggerStartAsyncNetworkBridgeCreation: remoteBroker=unconnected, localBroker= vm://localhost#0
+2019-05-08 14:00:27,630 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /admin | main
+2019-05-08 14:00:27,819 | INFO  | ActiveMQ WebConsole available at http://0.0.0.0:8161/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-08 14:00:27,819 | INFO  | ActiveMQ Jolokia REST API available at http://0.0.0.0:8161/api/jolokia/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-08 14:00:27,864 | INFO  | Initializing Spring FrameworkServlet 'dispatcher' | /admin | main
+2019-05-08 14:00:28,162 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /api | main
+2019-05-08 14:00:28,203 | INFO  | jolokia-agent: Using policy access restrictor classpath:/jolokia-access.xml | /api | main
