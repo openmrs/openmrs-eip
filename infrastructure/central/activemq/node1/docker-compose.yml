@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
 
-  activemq:
+  activemq-central-node1:
     image: webcenter/activemq:latest
     ports:
       # mqtt
@@ -17,7 +17,7 @@ services:
       - "63614:61614"
       # jms
       - "63616:61616"
-    networks: 
+    networks:
       activemq-network:
         ipv4_address: 172.28.0.2
     volumes: 

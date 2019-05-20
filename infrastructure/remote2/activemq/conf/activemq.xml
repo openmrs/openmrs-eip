@@ -118,7 +118,7 @@
         </transportConnectors>
 
         <networkConnectors>
-                <networkConnector name="Remote2_To_Geneve" duplex="false" uri="masterslave:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)" staticBridge="true">
+                <networkConnector name="Remote2_To_Central" duplex="false" uri="masterslave:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)" staticBridge="true">
                         <staticallyIncludedDestinations>
                                 <queue physicalName="cicr.fhir.queue" />
                         </staticallyIncludedDestinations>
