@@ -1,4 +1,4 @@
-package org.cicr.sync.remote.config;
+package org.cicr.sync.core.config;
 
 import org.apache.camel.component.jms.JmsComponent;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,7 @@
-package org.cicr.sync.central.service;
+package org.cicr.sync.core.servicedeprecated;
 
-import org.cicr.sync.central.repository.ConceptRepository;
 import org.cicr.sync.core.entity.ConceptEty;
+import org.cicr.sync.core.repository.ConceptRepository;
 import org.springframework.stereotype.Service;
 
 @Service

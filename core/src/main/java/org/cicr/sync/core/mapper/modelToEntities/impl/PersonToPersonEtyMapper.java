@@ -1,15 +1,14 @@
-package org.cicr.sync.central.mapper;
+package org.cicr.sync.core.mapper.modelToEntities.impl;
 
-import org.cicr.sync.central.service.ConceptService;
-import org.cicr.sync.central.service.UserService;
 import org.cicr.sync.core.entity.PersonEty;
-import org.cicr.sync.core.model.Person;
+import org.cicr.sync.core.mapper.modelToEntities.ModelToEntityMapper;
+import org.cicr.sync.core.model.PersonModel;
+import org.cicr.sync.core.servicedeprecated.ConceptService;
+import org.cicr.sync.core.servicedeprecated.UserService;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
-
 @Component
-public class PersonToPersonEtyMapper implements Function<Person, PersonEty> {
+public class PersonToPersonEtyMapper implements ModelToEntityMapper<PersonModel, PersonEty> {
 
     private ConceptService conceptService;
     private UserService userService;
@@ -21,9 +20,9 @@ public class PersonToPersonEtyMapper implements Function<Person, PersonEty> {
     }
 
     @Override
-    public PersonEty apply(Person person) {
+    public PersonEty apply(PersonModel person) {
         PersonEty ety = new PersonEty();
-        ety.setPersonId(person.getPersonId());
+        ety.setId(person.getPersonId());
         ety.setGender(person.getGender());
         ety.setBirthdate(person.getBirthdate());
         ety.setBirthdateEstimated(person.getBirthdateEstimated());

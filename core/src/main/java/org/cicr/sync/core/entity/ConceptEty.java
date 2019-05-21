@@ -1,21 +1,21 @@
 package org.cicr.sync.core.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "concept")
-public class ConceptEty {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer conceptId;
-
-    @NotNull
-    private String uuid;
+@AttributeOverrides(
+        {
+                @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
+        }
+)
+public class ConceptEty extends OpenMrsEty {
 
     @NotNull
     private int datatypeId;

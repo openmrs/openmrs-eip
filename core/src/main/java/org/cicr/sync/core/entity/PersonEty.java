@@ -1,18 +1,20 @@
 package org.cicr.sync.core.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "person")
-public class PersonEty {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer personId;
+@AttributeOverrides(
+        {
+                @AttributeOverride(name = "id", column = @Column(name = "person_id"))
+        }
+)
+public class PersonEty extends OpenMrsEty {
 
     private String gender;
 
@@ -50,13 +52,11 @@ public class PersonEty {
 
     private String voidReason;
 
-    @NotNull
-    private String uuid;
-
     private Boolean deathdateEstimated;
 
     private String birthtime;
 
-    public PersonEty() {}
+    public PersonEty() {
+    }
 
 }

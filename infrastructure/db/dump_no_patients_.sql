@@ -4261,7 +4261,7 @@ LOCK TABLES `patient_state` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `person`
+-- Table structure for table `personModel`
 --
 
 DROP TABLE IF EXISTS `person`;
@@ -4302,13 +4302,13 @@ CREATE TABLE `person` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `person`
+-- Dumping data for table `personModel`
 --
 
 LOCK TABLES `person` WRITE;
-/*!40000 ALTER TABLE `person` DISABLE KEYS */;
+/*!40000 ALTER TABLE `personModel` DISABLE KEYS */;
 INSERT INTO `person` VALUES (1,'','1967-10-24',0,0,NULL,NULL,NULL,'2005-01-01 00:00:00',NULL,NULL,0,NULL,NULL,NULL,'admin_user',0,NULL);
-/*!40000 ALTER TABLE `person` ENABLE KEYS */;
+/*!40000 ALTER TABLE `personModel` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

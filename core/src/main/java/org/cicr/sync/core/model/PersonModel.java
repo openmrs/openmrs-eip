@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Person {
+public class PersonModel implements OpenMrsModel {
 
     private int personId;
 

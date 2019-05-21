@@ -1,18 +1,17 @@
-package org.cicr.sync.remote.mapper;
+package org.cicr.sync.core.mapper.entitiesToModel.impl;
 
 import org.cicr.sync.core.entity.PersonEty;
-import org.cicr.sync.core.model.Person;
+import org.cicr.sync.core.mapper.entitiesToModel.EntityToModelMapper;
+import org.cicr.sync.core.model.PersonModel;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
-
 @Component
-public class PersonEtyToPersonMapper implements Function<PersonEty, Person> {
+public class PersonEtyToPersonMapper implements EntityToModelMapper<PersonEty, PersonModel> {
 
     @Override
-    public Person apply(PersonEty ety) {
-        return new Person(
-                ety.getPersonId(),
+    public PersonModel apply(PersonEty ety) {
+        return new PersonModel(
+                ety.getId(),
                 ety.getGender(),
                 ety.getBirthdate(),
                 ety.getBirthdateEstimated(),

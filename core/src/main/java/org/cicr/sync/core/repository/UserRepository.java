@@ -1,4 +1,4 @@
-package org.cicr.sync.central.repository;
+package org.cicr.sync.core.repository;
 
 import org.cicr.sync.core.entity.UserEty;
 import org.springframework.data.jpa.repository.JpaRepository;
