@@ -1220,3 +1220,37 @@
 2019-05-20 12:45:09,029 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /api | main
 2019-05-20 12:45:09,095 | INFO  | jolokia-agent: Using policy access restrictor classpath:/jolokia-access.xml | /api | main
 2019-05-20 12:51:16,190 | WARN  | Transport Connection to: tcp://172.28.0.3:53316 failed: java.io.EOFException | org.apache.activemq.broker.TransportConnection.Transport | ActiveMQ Transport: tcp:///172.28.0.3:53316@61616
+2019-05-22 07:46:32,846 | INFO  | Refreshing org.apache.activemq.xbean.XBeanBrokerFactory$1@7823a2f9: startup date [Wed May 22 07:46:32 UTC 2019]; root of context hierarchy | org.apache.activemq.xbean.XBeanBrokerFactory$1 | main
+2019-05-22 07:46:33,955 | INFO  | Using Persistence Adapter: KahaDBPersistenceAdapter[/data/activemq/kahadb] | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:34,071 | INFO  | KahaDB is version 6 | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-22 07:46:34,159 | INFO  | Recovering from the journal @1:878189 | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-22 07:46:34,161 | INFO  | Recovery replayed 30 operations from the journal in 0.08 seconds. | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-05-22 07:46:34,173 | INFO  | PListStore:[/data/activemq/localhost/tmp_storage] started | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
+2019-05-22 07:46:34,210 | INFO  | Scheduler Store version 1 loaded | org.apache.activemq.store.kahadb.scheduler.JobSchedulerKahaDBMetaData | main
+2019-05-22 07:46:34,328 | INFO  | Recovering from the scheduled job journal @1:1972 | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-22 07:46:34,332 | INFO  | Recovery replayed 1 operations from the journal in 0.004 seconds. | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-22 07:46:34,334 | INFO  | JobSchedulerStore: /data/activemq/localhost/scheduler started. | org.apache.activemq.store.kahadb.scheduler.JobSchedulerStoreImpl | main
+2019-05-22 07:46:34,459 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:8ba03c879ab3-33965-1558511194222-1:1) is starting | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:34,483 | INFO  | Listening for connections at: tcp://8ba03c879ab3:61616?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-22 07:46:34,484 | INFO  | Connector openwire started | org.apache.activemq.broker.TransportConnector | main
+2019-05-22 07:46:34,494 | INFO  | Listening for connections at: amqp://8ba03c879ab3:5672?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-22 07:46:34,495 | INFO  | Connector amqp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-22 07:46:34,502 | INFO  | Listening for connections at: stomp://8ba03c879ab3:61613?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-22 07:46:34,505 | INFO  | Connector stomp started | org.apache.activemq.broker.TransportConnector | main
+2019-05-22 07:46:34,510 | INFO  | Listening for connections at: mqtt://8ba03c879ab3:1883?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.TransportServerThreadSupport | main
+2019-05-22 07:46:34,511 | INFO  | Connector mqtt started | org.apache.activemq.broker.TransportConnector | main
+2019-05-22 07:46:34,708 | WARN  | ServletContext@o.e.j.s.ServletContextHandler@4b40f651{/,null,STARTING} has uncovered http methods for path: / | org.eclipse.jetty.security.SecurityHandler | main
+2019-05-22 07:46:34,762 | INFO  | Listening for connections at ws://8ba03c879ab3:61614?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.ws.WSTransportServer | main
+2019-05-22 07:46:34,763 | INFO  | Connector ws started | org.apache.activemq.broker.TransportConnector | main
+2019-05-22 07:46:34,764 | INFO  | Apache ActiveMQ 5.14.3 (localhost, ID:8ba03c879ab3-33965-1558511194222-1:1) started | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:34,765 | INFO  | For help or more information please see: http://activemq.apache.org | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:34,766 | WARN  | Store limit is 102400 mb (current store usage is 0 mb). The data directory: /data/activemq/kahadb only has 23209 mb of usable space. - resetting to maximum available disk space: 23209 mb | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:34,766 | WARN  | Temporary Store limit is 51200 mb (current store usage is 0 mb). The data directory: /data/activemq/localhost only has 23208 mb of usable space. - resetting to maximum available disk space: 23208 mb | org.apache.activemq.broker.BrokerService | main
+2019-05-22 07:46:35,322 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /admin | main
+2019-05-22 07:46:35,796 | INFO  | ActiveMQ WebConsole available at http://0.0.0.0:8161/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-22 07:46:35,797 | INFO  | ActiveMQ Jolokia REST API available at http://0.0.0.0:8161/api/jolokia/ | org.apache.activemq.web.WebConsoleStarter | main
+2019-05-22 07:46:36,013 | INFO  | Initializing Spring FrameworkServlet 'dispatcher' | /admin | main
+2019-05-22 07:46:36,704 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /api | main
+2019-05-22 07:46:36,898 | INFO  | jolokia-agent: Using policy access restrictor classpath:/jolokia-access.xml | /api | main
+2019-05-22 08:56:29,230 | WARN  | Transport Connection to: tcp://172.28.0.1:42332 failed: org.apache.activemq.transport.InactivityIOException: Channel was inactive for too (>30000) long: tcp://172.28.0.1:42332 | org.apache.activemq.broker.TransportConnection.Transport | ActiveMQ InactivityMonitor Worker
+2019-05-22 08:59:43,468 | WARN  | Transport Connection to: tcp://172.28.0.1:42364 failed: org.apache.activemq.transport.InactivityIOException: Channel was inactive for too (>30000) long: tcp://172.28.0.1:42364 | org.apache.activemq.broker.TransportConnection.Transport | ActiveMQ InactivityMonitor Worker

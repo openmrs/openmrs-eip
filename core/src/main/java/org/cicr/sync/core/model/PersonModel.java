@@ -2,14 +2,9 @@ package org.cicr.sync.core.model;
 
 import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class PersonModel implements OpenMrsModel {
-
-    private int personId;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class PersonModel extends OpenMrsModel {
 
     private String gender;
 
@@ -38,8 +33,6 @@ public class PersonModel implements OpenMrsModel {
     private String dateVoided;
 
     private String voidReason;
-
-    private String uuid;
 
     private Boolean deathdateEstimated;
 

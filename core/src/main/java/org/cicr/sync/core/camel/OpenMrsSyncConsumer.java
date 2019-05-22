@@ -5,7 +5,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.support.ScheduledPollConsumer;
 import org.cicr.sync.core.model.OpenMrsModel;
-import org.cicr.sync.core.service.facade.LoadEntityServiceFacade;
+import org.cicr.sync.core.service.facade.EntityServiceFacade;
 
 import java.util.List;
 
@@ -13,21 +13,21 @@ public class OpenMrsSyncConsumer extends ScheduledPollConsumer {
 
     private EntityNameEnum entityName;
 
-    private LoadEntityServiceFacade loadEntityServiceFacade;
+    private EntityServiceFacade entityServiceFacade;
 
     public OpenMrsSyncConsumer(final Endpoint endpoint,
                                final Processor processor,
                                final EntityNameEnum entityName,
-                               final LoadEntityServiceFacade loadEntityServiceFacade) {
+                               final EntityServiceFacade entityServiceFacade) {
         super(endpoint, processor);
         this.entityName = entityName;
-        this.loadEntityServiceFacade = loadEntityServiceFacade;
+        this.entityServiceFacade = entityServiceFacade;
     }
 
     @Override
     protected int poll() throws Exception {
 
-        List<? extends OpenMrsModel> models = loadEntityServiceFacade.getModels(entityName);
+        List<? extends OpenMrsModel> models = entityServiceFacade.getModels(entityName);
 
         for (OpenMrsModel model : models) {
             Exchange exchange = getEndpoint().createExchange();

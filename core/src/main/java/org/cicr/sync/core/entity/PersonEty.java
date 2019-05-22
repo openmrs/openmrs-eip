@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "person")
 @AttributeOverrides(
@@ -27,17 +27,17 @@ public class PersonEty extends OpenMrsEty {
     private String deathDate;
 
     @JoinColumn(name = "cause_of_death")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne
     private ConceptEty causeOfDeath;
 
     @JoinColumn(name = "creator")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne
     private UserEty creator;
 
     private String dateCreated;
 
     @JoinColumn(name = "changed_by")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne
     private UserEty changedBy;
 
     private String dateChanged;
@@ -45,7 +45,7 @@ public class PersonEty extends OpenMrsEty {
     private Boolean voided;
 
     @JoinColumn(name = "voided_by")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne
     private UserEty voidedBy;
 
     private String dateVoided;

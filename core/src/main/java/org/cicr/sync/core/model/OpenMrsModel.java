@@ -1,4 +1,9 @@
 package org.cicr.sync.core.model;
 
-public interface OpenMrsModel {
+import lombok.Data;
+
+@Data
+public abstract class OpenMrsModel {
+
+    private String uuid;
 }

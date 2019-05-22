@@ -8,7 +8,7 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.ScheduledPollConsumer;
 import org.apache.camel.support.ScheduledPollEndpoint;
-import org.cicr.sync.core.service.facade.LoadEntityServiceFacade;
+import org.cicr.sync.core.service.facade.EntityServiceFacade;
 
 @UriEndpoint(
         firstVersion = "1.0.0",
@@ -23,24 +23,24 @@ public class OpenMrsSyncEndpoint extends ScheduledPollEndpoint {
     @Metadata(required = true)
     private EntityNameEnum entityName = null;
 
-    private LoadEntityServiceFacade loadEntityServiceFacade;
+    private EntityServiceFacade entityServiceFacade;
 
     protected OpenMrsSyncEndpoint(final String endpointUri,
                                   final OpenMrsSyncComponent component,
-                                  final LoadEntityServiceFacade loadEntityServiceFacade) {
+                                  final EntityServiceFacade entityServiceFacade) {
         super(endpointUri, component);
         this.entityName = component.getEntityName();
-        this.loadEntityServiceFacade = loadEntityServiceFacade;
+        this.entityServiceFacade = entityServiceFacade;
     }
 
     @Override
     public Producer createProducer() throws Exception {
-        return new OpenMrsSyncProducer(this, entityName);
+        return new OpenMrsSyncProducer(this, entityName, entityServiceFacade);
     }
 
     @Override
     public Consumer createConsumer(final Processor processor) throws Exception {
-        ScheduledPollConsumer consumer = new OpenMrsSyncConsumer(this, processor, entityName, loadEntityServiceFacade);
+        ScheduledPollConsumer consumer = new OpenMrsSyncConsumer(this, processor, entityName, entityServiceFacade);
         consumer.setScheduler(getScheduler());
         consumer.setDelay(getDelay());
         return consumer;

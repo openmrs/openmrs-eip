@@ -2,7 +2,7 @@ package org.cicr.sync.core.camel;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
-import org.cicr.sync.core.service.facade.LoadEntityServiceFacade;
+import org.cicr.sync.core.service.facade.EntityServiceFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -10,12 +10,12 @@ import java.util.Map;
 @Component
 public class OpenMrsSyncComponent extends DefaultComponent {
 
-    private LoadEntityServiceFacade loadEntityServiceFacade;
+    private EntityServiceFacade entityServiceFacade;
 
     private EntityNameEnum entityName;
 
-    public OpenMrsSyncComponent(final LoadEntityServiceFacade loadEntityServiceFacade) {
-        this.loadEntityServiceFacade = loadEntityServiceFacade;
+    public OpenMrsSyncComponent(final EntityServiceFacade entityServiceFacade) {
+        this.entityServiceFacade = entityServiceFacade;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class OpenMrsSyncComponent extends DefaultComponent {
                                       final Map<String, Object> parameters) throws Exception {
         this.entityName = EntityNameEnum.getEntityNameEnum(remaining.toUpperCase());
 
-        OpenMrsSyncEndpoint endpoint = new OpenMrsSyncEndpoint(uri, this, loadEntityServiceFacade);
+        OpenMrsSyncEndpoint endpoint = new OpenMrsSyncEndpoint(uri, this, entityServiceFacade);
 
         endpoint.setConsumerProperties(parameters);
         setProperties(endpoint, parameters);

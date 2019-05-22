@@ -21,7 +21,7 @@ public enum EntityNameEnum {
         return entityType;
     }
 
-    public Class getModelType() {
+    public Class<? extends OpenMrsModel> getModelType() {
         return modelType;
     }
 
