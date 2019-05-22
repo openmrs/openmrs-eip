@@ -34,7 +34,7 @@ services:
       ACTIVEMQ_READ_PASSWORD: password
       ACTIVEMQ_JMX_LOGIN: jmx
       ACTIVEMQ_JMX_PASSWORD: password
-      ACTIVEMQ_STATIC_QUEUES: cicr.fhir.queue
+      ACTIVEMQ_STATIC_QUEUES: openmrs.sync.queue
       ACTIVEMQ_ENABLED_SCHEDULER: "true"
       ACTIVEMQ_MIN_MEMORY: 512
       ACTIVEMQ_MAX_MEMORY: 2048
