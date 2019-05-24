@@ -11,15 +11,8 @@ import java.time.Month;
 @Service
 public class UserService extends AbstractSimpleService<UserEty> {
 
-    private OpenMrsRepository<UserEty> userRepository;
-
     public UserService(final OpenMrsRepository<UserEty> userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    protected OpenMrsRepository<UserEty> getRepository() {
-        return userRepository;
+        super(userRepository);
     }
 
     @Override

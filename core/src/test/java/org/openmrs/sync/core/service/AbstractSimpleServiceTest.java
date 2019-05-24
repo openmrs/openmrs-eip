@@ -32,7 +32,7 @@ public class AbstractSimpleServiceTest {
     @Test
     public void getOrInit_exists() {
         // Given
-        MockedEntity userEty = new MockedEntity(1, UUID);
+        MockedEntity userEty = new MockedEntity(1L, UUID);
         when(repository.findByUuid(UUID)).thenReturn(userEty);
         when(repository.save(userEty)).thenReturn(userEty);
 
@@ -57,6 +57,6 @@ public class AbstractSimpleServiceTest {
     }
 
     private MockedEntity getExpectedEntity() {
-        return new MockedEntity(1, UUID);
+        return new MockedEntity(1L, UUID);
     }
 }

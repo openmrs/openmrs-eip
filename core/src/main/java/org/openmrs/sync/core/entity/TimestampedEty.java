@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class TimestampedEty extends OpenMrsEty {
+public abstract class TimestampedEty extends OpenMrsEty {
 
     @JoinColumn(name = "creator")
     @ManyToOne

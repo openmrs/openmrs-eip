@@ -16,6 +16,7 @@ public class SelectPersonRoute extends RouteBuilder {
     public void configure() throws Exception {
         from("openmrsSync:person?delay=60000")
                 .marshal().json(JsonLibrary.Jackson)
-                .to("{{output.queue}}");
+                .to("log:row");
+                //.to("{{output.queue}}");
     }
 }

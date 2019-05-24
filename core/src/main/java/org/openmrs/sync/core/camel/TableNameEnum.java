@@ -1,10 +1,10 @@
 package org.openmrs.sync.core.camel;
 
-public enum EntityNameEnum {
+public enum TableNameEnum {
     PERSON,
     PATIENT;
 
-    public static EntityNameEnum getEntityNameEnum(String entityName) {
+    public static TableNameEnum getEntityNameEnum(String entityName) {
         return valueOf(entityName.toUpperCase());
     }
 }

@@ -39,8 +39,8 @@ public class AbstractEntityServiceTest {
     @Test
     public void getModels() {
         // Given
-        MockedEntity mockedEntity1 = new MockedEntity(1, "uuid1");
-        MockedEntity mockedEntity2 = new MockedEntity(2, "uuid2");
+        MockedEntity mockedEntity1 = new MockedEntity(1L, "uuid1");
+        MockedEntity mockedEntity2 = new MockedEntity(2L, "uuid2");
         MockedModel mockedModel1 = new MockedModel("uuid1");
         MockedModel mockedModel2 = new MockedModel("uuid2");
         when(repository.findAll()).thenReturn(Arrays.asList(mockedEntity1, mockedEntity2));
@@ -61,7 +61,7 @@ public class AbstractEntityServiceTest {
         // Given
         MockedModel mockedModel = new MockedModel("uuid");
         MockedEntity mockedEntity= new MockedEntity(null, "uuid");
-        MockedEntity mockedEntityInDb = new MockedEntity(1, "uuid");
+        MockedEntity mockedEntityInDb = new MockedEntity(1L, "uuid");
         when(repository.findByUuid("uuid")).thenReturn(mockedEntityInDb);
         when(repository.save(mockedEntityInDb)).thenReturn(mockedEntity);
         when(modelToEtyMapper.apply(mockedModel)).thenReturn(mockedEntity);

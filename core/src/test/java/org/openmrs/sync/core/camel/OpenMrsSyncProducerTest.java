@@ -26,7 +26,7 @@ public class OpenMrsSyncProducerTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        producer = new OpenMrsSyncProducer(endpoint, EntityNameEnum.PERSON, facade);
+        producer = new OpenMrsSyncProducer(endpoint, TableNameEnum.PERSON, facade);
     }
 
     @Test
@@ -40,6 +40,6 @@ public class OpenMrsSyncProducerTest {
         producer.process(exchange);
 
         // Then
-        verify(facade).saveModel(EntityNameEnum.PERSON, mockedModel);
+        verify(facade).saveModel(TableNameEnum.PERSON, mockedModel);
     }
 }

@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class MockedEntity extends OpenMrsEty {
 
-    public MockedEntity(final Integer id,
+    public MockedEntity(final Long id,
                         final String uuid) {
         this.setId(id);
         this.setUuid(uuid);

@@ -27,11 +27,6 @@ public class ConceptServiceTest {
     }
 
     @Test
-    public void getRepository() {
-        assertEquals(repository, service.getRepository());
-    }
-
-    @Test
     public void getFakeEntity() {
         assertEquals(getExpectedConcept(), service.getFakeEntity("UUID"));
     }

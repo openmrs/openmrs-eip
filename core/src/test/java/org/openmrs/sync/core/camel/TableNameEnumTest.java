@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class EntityNameEnumTest {
+public class TableNameEnumTest {
 
     @Test
     public void getEntityNameEnum() {
@@ -12,9 +12,9 @@ public class EntityNameEnumTest {
         String nameString = "person";
 
         // When
-        EntityNameEnum result = EntityNameEnum.getEntityNameEnum(nameString);
+        TableNameEnum result = TableNameEnum.getEntityNameEnum(nameString);
 
         // Then
-        assertEquals(EntityNameEnum.PERSON, result);
+        assertEquals(TableNameEnum.PERSON, result);
     }
 }

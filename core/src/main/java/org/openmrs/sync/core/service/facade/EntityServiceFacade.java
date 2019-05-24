@@ -1,6 +1,6 @@
 package org.openmrs.sync.core.service.facade;
 
-import org.openmrs.sync.core.camel.EntityNameEnum;
+import org.openmrs.sync.core.camel.TableNameEnum;
 import org.openmrs.sync.core.entity.OpenMrsEty;
 import org.openmrs.sync.core.model.OpenMrsModel;
 import org.openmrs.sync.core.service.AbstractEntityService;
@@ -17,16 +17,16 @@ public class EntityServiceFacade {
         this.services = services;
     }
 
-    public <M extends OpenMrsModel> List<M> getModels(final EntityNameEnum entityNameEnum) {
-        return (List<M>) getService(entityNameEnum).getModels();
+    public <M extends OpenMrsModel> List<M> getModels(final TableNameEnum tableNameEnum) {
+        return (List<M>) getService(tableNameEnum).getModels();
     }
 
-    public <M extends OpenMrsModel> void saveModel(final EntityNameEnum entityNameEnum,
+    public <M extends OpenMrsModel> void saveModel(final TableNameEnum tableNameEnum,
                                                    final M model) {
-        getService(entityNameEnum).save(model);
+        getService(tableNameEnum).save(model);
     }
 
-    private <E extends OpenMrsEty, M extends OpenMrsModel> AbstractEntityService<E, M> getService(final EntityNameEnum entityName) {
+    private <E extends OpenMrsEty, M extends OpenMrsModel> AbstractEntityService<E, M> getService(final TableNameEnum entityName) {
         return services.stream()
                 .filter(service -> service.getEntityName() == entityName)
                 .map(service -> (AbstractEntityService<E, M>) service)

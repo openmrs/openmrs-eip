@@ -11,7 +11,7 @@ public class OpenMrsSyncComponent extends DefaultComponent {
 
     private EntityServiceFacade entityServiceFacade;
 
-    private EntityNameEnum entityName;
+    private TableNameEnum entityName;
 
     public OpenMrsSyncComponent(final EntityServiceFacade entityServiceFacade) {
         this.entityServiceFacade = entityServiceFacade;
@@ -21,7 +21,7 @@ public class OpenMrsSyncComponent extends DefaultComponent {
     protected OpenMrsSyncEndpoint createEndpoint(final String uri,
                                       final String remaining,
                                       final Map<String, Object> parameters) throws Exception {
-        this.entityName = EntityNameEnum.getEntityNameEnum(remaining.toUpperCase());
+        this.entityName = TableNameEnum.getEntityNameEnum(remaining.toUpperCase());
 
         OpenMrsSyncEndpoint endpoint = new OpenMrsSyncEndpoint(uri, this, entityServiceFacade);
 
@@ -31,7 +31,7 @@ public class OpenMrsSyncComponent extends DefaultComponent {
         return endpoint;
     }
 
-    public EntityNameEnum getEntityName() {
+    public TableNameEnum getEntityName() {
         return entityName;
     }
 }

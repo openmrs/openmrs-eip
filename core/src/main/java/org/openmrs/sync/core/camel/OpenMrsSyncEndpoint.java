@@ -1,12 +1,9 @@
 package org.openmrs.sync.core.camel;
 
-import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
-import org.apache.camel.Producer;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriPath;
-import org.apache.camel.support.ScheduledPollConsumer;
 import org.apache.camel.support.ScheduledPollEndpoint;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
@@ -21,7 +18,7 @@ public class OpenMrsSyncEndpoint extends ScheduledPollEndpoint {
 
     @UriPath(name = "entityName")
     @Metadata(required = true)
-    private EntityNameEnum entityName;
+    private TableNameEnum entityName;
 
     private EntityServiceFacade entityServiceFacade;
 

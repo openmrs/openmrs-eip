@@ -36,6 +36,6 @@ public class OpenMrsSyncComponentTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(EntityNameEnum.PERSON, component.getEntityName());
+        assertEquals(TableNameEnum.PERSON, component.getEntityName());
     }
 }

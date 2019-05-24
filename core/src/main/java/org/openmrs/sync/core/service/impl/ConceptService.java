@@ -11,15 +11,8 @@ import java.time.Month;
 @Service
 public class ConceptService extends AbstractSimpleService<ConceptEty> {
 
-    private OpenMrsRepository<ConceptEty> conceptRepository;
-
     public ConceptService(final OpenMrsRepository<ConceptEty> conceptRepository) {
-        this.conceptRepository = conceptRepository;
-    }
-
-    @Override
-    protected OpenMrsRepository<ConceptEty> getRepository() {
-        return conceptRepository;
+        super(conceptRepository);
     }
 
     @Override

@@ -27,11 +27,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getRepository() {
-        assertEquals(repository, service.getRepository());
-    }
-
-    @Test
     public void getFakeEntity() {
         assertEquals(getExpectedUser(), service.getFakeEntity("uuid"));
     }

@@ -11,13 +11,13 @@ import java.util.List;
 
 public class OpenMrsSyncConsumer extends ScheduledPollConsumer {
 
-    private EntityNameEnum entityName;
+    private TableNameEnum entityName;
 
     private EntityServiceFacade entityServiceFacade;
 
     public OpenMrsSyncConsumer(final Endpoint endpoint,
                                final Processor processor,
-                               final EntityNameEnum entityName,
+                               final TableNameEnum entityName,
                                final EntityServiceFacade entityServiceFacade) {
         super(endpoint, processor);
         this.entityName = entityName;

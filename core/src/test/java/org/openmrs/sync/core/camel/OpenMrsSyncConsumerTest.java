@@ -35,7 +35,7 @@ public class OpenMrsSyncConsumerTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        consumer = new OpenMrsSyncConsumer(endpoint, processor, EntityNameEnum.PERSON, facade);
+        consumer = new OpenMrsSyncConsumer(endpoint, processor, TableNameEnum.PERSON, facade);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class OpenMrsSyncConsumerTest {
         OpenMrsModel model1 = new MockedModel("uuid1");
         OpenMrsModel model2 = new MockedModel("uuid2");
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        when(facade.getModels(EntityNameEnum.PERSON)).thenReturn(Arrays.asList(model1, model2));
+        when(facade.getModels(TableNameEnum.PERSON)).thenReturn(Arrays.asList(model1, model2));
         when(endpoint.createExchange()).thenReturn(exchange);
 
         // When

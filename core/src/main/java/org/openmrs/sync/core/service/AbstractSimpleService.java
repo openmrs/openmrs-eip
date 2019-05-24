@@ -5,18 +5,27 @@ import org.openmrs.sync.core.repository.OpenMrsRepository;
 
 public abstract class AbstractSimpleService<E extends OpenMrsEty> implements SimpleService<E> {
 
-    protected abstract E getFakeEntity(String uuid);
+    private OpenMrsRepository<E> repository;
 
-    protected abstract OpenMrsRepository<E> getRepository();
+    public AbstractSimpleService(final OpenMrsRepository<E> repository) {
+        this.repository = repository;
+    }
+
+    /**
+     * Creates an entity with default data
+     * @param uuid the uuid
+     * @return the entity
+     */
+    protected abstract E getFakeEntity(String uuid);
 
     @Override
     public E getOrInit(String uuid) {
-        E user = getRepository().findByUuid(uuid);
+        E user = repository.findByUuid(uuid);
 
         if (user == null) {
             user = getFakeEntity(uuid);
         }
 
-        return getRepository().save(user);
+        return repository.save(user);
     }
 }

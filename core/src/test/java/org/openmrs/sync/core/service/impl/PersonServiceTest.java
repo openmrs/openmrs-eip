@@ -1,6 +1,6 @@
 package org.openmrs.sync.core.service.impl;
 
-import org.openmrs.sync.core.camel.EntityNameEnum;
+import org.openmrs.sync.core.camel.TableNameEnum;
 import org.openmrs.sync.core.entity.PersonEty;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
@@ -35,21 +35,6 @@ public class PersonServiceTest {
 
     @Test
     public void getEntityName() {
-        assertEquals(EntityNameEnum.PERSON, personService.getEntityName());
-    }
-
-    @Test
-    public void getRepository() {
-        assertEquals(personRepository, personService.getRepository());
-    }
-
-    @Test
-    public void getEntityToModelMapper() {
-        assertEquals(etyToModelMapper, personService.getEntityToModelMapper());
-    }
-
-    @Test
-    public void getModelToEntityMapper() {
-        assertEquals(etyToModelMapper, personService.getEntityToModelMapper());
+        assertEquals(TableNameEnum.PERSON, personService.getEntityName());
     }
 }

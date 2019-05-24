@@ -8,11 +8,11 @@ import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
 public class OpenMrsSyncProducer extends DefaultProducer {
 
-    private EntityNameEnum entityName;
+    private TableNameEnum entityName;
     private EntityServiceFacade entityServiceFacade;
 
     public OpenMrsSyncProducer(final Endpoint endpoint,
-                               final EntityNameEnum entityName,
+                               final TableNameEnum entityName,
                                final EntityServiceFacade entityServiceFacade) {
         super(endpoint);
         this.entityName = entityName;
