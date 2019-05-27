@@ -14,5 +14,5 @@ import javax.persistence.*;
                 @AttributeOverride(name = "id", column = @Column(name = "patient_id"))
         }
 )
-public class PatientEty extends TimestampedEty {
+public class Patient extends AuditableEntity {
 }

@@ -1,7 +1,7 @@
 package org.openmrs.sync.remote.management.entity;
 
 import lombok.Data;
-import org.openmrs.sync.core.camel.TableNameEnum;
+import org.openmrs.sync.core.service.TableNameEnum;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

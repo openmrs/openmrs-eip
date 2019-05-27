@@ -1,9 +1,9 @@
 package org.openmrs.sync.core.service;
 
-import org.openmrs.sync.core.entity.OpenMrsEty;
+import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 
-public abstract class AbstractSimpleService<E extends OpenMrsEty> implements SimpleService<E> {
+public abstract class AbstractSimpleService<E extends BaseEntity> implements SimpleService<E> {
 
     private OpenMrsRepository<E> repository;
 

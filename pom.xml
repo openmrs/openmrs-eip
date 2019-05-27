@@ -22,7 +22,7 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- Camel BOM -->
+      <!-- camel BOM -->
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>

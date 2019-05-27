@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class OpenMrsEty {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

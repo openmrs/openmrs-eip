@@ -17,7 +17,7 @@ import java.time.LocalTime;
                 @AttributeOverride(name = "id", column = @Column(name = "person_id"))
         }
 )
-public class PersonEty extends TimestampedEty {
+public class Person extends AuditableEntity {
 
     private String gender;
 
@@ -33,14 +33,14 @@ public class PersonEty extends TimestampedEty {
 
     @JoinColumn(name = "cause_of_death")
     @ManyToOne
-    private ConceptEty causeOfDeath;
+    private Concept causeOfDeath;
 
     @NotNull
     private boolean deathdateEstimated;
 
     private LocalTime birthtime;
 
-    public PersonEty() {
+    public Person() {
     }
 
 }

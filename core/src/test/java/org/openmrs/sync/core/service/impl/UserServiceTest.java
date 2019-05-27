@@ -1,6 +1,6 @@
 package org.openmrs.sync.core.service.impl;
 
-import org.openmrs.sync.core.entity.UserEty;
+import org.openmrs.sync.core.entity.User;
 import org.openmrs.sync.core.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +31,8 @@ public class UserServiceTest {
         assertEquals(getExpectedUser(), service.getFakeEntity("uuid"));
     }
 
-    private UserEty getExpectedUser() {
-        UserEty user = new UserEty();
+    private User getExpectedUser() {
+        User user = new User();
         user.setUuid("uuid");
         user.setCreator(1);
         user.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));

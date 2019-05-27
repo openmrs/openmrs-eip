@@ -1,9 +1,9 @@
 package org.openmrs.sync.core.service.impl;
 
-import org.openmrs.sync.core.camel.TableNameEnum;
-import org.openmrs.sync.core.entity.PersonEty;
+import org.openmrs.sync.core.repository.AuditableRepository;
+import org.openmrs.sync.core.service.TableNameEnum;
+import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.PersonModel;
-import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,13 +16,13 @@ import static org.junit.Assert.assertEquals;
 public class PersonServiceTest {
 
     @Mock
-    private OpenMrsRepository<PersonEty> personRepository;
+    private AuditableRepository<Person> personRepository;
 
     @Mock
-    private Function<PersonEty, PersonModel> etyToModelMapper;
+    private Function<Person, PersonModel> etyToModelMapper;
 
     @Mock
-    private Function<PersonModel, PersonEty> modelToEtyMapper;
+    private Function<PersonModel, Person> modelToEtyMapper;
 
     private PersonService personService;
 
@@ -34,7 +34,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void getEntityName() {
-        assertEquals(TableNameEnum.PERSON, personService.getEntityName());
+    public void getTableName() {
+        assertEquals(TableNameEnum.PERSON, personService.getTableName());
     }
 }

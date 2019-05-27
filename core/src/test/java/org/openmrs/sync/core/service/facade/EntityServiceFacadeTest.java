@@ -1,8 +1,8 @@
 package org.openmrs.sync.core.service.facade;
 
-import org.openmrs.sync.core.camel.TableNameEnum;
-import org.openmrs.sync.core.entity.PatientEty;
-import org.openmrs.sync.core.entity.PersonEty;
+import org.openmrs.sync.core.service.TableNameEnum;
+import org.openmrs.sync.core.entity.Patient;
+import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.OpenMrsModel;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.model.PersonModel;
@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +24,10 @@ import static org.mockito.Mockito.when;
 public class EntityServiceFacadeTest {
 
     @Mock
-    private AbstractEntityService<PersonEty, PersonModel> personService;
+    private AbstractEntityService<Person, PersonModel> personService;
 
     @Mock
-    private AbstractEntityService<PatientEty, PatientModel> patientService;
+    private AbstractEntityService<Patient, PatientModel> patientService;
 
     private EntityServiceFacade facade;
 
@@ -42,12 +43,13 @@ public class EntityServiceFacadeTest {
         // Given
         PersonModel personModel1 = new PersonModel();
         PersonModel personModel2 = new PersonModel();
-        when(personService.getEntityName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getEntityName()).thenReturn(TableNameEnum.PATIENT);
-        when(personService.getModels()).thenReturn(Arrays.asList(personModel1, personModel2));
+        LocalDateTime lastSyncDate = LocalDateTime.now();
+        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
+        when(patientService.getTableName()).thenReturn(TableNameEnum.PATIENT);
+        when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
 
         // When
-        List<? extends OpenMrsModel> result = facade.getModels(TableNameEnum.PERSON);
+        List<? extends OpenMrsModel> result = facade.getModels(TableNameEnum.PERSON, lastSyncDate);
 
         // Then
         assertEquals(2, result.size());
@@ -56,12 +58,13 @@ public class EntityServiceFacadeTest {
     @Test(expected = IllegalArgumentException.class)
     public void getModels_unknown_service() {
         // Given
+        LocalDateTime lastSyncDate = LocalDateTime.now();
         facade = new EntityServiceFacade(Collections.singletonList(personService));
-        when(personService.getEntityName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getEntityName()).thenReturn(TableNameEnum.PATIENT);
+        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
+        when(patientService.getTableName()).thenReturn(TableNameEnum.PATIENT);
 
         // When
-        facade.getModels(TableNameEnum.PATIENT);
+        facade.getModels(TableNameEnum.PATIENT, lastSyncDate);
 
         // Then
         // BOOM
@@ -71,7 +74,7 @@ public class EntityServiceFacadeTest {
     public void saveModel() {
         // Given
         PersonModel personModel = new PersonModel();
-        when(personService.getEntityName()).thenReturn(TableNameEnum.PERSON);
+        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
 
         // When
         facade.saveModel(TableNameEnum.PERSON, personModel);

@@ -1,8 +1,8 @@
 package org.openmrs.sync.core.mapper.modelToEntity;
 
-import org.openmrs.sync.core.entity.ConceptEty;
-import org.openmrs.sync.core.entity.PersonEty;
-import org.openmrs.sync.core.entity.UserEty;
+import org.openmrs.sync.core.entity.Concept;
+import org.openmrs.sync.core.entity.Person;
+import org.openmrs.sync.core.entity.User;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.SimpleService;
 import org.junit.Before;
@@ -22,10 +22,10 @@ import static org.mockito.Mockito.when;
 public class PersonModelToEtyMapperTest {
 
     @Mock
-    private SimpleService<UserEty> userService;
+    private SimpleService<User> userService;
 
     @Mock
-    private SimpleService<ConceptEty> conceptService;
+    private SimpleService<Concept> conceptService;
 
     private PersonModelToEtyMapper mapper;
 
@@ -44,7 +44,7 @@ public class PersonModelToEtyMapperTest {
         when(userService.getOrInit("user")).thenReturn(getUserEty());
 
         // When
-        PersonEty result = mapper.apply(model);
+        Person result = mapper.apply(model);
 
         // Then
         assertResult(model, result);
@@ -58,13 +58,13 @@ public class PersonModelToEtyMapperTest {
         when(userService.getOrInit("user")).thenReturn(getUserEty());
 
         // When
-        PersonEty result = mapper.apply(model);
+        Person result = mapper.apply(model);
 
         // Then
         assertResult(model, result);
     }
 
-    private void assertResult(PersonModel model, PersonEty result) {
+    private void assertResult(PersonModel model, Person result) {
         assertEquals(model.getGender(), result.getGender());
         assertEquals(model.getBirthdate(), result.getBirthdate());
         assertEquals(model.getBirthdateEstimated(), result.isBirthdateEstimated());
@@ -122,15 +122,15 @@ public class PersonModelToEtyMapperTest {
         return model;
     }
 
-    private UserEty getUserEty() {
-        UserEty userEty = new UserEty();
-        userEty.setUuid("user");
-        return userEty;
+    private User getUserEty() {
+        User user = new User();
+        user.setUuid("user");
+        return user;
     }
 
-    private ConceptEty getConceptEty() {
-        ConceptEty conceptEty = new ConceptEty();
-        conceptEty.setUuid("concept");
-        return conceptEty;
+    private Concept getConceptEty() {
+        Concept concept = new Concept();
+        concept.setUuid("concept");
+        return concept;
     }
 }

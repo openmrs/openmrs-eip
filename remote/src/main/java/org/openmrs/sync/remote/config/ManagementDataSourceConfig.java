@@ -1,5 +1,6 @@
 package org.openmrs.sync.remote.config;
 
+import org.apache.camel.component.jpa.JpaComponent;
 import org.openmrs.sync.core.config.DataSourceConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,14 +1,9 @@
 package org.openmrs.sync.core.repository;
 
-import org.openmrs.sync.core.entity.UserEty;
+import org.openmrs.sync.core.entity.User;
 
-public interface UserRepository extends OpenMrsRepository<UserEty> {
+public interface UserRepository extends OpenMrsRepository<User> {
 
-    /**
-     * find user by uuid
-     * @param uuid the uuid
-     * @return UserEty
-     */
     @Override
-    UserEty findByUuid(final String uuid);
+    User findByUuid(final String uuid);
 }

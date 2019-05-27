@@ -1,13 +1,13 @@
 package org.openmrs.sync.core.repository;
 
-import org.openmrs.sync.core.entity.ConceptEty;
+import org.openmrs.sync.core.entity.Concept;
 
-public interface ConceptRepository extends OpenMrsRepository<ConceptEty> {
+public interface ConceptRepository extends OpenMrsRepository<Concept> {
 
     /**
      * find concept by uuid
      * @param uuid the uuid
-     * @return ConceptEty
+     * @return Concept
      */
-    ConceptEty findByUuid(final String uuid);
+    Concept findByUuid(final String uuid);
 }

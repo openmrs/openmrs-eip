@@ -1,6 +1,6 @@
 package org.openmrs.sync.remote.management.init;
 
-import org.openmrs.sync.core.camel.TableNameEnum;
+import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
 
 import java.util.Arrays;

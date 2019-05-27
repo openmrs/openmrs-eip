@@ -7,8 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(
         basePackages = {
-                "org.openmrs.sync.central.routes",
-                "org.openmrs.sync.central.config",
+                "org.openmrs.sync.central",
                 "org.openmrs.sync.core"
         }
 )

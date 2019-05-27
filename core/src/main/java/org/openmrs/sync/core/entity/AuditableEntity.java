@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class TimestampedEty extends OpenMrsEty {
+public abstract class AuditableEntity extends BaseEntity {
 
     @JoinColumn(name = "creator")
     @ManyToOne
-    private UserEty creator;
+    private User creator;
 
     @NotNull
     private LocalDateTime dateCreated;
 
     @JoinColumn(name = "changed_by")
     @ManyToOne
-    private UserEty changedBy;
+    private User changedBy;
 
     private LocalDateTime dateChanged;
 
@@ -31,7 +31,7 @@ public abstract class TimestampedEty extends OpenMrsEty {
 
     @JoinColumn(name = "voided_by")
     @ManyToOne
-    private UserEty voidedBy;
+    private User voidedBy;
 
     private LocalDateTime dateVoided;
 

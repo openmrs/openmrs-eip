@@ -1,14 +1,14 @@
 package org.openmrs.sync.core.mapper.entityToModel;
 
-import org.openmrs.sync.core.entity.PersonEty;
+import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.PersonModel;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersonEtyToModelMapper implements java.util.function.Function<PersonEty, PersonModel> {
+public class PersonEtyToModelMapper implements java.util.function.Function<Person, PersonModel> {
 
     @Override
-    public PersonModel apply(PersonEty ety) {
+    public PersonModel apply(Person ety) {
         PersonModel model = new PersonModel();
         model.setGender(ety.getGender());
         model.setBirthdate(ety.getBirthdate());

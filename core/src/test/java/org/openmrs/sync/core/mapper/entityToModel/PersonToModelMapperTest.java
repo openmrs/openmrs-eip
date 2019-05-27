@@ -1,8 +1,8 @@
 package org.openmrs.sync.core.mapper.entityToModel;
 
-import org.openmrs.sync.core.entity.ConceptEty;
-import org.openmrs.sync.core.entity.PersonEty;
-import org.openmrs.sync.core.entity.UserEty;
+import org.openmrs.sync.core.entity.Concept;
+import org.openmrs.sync.core.entity.Person;
+import org.openmrs.sync.core.entity.User;
 import org.openmrs.sync.core.model.PersonModel;
 import org.junit.Test;
 
@@ -13,14 +13,14 @@ import java.time.Month;
 
 import static org.junit.Assert.assertEquals;
 
-public class PersonEtyToModelMapperTest {
+public class PersonToModelMapperTest {
 
     private PersonEtyToModelMapper mapper = new PersonEtyToModelMapper();
 
     @Test
     public void apply() {
         // Given
-        PersonEty ety = getPersonEty();
+        Person ety = getPersonEty();
 
         // When
         PersonModel result = mapper.apply(ety);
@@ -29,7 +29,7 @@ public class PersonEtyToModelMapperTest {
         assertResult(ety, result);
     }
 
-    private void assertResult(PersonEty ety, PersonModel result) {
+    private void assertResult(Person ety, PersonModel result) {
         assertEquals(ety.getGender(), result.getGender());
         assertEquals(ety.getBirthdate(), result.getBirthdate());
         assertEquals(ety.isBirthdateEstimated(), result.getBirthdateEstimated());
@@ -49,26 +49,26 @@ public class PersonEtyToModelMapperTest {
         assertEquals(ety.getBirthtime(), result.getBirthtime());
     }
 
-    private PersonEty getPersonEty() {
-        ConceptEty conceptEty = new ConceptEty();
-        conceptEty.setUuid("causeOfDeath");
+    private Person getPersonEty() {
+        Concept concept = new Concept();
+        concept.setUuid("causeOfDeath");
 
-        UserEty userEty = new UserEty();
-        userEty.setUuid("userId");
+        User user = new User();
+        user.setUuid("userId");
 
-        PersonEty ety = new PersonEty();
+        Person ety = new Person();
         ety.setGender("M");
         ety.setBirthdate(LocalDate.of(1956, Month.OCTOBER, 22));
         ety.setBirthdateEstimated(true);
         ety.setDead(false);
         ety.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
-        ety.setCauseOfDeath(conceptEty);
-        ety.setCreator(userEty);
+        ety.setCauseOfDeath(concept);
+        ety.setCreator(user);
         ety.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        ety.setChangedBy(userEty);
+        ety.setChangedBy(user);
         ety.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         ety.setVoided(true);
-        ety.setVoidedBy(userEty);
+        ety.setVoidedBy(user);
         ety.setDateVoided(LocalDateTime.of(2012, Month.JANUARY, 1, 0, 0));
         ety.setVoidReason("voided");
         ety.setUuid("person");

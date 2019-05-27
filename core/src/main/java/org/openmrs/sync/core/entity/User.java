@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
                 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
         }
 )
-public class UserEty extends OpenMrsEty {
+public class User extends BaseEntity {
 
     @NotNull
     private String systemId;
@@ -30,5 +30,5 @@ public class UserEty extends OpenMrsEty {
     @NotNull
     private int personId;
 
-    public UserEty() {}
+    public User() {}
 }

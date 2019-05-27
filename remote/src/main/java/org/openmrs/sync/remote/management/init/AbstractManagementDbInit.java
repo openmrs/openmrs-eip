@@ -1,7 +1,7 @@
 package org.openmrs.sync.remote.management.init;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.sync.core.camel.TableNameEnum;
+import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.remote.management.entity.TableSyncStatus;
 import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
 
@@ -28,7 +28,7 @@ public abstract class AbstractManagementDbInit {
      */
     public void start() {
         List<TableSyncStatus> createdStatuses = getTablesToSync().stream()
-                .filter(entityNameEnum -> repository.countByTableName(entityNameEnum) == 0)
+                .filter(tableNameEnum -> repository.countByTableName(tableNameEnum) == 0)
                 .map(this::createTableSyncStatus)
                 .map(status -> repository.save(status))
                 .collect(Collectors.toList());

@@ -1,6 +1,6 @@
 package org.openmrs.sync.core.service.impl;
 
-import org.openmrs.sync.core.entity.ConceptEty;
+import org.openmrs.sync.core.entity.Concept;
 import org.openmrs.sync.core.repository.ConceptRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +31,8 @@ public class ConceptServiceTest {
         assertEquals(getExpectedConcept(), service.getFakeEntity("UUID"));
     }
 
-    private ConceptEty getExpectedConcept() {
-        ConceptEty expected = new ConceptEty();
+    private Concept getExpectedConcept() {
+        Concept expected = new Concept();
         expected.setUuid("UUID");
         expected.setClassId(1);
         expected.setDatatypeId(1);

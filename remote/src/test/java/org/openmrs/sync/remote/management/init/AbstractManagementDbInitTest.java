@@ -4,9 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.camel.TableNameEnum;
+import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.remote.management.entity.TableSyncStatus;
-import org.openmrs.sync.remote.management.init.impl.ManagementDbInit;
 import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
 
 import static org.mockito.Mockito.*;

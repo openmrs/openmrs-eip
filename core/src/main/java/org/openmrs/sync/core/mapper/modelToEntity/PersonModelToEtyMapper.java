@@ -1,27 +1,27 @@
 package org.openmrs.sync.core.mapper.modelToEntity;
 
-import org.openmrs.sync.core.entity.ConceptEty;
-import org.openmrs.sync.core.entity.PersonEty;
-import org.openmrs.sync.core.entity.UserEty;
+import org.openmrs.sync.core.entity.Concept;
+import org.openmrs.sync.core.entity.Person;
+import org.openmrs.sync.core.entity.User;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.SimpleService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersonModelToEtyMapper implements java.util.function.Function<PersonModel, PersonEty> {
+public class PersonModelToEtyMapper implements java.util.function.Function<PersonModel, Person> {
 
-    private SimpleService<UserEty> userService;
-    private SimpleService<ConceptEty> conceptService;
+    private SimpleService<User> userService;
+    private SimpleService<Concept> conceptService;
 
-    public PersonModelToEtyMapper(final SimpleService<UserEty> userService,
-                                  final SimpleService<ConceptEty> conceptService) {
+    public PersonModelToEtyMapper(final SimpleService<User> userService,
+                                  final SimpleService<Concept> conceptService) {
         this.userService = userService;
         this.conceptService = conceptService;
     }
 
     @Override
-    public PersonEty apply(final PersonModel person) {
-        PersonEty ety = new PersonEty();
+    public Person apply(final PersonModel person) {
+        Person ety = new Person();
         ety.setGender(person.getGender());
         ety.setBirthdate(person.getBirthdate());
         ety.setBirthdateEstimated(person.getBirthdateEstimated());

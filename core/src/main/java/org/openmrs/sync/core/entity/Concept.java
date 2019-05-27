@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
                 @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
         }
 )
-public class ConceptEty extends OpenMrsEty {
+public class Concept extends BaseEntity {
 
     @NotNull
     private int datatypeId;
@@ -30,5 +30,5 @@ public class ConceptEty extends OpenMrsEty {
     @NotNull
     private LocalDateTime dateCreated;
 
-    public ConceptEty() {}
+    public Concept() {}
 }

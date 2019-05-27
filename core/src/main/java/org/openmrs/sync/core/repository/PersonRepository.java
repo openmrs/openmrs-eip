@@ -1,14 +1,18 @@
 package org.openmrs.sync.core.repository;
 
-import org.openmrs.sync.core.entity.PersonEty;
+import org.openmrs.sync.core.entity.Person;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface PersonRepository extends OpenMrsRepository<PersonEty> {
+import java.time.LocalDateTime;
+import java.util.List;
 
-    /**
-     * find person by uuid
-     * @param uuid the uuid
-     * @return PersonEty
-     */
+public interface PersonRepository extends AuditableRepository<Person> {
+
     @Override
-    PersonEty findByUuid(final String uuid);
+    Person findByUuid(final String uuid);
+
+    @Override
+    @Query("select p from Person p where p.dateChanged is null and p.dateCreated >= :lastSyncDate or p.dateChanged >= :lastSyncDate")
+    List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }
