@@ -1,7 +1,8 @@
-package org.openmrs.sync.core.entity;
+package org.openmrs.sync.core.entity.light;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.openmrs.sync.core.entity.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,24 +12,24 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
-@AttributeOverrides(
-        {
-                @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-        }
-)
-public class User extends BaseEntity {
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
+public class UserLight extends BaseEntity {
 
     @NotNull
+    @Column(name = "system_id")
     private String systemId;
 
     @NotNull
-    private Integer creator;
+    @Column(name = "creator")
+    private Long creator;
 
     @NotNull
+    @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
     @NotNull
+    @Column(name = "person_id")
     private int personId;
 
-    public User() {}
+    public UserLight() {}
 }

@@ -1,6 +1,7 @@
 package org.openmrs.sync.core.service;
 
 import org.openmrs.sync.core.entity.MockedEntity;
+import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.MockedModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,10 +22,7 @@ public class AbstractEntityServiceTest {
     private MockedOpenMrsRepository repository;
 
     @Mock
-    private Function<MockedEntity, MockedModel> etyToModelMapper;
-
-    @Mock
-    private Function<MockedModel, MockedEntity> modelToEtyMapper;
+    private EntityMapper<MockedEntity, MockedModel> mapper;
 
     private MockedEntityService mockedEntityService;
 
@@ -33,7 +30,7 @@ public class AbstractEntityServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        mockedEntityService = new MockedEntityService(repository, etyToModelMapper, modelToEtyMapper);
+        mockedEntityService = new MockedEntityService(repository, mapper);
     }
 
     @Test
@@ -45,8 +42,8 @@ public class AbstractEntityServiceTest {
         MockedModel mockedModel1 = new MockedModel("uuid1");
         MockedModel mockedModel2 = new MockedModel("uuid2");
         when(repository.findModelsChangedAfterDate(lastSyncDate)).thenReturn(Arrays.asList(mockedEntity1, mockedEntity2));
-        when(etyToModelMapper.apply(mockedEntity1)).thenReturn(mockedModel1);
-        when(etyToModelMapper.apply(mockedEntity2)).thenReturn(mockedModel2);
+        when(mapper.entityToModel(mockedEntity1)).thenReturn(mockedModel1);
+        when(mapper.entityToModel(mockedEntity2)).thenReturn(mockedModel2);
 
         // When
         List<MockedModel> result = mockedEntityService.getModels(lastSyncDate);
@@ -67,8 +64,8 @@ public class AbstractEntityServiceTest {
         MockedModel mockedModel1 = new MockedModel("uuid1");
         MockedModel mockedModel2 = new MockedModel("uuid2");
         when(repository.findAll()).thenReturn(Arrays.asList(mockedEntity1, mockedEntity2));
-        when(etyToModelMapper.apply(mockedEntity1)).thenReturn(mockedModel1);
-        when(etyToModelMapper.apply(mockedEntity2)).thenReturn(mockedModel2);
+        when(mapper.entityToModel(mockedEntity1)).thenReturn(mockedModel1);
+        when(mapper.entityToModel(mockedEntity2)).thenReturn(mockedModel2);
 
         // When
         List<MockedModel> result = mockedEntityService.getModels(null);
@@ -89,8 +86,8 @@ public class AbstractEntityServiceTest {
         MockedEntity mockedEntityInDb = new MockedEntity(1L, "uuid");
         when(repository.findByUuid("uuid")).thenReturn(mockedEntityInDb);
         when(repository.save(mockedEntityInDb)).thenReturn(mockedEntity);
-        when(modelToEtyMapper.apply(mockedModel)).thenReturn(mockedEntity);
-        when(etyToModelMapper.apply(mockedEntityInDb)).thenReturn(mockedModel);
+        when(mapper.modelToEntity(mockedModel)).thenReturn(mockedEntity);
+        when(mapper.entityToModel(mockedEntityInDb)).thenReturn(mockedModel);
 
         // When
         MockedModel result = mockedEntityService.save(mockedModel);
@@ -107,8 +104,8 @@ public class AbstractEntityServiceTest {
         MockedEntity mockedEntity= new MockedEntity(null, "uuid");
         when(repository.findByUuid("uuid")).thenReturn(null);
         when(repository.save(mockedEntity)).thenReturn(mockedEntity);
-        when(modelToEtyMapper.apply(mockedModel)).thenReturn(mockedEntity);
-        when(etyToModelMapper.apply(mockedEntity)).thenReturn(mockedModel);
+        when(mapper.modelToEntity(mockedModel)).thenReturn(mockedEntity);
+        when(mapper.entityToModel(mockedEntity)).thenReturn(mockedModel);
 
         // When
         MockedModel result = mockedEntityService.save(mockedModel);

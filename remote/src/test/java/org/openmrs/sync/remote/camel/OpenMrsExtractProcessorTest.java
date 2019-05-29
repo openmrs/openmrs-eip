@@ -2,21 +2,23 @@ package org.openmrs.sync.remote.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
+import org.apache.camel.impl.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.openmrs.sync.remote.management.entity.TableSyncStatus;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class OpenMrsExtractProcessorTest {
 
@@ -33,7 +35,7 @@ public class OpenMrsExtractProcessorTest {
     }
 
     @Test
-    public void process() throws Exception {
+    public void process() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         TableSyncStatus status = new TableSyncStatus();
@@ -46,11 +48,10 @@ public class OpenMrsExtractProcessorTest {
         // Then
         verify(entityServiceFacade).getModels(TableNameEnum.PERSON, status.getLastSyncDate());
         assertEquals(TableNameEnum.PERSON.name(), exchange.getIn().getHeader("OpenMrsTableSyncName"));
-        assertEquals(TableNameEnum.PERSON.getModelClass().getName(), exchange.getIn().getHeader("CamelJacksonUnmarshalType"));
     }
 
     @Test
-    public void process_body_wrong_type() throws Exception {
+    public void process_body_wrong_type() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         exchange.getIn().setBody("body");

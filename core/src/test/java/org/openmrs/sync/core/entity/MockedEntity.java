@@ -5,7 +5,9 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MockedEntity extends AuditableEntity {
+public class MockedEntity extends BaseEntity {
+
+    private Long id;
 
     public MockedEntity(final Long id,
                         final String uuid) {

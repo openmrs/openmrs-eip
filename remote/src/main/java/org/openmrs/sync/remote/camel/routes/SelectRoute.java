@@ -22,6 +22,7 @@ public class SelectRoute extends RouteBuilder {
         from("seda:sync")
                 .process(extractProcessor)
                 .split(body(), (oldExchange, newExchange) -> newExchange).streaming()
+                        .setHeader("CamelJacksonUnmarshalType", simple("${body.getClass().getName()}"))
                         .marshal().json(JsonLibrary.Jackson)
                         .to("log:row")
                         .to("{{output.queue}}")

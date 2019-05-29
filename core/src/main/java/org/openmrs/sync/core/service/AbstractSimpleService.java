@@ -20,6 +20,10 @@ public abstract class AbstractSimpleService<E extends BaseEntity> implements Sim
 
     @Override
     public E getOrInit(String uuid) {
+        if (uuid == null) {
+            return null;
+        }
+
         E user = repository.findByUuid(uuid);
 
         if (user == null) {

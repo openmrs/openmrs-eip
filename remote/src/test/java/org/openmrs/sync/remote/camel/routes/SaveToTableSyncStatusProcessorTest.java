@@ -2,7 +2,7 @@ package org.openmrs.sync.remote.camel.routes;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
+import org.apache.camel.impl.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -14,7 +14,6 @@ import org.openmrs.sync.remote.management.entity.TableSyncStatus;
 import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +38,7 @@ public class SaveToTableSyncStatusProcessorTest {
     }
 
     @Test
-    public void process() throws Exception {
+    public void process() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         exchange.getIn().setHeader("OpenMrsTableSyncStatusId", 1L);

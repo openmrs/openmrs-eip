@@ -1,6 +1,6 @@
 package org.openmrs.sync.core.service.impl;
 
-import org.openmrs.sync.core.entity.Concept;
+import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.repository.ConceptRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,12 +31,12 @@ public class ConceptServiceTest {
         assertEquals(getExpectedConcept(), service.getFakeEntity("UUID"));
     }
 
-    private Concept getExpectedConcept() {
-        Concept expected = new Concept();
+    private ConceptLight getExpectedConcept() {
+        ConceptLight expected = new ConceptLight();
         expected.setUuid("UUID");
         expected.setClassId(1);
         expected.setDatatypeId(1);
-        expected.setCreator(1);
+        expected.setCreator(1L);
         expected.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         return expected;
     }

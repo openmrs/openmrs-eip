@@ -1,9 +1,9 @@
 package org.openmrs.sync.core.repository;
 
-import org.openmrs.sync.core.entity.User;
+import org.openmrs.sync.core.entity.light.UserLight;
 
-public interface UserRepository extends OpenMrsRepository<User> {
+public interface UserRepository extends OpenMrsRepository<UserLight> {
 
     @Override
-    User findByUuid(final String uuid);
+    UserLight findByUuid(final String uuid);
 }

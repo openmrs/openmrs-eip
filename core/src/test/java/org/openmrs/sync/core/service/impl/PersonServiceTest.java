@@ -1,5 +1,6 @@
 package org.openmrs.sync.core.service.impl;
 
+import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.repository.AuditableRepository;
 import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.core.entity.Person;
@@ -19,10 +20,7 @@ public class PersonServiceTest {
     private AuditableRepository<Person> personRepository;
 
     @Mock
-    private Function<Person, PersonModel> etyToModelMapper;
-
-    @Mock
-    private Function<PersonModel, Person> modelToEtyMapper;
+    private EntityMapper<Person, PersonModel> mapper;
 
     private PersonService personService;
 
@@ -30,7 +28,7 @@ public class PersonServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        personService = new PersonService(personRepository, etyToModelMapper, modelToEtyMapper);
+        personService = new PersonService(personRepository, mapper);
     }
 
     @Test

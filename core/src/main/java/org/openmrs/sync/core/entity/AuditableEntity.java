@@ -1,39 +1,40 @@
 package org.openmrs.sync.core.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.openmrs.sync.core.entity.light.UserLight;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@MappedSuperclass
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class AuditableEntity extends BaseEntity {
+public interface AuditableEntity {
 
-    @JoinColumn(name = "creator")
-    @ManyToOne
-    private User creator;
+    UserLight getCreator();
 
-    @NotNull
-    private LocalDateTime dateCreated;
+    void setCreator(final UserLight creator);
 
-    @JoinColumn(name = "changed_by")
-    @ManyToOne
-    private User changedBy;
+    LocalDateTime getDateCreated();
 
-    private LocalDateTime dateChanged;
+    void setDateCreated(final LocalDateTime dateCreated);
 
-    @NotNull
-    private boolean voided;
+    UserLight getChangedBy();
 
-    @JoinColumn(name = "voided_by")
-    @ManyToOne
-    private User voidedBy;
+    void setChangedBy(final UserLight changedBy);
 
-    private LocalDateTime dateVoided;
+    LocalDateTime getDateChanged();
 
-    private String voidReason;
+    void setDateChanged(final LocalDateTime dateChanged);
+
+    boolean isVoided();
+
+    void setVoided(final boolean voided);
+
+    UserLight getVoidedBy();
+
+    void setVoidedBy(final UserLight voidedBy);
+
+    LocalDateTime getDateVoided();
+
+    void setDateVoided(final LocalDateTime dateVoided);
+
+    String getVoidReason();
+
+    void setVoidReason(final String voidReason);
 }

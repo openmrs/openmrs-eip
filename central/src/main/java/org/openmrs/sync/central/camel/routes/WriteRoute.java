@@ -8,11 +8,11 @@ import org.openmrs.sync.central.camel.OpenMrsInsertProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WritePersonRoute extends RouteBuilder {
+public class WriteRoute extends RouteBuilder {
 
     private OpenMrsInsertProcessor processor;
 
-    public WritePersonRoute(final OpenMrsInsertProcessor processor) {
+    public WriteRoute(final OpenMrsInsertProcessor processor) {
         this.processor = processor;
     }
 

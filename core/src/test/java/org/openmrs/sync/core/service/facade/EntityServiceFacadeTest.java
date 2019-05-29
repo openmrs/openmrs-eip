@@ -1,9 +1,9 @@
 package org.openmrs.sync.core.service.facade;
 
+import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.TableNameEnum;
 import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.entity.Person;
-import org.openmrs.sync.core.model.OpenMrsModel;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.AbstractEntityService;
@@ -49,7 +49,7 @@ public class EntityServiceFacadeTest {
         when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
 
         // When
-        List<? extends OpenMrsModel> result = facade.getModels(TableNameEnum.PERSON, lastSyncDate);
+        List<? extends BaseModel> result = facade.getModels(TableNameEnum.PERSON, lastSyncDate);
 
         // Then
         assertEquals(2, result.size());

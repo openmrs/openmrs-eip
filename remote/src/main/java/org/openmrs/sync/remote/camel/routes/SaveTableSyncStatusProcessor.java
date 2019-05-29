@@ -19,7 +19,7 @@ public class SaveTableSyncStatusProcessor implements Processor {
     }
 
     @Override
-    public void process(final Exchange exchange) throws Exception {
+    public void process(final Exchange exchange) {
         Optional<TableSyncStatus> statusOptional = repository.findById((Long) exchange.getIn().getHeader("OpenMrsTableSyncStatusId"));
         statusOptional.ifPresent(status -> {
             status.setLastSyncDate(LocalDateTime.now());

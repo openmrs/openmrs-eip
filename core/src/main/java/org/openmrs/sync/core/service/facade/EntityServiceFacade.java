@@ -1,8 +1,8 @@
 package org.openmrs.sync.core.service.facade;
 
-import org.openmrs.sync.core.entity.AuditableEntity;
+import org.openmrs.sync.core.entity.BaseEntity;
+import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.TableNameEnum;
-import org.openmrs.sync.core.model.OpenMrsModel;
 import org.openmrs.sync.core.service.AbstractEntityService;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +12,9 @@ import java.util.List;
 @Component
 public class EntityServiceFacade {
 
-    private List<AbstractEntityService<? extends AuditableEntity, ? extends OpenMrsModel>> services;
+    private List<AbstractEntityService<? extends BaseEntity, ? extends BaseModel>> services;
 
-    public EntityServiceFacade(final List<AbstractEntityService<? extends AuditableEntity, ? extends OpenMrsModel>> services) {
+    public EntityServiceFacade(final List<AbstractEntityService<? extends BaseEntity, ? extends BaseModel>> services) {
         this.services = services;
     }
 
@@ -25,7 +25,7 @@ public class EntityServiceFacade {
      * @param <M>
      * @return the entities
      */
-    public <M extends OpenMrsModel> List<M> getModels(final TableNameEnum tableNameEnum, final LocalDateTime lastSyncDate) {
+    public <M extends BaseModel> List<M> getModels(final TableNameEnum tableNameEnum, final LocalDateTime lastSyncDate) {
         return (List<M>) getService(tableNameEnum).getModels(lastSyncDate);
     }
 
@@ -35,12 +35,12 @@ public class EntityServiceFacade {
      * @param model the model to save
      * @param <M>
      */
-    public <M extends OpenMrsModel> void saveModel(final TableNameEnum tableNameEnum,
-                                                   final M model) {
+    public <M extends BaseModel> void saveModel(final TableNameEnum tableNameEnum,
+                                                final M model) {
         getService(tableNameEnum).save(model);
     }
 
-    private <E extends AuditableEntity, M extends OpenMrsModel> AbstractEntityService<E, M> getService(final TableNameEnum tableName) {
+    private <E extends BaseEntity, M extends BaseModel> AbstractEntityService<E, M> getService(final TableNameEnum tableName) {
         return services.stream()
                 .filter(service -> service.getTableName() == tableName)
                 .map(service -> (AbstractEntityService<E, M>) service)

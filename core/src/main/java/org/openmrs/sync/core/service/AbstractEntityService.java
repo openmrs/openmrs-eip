@@ -1,31 +1,27 @@
 package org.openmrs.sync.core.service;
 
-import org.openmrs.sync.core.entity.AuditableEntity;
-import org.openmrs.sync.core.model.OpenMrsModel;
+import org.openmrs.sync.core.entity.BaseEntity;
+import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.repository.AuditableRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
-public abstract class AbstractEntityService<E extends AuditableEntity, M extends OpenMrsModel> implements EntityService<M> {
+public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
     private AuditableRepository<E> repository;
-    private Function<E, M> entityToModelMapper;
-    private Function<M, E> modelToEntityMapper;
+    private EntityMapper<E, M> mapper;
 
     public AbstractEntityService(final AuditableRepository<E> repository,
-                                 final Function<E, M> entityToModelMapper,
-                                 final Function<M, E> modelToEntityMapper) {
+                                 final EntityMapper<E, M> mapper) {
         assertNotNull(repository);
-        assertNotNull(entityToModelMapper);
-        assertNotNull(modelToEntityMapper);
+        assertNotNull(mapper);
         this.repository = repository;
-        this.entityToModelMapper = entityToModelMapper;
-        this.modelToEntityMapper = modelToEntityMapper;
+        this.mapper = mapper;
     }
 
     /**
@@ -38,12 +34,12 @@ public abstract class AbstractEntityService<E extends AuditableEntity, M extends
     public M save(M model) {
         E etyInDb = repository.findByUuid(model.getUuid());
 
-        E ety = modelToEntityMapper.apply(model);
+        E ety = mapper.modelToEntity(model);
         if (etyInDb != null) {
             ety.setId(etyInDb.getId());
         }
 
-        return entityToModelMapper.apply(repository.save(ety));
+        return mapper.entityToModel(repository.save(ety));
     }
 
     @Override
@@ -56,7 +52,7 @@ public abstract class AbstractEntityService<E extends AuditableEntity, M extends
         }
 
         return entities.stream()
-                .map(entityToModelMapper)
+                .map(mapper::entityToModel)
                 .collect(Collectors.toList());
     }
 }

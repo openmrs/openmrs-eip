@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PersonModel extends OpenMrsModel {
+public class PersonModel extends BaseModel {
 
     private String gender;
 
@@ -20,23 +20,23 @@ public class PersonModel extends OpenMrsModel {
 
     private LocalDate deathDate;
 
-    private String causeOfDeathUUID;
+    private String causeOfDeathUuid;
 
-    private String creatorUUID;
+    private String personCreatorUuid;
 
-    private LocalDateTime dateCreated;
+    private LocalDateTime personDateCreated;
 
-    private String changedByUUID;
+    private String personChangedByUuid;
 
-    private LocalDateTime dateChanged;
+    private LocalDateTime personDateChanged;
 
-    private Boolean voided;
+    private Boolean personVoided;
 
-    private String voidedByUUID;
+    private String personVoidedByUuid;
 
-    private LocalDateTime dateVoided;
+    private LocalDateTime personDateVoided;
 
-    private String voidReason;
+    private String personVoidReason;
 
     private Boolean deathdateEstimated;
 
