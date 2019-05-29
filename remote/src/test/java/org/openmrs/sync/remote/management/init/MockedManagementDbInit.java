@@ -14,6 +14,6 @@ public class MockedManagementDbInit extends AbstractManagementDbInit {
 
     @Override
     protected List<TableNameEnum> getTablesToSync() {
-        return Arrays.asList(TableNameEnum.PERSON, TableNameEnum.PATIENT);
+        return Arrays.asList(TableNameEnum.PERSON, TableNameEnum.VISIT);
     }
 }

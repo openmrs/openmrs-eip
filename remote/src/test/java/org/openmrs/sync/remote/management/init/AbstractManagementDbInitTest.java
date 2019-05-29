@@ -31,7 +31,7 @@ public class AbstractManagementDbInitTest {
         toSave.setTableName(TableNameEnum.PERSON);
 
         when(repository.countByTableName(TableNameEnum.PERSON)).thenReturn(0L);
-        when(repository.countByTableName(TableNameEnum.PATIENT)).thenReturn(1L);
+        when(repository.countByTableName(TableNameEnum.VISIT)).thenReturn(1L);
         when(repository.save(toSave)).thenReturn(toSave);
 
         // When

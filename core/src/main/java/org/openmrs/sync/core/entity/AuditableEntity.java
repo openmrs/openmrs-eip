@@ -1,40 +1,47 @@
 package org.openmrs.sync.core.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.openmrs.sync.core.entity.light.UserLight;
 
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-public interface AuditableEntity {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@MappedSuperclass
+public abstract class AuditableEntity extends BaseEntity {
 
-    UserLight getCreator();
+    @ManyToOne
+    @JoinColumn(name = "creator")
+    protected UserLight creator;
 
-    void setCreator(final UserLight creator);
+    @NotNull
+    @Column(name = "date_created")
+    protected LocalDateTime dateCreated;
 
-    LocalDateTime getDateCreated();
+    @ManyToOne
+    @JoinColumn(name = "changed_by")
+    protected UserLight changedBy;
 
-    void setDateCreated(final LocalDateTime dateCreated);
+    @Column(name = "date_changed")
+    protected LocalDateTime dateChanged;
 
-    UserLight getChangedBy();
+    @NotNull
+    @Column(name = "voided")
+    protected boolean voided;
 
-    void setChangedBy(final UserLight changedBy);
+    @ManyToOne
+    @JoinColumn(name = "voided_by")
+    protected UserLight voidedBy;
 
-    LocalDateTime getDateChanged();
+    @Column(name = "date_voided")
+    protected LocalDateTime dateVoided;
 
-    void setDateChanged(final LocalDateTime dateChanged);
-
-    boolean isVoided();
-
-    void setVoided(final boolean voided);
-
-    UserLight getVoidedBy();
-
-    void setVoidedBy(final UserLight voidedBy);
-
-    LocalDateTime getDateVoided();
-
-    void setDateVoided(final LocalDateTime dateVoided);
-
-    String getVoidReason();
-
-    void setVoidReason(final String voidReason);
+    @Column(name = "void_reason")
+    protected String voidReason;
 }

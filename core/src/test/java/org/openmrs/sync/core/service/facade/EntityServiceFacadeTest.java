@@ -45,7 +45,7 @@ public class EntityServiceFacadeTest {
         PersonModel personModel2 = new PersonModel();
         LocalDateTime lastSyncDate = LocalDateTime.now();
         when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getTableName()).thenReturn(TableNameEnum.PATIENT);
+        when(patientService.getTableName()).thenReturn(TableNameEnum.VISIT);
         when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
 
         // When
@@ -61,10 +61,10 @@ public class EntityServiceFacadeTest {
         LocalDateTime lastSyncDate = LocalDateTime.now();
         facade = new EntityServiceFacade(Collections.singletonList(personService));
         when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getTableName()).thenReturn(TableNameEnum.PATIENT);
+        when(patientService.getTableName()).thenReturn(TableNameEnum.VISIT);
 
         // When
-        facade.getModels(TableNameEnum.PATIENT, lastSyncDate);
+        facade.getModels(TableNameEnum.VISIT, lastSyncDate);
 
         // Then
         // BOOM

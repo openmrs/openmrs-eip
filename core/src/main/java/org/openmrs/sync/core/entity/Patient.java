@@ -22,32 +22,32 @@ public class Patient extends Person {
 
     @ManyToOne
     @JoinColumn(name = "creator")
-    private UserLight creator;
+    private UserLight patientCreator;
 
     @NotNull
     @Column(name = "date_created")
-    private LocalDateTime dateCreated;
+    private LocalDateTime patientDateCreated;
 
     @ManyToOne
     @JoinColumn(name = "changed_by")
-    private UserLight changedBy;
+    private UserLight patientChangedBy;
 
     @Column(name = "date_changed")
-    private LocalDateTime dateChanged;
+    private LocalDateTime patientDateChanged;
 
     @NotNull
     @Column(name = "voided")
-    private boolean voided;
+    private boolean patientVoided;
 
     @ManyToOne
     @JoinColumn(name = "voided_by")
-    private UserLight voidedBy;
+    private UserLight patientVoidedBy;
 
     @Column(name = "date_voided")
-    private LocalDateTime dateVoided;
+    private LocalDateTime patientDateVoided;
 
     @Column(name = "void_reason")
-    private String voidReason;
+    private String patientVoidReason;
 
     public Patient() {}
 
@@ -57,7 +57,7 @@ public class Patient extends Person {
 
     public void setCreator(final UserLight creator) {
         this.creator = creator;
-        setPersonCreator(creator);
+        setPatientCreator(creator);
     }
 
     public LocalDateTime getDateCreated() {
@@ -66,7 +66,7 @@ public class Patient extends Person {
 
     public void setDateCreated(final LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
-        setPersonDateCreated(dateCreated);
+        setPatientDateCreated(dateCreated);
     }
 
     public UserLight getChangedBy() {
@@ -75,7 +75,7 @@ public class Patient extends Person {
 
     public void setChangedBy(final UserLight changedBy) {
         this.changedBy = changedBy;
-        setPersonChangedBy(changedBy);
+        setPatientChangedBy(changedBy);
     }
 
     public LocalDateTime getDateChanged() {
@@ -84,7 +84,7 @@ public class Patient extends Person {
 
     public void setDateChanged(final LocalDateTime dateChanged) {
         this.dateChanged = dateChanged;
-        setPersonDateChanged(dateChanged);
+        setPatientDateChanged(dateChanged);
     }
 
     public boolean isVoided() {
@@ -93,7 +93,7 @@ public class Patient extends Person {
 
     public void setVoided(final boolean voided) {
         this.voided = voided;
-        setPersonVoided(voided);
+        setPatientVoided(voided);
     }
 
     public UserLight getVoidedBy() {
@@ -102,7 +102,7 @@ public class Patient extends Person {
 
     public void setVoidedBy(final UserLight voidedBy) {
         this.voidedBy = voidedBy;
-        setPersonVoidedBy(voidedBy);
+        setPatientVoidedBy(voidedBy);
     }
 
     public LocalDateTime getDateVoided() {
@@ -111,7 +111,7 @@ public class Patient extends Person {
 
     public void setDateVoided(final LocalDateTime dateVoided) {
         this.dateVoided = dateVoided;
-        setPersonDateVoided(dateVoided);
+        setPatientDateVoided(dateVoided);
     }
 
     public String getVoidReason() {
@@ -120,6 +120,6 @@ public class Patient extends Person {
 
     public void setVoidReason(final String voidReason) {
         this.voidReason = voidReason;
-        setPersonVoidReason(voidReason);
+        setPatientVoidReason(voidReason);
     }
 }

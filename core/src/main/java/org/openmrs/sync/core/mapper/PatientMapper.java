@@ -25,9 +25,9 @@ public abstract class PatientMapper implements EntityMapper<Patient, PatientMode
             @Mapping(source = "creator.uuid", target = "creatorUuid"),
             @Mapping(source = "changedBy.uuid", target = "changedByUuid"),
             @Mapping(source = "voidedBy.uuid", target = "voidedByUuid"),
-            @Mapping(source = "creator.uuid", target = "personCreatorUuid"),
-            @Mapping(source = "changedBy.uuid", target = "personChangedByUuid"),
-            @Mapping(source = "voidedBy.uuid", target = "personVoidedByUuid")
+            @Mapping(source = "patientCreator.uuid", target = "patientCreatorUuid"),
+            @Mapping(source = "patientChangedBy.uuid", target = "patientChangedByUuid"),
+            @Mapping(source = "patientVoidedBy.uuid", target = "patientVoidedByUuid")
     })
     public abstract PatientModel entityToModel(final Patient entity);
 
@@ -37,9 +37,9 @@ public abstract class PatientMapper implements EntityMapper<Patient, PatientMode
             @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
             @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy"),
             @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonCreatorUuid()))", target ="personCreator"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonChangedByUuid()))", target ="personChangedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonVoidedByUuid()))", target ="personVoidedBy"),
+            @Mapping(expression = "java(userService.getOrInit(model.getPatientCreatorUuid()))", target ="patientCreator"),
+            @Mapping(expression = "java(userService.getOrInit(model.getPatientChangedByUuid()))", target ="patientChangedBy"),
+            @Mapping(expression = "java(userService.getOrInit(model.getPatientVoidedByUuid()))", target ="patientVoidedBy"),
             @Mapping(ignore = true, target = "id")
     })
     public abstract Patient modelToEntity(final PatientModel model);

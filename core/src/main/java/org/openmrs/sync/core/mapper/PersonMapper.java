@@ -22,7 +22,7 @@ public abstract class PersonMapper implements EntityMapper<Person, PersonModel> 
     protected SimpleService<UserLight> userService;
 
     @Autowired
-    protected PatientMapper patientMapper;
+    protected EntityMapper<Patient, PatientModel> patientMapper;
 
     @Override
     public PersonModel entityToModel(final Person entity) {
@@ -44,18 +44,18 @@ public abstract class PersonMapper implements EntityMapper<Person, PersonModel> 
 
     @Mappings({
             @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid"),
-            @Mapping(source = "personCreator.uuid", target = "personCreatorUuid"),
-            @Mapping(source = "personChangedBy.uuid", target = "personChangedByUuid"),
-            @Mapping(source = "personVoidedBy.uuid", target = "personVoidedByUuid")
+            @Mapping(source = "creator.uuid", target = "creatorUuid"),
+            @Mapping(source = "changedBy.uuid", target = "changedByUuid"),
+            @Mapping(source = "voidedBy.uuid", target = "voidedByUuid")
     })
-    public abstract PersonModel personToModel(Person entity);
+    protected abstract PersonModel personToModel(Person entity);
 
     @Mappings({
             @Mapping(expression = "java(conceptService.getOrInit(model.getCauseOfDeathUuid()))", target ="causeOfDeath"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonCreatorUuid()))", target ="personCreator"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonChangedByUuid()))", target ="personChangedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPersonVoidedByUuid()))", target ="personVoidedBy"),
+            @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
+            @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy"),
+            @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
             @Mapping(ignore = true, target = "id")
     })
-    public abstract Person modelToPerson(PersonModel model);
+    protected abstract Person modelToPerson(PersonModel model);
 }

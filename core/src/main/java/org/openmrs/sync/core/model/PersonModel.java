@@ -14,31 +14,31 @@ public class PersonModel extends BaseModel {
 
     private LocalDate birthdate;
 
-    private Boolean birthdateEstimated;
+    private boolean birthdateEstimated;
 
-    private Boolean dead;
+    private boolean dead;
 
     private LocalDate deathDate;
 
     private String causeOfDeathUuid;
 
-    private String personCreatorUuid;
+    private boolean deathdateEstimated;
 
-    private LocalDateTime personDateCreated;
+    private String creatorUuid;
 
-    private String personChangedByUuid;
+    private LocalDateTime dateCreated;
 
-    private LocalDateTime personDateChanged;
+    private String changedByUuid;
 
-    private Boolean personVoided;
+    private LocalDateTime dateChanged;
 
-    private String personVoidedByUuid;
+    private boolean voided;
 
-    private LocalDateTime personDateVoided;
+    private String voidedByUuid;
 
-    private String personVoidReason;
+    private LocalDateTime dateVoided;
 
-    private Boolean deathdateEstimated;
+    private String voidReason;
 
     private LocalTime birthtime;
 }

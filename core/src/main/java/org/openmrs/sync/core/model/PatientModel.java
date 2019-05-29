@@ -12,23 +12,23 @@ public class PatientModel extends PersonModel {
 
     private String allergyStatus;
 
-    private String creatorUuid;
+    private String patientCreatorUuid;
 
-    private LocalDateTime dateCreated;
+    private LocalDateTime patientDateCreated;
 
-    private String changedByUuid;
+    private String patientChangedByUuid;
 
-    private LocalDateTime dateChanged;
+    private LocalDateTime patientDateChanged;
 
-    private Boolean voided;
+    private boolean patientVoided;
 
-    private String voidedByUuid;
+    private String patientVoidedByUuid;
 
-    private LocalDateTime dateVoided;
+    private LocalDateTime patientDateVoided;
 
-    private String voidReason;
+    private String patientVoidReason;
 
-    private Boolean deathdateEstimated;
+    private boolean deathdateEstimated;
 
     private LocalTime birthtime;
 }
