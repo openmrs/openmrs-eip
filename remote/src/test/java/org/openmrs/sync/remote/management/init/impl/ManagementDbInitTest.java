@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.TableNameEnum;
-import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
+import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.remote.management.repository.EntitySyncStatusRepository;
 
 import java.util.Arrays;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class ManagementDbInitTest {
 
     @Mock
-    private TableSyncStatusRepository repository;
+    private EntitySyncStatusRepository repository;
 
     private ManagementDbInit dbInit;
 
@@ -27,6 +27,6 @@ public class ManagementDbInitTest {
 
     @Test
     public void getTablesToSync() {
-        assertEquals(Arrays.asList(TableNameEnum.values()), dbInit.getTablesToSync());
+        assertEquals(Arrays.asList(EntityNameEnum.values()), dbInit.getTablesToSync());
     }
 }

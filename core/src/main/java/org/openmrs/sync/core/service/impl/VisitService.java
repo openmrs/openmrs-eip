@@ -5,7 +5,7 @@ import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.VisitModel;
 import org.openmrs.sync.core.repository.AuditableRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
-import org.openmrs.sync.core.service.TableNameEnum;
+import org.openmrs.sync.core.service.EntityNameEnum;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class VisitService extends AbstractEntityService<Visit, VisitModel> {
     }
 
     @Override
-    public TableNameEnum getTableName() {
-        return TableNameEnum.VISIT;
+    public EntityNameEnum getEntityName() {
+        return EntityNameEnum.VISIT;
     }
 }

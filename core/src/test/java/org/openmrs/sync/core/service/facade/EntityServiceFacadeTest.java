@@ -1,7 +1,7 @@
 package org.openmrs.sync.core.service.facade;
 
 import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.service.TableNameEnum;
+import org.openmrs.sync.core.service.EntityNameEnum;
 import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.PatientModel;
@@ -44,12 +44,12 @@ public class EntityServiceFacadeTest {
         PersonModel personModel1 = new PersonModel();
         PersonModel personModel2 = new PersonModel();
         LocalDateTime lastSyncDate = LocalDateTime.now();
-        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getTableName()).thenReturn(TableNameEnum.VISIT);
+        when(personService.getEntityName()).thenReturn(EntityNameEnum.PERSON);
+        when(patientService.getEntityName()).thenReturn(EntityNameEnum.VISIT);
         when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
 
         // When
-        List<? extends BaseModel> result = facade.getModels(TableNameEnum.PERSON, lastSyncDate);
+        List<? extends BaseModel> result = facade.getModels(EntityNameEnum.PERSON, lastSyncDate);
 
         // Then
         assertEquals(2, result.size());
@@ -60,11 +60,11 @@ public class EntityServiceFacadeTest {
         // Given
         LocalDateTime lastSyncDate = LocalDateTime.now();
         facade = new EntityServiceFacade(Collections.singletonList(personService));
-        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
-        when(patientService.getTableName()).thenReturn(TableNameEnum.VISIT);
+        when(personService.getEntityName()).thenReturn(EntityNameEnum.PERSON);
+        when(patientService.getEntityName()).thenReturn(EntityNameEnum.VISIT);
 
         // When
-        facade.getModels(TableNameEnum.VISIT, lastSyncDate);
+        facade.getModels(EntityNameEnum.VISIT, lastSyncDate);
 
         // Then
         // BOOM
@@ -74,10 +74,10 @@ public class EntityServiceFacadeTest {
     public void saveModel() {
         // Given
         PersonModel personModel = new PersonModel();
-        when(personService.getTableName()).thenReturn(TableNameEnum.PERSON);
+        when(personService.getEntityName()).thenReturn(EntityNameEnum.PERSON);
 
         // When
-        facade.saveModel(TableNameEnum.PERSON, personModel);
+        facade.saveModel(EntityNameEnum.PERSON, personModel);
 
         // Then
         verify(personService).save(personModel);

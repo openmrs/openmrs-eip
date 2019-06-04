@@ -27,7 +27,7 @@ import static java.util.Collections.singletonMap;
         transactionManagerRef = "openmrsTransactionManager",
         basePackages = {"org.openmrs.sync.core.repository"}
 )
-public class OpenMrsDataSourceConfigRemote implements DataSourceConfig {
+public class OpenMrsDataSourceRemoteConfig implements DataSourceConfig {
 
     @Value("${spring.openmrs-datasource.dialect}")
     private String hibernateDialect;

@@ -4,16 +4,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.TableNameEnum;
-import org.openmrs.sync.remote.management.entity.TableSyncStatus;
-import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
+import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.remote.management.entity.EntitySyncStatus;
+import org.openmrs.sync.remote.management.repository.EntitySyncStatusRepository;
 
 import static org.mockito.Mockito.*;
 
 public class AbstractManagementDbInitTest {
 
     @Mock
-    private TableSyncStatusRepository repository;
+    private EntitySyncStatusRepository repository;
 
     private MockedManagementDbInit dbInit;
 
@@ -27,17 +27,17 @@ public class AbstractManagementDbInitTest {
     @Test
     public void start() {
         // Given
-        TableSyncStatus toSave = new TableSyncStatus();
-        toSave.setTableName(TableNameEnum.PERSON);
+        EntitySyncStatus toSave = new EntitySyncStatus();
+        toSave.setEntityName(EntityNameEnum.PERSON);
 
-        when(repository.countByTableName(TableNameEnum.PERSON)).thenReturn(0L);
-        when(repository.countByTableName(TableNameEnum.VISIT)).thenReturn(1L);
+        when(repository.countByEntityName(EntityNameEnum.PERSON)).thenReturn(0L);
+        when(repository.countByEntityName(EntityNameEnum.VISIT)).thenReturn(1L);
         when(repository.save(toSave)).thenReturn(toSave);
 
         // When
         dbInit.start();
 
         // Then
-        verify(repository).save(any(TableSyncStatus.class));
+        verify(repository).save(any(EntitySyncStatus.class));
     }
 }

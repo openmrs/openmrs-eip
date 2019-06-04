@@ -28,7 +28,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
      * get the service entity name
      * @return enum
      */
-    public abstract TableNameEnum getTableName();
+    public abstract EntityNameEnum getEntityName();
 
     @Override
     public M save(M model) {

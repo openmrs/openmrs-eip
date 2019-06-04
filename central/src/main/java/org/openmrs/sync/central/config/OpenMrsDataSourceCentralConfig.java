@@ -27,7 +27,7 @@ import static java.util.Collections.singletonMap;
         entityManagerFactoryRef = "entityManager",
         basePackages = {"org.openmrs.sync.core.repository"}
 )
-public class OpenMrsDataSourceConfigCentral implements DataSourceConfig {
+public class OpenMrsDataSourceCentralConfig implements DataSourceConfig {
 
     @Primary
     @Bean(name = "dataSource")

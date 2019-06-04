@@ -4,9 +4,6 @@ import org.openmrs.sync.core.entity.MockedEntity;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.MockedModel;
 import org.openmrs.sync.core.repository.AuditableRepository;
-import org.openmrs.sync.core.repository.OpenMrsRepository;
-
-import java.util.function.Function;
 
 public class MockedEntityService extends AbstractEntityService<MockedEntity, MockedModel> {
 
@@ -16,7 +13,7 @@ public class MockedEntityService extends AbstractEntityService<MockedEntity, Moc
     }
 
     @Override
-    public TableNameEnum getTableName() {
+    public EntityNameEnum getEntityName() {
         return null;
     }
 }

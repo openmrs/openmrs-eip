@@ -1,4 +1,4 @@
-package org.openmrs.sync.remote.camel.routes;
+package org.openmrs.sync.remote.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
@@ -11,10 +11,10 @@ public class ScheduledRoute extends RouteBuilder {
     @Override
     public void configure() {
         from("scheduler:sync?delay=" + DELAY)
-                .to("jpa://org.openmrs.sync.remote.management.entity.TableSyncStatus?" +
-                        "query=select p from org.openmrs.sync.remote.management.entity.TableSyncStatus p")
+                .to("jpa://org.openmrs.sync.remote.management.entity.EntitySyncStatus?" +
+                        "query=select p from org.openmrs.sync.remote.management.entity.EntitySyncStatus p")
                 .split(body()).streaming()
-                .setHeader("OpenMrsTableSyncStatusId", simple("${in.body.getId()}"))
+                .setHeader("OpenMrsEntitySyncStatusId", simple("${in.body.getId()}"))
                 .to("seda:sync");
     }
 }
