@@ -15,22 +15,22 @@ import static org.junit.Assert.assertEquals;
 public class PersonServiceTest {
 
     @Mock
-    private AuditableRepository<Person> personRepository;
+    private AuditableRepository<Person> repository;
 
     @Mock
     private EntityMapper<Person, PersonModel> mapper;
 
-    private PersonService personService;
+    private PersonService service;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        personService = new PersonService(personRepository, mapper);
+        service = new PersonService(repository, mapper);
     }
 
     @Test
     public void getEntityName() {
-        assertEquals(EntityNameEnum.PERSON, personService.getEntityName());
+        assertEquals(EntityNameEnum.PERSON, service.getEntityName());
     }
 }

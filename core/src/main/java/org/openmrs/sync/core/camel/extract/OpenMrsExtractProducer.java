@@ -1,13 +1,9 @@
 package org.openmrs.sync.core.camel.extract;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.model.CamelModel;
 import org.openmrs.sync.core.service.EntityNameEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.openmrs.sync.core.utils.JsonUtils;
@@ -39,11 +35,9 @@ public class OpenMrsExtractProducer extends DefaultProducer {
 
         List<String> json = models.stream()
                 .filter(Objects::nonNull)
-                .map(CamelModel::new)
                 .map(JsonUtils::marshall)
                 .collect(Collectors.toList());
 
         exchange.getIn().setBody(json);
-        exchange.getIn().setHeader("OpenMrsTableSyncName", entityName);
     }
 }

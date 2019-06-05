@@ -15,7 +15,7 @@ public class SelectRoute extends RouteBuilder {
     @Override
     public void configure() {
         from("seda:sync")
-                .recipientList(simple("openmrsExtract:${body.getEntityName().name()}?lastSyncDate=${body.getLastSyncDate()}"))
+                .recipientList(simple("openmrsExtract:${body.getEntityName().name()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
                 .split(body()).streaming()
                         .to("log:row")
                         .to("{{output.queue}}")

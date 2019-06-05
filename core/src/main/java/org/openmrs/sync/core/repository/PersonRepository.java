@@ -13,6 +13,14 @@ public interface PersonRepository extends AuditableRepository<Person> {
     Person findByUuid(final String uuid);
 
     @Override
-    @Query("select p from Person p where p.dateChanged is null and p.dateCreated >= :lastSyncDate or p.dateChanged >= :lastSyncDate")
+    @Query("select p from Person p " +
+            "where type(p) = 'Person'")
+    List<Person> findAll();
+
+    @Override
+    @Query("select p from Person p " +
+            "where p.dateChanged is null " +
+            "and (p.dateCreated >= :lastSyncDate or p.dateChanged >= :lastSyncDate) " +
+            "and type(p) = 'Person'")
     List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

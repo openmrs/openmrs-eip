@@ -34,9 +34,6 @@ public class PersonMapperTest {
     @Mock
     private SimpleService<ConceptLight> conceptService;
 
-    @Mock
-    private EntityMapper<Patient, PatientModel> patientMapper;
-
     @InjectMocks
     private PersonMapperImpl mapper;
 
@@ -58,21 +55,6 @@ public class PersonMapperTest {
     }
 
     @Test
-    public void entityToModel_Patient() {
-        // Given
-        Patient ety = new Patient();
-        PatientModel model = new PatientModel();
-        when(patientMapper.entityToModel(ety)).thenReturn(model);
-
-        // When
-        PatientModel result = (PatientModel) mapper.entityToModel(ety);
-
-        // Then
-        verify(patientMapper).entityToModel(ety);
-        assertEquals(model, result);
-    }
-
-    @Test
     public void modelToEntity() {
         // Given
         PersonModel model = getPersonModel(false);
@@ -84,21 +66,6 @@ public class PersonMapperTest {
 
         // Then
         assertResult(model, result);
-    }
-
-    @Test
-    public void modelToEntity_Patient() {
-        // Given
-        PatientModel model = new PatientModel();
-        Patient ety = new Patient();
-        when(patientMapper.modelToEntity(model)).thenReturn(ety);
-
-        // When
-        Patient result = (Patient) mapper.modelToEntity(model);
-
-        // Then
-        verify(patientMapper).modelToEntity(model);
-        assertEquals(ety, result);
     }
 
     @Test

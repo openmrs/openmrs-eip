@@ -10,8 +10,9 @@ import org.springframework.stereotype.Component;
 public class WriteRoute extends RouteBuilder {
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("{{input.queue}}")
+                .to("log:tut")
                 .to("openmrsLoad");
     }
 }

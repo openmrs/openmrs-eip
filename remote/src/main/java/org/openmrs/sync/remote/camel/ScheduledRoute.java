@@ -15,6 +15,7 @@ public class ScheduledRoute extends RouteBuilder {
                         "query=select p from org.openmrs.sync.remote.management.entity.EntitySyncStatus p")
                 .split(body()).streaming()
                 .setHeader("OpenMrsEntitySyncStatusId", simple("${in.body.getId()}"))
+                .setHeader("OpenMrsEntitySyncName", simple("${in.body.getEntityName().name()}"))
                 .to("seda:sync");
     }
 }

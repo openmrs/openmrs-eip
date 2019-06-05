@@ -2,6 +2,7 @@ package org.openmrs.sync.remote.management.entity;
 
 import lombok.Data;
 import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.utils.DateUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,4 +21,8 @@ public class EntitySyncStatus {
 
     @Column(name = "last_sync_date")
     private LocalDateTime lastSyncDate;
+
+    public String getLastSyncDateAsString() {
+        return DateUtils.toString(lastSyncDate);
+    }
 }
