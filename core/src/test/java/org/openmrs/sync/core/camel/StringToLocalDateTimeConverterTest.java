@@ -19,7 +19,7 @@ public class StringToLocalDateTimeConverterTest {
         // Given
         String dateAsString = "2019-06-05-1552";
 
-        // When
+        // When²²²
         LocalDateTime result = converter.convertTo(LocalDateTime.class, exchange, dateAsString);
 
         // Then

@@ -16,7 +16,7 @@ public class StringToLocalDateTimeConverter extends TypeConverterSupport {
         if (valueAsString.isEmpty()) {
             return null;
         }
-        return (T) DateUtils.fromString(valueAsString);
+        return (T) DateUtils.stringToDate(valueAsString);
     }
 
     @Override
