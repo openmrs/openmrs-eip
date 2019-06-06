@@ -1,14 +1,14 @@
-package org.openmrs.sync.core.service.impl;
+package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.AbstractSimpleService;
+import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ConceptService extends AbstractSimpleService<ConceptLight> {
+public class ConceptLightService extends AbstractLightService<ConceptLight> {
 
-    public ConceptService(final OpenMrsRepository<ConceptLight> conceptRepository) {
+    public ConceptLightService(final OpenMrsRepository<ConceptLight> conceptRepository) {
         super(conceptRepository);
     }
 

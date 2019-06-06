@@ -1,14 +1,14 @@
-package org.openmrs.sync.core.service.impl;
+package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.VisitTypeLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.AbstractSimpleService;
+import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class VisitTypeService extends AbstractSimpleService<VisitTypeLight> {
+public class VisitTypeLightService extends AbstractLightService<VisitTypeLight> {
 
-    public VisitTypeService(final OpenMrsRepository<VisitTypeLight> repository) {
+    public VisitTypeLightService(final OpenMrsRepository<VisitTypeLight> repository) {
         super(repository);
     }
 

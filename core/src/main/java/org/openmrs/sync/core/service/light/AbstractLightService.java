@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.service;
+package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
@@ -6,7 +6,7 @@ import org.openmrs.sync.core.repository.OpenMrsRepository;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-public abstract class AbstractSimpleService<E extends BaseEntity> implements SimpleService<E> {
+public abstract class AbstractLightService<E extends BaseEntity> implements LightService<E> {
 
     protected static final String DEFAULT_STRING= "Default";
     protected static final LocalDateTime DEFAULT_DATE = LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0);
@@ -14,7 +14,7 @@ public abstract class AbstractSimpleService<E extends BaseEntity> implements Sim
 
     private OpenMrsRepository<E> repository;
 
-    public AbstractSimpleService(final OpenMrsRepository<E> repository) {
+    public AbstractLightService(final OpenMrsRepository<E> repository) {
         this.repository = repository;
     }
 

@@ -9,7 +9,7 @@ import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PatientModel;
-import org.openmrs.sync.core.service.SimpleService;
+import org.openmrs.sync.core.service.light.LightService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,10 +23,10 @@ import static org.mockito.Mockito.when;
 public class PatientMapperTest {
 
     @Mock
-    private SimpleService<UserLight> userService;
+    private LightService<UserLight> userService;
 
     @Mock
-    private SimpleService<ConceptLight> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     @InjectMocks
     private PatientMapperImpl mapper;

@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.service.impl;
+package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.repository.ConceptRepository;
@@ -6,24 +6,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.core.service.light.impl.ConceptLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConceptServiceTest {
+public class ConceptLightServiceTest {
 
     @Mock
     private ConceptRepository repository;
 
-    private ConceptService service;
+    private ConceptLightService service;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new ConceptService(repository);
+        service = new ConceptLightService(repository);
     }
 
     @Test

@@ -1,11 +1,12 @@
-package org.openmrs.sync.core.service;
+package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.MockedEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
+import org.openmrs.sync.core.service.light.AbstractLightService;
 
-public class MockedSimpleService extends AbstractSimpleService<MockedEntity> {
+public class MockedLightService extends AbstractLightService<MockedEntity> {
 
-    public MockedSimpleService(final OpenMrsRepository<MockedEntity> repository) {
+    public MockedLightService(final OpenMrsRepository<MockedEntity> repository) {
         super(repository);
     }
 

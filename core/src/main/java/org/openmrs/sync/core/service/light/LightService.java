@@ -1,8 +1,8 @@
-package org.openmrs.sync.core.service;
+package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.BaseEntity;
 
-public interface SimpleService<E extends BaseEntity> {
+public interface LightService<E extends BaseEntity> {
 
     /**
      * Gets the entity with the given uuid or creates it

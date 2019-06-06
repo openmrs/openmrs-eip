@@ -6,26 +6,26 @@ import org.mapstruct.Mappings;
 import org.openmrs.sync.core.entity.Visit;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.VisitModel;
-import org.openmrs.sync.core.service.SimpleService;
+import org.openmrs.sync.core.service.light.LightService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class VisitMapper implements EntityMapper<Visit, VisitModel> {
 
     @Autowired
-    protected SimpleService<UserLight> userService;
+    protected LightService<UserLight> userService;
 
     @Autowired
-    protected SimpleService<VisitTypeLight> visitTypeService;
+    protected LightService<VisitTypeLight> visitTypeService;
 
     @Autowired
-    protected SimpleService<LocationLight> locationService;
+    protected LightService<LocationLight> locationService;
 
     @Autowired
-    protected SimpleService<ConceptLight> conceptService;
+    protected LightService<ConceptLight> conceptService;
 
     @Autowired
-    protected SimpleService<PatientLight> patientService;
+    protected LightService<PatientLight> patientService;
 
     @Override
     @Mappings({

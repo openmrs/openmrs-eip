@@ -7,17 +7,17 @@ import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PersonModel;
-import org.openmrs.sync.core.service.SimpleService;
+import org.openmrs.sync.core.service.light.LightService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class PersonMapper implements EntityMapper<Person, PersonModel> {
 
     @Autowired
-    protected SimpleService<ConceptLight> conceptService;
+    protected LightService<ConceptLight> conceptService;
 
     @Autowired
-    protected SimpleService<UserLight> userService;
+    protected LightService<UserLight> userService;
 
     @Override
     @Mappings({

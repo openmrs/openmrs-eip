@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.service;
+package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.MockedEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
@@ -11,12 +11,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public class AbstractSimpleServiceTest {
+public class AbstractLightServiceTest {
 
     @Mock
     private OpenMrsRepository<MockedEntity> repository;
 
-    private MockedSimpleService service;
+    private MockedLightService service;
 
     private static final String UUID = "uuid";
 
@@ -24,7 +24,7 @@ public class AbstractSimpleServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new MockedSimpleService(repository);
+        service = new MockedLightService(repository);
     }
 
     @Test

@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.sync.core.entity.Visit;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.VisitModel;
-import org.openmrs.sync.core.service.SimpleService;
+import org.openmrs.sync.core.service.light.LightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,19 +23,19 @@ import static org.mockito.Mockito.when;
 public class VisitMapperTest {
 
     @Mock
-    protected SimpleService<UserLight> userService;
+    protected LightService<UserLight> userService;
 
     @Mock
-    protected SimpleService<VisitTypeLight> visitTypeService;
+    protected LightService<VisitTypeLight> visitTypeService;
 
     @Mock
-    protected SimpleService<LocationLight> locationService;
+    protected LightService<LocationLight> locationService;
 
     @Mock
-    protected SimpleService<ConceptLight> conceptService;
+    protected LightService<ConceptLight> conceptService;
 
     @Mock
-    protected SimpleService<PatientLight> patientService;
+    protected LightService<PatientLight> patientService;
 
     @InjectMocks
     private VisitMapperImpl mapper;
