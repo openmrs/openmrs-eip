@@ -1,7 +1,7 @@
 package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.entity.light.UserLight;
-import org.openmrs.sync.core.repository.UserRepository;
+import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class UserServiceTest {
 
     @Mock
-    private UserRepository repository;
+    private OpenMrsRepository<UserLight> repository;
 
     private UserService service;
 
@@ -37,7 +37,7 @@ public class UserServiceTest {
         user.setCreator(1L);
         user.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         user.setSystemId("admin");
-        user.setPersonId(1);
+        user.setPersonId(1L);
         return user;
     }
 }

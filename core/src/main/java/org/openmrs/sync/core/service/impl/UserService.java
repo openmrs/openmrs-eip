@@ -5,9 +5,6 @@ import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.AbstractSimpleService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.Month;
-
 @Service
 public class UserService extends AbstractSimpleService<UserLight> {
 
@@ -19,10 +16,10 @@ public class UserService extends AbstractSimpleService<UserLight> {
     protected UserLight getFakeEntity(final String uuid) {
         UserLight user = new UserLight();
         user.setUuid(uuid);
-        user.setCreator(1L);
-        user.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+        user.setCreator(DEFAULT_USER_ID);
+        user.setDateCreated(DEFAULT_DATE);
         user.setSystemId("admin");
-        user.setPersonId(1);
+        user.setPersonId(1L);
         return user;
     }
 }

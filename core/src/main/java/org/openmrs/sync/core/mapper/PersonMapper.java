@@ -19,6 +19,7 @@ public abstract class PersonMapper implements EntityMapper<Person, PersonModel> 
     @Autowired
     protected SimpleService<UserLight> userService;
 
+    @Override
     @Mappings({
             @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid"),
             @Mapping(source = "creator.uuid", target = "creatorUuid"),
@@ -27,6 +28,7 @@ public abstract class PersonMapper implements EntityMapper<Person, PersonModel> 
     })
     public abstract PersonModel entityToModel(final Person entity);
 
+    @Override
     @Mappings({
             @Mapping(expression = "java(conceptService.getOrInit(model.getCauseOfDeathUuid()))", target ="causeOfDeath"),
             @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),

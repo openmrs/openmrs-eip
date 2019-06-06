@@ -4,20 +4,23 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.sync.core.entity.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "users")
-@AttributeOverride(name = "id", column = @Column(name = "user_id"))
-public class UserLight extends BaseEntity {
+@Table(name = "visit_type")
+@AttributeOverride(name = "id", column = @Column(name = "visit_type_id"))
+public class VisitTypeLight extends BaseEntity {
 
     @NotNull
-    @Column(name = "system_id")
-    private String systemId;
+    @Column(name = "name")
+    private String name;
 
     @NotNull
     @Column(name = "creator")
@@ -28,8 +31,6 @@ public class UserLight extends BaseEntity {
     private LocalDateTime dateCreated;
 
     @NotNull
-    @Column(name = "person_id")
-    private Long personId;
-
-    public UserLight() {}
+    @Column(name = "retired")
+    private boolean retired;
 }

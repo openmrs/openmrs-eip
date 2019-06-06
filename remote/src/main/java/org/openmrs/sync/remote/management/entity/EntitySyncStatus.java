@@ -21,4 +21,11 @@ public class EntitySyncStatus {
 
     @Column(name = "last_sync_date")
     private LocalDateTime lastSyncDate;
+
+    public String getLastSyncDateAsString() {
+        if (lastSyncDate == null) {
+            return null;
+        }
+        return DateUtils.dateToString(lastSyncDate);
+    }
 }

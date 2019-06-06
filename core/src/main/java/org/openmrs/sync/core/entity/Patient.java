@@ -20,6 +20,7 @@ public class Patient extends Person {
     @Column(name = "allergy_status")
     private String allergyStatus;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "creator")
     private UserLight patientCreator;

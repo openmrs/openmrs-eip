@@ -34,8 +34,8 @@ public class ConceptServiceTest {
     private ConceptLight getExpectedConcept() {
         ConceptLight expected = new ConceptLight();
         expected.setUuid("UUID");
-        expected.setClassId(1);
-        expected.setDatatypeId(1);
+        expected.setClassId(1L);
+        expected.setDatatypeId(1L);
         expected.setCreator(1L);
         expected.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         return expected;

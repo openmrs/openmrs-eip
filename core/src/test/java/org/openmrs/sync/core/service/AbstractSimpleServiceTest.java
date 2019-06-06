@@ -9,7 +9,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AbstractSimpleServiceTest {
 
@@ -38,6 +38,7 @@ public class AbstractSimpleServiceTest {
         MockedEntity result = service.getOrInit(UUID);
 
         // Then
+        verify(repository, never()).save(any());
         assertEquals(userEty, result);
     }
 

@@ -1,0 +1,26 @@
+package org.openmrs.sync.core.service.impl;
+
+import org.openmrs.sync.core.entity.light.PatientLight;
+import org.openmrs.sync.core.repository.OpenMrsRepository;
+import org.openmrs.sync.core.service.AbstractSimpleService;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PatientLightService extends AbstractSimpleService<PatientLight> {
+
+    public PatientLightService(final OpenMrsRepository<PatientLight> repository) {
+        super(repository);
+    }
+
+    @Override
+    protected PatientLight getFakeEntity(final String uuid) {
+        PatientLight patient = new PatientLight();
+        patient.setUuid(uuid);
+        patient.setAllergyStatus(DEFAULT_STRING);
+        patient.setCreator(DEFAULT_USER_ID);
+        patient.setPatientCreator(DEFAULT_USER_ID);
+        patient.setDateCreated(DEFAULT_DATE);
+        patient.setPatientDateCreated(DEFAULT_DATE);
+        return patient;
+    }
+}

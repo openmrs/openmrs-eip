@@ -17,11 +17,11 @@ public class ConceptLight extends BaseEntity {
 
     @NotNull
     @Column(name = "datatype_id")
-    private int datatypeId;
+    private Long datatypeId;
 
     @NotNull
     @Column(name = "class_id")
-    private int classId;
+    private Long classId;
 
     @NotNull
     @Column(name = "creator")

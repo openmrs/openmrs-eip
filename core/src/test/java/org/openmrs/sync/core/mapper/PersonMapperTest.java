@@ -103,25 +103,19 @@ public class PersonMapperTest {
     }
 
     private Person getPersonEty() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("causeOfDeath");
-
-        UserLight user = new UserLight();
-        user.setUuid("userId");
-
         Person ety = new Person();
         ety.setGender("M");
         ety.setBirthdate(LocalDate.of(1956, Month.OCTOBER, 22));
         ety.setBirthdateEstimated(true);
         ety.setDead(false);
         ety.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
-        ety.setCauseOfDeath(concept);
-        ety.setCreator(user);
+        ety.setCauseOfDeath(getConcept());
+        ety.setCreator(getUser());
         ety.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        ety.setChangedBy(user);
+        ety.setChangedBy(getUser());
         ety.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         ety.setVoided(true);
-        ety.setVoidedBy(user);
+        ety.setVoidedBy(getUser());
         ety.setDateVoided(LocalDateTime.of(2012, Month.JANUARY, 1, 0, 0));
         ety.setVoidReason("voided");
         ety.setUuid("person");
@@ -175,12 +169,12 @@ public class PersonMapperTest {
         model.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
         model.setCauseOfDeathUuid(nullDependencies ? null : "concept");
         model.setCreatorUuid(nullDependencies ? null : "user");
-        model.setDateCreated(nullDependencies ? null : LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
+        model.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
         model.setChangedByUuid(nullDependencies ? null : "user");
-        model.setDateChanged(nullDependencies ? null : LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
+        model.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         model.setVoided(true);
         model.setVoidedByUuid(nullDependencies ? null : "user");
-        model.setDateVoided(nullDependencies ? null : LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
+        model.setDateVoided(LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
         model.setVoidReason(nullDependencies ? null : "voided");
         model.setUuid("person");
         model.setDeathdateEstimated(false);
