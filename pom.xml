@@ -19,6 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <mapStructVersion>1.3.0.Final</mapStructVersion>
+    <activeMqVersion>5.15.8</activeMqVersion>
   </properties>
 
   <dependencyManagement>
