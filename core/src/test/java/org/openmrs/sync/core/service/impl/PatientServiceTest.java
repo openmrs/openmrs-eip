@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.PatientModel;
-import org.openmrs.sync.core.repository.AuditableRepository;
+import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.EntityNameEnum;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class PatientServiceTest {
 
     @Mock
-    private AuditableRepository<Patient> repository;
+    private SyncEntityRepository<Patient> repository;
 
     @Mock
     private EntityMapper<Patient, PatientModel> mapper;

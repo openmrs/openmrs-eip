@@ -10,6 +10,7 @@ import org.openmrs.sync.core.service.light.impl.PatientLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +30,7 @@ public class PatientLightServiceTest {
 
     @Test
     public void getFakeEntity() {
-        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid"));
+        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid", Collections.emptyList()));
     }
 
     private PatientLight getExpectedLocation() {
@@ -39,7 +40,7 @@ public class PatientLightServiceTest {
         patient.setPatientCreator(1L);
         patient.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         patient.setPatientDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        patient.setAllergyStatus("Default");
+        patient.setAllergyStatus("[Default]");
         return patient;
     }
 }

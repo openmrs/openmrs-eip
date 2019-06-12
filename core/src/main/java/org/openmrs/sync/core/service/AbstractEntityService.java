@@ -3,7 +3,7 @@ package org.openmrs.sync.core.service;
 import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.repository.AuditableRepository;
+import org.openmrs.sync.core.repository.SyncEntityRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,10 +13,10 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
-    private AuditableRepository<E> repository;
+    private SyncEntityRepository<E> repository;
     private EntityMapper<E, M> mapper;
 
-    public AbstractEntityService(final AuditableRepository<E> repository,
+    public AbstractEntityService(final SyncEntityRepository<E> repository,
                                  final EntityMapper<E, M> mapper) {
         assertNotNull(repository);
         assertNotNull(mapper);

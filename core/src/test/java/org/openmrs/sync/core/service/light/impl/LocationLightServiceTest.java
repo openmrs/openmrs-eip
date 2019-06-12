@@ -10,6 +10,7 @@ import org.openmrs.sync.core.service.light.impl.LocationLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +30,7 @@ public class LocationLightServiceTest {
 
     @Test
     public void getFakeEntity() {
-        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid"));
+        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid", Collections.emptyList()));
     }
 
     private LocationLight getExpectedLocation() {
@@ -37,7 +38,7 @@ public class LocationLightServiceTest {
         location.setUuid("uuid");
         location.setCreator(1L);
         location.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        location.setName("Default");
+        location.setName("[Default]");
         return location;
     }
 }

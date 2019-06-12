@@ -26,21 +26,5 @@ public class PersonModel extends BaseModel {
 
     private boolean deathdateEstimated;
 
-    private String creatorUuid;
-
-    private LocalDateTime dateCreated;
-
-    private String changedByUuid;
-
-    private LocalDateTime dateChanged;
-
-    private boolean voided;
-
-    private String voidedByUuid;
-
-    private LocalDateTime dateVoided;
-
-    private String voidReason;
-
     private LocalTime birthtime;
 }

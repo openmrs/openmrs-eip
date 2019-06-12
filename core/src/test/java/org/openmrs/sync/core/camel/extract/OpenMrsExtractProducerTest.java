@@ -61,13 +61,6 @@ public class OpenMrsExtractProducerTest {
 
     private String expectedJson(final String uuid) {
         return "{\"uuid\":\"" + uuid + "\"," +
-                "\"gender\":null," +
-                "\"birthdate\":null," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"deathdateEstimated\":false," +
                 "\"creatorUuid\":null," +
                 "\"dateCreated\":null," +
                 "\"changedByUuid\":null," +
@@ -76,6 +69,13 @@ public class OpenMrsExtractProducerTest {
                 "\"voidedByUuid\":null," +
                 "\"dateVoided\":null," +
                 "\"voidReason\":null," +
+                "\"gender\":null," +
+                "\"birthdate\":null," +
+                "\"birthdateEstimated\":false," +
+                "\"dead\":false," +
+                "\"deathDate\":null," +
+                "\"causeOfDeathUuid\":null," +
+                "\"deathdateEstimated\":false," +
                 "\"birthtime\":null" +
                 "}";
     }

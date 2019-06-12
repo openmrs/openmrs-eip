@@ -7,12 +7,11 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface VisitRepository extends AuditableRepository<Visit> {
+public interface VisitRepository extends SyncEntityRepository<Visit> {
 
     @Override
-    Visit findByUuid(final String uuid);
-
-    @Override
-    @Query("select v from Visit v where v.dateChanged is null and v.dateCreated >= :lastSyncDate or v.dateChanged >= :lastSyncDate")
+    @Query("select v from Visit v " +
+            "where v.dateChanged is null and v.dateCreated >= :lastSyncDate " +
+            "or v.dateChanged >= :lastSyncDate")
     List<Visit> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

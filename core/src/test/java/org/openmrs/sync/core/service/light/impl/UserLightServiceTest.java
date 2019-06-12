@@ -10,6 +10,7 @@ import org.openmrs.sync.core.service.light.impl.UserLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +30,7 @@ public class UserLightServiceTest {
 
     @Test
     public void getFakeEntity() {
-        assertEquals(getExpectedUser(), service.getFakeEntity("uuid"));
+        assertEquals(getExpectedUser(), service.getFakeEntity("uuid", Collections.emptyList()));
     }
 
     private UserLight getExpectedUser() {

@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Visit;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.VisitModel;
-import org.openmrs.sync.core.repository.AuditableRepository;
+import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.EntityNameEnum;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class VisitServiceTest {
 
     @Mock
-    private AuditableRepository<Visit> repository;
+    private SyncEntityRepository<Visit> repository;
 
     @Mock
     private EntityMapper<Visit, VisitModel> mapper;

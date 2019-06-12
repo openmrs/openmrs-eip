@@ -1,14 +1,13 @@
 package org.openmrs.sync.core.service;
 
-import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.model.PatientModel;
-import org.openmrs.sync.core.model.PersonModel;
-import org.openmrs.sync.core.model.VisitModel;
+import org.openmrs.sync.core.model.*;
 
 public enum EntityNameEnum {
     PERSON(PersonModel.class),
     PATIENT(PatientModel.class),
-    VISIT(VisitModel.class);
+    VISIT(VisitModel.class),
+    ENCOUNTER(EncounterModel.class),
+    OBSERVATION(ObservationModel.class);
 
     private Class<? extends BaseModel> modelClass;
 

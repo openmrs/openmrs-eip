@@ -10,6 +10,7 @@ import org.openmrs.sync.core.service.light.impl.VisitTypeLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +30,7 @@ public class VisitTypeLightServiceTest {
 
     @Test
     public void getFakeEntity() {
-        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid"));
+        assertEquals(getExpectedLocation(), service.getFakeEntity("uuid", Collections.emptyList()));
     }
 
     private VisitTypeLight getExpectedLocation() {
@@ -37,7 +38,7 @@ public class VisitTypeLightServiceTest {
         visitType.setUuid("uuid");
         visitType.setCreator(1L);
         visitType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        visitType.setName("Default");
+        visitType.setName("[Default]");
         return visitType;
     }
 }

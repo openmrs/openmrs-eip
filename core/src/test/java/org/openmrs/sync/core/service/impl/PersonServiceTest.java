@@ -1,7 +1,7 @@
 package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.mapper.EntityMapper;
-import org.openmrs.sync.core.repository.AuditableRepository;
+import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.EntityNameEnum;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.PersonModel;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class PersonServiceTest {
 
     @Mock
-    private AuditableRepository<Person> repository;
+    private SyncEntityRepository<Person> repository;
 
     @Mock
     private EntityMapper<Person, PersonModel> mapper;

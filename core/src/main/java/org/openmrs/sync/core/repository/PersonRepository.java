@@ -7,10 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PersonRepository extends AuditableRepository<Person> {
-
-    @Override
-    Person findByUuid(final String uuid);
+public interface PersonRepository extends SyncEntityRepository<Person> {
 
     @Override
     @Query("select p from Person p " +
@@ -19,8 +16,8 @@ public interface PersonRepository extends AuditableRepository<Person> {
 
     @Override
     @Query("select p from Person p " +
-            "where p.dateChanged is null " +
-            "and (p.dateCreated >= :lastSyncDate or p.dateChanged >= :lastSyncDate) " +
+            "where (p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
+            "or p.dateChanged >= :lastSyncDate) " +
             "and type(p) = 'Person'")
     List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }
