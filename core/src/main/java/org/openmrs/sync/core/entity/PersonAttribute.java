@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "person_attribute")
-@Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_attribute_id"))
 public class PersonAttribute extends AuditableEntity {
 
