@@ -6,11 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.light.impl.UserLightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,8 +27,8 @@ public class UserLightServiceTest {
     }
 
     @Test
-    public void getFakeEntity() {
-        assertEquals(getExpectedUser(), service.getFakeEntity("uuid", Collections.emptyList()));
+    public void getShadowEntity() {
+        assertEquals(getExpectedUser(), service.getShadowEntity("uuid"));
     }
 
     private UserLight getExpectedUser() {

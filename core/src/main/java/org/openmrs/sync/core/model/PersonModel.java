@@ -24,6 +24,10 @@ public class PersonModel extends BaseModel {
 
     private String causeOfDeathUuid;
 
+    private String causeOfDeathClassUuid;
+
+    private String causeOfDeathDatatypeUuid;
+
     private boolean deathdateEstimated;
 
     private LocalTime birthtime;

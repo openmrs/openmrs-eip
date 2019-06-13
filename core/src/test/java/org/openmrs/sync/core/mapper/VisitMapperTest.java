@@ -11,6 +11,8 @@ import org.openmrs.sync.core.entity.Visit;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.VisitModel;
 import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -20,22 +22,22 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class VisitMapperTest {
+public class VisitMapperTest extends AbstractMapperTest {
 
     @Mock
-    protected LightService<UserLight> userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Mock
-    protected LightService<VisitTypeLight> visitTypeService;
+    protected LightServiceNoContext<VisitTypeLight> visitTypeService;
 
     @Mock
-    protected LightService<LocationLight> locationService;
+    protected LightServiceNoContext<LocationLight> locationService;
 
     @Mock
-    protected LightService<ConceptLight> conceptService;
+    protected LightService<ConceptLight, ConceptContext> conceptService;
 
     @Mock
-    protected LightService<PatientLight> patientService;
+    protected LightServiceNoContext<PatientLight> patientService;
 
     @InjectMocks
     private VisitMapperImpl mapper;
@@ -58,28 +60,14 @@ public class VisitMapperTest {
     }
 
     @Test
-    public void modelToEntity() {
+     public void modelToEntity() {
         // Given
-        VisitModel model = getVisitModel(false);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
+        VisitModel model = getVisitModel();
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
         when(userService.getOrInit("user")).thenReturn(getUser());
         when(locationService.getOrInit("location")).thenReturn(getLocation());
         when(visitTypeService.getOrInit("visitType")).thenReturn(getVisitType());
         when(patientService.getOrInit("patient")).thenReturn(getPatient());
-
-        // When
-        Visit result = mapper.modelToEntity(model);
-
-        // Then
-        assertResult(model, result);
-    }
-
-    @Test
-    public void modelToEntityWithNullDependencies() {
-        // Given
-        VisitModel model = getVisitModel(true);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
 
         // When
         Visit result = mapper.modelToEntity(model);
@@ -107,12 +95,6 @@ public class VisitMapperTest {
     }
 
     private Visit getVisitEty() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("causeOfDeath");
-
-        UserLight user = new UserLight();
-        user.setUuid("userId");
-
         Visit visit = new Visit();
         visit.setUuid("visit");
         visit.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 10, 10));
@@ -142,53 +124,27 @@ public class VisitMapperTest {
         assertEquals(model.getVoidReason(), result.getVoidReason());
         assertEquals(model.getDateStarted(), result.getDateStarted());
         assertEquals(model.getDateStopped(), result.getDateStopped());
-        if (model.getVoidedByUuid() != null) {
-            assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
-        } else {
-            assertNull(result.getVoidedBy());
-        }
-        if (model.getCreatorUuid() != null) {
-            assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
-        } else {
-            assertNull(result.getCreator());
-        }
-        if (model.getPatientUuid() != null) {
-            assertEquals(model.getPatientUuid(), result.getPatient().getUuid());
-        } else {
-            assertNull(result.getCreator());
-        }
-        if (model.getChangedByUuid() != null) {
-            assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
-        } else {
-            assertNull(result.getChangedBy());
-        }
-        if (model.getLocationUuid() != null) {
-            assertEquals(model.getLocationUuid(), result.getLocation().getUuid());
-        } else {
-            assertNull(result.getLocation());
-        }
-        if (model.getIndicationConceptUuid() != null) {
-            assertEquals(model.getIndicationConceptUuid(), result.getIndicationConcept().getUuid());
-        } else {
-            assertNull(result.getIndicationConcept());
-        }
-        if (model.getVisitTypeUuid() != null) {
-            assertEquals(model.getVisitTypeUuid(), result.getVisitType().getUuid());
-        } else {
-            assertNull(result.getVisitType());
-        }
+        assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
+        assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
+        assertEquals(model.getPatientUuid(), result.getPatient().getUuid());
+        assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
+        assertEquals(model.getLocationUuid(), result.getLocation().getUuid());
+        assertEquals(model.getIndicationConceptUuid(), result.getIndicationConcept().getUuid());
+        assertEquals(model.getVisitTypeUuid(), result.getVisitType().getUuid());
     }
 
-    private VisitModel getVisitModel(final boolean nullDependencies) {
+    private VisitModel getVisitModel() {
         VisitModel visitModel = new VisitModel();
 
-        visitModel.setIndicationConceptUuid(nullDependencies ? null : "concept");
-        visitModel.setPatientUuid(nullDependencies ? null : "patient");
-        visitModel.setCreatorUuid(nullDependencies ? null : "user");
-        visitModel.setLocationUuid(nullDependencies ? null : "location");
-        visitModel.setVoidedByUuid(nullDependencies ? null : "user");
-        visitModel.setChangedByUuid(nullDependencies ? null : "user");
-        visitModel.setVisitTypeUuid(nullDependencies ? null : "visitType");
+        visitModel.setIndicationConceptUuid("concept");
+        visitModel.setIndicationConceptClassUuid("conceptClass");
+        visitModel.setIndicationConceptDatatypeUuid("conceptDatatype");
+        visitModel.setPatientUuid("patient");
+        visitModel.setCreatorUuid("user");
+        visitModel.setLocationUuid("location");
+        visitModel.setVoidedByUuid("user");
+        visitModel.setChangedByUuid("user");
+        visitModel.setVisitTypeUuid("visitType");
         visitModel.setUuid("visit");
         visitModel.setDateStarted(LocalDateTime.of(2010,Month.JANUARY, 1, 10, 11));
         visitModel.setDateStopped(LocalDateTime.of(2010,Month.JANUARY, 1, 10, 15));
@@ -201,33 +157,10 @@ public class VisitMapperTest {
         return visitModel;
     }
 
-    private UserLight getUser() {
-        UserLight user = new UserLight();
-        user.setUuid("user");
-        return user;
-    }
-
-    private ConceptLight getConcept() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
-        return concept;
-    }
-
-    private LocationLight getLocation() {
-        LocationLight location = new LocationLight();
-        location.setUuid("location");
-        return location;
-    }
-
-    private VisitTypeLight getVisitType() {
-        VisitTypeLight visitType = new VisitTypeLight();
-        visitType.setUuid("visitType");
-        return visitType;
-    }
-
-    private PatientLight getPatient() {
-        PatientLight patient = new PatientLight();
-        patient.setUuid("patient");
-        return patient;
+    private ConceptContext getConceptContext() {
+        return ConceptContext.builder()
+                .conceptClassUuid("conceptClass")
+                .conceptDatatypeUuid("conceptDatatype")
+                .build();
     }
 }

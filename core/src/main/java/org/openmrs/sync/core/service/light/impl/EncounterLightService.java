@@ -1,38 +1,38 @@
 package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.EncounterLight;
+import org.openmrs.sync.core.entity.light.EncounterTypeLight;
+import org.openmrs.sync.core.entity.light.PatientLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.attribute.AttributeHelper;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
 import org.openmrs.sync.core.service.light.AbstractLightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.EncounterContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class EncounterLightService extends AbstractLightService<EncounterLight> {
+public class EncounterLightService extends AbstractLightService<EncounterLight, EncounterContext> {
 
-    private PatientLightService patientService;
+    private LightServiceNoContext<PatientLight> patientService;
 
-    private EncounterTypeLightService encounterTypeService;
+    private LightServiceNoContext<EncounterTypeLight> encounterTypeService;
 
     public EncounterLightService(final OpenMrsRepository<EncounterLight> repository,
-                                 final PatientLightService patientService,
-                                 final EncounterTypeLightService encounterTypeService) {
+                                 final LightServiceNoContext<PatientLight> patientService,
+                                 final LightServiceNoContext<EncounterTypeLight> encounterTypeService) {
         super(repository);
         this.patientService = patientService;
         this.encounterTypeService = encounterTypeService;
     }
 
     @Override
-    protected EncounterLight getFakeEntity(final String uuid, final List<AttributeUuid> uuids) {
+    protected EncounterLight getShadowEntity(final String uuid, final EncounterContext context) {
         EncounterLight encounter = new EncounterLight();
         encounter.setUuid(uuid);
         encounter.setDateCreated(DEFAULT_DATE);
         encounter.setCreator(DEFAULT_USER_ID);
-        encounter.setEncounterType(encounterTypeService.getOrInit(AttributeHelper.getEncounterTypeUuid(uuids)));
+        encounter.setEncounterType(encounterTypeService.getOrInit(context.getEncounterTypeUuid()));
         encounter.setEncounterDatetime(DEFAULT_DATE);
-        encounter.setPatient(patientService.getOrInit(AttributeHelper.getPatientUuid(uuids)));
+        encounter.setPatient(patientService.getOrInit(context.getPatientUuid()));
         return encounter;
     }
 }

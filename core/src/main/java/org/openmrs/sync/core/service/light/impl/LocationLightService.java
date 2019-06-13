@@ -2,22 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.LocationLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class LocationLightService extends AbstractLightService<LocationLight> {
+public class LocationLightService extends AbstractLightServiceNoContext<LocationLight> {
 
     public LocationLightService(final OpenMrsRepository<LocationLight> repository) {
         super(repository);
     }
 
     @Override
-    protected LocationLight getFakeEntity(final String uuid,
-                                          final List<AttributeUuid> attributeUuids) {
+    protected LocationLight getShadowEntity(final String uuid) {
         LocationLight location = new LocationLight();
         location.setUuid(uuid);
         location.setName(DEFAULT_STRING);

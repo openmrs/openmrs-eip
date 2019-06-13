@@ -10,6 +10,8 @@ import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,13 +22,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
-public class PatientMapperTest {
+public class PatientMapperTest extends AbstractMapperTest {
 
     @Mock
-    private LightService<UserLight> userService;
+    private LightServiceNoContext<UserLight> userService;
 
     @Mock
-    private LightService<ConceptLight> conceptService;
+    private LightService<ConceptLight, ConceptContext> conceptService;
 
     @InjectMocks
     private PatientMapperImpl mapper;
@@ -51,22 +53,8 @@ public class PatientMapperTest {
     @Test
     public void modelToEntity() {
         // Given
-        PatientModel model = getPersonModel(false);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
-
-        // When
-        Patient result = mapper.modelToEntity(model);
-
-        // Then
-        assertResult(model, result);
-    }
-
-    @Test
-    public void modelToEntityWithNullDependencies() {
-        // Given
-        PatientModel model = getPersonModel(true);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
+        PatientModel model = getPersonModel();
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
         when(userService.getOrInit("user")).thenReturn(getUser());
 
         // When
@@ -147,49 +135,21 @@ public class PatientMapperTest {
         assertEquals(model.isBirthdateEstimated(), result.isBirthdateEstimated());
         assertEquals(model.isDead(), result.isDead());
         assertEquals(model.getDeathDate(), result.getDeathDate());
-        if (model.getCauseOfDeathUuid() != null) {
-            assertEquals(model.getCauseOfDeathUuid(), result.getCauseOfDeath().getUuid());
-        } else {
-            assertNull(result.getCauseOfDeath());
-        }
-        if (model.getCreatorUuid() != null) {
-            assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
-        } else {
-            assertNull(result.getCreator());
-        }
+        assertEquals(model.getCauseOfDeathUuid(), result.getCauseOfDeath().getUuid());
+        assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
         assertEquals(model.getDateCreated(), result.getDateCreated());
-        if (model.getChangedByUuid() != null) {
-            assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
-        } else {
-            assertNull(result.getChangedBy());
-        }
+        assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
         assertEquals(model.getDateChanged(), result.getDateChanged());
         assertEquals(model.isVoided(), result.isVoided());
-        if (model.getVoidedByUuid() != null) {
-            assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
-        } else {
-            assertNull(result.getVoidedBy());
-        }
+        assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
         assertEquals(model.getDateVoided(), result.getDateVoided());
         assertEquals(model.getVoidReason(), result.getVoidReason());
-        if (model.getPatientCreatorUuid() != null) {
-            assertEquals(model.getPatientCreatorUuid(), result.getPatientCreator().getUuid());
-        } else {
-            assertNull(result.getPatientCreator());
-        }
+        assertEquals(model.getPatientCreatorUuid(), result.getPatientCreator().getUuid());
         assertEquals(model.getPatientDateCreated(), result.getPatientDateCreated());
-        if (model.getPatientChangedByUuid() != null) {
-            assertEquals(model.getPatientChangedByUuid(), result.getPatientChangedBy().getUuid());
-        } else {
-            assertNull(result.getPatientChangedBy());
-        }
+        assertEquals(model.getPatientChangedByUuid(), result.getPatientChangedBy().getUuid());
         assertEquals(model.getPatientDateChanged(), result.getPatientDateChanged());
         assertEquals(model.isPatientVoided(), result.isPatientVoided());
-        if (model.getPatientVoidedByUuid() != null) {
-            assertEquals(model.getPatientVoidedByUuid(), result.getPatientVoidedBy().getUuid());
-        } else {
-            assertNull(result.getPatientVoidedBy());
-        }
+        assertEquals(model.getPatientVoidedByUuid(), result.getPatientVoidedBy().getUuid());
         assertEquals(model.getPatientDateVoided(), result.getPatientDateVoided());
         assertEquals(model.getPatientVoidReason(), result.getPatientVoidReason());
         assertEquals(model.getUuid(), result.getUuid());
@@ -197,45 +157,42 @@ public class PatientMapperTest {
         assertEquals(model.getBirthtime(), result.getBirthtime());
     }
 
-    private PatientModel getPersonModel(boolean nullDependencies) {
+    private PatientModel getPersonModel() {
         PatientModel model = new PatientModel();
         model.setGender("M");
         model.setBirthdate(LocalDate.of(1956, Month.OCTOBER, 22));
         model.setBirthdateEstimated(false);
         model.setDead(false);
         model.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
-        model.setCauseOfDeathUuid(nullDependencies ? null : "concept");
-        model.setCreatorUuid(nullDependencies ? null : "user");
-        model.setDateCreated(nullDependencies ? null : LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        model.setChangedByUuid(nullDependencies ? null : "user");
-        model.setDateChanged(nullDependencies ? null : LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
+        model.setCauseOfDeathUuid("concept");
+        model.setCauseOfDeathClassUuid("conceptClass");
+        model.setCauseOfDeathDatatypeUuid("conceptDatatype");
+        model.setCreatorUuid("user");
+        model.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
+        model.setChangedByUuid("user");
+        model.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         model.setVoided(true);
-        model.setVoidedByUuid(nullDependencies ? null : "user");
-        model.setDateVoided(nullDependencies ? null : LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
-        model.setVoidReason(nullDependencies ? null : "voided");
-        model.setPatientCreatorUuid(nullDependencies ? null : "user");
-        model.setPatientDateCreated(nullDependencies ? null : LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        model.setPatientChangedByUuid(nullDependencies ? null : "user");
-        model.setPatientDateChanged(nullDependencies ? null : LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
+        model.setVoidedByUuid("user");
+        model.setDateVoided(LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
+        model.setVoidReason("voided");
+        model.setPatientCreatorUuid("user");
+        model.setPatientDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
+        model.setPatientChangedByUuid("user");
+        model.setPatientDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         model.setPatientVoided(true);
-        model.setPatientVoidedByUuid(nullDependencies ? null : "user");
-        model.setPatientDateVoided(nullDependencies ? null : LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
-        model.setPatientVoidReason(nullDependencies ? null : "voided");
+        model.setPatientVoidedByUuid("user");
+        model.setPatientDateVoided(LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
+        model.setPatientVoidReason("voided");
         model.setUuid("person");
         model.setDeathdateEstimated(false);
         model.setBirthtime(LocalTime.of(10, 10));
         return model;
     }
 
-    private UserLight getUser() {
-        UserLight user = new UserLight();
-        user.setUuid("user");
-        return user;
-    }
-
-    private ConceptLight getConcept() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
-        return concept;
+    private ConceptContext getConceptContext() {
+        return ConceptContext.builder()
+                .conceptClassUuid("conceptClass")
+                .conceptDatatypeUuid("conceptDatatype")
+                .build();
     }
 }

@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
     private SyncEntityRepository<E> repository;
@@ -18,8 +16,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     public AbstractEntityService(final SyncEntityRepository<E> repository,
                                  final EntityMapper<E, M> mapper) {
-        assertNotNull(repository);
-        assertNotNull(mapper);
         this.repository = repository;
         this.mapper = mapper;
     }

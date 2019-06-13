@@ -8,20 +8,24 @@ import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class PatientMapper implements EntityMapper<Patient, PatientModel> {
 
     @Autowired
-    protected LightService<ConceptLight> conceptService;
+    protected LightService<ConceptLight, ConceptContext> conceptService;
 
     @Autowired
-    protected LightService<UserLight> userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @Mappings({
             @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid"),
+            @Mapping(source = "causeOfDeath.conceptClass.uuid", target = "causeOfDeathClassUuid"),
+            @Mapping(source = "causeOfDeath.datatype.uuid", target = "causeOfDeathDatatypeUuid"),
             @Mapping(source = "creator.uuid", target = "creatorUuid"),
             @Mapping(source = "changedBy.uuid", target = "changedByUuid"),
             @Mapping(source = "voidedBy.uuid", target = "voidedByUuid"),
@@ -33,7 +37,7 @@ public abstract class PatientMapper implements EntityMapper<Patient, PatientMode
 
     @Override
     @Mappings({
-            @Mapping(expression = "java(conceptService.getOrInit(model.getCauseOfDeathUuid()))", target ="causeOfDeath"),
+            @Mapping(expression = "java(getOrInitCauseOfDeath(model))", target ="causeOfDeath"),
             @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
             @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy"),
             @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
@@ -43,4 +47,13 @@ public abstract class PatientMapper implements EntityMapper<Patient, PatientMode
             @Mapping(ignore = true, target = "id")
     })
     public abstract Patient modelToEntity(final PatientModel model);
+
+    protected ConceptLight getOrInitCauseOfDeath(final PatientModel model) {
+        ConceptContext context = ConceptContext.builder()
+                .conceptClassUuid(model.getCauseOfDeathClassUuid())
+                .conceptDatatypeUuid(model.getCauseOfDeathDatatypeUuid())
+                .build();
+
+        return conceptService.getOrInit(model.getCauseOfDeathUuid(), context);
+    }
 }

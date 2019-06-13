@@ -29,6 +29,10 @@ public class ObservationModel extends BaseModel {
 
     private String orderConceptUuid;
 
+    private String orderConceptClassUuid;
+
+    private String orderConceptDatatypeUuid;
+
     private String orderOrdererUuid;
 
     private String orderEncounterUuid;
@@ -68,6 +72,12 @@ public class ObservationModel extends BaseModel {
     private String valueCodedNameUuid;
 
     private String valueDrugUuid;
+
+    private String valueDrugConceptUuid;
+
+    private String valueDrugConceptDatatypeUuid;
+
+    private String valueDrugConceptClassUuid;
 
     private LocalDateTime valueDatetime;
 

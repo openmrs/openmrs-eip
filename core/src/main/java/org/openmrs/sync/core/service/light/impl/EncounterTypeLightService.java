@@ -2,22 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.EncounterTypeLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class EncounterTypeLightService extends AbstractLightService<EncounterTypeLight> {
+public class EncounterTypeLightService extends AbstractLightServiceNoContext<EncounterTypeLight> {
 
     public EncounterTypeLightService(final OpenMrsRepository<EncounterTypeLight> repository) {
         super(repository);
     }
 
     @Override
-    protected EncounterTypeLight getFakeEntity(final String uuid,
-                                               final List<AttributeUuid> attributeUuids) {
+    protected EncounterTypeLight getShadowEntity(final String uuid) {
         EncounterTypeLight encounterType = new EncounterTypeLight();
         encounterType.setUuid(uuid);
         encounterType.setName(DEFAULT_STRING + " - " + uuid);

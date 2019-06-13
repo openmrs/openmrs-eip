@@ -3,18 +3,15 @@ package org.openmrs.sync.core.service.light.impl;
 import org.openmrs.sync.core.entity.light.ConceptClassLight;
 import org.openmrs.sync.core.entity.light.ConceptDatatypeLight;
 import org.openmrs.sync.core.entity.light.ConceptLight;
-import org.openmrs.sync.core.repository.light.ConceptLightRepository;
+import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.attribute.AttributeHelper;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -22,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class ConceptLightServiceTest {
 
     @Mock
-    private ConceptLightRepository repository;
+    private OpenMrsRepository<ConceptLight> repository;
 
     @Mock
     private ConceptClassLightService conceptClassService;
@@ -40,24 +37,26 @@ public class ConceptLightServiceTest {
     }
 
     @Test
-    public void getFakeEntity() {
+    public void getShadowEntity() {
         // Given
-        AttributeUuid conceptClassUuid = AttributeHelper.buildConceptClassAttributeUuid("conceptClassUuid");
-        AttributeUuid conceptDatatypeUuid = AttributeHelper.buildConceptDatatypeAttributeUuid("conceptDatatypeUuid");
-        when(conceptClassService.getOrInit("conceptClassUuid")).thenReturn(getConceptClassLight());
-        when(conceptDatatypeService.getOrInit("conceptDatatypeUuid")).thenReturn(getConceptDatatypeLight());
+        when(conceptClassService.getOrInit("conceptClassUuid")).thenReturn(getConceptClass());
+        when(conceptDatatypeService.getOrInit("conceptDatatypeUuid")).thenReturn(getConceptDatatype());
+        ConceptContext conceptContext = ConceptContext.builder()
+                .conceptDatatypeUuid("conceptDatatypeUuid")
+                .conceptClassUuid("conceptClassUuid")
+                .build();
 
         // When
-        ConceptLight result = service.getFakeEntity("UUID", Arrays.asList(conceptClassUuid, conceptDatatypeUuid));
+        ConceptLight result = service.getShadowEntity("UUID", conceptContext);
 
         // Then
         assertEquals(getExpectedConcept(), result);
     }
 
     private ConceptLight getExpectedConcept() {
-        ConceptClassLight conceptClass = getConceptClassLight();
+        ConceptClassLight conceptClass = getConceptClass();
 
-        ConceptDatatypeLight conceptDatatype = getConceptDatatypeLight();
+        ConceptDatatypeLight conceptDatatype = getConceptDatatype();
 
         ConceptLight expected = new ConceptLight();
         expected.setUuid("UUID");
@@ -68,13 +67,13 @@ public class ConceptLightServiceTest {
         return expected;
     }
 
-    private ConceptClassLight getConceptClassLight() {
+    private ConceptClassLight getConceptClass() {
         ConceptClassLight conceptClass = new ConceptClassLight();
         conceptClass.setUuid("conceptClassUuid");
         return conceptClass;
     }
 
-    private ConceptDatatypeLight getConceptDatatypeLight() {
+    private ConceptDatatypeLight getConceptDatatype() {
         ConceptDatatypeLight conceptDatatype = new ConceptDatatypeLight();
         conceptDatatype.setUuid("conceptDatatypeUuid");
         return conceptDatatype;

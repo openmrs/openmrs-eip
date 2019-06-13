@@ -4,35 +4,33 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.openmrs.sync.core.entity.Encounter;
-import org.openmrs.sync.core.entity.light.VisitLight;
+import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.EncounterModel;
-import org.openmrs.sync.core.service.attribute.AttributeHelper;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
-import org.openmrs.sync.core.service.light.impl.*;
+import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.VisitContext;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Arrays;
 
 @Mapper(componentModel = "spring")
 public abstract class EncounterMapper implements EntityMapper<Encounter, EncounterModel> {
 
     @Autowired
-    protected EncounterTypeLightService encounterTypeService;
+    protected LightServiceNoContext<EncounterTypeLight> encounterTypeService;
 
     @Autowired
-    protected PatientLightService patientService;
+    protected LightServiceNoContext<PatientLight> patientService;
 
     @Autowired
-    protected LocationLightService locationService;
+    protected LightServiceNoContext<LocationLight> locationService;
 
     @Autowired
-    protected FormLightService formService;
+    protected LightServiceNoContext<FormLight> formService;
 
     @Autowired
-    protected VisitLightService visitService;
+    protected LightService<VisitLight, VisitContext> visitService;
 
     @Autowired
-    protected UserLightService userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @Mappings({
@@ -64,8 +62,10 @@ public abstract class EncounterMapper implements EntityMapper<Encounter, Encount
     public abstract Encounter modelToEntity(final EncounterModel model);
 
     protected VisitLight getOrInitVisit(final EncounterModel model) {
-        AttributeUuid patientAttributeUuid = AttributeHelper.buildPatientAttributeUuid(model.getVisitPatientUuid());
-        AttributeUuid visitTypeAttributeUuid = AttributeHelper.buildVisitTypeAttributeUuid(model.getVisitVisitTypeUuid());
-        return visitService.getOrInit(model.getVisitUuid(), Arrays.asList(patientAttributeUuid, visitTypeAttributeUuid));
+        VisitContext context = VisitContext.builder()
+                .patientUuid(model.getVisitPatientUuid())
+                .visitTypeUuid(model.getVisitVisitTypeUuid())
+                .build();
+        return visitService.getOrInit(model.getVisitUuid(), context);
     }
 }

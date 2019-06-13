@@ -2,21 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.ConceptNameLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
-import org.openmrs.sync.core.service.light.AbstractLightService;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class ConceptNameLightService extends AbstractLightService<ConceptNameLight> {
+public class ConceptNameLightService extends AbstractLightServiceNoContext<ConceptNameLight> {
 
     public ConceptNameLightService(final OpenMrsRepository<ConceptNameLight> repository) {
         super(repository);
     }
 
     @Override
-    protected ConceptNameLight getFakeEntity(final String uuid, final List<AttributeUuid> uuids) {
+    protected ConceptNameLight getShadowEntity(final String uuid) {
         ConceptNameLight conceptName = new ConceptNameLight();
         conceptName.setUuid(uuid);
         conceptName.setDateCreated(DEFAULT_DATE);

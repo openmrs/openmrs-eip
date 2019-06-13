@@ -2,22 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.PatientLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class PatientLightService extends AbstractLightService<PatientLight> {
+public class PatientLightService extends AbstractLightServiceNoContext<PatientLight> {
 
     public PatientLightService(final OpenMrsRepository<PatientLight> repository) {
         super(repository);
     }
 
     @Override
-    protected PatientLight getFakeEntity(final String uuid,
-                                         final List<AttributeUuid> attributeUuids) {
+    protected PatientLight getShadowEntity(final String uuid) {
         PatientLight patient = new PatientLight();
         patient.setUuid(uuid);
         patient.setAllergyStatus(DEFAULT_STRING);

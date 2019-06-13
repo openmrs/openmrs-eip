@@ -2,22 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.FormLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class FormLightService extends AbstractLightService<FormLight> {
+public class FormLightService extends AbstractLightServiceNoContext<FormLight> {
 
     public FormLightService(final OpenMrsRepository<FormLight> repository) {
         super(repository);
     }
 
     @Override
-    protected FormLight getFakeEntity(final String uuid,
-                                      final List<AttributeUuid> attributeUuids) {
+    protected FormLight getShadowEntity(final String uuid) {
         FormLight form = new FormLight();
         form.setUuid(uuid);
         form.setName(DEFAULT_STRING);

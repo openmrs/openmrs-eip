@@ -12,6 +12,8 @@ import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PersonModel;
 import org.junit.Test;
 import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,18 +21,16 @@ import java.time.LocalTime;
 import java.time.Month;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PersonMapperTest {
+public class PersonMapperTest extends AbstractMapperTest {
 
     @Mock
-    private LightService<UserLight> userService;
+    private LightServiceNoContext<UserLight> userService;
 
     @Mock
-    private LightService<ConceptLight> conceptService;
+    private LightService<ConceptLight, ConceptContext> conceptService;
 
     @InjectMocks
     private PersonMapperImpl mapper;
@@ -55,22 +55,8 @@ public class PersonMapperTest {
     @Test
     public void modelToEntity() {
         // Given
-        PersonModel model = getPersonModel(false);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
-
-        // When
-        Person result = mapper.modelToEntity(model);
-
-        // Then
-        assertResult(model, result);
-    }
-
-    @Test
-    public void modelToEntityWithNullDependencies() {
-        // Given
-        PersonModel model = getPersonModel(true);
-        when(conceptService.getOrInit("concept")).thenReturn(getConcept());
+        PersonModel model = getPersonModel();
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
         when(userService.getOrInit("user")).thenReturn(getUser());
 
         // When
@@ -128,29 +114,13 @@ public class PersonMapperTest {
         assertEquals(model.isBirthdateEstimated(), result.isBirthdateEstimated());
         assertEquals(model.isDead(), result.isDead());
         assertEquals(model.getDeathDate(), result.getDeathDate());
-        if (model.getCauseOfDeathUuid() != null) {
-            assertEquals(model.getCauseOfDeathUuid(), result.getCauseOfDeath().getUuid());
-        } else {
-            assertNull(result.getCauseOfDeath());
-        }
-        if (model.getCreatorUuid() != null) {
-            assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
-        } else {
-            assertNull(result.getCreator());
-        }
+        assertEquals(model.getCauseOfDeathUuid(), result.getCauseOfDeath().getUuid());
+        assertEquals(model.getCreatorUuid(), result.getCreator().getUuid());
         assertEquals(model.getDateCreated(), result.getDateCreated());
-        if (model.getChangedByUuid() != null) {
-            assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
-        } else {
-            assertNull(result.getChangedBy());
-        }
+        assertEquals(model.getChangedByUuid(), result.getChangedBy().getUuid());
         assertEquals(model.getDateChanged(), result.getDateChanged());
         assertEquals(model.isVoided(), result.isVoided());
-        if (model.getVoidedByUuid() != null) {
-            assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
-        } else {
-            assertNull(result.getVoidedBy());
-        }
+        assertEquals(model.getVoidedByUuid(), result.getVoidedBy().getUuid());
         assertEquals(model.getDateVoided(), result.getDateVoided());
         assertEquals(model.getVoidReason(), result.getVoidReason());
         assertEquals(model.getUuid(), result.getUuid());
@@ -158,37 +128,34 @@ public class PersonMapperTest {
         assertEquals(model.getBirthtime(), result.getBirthtime());
     }
 
-    private PersonModel getPersonModel(boolean nullDependencies) {
+    private PersonModel getPersonModel() {
         PersonModel model = new PersonModel();
         model.setGender("M");
         model.setBirthdate(LocalDate.of(1956, Month.OCTOBER, 22));
         model.setBirthdateEstimated(false);
         model.setDead(false);
         model.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
-        model.setCauseOfDeathUuid(nullDependencies ? null : "concept");
-        model.setCreatorUuid(nullDependencies ? null : "user");
+        model.setCauseOfDeathUuid("concept");
+        model.setCauseOfDeathClassUuid("conceptClass");
+        model.setCauseOfDeathDatatypeUuid("conceptDatatype");
+        model.setCreatorUuid("user");
         model.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        model.setChangedByUuid(nullDependencies ? null : "user");
+        model.setChangedByUuid("user");
         model.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         model.setVoided(true);
-        model.setVoidedByUuid(nullDependencies ? null : "user");
+        model.setVoidedByUuid("user");
         model.setDateVoided(LocalDateTime.of(1012, Month.JANUARY, 1, 0, 0));
-        model.setVoidReason(nullDependencies ? null : "voided");
+        model.setVoidReason("voided");
         model.setUuid("person");
         model.setDeathdateEstimated(false);
         model.setBirthtime(LocalTime.of(10, 10));
         return model;
     }
 
-    private UserLight getUser() {
-        UserLight user = new UserLight();
-        user.setUuid("user");
-        return user;
-    }
-
-    private ConceptLight getConcept() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
-        return concept;
+    private ConceptContext getConceptContext() {
+        return ConceptContext.builder()
+                .conceptClassUuid("conceptClass")
+                .conceptDatatypeUuid("conceptDatatype")
+                .build();
     }
 }

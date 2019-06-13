@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.core.service.light.impl.context.MockedContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -35,7 +36,7 @@ public class AbstractLightServiceTest {
         when(repository.save(userEty)).thenReturn(userEty);
 
         // When
-        MockedLightEntity result = service.getOrInit(UUID);
+        MockedLightEntity result = service.getOrInit(UUID, new MockedContext());
 
         // Then
         verify(repository, never()).save(any());
@@ -49,7 +50,7 @@ public class AbstractLightServiceTest {
         when(repository.save(new MockedLightEntity(null, UUID))).thenReturn(getExpectedEntity());
 
         // When
-        MockedLightEntity result = service.getOrInit(UUID);
+        MockedLightEntity result = service.getOrInit(UUID, new MockedContext());
 
         // Then
         assertEquals(getExpectedEntity(), result);

@@ -8,20 +8,24 @@ import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class PersonMapper implements EntityMapper<Person, PersonModel> {
 
     @Autowired
-    protected LightService<ConceptLight> conceptService;
+    protected LightService<ConceptLight, ConceptContext> conceptService;
 
     @Autowired
-    protected LightService<UserLight> userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @Mappings({
             @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid"),
+            @Mapping(source = "causeOfDeath.conceptClass.uuid", target = "causeOfDeathClassUuid"),
+            @Mapping(source = "causeOfDeath.datatype.uuid", target = "causeOfDeathDatatypeUuid"),
             @Mapping(source = "creator.uuid", target = "creatorUuid"),
             @Mapping(source = "changedBy.uuid", target = "changedByUuid"),
             @Mapping(source = "voidedBy.uuid", target = "voidedByUuid")
@@ -30,11 +34,20 @@ public abstract class PersonMapper implements EntityMapper<Person, PersonModel> 
 
     @Override
     @Mappings({
-            @Mapping(expression = "java(conceptService.getOrInit(model.getCauseOfDeathUuid()))", target ="causeOfDeath"),
+            @Mapping(expression = "java(getOrInitCauseOfDeath(model))", target ="causeOfDeath"),
             @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
             @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy"),
             @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
             @Mapping(ignore = true, target = "id")
     })
     public abstract Person modelToEntity(final PersonModel model);
+
+    protected ConceptLight getOrInitCauseOfDeath(final PersonModel model) {
+        ConceptContext context = ConceptContext.builder()
+                .conceptClassUuid(model.getCauseOfDeathClassUuid())
+                .conceptDatatypeUuid(model.getCauseOfDeathDatatypeUuid())
+                .build();
+
+        return conceptService.getOrInit(model.getCauseOfDeathUuid(), context);
+    }
 }

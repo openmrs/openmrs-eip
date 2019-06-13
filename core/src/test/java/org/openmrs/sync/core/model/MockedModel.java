@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class MockedModel extends BaseModel {
 
+    public MockedModel() {}
+
     public MockedModel(final String uuid) {
         this.setUuid(uuid);
     }

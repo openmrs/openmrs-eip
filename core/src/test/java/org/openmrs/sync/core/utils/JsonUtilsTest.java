@@ -1,41 +1,43 @@
 package org.openmrs.sync.core.utils;
 
 import org.junit.Test;
-import org.openmrs.sync.core.model.PersonModel;
+import org.openmrs.sync.core.model.MockedModel;
 
 import static org.junit.Assert.assertEquals;
 
 public class JsonUtilsTest {
 
+    private static final String UUID = "UUID";
+
     @Test
     public void marshall() {
         // Given
-        PersonModel model = new PersonModel();
-        model.setUuid("uuid");
+        MockedModel model = new MockedModel(UUID);
+        model.setUuid(UUID);
 
         // When
         String result = JsonUtils.marshall(model);
 
         // Then
-        assertEquals(json("uuid"), result);
+        assertEquals(json(), result);
     }
 
     @Test
     public void unmarshall() {
         // Given
-        String json = json("uuid");
+        String json = json();
 
         // When
-        PersonModel result = (PersonModel) JsonUtils.unmarshal(json, PersonModel.class.getName());
+        MockedModel result = (MockedModel) JsonUtils.unmarshal(json, MockedModel.class.getName());
 
         // Then
-        PersonModel expected = new PersonModel();
-        expected.setUuid("uuid");
+        MockedModel expected = new MockedModel(UUID);
+        expected.setUuid(UUID);
         assertEquals(expected, result);
     }
 
-    private String json(final String uuid) {
-        return "{\"uuid\":\"" + uuid + "\"," +
+    private String json() {
+        return "{\"uuid\":\"UUID\"," +
                 "\"creatorUuid\":null," +
                 "\"dateCreated\":null," +
                 "\"changedByUuid\":null," +
@@ -43,15 +45,6 @@ public class JsonUtilsTest {
                 "\"voided\":false," +
                 "\"voidedByUuid\":null," +
                 "\"dateVoided\":null," +
-                "\"voidReason\":null," +
-                "\"gender\":null," +
-                "\"birthdate\":null," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
-                "}";
+                "\"voidReason\":null}";
     }
 }

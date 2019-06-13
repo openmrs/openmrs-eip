@@ -2,22 +2,18 @@ package org.openmrs.sync.core.service.light.impl;
 
 import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
+import org.openmrs.sync.core.service.light.AbstractLightServiceNoContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class UserLightService extends AbstractLightService<UserLight> {
+public class UserLightService extends AbstractLightServiceNoContext<UserLight> {
 
     public UserLightService(final OpenMrsRepository<UserLight> userRepository) {
         super(userRepository);
     }
 
     @Override
-    protected UserLight getFakeEntity(final String uuid,
-                                      final List<AttributeUuid> attributeUuids) {
+    protected UserLight getShadowEntity(final String uuid) {
         UserLight user = new UserLight();
         user.setUuid(uuid);
         user.setCreator(DEFAULT_USER_ID);

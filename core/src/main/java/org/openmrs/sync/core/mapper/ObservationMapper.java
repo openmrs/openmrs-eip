@@ -4,48 +4,42 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.openmrs.sync.core.entity.Observation;
-import org.openmrs.sync.core.entity.light.ConceptLight;
-import org.openmrs.sync.core.entity.light.EncounterLight;
-import org.openmrs.sync.core.entity.light.ObservationLight;
-import org.openmrs.sync.core.entity.light.OrderLight;
+import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.ObservationModel;
-import org.openmrs.sync.core.service.attribute.AttributeHelper;
-import org.openmrs.sync.core.service.attribute.AttributeUuid;
-import org.openmrs.sync.core.service.light.impl.*;
+import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
+import org.openmrs.sync.core.service.light.impl.context.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class ObservationMapper implements EntityMapper<Observation, ObservationModel> {
 
     @Autowired
-    protected PersonLightService personService;
+    protected LightServiceNoContext<PersonLight> personService;
 
     @Autowired
-    protected ConceptLightService conceptService;
+    protected LightService<ConceptLight, ConceptContext> conceptService;
 
     @Autowired
-    protected EncounterLightService encounterService;
+    protected LightService<EncounterLight, EncounterContext> encounterService;
 
     @Autowired
-    protected OrderLightService orderService;
+    protected LightService<OrderLight, OrderContext> orderService;
 
     @Autowired
-    protected LocationLightService locationService;
+    protected LightServiceNoContext<LocationLight> locationService;
 
     @Autowired
-    protected ObservationLightService observationService;
+    protected LightService<ObservationLight, ObservationContext> observationService;
 
     @Autowired
-    protected ConceptNameLightService conceptNameService;
+    protected LightServiceNoContext<ConceptNameLight> conceptNameService;
 
     @Autowired
-    protected DrugLightService drugService;
+    protected LightService<DrugLight, DrugContext> drugService;
 
     @Autowired
-    protected UserLightService userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @Mappings({
@@ -59,6 +53,8 @@ public abstract class ObservationMapper implements EntityMapper<Observation, Obs
             @Mapping(source = "order.uuid", target = "orderUuid"),
             @Mapping(source = "order.orderType.uuid", target = "orderOrderTypeUuid"),
             @Mapping(source = "order.concept.uuid", target = "orderConceptUuid"),
+            @Mapping(source = "order.concept.datatype.uuid", target = "orderConceptClassUuid"),
+            @Mapping(source = "order.concept.conceptClass.uuid", target = "orderConceptDatatypeUuid"),
             @Mapping(source = "order.orderer.uuid", target = "orderOrdererUuid"),
             @Mapping(source = "order.encounter.uuid", target = "orderEncounterUuid"),
             @Mapping(source = "order.encounter.patient.uuid", target = "orderEncounterPatientUuid"),
@@ -76,6 +72,9 @@ public abstract class ObservationMapper implements EntityMapper<Observation, Obs
             @Mapping(source = "valueCoded.datatype.uuid", target = "valueCodedDatatypeUuid"),
             @Mapping(source = "valueCodedName.uuid", target = "valueCodedNameUuid"),
             @Mapping(source = "valueDrug.uuid", target = "valueDrugUuid"),
+            @Mapping(source = "valueDrug.concept.uuid", target = "valueDrugConceptUuid"),
+            @Mapping(source = "valueDrug.concept.datatype.uuid", target = "valueDrugConceptDatatypeUuid"),
+            @Mapping(source = "valueDrug.concept.conceptClass.uuid", target = "valueDrugConceptClassUuid"),
             @Mapping(source = "previousVersion.uuid", target = "previousVersionUuid"),
             @Mapping(source = "previousVersion.concept.uuid", target = "previousVersionConceptUuid"),
             @Mapping(source = "previousVersion.concept.datatype.uuid", target = "previousVersionConceptDatatypeUuid"),
@@ -96,7 +95,7 @@ public abstract class ObservationMapper implements EntityMapper<Observation, Obs
             @Mapping(expression = "java(getOrInitObsGroup(model))", target ="obsGroup"),
             @Mapping(expression = "java(getOrInitValueCoded(model))", target ="valueCoded"),
             @Mapping(expression = "java(conceptNameService.getOrInit(model.getValueCodedNameUuid()))", target ="valueCodedName"),
-            @Mapping(expression = "java(drugService.getOrInit(model.getValueDrugUuid()))", target ="valueDrug"),
+            @Mapping(expression = "java(getOrInitValueDrug(model))", target ="valueDrug"),
             @Mapping(expression = "java(getOrInitPreviousVersion(model))", target ="previousVersion"),
             @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
             @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
@@ -105,80 +104,77 @@ public abstract class ObservationMapper implements EntityMapper<Observation, Obs
     public abstract Observation modelToEntity(final ObservationModel model);
 
     protected ConceptLight getOrInitConcept(final ObservationModel model) {
-        AttributeUuid conceptDatatypeAttributeUuid = AttributeHelper.buildConceptDatatypeAttributeUuid(model.getConceptDatatypeUuid());
-        AttributeUuid conceptClassAttributeUuid = AttributeHelper.buildConceptClassAttributeUuid(model.getConceptClassUuid());
+        ConceptContext context = ConceptContext.builder()
+                .conceptClassUuid(model.getConceptClassUuid())
+                .conceptDatatypeUuid(model.getConceptDatatypeUuid())
+                .build();
 
-        return conceptService.getOrInit(model.getConceptUuid(), Arrays.asList(conceptDatatypeAttributeUuid, conceptClassAttributeUuid));
+        return conceptService.getOrInit(model.getConceptUuid(), context);
     }
 
     protected ConceptLight getOrInitValueCoded(final ObservationModel model) {
-        AttributeUuid conceptDatatypeAttributeUuid = AttributeHelper.buildConceptDatatypeAttributeUuid(model.getValueCodedDatatypeUuid());
-        AttributeUuid conceptClassAttributeUuid = AttributeHelper.buildConceptClassAttributeUuid(model.getValueCodedClassUuid());
+        ConceptContext context = ConceptContext.builder()
+                .conceptClassUuid(model.getValueCodedClassUuid())
+                .conceptDatatypeUuid(model.getValueCodedDatatypeUuid())
+                .build();
 
-        return conceptService.getOrInit(model.getValueCodedUuid(), Arrays.asList(conceptDatatypeAttributeUuid, conceptClassAttributeUuid));
+        return conceptService.getOrInit(model.getValueCodedUuid(), context);
+    }
+
+    protected DrugLight getOrInitValueDrug(final ObservationModel model) {
+        DrugContext context = DrugContext.builder()
+                .conceptUuid(model.getValueDrugConceptUuid())
+                .conceptClassUuid(model.getValueDrugConceptClassUuid())
+                .conceptDatatypeUuid(model.getValueDrugConceptDatatypeUuid())
+                .build();
+
+        return drugService.getOrInit(model.getValueDrugUuid(), context);
     }
 
     protected EncounterLight getOrInitEncounter(final ObservationModel model) {
-        AttributeUuid patientAttributeUuid = AttributeHelper.buildPatientAttributeUuid(model.getEncounterPatientUuid());
-        AttributeUuid encounterTypeAttributeUuid = AttributeHelper.buildEncounterTypeAttributeUuid(model.getEncounterEncounterTypeUuid());
-        return encounterService.getOrInit(model.getEncounterUuid(), Arrays.asList(patientAttributeUuid, encounterTypeAttributeUuid));
+        EncounterContext context = EncounterContext.builder()
+                .patientUuid(model.getEncounterPatientUuid())
+                .encounterTypeUuid(model.getEncounterEncounterTypeUuid())
+                .build();
+        return encounterService.getOrInit(model.getEncounterUuid(), context);
     }
 
     protected OrderLight getOrInitOrder(final ObservationModel model) {
-        AttributeUuid orderTypeAttributeUuid = AttributeHelper.buildOrderTypeAttributeUuid(model.getOrderOrderTypeUuid());
-        AttributeUuid conceptAttributeUuid = AttributeHelper.buildConceptAttributeUuid(model.getOrderConceptUuid());
-        AttributeUuid providerAttributeUuid = AttributeHelper.buildProviderAttributeUuid(model.getOrderOrdererUuid());
+        OrderContext context = OrderContext.builder()
+                .orderTypeUuid(model.getOrderOrderTypeUuid())
+                .conceptUuid(model.getOrderConceptUuid())
+                .conceptClassUuid(model.getOrderConceptClassUuid())
+                .conceptDatatypeUuid(model.getOrderConceptDatatypeUuid())
+                .providerUuid(model.getOrderOrdererUuid())
+                .encounterUuid(model.getOrderEncounterUuid())
+                .encounterPatientUuid(model.getOrderEncounterPatientUuid())
+                .encounterEncounterTypeUuid(model.getOrderEncounterTypeUuid())
+                .patientUuid(model.getOrderPatientUuid())
+                .careSettingUuid(model.getOrderCareSettingUuid())
+                .build();
 
-        AttributeUuid encounterAttributeUuid = AttributeHelper.buildOrderEncounterAttributeUuid(model.getOrderEncounterUuid());
-        AttributeUuid encounterTypeAttributeUuid = AttributeHelper.buildOrderEncounterTypeAttributeUuid(model.getOrderEncounterTypeUuid());
-        AttributeUuid encounterPatientAttributeUuid = AttributeHelper.buildOrderPatientAttributeUuid(model.getOrderEncounterPatientUuid());
-
-        AttributeUuid patientAttributeUuid = AttributeHelper.buildPatientAttributeUuid(model.getOrderPatientUuid());
-        AttributeUuid careSettingAttributeUuid = AttributeHelper.buildCareSettingTypeAttributeUuid(model.getOrderCareSettingUuid());
-
-        List<AttributeUuid> attributeUuids = Arrays.asList(
-                orderTypeAttributeUuid,
-                conceptAttributeUuid,
-                providerAttributeUuid,
-                encounterAttributeUuid,
-                encounterTypeAttributeUuid,
-                encounterPatientAttributeUuid,
-                patientAttributeUuid,
-                careSettingAttributeUuid
-        );
-
-        return orderService.getOrInit(model.getOrderUuid(), attributeUuids);
+        return orderService.getOrInit(model.getOrderUuid(), context);
     }
 
     protected ObservationLight getOrInitObsGroup(final ObservationModel model) {
-        AttributeUuid conceptAttributeUuid = AttributeHelper.buildConceptAttributeUuid(model.getObsGroupConceptUuid());
-        AttributeUuid conceptDatatypeAttributeUuid = AttributeHelper.buildConceptDatatypeAttributeUuid(model.getObsGroupConceptDatatypeUuid());
-        AttributeUuid conceptClassAttributeUuid = AttributeHelper.buildConceptClassAttributeUuid(model.getObsGroupConceptClassUuid());
-        AttributeUuid personTypeAttributeUuid = AttributeHelper.buildPersonAttributeUuid(model.getObsGroupPersonUuid());
+        ObservationContext context = ObservationContext.builder()
+                .conceptUuid(model.getObsGroupConceptUuid())
+                .conceptClassUuid(model.getObsGroupConceptClassUuid())
+                .conceptDatatypeUuid(model.getObsGroupConceptDatatypeUuid())
+                .personUuid(model.getObsGroupPersonUuid())
+                .build();
 
-        List<AttributeUuid> attributeUuids = Arrays.asList(
-                conceptAttributeUuid,
-                conceptDatatypeAttributeUuid,
-                conceptClassAttributeUuid,
-                personTypeAttributeUuid
-        );
-
-        return observationService.getOrInit(model.getObsGroupUuid(), attributeUuids);
+        return observationService.getOrInit(model.getObsGroupUuid(), context);
     }
 
     protected ObservationLight getOrInitPreviousVersion(final ObservationModel model) {
-        AttributeUuid conceptAttributeUuid = AttributeHelper.buildConceptAttributeUuid(model.getPreviousVersionConceptUuid());
-        AttributeUuid conceptDatatypeAttributeUuid = AttributeHelper.buildConceptDatatypeAttributeUuid(model.getPreviousVersionConceptDatatypeUuid());
-        AttributeUuid conceptClassAttributeUuid = AttributeHelper.buildConceptClassAttributeUuid(model.getPreviousVersionConceptClassUuid());
-        AttributeUuid personTypeAttributeUuid = AttributeHelper.buildPersonAttributeUuid(model.getPreviousVersionPersonUuid());
+        ObservationContext context = ObservationContext.builder()
+                .conceptUuid(model.getPreviousVersionConceptUuid())
+                .conceptClassUuid(model.getPreviousVersionConceptClassUuid())
+                .conceptDatatypeUuid(model.getPreviousVersionConceptDatatypeUuid())
+                .personUuid(model.getPreviousVersionPersonUuid())
+                .build();
 
-        List<AttributeUuid> attributeUuids = Arrays.asList(
-                conceptAttributeUuid,
-                conceptDatatypeAttributeUuid,
-                conceptClassAttributeUuid,
-                personTypeAttributeUuid
-        );
-
-        return observationService.getOrInit(model.getPreviousVersionUuid(), attributeUuids);
+        return observationService.getOrInit(model.getPreviousVersionUuid(), context);
     }
 }
