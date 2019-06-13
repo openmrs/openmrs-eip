@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "person_attribute_type")
-@Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_attribute_type_id"))
 public class PersonAttributeTypeLight extends LightEntity {
 
