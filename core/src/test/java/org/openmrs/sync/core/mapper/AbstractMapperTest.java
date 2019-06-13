@@ -116,4 +116,11 @@ public abstract class AbstractMapperTest {
         encounter.setUuid("encounter");
         return encounter;
     }
+
+    protected PersonAttributeTypeLight getPersonAttributeType() {
+        PersonAttributeTypeLight personAttributeType = new PersonAttributeTypeLight();
+        personAttributeType.setUuid("personAttributeType");
+        return personAttributeType;
+    }
+
 }

@@ -7,7 +7,8 @@ public enum EntityNameEnum {
     PATIENT(PatientModel.class),
     VISIT(VisitModel.class),
     ENCOUNTER(EncounterModel.class),
-    OBSERVATION(ObservationModel.class);
+    OBSERVATION(ObservationModel.class),
+    PERSON_ATTRIBUTE(PersonAttributeModel.class);
 
     private Class<? extends BaseModel> modelClass;
 
