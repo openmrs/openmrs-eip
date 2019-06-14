@@ -3,7 +3,6 @@ package org.openmrs.sync.core.camel.load;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
-import org.openmrs.sync.core.service.EntityNameEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.springframework.stereotype.Component;
 

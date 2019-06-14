@@ -61,4 +61,17 @@ public class OpenMrsExtractEndpoint extends DefaultEndpoint {
     public void setLastSyncDate(final LocalDateTime lastSyncDate) {
         this.lastSyncDate = lastSyncDate;
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object instanceof OpenMrsExtractEndpoint) {
+            return super.equals(object);
+        }
+        return false;
+    }
 }

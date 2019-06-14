@@ -3,12 +3,10 @@ package org.openmrs.sync.core.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.sync.core.entity.light.ConceptLight;
-import org.openmrs.sync.core.entity.light.UserLight;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -46,6 +44,4 @@ public class Person extends AuditableEntity {
 
     @Column(name = "birthtime")
     private LocalTime birthtime;
-
-    public Person() {}
 }

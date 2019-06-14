@@ -41,4 +41,17 @@ public class OpenMrsLoadEndpoint extends DefaultEndpoint {
     public boolean isSingleton() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object instanceof OpenMrsLoadEndpoint) {
+            return super.equals(object);
+        }
+        return false;
+    }
 }

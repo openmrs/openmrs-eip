@@ -50,75 +50,89 @@ public class Patient extends Person {
     @Column(name = "void_reason")
     private String patientVoidReason;
 
-    public Patient() {}
-
+    @Override
     public UserLight getCreator() {
         return creator;
     }
 
+    @Override
     public void setCreator(final UserLight creator) {
         this.creator = creator;
         setPatientCreator(creator);
     }
 
+    @Override
     public LocalDateTime getDateCreated() {
         return dateCreated;
     }
 
+    @Override
     public void setDateCreated(final LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
         setPatientDateCreated(dateCreated);
     }
 
+    @Override
     public UserLight getChangedBy() {
         return changedBy;
     }
 
+    @Override
     public void setChangedBy(final UserLight changedBy) {
         this.changedBy = changedBy;
         setPatientChangedBy(changedBy);
     }
 
+    @Override
     public LocalDateTime getDateChanged() {
         return dateChanged;
     }
 
+    @Override
     public void setDateChanged(final LocalDateTime dateChanged) {
         this.dateChanged = dateChanged;
         setPatientDateChanged(dateChanged);
     }
 
+    @Override
     public boolean isVoided() {
         return voided;
     }
 
+    @Override
     public void setVoided(final boolean voided) {
         this.voided = voided;
         setPatientVoided(voided);
     }
 
+    @Override
     public UserLight getVoidedBy() {
         return voidedBy;
     }
 
+    @Override
     public void setVoidedBy(final UserLight voidedBy) {
         this.voidedBy = voidedBy;
         setPatientVoidedBy(voidedBy);
     }
 
+    @Override
     public LocalDateTime getDateVoided() {
         return dateVoided;
     }
 
+    @Override
     public void setDateVoided(final LocalDateTime dateVoided) {
         this.dateVoided = dateVoided;
         setPatientDateVoided(dateVoided);
     }
 
+    @Override
     public String getVoidReason() {
         return voidReason;
     }
 
+    @Override
     public void setVoidReason(final String voidReason) {
         this.voidReason = voidReason;
         setPatientVoidReason(voidReason);

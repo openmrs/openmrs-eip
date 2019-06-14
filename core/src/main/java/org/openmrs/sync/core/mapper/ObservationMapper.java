@@ -2,7 +2,6 @@ package org.openmrs.sync.core.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.openmrs.sync.core.entity.Observation;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.ObservationModel;
@@ -42,65 +41,61 @@ public abstract class ObservationMapper implements EntityMapper<Observation, Obs
     protected LightServiceNoContext<UserLight> userService;
 
     @Override
-    @Mappings({
-            @Mapping(source = "person.uuid", target = "personUuid"),
-            @Mapping(source = "concept.uuid", target = "conceptUuid"),
-            @Mapping(source = "concept.conceptClass.uuid", target = "conceptClassUuid"),
-            @Mapping(source = "concept.datatype.uuid", target = "conceptDatatypeUuid"),
-            @Mapping(source = "encounter.uuid", target = "encounterUuid"),
-            @Mapping(source = "encounter.patient.uuid", target = "encounterPatientUuid"),
-            @Mapping(source = "encounter.encounterType.uuid", target = "encounterEncounterTypeUuid"),
-            @Mapping(source = "order.uuid", target = "orderUuid"),
-            @Mapping(source = "order.orderType.uuid", target = "orderOrderTypeUuid"),
-            @Mapping(source = "order.concept.uuid", target = "orderConceptUuid"),
-            @Mapping(source = "order.concept.datatype.uuid", target = "orderConceptClassUuid"),
-            @Mapping(source = "order.concept.conceptClass.uuid", target = "orderConceptDatatypeUuid"),
-            @Mapping(source = "order.orderer.uuid", target = "orderOrdererUuid"),
-            @Mapping(source = "order.encounter.uuid", target = "orderEncounterUuid"),
-            @Mapping(source = "order.encounter.patient.uuid", target = "orderEncounterPatientUuid"),
-            @Mapping(source = "order.encounter.encounterType.uuid", target = "orderEncounterTypeUuid"),
-            @Mapping(source = "order.patient.uuid", target = "orderPatientUuid"),
-            @Mapping(source = "order.careSetting.uuid", target = "orderCareSettingUuid"),
-            @Mapping(source = "location.uuid", target = "locationUuid"),
-            @Mapping(source = "obsGroup.uuid", target = "obsGroupUuid"),
-            @Mapping(source = "obsGroup.concept.uuid", target = "obsGroupConceptUuid"),
-            @Mapping(source = "obsGroup.concept.datatype.uuid", target = "obsGroupConceptDatatypeUuid"),
-            @Mapping(source = "obsGroup.concept.conceptClass.uuid", target = "obsGroupConceptClassUuid"),
-            @Mapping(source = "obsGroup.person.uuid", target = "obsGroupPersonUuid"),
-            @Mapping(source = "valueCoded.uuid", target = "valueCodedUuid"),
-            @Mapping(source = "valueCoded.conceptClass.uuid", target = "valueCodedClassUuid"),
-            @Mapping(source = "valueCoded.datatype.uuid", target = "valueCodedDatatypeUuid"),
-            @Mapping(source = "valueCodedName.uuid", target = "valueCodedNameUuid"),
-            @Mapping(source = "valueDrug.uuid", target = "valueDrugUuid"),
-            @Mapping(source = "valueDrug.concept.uuid", target = "valueDrugConceptUuid"),
-            @Mapping(source = "valueDrug.concept.datatype.uuid", target = "valueDrugConceptDatatypeUuid"),
-            @Mapping(source = "valueDrug.concept.conceptClass.uuid", target = "valueDrugConceptClassUuid"),
-            @Mapping(source = "previousVersion.uuid", target = "previousVersionUuid"),
-            @Mapping(source = "previousVersion.concept.uuid", target = "previousVersionConceptUuid"),
-            @Mapping(source = "previousVersion.concept.datatype.uuid", target = "previousVersionConceptDatatypeUuid"),
-            @Mapping(source = "previousVersion.concept.conceptClass.uuid", target = "previousVersionConceptClassUuid"),
-            @Mapping(source = "previousVersion.person.uuid", target = "previousVersionPersonUuid"),
-            @Mapping(source = "creator.uuid", target = "creatorUuid"),
-            @Mapping(source = "voidedBy.uuid", target = "voidedByUuid")
-    })
+    @Mapping(source = "person.uuid", target = "personUuid")
+    @Mapping(source = "concept.uuid", target = "conceptUuid")
+    @Mapping(source = "concept.conceptClass.uuid", target = "conceptClassUuid")
+    @Mapping(source = "concept.datatype.uuid", target = "conceptDatatypeUuid")
+    @Mapping(source = "encounter.uuid", target = "encounterUuid")
+    @Mapping(source = "encounter.patient.uuid", target = "encounterPatientUuid")
+    @Mapping(source = "encounter.encounterType.uuid", target = "encounterEncounterTypeUuid")
+    @Mapping(source = "order.uuid", target = "orderUuid")
+    @Mapping(source = "order.orderType.uuid", target = "orderOrderTypeUuid")
+    @Mapping(source = "order.concept.uuid", target = "orderConceptUuid")
+    @Mapping(source = "order.concept.datatype.uuid", target = "orderConceptClassUuid")
+    @Mapping(source = "order.concept.conceptClass.uuid", target = "orderConceptDatatypeUuid")
+    @Mapping(source = "order.orderer.uuid", target = "orderOrdererUuid")
+    @Mapping(source = "order.encounter.uuid", target = "orderEncounterUuid")
+    @Mapping(source = "order.encounter.patient.uuid", target = "orderEncounterPatientUuid")
+    @Mapping(source = "order.encounter.encounterType.uuid", target = "orderEncounterTypeUuid")
+    @Mapping(source = "order.patient.uuid", target = "orderPatientUuid")
+    @Mapping(source = "order.careSetting.uuid", target = "orderCareSettingUuid")
+    @Mapping(source = "location.uuid", target = "locationUuid")
+    @Mapping(source = "obsGroup.uuid", target = "obsGroupUuid")
+    @Mapping(source = "obsGroup.concept.uuid", target = "obsGroupConceptUuid")
+    @Mapping(source = "obsGroup.concept.datatype.uuid", target = "obsGroupConceptDatatypeUuid")
+    @Mapping(source = "obsGroup.concept.conceptClass.uuid", target = "obsGroupConceptClassUuid")
+    @Mapping(source = "obsGroup.person.uuid", target = "obsGroupPersonUuid")
+    @Mapping(source = "valueCoded.uuid", target = "valueCodedUuid")
+    @Mapping(source = "valueCoded.conceptClass.uuid", target = "valueCodedClassUuid")
+    @Mapping(source = "valueCoded.datatype.uuid", target = "valueCodedDatatypeUuid")
+    @Mapping(source = "valueCodedName.uuid", target = "valueCodedNameUuid")
+    @Mapping(source = "valueDrug.uuid", target = "valueDrugUuid")
+    @Mapping(source = "valueDrug.concept.uuid", target = "valueDrugConceptUuid")
+    @Mapping(source = "valueDrug.concept.datatype.uuid", target = "valueDrugConceptDatatypeUuid")
+    @Mapping(source = "valueDrug.concept.conceptClass.uuid", target = "valueDrugConceptClassUuid")
+    @Mapping(source = "previousVersion.uuid", target = "previousVersionUuid")
+    @Mapping(source = "previousVersion.concept.uuid", target = "previousVersionConceptUuid")
+    @Mapping(source = "previousVersion.concept.datatype.uuid", target = "previousVersionConceptDatatypeUuid")
+    @Mapping(source = "previousVersion.concept.conceptClass.uuid", target = "previousVersionConceptClassUuid")
+    @Mapping(source = "previousVersion.person.uuid", target = "previousVersionPersonUuid")
+    @Mapping(source = "creator.uuid", target = "creatorUuid")
+    @Mapping(source = "voidedBy.uuid", target = "voidedByUuid")
     public abstract ObservationModel entityToModel(final Observation entity);
 
     @Override
-    @Mappings({
-            @Mapping(expression = "java(personService.getOrInit(model.getPersonUuid()))", target ="person"),
-            @Mapping(expression = "java(getOrInitConcept(model))", target ="concept"),
-            @Mapping(expression = "java(getOrInitEncounter(model))", target ="encounter"),
-            @Mapping(expression = "java(getOrInitOrder(model))", target ="order"),
-            @Mapping(expression = "java(locationService.getOrInit(model.getLocationUuid()))", target ="location"),
-            @Mapping(expression = "java(getOrInitObsGroup(model))", target ="obsGroup"),
-            @Mapping(expression = "java(getOrInitValueCoded(model))", target ="valueCoded"),
-            @Mapping(expression = "java(conceptNameService.getOrInit(model.getValueCodedNameUuid()))", target ="valueCodedName"),
-            @Mapping(expression = "java(getOrInitValueDrug(model))", target ="valueDrug"),
-            @Mapping(expression = "java(getOrInitPreviousVersion(model))", target ="previousVersion"),
-            @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
-            @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
-            @Mapping(ignore = true, target = "id")
-    })
+    @Mapping(expression = "java(personService.getOrInit(model.getPersonUuid()))", target ="person")
+    @Mapping(expression = "java(getOrInitConcept(model))", target ="concept")
+    @Mapping(expression = "java(getOrInitEncounter(model))", target ="encounter")
+    @Mapping(expression = "java(getOrInitOrder(model))", target ="order")
+    @Mapping(expression = "java(locationService.getOrInit(model.getLocationUuid()))", target ="location")
+    @Mapping(expression = "java(getOrInitObsGroup(model))", target ="obsGroup")
+    @Mapping(expression = "java(getOrInitValueCoded(model))", target ="valueCoded")
+    @Mapping(expression = "java(conceptNameService.getOrInit(model.getValueCodedNameUuid()))", target ="valueCodedName")
+    @Mapping(expression = "java(getOrInitValueDrug(model))", target ="valueDrug")
+    @Mapping(expression = "java(getOrInitPreviousVersion(model))", target ="previousVersion")
+    @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator")
+    @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy")
+    @Mapping(ignore = true, target = "id")
     public abstract Observation modelToEntity(final ObservationModel model);
 
     protected ConceptLight getOrInitConcept(final ObservationModel model) {

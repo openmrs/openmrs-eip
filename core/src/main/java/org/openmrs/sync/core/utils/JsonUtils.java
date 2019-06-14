@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.openmrs.sync.core.exception.OpenMrsSyncException;
 
 import java.io.IOException;
 
@@ -20,7 +21,7 @@ public final class JsonUtils {
             return mapper.writeValueAsString(object).replaceAll("^\"|\"$|\\\\", "");
         } catch (JsonProcessingException e) {
             log.error("Error while marshalling object", e);
-            throw new RuntimeException(e);
+            throw new OpenMrsSyncException("Error while marshalling object", e);
         }
     }
 
@@ -33,7 +34,7 @@ public final class JsonUtils {
             return mapper.readValue(json, Class.forName(className));
         } catch (IOException | ClassNotFoundException e) {
             log.error("Error while unmarshalling object", e);
-            throw new RuntimeException(e);
+            throw new OpenMrsSyncException("Error while unmarshalling object", e);
         }
     }
 }

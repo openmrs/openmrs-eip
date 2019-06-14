@@ -4,9 +4,6 @@ import org.openmrs.sync.core.entity.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @NoRepositoryBean
 public interface OpenMrsRepository<E extends BaseEntity> extends JpaRepository<E, Integer> {
 

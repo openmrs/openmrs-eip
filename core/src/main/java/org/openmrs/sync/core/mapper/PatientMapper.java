@@ -2,7 +2,6 @@ package org.openmrs.sync.core.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.UserLight;
@@ -22,30 +21,26 @@ public abstract class PatientMapper implements EntityMapper<Patient, PatientMode
     protected LightServiceNoContext<UserLight> userService;
 
     @Override
-    @Mappings({
-            @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid"),
-            @Mapping(source = "causeOfDeath.conceptClass.uuid", target = "causeOfDeathClassUuid"),
-            @Mapping(source = "causeOfDeath.datatype.uuid", target = "causeOfDeathDatatypeUuid"),
-            @Mapping(source = "creator.uuid", target = "creatorUuid"),
-            @Mapping(source = "changedBy.uuid", target = "changedByUuid"),
-            @Mapping(source = "voidedBy.uuid", target = "voidedByUuid"),
-            @Mapping(source = "patientCreator.uuid", target = "patientCreatorUuid"),
-            @Mapping(source = "patientChangedBy.uuid", target = "patientChangedByUuid"),
-            @Mapping(source = "patientVoidedBy.uuid", target = "patientVoidedByUuid")
-    })
+    @Mapping(source = "causeOfDeath.uuid", target = "causeOfDeathUuid")
+    @Mapping(source = "causeOfDeath.conceptClass.uuid", target = "causeOfDeathClassUuid")
+    @Mapping(source = "causeOfDeath.datatype.uuid", target = "causeOfDeathDatatypeUuid")
+    @Mapping(source = "creator.uuid", target = "creatorUuid")
+    @Mapping(source = "changedBy.uuid", target = "changedByUuid")
+    @Mapping(source = "voidedBy.uuid", target = "voidedByUuid")
+    @Mapping(source = "patientCreator.uuid", target = "patientCreatorUuid")
+    @Mapping(source = "patientChangedBy.uuid", target = "patientChangedByUuid")
+    @Mapping(source = "patientVoidedBy.uuid", target = "patientVoidedByUuid")
     public abstract PatientModel entityToModel(final Patient entity);
 
     @Override
-    @Mappings({
-            @Mapping(expression = "java(getOrInitCauseOfDeath(model))", target ="causeOfDeath"),
-            @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator"),
-            @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPatientCreatorUuid()))", target ="patientCreator"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPatientChangedByUuid()))", target ="patientChangedBy"),
-            @Mapping(expression = "java(userService.getOrInit(model.getPatientVoidedByUuid()))", target ="patientVoidedBy"),
-            @Mapping(ignore = true, target = "id")
-    })
+    @Mapping(expression = "java(getOrInitCauseOfDeath(model))", target ="causeOfDeath")
+    @Mapping(expression = "java(userService.getOrInit(model.getCreatorUuid()))", target ="creator")
+    @Mapping(expression = "java(userService.getOrInit(model.getChangedByUuid()))", target ="changedBy")
+    @Mapping(expression = "java(userService.getOrInit(model.getVoidedByUuid()))", target ="voidedBy")
+    @Mapping(expression = "java(userService.getOrInit(model.getPatientCreatorUuid()))", target ="patientCreator")
+    @Mapping(expression = "java(userService.getOrInit(model.getPatientChangedByUuid()))", target ="patientChangedBy")
+    @Mapping(expression = "java(userService.getOrInit(model.getPatientVoidedByUuid()))", target ="patientVoidedBy")
+    @Mapping(ignore = true, target = "id")
     public abstract Patient modelToEntity(final PatientModel model);
 
     protected ConceptLight getOrInitCauseOfDeath(final PatientModel model) {
