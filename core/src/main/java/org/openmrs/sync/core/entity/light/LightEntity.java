@@ -23,6 +23,6 @@ public abstract class LightEntity extends BaseEntity {
 
     @Override
     public boolean wasModifiedAfter(final BaseEntity model) {
-        return true;
+        return false;
     }
 }
