@@ -3,10 +3,13 @@ package org.openmrs.sync.core.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.sync.core.entity.light.*;
+import org.openmrs.sync.core.utils.DateUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -115,4 +118,15 @@ public class Observation extends BaseEntity {
 
     @Column(name = "void_reason")
     protected String voidReason;
+
+    @Override
+    public boolean wasModifiedAfter(final BaseEntity entity) {
+        Observation auditableEntity = (Observation) entity;
+        List<LocalDateTime> datesToCheck = Arrays.asList(
+                auditableEntity.getDateCreated(),
+                auditableEntity.getDateVoided());
+        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
+        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
+        return dateCreatedAfter || dateVoidedAfter;
+    }
 }

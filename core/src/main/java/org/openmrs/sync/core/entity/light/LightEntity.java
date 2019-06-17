@@ -20,4 +20,9 @@ public abstract class LightEntity extends BaseEntity {
     @NotNull
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
+
+    @Override
+    public boolean wasModifiedAfter(final BaseEntity model) {
+        return true;
+    }
 }

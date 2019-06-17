@@ -27,14 +27,24 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     public abstract EntityNameEnum getEntityName();
 
     @Override
-    public M save(M model) {
+    public M save(final M model) {
         E etyInDb = repository.findByUuid(model.getUuid());
 
         E ety = mapper.modelToEntity(model);
-        if (etyInDb != null) {
+
+        M modelToReturn = model;
+
+        if (etyInDb == null) {
+            modelToReturn = saveEntity(ety);
+        } else if (!etyInDb.wasModifiedAfter(ety)) {
             ety.setId(etyInDb.getId());
+            modelToReturn = saveEntity(ety);
         }
 
+        return modelToReturn;
+    }
+
+    private M saveEntity(final E ety) {
         return mapper.entityToModel(repository.save(ety));
     }
 

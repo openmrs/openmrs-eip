@@ -2,12 +2,14 @@ package org.openmrs.sync.core.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.function.Predicate;
 
 public final class DateUtils {
 
     private DateUtils() {}
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static String dateToString(final LocalDateTime dateTime) {
         if (dateTime == null) {
@@ -21,5 +23,17 @@ public final class DateUtils {
             return null;
         }
         return LocalDateTime.parse(dateAsString, FORMATTER);
+    }
+
+    public static boolean isDateAfterAtLeastOneInList(final LocalDateTime date,
+                                                      final List<LocalDateTime> dates) {
+        if (date == null) {
+            return false;
+        }
+        return dates.stream()
+                .map(d -> (Predicate<LocalDateTime>) o -> d != null && date.isAfter(d))
+                .reduce(Predicate::or)
+                .map(p -> p.test(date))
+                .orElse(false);
     }
 }

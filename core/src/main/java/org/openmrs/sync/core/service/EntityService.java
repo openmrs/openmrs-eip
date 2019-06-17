@@ -19,5 +19,5 @@ public interface EntityService<M extends BaseModel> {
      * @return a list of BaseModel
      * @param lastSyncDate
      */
-    List<M> getModels(final LocalDateTime lastSyncDate);
+    List<M> getModels(LocalDateTime lastSyncDate);
 }
