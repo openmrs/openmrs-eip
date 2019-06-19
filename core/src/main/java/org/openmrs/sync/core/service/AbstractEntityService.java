@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
-    private SyncEntityRepository<E> repository;
-    private EntityMapper<E, M> mapper;
+    protected SyncEntityRepository<E> repository;
+    protected EntityMapper<E, M> mapper;
 
     public AbstractEntityService(final SyncEntityRepository<E> repository,
                                  final EntityMapper<E, M> mapper) {
@@ -57,6 +57,10 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
             entities = repository.findModelsChangedAfterDate(lastSyncDate);
         }
 
+        return mapEntities(entities);
+    }
+
+    protected List<M> mapEntities(List<E> entities) {
         return entities.stream()
                 .map(mapper::entityToModel)
                 .collect(Collectors.toList());

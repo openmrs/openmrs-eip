@@ -3,7 +3,6 @@ package org.openmrs.sync.remote;
 import org.apache.camel.CamelContext;
 import org.openmrs.sync.core.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.remote.management.init.impl.ManagementDbInit;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

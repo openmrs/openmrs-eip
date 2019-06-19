@@ -11,13 +11,7 @@ public interface PersonRepository extends SyncEntityRepository<Person> {
 
     @Override
     @Query("select p from Person p " +
-            "where type(p) = 'Person'")
-    List<Person> findAll();
-
-    @Override
-    @Query("select p from Person p " +
             "where (p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-            "or p.dateChanged >= :lastSyncDate) " +
-            "and type(p) = 'Person'")
+            "or p.dateChanged >= :lastSyncDate)")
     List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

@@ -12,7 +12,7 @@ import org.openmrs.sync.core.service.facade.EntityServiceFacade;
         firstVersion = "1.0.0",
         scheme = "openmrsLoad",
         title = "OpenMrsLoad",
-        syntax = "openmrsLoad:entityName",
+        syntax = "openmrsLoad",
         producerOnly = true,
         label = "core,java"
 )

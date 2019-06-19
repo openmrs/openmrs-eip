@@ -1,8 +1,6 @@
 package org.openmrs.sync.central.camel.routes;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.dataformat.JsonDataFormat;
-import org.apache.camel.model.dataformat.JsonLibrary;
 
 import org.springframework.stereotype.Component;
 
