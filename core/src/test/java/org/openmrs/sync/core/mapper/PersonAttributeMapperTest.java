@@ -35,6 +35,9 @@ public class PersonAttributeMapperTest extends AbstractMapperTest {
     @InjectMocks
     private PersonAttributeMapperImpl mapper;
 
+    private PersonLight person = initBaseModel(PersonLight.class, "person");
+    private PersonAttributeTypeLight personAttributeType = initBaseModel(PersonAttributeTypeLight.class, "personAttributeType");
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -56,9 +59,9 @@ public class PersonAttributeMapperTest extends AbstractMapperTest {
     public void modelToEntity() {
         // Given
         PersonAttributeModel model = getVisitModel();
-        when(userService.getOrInit("user")).thenReturn(getUser());
-        when(personService.getOrInit("person")).thenReturn(getPerson());
-        when(persontAttributeTypeService.getOrInit("personAttributeType")).thenReturn(getPersonAttributeType());
+        when(userService.getOrInit("user")).thenReturn(user);
+        when(personService.getOrInit("person")).thenReturn(person);
+        when(persontAttributeTypeService.getOrInit("personAttributeType")).thenReturn(personAttributeType);
 
         // When
         PersonAttribute result = mapper.modelToEntity(model);
@@ -90,11 +93,11 @@ public class PersonAttributeMapperTest extends AbstractMapperTest {
         visit.setVoided(true);
         visit.setDateVoided(LocalDateTime.of(2012,Month.JANUARY, 1, 10, 10));
         visit.setVoidReason("reason");
-        visit.setVoidedBy(getUser());
-        visit.setCreator(getUser());
-        visit.setChangedBy(getUser());
-        visit.setPerson(getPerson());
-        visit.setPersonAttributeType(getPersonAttributeType());
+        visit.setVoidedBy(user);
+        visit.setCreator(user);
+        visit.setChangedBy(user);
+        visit.setPerson(person);
+        visit.setPersonAttributeType(personAttributeType);
         visit.setValue("value");
 
         return visit;

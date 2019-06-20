@@ -32,6 +32,8 @@ public class PatientMapperTest extends AbstractMapperTest {
     @InjectMocks
     private PatientMapperImpl mapper;
 
+    private ConceptLight concept = initBaseModel(ConceptLight.class, "concept");
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -52,9 +54,9 @@ public class PatientMapperTest extends AbstractMapperTest {
     @Test
     public void modelToEntity() {
         // Given
-        PatientModel model = getPersonModel();
-        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
+        PatientModel model = getPatientModel();
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(concept);
+        when(userService.getOrInit("user")).thenReturn(user);
 
         // When
         Patient result = mapper.modelToEntity(model);
@@ -156,7 +158,7 @@ public class PatientMapperTest extends AbstractMapperTest {
         assertEquals(model.getBirthtime(), result.getBirthtime());
     }
 
-    private PatientModel getPersonModel() {
+    private PatientModel getPatientModel() {
         PatientModel model = new PatientModel();
         model.setGender("M");
         model.setBirthdate(LocalDate.of(1956, Month.OCTOBER, 22));

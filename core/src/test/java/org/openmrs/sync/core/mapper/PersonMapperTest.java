@@ -1,11 +1,9 @@
 package org.openmrs.sync.core.mapper;
 
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.entity.light.UserLight;
@@ -23,7 +21,6 @@ import java.time.Month;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PersonMapperTest extends AbstractMapperTest {
 
     @Mock
@@ -34,6 +31,8 @@ public class PersonMapperTest extends AbstractMapperTest {
 
     @InjectMocks
     private PersonMapperImpl mapper;
+
+    private ConceptLight concept = initBaseModel(ConceptLight.class, "concept");
 
     @Before
     public void init() {
@@ -56,8 +55,8 @@ public class PersonMapperTest extends AbstractMapperTest {
     public void modelToEntity() {
         // Given
         PersonModel model = getPersonModel();
-        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(concept);
+        when(userService.getOrInit("user")).thenReturn(user);
 
         // When
         Person result = mapper.modelToEntity(model);
@@ -93,13 +92,13 @@ public class PersonMapperTest extends AbstractMapperTest {
         ety.setBirthdateEstimated(true);
         ety.setDead(false);
         ety.setDeathDate(LocalDate.of(1988, Month.NOVEMBER, 1));
-        ety.setCauseOfDeath(getConcept());
-        ety.setCreator(getUser());
+        ety.setCauseOfDeath(concept);
+        ety.setCreator(user);
         ety.setDateCreated(LocalDateTime.of(2010, Month.JANUARY, 1, 0, 0));
-        ety.setChangedBy(getUser());
+        ety.setChangedBy(user);
         ety.setDateChanged(LocalDateTime.of(2011, Month.JANUARY, 1, 0, 0));
         ety.setVoided(true);
-        ety.setVoidedBy(getUser());
+        ety.setVoidedBy(user);
         ety.setDateVoided(LocalDateTime.of(2012, Month.JANUARY, 1, 0, 0));
         ety.setVoidReason("voided");
         ety.setUuid("person");

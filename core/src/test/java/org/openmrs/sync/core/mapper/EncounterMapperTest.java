@@ -2,11 +2,9 @@ package org.openmrs.sync.core.mapper;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.sync.core.entity.Encounter;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.EncounterModel;
@@ -20,7 +18,6 @@ import java.time.Month;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class EncounterMapperTest extends AbstractMapperTest {
 
     @Mock
@@ -43,6 +40,12 @@ public class EncounterMapperTest extends AbstractMapperTest {
 
     @InjectMocks
     private EncounterMapperImpl mapper;
+
+    private EncounterTypeLight encounterType = initBaseModel(EncounterTypeLight.class, "encounterType");
+    private PatientLight patient = initBaseModel(PatientLight.class, "patient");
+    private LocationLight location = initBaseModel(LocationLight.class, "location");
+    private FormLight form = initBaseModel(FormLight.class, "form");
+    private VisitLight visit = initBaseModel(VisitLight.class, "visit");
 
     @Before
     public void init() {
@@ -70,12 +73,12 @@ public class EncounterMapperTest extends AbstractMapperTest {
                 .build();
 
         EncounterModel model = getEncounterModel();
-        when(encounterTypeService.getOrInit("encounterType")).thenReturn(getEncounterType());
-        when(patientService.getOrInit("patient")).thenReturn(getPatient("patient"));
-        when(locationService.getOrInit("location")).thenReturn(getLocation());
-        when(formService.getOrInit("form")).thenReturn(getForm());
-        when(visitService.getOrInit("visit", visitContext)).thenReturn(getVisit());
-        when(userService.getOrInit("user")).thenReturn(getUser());
+        when(encounterTypeService.getOrInit("encounterType")).thenReturn(encounterType);
+        when(patientService.getOrInit("patient")).thenReturn(patient);
+        when(locationService.getOrInit("location")).thenReturn(location);
+        when(formService.getOrInit("form")).thenReturn(form);
+        when(visitService.getOrInit("visit", visitContext)).thenReturn(visit);
+        when(userService.getOrInit("user")).thenReturn(user);
 
         // When
         Encounter result = mapper.modelToEntity(model);
@@ -100,8 +103,6 @@ public class EncounterMapperTest extends AbstractMapperTest {
         assertEquals(ety.getLocation().getUuid(), result.getLocationUuid());
         assertEquals(ety.getEncounterType().getUuid(), result.getEncounterTypeUuid());
         assertEquals(ety.getVisit().getUuid(), result.getVisitUuid());
-        assertEquals(ety.getVisit().getVisitType().getUuid(), result.getVisitVisitTypeUuid());
-        assertEquals(ety.getVisit().getPatient().getUuid(), result.getVisitPatientUuid());
     }
 
     private Encounter getEncounterEty() {
@@ -114,22 +115,20 @@ public class EncounterMapperTest extends AbstractMapperTest {
         encounter.setDateVoided(LocalDateTime.of(2012,Month.JANUARY, 1, 10, 11));
         encounter.setVoidReason("reason");
         encounter.setEncounterDatetime(LocalDateTime.of(2013,Month.JANUARY, 1, 10, 11));
-        encounter.setVoidedBy(getUser());
-        encounter.setCreator(getUser());
-        encounter.setForm(getForm());
-        encounter.setPatient(getPatient("visitPatient"));
-        encounter.setChangedBy(getUser());
-        encounter.setLocation(getLocation());
-        encounter.setVisit(getVisit());
-        encounter.setEncounterType(getEncounterType());
+        encounter.setVoidedBy(user);
+        encounter.setCreator(user);
+        encounter.setForm(form);
+        encounter.setPatient(patient);
+        encounter.setChangedBy(user);
+        encounter.setLocation(location);
+        encounter.setVisit(visit);
+        encounter.setEncounterType(encounterType);
 
         return encounter;
     }
 
     private void assertResult(final EncounterModel model, final Encounter result) {
         assertEquals(model.getVisitUuid(), result.getVisit().getUuid());
-        assertEquals(model.getVisitPatientUuid(), result.getVisit().getPatient().getUuid());
-        assertEquals(model.getVisitVisitTypeUuid(), result.getVisit().getVisitType().getUuid());
         assertEquals(model.getFormUuid(), result.getForm().getUuid());
         assertEquals(model.getEncounterTypeUuid(), result.getEncounterType().getUuid());
         assertEquals(model.getPatientUuid(), result.getPatient().getUuid());

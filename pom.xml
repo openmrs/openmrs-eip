@@ -21,6 +21,7 @@
     <mapStruct.version>1.3.0.Final</mapStruct.version>
     <activeMq.version>5.15.8</activeMq.version>
     <lombok.version>1.18.8</lombok.version>
+    <exclude.tests>nothing-to-exclude</exclude.tests>
   </properties>
 
   <dependencyManagement>
@@ -87,6 +88,15 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>fastTests</id>
+      <properties>
+        <exclude.tests>**/*ITest.java</exclude.tests>
+      </properties>
+    </profile>
+  </profiles>
+
   <build>
     <defaultGoal>install</defaultGoal>
 
@@ -115,6 +125,15 @@
             </path>
             <!-- other annotation processors -->
           </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>${exclude.tests}</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>

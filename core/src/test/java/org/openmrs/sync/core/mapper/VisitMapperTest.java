@@ -2,11 +2,9 @@ package org.openmrs.sync.core.mapper;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.sync.core.entity.Visit;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.VisitModel;
@@ -20,7 +18,6 @@ import java.time.Month;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class VisitMapperTest extends AbstractMapperTest {
 
     @Mock
@@ -40,6 +37,11 @@ public class VisitMapperTest extends AbstractMapperTest {
 
     @InjectMocks
     private VisitMapperImpl mapper;
+
+    private ConceptLight concept = initBaseModel(ConceptLight.class, "concept");
+    private LocationLight location = initBaseModel(LocationLight.class, "location");
+    private VisitTypeLight visitType = initBaseModel(VisitTypeLight.class, "visitType");
+    private PatientLight patient = initBaseModel(PatientLight.class, "patient");
 
     @Before
     public void init() {
@@ -62,11 +64,11 @@ public class VisitMapperTest extends AbstractMapperTest {
      public void modelToEntity() {
         // Given
         VisitModel model = getVisitModel();
-        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(getConcept());
-        when(userService.getOrInit("user")).thenReturn(getUser());
-        when(locationService.getOrInit("location")).thenReturn(getLocation());
-        when(visitTypeService.getOrInit("visitType")).thenReturn(getVisitType());
-        when(patientService.getOrInit("patient")).thenReturn(getPatient());
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(concept);
+        when(userService.getOrInit("user")).thenReturn(user);
+        when(locationService.getOrInit("location")).thenReturn(location);
+        when(visitTypeService.getOrInit("visitType")).thenReturn(visitType);
+        when(patientService.getOrInit("patient")).thenReturn(patient);
 
         // When
         Visit result = mapper.modelToEntity(model);
@@ -103,13 +105,13 @@ public class VisitMapperTest extends AbstractMapperTest {
         visit.setVoidReason("reason");
         visit.setDateStarted(LocalDateTime.of(2010,Month.JANUARY, 1, 10, 11));
         visit.setDateStopped(LocalDateTime.of(2010,Month.JANUARY, 1, 10, 15));
-        visit.setVoidedBy(getUser());
-        visit.setCreator(getUser());
-        visit.setPatient(getPatient());
-        visit.setChangedBy(getUser());
-        visit.setLocation(getLocation());
-        visit.setIndicationConcept(getConcept());
-        visit.setVisitType(getVisitType());
+        visit.setVoidedBy(user);
+        visit.setCreator(user);
+        visit.setPatient(patient);
+        visit.setChangedBy(user);
+        visit.setLocation(location);
+        visit.setIndicationConcept(concept);
+        visit.setVisitType(visitType);
 
         return visit;
     }

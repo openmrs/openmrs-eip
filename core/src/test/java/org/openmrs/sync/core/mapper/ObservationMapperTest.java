@@ -2,11 +2,9 @@ package org.openmrs.sync.core.mapper;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.sync.core.entity.Observation;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.model.ObservationModel;
@@ -20,7 +18,6 @@ import java.time.Month;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ObservationMapperTest extends AbstractMapperTest {
 
     @Mock
@@ -53,6 +50,17 @@ public class ObservationMapperTest extends AbstractMapperTest {
     @InjectMocks
     private ObservationMapperImpl mapper;
 
+    private PersonLight person = initBaseModel(PersonLight.class, "person");
+    private ConceptLight concept = initBaseModel(ConceptLight.class, "concept");
+    private ConceptLight valueCoded = initBaseModel(ConceptLight.class, "valueCoded");
+    private EncounterLight encounter = initBaseModel(EncounterLight.class, "encounter");
+    private OrderLight order = initBaseModel(OrderLight.class, "order");
+    private LocationLight location = initBaseModel(LocationLight.class, "location");
+    private ObservationLight obsGroup = initBaseModel(ObservationLight.class, "obsGroup");
+    private ObservationLight previousVersion = initBaseModel(ObservationLight.class, "previousVersion");
+    private ConceptNameLight valueCodeName = initBaseModel(ConceptNameLight.class, "valueCodeName");
+    private DrugLight drug = initBaseModel(DrugLight.class, "drug");
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -73,54 +81,18 @@ public class ObservationMapperTest extends AbstractMapperTest {
     @Test
     public void etyToModel() {
         // Given
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptClassUuid("conceptClass")
-                .build();
-
-        EncounterContext encounterContext = EncounterContext.builder()
-                .patientUuid("patient")
-                .encounterTypeUuid("encounterType")
-                .build();
-
-        OrderContext orderContext = OrderContext.builder()
-                .orderTypeUuid("orderType")
-                .careSettingUuid("careSetting")
-                .patientUuid("patient")
-                .encounterEncounterTypeUuid("encounterType")
-                .encounterPatientUuid("patient")
-                .encounterUuid("encounter")
-                .providerUuid("orderer")
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptClassUuid("conceptClass")
-                .conceptUuid("concept")
-                .build();
-
-        ObservationContext observationContext = ObservationContext.builder()
-                .personUuid("person")
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptClassUuid("conceptClass")
-                .conceptUuid("concept")
-                .build();
-
-        DrugContext drugContext = DrugContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptUuid("concept")
-                .build();
-
         ObservationModel model = getObservationModel();
-        when(personService.getOrInit("person")).thenReturn(getPerson());
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
-        when(conceptService.getOrInit("valueCoded", conceptContext)).thenReturn(getConcept("valueCoded"));
-        when(encounterService.getOrInit("encounter", encounterContext)).thenReturn(getEncounter());
-        when(orderService.getOrInit("order", orderContext)).thenReturn(getOrder());
-        when(locationService.getOrInit("location")).thenReturn(getLocation());
-        when(observationService.getOrInit("obsGroup", observationContext)).thenReturn(getObservation("obsGroup"));
-        when(observationService.getOrInit("previousVersion", observationContext)).thenReturn(getObservation("previousVersion"));
-        when(conceptNameService.getOrInit("conceptName")).thenReturn(getValueCodeName());
-        when(drugService.getOrInit("drug", drugContext)).thenReturn(getValueDrug());
-        when(userService.getOrInit("user")).thenReturn(getUser());
+        when(personService.getOrInit("person")).thenReturn(person);
+        when(conceptService.getOrInit("concept", getConceptContext())).thenReturn(concept);
+        when(conceptService.getOrInit("valueCoded", getConceptContext())).thenReturn(valueCoded);
+        when(encounterService.getOrInit("encounter", getEncounterContext())).thenReturn(encounter);
+        when(orderService.getOrInit("order", getOrderContext())).thenReturn(order);
+        when(locationService.getOrInit("location")).thenReturn(location);
+        when(observationService.getOrInit("obsGroup", getObservationContext())).thenReturn(obsGroup);
+        when(observationService.getOrInit("previousVersion", getObservationContext())).thenReturn(previousVersion);
+        when(conceptNameService.getOrInit("valueCodeName")).thenReturn(valueCodeName);
+        when(drugService.getOrInit("drug", getDrugContext())).thenReturn(drug);
+        when(userService.getOrInit("user")).thenReturn(user);
 
         // When
         Observation result = mapper.modelToEntity(model);
@@ -180,18 +152,18 @@ public class ObservationMapperTest extends AbstractMapperTest {
         observation.setVoided(true);
         observation.setDateVoided(LocalDateTime.of(2013, Month.JANUARY, 1, 0, 0));
         observation.setVoidReason("voidReason");
-        observation.setCreator(getUser());
-        observation.setValueDrug(getValueDrug());
-        observation.setConcept(getConcept());
-        observation.setEncounter(getEncounter());
-        observation.setVoidedBy(getUser());
-        observation.setPerson(getPerson());
-        observation.setPreviousVersion(getObservation("obsGroup"));
-        observation.setLocation(getLocation());
-        observation.setValueCodedName(getValueCodeName());
-        observation.setValueCoded(getValueCoded());
-        observation.setOrder(getOrder());
-        observation.setObsGroup(getObsGroup());
+        observation.setCreator(user);
+        observation.setValueDrug(drug);
+        observation.setConcept(concept);
+        observation.setEncounter(encounter);
+        observation.setVoidedBy(user);
+        observation.setPerson(person);
+        observation.setPreviousVersion(previousVersion);
+        observation.setLocation(location);
+        observation.setValueCodedName(valueCodeName);
+        observation.setValueCoded(valueCoded);
+        observation.setOrder(order);
+        observation.setObsGroup(obsGroup);
         return observation;
     }
 
@@ -265,7 +237,7 @@ public class ObservationMapperTest extends AbstractMapperTest {
         model.setValueDrugConceptDatatypeUuid("conceptDatatype");
         model.setEncounterPatientUuid("patient");
         model.setValueCodedClassUuid("conceptClass");
-        model.setValueCodedNameUuid("conceptName");
+        model.setValueCodedNameUuid("valueCodeName");
         model.setPreviousVersionConceptUuid("concept");
         model.setEncounterUuid("encounter");
         model.setUuid("uuid");
@@ -287,5 +259,51 @@ public class ObservationMapperTest extends AbstractMapperTest {
         model.setInterpretation("interpretation");
 
         return model;
+    }
+
+    private DrugContext getDrugContext() {
+        return DrugContext.builder()
+                .conceptClassUuid("conceptClass")
+                .conceptDatatypeUuid("conceptDatatype")
+                .conceptUuid("concept")
+                .build();
+    }
+
+    private ObservationContext getObservationContext() {
+        return ObservationContext.builder()
+                .personUuid("person")
+                .conceptDatatypeUuid("conceptDatatype")
+                .conceptClassUuid("conceptClass")
+                .conceptUuid("concept")
+                .build();
+    }
+
+    private OrderContext getOrderContext() {
+        return OrderContext.builder()
+                .orderTypeUuid("orderType")
+                .careSettingUuid("careSetting")
+                .patientUuid("patient")
+                .encounterEncounterTypeUuid("encounterType")
+                .encounterPatientUuid("patient")
+                .encounterUuid("encounter")
+                .providerUuid("orderer")
+                .conceptDatatypeUuid("conceptDatatype")
+                .conceptClassUuid("conceptClass")
+                .conceptUuid("concept")
+                .build();
+    }
+
+    private EncounterContext getEncounterContext() {
+        return EncounterContext.builder()
+                .patientUuid("patient")
+                .encounterTypeUuid("encounterType")
+                .build();
+    }
+
+    private ConceptContext getConceptContext() {
+        return ConceptContext.builder()
+                .conceptDatatypeUuid("conceptDatatype")
+                .conceptClassUuid("conceptClass")
+                .build();
     }
 }
