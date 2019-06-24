@@ -10,7 +10,11 @@ public enum EntityNameEnum {
     OBSERVATION(ObservationModel.class),
     PERSON_ATTRIBUTE(PersonAttributeModel.class),
     PATIENT_PROGRAM(PatientProgramModel.class),
-    PATIENT_STATE(PatientStateModel.class);
+    PATIENT_STATE(PatientStateModel.class),
+    CONCEPT_ATTRIBUTE(ConceptAttributeModel.class),
+    LOCATION_ATTRIBUTE(AttributeModel.class),
+    PROVIDER_ATTRIBUTE(AttributeModel.class),
+    VISIT_ATTRIBUTE(VisitAttributeModel.class);
 
     private Class<? extends BaseModel> modelClass;
 
