@@ -3,6 +3,7 @@ package org.openmrs.sync.core.camel.extract;
 import org.apache.camel.Exchange;
 import org.json.JSONException;
 import org.junit.Test;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -20,7 +21,7 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
     public void extract() throws JSONException {
         // Given
         CamelInitObect camelInitObect = CamelInitObect.builder()
-                .entityName("person")
+                .tableToSync("person")
                 .lastSyncDate(date)
                 .build();
 
@@ -37,25 +38,28 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
 
     private String getExpectedJson() {
         return "{" +
-                "\"uuid\":\"dd279794-76e9-11e9-8cd9-0242ac1c000b\"," +
-                "\"creatorUuid\":null," +
-                "\"dateCreated\":[2005,1,1,0,0]," +
-                "\"changedByUuid\":null," +
-                "\"dateChanged\":null," +
-                "\"voided\":false," +
-                "\"voidedByUuid\":null," +
-                "\"dateVoided\":null," +
-                "\"voidReason\":null," +
-                "\"gender\":\"M\"," +
-                "\"birthdate\":null," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"causeOfDeathClassUuid\":null," +
-                "\"causeOfDeathDatatypeUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
+                    "\"tableToSync\":\"" + TableToSyncEnum.PERSON + "\"," +
+                    "\"model\":{" +
+                        "\"uuid\":\"dd279794-76e9-11e9-8cd9-0242ac1c000b\"," +
+                        "\"creatorUuid\":null," +
+                        "\"dateCreated\":[2005,1,1,0,0]," +
+                        "\"changedByUuid\":null," +
+                        "\"dateChanged\":null," +
+                        "\"voided\":false," +
+                        "\"voidedByUuid\":null," +
+                        "\"dateVoided\":null," +
+                        "\"voidReason\":null," +
+                        "\"gender\":\"M\"," +
+                        "\"birthdate\":null," +
+                        "\"birthdateEstimated\":false," +
+                        "\"dead\":false," +
+                        "\"deathDate\":null," +
+                        "\"causeOfDeathUuid\":null," +
+                        "\"causeOfDeathClassUuid\":null," +
+                        "\"causeOfDeathDatatypeUuid\":null," +
+                        "\"deathdateEstimated\":false," +
+                        "\"birthtime\":null" +
+                    "}" +
                 "}";
     }
 }

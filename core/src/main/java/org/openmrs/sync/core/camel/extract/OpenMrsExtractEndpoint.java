@@ -6,7 +6,7 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
 import java.time.LocalDateTime;
@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
         firstVersion = "1.0.0",
         scheme = "openmrsExtract",
         title = "OpenMrsExtract",
-        syntax = "openmrsExtract:entityName",
+        syntax = "openmrsExtract:tableToSync",
         producerOnly = true,
         label = "core,java"
 )
 public class OpenMrsExtractEndpoint extends DefaultEndpoint {
 
-    @UriPath(name = "entityName")
+    @UriPath(name = "tableToSync")
     @Metadata(required = "true")
-    private EntityNameEnum entityName;
+    private TableToSyncEnum tableToSync;
 
     @UriParam(label = "consumer,advanced")
     private LocalDateTime lastSyncDate;
@@ -33,15 +33,15 @@ public class OpenMrsExtractEndpoint extends DefaultEndpoint {
     public OpenMrsExtractEndpoint(final String endpointUri,
                                   final Component component,
                                   final EntityServiceFacade entityServiceFacade,
-                                  final EntityNameEnum entityName) {
+                                  final TableToSyncEnum tableToSync) {
         super(endpointUri, component);
         this.entityServiceFacade = entityServiceFacade;
-        this.entityName = entityName;
+        this.tableToSync = tableToSync;
     }
 
     @Override
     public Producer createProducer() {
-        return new OpenMrsExtractProducer(this, entityServiceFacade, entityName, lastSyncDate);
+        return new OpenMrsExtractProducer(this, entityServiceFacade, tableToSync, lastSyncDate);
     }
 
     @Override

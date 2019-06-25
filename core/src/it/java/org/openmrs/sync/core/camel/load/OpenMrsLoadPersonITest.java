@@ -5,6 +5,7 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.Test;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -20,7 +21,7 @@ public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
     public void load() {
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setHeader("OpenMrsEntitySyncName", "PERSON");
+        exchange.getIn().setHeader("OpenMrsTableSyncName", TableToSyncEnum.PERSON.name());
         exchange.getIn().setBody(getPersonJson());
 
         // When
@@ -32,25 +33,28 @@ public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
 
     private String getPersonJson() {
         return "{" +
-                "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
-                "\"creatorUuid\":1," +
-                "\"dateCreated\":[2019,5,28,13,42,31]," +
-                "\"changedByUuid\":null," +
-                "\"dateChanged\":null," +
-                "\"voided\":false," +
-                "\"voidedByUuid\":null," +
-                "\"dateVoided\":null," +
-                "\"voidReason\":null," +
-                "\"gender\":\"F\"," +
-                "\"birthdate\":\"1982-01-06\"," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"causeOfDeathClassUuid\":null," +
-                "\"causeOfDeathDatatypeUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
+                    "\"tableToSync\":\"" + TableToSyncEnum.PERSON + "\"," +
+                    "\"model\":{" +
+                        "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
+                        "\"creatorUuid\":1," +
+                        "\"dateCreated\":[2019,5,28,13,42,31]," +
+                        "\"changedByUuid\":null," +
+                        "\"dateChanged\":null," +
+                        "\"voided\":false," +
+                        "\"voidedByUuid\":null," +
+                        "\"dateVoided\":null," +
+                        "\"voidReason\":null," +
+                        "\"gender\":\"F\"," +
+                        "\"birthdate\":\"1982-01-06\"," +
+                        "\"birthdateEstimated\":false," +
+                        "\"dead\":false," +
+                        "\"deathDate\":null," +
+                        "\"causeOfDeathUuid\":null," +
+                        "\"causeOfDeathClassUuid\":null," +
+                        "\"causeOfDeathDatatypeUuid\":null," +
+                        "\"deathdateEstimated\":false," +
+                        "\"birthtime\":null" +
+                    "}" +
                 "}";
     }
 }

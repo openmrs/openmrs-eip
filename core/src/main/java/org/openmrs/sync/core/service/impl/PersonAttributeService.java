@@ -5,7 +5,7 @@ import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.PersonAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class PersonAttributeService extends AbstractEntityService<PersonAttribut
     }
 
     @Override
-    public EntityNameEnum getEntityName() {
-        return EntityNameEnum.PERSON_ATTRIBUTE;
+    public TableToSyncEnum getTableToSync() {
+        return TableToSyncEnum.PERSON_ATTRIBUTE;
     }
 }

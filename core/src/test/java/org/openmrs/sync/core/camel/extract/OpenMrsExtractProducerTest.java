@@ -4,13 +4,15 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.model.PersonModel;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -37,17 +39,17 @@ public class OpenMrsExtractProducerTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        producer = new OpenMrsExtractProducer(endpoint, serviceFacade, EntityNameEnum.PERSON, lastSyncDate);
+        producer = new OpenMrsExtractProducer(endpoint, serviceFacade, TableToSyncEnum.PERSON, lastSyncDate);
     }
 
     @Test
-    public void process() {
+    public void process() throws JSONException {
         // Given
         PersonModel model1 = new PersonModel();
         model1.setUuid("uuid1");
         PersonModel model2 = new PersonModel();
         model2.setUuid("uuid2");
-        when(serviceFacade.getModels(EntityNameEnum.PERSON, lastSyncDate)).thenReturn(Arrays.asList(model1, model2));
+        when(serviceFacade.getModels(TableToSyncEnum.PERSON, lastSyncDate)).thenReturn(Arrays.asList(model1, model2));
 
         // When
         producer.process(exchange);
@@ -55,30 +57,34 @@ public class OpenMrsExtractProducerTest {
         // Then
         List<String> json = (List<String>) exchange.getIn().getBody();
         assertEquals(2, json.size());
-        assertEquals(expectedJson("uuid1"), json.get(0));
-        assertEquals(expectedJson("uuid2"), json.get(1));
+        JSONAssert.assertEquals(expectedJson("uuid1"), json.get(0), false);
+        JSONAssert.assertEquals(expectedJson("uuid2"), json.get(1), false);
     }
 
     private String expectedJson(final String uuid) {
-        return "{\"uuid\":\"" + uuid + "\"," +
-                "\"creatorUuid\":null," +
-                "\"dateCreated\":null," +
-                "\"changedByUuid\":null," +
-                "\"dateChanged\":null," +
-                "\"voided\":false," +
-                "\"voidedByUuid\":null," +
-                "\"dateVoided\":null," +
-                "\"voidReason\":null," +
-                "\"gender\":null," +
-                "\"birthdate\":null," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"causeOfDeathClassUuid\":null," +
-                "\"causeOfDeathDatatypeUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
+        return "{" +
+                    "\"tableToSync\":\"" + TableToSyncEnum.PERSON + "\"," +
+                    "\"model\": {" +
+                        "\"uuid\":\"" + uuid + "\"," +
+                        "\"creatorUuid\":null," +
+                        "\"dateCreated\":null," +
+                        "\"changedByUuid\":null," +
+                        "\"dateChanged\":null," +
+                        "\"voided\":false," +
+                        "\"voidedByUuid\":null," +
+                        "\"dateVoided\":null," +
+                        "\"voidReason\":null," +
+                        "\"gender\":null," +
+                        "\"birthdate\":null," +
+                        "\"birthdateEstimated\":false," +
+                        "\"dead\":false," +
+                        "\"deathDate\":null," +
+                        "\"causeOfDeathUuid\":null," +
+                        "\"causeOfDeathClassUuid\":null," +
+                        "\"causeOfDeathDatatypeUuid\":null," +
+                        "\"deathdateEstimated\":false," +
+                        "\"birthtime\":null" +
+                    "}" +
                 "}";
     }
 }

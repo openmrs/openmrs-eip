@@ -4,7 +4,7 @@ import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.model.PersonModel;
 import org.junit.Before;
@@ -37,8 +37,8 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void getEntityName() {
-        assertEquals(EntityNameEnum.PERSON, service.getEntityName());
+    public void getTableToSync() {
+        assertEquals(TableToSyncEnum.PERSON, service.getTableToSync());
     }
 
     @Test

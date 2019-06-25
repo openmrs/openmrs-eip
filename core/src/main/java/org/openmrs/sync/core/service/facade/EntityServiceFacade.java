@@ -2,7 +2,7 @@ package org.openmrs.sync.core.service.facade;
 
 import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.AbstractEntityService;
 import org.springframework.stereotype.Component;
 
@@ -20,31 +20,31 @@ public class EntityServiceFacade {
 
     /**
      * get all models of type in parameter after the last sync date
-     * @param entityNameEnum the type of entities to get
+     * @param tableToSyncEnum the type of entities to get
      * @param lastSyncDate the last sync date
      * @param <M>
      * @return the entities
      */
-    public <M extends BaseModel> List<M> getModels(final EntityNameEnum entityNameEnum, final LocalDateTime lastSyncDate) {
-        return (List<M>) getService(entityNameEnum).getModels(lastSyncDate);
+    public <M extends BaseModel> List<M> getModels(final TableToSyncEnum tableToSyncEnum, final LocalDateTime lastSyncDate) {
+        return (List<M>) getService(tableToSyncEnum).getModels(lastSyncDate);
     }
 
     /**
      * save the model of type in parameter
-     * @param entityNameEnum the type of model to save
+     * @param tableToSync the type of model to save
      * @param model the model to save
      * @param <M>
      */
-    public <M extends BaseModel> void saveModel(final EntityNameEnum entityNameEnum,
+    public <M extends BaseModel> void saveModel(final TableToSyncEnum tableToSync,
                                                 final M model) {
-        getService(entityNameEnum).save(model);
+        getService(tableToSync).save(model);
     }
 
-    private <E extends BaseEntity, M extends BaseModel> AbstractEntityService<E, M> getService(final EntityNameEnum entityName) {
+    private <E extends BaseEntity, M extends BaseModel> AbstractEntityService<E, M> getService(final TableToSyncEnum tableToSync) {
         return services.stream()
-                .filter(service -> service.getEntityName() == entityName)
+                .filter(service -> service.getTableToSync().equals(tableToSync))
                 .map(service -> (AbstractEntityService<E, M>) service)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown entity " + entityName.name()));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown entity " + tableToSync.name()));
     }
 }

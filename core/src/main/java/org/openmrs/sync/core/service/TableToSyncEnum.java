@@ -2,7 +2,7 @@ package org.openmrs.sync.core.service;
 
 import org.openmrs.sync.core.model.*;
 
-public enum EntityNameEnum {
+public enum TableToSyncEnum {
     PERSON(PersonModel.class),
     PATIENT(PatientModel.class),
     VISIT(VisitModel.class),
@@ -18,7 +18,7 @@ public enum EntityNameEnum {
 
     private Class<? extends BaseModel> modelClass;
 
-    EntityNameEnum(final Class<? extends BaseModel> modelClass) {
+    TableToSyncEnum(final Class<? extends BaseModel> modelClass) {
         this.modelClass = modelClass;
     }
 
@@ -26,7 +26,7 @@ public enum EntityNameEnum {
         return modelClass;
     }
 
-    public static EntityNameEnum getEntityNameEnum(String entityName) {
-        return valueOf(entityName.toUpperCase());
+    public static TableToSyncEnum getTableToSyncEnum(String tableToSync) {
+        return valueOf(tableToSync.toUpperCase());
     }
 }

@@ -5,7 +5,7 @@ import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.ConceptAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class ConceptAttributeService extends AbstractEntityService<ConceptAttrib
     }
 
     @Override
-    public EntityNameEnum getEntityName() {
-        return EntityNameEnum.CONCEPT_ATTRIBUTE;
+    public TableToSyncEnum getTableToSync() {
+        return TableToSyncEnum.CONCEPT_ATTRIBUTE;
     }
 }

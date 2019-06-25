@@ -5,7 +5,7 @@ import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.PatientProgramModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class PatientProgramService extends AbstractEntityService<PatientProgram,
     }
 
     @Override
-    public EntityNameEnum getEntityName() {
-        return EntityNameEnum.PATIENT_PROGRAM;
+    public TableToSyncEnum getTableToSync() {
+        return TableToSyncEnum.PATIENT_PROGRAM;
     }
 }

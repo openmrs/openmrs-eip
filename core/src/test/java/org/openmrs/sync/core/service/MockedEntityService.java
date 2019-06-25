@@ -13,7 +13,7 @@ public class MockedEntityService extends AbstractEntityService<MockedEntity, Moc
     }
 
     @Override
-    public EntityNameEnum getEntityName() {
+    public TableToSyncEnum getTableToSync() {
         return null;
     }
 }

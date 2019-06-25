@@ -1,59 +1,55 @@
-package org.openmrs.sync.core.camel.load;
+package org.openmrs.sync.core.camel;
 
-import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import lombok.SneakyThrows;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.model.PersonModel;
+import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
-import static org.mockito.Mockito.verify;
+import java.io.IOException;
 
-public class OpenMrsLoadProducerTest {
+import static org.junit.Assert.assertNotNull;
 
-    @Mock
-    private Endpoint endpoint;
+public class BaseModelDeserializerTest {
 
-    @Mock
-    private EntityServiceFacade serviceFacade;
-
-    private Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-
-    private OpenMrsLoadProducer producer;
+    private ObjectMapper mapper;
+    private BaseModelDeserializer deserializer;
 
     @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        producer = new OpenMrsLoadProducer(endpoint, serviceFacade);
+    public void setup() {
+        mapper = new ObjectMapper();
+        deserializer = new BaseModelDeserializer();
     }
 
     @Test
-    public void process() {
+    public void deserialize() {
         // Given
-        exchange.getIn().setHeader("OpenMrsTableSyncName", "person");
-        exchange.getIn().setBody(json());
+        String json = personJson();
 
         // When
-        producer.process(exchange);
+        TransferObject deserialisedJson = deserializeJson(json);
 
         // Then
-        PersonModel model = new PersonModel();
-        model.setUuid("uuid");
-        verify(serviceFacade).saveModel(TableToSyncEnum.PERSON, model);
+        assertNotNull(deserialisedJson);
     }
 
+    @SneakyThrows({JsonParseException.class, IOException.class})
+    private TransferObject deserializeJson(String json) {
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(BaseModel.class, deserializer);
+        mapper.registerModule(module);
 
-    private String json() {
+        return mapper.readValue(json, TransferObject.class);
+    }
+
+    private String personJson() {
         return "{" +
                     "\"tableToSync\": \"" + TableToSyncEnum.PERSON + "\"," +
                     "\"model\": {" +
-                        "\"uuid\":\"uuid\"," +
+                        "\"uuid\":\"personUuid\"," +
                         "\"creatorUuid\":null," +
                         "\"dateCreated\":null," +
                         "\"changedByUuid\":null," +

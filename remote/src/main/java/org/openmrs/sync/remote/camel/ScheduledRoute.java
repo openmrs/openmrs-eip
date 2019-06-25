@@ -11,11 +11,10 @@ public class ScheduledRoute extends RouteBuilder {
     @Override
     public void configure() {
         from("scheduler:sync?delay=" + DELAY)
-                .to("jpa://org.openmrs.sync.remote.management.entity.EntitySyncStatus?" +
-                        "query=select p from org.openmrs.sync.remote.management.entity.EntitySyncStatus p")
+                .to("jpa://org.openmrs.sync.remote.management.entity.TableSyncStatus?" +
+                        "query=select p from org.openmrs.sync.remote.management.entity.TableSyncStatus p")
                 .split(body()).streaming()
                 .setHeader("OpenMrsEntitySyncStatusId", simple("${in.body.getId()}"))
-                .setHeader("OpenMrsEntitySyncName", simple("${in.body.getEntityName().name()}"))
                 .to("seda:sync");
     }
 }

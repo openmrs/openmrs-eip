@@ -8,7 +8,7 @@ import org.openmrs.sync.core.entity.VisitAttribute;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.VisitAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +30,7 @@ public class VisitAttributeServiceTest {
     }
 
     @Test
-    public void getEntityName() {
-        assertEquals(EntityNameEnum.VISIT_ATTRIBUTE, service.getEntityName());
+    public void getTableToSync() {
+        assertEquals(TableToSyncEnum.VISIT_ATTRIBUTE, service.getTableToSync());
     }
 }

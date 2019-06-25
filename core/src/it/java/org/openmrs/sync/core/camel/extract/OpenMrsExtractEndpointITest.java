@@ -47,7 +47,7 @@ public abstract class OpenMrsExtractEndpointITest {
             @Override
             public void configure() throws Exception {
                 from("direct:start")
-                        .recipientList(simple("openmrsExtract:${body.getEntityName()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
+                        .recipientList(simple("openmrsExtract:${body.getTableToSync()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
                         .to("mock:result");
             }
         };
@@ -57,7 +57,7 @@ public abstract class OpenMrsExtractEndpointITest {
     @Builder
     public static class CamelInitObect {
         private LocalDateTime lastSyncDate;
-        private String entityName;
+        private String tableToSync;
 
         public String getLastSyncDateAsString() {
             return DateUtils.dateToString(getLastSyncDate());

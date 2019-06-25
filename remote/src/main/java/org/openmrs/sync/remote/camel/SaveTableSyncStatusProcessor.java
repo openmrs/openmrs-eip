@@ -2,25 +2,25 @@ package org.openmrs.sync.remote.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.openmrs.sync.remote.management.entity.EntitySyncStatus;
-import org.openmrs.sync.remote.management.repository.EntitySyncStatusRepository;
+import org.openmrs.sync.remote.management.entity.TableSyncStatus;
+import org.openmrs.sync.remote.management.repository.TableSyncStatusRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
-public class SaveEntitySyncStatusProcessor implements Processor {
+public class SaveTableSyncStatusProcessor implements Processor {
 
-    private EntitySyncStatusRepository repository;
+    private TableSyncStatusRepository repository;
 
-    public SaveEntitySyncStatusProcessor(final EntitySyncStatusRepository repository) {
+    public SaveTableSyncStatusProcessor(final TableSyncStatusRepository repository) {
         this.repository = repository;
     }
 
     @Override
     public void process(final Exchange exchange) {
-        Optional<EntitySyncStatus> statusOptional = repository.findById((Long) exchange.getIn().getHeader("OpenMrsEntitySyncStatusId"));
+        Optional<TableSyncStatus> statusOptional = repository.findById((Long) exchange.getIn().getHeader("OpenMrsEntitySyncStatusId"));
         statusOptional.ifPresent(status -> {
             status.setLastSyncDate(LocalDateTime.now());
             repository.save(status);

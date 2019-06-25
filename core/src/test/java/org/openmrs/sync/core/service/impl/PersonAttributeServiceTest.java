@@ -8,7 +8,7 @@ import org.openmrs.sync.core.entity.PersonAttribute;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.PersonAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +30,7 @@ public class PersonAttributeServiceTest {
     }
 
     @Test
-    public void getEntityName() {
-        assertEquals(EntityNameEnum.PERSON_ATTRIBUTE, service.getEntityName());
+    public void getTableToSync() {
+        assertEquals(TableToSyncEnum.PERSON_ATTRIBUTE, service.getTableToSync());
     }
 }

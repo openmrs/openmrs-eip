@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ public class OpenMrsExtractEndpointTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        endpoint = new OpenMrsExtractEndpoint("testEndPoint", component, serviceFacade, EntityNameEnum.PERSON);
+        endpoint = new OpenMrsExtractEndpoint("testEndPoint", component, serviceFacade, TableToSyncEnum.PERSON);
     }
 
     @Test

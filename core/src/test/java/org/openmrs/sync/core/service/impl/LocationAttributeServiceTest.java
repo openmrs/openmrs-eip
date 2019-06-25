@@ -8,7 +8,7 @@ import org.openmrs.sync.core.entity.LocationAttribute;
 import org.openmrs.sync.core.mapper.EntityMapper;
 import org.openmrs.sync.core.model.AttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
-import org.openmrs.sync.core.service.EntityNameEnum;
+import org.openmrs.sync.core.service.TableToSyncEnum;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +30,7 @@ public class LocationAttributeServiceTest {
     }
 
     @Test
-    public void getEntityName() {
-        assertEquals(EntityNameEnum.LOCATION_ATTRIBUTE, service.getEntityName());
+    public void getTableToSync() {
+        assertEquals(TableToSyncEnum.LOCATION_ATTRIBUTE, service.getTableToSync());
     }
 }

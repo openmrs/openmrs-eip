@@ -6,20 +6,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class SelectRoute extends RouteBuilder {
 
-    private SaveEntitySyncStatusProcessor saveEntitySyncStatusProcessor;
+    private SaveTableSyncStatusProcessor saveTableSyncStatusProcessor;
 
-    public SelectRoute(final SaveEntitySyncStatusProcessor saveEntitySyncStatusProcessor) {
-        this.saveEntitySyncStatusProcessor = saveEntitySyncStatusProcessor;
+    public SelectRoute(final SaveTableSyncStatusProcessor saveTableSyncStatusProcessor) {
+        this.saveTableSyncStatusProcessor = saveTableSyncStatusProcessor;
     }
 
     @Override
     public void configure() {
         from("seda:sync")
-                .recipientList(simple("openmrsExtract:${body.getEntityName().name()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
+                .recipientList(simple("openmrsExtract:${body.getTableToSync().name()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
                 .split(body()).streaming()
                         .to("log:row")
                         .to("{{output.queue}}")
                 .end()
-                .process(saveEntitySyncStatusProcessor);
+                .process(saveTableSyncStatusProcessor);
     }
 }
