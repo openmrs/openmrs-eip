@@ -16,13 +16,12 @@ import java.time.LocalDateTime;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public abstract class OpenMrsLoadEndpointITest {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @Produce(uri = "direct:start")
+    @Produce(uri = "direct:startLoad")
     protected ProducerTemplate template;
 
     @Autowired
@@ -39,7 +38,7 @@ public abstract class OpenMrsLoadEndpointITest {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:start")
+                from("direct:startLoad")
                         .to("openmrsLoad");
             }
         };

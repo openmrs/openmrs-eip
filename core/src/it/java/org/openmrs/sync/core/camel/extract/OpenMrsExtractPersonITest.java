@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Sql("classpath:org/openmrs/sync/core/camel/extract/init_person_extract.sql")
 public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
 
     private LocalDateTime date = null;

@@ -11,7 +11,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.Assert.assertEquals;
 
-@Sql("classpath:org/openmrs/sync/core/camel/load/init_person_load.sql")
 public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
 
     @Autowired

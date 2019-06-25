@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public abstract class OpenMrsExtractEndpointITest {
 
     @Autowired
@@ -29,7 +28,7 @@ public abstract class OpenMrsExtractEndpointITest {
     @EndpointInject(uri = "mock:result")
     protected MockEndpoint resultEndpoint;
 
-    @Produce(uri = "direct:start")
+    @Produce(uri = "direct:startExtract")
     protected ProducerTemplate template;
 
     @Autowired
@@ -46,7 +45,7 @@ public abstract class OpenMrsExtractEndpointITest {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:start")
+                from("direct:startExtract")
                         .recipientList(simple("openmrsExtract:${body.getTableToSync()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
                         .to("mock:result");
             }
