@@ -21,12 +21,44 @@ public class EntityServiceFacade {
     /**
      * get all models of type in parameter after the last sync date
      * @param tableToSyncEnum the type of entities to get
+     * @param <M>
+     * @return the entities
+     */
+    public <M extends BaseModel> List<M> getAllModels(final TableToSyncEnum tableToSyncEnum) {
+        return (List<M>) getService(tableToSyncEnum).getAllModels();
+    }
+
+    /**
+     * get all models of type in parameter after the last sync date
+     * @param tableToSyncEnum the type of entities to get
      * @param lastSyncDate the last sync date
      * @param <M>
      * @return the entities
      */
-    public <M extends BaseModel> List<M> getModels(final TableToSyncEnum tableToSyncEnum, final LocalDateTime lastSyncDate) {
+    public <M extends BaseModel> List<M> getModelsAfterDate(final TableToSyncEnum tableToSyncEnum, final LocalDateTime lastSyncDate) {
         return (List<M>) getService(tableToSyncEnum).getModels(lastSyncDate);
+    }
+
+    /**
+     * get model of type in parameter with the given uuid
+     * @param tableToSyncEnum the type of entities to get
+     * @param uuid the uuid
+     * @param <M>
+     * @return the entity
+     */
+    public <M extends BaseModel> M getModel(final TableToSyncEnum tableToSyncEnum, final String uuid) {
+        return (M) getService(tableToSyncEnum).getModel(uuid);
+    }
+
+    /**
+     * get model of type in parameter with the given uuid
+     * @param tableToSyncEnum the type of entities to get
+     * @param id the id
+     * @param <M>
+     * @return the entity
+     */
+    public <M extends BaseModel> M getModel(final TableToSyncEnum tableToSyncEnum, final Long id) {
+        return (M) getService(tableToSyncEnum).getModel(id);
     }
 
     /**

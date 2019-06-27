@@ -8,12 +8,11 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openmrs.sync.core.camel.StringToLocalDateTimeConverter;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.config.TestConfig;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.openmrs.sync.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
@@ -32,11 +31,11 @@ public abstract class OpenMrsExtractEndpointITest {
     protected ProducerTemplate template;
 
     @Autowired
-    private EntityServiceFacade facade;
+    private FetchModelsRuleEngine ruleEngine;
 
     @Before
     public void init() throws Exception {
-        camelContext.addComponent("openmrsExtract", new OpenMrsExtractComponent(camelContext, facade));
+        camelContext.addComponent("openmrsExtract", new OpenMrsExtractComponent(camelContext, ruleEngine));
         camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class, new StringToLocalDateTimeConverter());
         camelContext.addRoutes(createRouteBuilder());
     }

@@ -9,7 +9,6 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.service.light.impl.context.MockedContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class AbstractLightServiceTest {

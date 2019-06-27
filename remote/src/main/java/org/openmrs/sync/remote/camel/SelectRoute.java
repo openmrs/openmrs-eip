@@ -21,5 +21,13 @@ public class SelectRoute extends RouteBuilder {
                         .to("{{output.queue}}")
                 .end()
                 .process(saveTableSyncStatusProcessor);
+
+        /*from("timer://runOnce?repeatCount=1")
+                .autoStartup(true)
+                .recipientList(simple("openmrsExtract:person?entityId=7"))
+                .split(body()).streaming()
+                .to("log:row")
+                .to("{{output.queue}}")
+                .end();*/
     }
 }

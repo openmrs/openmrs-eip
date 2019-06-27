@@ -9,12 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.core.camel.extract.fetchmodels.ComponentParams;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,11 +27,11 @@ public class OpenMrsExtractProducerTest {
     private Endpoint endpoint;
 
     @Mock
-    private EntityServiceFacade serviceFacade;
+    private FetchModelsRuleEngine ruleEngine;
 
     private Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 
-    private LocalDateTime lastSyncDate = LocalDateTime.now();
+    private ComponentParams params = ComponentParams.builder().build();
 
     private OpenMrsExtractProducer producer;
 
@@ -39,7 +39,7 @@ public class OpenMrsExtractProducerTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        producer = new OpenMrsExtractProducer(endpoint, serviceFacade, TableToSyncEnum.PERSON, lastSyncDate);
+        producer = new OpenMrsExtractProducer(endpoint, ruleEngine, TableToSyncEnum.PERSON, params);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class OpenMrsExtractProducerTest {
         model1.setUuid("uuid1");
         PersonModel model2 = new PersonModel();
         model2.setUuid("uuid2");
-        when(serviceFacade.getModels(TableToSyncEnum.PERSON, lastSyncDate)).thenReturn(Arrays.asList(model1, model2));
+        when(ruleEngine.process(TableToSyncEnum.PERSON, params)).thenReturn(Arrays.asList(model1, model2));
 
         // When
         producer.process(exchange);

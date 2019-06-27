@@ -2,12 +2,12 @@ package org.openmrs.sync.core.camel.load;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
+import org.junit.After;
 import org.junit.Test;
 import org.openmrs.sync.core.entity.Person;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +28,13 @@ public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
 
         // Then
         assertEquals(2, repository.findAll().size());
+    }
+
+    // TEAR-DOWN
+    @After
+    public void after() {
+        Person p = repository.findByUuid("818b4ee6-8d68-4849-975d-80ab98016677");
+        repository.delete(p);
     }
 
     private String getPersonJson() {

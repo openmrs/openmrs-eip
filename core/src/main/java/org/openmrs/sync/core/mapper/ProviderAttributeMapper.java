@@ -4,21 +4,24 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.openmrs.sync.core.entity.ProviderAttribute;
+import org.openmrs.sync.core.entity.light.ProviderAttributeTypeLight;
+import org.openmrs.sync.core.entity.light.ProviderLight;
+import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.AttributeModel;
-import org.openmrs.sync.core.service.light.impl.*;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring", config = AttributeMapper.class)
 public abstract class ProviderAttributeMapper implements EntityMapper<ProviderAttribute, AttributeModel> {
 
     @Autowired
-    protected ProviderLightService providerService;
+    protected LightServiceNoContext<ProviderLight> providerService;
 
     @Autowired
-    protected ProviderAttributeTypeLightService providerAttributeTypeService;
+    protected LightServiceNoContext<ProviderAttributeTypeLight> providerAttributeTypeService;
 
     @Autowired
-    protected UserLightService userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @InheritConfiguration(name = "entityToModel")

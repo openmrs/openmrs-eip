@@ -57,28 +57,6 @@ public class AbstractEntityServiceTest {
     }
 
     @Test
-    public void getModels_last_sync_date_null() {
-        // Given
-        MockedEntity mockedEntity1 = new MockedEntity(1L, "uuid1");
-        MockedEntity mockedEntity2 = new MockedEntity(2L, "uuid2");
-        MockedModel mockedModel1 = new MockedModel("uuid1");
-        MockedModel mockedModel2 = new MockedModel("uuid2");
-        when(repository.findAll()).thenReturn(Arrays.asList(mockedEntity1, mockedEntity2));
-        when(mapper.entityToModel(mockedEntity1)).thenReturn(mockedModel1);
-        when(mapper.entityToModel(mockedEntity2)).thenReturn(mockedModel2);
-
-        // When
-        List<MockedModel> result = mockedEntityService.getModels(null);
-
-        // Then
-        assertEquals(2, result.size());
-        assertTrue(result.stream().anyMatch(model -> model.equals(mockedModel1)));
-        assertTrue(result.stream().anyMatch(model -> model.equals(mockedModel2)));
-        verify(repository).findAll();
-        verify(repository, never()).findModelsChangedAfterDate(any(LocalDateTime.class));
-    }
-
-    @Test
     public void save_entity_exists() {
         // Given
         MockedModel mockedModel = new MockedModel("uuid");

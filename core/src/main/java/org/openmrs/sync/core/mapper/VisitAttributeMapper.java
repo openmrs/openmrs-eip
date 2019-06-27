@@ -4,11 +4,12 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.openmrs.sync.core.entity.VisitAttribute;
+import org.openmrs.sync.core.entity.light.UserLight;
+import org.openmrs.sync.core.entity.light.VisitAttributeTypeLight;
 import org.openmrs.sync.core.entity.light.VisitLight;
 import org.openmrs.sync.core.model.VisitAttributeModel;
-import org.openmrs.sync.core.service.light.impl.UserLightService;
-import org.openmrs.sync.core.service.light.impl.VisitAttributeTypeLightService;
-import org.openmrs.sync.core.service.light.impl.VisitLightService;
+import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
 import org.openmrs.sync.core.service.light.impl.context.VisitContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class VisitAttributeMapper implements EntityMapper<VisitAttribute, VisitAttributeModel> {
 
     @Autowired
-    protected VisitLightService visitService;
+    protected LightService<VisitLight, VisitContext> visitService;
 
     @Autowired
-    protected VisitAttributeTypeLightService visitAttributeTypeService;
+    protected LightServiceNoContext<VisitAttributeTypeLight> visitAttributeTypeService;
 
     @Autowired
-    protected UserLightService userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @InheritConfiguration(name = "entityToModel")

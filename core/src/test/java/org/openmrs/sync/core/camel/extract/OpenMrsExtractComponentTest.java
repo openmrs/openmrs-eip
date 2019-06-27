@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 
 import java.util.HashMap;
 
@@ -18,7 +18,7 @@ public class OpenMrsExtractComponentTest {
     private CamelContext context;
 
     @Mock
-    private EntityServiceFacade serviceFacade;
+    private FetchModelsRuleEngine ruleEngine;
 
     private OpenMrsExtractComponent component;
 
@@ -26,7 +26,7 @@ public class OpenMrsExtractComponentTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        component = new OpenMrsExtractComponent(context, serviceFacade);
+        component = new OpenMrsExtractComponent(context, ruleEngine);
     }
 
     @Test

@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ public class OpenMrsExtractEndpointTest {
     private Component component;
 
     @Mock
-    private EntityServiceFacade serviceFacade;
+    private FetchModelsRuleEngine ruleEngine;
 
     private OpenMrsExtractEndpoint endpoint;
 
@@ -29,7 +29,7 @@ public class OpenMrsExtractEndpointTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        endpoint = new OpenMrsExtractEndpoint("testEndPoint", component, serviceFacade, TableToSyncEnum.PERSON);
+        endpoint = new OpenMrsExtractEndpoint("testEndPoint", component, ruleEngine, TableToSyncEnum.PERSON);
     }
 
     @Test

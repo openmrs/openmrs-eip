@@ -6,8 +6,9 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
+import org.openmrs.sync.core.camel.extract.fetchmodels.ComponentParams;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 
 import java.time.LocalDateTime;
 
@@ -28,20 +29,31 @@ public class OpenMrsExtractEndpoint extends DefaultEndpoint {
     @UriParam(label = "consumer,advanced")
     private LocalDateTime lastSyncDate;
 
-    private EntityServiceFacade entityServiceFacade;
+    @UriParam(label = "consumer, advanced")
+    private String uuid;
+
+    @UriParam(label = "consumer, advanced")
+    private Long entityId;
+
+    private FetchModelsRuleEngine ruleEngine;
 
     public OpenMrsExtractEndpoint(final String endpointUri,
                                   final Component component,
-                                  final EntityServiceFacade entityServiceFacade,
+                                  final FetchModelsRuleEngine ruleEngine,
                                   final TableToSyncEnum tableToSync) {
         super(endpointUri, component);
-        this.entityServiceFacade = entityServiceFacade;
+        this.ruleEngine = ruleEngine;
         this.tableToSync = tableToSync;
     }
 
     @Override
     public Producer createProducer() {
-        return new OpenMrsExtractProducer(this, entityServiceFacade, tableToSync, lastSyncDate);
+        ComponentParams params = ComponentParams.builder()
+                .lastSyncDate(lastSyncDate)
+                .id(entityId)
+                .uuid(uuid)
+                .build();
+        return new OpenMrsExtractProducer(this, ruleEngine, tableToSync, params);
     }
 
     @Override
@@ -60,6 +72,22 @@ public class OpenMrsExtractEndpoint extends DefaultEndpoint {
 
     public void setLastSyncDate(final LocalDateTime lastSyncDate) {
         this.lastSyncDate = lastSyncDate;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setEntityId(final Long entityId) {
+        this.entityId = entityId;
+    }
+
+    public Long getEntityId() {
+        return entityId;
     }
 
     @Override

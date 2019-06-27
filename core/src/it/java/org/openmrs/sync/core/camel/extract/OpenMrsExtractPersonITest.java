@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.junit.Test;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
 
-    private LocalDateTime date = null;
+    private LocalDateTime date = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
 
     @Test
     public void extract() throws JSONException {

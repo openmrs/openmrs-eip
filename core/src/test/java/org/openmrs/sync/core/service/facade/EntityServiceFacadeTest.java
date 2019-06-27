@@ -49,7 +49,7 @@ public class EntityServiceFacadeTest {
         when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
 
         // When
-        List<? extends BaseModel> result = facade.getModels(TableToSyncEnum.PERSON, lastSyncDate);
+        List<? extends BaseModel> result = facade.getModelsAfterDate(TableToSyncEnum.PERSON, lastSyncDate);
 
         // Then
         assertEquals(2, result.size());
@@ -64,7 +64,7 @@ public class EntityServiceFacadeTest {
         when(patientService.getTableToSync()).thenReturn(TableToSyncEnum.VISIT);
 
         // When
-        facade.getModels(TableToSyncEnum.VISIT, lastSyncDate);
+        facade.getModelsAfterDate(TableToSyncEnum.VISIT, lastSyncDate);
 
         // Then
         // BOOM

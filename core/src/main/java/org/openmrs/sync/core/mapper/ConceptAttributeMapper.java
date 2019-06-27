@@ -4,11 +4,12 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.openmrs.sync.core.entity.ConceptAttribute;
+import org.openmrs.sync.core.entity.light.ConceptAttributeTypeLight;
 import org.openmrs.sync.core.entity.light.ConceptLight;
+import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.ConceptAttributeModel;
-import org.openmrs.sync.core.service.light.impl.ConceptAttributeTypeLightService;
-import org.openmrs.sync.core.service.light.impl.ConceptLightService;
-import org.openmrs.sync.core.service.light.impl.UserLightService;
+import org.openmrs.sync.core.service.light.LightService;
+import org.openmrs.sync.core.service.light.LightServiceNoContext;
 import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ConceptAttributeMapper implements EntityMapper<ConceptAttribute, ConceptAttributeModel> {
 
     @Autowired
-    protected ConceptLightService conceptService;
+    protected LightService<ConceptLight, ConceptContext> conceptService;
 
     @Autowired
-    protected ConceptAttributeTypeLightService conceptAttributeTypeService;
+    protected LightServiceNoContext<ConceptAttributeTypeLight> conceptAttributeTypeService;
 
     @Autowired
-    protected UserLightService userService;
+    protected LightServiceNoContext<UserLight> userService;
 
     @Override
     @InheritConfiguration(name = "entityToModel")

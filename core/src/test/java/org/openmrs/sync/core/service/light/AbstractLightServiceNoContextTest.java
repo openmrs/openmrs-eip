@@ -8,7 +8,6 @@ import org.openmrs.sync.core.entity.MockedLightEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 

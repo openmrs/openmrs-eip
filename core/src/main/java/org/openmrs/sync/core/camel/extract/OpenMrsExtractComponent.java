@@ -3,8 +3,8 @@ package org.openmrs.sync.core.camel.extract;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
+import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.service.facade.EntityServiceFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,12 +12,12 @@ import java.util.Map;
 @Component
 public class OpenMrsExtractComponent extends DefaultComponent {
 
-    private EntityServiceFacade entityServiceFacade;
+    private FetchModelsRuleEngine ruleEngine;
 
     public OpenMrsExtractComponent(final CamelContext context,
-                                   final EntityServiceFacade entityServiceFacade) {
+                                   final FetchModelsRuleEngine ruleEngine) {
         super(context);
-        this.entityServiceFacade = entityServiceFacade;
+        this.ruleEngine = ruleEngine;
     }
 
     @Override
@@ -25,6 +25,6 @@ public class OpenMrsExtractComponent extends DefaultComponent {
                                       final String remaining,
                                       final Map<String, Object> parameters) {
         TableToSyncEnum tableToSync = TableToSyncEnum.getTableToSyncEnum(remaining);
-        return new OpenMrsExtractEndpoint(uri, this, entityServiceFacade, tableToSync);
+        return new OpenMrsExtractEndpoint(uri, this, ruleEngine, tableToSync);
     }
 }

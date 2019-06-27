@@ -7,6 +7,7 @@ import org.openmrs.sync.core.repository.SyncEntityRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
@@ -49,15 +50,27 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     }
 
     @Override
+    public List<M> getAllModels() {
+        return mapEntities(repository.findAll());
+    }
+
+    @Override
     public List<M> getModels(final LocalDateTime lastSyncDate) {
-        List<E> entities;
-        if (lastSyncDate == null) {
-            entities = repository.findAll();
-        } else {
-            entities = repository.findModelsChangedAfterDate(lastSyncDate);
-        }
+        List<E> entities = repository.findModelsChangedAfterDate(lastSyncDate);
 
         return mapEntities(entities);
+    }
+
+    @Override
+    public M getModel(final String uuid) {
+        return mapper.entityToModel(repository.findByUuid(uuid));
+    }
+
+    @Override
+    public M getModel(final Long id) {
+        Optional<E> entity = repository.findById(id);
+        return entity.map(mapper::entityToModel)
+                .orElse(null);
     }
 
     protected List<M> mapEntities(List<E> entities) {
