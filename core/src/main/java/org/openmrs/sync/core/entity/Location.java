@@ -87,6 +87,7 @@ public class Location extends MetaDataEntity {
     @Column(name = "county_district")
     private String countyDistrict;
 
-    @Column(name = "parent_location")
+    @ManyToOne
+    @JoinColumn(name = "parent_location")
     private LocationLight parentLocation;
 }
