@@ -24,4 +24,12 @@ public abstract class BaseModel {
     private LocalDateTime dateVoided;
 
     private String voidReason;
+
+    private boolean retired;
+
+    private String retiredByUuid;
+
+    private LocalDateTime dateRetired;
+
+    private String retiredReason;
 }

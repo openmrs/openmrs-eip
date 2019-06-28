@@ -121,10 +121,10 @@ public class Observation extends BaseEntity {
 
     @Override
     public boolean wasModifiedAfter(final BaseEntity entity) {
-        Observation auditableEntity = (Observation) entity;
+        Observation observation = (Observation) entity;
         List<LocalDateTime> datesToCheck = Arrays.asList(
-                auditableEntity.getDateCreated(),
-                auditableEntity.getDateVoided());
+                observation.getDateCreated(),
+                observation.getDateVoided());
         boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
         boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
         return dateCreatedAfter || dateVoidedAfter;

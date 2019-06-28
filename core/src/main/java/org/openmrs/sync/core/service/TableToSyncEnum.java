@@ -14,7 +14,9 @@ public enum TableToSyncEnum {
     CONCEPT_ATTRIBUTE(ConceptAttributeModel.class),
     LOCATION_ATTRIBUTE(AttributeModel.class),
     PROVIDER_ATTRIBUTE(AttributeModel.class),
-    VISIT_ATTRIBUTE(VisitAttributeModel.class);
+    VISIT_ATTRIBUTE(VisitAttributeModel.class),
+    CONCEPT(ConceptModel.class),
+    LOCATION(LocationModel.class);
 
     private Class<? extends BaseModel> modelClass;
 
