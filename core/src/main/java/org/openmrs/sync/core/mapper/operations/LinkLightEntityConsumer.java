@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.core.entity.BaseEntity;
@@ -10,7 +10,6 @@ import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
 @Slf4j

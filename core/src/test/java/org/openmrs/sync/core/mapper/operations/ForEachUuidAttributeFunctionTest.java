@@ -1,11 +1,10 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.MockedEntity;
-import org.openmrs.sync.core.entity.MockedLightEntity;
 import org.openmrs.sync.core.model.MockedModel;
 
 import java.util.function.BiConsumer;
@@ -15,12 +14,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ForEachLinkedEntityFunctionTest {
+public class ForEachUuidAttributeFunctionTest {
 
     @Mock
     private BiConsumer<Context<MockedEntity, MockedModel>, String> action;
 
-    private ForEachLinkedEntityFunction<MockedEntity, MockedModel> function = new ForEachLinkedEntityFunction<>();
+    private ForEachUuidAttributeFunction<MockedEntity, MockedModel> function = new ForEachUuidAttributeFunction<>();
 
     @Before
     public void init() {
@@ -30,19 +29,19 @@ public class ForEachLinkedEntityFunctionTest {
     @Test
     public void apply_should_call_action() {
         // Given
-        MockedModel model = new MockedModel("uuid");
-        Context<MockedEntity, MockedModel> context = getContext(model);
+        MockedEntity entity = new MockedEntity(1L, "uuid");
+        Context<MockedEntity, MockedModel> context = getContext(entity);
 
         // When
-        MockedModel result = function.apply(context, action);
+        MockedEntity result = function.apply(context, action);
 
         // Then
-        assertEquals(model, result);
-        verify(action, times(4)).accept(any(Context.class), any(String.class));
+        assertEquals(entity, result);
+        verify(action, times(5)).accept(any(Context.class), any(String.class));
     }
 
-    private Context<MockedEntity, MockedModel> getContext(final MockedModel model) {
-        MockedEntity entity = new MockedEntity(1L, "uuid");
+    private Context<MockedEntity, MockedModel> getContext(final MockedEntity entity) {
+        MockedModel model = new MockedModel("uuid");
 
         return new Context<>(entity, model, MappingDirectionEnum.ENTITY_TO_MODEL);
     }

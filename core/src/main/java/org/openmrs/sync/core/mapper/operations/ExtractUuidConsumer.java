@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.model.BaseModel;

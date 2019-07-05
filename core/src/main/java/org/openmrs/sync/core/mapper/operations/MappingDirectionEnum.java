@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 public enum MappingDirectionEnum {
     MODEL_TO_ENTITY,

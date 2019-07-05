@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

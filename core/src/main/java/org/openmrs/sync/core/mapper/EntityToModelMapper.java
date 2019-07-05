@@ -2,6 +2,7 @@ package org.openmrs.sync.core.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.core.entity.BaseEntity;
+import org.openmrs.sync.core.mapper.operations.Context;
 import org.openmrs.sync.core.model.BaseModel;
 import org.springframework.stereotype.Component;
 

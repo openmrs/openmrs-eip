@@ -1,4 +1,4 @@
-package org.openmrs.sync.core.mapper;
+package org.openmrs.sync.core.mapper.operations;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,12 +14,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ForEachUuidAttributeFunctionTest {
+public class ForEachLinkedEntityFunctionTest {
 
     @Mock
     private BiConsumer<Context<MockedEntity, MockedModel>, String> action;
 
-    private ForEachUuidAttributeFunction<MockedEntity, MockedModel> function = new ForEachUuidAttributeFunction<>();
+    private ForEachLinkedEntityFunction<MockedEntity, MockedModel> function = new ForEachLinkedEntityFunction<>();
 
     @Before
     public void init() {
@@ -29,19 +29,19 @@ public class ForEachUuidAttributeFunctionTest {
     @Test
     public void apply_should_call_action() {
         // Given
-        MockedEntity entity = new MockedEntity(1L, "uuid");
-        Context<MockedEntity, MockedModel> context = getContext(entity);
+        MockedModel model = new MockedModel("uuid");
+        Context<MockedEntity, MockedModel> context = getContext(model);
 
         // When
-        MockedEntity result = function.apply(context, action);
+        MockedModel result = function.apply(context, action);
 
         // Then
-        assertEquals(entity, result);
-        verify(action, times(5)).accept(any(Context.class), any(String.class));
+        assertEquals(model, result);
+        verify(action, times(4)).accept(any(Context.class), any(String.class));
     }
 
-    private Context<MockedEntity, MockedModel> getContext(final MockedEntity entity) {
-        MockedModel model = new MockedModel("uuid");
+    private Context<MockedEntity, MockedModel> getContext(final MockedModel model) {
+        MockedEntity entity = new MockedEntity(1L, "uuid");
 
         return new Context<>(entity, model, MappingDirectionEnum.ENTITY_TO_MODEL);
     }

@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.MockedEntity;
+import org.openmrs.sync.core.mapper.operations.Context;
+import org.openmrs.sync.core.mapper.operations.MappingDirectionEnum;
 import org.openmrs.sync.core.model.MockedModel;
 
 import java.util.function.BiConsumer;
