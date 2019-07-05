@@ -27,11 +27,12 @@ public class ConceptDataTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        ConceptDatatypeLight result = service.getShadowEntity("UUID");
+        ConceptDatatypeLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedConceptDatatype(), result);
@@ -39,7 +40,6 @@ public class ConceptDataTypeLightServiceTest {
 
     private ConceptDatatypeLight getExpectedConceptDatatype() {
         ConceptDatatypeLight conceptDatatype = new ConceptDatatypeLight();
-        conceptDatatype.setUuid("UUID");
         conceptDatatype.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         conceptDatatype.setCreator(1L);
         conceptDatatype.setName("[Default]");

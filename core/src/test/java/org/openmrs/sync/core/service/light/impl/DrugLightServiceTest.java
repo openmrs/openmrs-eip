@@ -8,8 +8,6 @@ import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.DrugLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.DrugContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,7 +21,7 @@ public class DrugLightServiceTest {
     private OpenMrsRepository<DrugLight> repository;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     private DrugLightService service;
 
@@ -35,21 +33,13 @@ public class DrugLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceHolderEntity() {
         // Given
-        DrugContext drugContext = DrugContext.builder()
-                .conceptUuid("concept")
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        String uuid = "uuid";
 
         // When
-        DrugLight result = service.getShadowEntity("UUID", drugContext);
+        DrugLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedDrug(), result);
@@ -57,7 +47,6 @@ public class DrugLightServiceTest {
 
     private DrugLight getExpectedDrug() {
         DrugLight drug = new DrugLight();
-        drug.setUuid("UUID");
         drug.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         drug.setCreator(1L);
         drug.setConcept(getConcept());
@@ -66,7 +55,7 @@ public class DrugLightServiceTest {
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 }

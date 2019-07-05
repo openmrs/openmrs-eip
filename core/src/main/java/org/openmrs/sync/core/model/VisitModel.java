@@ -19,9 +19,5 @@ public class VisitModel extends BaseModel {
 
     private String indicationConceptUuid;
 
-    private String indicationConceptClassUuid;
-
-    private String indicationConceptDatatypeUuid;
-
     private String locationUuid;
 }

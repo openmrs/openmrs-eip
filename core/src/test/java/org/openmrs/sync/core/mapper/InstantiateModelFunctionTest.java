@@ -17,15 +17,15 @@ import static org.junit.Assert.assertNotNull;
 public class InstantiateModelFunctionTest {
 
     @Mock
-    private MapperService mapperService;
+    private MapperService<MockedEntity, MockedModel> mapperService;
 
-    private InstantiateModelFunction instantiateModel;
+    private InstantiateModelFunction<MockedEntity, MockedModel> instantiateModel;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        instantiateModel = new InstantiateModelFunction(mapperService);
+        instantiateModel = new InstantiateModelFunction<>(mapperService);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class InstantiateModelFunctionTest {
         Mockito.<Class<? extends BaseModel>>when(mapperService.getCorrespondingModelClass(entity)).thenReturn(MockedModel.class);
 
         // When
-        Context result = instantiateModel.apply(entity);
+        Context<MockedEntity, MockedModel> result = instantiateModel.apply(entity);
 
         // Then
         assertNotNull(result);

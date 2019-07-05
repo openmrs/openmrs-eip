@@ -27,11 +27,12 @@ public class CareSettingLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        CareSettingLight result = service.getShadowEntity("UUID");
+        CareSettingLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedCareSetting(), result);
@@ -39,7 +40,6 @@ public class CareSettingLightServiceTest {
 
     private CareSettingLight getExpectedCareSetting() {
         CareSettingLight careSetting = new CareSettingLight();
-        careSetting.setUuid("UUID");
         careSetting.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         careSetting.setCreator(1L);
         careSetting.setCareSettingType("[Default]");

@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -37,17 +36,14 @@ public class ConceptLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        when(conceptClassService.getOrInit("conceptClassUuid")).thenReturn(getConceptClass());
-        when(conceptDatatypeService.getOrInit("conceptDatatypeUuid")).thenReturn(getConceptDatatype());
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptDatatypeUuid("conceptDatatypeUuid")
-                .conceptClassUuid("conceptClassUuid")
-                .build();
+        when(conceptClassService.getOrInitPlaceholderEntity()).thenReturn(getConceptClass());
+        when(conceptDatatypeService.getOrInitPlaceholderEntity()).thenReturn(getConceptDatatype());
+        String uuid = "uuid";
 
         // When
-        ConceptLight result = service.getShadowEntity("UUID", conceptContext);
+        ConceptLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedConcept(), result);
@@ -59,7 +55,6 @@ public class ConceptLightServiceTest {
         ConceptDatatypeLight conceptDatatype = getConceptDatatype();
 
         ConceptLight expected = new ConceptLight();
-        expected.setUuid("UUID");
         expected.setConceptClass(conceptClass);
         expected.setDatatype(conceptDatatype);
         expected.setCreator(1L);
@@ -69,13 +64,13 @@ public class ConceptLightServiceTest {
 
     private ConceptClassLight getConceptClass() {
         ConceptClassLight conceptClass = new ConceptClassLight();
-        conceptClass.setUuid("conceptClassUuid");
+        conceptClass.setUuid("PLACEHOLDER_CONCEPT_CLASS");
         return conceptClass;
     }
 
     private ConceptDatatypeLight getConceptDatatype() {
         ConceptDatatypeLight conceptDatatype = new ConceptDatatypeLight();
-        conceptDatatype.setUuid("conceptDatatypeUuid");
+        conceptDatatype.setUuid("PLACEHOLDER_CONCEPT_DATATYPE");
         return conceptDatatype;
     }
 }

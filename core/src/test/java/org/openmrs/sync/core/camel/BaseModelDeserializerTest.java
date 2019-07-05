@@ -64,8 +64,6 @@ public class BaseModelDeserializerTest {
                         "\"dead\":false," +
                         "\"deathDate\":null," +
                         "\"causeOfDeathUuid\":null," +
-                        "\"causeOfDeathClassUuid\":null," +
-                        "\"causeOfDeathDatatypeUuid\":null," +
                         "\"deathdateEstimated\":false," +
                         "\"birthtime\":null" +
                     "}" +

@@ -6,43 +6,31 @@ import org.openmrs.sync.core.entity.light.ProgramLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.PatientProgramContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PatientProgramLightService extends AbstractLightService<PatientProgramLight, PatientProgramContext> {
+public class PatientProgramLightService extends AbstractLightService<PatientProgramLight> {
 
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
-    private LightService<ProgramLight, ProgramContext> programService;
+    private LightService<ProgramLight> programService;
 
     public PatientProgramLightService(final OpenMrsRepository<PatientProgramLight> repository,
-                                      final LightServiceNoContext<PatientLight> patientService,
-                                      final LightService<ProgramLight, ProgramContext> programService) {
+                                      final LightService<PatientLight> patientService,
+                                      final LightService<ProgramLight> programService) {
         super(repository);
         this.patientService = patientService;
         this.programService = programService;
     }
 
     @Override
-    protected PatientProgramLight getShadowEntity(final String uuid, final PatientProgramContext context) {
+    protected PatientProgramLight createPlaceholderEntity(final String uuid) {
         PatientProgramLight patientProgram = new PatientProgramLight();
-        patientProgram.setUuid(uuid);
         patientProgram.setDateCreated(DEFAULT_DATE);
         patientProgram.setCreator(DEFAULT_USER_ID);
-        patientProgram.setPatient(patientService.getOrInit(context.getPatientUuid()));
-        patientProgram.setProgram(programService.getOrInit(context.getProgramUuid(), getProgramContext(context)));
+        patientProgram.setPatient(patientService.getOrInitPlaceholderEntity());
+        patientProgram.setProgram(programService.getOrInitPlaceholderEntity());
 
         return patientProgram;
-    }
-
-    private ProgramContext getProgramContext(final PatientProgramContext context) {
-        return ProgramContext.builder()
-                .conceptUuid(context.getProgramConceptUuid())
-                .conceptClassUuid(context.getProgramConceptClassUuid())
-                .conceptDatatypeUuid(context.getProgramConceptDatatypeUuid())
-                .build();
     }
 }

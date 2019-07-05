@@ -8,8 +8,6 @@ import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.entity.light.ProgramLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,7 +21,7 @@ public class ProgramLightServiceTest {
     private OpenMrsRepository<ProgramLight> repository;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     private ProgramLightService service;
 
@@ -35,29 +33,20 @@ public class ProgramLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        ProgramContext programContext = ProgramContext.builder()
-                .conceptUuid("concept")
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        String uuid = "uuid";
 
         // When
-        ProgramLight result = service.getShadowEntity("UUID", programContext);
+        ProgramLight result = service.createPlaceholderEntity(uuid);
 
         // Then
-        assertEquals(getExpectedPatientProgram(), result);
+        assertEquals(getExpectedProgram(), result);
     }
 
-    private ProgramLight getExpectedPatientProgram() {
+    private ProgramLight getExpectedProgram() {
         ProgramLight program = new ProgramLight();
-        program.setUuid("UUID");
         program.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         program.setCreator(1L);
         program.setName("[Default]");
@@ -67,7 +56,7 @@ public class ProgramLightServiceTest {
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 }

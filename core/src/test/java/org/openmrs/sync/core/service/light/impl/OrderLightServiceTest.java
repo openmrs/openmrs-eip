@@ -7,10 +7,6 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.EncounterContext;
-import org.openmrs.sync.core.service.light.impl.context.OrderContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -24,22 +20,22 @@ public class OrderLightServiceTest {
     private OpenMrsRepository<OrderLight> repository;
 
     @Mock
-    private LightServiceNoContext<OrderTypeLight> orderTypeService;
+    private LightService<OrderTypeLight> orderTypeService;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     @Mock
-    private LightServiceNoContext<ProviderLight> providerService;
+    private LightService<ProviderLight> providerService;
 
     @Mock
-    private LightService<EncounterLight, EncounterContext> encounterService;
+    private LightService<EncounterLight> encounterService;
 
     @Mock
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
     @Mock
-    private LightServiceNoContext<CareSettingLight> careSettingService;
+    private LightService<CareSettingLight> careSettingService;
 
     private OrderLightService service;
 
@@ -57,38 +53,18 @@ public class OrderLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        OrderContext orderContext = OrderContext.builder()
-                .orderTypeUuid("orderType")
-                .careSettingUuid("careSetting")
-                .conceptUuid("concept")
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .providerUuid("orderer")
-                .encounterUuid("encounter")
-                .encounterEncounterTypeUuid("encounterEncounterType")
-                .encounterPatientUuid("encounterPatient")
-                .patientUuid("patient")
-                .build();
-        EncounterContext encounterContext = EncounterContext.builder()
-                .encounterTypeUuid("encounterEncounterType")
-                .patientUuid("encounterPatient")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptClassUuid("conceptClass")
-                .build();
-
-        when(orderTypeService.getOrInit("orderType")).thenReturn(getOrderType());
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
-        when(providerService.getOrInit("orderer")).thenReturn(getOrderer());
-        when(encounterService.getOrInit("encounter", encounterContext)).thenReturn(getEncounter());
-        when(patientService.getOrInit("patient")).thenReturn(getPatient());
-        when(careSettingService.getOrInit("careSetting")).thenReturn(getCareSetting());
+        when(orderTypeService.getOrInitPlaceholderEntity()).thenReturn(getOrderType());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        when(providerService.getOrInitPlaceholderEntity()).thenReturn(getOrderer());
+        when(encounterService.getOrInitPlaceholderEntity()).thenReturn(getEncounter());
+        when(patientService.getOrInitPlaceholderEntity()).thenReturn(getPatient());
+        when(careSettingService.getOrInitPlaceholderEntity()).thenReturn(getCareSetting());
+        String uuid = "uuid";
 
         // When
-        OrderLight result = service.getShadowEntity("UUID", orderContext);
+        OrderLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedOrder(), result);
@@ -96,7 +72,6 @@ public class OrderLightServiceTest {
 
     private OrderLight getExpectedOrder() {
         OrderLight order = new OrderLight();
-        order.setUuid("UUID");
         order.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         order.setCreator(1L);
         order.setOrderType(getOrderType());
@@ -110,37 +85,37 @@ public class OrderLightServiceTest {
 
     private CareSettingLight getCareSetting() {
         CareSettingLight careSetting = new CareSettingLight();
-        careSetting.setUuid("careSetting");
+        careSetting.setUuid("PLACEHOLDER_CARE_SETTING");
         return careSetting;
     }
 
     private PatientLight getPatient() {
         PatientLight patient = new PatientLight();
-        patient.setUuid("patient");
+        patient.setUuid("PLACEHOLDER_PATIENT");
         return patient;
     }
 
     private EncounterLight getEncounter() {
         EncounterLight encounter = new EncounterLight();
-        encounter.setUuid("encounter");
+        encounter.setUuid("PLACEHOLDER_ENCOUNTER");
         return encounter;
     }
 
     private ProviderLight getOrderer() {
         ProviderLight provider = new ProviderLight();
-        provider.setUuid("orderer");
+        provider.setUuid("PLACEHOLDER_PROVIDER");
         return provider;
     }
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 
     private OrderTypeLight getOrderType() {
         OrderTypeLight orderType = new OrderTypeLight();
-        orderType.setUuid("orderType");
+        orderType.setUuid("PLACEHOLDER_ORDER_TYPE");
         return orderType;
     }
 }

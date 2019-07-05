@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.ProviderAttribute;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.AttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +19,10 @@ public class ProviderAttributeServiceTest {
     private SyncEntityRepository<ProviderAttribute> repository;
 
     @Mock
-    private EntityMapper<ProviderAttribute, AttributeModel> mapper;
+    private EntityToModelMapper<ProviderAttribute, AttributeModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<AttributeModel, ProviderAttribute> modelToEntityMapper;
 
     private ProviderAttributeService service;
 
@@ -26,7 +30,7 @@ public class ProviderAttributeServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new ProviderAttributeService(repository, mapper);
+        service = new ProviderAttributeService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

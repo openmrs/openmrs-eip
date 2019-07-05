@@ -4,34 +4,30 @@ import org.openmrs.sync.core.entity.light.*;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.EncounterContext;
-import org.openmrs.sync.core.service.light.impl.context.OrderContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderLightService extends AbstractLightService<OrderLight, OrderContext> {
+public class OrderLightService extends AbstractLightService<OrderLight> {
 
-    private LightServiceNoContext<OrderTypeLight> orderTypeService;
+    private LightService<OrderTypeLight> orderTypeService;
 
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
-    private LightServiceNoContext<ProviderLight> providerService;
+    private LightService<ProviderLight> providerService;
 
-    private LightService<EncounterLight, EncounterContext> encounterService;
+    private LightService<EncounterLight> encounterService;
 
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
-    private LightServiceNoContext<CareSettingLight> careSettingService;
+    private LightService<CareSettingLight> careSettingService;
 
     public OrderLightService(final OpenMrsRepository<OrderLight> repository,
-                             final LightServiceNoContext<OrderTypeLight> orderTypeService,
-                             final LightService<ConceptLight, ConceptContext> conceptService,
-                             final LightServiceNoContext<ProviderLight> providerService,
-                             final LightService<EncounterLight, EncounterContext> encounterService,
-                             final LightServiceNoContext<PatientLight> patientService,
-                             final LightServiceNoContext<CareSettingLight> careSettingService) {
+                             final LightService<OrderTypeLight> orderTypeService,
+                             final LightService<ConceptLight> conceptService,
+                             final LightService<ProviderLight> providerService,
+                             final LightService<EncounterLight> encounterService,
+                             final LightService<PatientLight> patientService,
+                             final LightService<CareSettingLight> careSettingService) {
         super(repository);
         this.orderTypeService = orderTypeService;
         this.conceptService = conceptService;
@@ -42,31 +38,16 @@ public class OrderLightService extends AbstractLightService<OrderLight, OrderCon
     }
 
     @Override
-    protected OrderLight getShadowEntity(final String uuid, final OrderContext context) {
+    protected OrderLight createPlaceholderEntity(final String uuid) {
         OrderLight order = new OrderLight();
-        order.setUuid(uuid);
         order.setDateCreated(DEFAULT_DATE);
         order.setCreator(DEFAULT_USER_ID);
-        order.setOrderType(orderTypeService.getOrInit(context.getOrderTypeUuid()));
-        order.setConcept(conceptService.getOrInit(context.getConceptUuid(), getConceptContext(context)));
-        order.setOrderer(providerService.getOrInit(context.getProviderUuid()));
-        order.setEncounter(encounterService.getOrInit(context.getEncounterUuid(), getEncounterContext(context)));
-        order.setPatient(patientService.getOrInit(context.getPatientUuid()));
-        order.setCareSetting(careSettingService.getOrInit(context.getCareSettingUuid()));
+        order.setOrderType(orderTypeService.getOrInitPlaceholderEntity());
+        order.setConcept(conceptService.getOrInitPlaceholderEntity());
+        order.setOrderer(providerService.getOrInitPlaceholderEntity());
+        order.setEncounter(encounterService.getOrInitPlaceholderEntity());
+        order.setPatient(patientService.getOrInitPlaceholderEntity());
+        order.setCareSetting(careSettingService.getOrInitPlaceholderEntity());
         return order;
-    }
-
-    private EncounterContext getEncounterContext(final OrderContext context) {
-        return EncounterContext.builder()
-                .encounterTypeUuid(context.getEncounterEncounterTypeUuid())
-                .patientUuid(context.getEncounterPatientUuid())
-                .build();
-    }
-
-    private ConceptContext getConceptContext(final OrderContext context) {
-        return ConceptContext.builder()
-                .conceptClassUuid(context.getConceptClassUuid())
-                .conceptDatatypeUuid(context.getConceptDatatypeUuid())
-                .build();
     }
 }

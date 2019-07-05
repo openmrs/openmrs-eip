@@ -27,13 +27,19 @@ public class UserLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
-        assertEquals(getExpectedUser(), service.getShadowEntity("uuid"));
+    public void createPlaceholderEntity() {
+        // Given
+        String uuid = "uuid";
+
+        // When
+        UserLight result = service.createPlaceholderEntity(uuid);
+
+        // Then
+        assertEquals(getExpectedUser(), result);
     }
 
     private UserLight getExpectedUser() {
         UserLight user = new UserLight();
-        user.setUuid("uuid");
         user.setCreator(1L);
         user.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         user.setSystemId("admin");

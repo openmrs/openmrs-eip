@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Observation;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.ObservationModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +19,10 @@ public class ObservationServiceTest {
     private SyncEntityRepository<Observation> repository;
 
     @Mock
-    private EntityMapper<Observation, ObservationModel> mapper;
+    private EntityToModelMapper<Observation, ObservationModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<ObservationModel, Observation> modelToEntityMapper;
 
     private ObservationService service;
 
@@ -26,7 +30,7 @@ public class ObservationServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new ObservationService(repository, mapper);
+        service = new ObservationService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

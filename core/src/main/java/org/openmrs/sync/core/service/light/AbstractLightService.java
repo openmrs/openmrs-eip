@@ -1,34 +1,56 @@
 package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.light.LightEntity;
-import org.openmrs.sync.core.service.light.impl.context.Context;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
+import org.openmrs.sync.core.utils.StringUtils;
 
+import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-public abstract class AbstractLightService<E extends LightEntity, C extends Context> implements LightService<E, C> {
+public abstract class AbstractLightService<E extends LightEntity> implements LightService<E> {
 
+    private static final String DEFAULT_UUID_PREFIX= "PLACEHOLDER_";
     protected static final String DEFAULT_STRING= "[Default]";
     protected static final LocalDateTime DEFAULT_DATE = LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0);
     protected static final long DEFAULT_USER_ID = 1L;
 
-    private OpenMrsRepository<E> repository;
+    protected OpenMrsRepository<E> repository;
 
     public AbstractLightService(final OpenMrsRepository<E> repository) {
         this.repository = repository;
     }
 
     /**
-     * Creates an entity with only mandatory attributes
-     * @param uuid the uuid
+     * Creates a placeholder entity with only mandatory attributes which will be
+     * unique for all entities with the same type.
+     * After a round of synchronization no placeholder entity should be left in the db
      * @return the entity
      */
-    protected abstract E getShadowEntity(String uuid, C context);
+    protected abstract E createPlaceholderEntity(String uuid);
+
+    /**
+     * Get the placeholder uuid
+     * @return uuid
+     */
+    private  String getPlaceholderUuid() {
+        Class<E> persistentClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass())
+                .getActualTypeArguments()[0];
+
+        return DEFAULT_UUID_PREFIX + StringUtils.fromCamelCaseToSnakeCase(persistentClass.getSimpleName());
+    }
 
     @Override
-    public E getOrInit(final String uuid,
-                       final C context) {
+    public E getOrInitEntity(final String uuid) {
+        return getOrInit(uuid);
+    }
+
+    @Override
+    public E getOrInitPlaceholderEntity() {
+        return getOrInit(getPlaceholderUuid());
+    }
+
+    private E getOrInit(final String uuid) {
         if (uuid == null) {
             return null;
         }
@@ -36,7 +58,9 @@ public abstract class AbstractLightService<E extends LightEntity, C extends Cont
         E entity = repository.findByUuid(uuid);
 
         if (entity == null) {
-            entity = getShadowEntity(uuid, context);
+            entity = createPlaceholderEntity(uuid);
+
+            entity.setUuid(uuid);
 
             entity = repository.save(entity);
         }

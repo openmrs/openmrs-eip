@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Location;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.LocationModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +19,10 @@ public class LocationServiceTest {
     private SyncEntityRepository<Location> repository;
 
     @Mock
-    private EntityMapper<Location, LocationModel> mapper;
+    private EntityToModelMapper<Location, LocationModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<LocationModel, Location> modelToEntityMapper;
 
     private LocationService service;
 
@@ -26,7 +30,7 @@ public class LocationServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new LocationService(repository, mapper);
+        service = new LocationService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

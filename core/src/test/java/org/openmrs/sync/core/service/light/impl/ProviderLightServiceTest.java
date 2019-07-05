@@ -27,11 +27,12 @@ public class ProviderLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        ProviderLight result = service.getShadowEntity("UUID");
+        ProviderLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedProvider(), result);
@@ -39,7 +40,6 @@ public class ProviderLightServiceTest {
 
     private ProviderLight getExpectedProvider() {
         ProviderLight provider = new ProviderLight();
-        provider.setUuid("UUID");
         provider.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         provider.setCreator(1L);
         return provider;

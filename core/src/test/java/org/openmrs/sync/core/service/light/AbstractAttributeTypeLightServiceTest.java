@@ -27,19 +27,19 @@ public class AbstractAttributeTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity_should_return_entity() {
         // Given
-
+        String uuid = "uuid";
 
         // When
-        MockedAttributeTypeLight result = service.getShadowEntity("UUID");
+        MockedAttributeTypeLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedAttributeType(), result);
     }
 
     private MockedAttributeTypeLight getExpectedAttributeType() {
-        MockedAttributeTypeLight attributeType = new MockedAttributeTypeLight(null, "UUID");
+        MockedAttributeTypeLight attributeType = new MockedAttributeTypeLight(null, null);
         attributeType.setName("[Default]");
         attributeType.setMinOccurs(0);
         attributeType.setCreator(1L);

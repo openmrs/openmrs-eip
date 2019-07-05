@@ -9,6 +9,9 @@ import org.openmrs.sync.core.model.BaseModel;
 
 import java.io.IOException;
 
+/**
+ * Overrides deserialize method to get the model class from the parent TransferObject
+ */
 public class BaseModelDeserializer extends StdDeserializer<BaseModel> {
 
     public BaseModelDeserializer() {

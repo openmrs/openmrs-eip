@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "provider_attribute")
 @AttributeOverride(name = "id", column = @Column(name = "provider_attribute_id"))
-public class ProviderAttribute extends Attribute<ProviderLight, ProviderAttributeTypeLight> {
+public class ProviderAttribute extends Attribute<ProviderAttributeTypeLight> {
 
     @NotNull
     @ManyToOne

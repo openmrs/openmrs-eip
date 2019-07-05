@@ -44,11 +44,19 @@ public enum TableToSyncEnum {
         return valueOf(tableToSync.toUpperCase());
     }
 
-    public static Class<? extends BaseModel> getModelClass(final BaseEntity baseEntity) {
+    public static Class<? extends BaseModel> getModelClass(final BaseEntity entity) {
         return Stream.of(values())
-                .filter(e -> e.getEntityClass().equals(baseEntity.getClass()))
+                .filter(e -> e.getEntityClass().equals(entity.getClass()))
                 .findFirst()
                 .map(TableToSyncEnum::getModelClass)
-                .orElseThrow(() -> new OpenMrsSyncException("No model class found corresponding to entity class " + baseEntity.getClass()));
+                .orElseThrow(() -> new OpenMrsSyncException("No model class found corresponding to entity class " + entity.getClass()));
+    }
+
+    public static Class<? extends BaseEntity> getEntityClass(final BaseModel model) {
+        return Stream.of(values())
+                .filter(e -> e.getModelClass().equals(model.getClass()))
+                .findFirst()
+                .map(TableToSyncEnum::getEntityClass)
+                .orElseThrow(() -> new OpenMrsSyncException("No entity class found corresponding to model class " + model.getClass()));
     }
 }

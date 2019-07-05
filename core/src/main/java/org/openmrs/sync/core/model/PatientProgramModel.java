@@ -13,12 +13,6 @@ public class PatientProgramModel extends BaseModel {
 
     private String programUuid;
 
-    private String programConceptUuid;
-
-    private String programConceptClassUuid;
-
-    private String programConceptDatatypeUuid;
-
     private LocalDateTime dateEnrolled;
 
     private LocalDateTime dateCompleted;
@@ -26,8 +20,4 @@ public class PatientProgramModel extends BaseModel {
     private String locationUuid;
 
     private String outcomeConceptUuid;
-
-    private String outcomeConceptClassUuid;
-
-    private String outcomeConceptDatatypeUuid;
 }

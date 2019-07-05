@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Encounter;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.EncounterModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +19,10 @@ public class EncounterServiceTest {
     private SyncEntityRepository<Encounter> repository;
 
     @Mock
-    private EntityMapper<Encounter, EncounterModel> mapper;
+    private EntityToModelMapper<Encounter, EncounterModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<EncounterModel, Encounter> modelToEntityMapper;
 
     private EncounterService service;
 
@@ -26,7 +30,7 @@ public class EncounterServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new EncounterService(repository, mapper);
+        service = new EncounterService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

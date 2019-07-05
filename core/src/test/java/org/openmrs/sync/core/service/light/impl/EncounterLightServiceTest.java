@@ -8,8 +8,7 @@ import org.openmrs.sync.core.entity.light.EncounterLight;
 import org.openmrs.sync.core.entity.light.EncounterTypeLight;
 import org.openmrs.sync.core.entity.light.PatientLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.EncounterContext;
+import org.openmrs.sync.core.service.light.LightService;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,10 +22,10 @@ public class EncounterLightServiceTest {
     private OpenMrsRepository<EncounterLight> repository;
 
     @Mock
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
     @Mock
-    private LightServiceNoContext<EncounterTypeLight> encounterTypeService;
+    private LightService<EncounterTypeLight> encounterTypeService;
 
     private EncounterLightService service;
 
@@ -38,17 +37,14 @@ public class EncounterLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        when(patientService.getOrInit("patient")).thenReturn(getPatient());
-        when(encounterTypeService.getOrInit("encounterType")).thenReturn(getEncounterType());
-        EncounterContext encounterContext = EncounterContext.builder()
-                .patientUuid("patient")
-                .encounterTypeUuid("encounterType")
-                .build();
+        when(patientService.getOrInitPlaceholderEntity()).thenReturn(getPatient());
+        when(encounterTypeService.getOrInitPlaceholderEntity()).thenReturn(getEncounterType());
+        String uuid = "uuid";
 
         // When
-        EncounterLight result = service.getShadowEntity("UUID", encounterContext);
+        EncounterLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedEncounter(), result);
@@ -56,7 +52,6 @@ public class EncounterLightServiceTest {
 
     private EncounterLight getExpectedEncounter() {
         EncounterLight encounter = new EncounterLight();
-        encounter.setUuid("UUID");
         encounter.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         encounter.setCreator(1L);
         encounter.setEncounterType(getEncounterType());
@@ -67,13 +62,13 @@ public class EncounterLightServiceTest {
 
     private PatientLight getPatient() {
         PatientLight patient = new PatientLight();
-        patient.setUuid("patient");
+        patient.setUuid("PLACEHOLDER_PATIENT");
         return patient;
     }
 
     private EncounterTypeLight getEncounterType() {
         EncounterTypeLight encounterType = new EncounterTypeLight();
-        encounterType.setUuid("encounterType");
+        encounterType.setUuid("PLACEHOLDER_PATIENT");
         return encounterType;
     }
 }

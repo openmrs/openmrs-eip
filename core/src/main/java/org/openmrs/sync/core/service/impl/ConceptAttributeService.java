@@ -1,7 +1,8 @@
 package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.entity.ConceptAttribute;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.ConceptAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Service;
 public class ConceptAttributeService extends AbstractEntityService<ConceptAttribute, ConceptAttributeModel> {
 
     public ConceptAttributeService(final SyncEntityRepository<ConceptAttribute> repository,
-                                   final EntityMapper<ConceptAttribute, ConceptAttributeModel> mapper) {
-        super(repository, mapper);
+                                   final EntityToModelMapper<ConceptAttribute, ConceptAttributeModel> entityToModelMapper,
+                                   final ModelToEntityMapper<ConceptAttributeModel, ConceptAttribute> modelToEntityMapper) {
+        super(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Override

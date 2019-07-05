@@ -27,11 +27,12 @@ public class PersonLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        PersonLight result = service.getShadowEntity("UUID");
+        PersonLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedPerson(), result);
@@ -39,7 +40,6 @@ public class PersonLightServiceTest {
 
     private PersonLight getExpectedPerson() {
         PersonLight person = new PersonLight();
-        person.setUuid("UUID");
         person.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         return person;
     }

@@ -38,8 +38,8 @@ public class MetaDataEntity extends BaseEntity {
     @JoinColumn(name = "retired_by")
     private UserLight retiredBy;
 
-    @Column(name = "retired_date")
-    private LocalDateTime retiredDate;
+    @Column(name = "date_retired")
+    private LocalDateTime dateRetired;
 
     @Column(name = "retire_reason")
     private String retireReason;
@@ -54,10 +54,10 @@ public class MetaDataEntity extends BaseEntity {
         List<LocalDateTime> datesToCheck = Arrays.asList(
                 metaData.getDateCreated(),
                 metaData.getDateChanged(),
-                metaData.getRetiredDate());
+                metaData.getDateRetired());
         boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
         boolean dateChangedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateChanged(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getRetiredDate(), datesToCheck);
+        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateRetired(), datesToCheck);
         return dateCreatedAfter || dateChangedAfter || dateVoidedAfter;
     }
 }

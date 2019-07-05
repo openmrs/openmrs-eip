@@ -1,67 +1,51 @@
 package org.openmrs.sync.core.mapper;
 
-import lombok.EqualsAndHashCode;
 import org.junit.Test;
 import org.openmrs.sync.core.entity.MockedEntity;
-import org.openmrs.sync.core.exception.OpenMrsSyncException;
 import org.openmrs.sync.core.model.MockedModel;
 
 import static org.junit.Assert.assertEquals;
 
 public class CopyStandardFieldsFunctionTest {
 
-    private CopyStandardFieldsFunction function = new CopyStandardFieldsFunction();
+    private CopyStandardFieldsFunction<MockedEntity, MockedModel> function = new CopyStandardFieldsFunction<>();
 
     @Test
-    public void apply_should_populate_model() {
+    public void apply_should_copy_model_to_entity() {
         // Given
-        MockedModel model = new MockedModel("uuid");
-        Context context = getContext(model);
+        MockedModel model = getModel();
+        MockedEntity entity = new MockedEntity(1L, null);
+        Context<MockedEntity, MockedModel> context = new Context<>(entity, model, MappingDirectionEnum.MODEL_TO_ENTITY);
 
         // When
-        function.apply(context);
+        Context<MockedEntity, MockedModel> result = function.apply(context);
 
         // Then
-        assertEquals(expectedModel(), model);
+        assertEquals(getEntity(), result.getEntity());
     }
 
-    @Test(expected = OpenMrsSyncException.class)
-    public void apply_should_throw_exception() {
+    @Test
+    public void apply_should_copy_entity_to_model() {
         // Given
-        WrongMockedModel model = new WrongMockedModel("uuid");
-        Context context = getContext(model);
+        MockedEntity entity = getEntity();
+        MockedModel model = new MockedModel(null);
+        Context<MockedEntity, MockedModel> context = new Context<>(entity, model, MappingDirectionEnum.ENTITY_TO_MODEL);
 
         // When
-        function.apply(context);
+        Context<MockedEntity, MockedModel> result = function.apply(context);
 
         // Then
+        assertEquals(getModel(), result.getModel());
     }
 
-    @EqualsAndHashCode(callSuper = true)
-    private class WrongMockedModel extends MockedModel {
-
-        public WrongMockedModel(final String uuid) {
-            super(uuid);
-        }
-
-        @Override
-        public void setField2(final String field2) {
-            throw new UnsupportedOperationException();
-        }
+    public MockedEntity getEntity() {
+        MockedEntity expectedEntity = new MockedEntity(1L, "uuid");
+        expectedEntity.setField1("field1");
+        expectedEntity.setField2("field2");
+        return expectedEntity;
     }
 
-    private Context getContext(final MockedModel model) {
-        MockedEntity entity = new MockedEntity(1L, "uuid");
-        entity.setField1("field1");
-        entity.setField2("field2");
-
-        return Context.builder()
-                .entity(entity)
-                .model(model)
-                .build();
-    }
-
-    public MockedModel expectedModel() {
+    public MockedModel getModel() {
         MockedModel expectedModel = new MockedModel("uuid");
         expectedModel.setField1("field1");
         expectedModel.setField2("field2");

@@ -1,7 +1,8 @@
 package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.entity.PatientProgram;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.PatientProgramModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.AbstractEntityService;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Service;
 public class PatientProgramService extends AbstractEntityService<PatientProgram, PatientProgramModel> {
 
     public PatientProgramService(final SyncEntityRepository<PatientProgram> repository,
-                                 final EntityMapper<PatientProgram, PatientProgramModel> mapper) {
-        super(repository, mapper);
+                                 final EntityToModelMapper<PatientProgram, PatientProgramModel> entityToModelMapper,
+                                 final ModelToEntityMapper<PatientProgramModel, PatientProgram> modelToEntityMapper) {
+        super(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Override

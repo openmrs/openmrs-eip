@@ -2,17 +2,16 @@ package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.MockedLightEntity;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.impl.context.MockedContext;
 
 
-public class MockedLightService extends AbstractLightService<MockedLightEntity, MockedContext> {
+public class MockedLightService extends AbstractLightService<MockedLightEntity> {
 
     public MockedLightService(final OpenMrsRepository<MockedLightEntity> repository) {
         super(repository);
     }
 
     @Override
-    protected MockedLightEntity getShadowEntity(final String uuid, final MockedContext context) {
-        return new MockedLightEntity(null, uuid);
+    protected MockedLightEntity createPlaceholderEntity(final String uuid) {
+        return new MockedLightEntity(1L, null);
     }
 }

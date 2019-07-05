@@ -5,32 +5,29 @@ import org.openmrs.sync.core.entity.light.ConceptDatatypeLight;
 import org.openmrs.sync.core.entity.light.ConceptLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.AbstractLightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
+import org.openmrs.sync.core.service.light.LightService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ConceptLightService extends AbstractLightService<ConceptLight, ConceptContext> {
+public class ConceptLightService extends AbstractLightService<ConceptLight> {
 
-    private LightServiceNoContext<ConceptClassLight> conceptClassService;
+    private LightService<ConceptClassLight> conceptClassService;
 
-    private LightServiceNoContext<ConceptDatatypeLight> conceptDatatypeService;
+    private LightService<ConceptDatatypeLight> conceptDatatypeService;
 
     public ConceptLightService(final OpenMrsRepository<ConceptLight> conceptRepository,
-                               final LightServiceNoContext<ConceptClassLight> conceptClassService,
-                               final LightServiceNoContext<ConceptDatatypeLight> conceptDatatypeService) {
+                               final LightService<ConceptClassLight> conceptClassService,
+                               final LightService<ConceptDatatypeLight> conceptDatatypeService) {
         super(conceptRepository);
         this.conceptClassService = conceptClassService;
         this.conceptDatatypeService = conceptDatatypeService;
     }
 
     @Override
-    protected ConceptLight getShadowEntity(final String uuid,
-                                           final ConceptContext context) {
+    protected ConceptLight createPlaceholderEntity(final String uuid) {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid(uuid);
-        concept.setConceptClass(conceptClassService.getOrInit(context.getConceptClassUuid()));
-        concept.setDatatype(conceptDatatypeService.getOrInit(context.getConceptDatatypeUuid()));
+        concept.setConceptClass(conceptClassService.getOrInitPlaceholderEntity());
+        concept.setDatatype(conceptDatatypeService.getOrInitPlaceholderEntity());
         concept.setCreator(1L);
         concept.setDateCreated(DEFAULT_DATE);
         return concept;

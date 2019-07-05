@@ -1,33 +1,26 @@
 package org.openmrs.sync.core.mapper;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.openmrs.sync.core.entity.BaseEntity;
-import org.openmrs.sync.core.exception.OpenMrsSyncException;
 import org.openmrs.sync.core.model.BaseModel;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.UnaryOperator;
 
 @Component
-public class CopyStandardFieldsFunction implements UnaryOperator<Context> {
+public class CopyStandardFieldsFunction<E extends BaseEntity, M extends BaseModel> implements UnaryOperator<Context<E, M>> {
 
     @Override
-    public Context apply(final Context context) {
-        BaseModel model = context.getModel();
-        BaseEntity entity = context.getEntity();
+    public Context<E, M> apply(final Context<E, M> context) {
+        M model = context.getModel();
+        E entity = context.getEntity();
 
-        copyFieldsFromEntityToModel(model, entity);
-
-        return context;
-    }
-
-    private void copyFieldsFromEntityToModel(final BaseModel model,
-                                             final BaseEntity entity) {
-        try {
-            PropertyUtils.copyProperties(model, entity);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new OpenMrsSyncException("error while copying entity " + entity.getClass() + " to model " + model.getClass(), e);
+        if (context.getDirection() == MappingDirectionEnum.MODEL_TO_ENTITY) {
+            BeanUtils.copyProperties(model, entity);
+        } else if (context.getDirection() == MappingDirectionEnum.ENTITY_TO_MODEL) {
+            BeanUtils.copyProperties(entity, model);
         }
+
+        return new Context<>(entity, model, context.getDirection());
     }
 }

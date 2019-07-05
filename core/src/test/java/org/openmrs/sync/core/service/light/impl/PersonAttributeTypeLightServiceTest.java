@@ -27,13 +27,19 @@ public class PersonAttributeTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
-        assertEquals(getExpectedLocation(), service.getShadowEntity("uuid"));
+    public void createPlaceholderEntity() {
+        // Given
+        String uuid = "uuid";
+
+        // When
+        PersonAttributeTypeLight result = service.createPlaceholderEntity(uuid);
+
+        // Then
+        assertEquals(getExpectedLocation(), result);
     }
 
     private PersonAttributeTypeLight getExpectedLocation() {
         PersonAttributeTypeLight personAttributeType = new PersonAttributeTypeLight();
-        personAttributeType.setUuid("uuid");
         personAttributeType.setCreator(1L);
         personAttributeType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         personAttributeType.setName("[Default]");

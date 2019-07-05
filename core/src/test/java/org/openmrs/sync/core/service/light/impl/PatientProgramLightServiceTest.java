@@ -9,9 +9,6 @@ import org.openmrs.sync.core.entity.light.PatientProgramLight;
 import org.openmrs.sync.core.entity.light.ProgramLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.PatientProgramContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -25,10 +22,10 @@ public class PatientProgramLightServiceTest {
     private OpenMrsRepository<PatientProgramLight> repository;
 
     @Mock
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
     @Mock
-    private LightService<ProgramLight, ProgramContext> programService;
+    private LightService<ProgramLight> programService;
 
     private PatientProgramLightService service;
 
@@ -40,25 +37,14 @@ public class PatientProgramLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        PatientProgramContext patientProgramContext = PatientProgramContext.builder()
-                .programUuid("program")
-                .programConceptUuid("concept")
-                .programConceptClassUuid("conceptClass")
-                .programConceptDatatypeUuid("conceptDatatype")
-                .patientUuid("patient")
-                .build();
-        ProgramContext programContext = ProgramContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptUuid("concept")
-                .build();
-        when(patientService.getOrInit("patient")).thenReturn(getPatient());
-        when(programService.getOrInit("program", programContext)).thenReturn(getProgram());
+        when(patientService.getOrInitPlaceholderEntity()).thenReturn(getPatient());
+        when(programService.getOrInitPlaceholderEntity()).thenReturn(getProgram());
+        String uuid = "uuid";
 
         // When
-        PatientProgramLight result = service.getShadowEntity("UUID", patientProgramContext);
+        PatientProgramLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedPatientProgram(), result);
@@ -66,7 +52,6 @@ public class PatientProgramLightServiceTest {
 
     private PatientProgramLight getExpectedPatientProgram() {
         PatientProgramLight patientProgram = new PatientProgramLight();
-        patientProgram.setUuid("UUID");
         patientProgram.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         patientProgram.setCreator(1L);
         patientProgram.setPatient(getPatient());
@@ -76,13 +61,13 @@ public class PatientProgramLightServiceTest {
 
     private ProgramLight getProgram() {
         ProgramLight program = new ProgramLight();
-        program.setUuid("program");
+        program.setUuid("PLACEHOLDER_PROGRAM");
         return program;
     }
 
     private PatientLight getPatient() {
         PatientLight patient = new PatientLight();
-        patient.setUuid("patient");
+        patient.setUuid("PLACEHOLDER_PATIENT");
         return patient;
     }
 }

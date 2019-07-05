@@ -1,7 +1,8 @@
 package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.entity.Patient;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.PatientModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -25,7 +26,10 @@ public class PersonServiceTest {
     private SyncEntityRepository<Person> repository;
 
     @Mock
-    private EntityMapper<Person, PersonModel> mapper;
+    private EntityToModelMapper<Person, PersonModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<PersonModel, Person> modelToEntityMapper;
 
     private PersonService service;
 
@@ -33,7 +37,7 @@ public class PersonServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new PersonService(repository, mapper);
+        service = new PersonService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test
@@ -48,15 +52,15 @@ public class PersonServiceTest {
         Patient patient = new Patient();
         PersonModel personModel = new PersonModel();
         PatientModel patientModel = new PatientModel();
-        when(mapper.entityToModel(person)).thenReturn(personModel);
-        when(mapper.entityToModel(patient)).thenReturn(patientModel);
+        when(entityToModelMapper.apply(person)).thenReturn(personModel);
+        when(entityToModelMapper.apply(patient)).thenReturn(patientModel);
 
         // When
         List<PersonModel> result = service.mapEntities(Arrays.asList(person, patient));
 
         // Then
         assertEquals(1, result.size());
-        verify(mapper, never()).entityToModel(patient);
+        verify(entityToModelMapper, never()).apply(patient);
         assertTrue(result.get(0) instanceof PersonModel);
     }
 }

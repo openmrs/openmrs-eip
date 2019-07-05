@@ -2,7 +2,8 @@ package org.openmrs.sync.core.service.impl;
 
 import org.openmrs.sync.core.entity.Patient;
 import org.openmrs.sync.core.entity.Person;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.model.PersonModel;
@@ -16,8 +17,9 @@ import java.util.stream.Collectors;
 public class PersonService extends AbstractEntityService<Person, PersonModel> {
 
     public PersonService(final SyncEntityRepository<Person> personRepository,
-                         final EntityMapper<Person, PersonModel> mapper) {
-        super(personRepository, mapper);
+                         final EntityToModelMapper<Person, PersonModel> entityToModelMapper,
+                         final ModelToEntityMapper<PersonModel, Person> modelToEntityMapper) {
+        super(personRepository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Override
@@ -29,7 +31,7 @@ public class PersonService extends AbstractEntityService<Person, PersonModel> {
     protected List<PersonModel> mapEntities(final List<Person> entities) {
         return entities.stream()
                 .filter(person -> !(person instanceof Patient))
-                .map(mapper::entityToModel)
+                .map(entityToModelMapper)
                 .collect(Collectors.toList());
     }
 }

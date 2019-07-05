@@ -1,7 +1,8 @@
 package org.openmrs.sync.core.service;
 
 import org.openmrs.sync.core.entity.BaseEntity;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 
@@ -13,12 +14,15 @@ import java.util.stream.Collectors;
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
     protected SyncEntityRepository<E> repository;
-    protected EntityMapper<E, M> mapper;
+    protected EntityToModelMapper<E, M> entityToModelMapper;
+    protected ModelToEntityMapper<M, E> modelToEntityMapper;
 
     public AbstractEntityService(final SyncEntityRepository<E> repository,
-                                 final EntityMapper<E, M> mapper) {
+                                 final EntityToModelMapper<E, M> entityToModelMapper,
+                                 final ModelToEntityMapper<M, E> modelToEntityMapper) {
         this.repository = repository;
-        this.mapper = mapper;
+        this.entityToModelMapper = entityToModelMapper;
+        this.modelToEntityMapper = modelToEntityMapper;
     }
 
     /**
@@ -31,7 +35,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     public M save(final M model) {
         E etyInDb = repository.findByUuid(model.getUuid());
 
-        E ety = mapper.modelToEntity(model);
+        E ety = modelToEntityMapper.apply(model);
 
         M modelToReturn = model;
 
@@ -46,7 +50,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     }
 
     private M saveEntity(final E ety) {
-        return mapper.entityToModel(repository.save(ety));
+        return entityToModelMapper.apply(repository.save(ety));
     }
 
     @Override
@@ -63,19 +67,19 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     @Override
     public M getModel(final String uuid) {
-        return mapper.entityToModel(repository.findByUuid(uuid));
+        return entityToModelMapper.apply(repository.findByUuid(uuid));
     }
 
     @Override
     public M getModel(final Long id) {
         Optional<E> entity = repository.findById(id);
-        return entity.map(mapper::entityToModel)
+        return entity.map(entityToModelMapper)
                 .orElse(null);
     }
 
     protected List<M> mapEntities(List<E> entities) {
         return entities.stream()
-                .map(mapper::entityToModel)
+                .map(entityToModelMapper)
                 .collect(Collectors.toList());
     }
 }

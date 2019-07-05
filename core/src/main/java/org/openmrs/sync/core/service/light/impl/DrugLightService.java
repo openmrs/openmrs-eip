@@ -5,35 +5,25 @@ import org.openmrs.sync.core.entity.light.DrugLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.DrugContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DrugLightService extends AbstractLightService<DrugLight, DrugContext> {
+public class DrugLightService extends AbstractLightService<DrugLight> {
 
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     public DrugLightService(final OpenMrsRepository<DrugLight> repository,
-                            final LightService<ConceptLight, ConceptContext> conceptService) {
+                            final LightService<ConceptLight> conceptService) {
         super(repository);
         this.conceptService = conceptService;
     }
 
     @Override
-    protected DrugLight getShadowEntity(final String uuid, final DrugContext context) {
+    protected DrugLight createPlaceholderEntity(final String uuid) {
         DrugLight drug = new DrugLight();
-        drug.setUuid(uuid);
         drug.setDateCreated(DEFAULT_DATE);
         drug.setCreator(DEFAULT_USER_ID);
-        drug.setConcept(conceptService.getOrInit(context.getConceptUuid(), getConceptContext(context)));
+        drug.setConcept(conceptService.getOrInitPlaceholderEntity());
         return drug;
-    }
-
-    private ConceptContext getConceptContext(final DrugContext context) {
-        return ConceptContext.builder()
-                .conceptClassUuid(context.getConceptClassUuid())
-                .conceptDatatypeUuid(context.getConceptDatatypeUuid())
-                .build();
     }
 }

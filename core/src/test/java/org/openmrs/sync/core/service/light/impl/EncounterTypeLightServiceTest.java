@@ -27,11 +27,12 @@ public class EncounterTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        EncounterTypeLight result = service.getShadowEntity("UUID");
+        EncounterTypeLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedEncounterType(), result);
@@ -39,10 +40,9 @@ public class EncounterTypeLightServiceTest {
 
     private EncounterTypeLight getExpectedEncounterType() {
         EncounterTypeLight encounterType = new EncounterTypeLight();
-        encounterType.setUuid("UUID");
         encounterType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         encounterType.setCreator(1L);
-        encounterType.setName("[Default] - UUID");
+        encounterType.setName("[Default] - " + "uuid");
         return encounterType;
     }
 }

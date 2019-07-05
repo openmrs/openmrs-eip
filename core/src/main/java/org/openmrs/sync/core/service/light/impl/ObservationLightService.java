@@ -6,42 +6,31 @@ import org.openmrs.sync.core.entity.light.PersonLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.AbstractLightService;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.ObservationContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ObservationLightService extends AbstractLightService<ObservationLight, ObservationContext> {
+public class ObservationLightService extends AbstractLightService<ObservationLight> {
 
-    private LightServiceNoContext<PersonLight> personService;
+    private LightService<PersonLight> personService;
 
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     public ObservationLightService(final OpenMrsRepository<ObservationLight> repository,
-                                   final LightServiceNoContext<PersonLight> personService,
-                                   final LightService<ConceptLight, ConceptContext> conceptService) {
+                                   final LightService<PersonLight> personService,
+                                   final LightService<ConceptLight> conceptService) {
         super(repository);
         this.personService = personService;
         this.conceptService = conceptService;
     }
 
     @Override
-    protected ObservationLight getShadowEntity(final String uuid, final ObservationContext context) {
+    protected ObservationLight createPlaceholderEntity(final String uuid) {
         ObservationLight observation = new ObservationLight();
-        observation.setUuid(uuid);
         observation.setDateCreated(DEFAULT_DATE);
         observation.setCreator(DEFAULT_USER_ID);
         observation.setObsDatetime(DEFAULT_DATE);
-        observation.setPerson(personService.getOrInit(context.getPersonUuid()));
-        observation.setConcept(conceptService.getOrInit(context.getConceptUuid(), getConceptContext(context)));
+        observation.setPerson(personService.getOrInitPlaceholderEntity());
+        observation.setConcept(conceptService.getOrInitPlaceholderEntity());
         return observation;
-    }
-
-    private ConceptContext getConceptContext(final ObservationContext context) {
-        return ConceptContext.builder()
-                .conceptClassUuid(context.getConceptClassUuid())
-                .conceptDatatypeUuid(context.getConceptDatatypeUuid())
-                .build();
     }
 }

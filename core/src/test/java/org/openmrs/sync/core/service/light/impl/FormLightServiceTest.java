@@ -27,11 +27,12 @@ public class FormLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        FormLight result = service.getShadowEntity("UUID");
+        FormLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedForm(), result);
@@ -39,7 +40,6 @@ public class FormLightServiceTest {
 
     private FormLight getExpectedForm() {
         FormLight form = new FormLight();
-        form.setUuid("UUID");
         form.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         form.setCreator(1L);
         form.setName("[Default]");

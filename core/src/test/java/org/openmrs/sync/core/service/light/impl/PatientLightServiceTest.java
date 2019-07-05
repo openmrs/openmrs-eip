@@ -27,13 +27,19 @@ public class PatientLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
-        assertEquals(getExpectedLocation(), service.getShadowEntity("uuid"));
+    public void createPlaceholderEntity() {
+        // Given
+        String uuid = "uuid";
+
+        // When
+        PatientLight result = service.createPlaceholderEntity(uuid);
+
+        // Then
+        assertEquals(getExpectedLocation(), result);
     }
 
     private PatientLight getExpectedLocation() {
         PatientLight patient = new PatientLight();
-        patient.setUuid("uuid");
         patient.setCreator(1L);
         patient.setPatientCreator(1L);
         patient.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));

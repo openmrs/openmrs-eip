@@ -27,13 +27,19 @@ public class VisitTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
-        assertEquals(getExpectedLocation(), service.getShadowEntity("uuid"));
+    public void createPlaceholderEntity() {
+        // Given
+        String uuid = "uuid";
+
+        // When
+        VisitTypeLight result = service.createPlaceholderEntity(uuid);
+
+        // Then
+        assertEquals(getExpectedLocation(), service.createPlaceholderEntity(uuid));
     }
 
     private VisitTypeLight getExpectedLocation() {
         VisitTypeLight visitType = new VisitTypeLight();
-        visitType.setUuid("uuid");
         visitType.setCreator(1L);
         visitType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         visitType.setName("[Default]");

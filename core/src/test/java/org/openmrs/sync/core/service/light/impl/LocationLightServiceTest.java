@@ -27,13 +27,19 @@ public class LocationLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
-        assertEquals(getExpectedLocation(), service.getShadowEntity("uuid"));
+    public void createPlaceholderEntity() {
+        // Given
+        String uuid = "uuid";
+
+        // When
+        LocationLight result = service.createPlaceholderEntity(uuid);
+
+        // Then
+        assertEquals(getExpectedLocation(), result);
     }
 
     private LocationLight getExpectedLocation() {
         LocationLight location = new LocationLight();
-        location.setUuid("uuid");
         location.setCreator(1L);
         location.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         location.setName("[Default]");

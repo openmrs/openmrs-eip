@@ -3,6 +3,7 @@ package org.openmrs.sync.core.utils;
 import org.json.JSONException;
 import org.junit.Test;
 import org.openmrs.sync.core.camel.TransferObject;
+import org.openmrs.sync.core.exception.OpenMrsSyncException;
 import org.openmrs.sync.core.model.PersonModel;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -14,7 +15,7 @@ public class JsonUtilsTest {
     private static final String UUID = "UUID";
 
     @Test
-    public void marshall() throws JSONException {
+    public void marshall_should_produce_json() throws JSONException {
         // Given
         PersonModel model = new PersonModel();
         model.setUuid(UUID);
@@ -30,13 +31,29 @@ public class JsonUtilsTest {
         JSONAssert.assertEquals(json(), result, false);
     }
 
+    @Test(expected = OpenMrsSyncException.class)
+    public void marshall_should_throw_exception() {
+        // Given
+        WrongModel model = new WrongModel();
+        model.setUuid(UUID);
+        TransferObject to = TransferObject.builder()
+                .tableToSync(TableToSyncEnum.PERSON)
+                .model(model)
+                .build();
+
+        // When
+        JsonUtils.marshall(to);
+
+        // Then
+    }
+
     @Test
     public void unmarshall() {
         // Given
         String json = json();
 
         // When
-        TransferObject result = (TransferObject) JsonUtils.unmarshal(json);
+        TransferObject result = JsonUtils.unmarshal(json);
 
         // Then
         PersonModel expectedModel = new PersonModel();
@@ -46,6 +63,42 @@ public class JsonUtilsTest {
                 .model(expectedModel)
                 .build();
         assertEquals(expected, result);
+    }
+
+    @Test(expected = OpenMrsSyncException.class)
+    public void unmarshall_should_throw_exception() {
+        // Given
+        String json = badlyFormattedJson();
+
+        // When
+        JsonUtils.unmarshal(json);
+
+        // Then
+    }
+
+    private String badlyFormattedJson() {
+        return "{" +
+                "tableToSync:" + TableToSyncEnum.PERSON + "," +
+                "model: {" +
+                "uuid:" + UUID + "," +
+                "creatorUuid:null," +
+                "dateCreated:null," +
+                "changedByUuid:null," +
+                "dateChanged:null," +
+                "voided:false," +
+                "voidedByUuid:null," +
+                "dateVoided:null," +
+                "voidReason:null," +
+                "gender:null," +
+                "birthdate:null," +
+                "birthdateEstimated:false," +
+                "dead:false," +
+                "deathDate:null," +
+                "causeOfDeathUuid:null," +
+                "deathdateEstimated:false," +
+                "birthtime:null" +
+                "}" +
+                "}";
     }
 
     private String json() {
@@ -67,11 +120,17 @@ public class JsonUtilsTest {
                         "\"dead\":false," +
                         "\"deathDate\":null," +
                         "\"causeOfDeathUuid\":null," +
-                        "\"causeOfDeathClassUuid\":null," +
-                        "\"causeOfDeathDatatypeUuid\":null," +
                         "\"deathdateEstimated\":false," +
                         "\"birthtime\":null" +
                     "}" +
                 "}";
+    }
+
+    private class WrongModel extends PersonModel {
+
+        @Override
+        public String getGender() {
+            throw new RuntimeException();
+        }
     }
 }

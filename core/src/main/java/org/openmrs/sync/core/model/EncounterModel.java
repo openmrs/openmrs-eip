@@ -20,8 +20,4 @@ public class EncounterModel extends BaseModel {
     private LocalDateTime encounterDatetime;
 
     private String visitUuid;
-
-    private String visitPatientUuid;
-
-    private String visitVisitTypeUuid;
 }

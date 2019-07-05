@@ -13,4 +13,9 @@ public class MapperServiceImpl implements MapperService {
     public Class<? extends BaseModel> getCorrespondingModelClass(final BaseEntity entity) {
         return TableToSyncEnum.getModelClass(entity);
     }
+
+    @Override
+    public Class<? extends BaseEntity> getCorrespondingEntityClass(final BaseModel model) {
+        return TableToSyncEnum.getEntityClass(model);
+    }
 }

@@ -4,20 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.entity.MockedEntity;
-import org.openmrs.sync.core.entity.MockedLightEntity;
-import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.model.MockedModel;
 
-import java.beans.PropertyDescriptor;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,18 +20,18 @@ import static org.mockito.Mockito.when;
 public class EntityToModelMapperTest {
 
     @Mock
-    private Function<BaseEntity, Context> instantiateModel;
+    private Function<MockedEntity, Context<MockedEntity, MockedModel>> instantiateModel;
 
     @Mock
-    private UnaryOperator<Context> copyStandardFields;
+    private UnaryOperator<Context<MockedEntity, MockedModel>> copyStandardFields;
 
     @Mock
-    private BiConsumer<Context, PropertyDescriptor> extractUuid;
+    private BiConsumer<Context<MockedEntity, MockedModel>, String> extractUuid;
 
     @Mock
-    private BiFunction<Context, BiConsumer<Context, PropertyDescriptor>, Context> forEachLinkedEntity;
+    private BiFunction<Context<MockedEntity, MockedModel>, BiConsumer<Context<MockedEntity, MockedModel>, String>, MockedModel> forEachLinkedEntity;
 
-    private EntityToModelMapper mapper;
+    private EntityToModelMapper<MockedEntity, MockedModel> mapper;
 
     @Before
     public void init() {
@@ -46,24 +41,22 @@ public class EntityToModelMapperTest {
         when(copyStandardFields.andThen(any())).thenCallRealMethod();
         when(forEachLinkedEntity.andThen(any())).thenCallRealMethod();
 
-        mapper = new EntityToModelMapper(instantiateModel, copyStandardFields, extractUuid, forEachLinkedEntity);
+        mapper = new EntityToModelMapper<>(instantiateModel, copyStandardFields, extractUuid, forEachLinkedEntity);
     }
 
     @Test
     public void entityToModel_should_return_model() {
         // Given
-        MockedLightEntity entity = new MockedLightEntity(1L, "uuid");
+        MockedEntity entity = new MockedEntity(1L, "uuid");
         MockedModel expectedModel = new MockedModel("uuid");
-        Context context = Context.builder()
-                .entity(entity)
-                .model(expectedModel)
-                .build();
+        Context<MockedEntity, MockedModel> context = new Context<>(entity, expectedModel, MappingDirectionEnum.ENTITY_TO_MODEL);
+
         when(instantiateModel.apply(entity)).thenReturn(context);
         when(copyStandardFields.apply(context)).thenReturn(context);
-        when(forEachLinkedEntity.apply(context, extractUuid)).thenReturn(context);
+        when(forEachLinkedEntity.apply(context, extractUuid)).thenReturn(expectedModel);
 
         // When
-        MockedModel result = (MockedModel) mapper.entityToModel(entity);
+        MockedModel result = mapper.apply(entity);
 
         // Then
         assertEquals(expectedModel, result);

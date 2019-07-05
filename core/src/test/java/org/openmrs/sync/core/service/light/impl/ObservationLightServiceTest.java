@@ -9,9 +9,6 @@ import org.openmrs.sync.core.entity.light.ObservationLight;
 import org.openmrs.sync.core.entity.light.PersonLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.ObservationContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -25,10 +22,10 @@ public class ObservationLightServiceTest {
     private OpenMrsRepository<ObservationLight> repository;
 
     @Mock
-    private LightServiceNoContext<PersonLight> personService;
+    private LightService<PersonLight> personService;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     private ObservationLightService service;
 
@@ -40,23 +37,14 @@ public class ObservationLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        ObservationContext observationContext = ObservationContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .conceptUuid("concept")
-                .personUuid("person")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
-        when(personService.getOrInit("person")).thenReturn(getPerson());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        when(personService.getOrInitPlaceholderEntity()).thenReturn(getPerson());
+        String uuid = "uuid";
 
         // When
-        ObservationLight result = service.getShadowEntity("UUID", observationContext);
+        ObservationLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedObservation(), result);
@@ -64,7 +52,6 @@ public class ObservationLightServiceTest {
 
     private ObservationLight getExpectedObservation() {
         ObservationLight observation = new ObservationLight();
-        observation.setUuid("UUID");
         observation.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         observation.setCreator(1L);
         observation.setObsDatetime(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
@@ -75,13 +62,13 @@ public class ObservationLightServiceTest {
 
     private PersonLight getPerson() {
         PersonLight person = new PersonLight();
-        person.setUuid("person");
+        person.setUuid("PLACEHOLDER_PERSON");
         return person;
     }
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 }

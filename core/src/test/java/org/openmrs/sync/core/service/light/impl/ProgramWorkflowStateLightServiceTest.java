@@ -9,9 +9,6 @@ import org.openmrs.sync.core.entity.light.ProgramWorkflowLight;
 import org.openmrs.sync.core.entity.light.ProgramWorkflowStateLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramWorkflowContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramWorkflowStateContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -25,10 +22,10 @@ public class ProgramWorkflowStateLightServiceTest {
     private OpenMrsRepository<ProgramWorkflowStateLight> repository;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     @Mock
-    private LightService<ProgramWorkflowLight, ProgramWorkflowContext> programWorkflowService;
+    private LightService<ProgramWorkflowLight> programWorkflowService;
 
     private ProgramWorkflowStateLightService service;
 
@@ -40,39 +37,14 @@ public class ProgramWorkflowStateLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        ProgramWorkflowStateContext programWorkflowContext = ProgramWorkflowStateContext.builder()
-                .conceptUuid("concept")
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .workflowUuid("workflow")
-                .workflowConceptUuid("workflowConcept")
-                .workflowConceptClassUuid("workflowConceptClass")
-                .workflowConceptDatatypeUuid("workflowConceptDatatype")
-                .workflowProgramUuid("workflowProgram")
-                .workflowProgramConceptUuid("workflowProgramConcept")
-                .workflowProgramConceptClassUuid("workflowProgramConceptClass")
-                .workflowProgramConceptDatatypeUuid("workflowProgramConceptDatatype")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        ProgramWorkflowContext programContext = ProgramWorkflowContext.builder()
-                .conceptUuid("workflowConcept")
-                .conceptClassUuid("workflowConceptClass")
-                .conceptDatatypeUuid("workflowConceptDatatype")
-                .programUuid("workflowProgram")
-                .programConceptUuid("workflowProgramConcept")
-                .programConceptClassUuid("workflowProgramConceptClass")
-                .programConceptDatatypeUuid("workflowProgramConceptDatatype")
-                .build();
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
-        when(programWorkflowService.getOrInit("workflow", programContext)).thenReturn(getProgramWorkflow());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        when(programWorkflowService.getOrInitPlaceholderEntity()).thenReturn(getProgramWorkflow());
+        String uuid = "uuid";
 
         // When
-        ProgramWorkflowStateLight result = service.getShadowEntity("UUID", programWorkflowContext);
+        ProgramWorkflowStateLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedProgramWorkflow(), result);
@@ -80,7 +52,6 @@ public class ProgramWorkflowStateLightServiceTest {
 
     private ProgramWorkflowStateLight getExpectedProgramWorkflow() {
         ProgramWorkflowStateLight programWorkflowState = new ProgramWorkflowStateLight();
-        programWorkflowState.setUuid("UUID");
         programWorkflowState.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         programWorkflowState.setCreator(1L);
         programWorkflowState.setConcept(getConcept());
@@ -90,13 +61,13 @@ public class ProgramWorkflowStateLightServiceTest {
 
     private ProgramWorkflowLight getProgramWorkflow() {
         ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
-        programWorkflow.setUuid("programWorkflow");
+        programWorkflow.setUuid("PLACEHOLDER_PROGRAM_WORKFLOW");
         return programWorkflow;
     }
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 }

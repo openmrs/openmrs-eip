@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.Concept;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
 import org.openmrs.sync.core.model.ConceptModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +19,10 @@ public class ConceptServiceTest {
     private SyncEntityRepository<Concept> repository;
 
     @Mock
-    private EntityMapper<Concept, ConceptModel> mapper;
+    private EntityToModelMapper<Concept, ConceptModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<ConceptModel, Concept> modelToEntityMapper;
 
     private ConceptService service;
 
@@ -26,7 +30,7 @@ public class ConceptServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new ConceptService(repository, mapper);
+        service = new ConceptService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

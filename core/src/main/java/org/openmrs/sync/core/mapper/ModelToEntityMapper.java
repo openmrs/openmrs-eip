@@ -1,23 +1,44 @@
 package org.openmrs.sync.core.mapper;
 
 import org.openmrs.sync.core.entity.BaseEntity;
-import org.openmrs.sync.core.entity.light.LightEntity;
 import org.openmrs.sync.core.model.BaseModel;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 @Component
-public class ModelToEntityMapper {
+public class ModelToEntityMapper<M extends BaseModel, E extends BaseEntity> implements Function<M, E> {
 
-    private List<LightServiceNoContext<? extends LightEntity>> services;
+    private Function<M, Context<E, M>> instantiateEntity;
 
-    public ModelToEntityMapper(final List<LightServiceNoContext<? extends LightEntity>> services) {
-        this.services = services;
+    private UnaryOperator<Context<E, M>> copyStandardFields;
+
+    private BiConsumer<Context<E, M>, String> linkLightEntity;
+
+    private BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute;
+
+    public ModelToEntityMapper(final Function<M, Context<E, M>> instantiateEntity,
+                               final UnaryOperator<Context<E, M>> copyStandardFields,
+                               final BiConsumer<Context<E, M>, String> linkLightEntity,
+                               final BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute) {
+        this.instantiateEntity = instantiateEntity;
+        this.copyStandardFields = copyStandardFields;
+        this.linkLightEntity = linkLightEntity;
+        this.forEachUuidAttribute = forEachUuidAttribute;
     }
 
-    public BaseEntity modelToEntity(final BaseModel model) {
-        return null;
+    @Override
+    public E apply(final M model) {
+        return instantiateEntity
+                .andThen(copyStandardFields)
+                .andThen(forEachUuidAttribute(linkLightEntity))
+                .apply(model);
+    }
+
+    private Function<Context<E, M>, E> forEachUuidAttribute(final BiConsumer<Context<E, M>, String> linkEntity) {
+        return context -> forEachUuidAttribute.apply(context, linkEntity);
     }
 }

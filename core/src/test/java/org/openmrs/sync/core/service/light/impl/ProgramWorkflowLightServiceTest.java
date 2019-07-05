@@ -9,9 +9,6 @@ import org.openmrs.sync.core.entity.light.ProgramLight;
 import org.openmrs.sync.core.entity.light.ProgramWorkflowLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 import org.openmrs.sync.core.service.light.LightService;
-import org.openmrs.sync.core.service.light.impl.context.ConceptContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramContext;
-import org.openmrs.sync.core.service.light.impl.context.ProgramWorkflowContext;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -25,10 +22,10 @@ public class ProgramWorkflowLightServiceTest {
     private OpenMrsRepository<ProgramWorkflowLight> repository;
 
     @Mock
-    private LightService<ConceptLight, ConceptContext> conceptService;
+    private LightService<ConceptLight> conceptService;
 
     @Mock
-    private LightService<ProgramLight, ProgramContext> programService;
+    private LightService<ProgramLight> programService;
 
     private ProgramWorkflowLightService service;
 
@@ -40,31 +37,14 @@ public class ProgramWorkflowLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        ProgramWorkflowContext programWorkflowContext = ProgramWorkflowContext.builder()
-                .conceptUuid("concept")
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .programUuid("program")
-                .programConceptUuid("programConcept")
-                .programConceptClassUuid("programConceptClass")
-                .programConceptDatatypeUuid("programConceptDatatype")
-                .build();
-        ConceptContext conceptContext = ConceptContext.builder()
-                .conceptClassUuid("conceptClass")
-                .conceptDatatypeUuid("conceptDatatype")
-                .build();
-        ProgramContext programContext = ProgramContext.builder()
-                .conceptUuid("programConcept")
-                .conceptClassUuid("programConceptClass")
-                .conceptDatatypeUuid("programConceptDatatype")
-                .build();
-        when(conceptService.getOrInit("concept", conceptContext)).thenReturn(getConcept());
-        when(programService.getOrInit("program", programContext)).thenReturn(getProgram());
+        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+        when(programService.getOrInitPlaceholderEntity()).thenReturn(getProgram());
+        String uuid = "uuid";
 
         // When
-        ProgramWorkflowLight result = service.getShadowEntity("UUID", programWorkflowContext);
+        ProgramWorkflowLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedProgramWorkflow(), result);
@@ -72,7 +52,6 @@ public class ProgramWorkflowLightServiceTest {
 
     private ProgramWorkflowLight getExpectedProgramWorkflow() {
         ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
-        programWorkflow.setUuid("UUID");
         programWorkflow.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         programWorkflow.setCreator(1L);
         programWorkflow.setConcept(getConcept());
@@ -82,13 +61,13 @@ public class ProgramWorkflowLightServiceTest {
 
     private ProgramLight getProgram() {
         ProgramLight program = new ProgramLight();
-        program.setUuid("program");
+        program.setUuid("PLACEHOLDER_PROGRAM");
         return program;
     }
 
     private ConceptLight getConcept() {
         ConceptLight concept = new ConceptLight();
-        concept.setUuid("concept");
+        concept.setUuid("PLACEHOLDER_CONCEPT");
         return concept;
     }
 }

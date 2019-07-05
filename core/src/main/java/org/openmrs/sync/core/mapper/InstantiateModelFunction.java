@@ -8,24 +8,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
-@Component
-public class InstantiateModelFunction implements Function<BaseEntity, Context> {
+@Component("instantiateModel")
+public class InstantiateModelFunction<E extends BaseEntity, M extends BaseModel> implements Function<E, Context> {
 
-    private MapperService mapperService;
+    private MapperService<E, M> mapperService;
 
-    public InstantiateModelFunction(final MapperService mapperService) {
+    public InstantiateModelFunction(final MapperService<E, M> mapperService) {
         this.mapperService = mapperService;
     }
 
     @Override
-    public Context apply(final BaseEntity entity) {
-        Class<? extends BaseModel> modelClass = mapperService.getCorrespondingModelClass(entity);
+    public Context<E, M> apply(final E entity) {
+        Class<M> modelClass = mapperService.getCorrespondingModelClass(entity);
         try {
-            BaseModel instanciatedModel = modelClass.newInstance();
-            return Context.builder()
-                    .entity(entity)
-                    .model(instanciatedModel)
-                    .build();
+            M instanciatedModel = modelClass.newInstance();
+            return new Context<>(entity, instanciatedModel, MappingDirectionEnum.ENTITY_TO_MODEL);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new OpenMrsSyncException("error while instantiating entity " + modelClass, e);
         }

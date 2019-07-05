@@ -27,11 +27,12 @@ public class OrderTypeLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
+        String uuid = "uuid";
 
         // When
-        OrderTypeLight result = service.getShadowEntity("UUID");
+        OrderTypeLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedCareSetting(), result);
@@ -39,7 +40,6 @@ public class OrderTypeLightServiceTest {
 
     private OrderTypeLight getExpectedCareSetting() {
         OrderTypeLight orderType = new OrderTypeLight();
-        orderType.setUuid("UUID");
         orderType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         orderType.setCreator(1L);
         orderType.setName("[Default]");

@@ -21,4 +21,16 @@ public class MapperServiceTest {
         // Then
         assertEquals(PersonModel.class, result);
     }
+
+    @Test
+    public void getCorrespondingEntityClass_should_return_entity_class() {
+        // Given
+        PersonModel person = new PersonModel();
+
+        // When
+        Class result = mapperService.getCorrespondingEntityClass(person);
+
+        // Then
+        assertEquals(Person.class, result);
+    }
 }

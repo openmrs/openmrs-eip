@@ -29,7 +29,7 @@ public final class JsonUtils {
         }
     }
 
-    public static Object unmarshal(final String json) {
+    public static TransferObject unmarshal(final String json) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             SimpleModule module = new SimpleModule();

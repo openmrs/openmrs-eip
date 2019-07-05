@@ -2,7 +2,6 @@ package org.openmrs.sync.core.service.light;
 
 import org.openmrs.sync.core.entity.light.MockedAttributeTypeLight;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
-import org.openmrs.sync.core.service.light.AbstractAttributeTypeLightService;
 
 public class MockedAttributeTypeLightService extends AbstractAttributeTypeLightService<MockedAttributeTypeLight> {
 
@@ -12,6 +11,6 @@ public class MockedAttributeTypeLightService extends AbstractAttributeTypeLightS
 
     @Override
     protected MockedAttributeTypeLight createEntity() {
-        return new MockedAttributeTypeLight(null, "uuid");
+        return new MockedAttributeTypeLight(null, null);
     }
 }

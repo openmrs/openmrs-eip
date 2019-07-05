@@ -5,7 +5,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.VisitAttribute;
-import org.openmrs.sync.core.mapper.EntityMapper;
+import org.openmrs.sync.core.mapper.EntityToModelMapper;
+import org.openmrs.sync.core.mapper.ModelToEntityMapper;
+import org.openmrs.sync.core.model.AttributeModel;
 import org.openmrs.sync.core.model.VisitAttributeModel;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
@@ -18,7 +20,10 @@ public class VisitAttributeServiceTest {
     private SyncEntityRepository<VisitAttribute> repository;
 
     @Mock
-    private EntityMapper<VisitAttribute, VisitAttributeModel> mapper;
+    private EntityToModelMapper<VisitAttribute, VisitAttributeModel> entityToModelMapper;
+
+    @Mock
+    private ModelToEntityMapper<VisitAttributeModel, VisitAttribute> modelToEntityMapper;
 
     private VisitAttributeService service;
 
@@ -26,7 +31,7 @@ public class VisitAttributeServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new VisitAttributeService(repository, mapper);
+        service = new VisitAttributeService(repository, entityToModelMapper, modelToEntityMapper);
     }
 
     @Test

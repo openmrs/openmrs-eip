@@ -7,8 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.entity.light.PatientLight;
 import org.openmrs.sync.core.entity.light.VisitLight;
 import org.openmrs.sync.core.entity.light.VisitTypeLight;
-import org.openmrs.sync.core.service.light.LightServiceNoContext;
-import org.openmrs.sync.core.service.light.impl.context.VisitContext;
+import org.openmrs.sync.core.service.light.LightService;
 import org.openmrs.sync.core.repository.OpenMrsRepository;
 
 import java.time.LocalDateTime;
@@ -23,10 +22,10 @@ public class VisitLightServiceTest {
     private OpenMrsRepository<VisitLight> repository;
 
     @Mock
-    private LightServiceNoContext<PatientLight> patientService;
+    private LightService<PatientLight> patientService;
 
     @Mock
-    private LightServiceNoContext<VisitTypeLight> visitTypeService;
+    private LightService<VisitTypeLight> visitTypeService;
 
     private VisitLightService service;
 
@@ -38,17 +37,14 @@ public class VisitLightServiceTest {
     }
 
     @Test
-    public void getShadowEntity() {
+    public void createPlaceholderEntity() {
         // Given
-        VisitContext context = VisitContext.builder()
-                .patientUuid("patient")
-                .visitTypeUuid("visitType")
-                .build();
-        when(patientService.getOrInit("patient")).thenReturn(getPatient());
-        when(visitTypeService.getOrInit("visitType")).thenReturn(getVisitType());
+        when(patientService.getOrInitPlaceholderEntity()).thenReturn(getPatient());
+        when(visitTypeService.getOrInitPlaceholderEntity()).thenReturn(getVisitType());
+        String uuid = "uuid";
 
         // When
-        VisitLight result = service.getShadowEntity("UUID", context);
+        VisitLight result = service.createPlaceholderEntity(uuid);
 
         // Then
         assertEquals(getExpectedVisit(), result);
@@ -56,7 +52,6 @@ public class VisitLightServiceTest {
 
     private VisitLight getExpectedVisit() {
         VisitLight visit = new VisitLight();
-        visit.setUuid("UUID");
         visit.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         visit.setCreator(1L);
         visit.setDateStarted(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
@@ -67,13 +62,13 @@ public class VisitLightServiceTest {
 
     private VisitTypeLight getVisitType() {
         VisitTypeLight visitType = new VisitTypeLight();
-        visitType.setUuid("visitType");
+        visitType.setUuid("PLACEHOLDER_VISIT_TYPE");
         return visitType;
     }
 
     private PatientLight getPatient() {
         PatientLight patient = new PatientLight();
-        patient.setUuid("patient");
+        patient.setUuid("PLACEHOLDER_PATIENT");
         return patient;
     }
 }
