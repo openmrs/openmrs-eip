@@ -11,6 +11,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "concept")
 @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
+@AttributeOverride(name = "voided", column = @Column(name = "retired"))
+@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
+@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
 public class ConceptLight extends LightEntity {
 
     @NotNull

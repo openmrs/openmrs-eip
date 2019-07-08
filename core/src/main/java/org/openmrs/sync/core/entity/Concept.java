@@ -13,7 +13,11 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "concept")
 @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
-public class Concept extends MetaDataEntity {
+@AttributeOverride(name = "voided", column = @Column(name = "retired"))
+@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
+@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
+@AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
+public class Concept extends AuditableEntity {
 
     @NotNull
     @ManyToOne

@@ -7,6 +7,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
@@ -100,6 +103,11 @@ public class AbstractLightServiceTest {
     }
 
     private MockedLightEntity getExpectedEntity(final String uuid) {
-        return new MockedLightEntity(1L, uuid);
+        MockedLightEntity mockedLightEntity = new MockedLightEntity(1L, uuid);
+        mockedLightEntity.setVoided(true);
+        mockedLightEntity.setVoidReason("placeholder");
+        mockedLightEntity.setDateVoided(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+        mockedLightEntity.setVoidedBy(1L);
+        return mockedLightEntity;
     }
 }

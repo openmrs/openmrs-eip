@@ -21,6 +21,18 @@ public abstract class LightEntity extends BaseEntity {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
+    @Column(name = "voided")
+    private boolean voided;
+
+    @Column(name = "void_reason")
+    private String voidReason;
+
+    @Column(name = "date_voided")
+    private LocalDateTime dateVoided;
+
+    @Column(name = "voided_by")
+    private Long voidedBy;
+
     @Override
     public boolean wasModifiedAfter(final BaseEntity model) {
         return false;

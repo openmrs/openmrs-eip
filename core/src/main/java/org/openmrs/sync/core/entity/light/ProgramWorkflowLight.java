@@ -11,6 +11,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "program_workflow")
 @AttributeOverride(name = "id", column = @Column(name = "program_workflow_id"))
+@AttributeOverride(name = "voided", column = @Column(name = "retired"))
+@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
+@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
 public class ProgramWorkflowLight extends LightEntity {
 
     @NotNull

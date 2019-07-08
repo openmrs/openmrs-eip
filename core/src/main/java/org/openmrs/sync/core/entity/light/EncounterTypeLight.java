@@ -13,6 +13,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "encounter_type")
 @AttributeOverride(name = "id", column = @Column(name = "encounter_type_id"))
+@AttributeOverride(name = "voided", column = @Column(name = "retired"))
+@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
+@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
 public class EncounterTypeLight extends LightEntity {
 
     @Column(name = "name")

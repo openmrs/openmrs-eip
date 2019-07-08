@@ -61,10 +61,18 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
             entity = createPlaceholderEntity(uuid);
 
             entity.setUuid(uuid);
+            voidPlaceholder(entity);
 
             entity = repository.save(entity);
         }
 
         return entity;
+    }
+
+    private void voidPlaceholder(final E entity) {
+        entity.setVoided(true);
+        entity.setVoidReason("placeholder");
+        entity.setDateVoided(DEFAULT_DATE);
+        entity.setVoidedBy(DEFAULT_USER_ID);
     }
 }
