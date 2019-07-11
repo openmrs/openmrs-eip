@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @AttributeOverride(name = "voided", column = @Column(name = "retired"))
 @AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
 @AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
+@AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
 public class ProgramLight extends LightEntity {
 
     @NotNull
