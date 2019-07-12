@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "form")
 @AttributeOverride(name = "id", column = @Column(name = "form_id"))
 @AttributeOverride(name = "voided", column = @Column(name = "retired"))
-@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
+@AttributeOverride(name = "voidReason", column = @Column(name = "retired_reason"))
 @AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
 @AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
 public class FormLight extends LightEntity {

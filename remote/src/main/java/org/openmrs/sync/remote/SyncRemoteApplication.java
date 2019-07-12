@@ -1,6 +1,7 @@
 package org.openmrs.sync.remote;
 
 import org.apache.camel.CamelContext;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.sync.core.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.remote.management.init.impl.ManagementDbInit;
 import org.springframework.boot.SpringApplication;
@@ -8,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
+import java.security.Security;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
@@ -41,5 +43,10 @@ public class SyncRemoteApplication {
     @PostConstruct
     private void addTypeConverter() {
         camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class, new StringToLocalDateTimeConverter());
+    }
+
+    @PostConstruct
+    private void addBCProvider() {
+        Security.addProvider(new BouncyCastleProvider());
     }
 }

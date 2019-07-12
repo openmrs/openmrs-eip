@@ -29,7 +29,8 @@ import java.util.Map;
 @ComponentScan({
         "org.openmrs.sync.core.service",
         "org.openmrs.sync.core.mapper",
-        "org.openmrs.sync.core.camel"
+        "org.openmrs.sync.core.camel",
+        "org.openmrs.sync.core.encryption"
 })
 public class TestConfig implements DataSourceConfig {
 
@@ -44,6 +45,18 @@ public class TestConfig implements DataSourceConfig {
     @Override
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "pgp.receiver")
+    public ReceiverEncryptionProperties receiverEncryptionProperties() {
+        return new ReceiverEncryptionProperties();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "pgp.sender")
+    public SenderEncryptionProperties senderProperties() {
+        return new SenderEncryptionProperties();
     }
 
     @Bean

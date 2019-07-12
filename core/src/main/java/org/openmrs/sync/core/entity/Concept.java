@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "concept")
+@AttributeOverride(name = "id", column = @Column(name = "concept_id"))
 public class Concept extends MetaDataEntity {
 
     @NotNull

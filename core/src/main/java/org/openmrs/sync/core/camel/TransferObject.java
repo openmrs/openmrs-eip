@@ -15,5 +15,7 @@ public class TransferObject {
 
     private TableToSyncEnum tableToSync;
 
+    private String signatureUserId;
+
     private BaseModel model;
 }

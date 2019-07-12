@@ -20,6 +20,17 @@
         <jsonassert.version>1.5.0</jsonassert.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>bintray</id>
+            <name>bintray</name>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>http://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,6 +74,15 @@
             <artifactId>camel-spring</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>name.neuhalfen.projects.crypto.bouncycastle.openpgp</groupId>
+            <artifactId>bouncy-gpg</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
@@ -77,6 +97,11 @@
             <artifactId>jsonassert</artifactId>
             <version>${jsonassert.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

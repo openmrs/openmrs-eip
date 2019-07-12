@@ -1,11 +1,14 @@
 package org.openmrs.sync.core.camel.extract;
 
 import org.apache.camel.Exchange;
+import org.bouncycastle.openpgp.PGPException;
 import org.json.JSONException;
 import org.junit.Test;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import java.io.IOException;
+import java.security.NoSuchProviderException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,9 +32,9 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
         // Then
         List<Exchange> result = resultEndpoint.getExchanges();
         assertEquals(1, result.size());
-        List<String> jsons = (List<String>) result.get(0).getIn().getBody();
-        assertEquals(1, jsons.size());
-        JSONAssert.assertEquals(getExpectedJson(), jsons.get(0), false);
+        assertEquals("openmrs-remote@icrc.org", result.get(0).getIn().getHeader("pgp.key.userId"));
+        String json = pgpDecryptService.verifyAndDecrypt((String) result.get(0).getIn().getBody(), "openmrs-remote@icrc.org");
+        JSONAssert.assertEquals(getExpectedJson(), json, false);
     }
 
     private String getExpectedJson() {

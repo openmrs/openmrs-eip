@@ -5,16 +5,20 @@ import lombok.Data;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openmrs.sync.core.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.core.camel.extract.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.core.config.TestConfig;
+import org.openmrs.sync.core.service.security.PGPDecryptService;
+import org.openmrs.sync.core.service.security.PGPEncryptService;
 import org.openmrs.sync.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.security.Security;
 import java.time.LocalDateTime;
 
 @RunWith(SpringRunner.class)
@@ -31,10 +35,18 @@ public abstract class OpenMrsExtractEndpointITest {
     protected ProducerTemplate template;
 
     @Autowired
+    protected PGPDecryptService pgpDecryptService;
+
+    @Autowired
     private FetchModelsRuleEngine ruleEngine;
+
+    @Autowired
+    private PGPEncryptService pgpEncryptService;
 
     @Before
     public void init() throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+
         camelContext.addComponent("openmrsExtract", new OpenMrsExtractComponent(camelContext, ruleEngine));
         camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class, new StringToLocalDateTimeConverter());
         camelContext.addRoutes(createRouteBuilder());
@@ -46,6 +58,9 @@ public abstract class OpenMrsExtractEndpointITest {
             public void configure() throws Exception {
                 from("direct:startExtract")
                         .recipientList(simple("openmrsExtract:${body.getTableToSync()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
+                        .split(body()).streaming()
+                        .process(pgpEncryptService)
+                        .to("log:json")
                         .to("mock:result");
             }
         };
