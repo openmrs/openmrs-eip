@@ -60,7 +60,7 @@ public final class FileUtils {
     private static List<Path> listKeysFromFolder(final String folderPath,
                                                  final String suffix) throws IOException {
         try(Stream<Path> paths =
-                    Files.find(Paths.get(folderPath), 1,
+                    Files.find(new File(System.getProperty("user.dir") + folderPath).toPath(), 1,
                             (path, attr) -> attr.isRegularFile() && path.getFileName().toString().endsWith(suffix))
         ) {
             return paths.collect(Collectors.toList());
