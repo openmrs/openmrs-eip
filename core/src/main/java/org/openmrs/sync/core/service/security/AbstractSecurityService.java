@@ -14,12 +14,22 @@ import java.io.UnsupportedEncodingException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * IMPORTANT. All classes implementing this abstract class should be singletons
+ */
 public abstract class AbstractSecurityService {
 
-    protected static final String HEADER_USER_ID = "pgp.key.userId";
+    protected static final String HEADER_USER_ID = "pgp_key_userId";
 
     private InMemoryKeyring keyRing;
 
+    /**
+     * Returns the key ring containing all the keys registered in the keysFolderPath of the encryption
+     * properties.n
+     * Should remain in memory. The keyring is initiated on first call
+     * @param props the encryption properties
+     * @return the key ring object
+     */
     protected InMemoryKeyring getKeyRing(final EncryptionProperties props) {
         if (keyRing == null) {
             initKeyRing(props);
@@ -31,9 +41,9 @@ public abstract class AbstractSecurityService {
         try {
             keyRing = KeyringConfigs.forGpgExportedKeys(KeyringConfigCallbacks.withPassword(props.getPassword()));
 
-            FileUtils.getPublicKeysFromFolder(props.getKeysFolder()).forEach(this::addPublicKey);
+            FileUtils.getPublicKeysFromFolder(props.getKeysFolderPath()).forEach(this::addPublicKey);
 
-            keyRing.addSecretKey(FileUtils.getPrivateKeysFromFolder(props.getKeysFolder()));
+            keyRing.addSecretKey(FileUtils.getPrivateKeysFromFolder(props.getKeysFolderPath()));
         } catch (IOException | PGPException e) {
             throw new OpenMrsSyncException("Error while initiating key ring", e);
         }

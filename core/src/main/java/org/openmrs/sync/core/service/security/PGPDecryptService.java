@@ -16,6 +16,9 @@ import java.security.NoSuchProviderException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * The service to decrypt incoming messages
+ */
 @Service
 public class PGPDecryptService extends AbstractSecurityService implements Processor {
 
@@ -25,8 +28,15 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
         this.props = props;
     }
 
+    /**
+     * Verifies the signature and decrypts the message in parameter with the public key
+     * corresponding to the given userId
+     * @param encryptedMessage the message to decrypt
+     * @param senderUserId the userId of the
+     * @return the encrypted message
+     */
     public String verifyAndDecrypt(final String encryptedMessage,
-                                   final String userId) {
+                                   final String senderUserId) {
 
         InMemoryKeyring keyRing = getKeyRing(props);
 
@@ -36,7 +46,7 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
                 InputStream bouncyGPGInputStream = BouncyGPG
                         .decryptAndVerifyStream()
                         .withConfig(keyRing)
-                        .andRequireSignatureFromAllKeys(userId)
+                        .andRequireSignatureFromAllKeys(senderUserId)
                         .fromEncryptedInputStream(IOUtils.toInputStream(encryptedMessage, UTF_8))
         ) {
             Streams.pipeAll(bouncyGPGInputStream, bufferedOutputStream);
@@ -46,8 +56,14 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
         return toString(unencryptedOutputStream);
     }
 
+    /**
+     * Verifies and decrypts the message and puts it in the body with the senders
+     * public key userId from the header
+     * to know with which public key to decrypt the message
+     * @param exchange the Camel exchange object
+     */
     @Override
-    public void process(final Exchange exchange) throws Exception {
+    public void process(final Exchange exchange) {
         String userId = (String) exchange.getIn().getHeader(HEADER_USER_ID);
         exchange.getIn().setBody(verifyAndDecrypt((String) exchange.getIn().getBody(), userId));
     }

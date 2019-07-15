@@ -17,7 +17,7 @@ public class CamelConf {
 
     @Bean
     @ConfigurationProperties(prefix = "pgp.receiver")
-    public ReceiverEncryptionProperties receiverEncryptionProperties() {
+    public ReceiverEncryptionProperties receiverProperties() {
         return new ReceiverEncryptionProperties();
     }
 }

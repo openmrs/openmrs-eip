@@ -32,7 +32,7 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
         // Then
         List<Exchange> result = resultEndpoint.getExchanges();
         assertEquals(1, result.size());
-        assertEquals("openmrs-remote@icrc.org", result.get(0).getIn().getHeader("pgp.key.userId"));
+        assertEquals("openmrs-remote@icrc.org", result.get(0).getIn().getHeader("pgp_key_userId"));
         String json = pgpDecryptService.verifyAndDecrypt((String) result.get(0).getIn().getBody(), "openmrs-remote@icrc.org");
         JSONAssert.assertEquals(getExpectedJson(), json, false);
     }

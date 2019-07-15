@@ -5,7 +5,6 @@ import org.openmrs.sync.core.exception.OpenMrsSyncException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,6 +18,13 @@ public final class FileUtils {
 
     private FileUtils() {}
 
+    /**
+     * Get the private key from the folder with the path in parameter
+     * returns an exception if the number of private keys is diferrent than 1
+     * @param folderPath the path to the folder
+     * @return a file as byte array
+     * @throws IOException
+     */
     public static byte[] getPrivateKeysFromFolder(final String folderPath) throws IOException {
         List<Path> paths = listKeysFromFolder(folderPath, PRIVATE_KEY_SUFFIX);
 
@@ -31,6 +37,12 @@ public final class FileUtils {
                 .orElseThrow(() -> new OpenMrsSyncException("No private key found"));
     }
 
+    /**
+     * Get all the public keys from the folder with the path in parameter
+     * @param folderPath the path to the folder
+     * @return a list of Files as byte arrays
+     * @throws IOException
+     */
     public static List<byte[]> getPublicKeysFromFolder(final String folderPath) throws IOException {
         return listKeysFromFolder(folderPath, PUBLIC_KEY_SUFFIX).stream()
                 .map(FileUtils::extractKeyFromFile)
@@ -59,9 +71,15 @@ public final class FileUtils {
 
     private static List<Path> listKeysFromFolder(final String folderPath,
                                                  final String suffix) throws IOException {
-        try(Stream<Path> paths =
-                    Files.find(new File(System.getProperty("user.dir") + folderPath).toPath(), 1,
-                            (path, attr) -> attr.isRegularFile() && path.getFileName().toString().endsWith(suffix))
+        String path;
+        if (folderPath.startsWith("file:")) {
+            path = folderPath.replace("file:", "");
+        } else {
+            path = System.getProperty("user.dir") + folderPath;
+        }
+        try (Stream<Path> paths =
+                     Files.find(new File(path).toPath(), 1,
+                             (p, attr) -> attr.isRegularFile() && p.getFileName().toString().endsWith(suffix))
         ) {
             return paths.collect(Collectors.toList());
         }
