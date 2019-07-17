@@ -24,6 +24,8 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
 
     private ReceiverEncryptionProperties props;
 
+    private static final String LINE_SEPARATOR_REGEX = "\r\n|\r|\n";
+
     public PGPDecryptService(final ReceiverEncryptionProperties props) {
         this.props = props;
     }
@@ -57,7 +59,7 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
     }
 
     private String extractSenderUserId(final String encryptedMessage) {
-        String[] splittedString = encryptedMessage.split(System.getProperty("line.separator"), 2);
+        String[] splittedString = encryptedMessage.split(LINE_SEPARATOR_REGEX, 2);
 
         if (!splittedString[0].startsWith(HEADER_USER_KEY_PROP)) {
             throw new OpenMrsSyncException("Message should start with 'sender:'");
