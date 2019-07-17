@@ -2,7 +2,6 @@ package org.openmrs.sync.core.camel.load;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
-import org.bouncycastle.openpgp.PGPException;
 import org.junit.After;
 import org.junit.Test;
 import org.openmrs.sync.core.entity.Person;
@@ -10,11 +9,6 @@ import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.security.PGPEncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,8 +24,7 @@ public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
     public void load() {
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setHeader("pgp_key_userId", "openmrs-remote@icrc.org");
-        exchange.getIn().setBody(pgpEncryptService.encryptAndSign(getPersonJson()));
+        exchange.getIn().setBody("sender:openmrs-remote@icrc.org\n" + pgpEncryptService.encryptAndSign(getPersonJson()));
 
         // When
         template.send(exchange);

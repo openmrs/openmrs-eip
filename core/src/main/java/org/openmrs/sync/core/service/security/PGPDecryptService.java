@@ -32,11 +32,11 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
      * Verifies the signature and decrypts the message in parameter with the public key
      * corresponding to the given userId
      * @param encryptedMessage the message to decrypt
-     * @param senderUserId the userId of the
      * @return the encrypted message
      */
-    public String verifyAndDecrypt(final String encryptedMessage,
-                                   final String senderUserId) {
+    public String verifyAndDecrypt(final String encryptedMessage) {
+
+        String senderUserId = extractSenderUserId(encryptedMessage);
 
         InMemoryKeyring keyRing = getKeyRing(props);
 
@@ -56,6 +56,16 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
         return toString(unencryptedOutputStream);
     }
 
+    private String extractSenderUserId(final String encryptedMessage) {
+        String[] splittedString = encryptedMessage.split(System.getProperty("line.separator"), 2);
+
+        if (!splittedString[0].startsWith(HEADER_USER_KEY_PROP)) {
+            throw new OpenMrsSyncException("Message should start with 'sender:'");
+        }
+
+        return splittedString[0].replace(HEADER_USER_KEY_PROP, "");
+    }
+
     /**
      * Verifies and decrypts the message and puts it in the body with the senders
      * public key userId from the header
@@ -64,7 +74,6 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
      */
     @Override
     public void process(final Exchange exchange) {
-        String userId = (String) exchange.getIn().getHeader(HEADER_USER_ID);
-        exchange.getIn().setBody(verifyAndDecrypt((String) exchange.getIn().getBody(), userId));
+        exchange.getIn().setBody(verifyAndDecrypt((String) exchange.getIn().getBody()));
     }
 }

@@ -61,7 +61,8 @@ public class PGPEncryptService extends AbstractSecurityService implements Proces
      */
     @Override
     public void process(final Exchange exchange) {
-        exchange.getIn().setHeader(HEADER_USER_ID, props.getUserId());
-        exchange.getIn().setBody(encryptAndSign((String) exchange.getIn().getBody()));
+        String body = HEADER_USER_KEY_PROP + props.getUserId() + "\n";
+        body += encryptAndSign((String) exchange.getIn().getBody());
+        exchange.getIn().setBody(body);
     }
 }

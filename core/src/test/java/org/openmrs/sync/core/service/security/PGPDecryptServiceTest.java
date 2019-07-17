@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.sync.core.config.ReceiverEncryptionProperties;
 import org.openmrs.sync.core.config.SenderEncryptionProperties;
+import org.openmrs.sync.core.exception.OpenMrsSyncException;
 
 import java.io.IOException;
 import java.security.Security;
@@ -42,10 +43,10 @@ public class PGPDecryptServiceTest {
         pgpDecryptService = new PGPDecryptService(receiverProps);
 
         String toEncrypt = "message to encrypt";
-        String encryptedMessage = pgpEncryptService.encryptAndSign(toEncrypt);
+        String encryptedMessage = "sender:test-sender@icrc.org\n" + pgpEncryptService.encryptAndSign(toEncrypt);
 
         // When
-        String result = pgpDecryptService.verifyAndDecrypt(encryptedMessage, "test-sender@icrc.org");
+        String result = pgpDecryptService.verifyAndDecrypt(encryptedMessage);
 
         // Then
         assertNotNull(result);
@@ -61,11 +62,11 @@ public class PGPDecryptServiceTest {
         pgpDecryptService = new PGPDecryptService(receiverProps);
 
         String toEncrypt = "message to encrypt";
-        String encryptedMessage = pgpEncryptService.encryptAndSign(toEncrypt);
+        String encryptedMessage = "sender:test-sender@icrc.org\n" + pgpEncryptService.encryptAndSign(toEncrypt);
 
         // When
         try {
-            pgpDecryptService.verifyAndDecrypt(encryptedMessage, "test-sender@icrc.org");
+            pgpDecryptService.verifyAndDecrypt(encryptedMessage);
 
             fail();
         } catch (Exception e) {
@@ -75,6 +76,28 @@ public class PGPDecryptServiceTest {
         }
     }
 
+    @Test
+    public void verifyAndDecrypt_should_throw_exception_if_no_header() {
+        // Given
+        ReceiverEncryptionProperties receiverProps = new ReceiverEncryptionProperties();
+        receiverProps.setKeysFolderPath("/src/test/resources/keys/receiver");
+        receiverProps.setPassword("wrongpassword");
+        pgpDecryptService = new PGPDecryptService(receiverProps);
+
+        String toEncrypt = "message to encrypt";
+        String encryptedMessage = pgpEncryptService.encryptAndSign(toEncrypt);
+
+        // When
+        try {
+            pgpDecryptService.verifyAndDecrypt(encryptedMessage);
+
+            fail();
+        } catch (Exception e) {
+            // Then
+            assertTrue(e instanceof OpenMrsSyncException);
+            assertEquals("Message should start with 'sender:'", e.getMessage());
+        }
+    }
 
     @Test
     public void process_should_put_decrypted_string_in_body() {
@@ -86,8 +109,7 @@ public class PGPDecryptServiceTest {
 
         String toEncrypt = "message to encrypt";
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader("pgp_key_userId", "test-sender@icrc.org");
-        exchange.getIn().setBody(pgpEncryptService.encryptAndSign(toEncrypt));
+        exchange.getIn().setBody("sender:test-sender@icrc.org\n" + pgpEncryptService.encryptAndSign(toEncrypt));
 
         // When
         pgpDecryptService.process(exchange);

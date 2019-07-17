@@ -49,7 +49,7 @@ public class PGPEncryptServiceTest {
         // Then
         assertNotNull(result);
         assertNotEquals(toEncrypt, result);
-        assertEquals(toEncrypt, pgpDecryptService.verifyAndDecrypt(result, "test-sender@icrc.org"));
+        assertEquals(toEncrypt, pgpDecryptService.verifyAndDecrypt("sender:test-sender@icrc.org\n" + result));
     }
 
     @Test
@@ -98,6 +98,6 @@ public class PGPEncryptServiceTest {
         // Then
         assertNotNull(exchange.getIn().getBody());
         assertNotEquals(toEncrypt, exchange.getIn().getBody());
-        assertEquals(toEncrypt, pgpDecryptService.verifyAndDecrypt((String) exchange.getIn().getBody(), "test-sender@icrc.org"));
+        assertEquals(toEncrypt, pgpDecryptService.verifyAndDecrypt((String) exchange.getIn().getBody()));
     }
 }

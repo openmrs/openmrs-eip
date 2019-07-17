@@ -21,7 +21,7 @@ public class OpenMrsLoadProducer extends DefaultProducer {
     public void process(final Exchange exchange) {
         String json = (String) exchange.getIn().getBody();
 
-        TransferObject to = (TransferObject) JsonUtils.unmarshal(json);
+        TransferObject to = JsonUtils.unmarshal(json);
 
         entityServiceFacade.saveModel(to.getTableToSync(), to.getModel());
     }

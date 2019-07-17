@@ -18,6 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <hibernate.validator.version>6.0.16.Final</hibernate.validator.version>
         <jsonassert.version>1.5.0</jsonassert.version>
+        <bouncy-gpg.version>2.0.1</bouncy-gpg.version>
     </properties>
 
     <repositories>
@@ -80,7 +81,7 @@
         <dependency>
             <groupId>name.neuhalfen.projects.crypto.bouncycastle.openpgp</groupId>
             <artifactId>bouncy-gpg</artifactId>
-            <version>2.0.1</version>
+            <version>${bouncy-gpg.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

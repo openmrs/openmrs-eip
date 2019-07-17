@@ -19,7 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public abstract class AbstractSecurityService {
 
-    protected static final String HEADER_USER_ID = "pgp_key_userId";
+    protected static final String HEADER_USER_KEY_PROP = "sender:";
 
     private InMemoryKeyring keyRing;
 
