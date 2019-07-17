@@ -16,9 +16,11 @@ public class WriteRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-        from("{{input.queue}}")
+        //from("{{input.queue}}")
+        from("file:/home/sco/Desktop/temp")
+                .convertBodyTo(String.class)
                 .to("log:tut")
-                .process(pgpDecryptService)
+                //.process(pgpDecryptService)
                 .to("openmrsLoad");
     }
 }

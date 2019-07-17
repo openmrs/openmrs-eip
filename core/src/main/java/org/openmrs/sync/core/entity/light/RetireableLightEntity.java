@@ -3,29 +3,26 @@ package org.openmrs.sync.core.entity.light;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "program_workflow")
-@AttributeOverride(name = "id", column = @Column(name = "program_workflow_id"))
-public class ProgramWorkflowLight extends LightEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "program_id")
-    private ProgramLight program;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "concept_id")
-    private ConceptLight concept;
+@MappedSuperclass
+public abstract class RetireableLightEntity extends LightEntity {
 
     @Column(name = "retired")
     private boolean retired;
+
+    @Column(name = "retire_reason")
+    private String retireReason;
+
+    @Column(name = "date_retired")
+    private LocalDateTime dateRetired;
+
+    @Column(name = "retired_by")
+    private Long retiredBy;
 
     @Override
     public void setMuted(final boolean muted) {
@@ -34,16 +31,16 @@ public class ProgramWorkflowLight extends LightEntity {
 
     @Override
     public void setDateMuted(final LocalDateTime dateMuted) {
-        // Not applicable
+        this.dateRetired = dateMuted;
     }
 
     @Override
     public void setMuteReason(final String muteReason) {
-        // Not applicable
+        this.retireReason = muteReason;
     }
 
     @Override
     public void setMutedBy(final Long mutedBy) {
-        // Not applicable
+        this.retiredBy = mutedBy;
     }
 }

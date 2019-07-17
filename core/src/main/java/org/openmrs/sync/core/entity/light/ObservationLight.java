@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "obs")
 @AttributeOverride(name = "id", column = @Column(name = "obs_id"))
-public class ObservationLight extends LightEntity {
+public class ObservationLight extends VoidableLightEntity {
 
     @NotNull
     @Column(name = "obs_datetime")

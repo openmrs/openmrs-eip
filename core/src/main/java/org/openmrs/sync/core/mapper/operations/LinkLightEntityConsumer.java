@@ -32,7 +32,7 @@ public class LinkLightEntityConsumer<E extends BaseEntity, M extends BaseModel> 
         String entityAttributeName = getEntityAttributeName(modelAttributeName);
 
         if (!context.getEntityBeanWrapper().isReadableProperty(entityAttributeName)) {
-            log.error("No getter exists for attribute " + entityAttributeName + " in class " + context.getEntity().getClass() + ". " +
+            log.warn("No getter exists for attribute " + entityAttributeName + " in class " + context.getEntity().getClass() + ". " +
                     "The attribute will be ignored");
             return;
         }

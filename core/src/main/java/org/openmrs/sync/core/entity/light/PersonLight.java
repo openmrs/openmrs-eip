@@ -11,5 +11,5 @@ import javax.persistence.*;
 @Table(name = "person")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_id"))
-public class PersonLight extends LightEntity {
+public class PersonLight extends VoidableLightEntity {
 }

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "orders")
 @AttributeOverride(name = "id", column = @Column(name = "order_id"))
-public class OrderLight extends LightEntity {
+public class OrderLight extends VoidableLightEntity {
 
     @NotNull
     @ManyToOne

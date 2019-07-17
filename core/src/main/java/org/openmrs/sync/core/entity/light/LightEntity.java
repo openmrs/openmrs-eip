@@ -21,17 +21,13 @@ public abstract class LightEntity extends BaseEntity {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
-    @Column(name = "voided")
-    private boolean voided;
+    public abstract void setMuted(boolean mute);
 
-    @Column(name = "void_reason")
-    private String voidReason;
+    public abstract void setDateMuted(LocalDateTime dateMuted);
 
-    @Column(name = "date_voided")
-    private LocalDateTime dateVoided;
+    public abstract void setMuteReason(String muteReason);
 
-    @Column(name = "voided_by")
-    private Long voidedBy;
+    public abstract void setMutedBy(Long mutedBy);
 
     @Override
     public boolean wasModifiedAfter(final BaseEntity model) {

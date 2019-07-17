@@ -5,16 +5,13 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "program")
 @AttributeOverride(name = "id", column = @Column(name = "program_id"))
-@AttributeOverride(name = "voided", column = @Column(name = "retired"))
-@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
-@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
-@AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
 public class ProgramLight extends LightEntity {
 
     @NotNull
@@ -25,4 +22,27 @@ public class ProgramLight extends LightEntity {
     @ManyToOne
     @JoinColumn(name = "concept_id")
     private ConceptLight concept;
+
+    @Column(name = "retired")
+    private boolean retired;
+
+    @Override
+    public void setMuted(final boolean muted) {
+        this.retired = muted;
+    }
+
+    @Override
+    public void setDateMuted(final LocalDateTime dateMuted) {
+        // Not applicable
+    }
+
+    @Override
+    public void setMuteReason(final String muteReason) {
+        // Not applicable
+    }
+
+    @Override
+    public void setMutedBy(final Long mutedBy) {
+        // Not applicable
+    }
 }

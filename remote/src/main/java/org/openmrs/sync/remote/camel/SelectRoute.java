@@ -22,9 +22,10 @@ public class SelectRoute extends RouteBuilder {
         from("seda:sync")
                 .recipientList(simple("openmrsExtract:${body.getTableToSync().name()}?lastSyncDate=${body.getLastSyncDateAsString()}"))
                 .split(body()).streaming()
-                        .process(pgpEncryptService)
+                        //.process(pgpEncryptService)
                         .to("log:row")
-                        .to("{{output.queue}}")
+                        .to("file:/home/sco/Desktop/temp")
+                        //.to("{{output.queue}}")
                 .end()
                 .process(saveTableSyncStatusProcessor);
 

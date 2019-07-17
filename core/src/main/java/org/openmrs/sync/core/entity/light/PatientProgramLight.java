@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "patient_program")
 @AttributeOverride(name = "id", column = @Column(name = "patient_program_id"))
-public class PatientProgramLight extends LightEntity {
+public class PatientProgramLight extends VoidableLightEntity {
 
     @NotNull
     @ManyToOne

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
-public abstract class AttributeTypeLight extends LightEntity {
+public abstract class AttributeTypeLight extends VoidableLightEntity {
 
     @NotNull
     @Column(name = "name")

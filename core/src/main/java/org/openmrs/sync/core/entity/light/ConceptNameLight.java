@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "concept_name")
 @AttributeOverride(name = "id", column = @Column(name = "concept_name_id"))
-public class ConceptNameLight extends LightEntity {
+public class ConceptNameLight extends VoidableLightEntity {
 
     @NotNull
     @Column(name = "name")

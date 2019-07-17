@@ -11,11 +11,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "drug")
 @AttributeOverride(name = "id", column = @Column(name = "drug_id"))
-@AttributeOverride(name = "voided", column = @Column(name = "retired"))
-@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
-@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
-@AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
-public class DrugLight extends LightEntity {
+public class DrugLight extends RetireableLightEntity {
 
     @NotNull
     @ManyToOne

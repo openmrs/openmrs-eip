@@ -14,11 +14,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "order_type")
 @AttributeOverride(name = "id", column = @Column(name = "order_type_id"))
-@AttributeOverride(name = "voided", column = @Column(name = "retired"))
-@AttributeOverride(name = "voidReason", column = @Column(name = "retire_reason"))
-@AttributeOverride(name = "dateVoided", column = @Column(name = "date_retired"))
-@AttributeOverride(name = "voidedBy", column = @Column(name = "retired_by"))
-public class OrderTypeLight extends LightEntity {
+public class OrderTypeLight extends RetireableLightEntity {
 
     @NotNull
     @Column(name = "name")
