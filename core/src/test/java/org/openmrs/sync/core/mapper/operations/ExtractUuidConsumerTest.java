@@ -29,7 +29,7 @@ public class ExtractUuidConsumerTest {
 
         // Then
         assertNotNull(context);
-        assertEquals("uuid2", context.getModel().getLinkedEntityUuid());
+        assertEquals(MockedLightEntity.class.getName() + "(uuid2)", context.getModel().getLinkedEntityUuid());
     }
 
     @Test

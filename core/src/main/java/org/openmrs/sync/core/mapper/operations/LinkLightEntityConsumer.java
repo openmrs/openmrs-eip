@@ -2,6 +2,7 @@ package org.openmrs.sync.core.mapper.operations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.core.entity.BaseEntity;
+import org.openmrs.sync.core.entity.light.LightEntity;
 import org.openmrs.sync.core.exception.OpenMrsSyncException;
 import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.light.LightService;
@@ -10,6 +11,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
 import java.beans.PropertyDescriptor;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @Slf4j
@@ -17,7 +19,6 @@ import java.util.function.BiConsumer;
 public class LinkLightEntityConsumer<E extends BaseEntity, M extends BaseModel> implements BiConsumer<Context<E, M>, String> {
 
     private ApplicationContext applicationContext;
-
 
     private static final String UUID_SUFFIX = "Uuid";
 
@@ -39,14 +40,31 @@ public class LinkLightEntityConsumer<E extends BaseEntity, M extends BaseModel> 
 
         PropertyDescriptor entityDesc = context.getEntityBeanWrapper().getPropertyDescriptor(entityAttributeName);
 
-        LightService service = getService(entityDesc);
         String linkedEntityUuid = (String) context.getModelBeanWrapper().getPropertyValue(modelAttributeName);
-        context.getEntityBeanWrapper().setPropertyValue(entityAttributeName, service.getOrInitEntity(linkedEntityUuid));
+        decomposeUuid(linkedEntityUuid).ifPresent(
+                decomposedUuid -> {
+                    LightService service = getService(entityDesc, decomposedUuid.getEntityType());
+                    context.getEntityBeanWrapper().setPropertyValue(entityAttributeName, service.getOrInitEntity(decomposedUuid.getUuid()));
+                }
+        );
     }
 
-    private LightService getService(final PropertyDescriptor entityDesc) {
+    private Optional<DecomposedUuid> decomposeUuid(final String linkedEntityUuid) {
+        if (linkedEntityUuid == null) {
+            return Optional.empty();
+        }
+        int openingParenthesisIndex = linkedEntityUuid.indexOf('(');
+        int closingParenthesisIndex = linkedEntityUuid.indexOf(')');
+        String entityTypeName = linkedEntityUuid.substring(0, openingParenthesisIndex);
+        String uuid = linkedEntityUuid.substring(openingParenthesisIndex + 1, closingParenthesisIndex);
+
+        return Optional.of(new DecomposedUuid(entityTypeName, uuid));
+    }
+
+    private LightService getService(final PropertyDescriptor entityDesc,
+                                    final Class<? extends LightEntity> linkedEntityType) {
         String[] beanNamesForType = applicationContext.getBeanNamesForType(
-                ResolvableType.forClassWithGenerics(LightService.class, entityDesc.getPropertyType())
+                ResolvableType.forClassWithGenerics(LightService.class, linkedEntityType)
         );
 
         if (beanNamesForType.length == 0) {

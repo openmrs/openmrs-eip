@@ -1,18 +1,25 @@
 package org.openmrs.sync.core.service.facade;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.core.entity.BaseEntity;
+import org.openmrs.sync.core.exception.OpenMrsSyncException;
+import org.openmrs.sync.core.exception.SynchroError;
 import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.AbstractEntityService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class EntityServiceFacade {
 
     private List<AbstractEntityService<? extends BaseEntity, ? extends BaseModel>> services;
+
+    private List<SynchroError> errors = new ArrayList<>();
 
     public EntityServiceFacade(final List<AbstractEntityService<? extends BaseEntity, ? extends BaseModel>> services) {
         this.services = services;
@@ -69,7 +76,20 @@ public class EntityServiceFacade {
      */
     public <M extends BaseModel> void saveModel(final TableToSyncEnum tableToSync,
                                                 final M model) {
-        getService(tableToSync).save(model);
+        try {
+            getService(tableToSync).save(model);
+        } catch (OpenMrsSyncException e) {
+            log.error("Error while saving the following model " + model.getUuid());
+            errors.add(SynchroError.builder()
+                    .date(LocalDateTime.now())
+                    .model(model)
+                    .cause(e)
+                    .build());
+        }
+    }
+
+    public List<SynchroError> getErrors() {
+        return errors;
     }
 
     private <E extends BaseEntity, M extends BaseModel> AbstractEntityService<E, M> getService(final TableToSyncEnum tableToSync) {

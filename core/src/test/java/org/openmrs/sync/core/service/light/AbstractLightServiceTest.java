@@ -105,7 +105,7 @@ public class AbstractLightServiceTest {
     private MockedLightEntity getExpectedEntity(final String uuid) {
         MockedLightEntity mockedLightEntity = new MockedLightEntity(1L, uuid);
         mockedLightEntity.setVoided(true);
-        mockedLightEntity.setVoidReason("placeholder");
+        mockedLightEntity.setVoidReason("[placeholder]");
         mockedLightEntity.setDateVoided(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         mockedLightEntity.setVoidedBy(1L);
         return mockedLightEntity;

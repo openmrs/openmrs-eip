@@ -17,7 +17,8 @@ public class ExtractUuidConsumer<E extends BaseEntity, M extends BaseModel> impl
         BaseEntity linkedEntity = (BaseEntity) context.getEntityBeanWrapper().getPropertyValue(attributeName);
         if (linkedEntity != null) {
             String uuid = linkedEntity.getUuid();
-            context.getModelBeanWrapper().setPropertyValue(attributeName + UUID_SUFFIX, uuid);
+            String entityClass = linkedEntity.getClass().getName();
+            context.getModelBeanWrapper().setPropertyValue(attributeName + UUID_SUFFIX, entityClass + "(" +uuid + ")");
         }
     }
 }

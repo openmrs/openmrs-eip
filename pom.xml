@@ -90,7 +90,7 @@
 
   <profiles>
     <profile>
-      <id>fastTests</id>
+      <id>skipITests</id>
       <properties>
         <exclude.tests>**/*ITest.java</exclude.tests>
       </properties>

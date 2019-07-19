@@ -1,5 +1,6 @@
 package org.openmrs.sync.core.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.core.entity.BaseEntity;
 import org.openmrs.sync.core.mapper.EntityToModelMapper;
 import org.openmrs.sync.core.mapper.ModelToEntityMapper;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
 
     protected SyncEntityRepository<E> repository;
@@ -41,9 +43,11 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
         if (etyInDb == null) {
             modelToReturn = saveEntity(ety);
+            log.info(getMsg(ety, model.getUuid(), " inserted"));
         } else if (!etyInDb.wasModifiedAfter(ety)) {
             ety.setId(etyInDb.getId());
             modelToReturn = saveEntity(ety);
+            log.info(getMsg(ety, model.getUuid(), " updated"));
         }
 
         return modelToReturn;
@@ -79,7 +83,12 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     protected List<M> mapEntities(List<E> entities) {
         return entities.stream()
+                .peek(ety -> log.info(getMsg(ety, ety.getUuid(), " extracted")))
                 .map(entityToModelMapper)
                 .collect(Collectors.toList());
+    }
+
+    private String getMsg(final E ety, final String uuid, final String s) {
+        return "Entity of type " + ety.getClass().getName() + " with uuid " + uuid + s;
     }
 }

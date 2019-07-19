@@ -24,7 +24,7 @@ public class InstantiateModelFunction<E extends BaseEntity, M extends BaseModel>
             M instanciatedModel = modelClass.newInstance();
             return new Context<>(entity, instanciatedModel, MappingDirectionEnum.ENTITY_TO_MODEL);
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new OpenMrsSyncException("error while instantiating entity " + modelClass, e);
+            throw new OpenMrsSyncException("cause while instantiating entity " + modelClass, e);
         }
     }
 }

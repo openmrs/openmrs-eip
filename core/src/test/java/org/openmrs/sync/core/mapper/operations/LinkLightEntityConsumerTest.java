@@ -38,7 +38,7 @@ public class LinkLightEntityConsumerTest {
         // Given
         MockedEntity entity = new MockedEntity(1L, "uuid");
         MockedModel model = new MockedModel("uuid");
-        model.setCreatorUuid("userUuid");
+        model.setCreatorUuid(UserLight.class.getName() + "(userUuid)");
         Context<MockedEntity, MockedModel> mapperContext = new Context<>(entity, model, MappingDirectionEnum.MODEL_TO_ENTITY);
         String[] userServiceClassName = new String[]{"userLightService"};
         when(applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(LightService.class, UserLight.class))).thenReturn(userServiceClassName);
@@ -51,6 +51,24 @@ public class LinkLightEntityConsumerTest {
         // Then
         verify(userService).getOrInitEntity("userUuid");
         assertEquals(getUser(), mapperContext.getEntity().getCreator());
+    }
+
+    @Test
+    public void apply_should_not_call_service_if_uuid_null() {
+        // Given
+        MockedEntity entity = new MockedEntity(1L, "uuid");
+        MockedModel model = new MockedModel("uuid");
+        Context<MockedEntity, MockedModel> mapperContext = new Context<>(entity, model, MappingDirectionEnum.MODEL_TO_ENTITY);
+        String[] userServiceClassName = new String[]{"userLightService"};
+        when(applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(LightService.class, UserLight.class))).thenReturn(userServiceClassName);
+        when(applicationContext.getBean(userServiceClassName[0])).thenReturn(userService);
+        when(userService.getOrInitEntity("userUuid")).thenReturn(getUser());
+
+        // When
+        consumer.accept(mapperContext, "creatorUuid");
+
+        // Then
+        verify(userService, never()).getOrInitEntity(anyString());
     }
 
     @Test
@@ -87,7 +105,7 @@ public class LinkLightEntityConsumerTest {
         // Given
         MockedEntity entity = new MockedEntity(1L, "uuid");
         MockedModel model = new MockedModel("uuid");
-        model.setCreatorUuid("userUuid");
+        model.setCreatorUuid(UserLight.class.getName() + "(userUuid)");
         Context<MockedEntity, MockedModel> mapperContext = new Context<>(entity, model, MappingDirectionEnum.MODEL_TO_ENTITY);
         String[] userServiceClassName = new String[0];
         when(applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(LightService.class, UserLight.class))).thenReturn(userServiceClassName);

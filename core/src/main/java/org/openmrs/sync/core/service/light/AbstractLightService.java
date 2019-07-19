@@ -71,7 +71,7 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 
     private void voidPlaceholder(final E entity) {
         entity.setMuted(true);
-        entity.setMuteReason("placeholder");
+        entity.setMuteReason("[placeholder]");
         entity.setDateMuted(DEFAULT_DATE);
         entity.setMutedBy(DEFAULT_USER_ID);
     }

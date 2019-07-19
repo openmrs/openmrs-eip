@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScheduledRoute extends RouteBuilder {
 
-    private static final int DELAY = 48 * 60 * 60 * 1000;
+    private static final int DELAY = 96 * 60 * 60 * 1000;
 
     @Override
     public void configure() {

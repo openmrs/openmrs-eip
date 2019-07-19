@@ -1,6 +1,7 @@
 package org.openmrs.sync.core.repository;
 
 import org.openmrs.sync.core.entity.Person;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,4 +15,8 @@ public interface PersonRepository extends SyncEntityRepository<Person> {
             "where (p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
             "or p.dateChanged >= :lastSyncDate)")
     List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+
+    @Override
+    @Cacheable(cacheNames = "personAll")
+    List<Person> findAll();
 }

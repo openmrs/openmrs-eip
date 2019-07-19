@@ -5,6 +5,7 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.After;
 import org.junit.Test;
 import org.openmrs.sync.core.entity.Person;
+import org.openmrs.sync.core.entity.light.UserLight;
 import org.openmrs.sync.core.repository.SyncEntityRepository;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.service.security.PGPEncryptService;
@@ -45,7 +46,7 @@ public class OpenMrsLoadPersonITest extends OpenMrsLoadEndpointITest {
                     "\"tableToSync\":\"" + TableToSyncEnum.PERSON + "\"," +
                     "\"model\":{" +
                         "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
-                        "\"creatorUuid\":1," +
+                        "\"creatorUuid\":\"" + UserLight.class.getName() + "(1)\"," +
                         "\"dateCreated\":[2019,5,28,13,42,31]," +
                         "\"changedByUuid\":null," +
                         "\"dateChanged\":null," +

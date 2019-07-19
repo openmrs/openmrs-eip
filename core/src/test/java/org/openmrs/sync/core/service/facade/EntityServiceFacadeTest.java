@@ -1,5 +1,7 @@
 package org.openmrs.sync.core.service.facade;
 
+import org.openmrs.sync.core.exception.OpenMrsSyncException;
+import org.openmrs.sync.core.exception.SynchroError;
 import org.openmrs.sync.core.model.BaseModel;
 import org.openmrs.sync.core.service.TableToSyncEnum;
 import org.openmrs.sync.core.entity.Patient;
@@ -12,14 +14,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class EntityServiceFacadeTest {
 
@@ -39,7 +41,43 @@ public class EntityServiceFacadeTest {
     }
 
     @Test
-    public void getModels() {
+    public void getAllModels_should_return_all_models() {
+        // Given
+        when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
+
+        // When
+        facade.getAllModels(TableToSyncEnum.PERSON);
+
+        // Then
+        verify(personService).getAllModels();
+    }
+
+    @Test
+    public void getModel_by_uuid_should_return_model() {
+        // Given
+        when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
+
+        // When
+        facade.getModel(TableToSyncEnum.PERSON, "uuid");
+
+        // Then
+        verify(personService).getModel("uuid");
+    }
+
+    @Test
+    public void getModel_by_id_should_return_model() {
+        // Given
+        when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
+
+        // When
+        facade.getModel(TableToSyncEnum.PERSON, 1L);
+
+        // Then
+        verify(personService).getModel(1L);
+    }
+
+    @Test
+    public void getModelsAfterDate_should_return_models() {
         // Given
         PersonModel personModel1 = new PersonModel();
         PersonModel personModel2 = new PersonModel();
@@ -71,7 +109,7 @@ public class EntityServiceFacadeTest {
     }
 
     @Test
-    public void saveModel() {
+    public void saveModel_should_save_model() {
         // Given
         PersonModel personModel = new PersonModel();
         when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
@@ -81,5 +119,23 @@ public class EntityServiceFacadeTest {
 
         // Then
         verify(personService).save(personModel);
+    }
+
+    @Test
+    public void saveModel_should_catch_exception() {
+        // Given
+        PersonModel personModel = new PersonModel();
+        when(personService.getTableToSync()).thenThrow(new OpenMrsSyncException("ERROR"));
+
+        // When
+        facade.saveModel(TableToSyncEnum.PERSON, personModel);
+
+        // Then
+        assertFalse(facade.getErrors().isEmpty());
+        assertEquals(1, facade.getErrors().size());
+        assertEquals(LocalDate.now(), facade.getErrors().get(0).getDate().toLocalDate());
+        assertTrue(facade.getErrors().get(0).getCause() instanceof OpenMrsSyncException);
+        assertEquals("ERROR", facade.getErrors().get(0).getCause().getMessage());
+        assertEquals(personModel, facade.getErrors().get(0).getModel());
     }
 }
