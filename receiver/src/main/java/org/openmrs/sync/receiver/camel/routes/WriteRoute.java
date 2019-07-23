@@ -16,7 +16,7 @@ public class WriteRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-        from("{{input.queue}}")
+        from("{{camel.input.endpoint}}")
                 .convertBodyTo(String.class)
                 .process(pgpDecryptService)
                 .to("openmrsLoad");

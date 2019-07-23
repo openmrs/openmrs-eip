@@ -55,11 +55,15 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
         ) {
             Streams.pipeAll(bouncyGPGInputStream, bufferedOutputStream);
 
-            log.info("Decrypted message: " + encryptedMessage);
         } catch (IOException | PGPException | NoSuchProviderException e) {
             throw new OpenMrsSyncException("Error during decryption process", e);
         }
-        return toString(unencryptedOutputStream);
+
+        String decryptedMessage = toString(unencryptedOutputStream);
+
+        log.info("Decrypted message" + decryptedMessage);
+
+        return decryptedMessage;
     }
 
     private String extractSenderUserId(final String encryptedMessage) {
