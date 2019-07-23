@@ -1,5 +1,6 @@
 package org.openmrs.sync.core.service.security;
 
+import lombok.extern.slf4j.Slf4j;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.BouncyGPG;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.InMemoryKeyring;
 import org.apache.camel.Exchange;
@@ -19,6 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * The service to decrypt incoming messages
  */
+@Slf4j
 @Service
 public class PGPDecryptService extends AbstractSecurityService implements Processor {
 
@@ -52,6 +54,8 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
                         .fromEncryptedInputStream(IOUtils.toInputStream(encryptedMessage, UTF_8))
         ) {
             Streams.pipeAll(bouncyGPGInputStream, bufferedOutputStream);
+
+            log.info("Decrypted message: " + encryptedMessage);
         } catch (IOException | PGPException | NoSuchProviderException e) {
             throw new OpenMrsSyncException("Error during decryption process", e);
         }

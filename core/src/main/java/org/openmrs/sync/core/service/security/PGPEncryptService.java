@@ -1,5 +1,6 @@
 package org.openmrs.sync.core.service.security;
 
+import lombok.extern.slf4j.Slf4j;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.BouncyGPG;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.InMemoryKeyring;
 import org.apache.camel.Exchange;
@@ -18,6 +19,7 @@ import java.security.SignatureException;
 /**
  * The service to encrypt outgoing messages
  */
+@Slf4j
 @Service
 public class PGPEncryptService extends AbstractSecurityService implements Processor {
 
@@ -47,6 +49,9 @@ public class PGPEncryptService extends AbstractSecurityService implements Proces
                         .andWriteTo(bufferedOutputStream)
         ) {
             Streams.pipeAll(new ByteArrayInputStream(unencryptedMessage.getBytes()), bouncyGPGOutputStream);
+
+            log.info("Encrypted message: " + unencryptedMessage);
+
         } catch (IOException | PGPException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
             throw new OpenMrsSyncException("Error during encryption process", e);
         }
