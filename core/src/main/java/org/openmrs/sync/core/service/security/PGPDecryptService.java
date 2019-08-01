@@ -59,11 +59,7 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
             throw new OpenMrsSyncException("Error during decryption process", e);
         }
 
-        String decryptedMessage = toString(unencryptedOutputStream);
-
-        log.info("Decrypted message" + decryptedMessage);
-
-        return decryptedMessage;
+        return toString(unencryptedOutputStream);
     }
 
     private String extractSenderUserId(final String encryptedMessage) {

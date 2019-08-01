@@ -55,6 +55,10 @@
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-base64</artifactId>
+    </dependency>
 
     <!-- logging -->
     <dependency>

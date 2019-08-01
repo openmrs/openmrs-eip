@@ -45,7 +45,7 @@ public class ManagementDataSourceConfig implements DataSourceConfig {
     @Bean(name = "mngtEntityManager")
     @Override
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-                                                                    @Qualifier("mngtDataSource") final DataSource dataSource) {
+                                                                @Qualifier("mngtDataSource") final DataSource dataSource) {
 
         Map<String, String> props = new HashMap<>();
         props.put("hibernate.dialect", hibernateDialect);

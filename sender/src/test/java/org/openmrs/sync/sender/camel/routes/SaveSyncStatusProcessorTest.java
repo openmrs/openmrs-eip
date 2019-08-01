@@ -10,7 +10,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.sender.camel.SaveTableSyncStatusProcessor;
+import org.openmrs.sync.sender.camel.SaveSyncStatusProcessor;
 import org.openmrs.sync.sender.management.entity.TableSyncStatus;
 import org.openmrs.sync.sender.management.repository.TableSyncStatusRepository;
 
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class SaveTableSyncStatusProcessorTest {
+public class SaveSyncStatusProcessorTest {
 
     @Mock
     private TableSyncStatusRepository repository;
@@ -29,13 +29,13 @@ public class SaveTableSyncStatusProcessorTest {
     @Captor
     private ArgumentCaptor<TableSyncStatus> captor;
 
-    private SaveTableSyncStatusProcessor processor;
+    private SaveSyncStatusProcessor processor;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        processor = new SaveTableSyncStatusProcessor(repository);
+        processor = new SaveSyncStatusProcessor(repository);
     }
 
     @Test

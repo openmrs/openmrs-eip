@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 public class AbstractManagementDbInitTest {
 
     @Mock
-    private TableSyncStatusRepository repository;
+    private TableSyncStatusRepository tableSyncStatusRepository;
 
     private MockedManagementDbInit dbInit;
 
@@ -21,7 +21,7 @@ public class AbstractManagementDbInitTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        dbInit = new MockedManagementDbInit(repository);
+        dbInit = new MockedManagementDbInit(tableSyncStatusRepository);
     }
 
     @Test
@@ -30,14 +30,14 @@ public class AbstractManagementDbInitTest {
         TableSyncStatus toSave = new TableSyncStatus();
         toSave.setTableToSync(TableToSyncEnum.PERSON);
 
-        when(repository.countByTableToSync(TableToSyncEnum.PERSON)).thenReturn(0L);
-        when(repository.countByTableToSync(TableToSyncEnum.VISIT)).thenReturn(1L);
-        when(repository.save(toSave)).thenReturn(toSave);
+        when(tableSyncStatusRepository.countByTableToSync(TableToSyncEnum.PERSON)).thenReturn(0L);
+        when(tableSyncStatusRepository.countByTableToSync(TableToSyncEnum.VISIT)).thenReturn(1L);
+        when(tableSyncStatusRepository.save(toSave)).thenReturn(toSave);
 
         // When
         dbInit.start();
 
         // Then
-        verify(repository).save(any(TableSyncStatus.class));
+        verify(tableSyncStatusRepository).save(any(TableSyncStatus.class));
     }
 }

@@ -21,6 +21,7 @@ public final class FileUtils {
     /**
      * Get the private key from the folder with the path in parameter
      * returns an exception if the number of private keys is diferrent than 1
+     *
      * @param folderPath the path to the folder
      * @return a file as byte array
      * @throws IOException
@@ -39,6 +40,7 @@ public final class FileUtils {
 
     /**
      * Get all the public keys from the folder with the path in parameter
+     *
      * @param folderPath the path to the folder
      * @return a list of Files as byte arrays
      * @throws IOException

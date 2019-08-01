@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
-public class SaveTableSyncStatusProcessor implements Processor {
+public class SaveSyncStatusProcessor implements Processor {
 
     private TableSyncStatusRepository repository;
 
-    public SaveTableSyncStatusProcessor(final TableSyncStatusRepository repository) {
+    public SaveSyncStatusProcessor(final TableSyncStatusRepository repository) {
         this.repository = repository;
     }
 

@@ -50,7 +50,7 @@ public class PGPEncryptService extends AbstractSecurityService implements Proces
         ) {
             Streams.pipeAll(new ByteArrayInputStream(unencryptedMessage.getBytes()), bouncyGPGOutputStream);
 
-            log.info("Encrypted message: " + unencryptedMessage);
+            log.info("Encrypted message sent");
 
         } catch (IOException | PGPException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
             throw new OpenMrsSyncException("Error during encryption process", e);
@@ -62,6 +62,7 @@ public class PGPEncryptService extends AbstractSecurityService implements Proces
      * Encrypts and sign the message and puts it in the body
      * Also puts the sender's private key userId in the header for the reveiving part
      * to know with which public key to decrypt the message
+     *
      * @param exchange the Camel exchange object
      */
     @Override

@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class SelectRoute extends RouteBuilder {
 
-    private SaveTableSyncStatusProcessor saveTableSyncStatusProcessor;
+    private SaveSyncStatusProcessor saveSyncStatusProcessor;
 
     private PGPEncryptService pgpEncryptService;
 
-    public SelectRoute(final SaveTableSyncStatusProcessor saveTableSyncStatusProcessor,
+    public SelectRoute(final SaveSyncStatusProcessor saveSyncStatusProcessor,
                        final PGPEncryptService pgpEncryptService) {
-        this.saveTableSyncStatusProcessor = saveTableSyncStatusProcessor;
+        this.saveSyncStatusProcessor = saveSyncStatusProcessor;
         this.pgpEncryptService = pgpEncryptService;
     }
 
@@ -25,7 +25,7 @@ public class SelectRoute extends RouteBuilder {
                         .process(pgpEncryptService)
                         .to("{{camel.output.endpoint}}")
                 .end()
-                .process(saveTableSyncStatusProcessor);
+                .process(saveSyncStatusProcessor);
 
         /*from("timer://runOnce?repeatCount=1")
                 .autoStartup(true)
