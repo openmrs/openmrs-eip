@@ -8,6 +8,9 @@ to receive the data and store them in another database.
 - The sender module which is a Spring Boot application calling the sender's Camel component
 - The receiver module which is a Spring Boot application calling the receiver's Camel component
 
+It is also possible to synchronize the content of a folder. The folder sync is performed via a different Camel route, but files will be transferred through the same endpoint. They will thus be received by the receiver via the same endpoint as the entities.
+To differentiate entities from files at reception, files are encoded in Base64 and the result is placed between the `<FILE>`' and `</FILE>` tags.
+
 Each major version of OpenMRS leads to a new branch of the project.
 
 # Getting Started
@@ -19,10 +22,13 @@ For each receiver or sender module, the following setup is necessary:
 You need to create a folder to which the messages will transit and register it in the application.properties files with the following keys/values:
     * `camel.output.endpoint=file:<folder_path>` for the sender
     * `camel.input.endpoint=file:<folder_path>` for the receiver
+4. If you want to also synchronize a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
+The property for that purpose is: 
+    * `camel.output.endpoint.file.location:<folder_path>`
 
 #Security
-The flow of messages between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors where developed to encrypt and sign message on one side
-and verify and decrypt on the other side. They simply need to be registered in the corresponding Camel route before being sent or after being received.
+The flow of messages between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors where developed to encrypt and sign (`PGPEncryptService`) message on one side
+and verify and decrypt (`PGPDecryptService`) on the other side. They simply need to be registered in the corresponding Camel route before being sent or after being received.
 
 The encryption is performed by PGP. So public and private keys shall be generated for each side of the exchange.
 * To encrypt the message, the sender needs the receiver's public key
