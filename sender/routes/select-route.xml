@@ -1,0 +1,15 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="select">
+    <from uri="seda:sync"/>
+    <to uri="log:log"/>
+    <recipientList>
+      <simple>openmrsExtract:${body.getTableToSync().name()}?lastSyncDate=${body.getLastSyncDateAsString()}</simple>
+    </recipientList>
+    <split streaming="true">
+      <simple>${body}</simple>
+      <process ref="pgpEncryptService"/>
+      <to uri="{{camel.output.endpoint}}"/>
+    </split>
+    <process ref="saveSyncStatusProcessor"/>
+  </route>
+</routes>

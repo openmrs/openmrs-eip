@@ -20,7 +20,7 @@ import java.security.SignatureException;
  * The service to encrypt outgoing messages
  */
 @Slf4j
-@Service
+@Service("pgpEncryptService")
 public class PGPEncryptService extends AbstractSecurityService implements Processor {
 
     private SenderEncryptionProperties props;

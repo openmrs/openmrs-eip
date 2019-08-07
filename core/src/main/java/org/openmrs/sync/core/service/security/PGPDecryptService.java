@@ -21,7 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * The service to decrypt incoming messages
  */
 @Slf4j
-@Service
+@Service("pgpDecryptService")
 public class PGPDecryptService extends AbstractSecurityService implements Processor {
 
     private ReceiverEncryptionProperties props;

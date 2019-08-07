@@ -1,0 +1,13 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="folder-sync">
+    <from uri="file:/home/sco/Desktop/docs?noop=true&amp;recursive=true&amp;idempotentKey=${file:name}-${file:modified}&amp;idempotentRepository=#fileSyncIdempotentRepository"/>
+    <marshal>
+      <base64/>
+    </marshal>
+    <transform>
+      <simple>&lt;FILE&gt;${body}&lt;/FILE&gt;</simple>
+    </transform>
+    <process ref="pgpEncryptService"/>
+    <to uri="{{camel.output.endpoint}}"/>
+  </route>
+</routes>

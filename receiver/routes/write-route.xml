@@ -1,0 +1,22 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="write">
+    <from uri="{{camel.input.endpoint}}"/>
+    <convertBodyTo type="java.lang.String"/>
+    <process ref="pgpDecryptService"/>
+    <choice>
+      <when>
+        <method bean="isFilePredicate"/>
+        <transform>
+          <method bean="removeFileTagsExpression" />
+        </transform>
+        <unmarshal>
+          <base64/>
+        </unmarshal>
+        <to uri="file:/home/sco/Desktop/res"/>
+      </when>
+      <otherwise>
+        <to uri="openmrsLoad"/>
+      </otherwise>
+    </choice>
+  </route>
+</routes>

@@ -4,7 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("removeFileTagsExpression")
 public class RemoveFileTagsExpression implements Expression {
 
     @Override
