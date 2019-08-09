@@ -1,9 +1,13 @@
-package org.openmrs.sync.core.camel;
+package org.openmrs.sync.app.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
+import org.openmrs.sync.core.camel.TypeEnum;
 import org.springframework.stereotype.Component;
 
+/**
+ * Removes the <FILE> prefix and the </FILE> suffix from a file converted to base64 string
+ */
 @Component("removeFileTagsExpression")
 public class RemoveFileTagsExpression implements Expression {
 

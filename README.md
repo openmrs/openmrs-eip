@@ -2,29 +2,31 @@
 This project aims at providing a low level synchronization module based on Apache Camel.
 Data are directly pulled from a source OpenMRS MySQL database and pushed to a target OpenMRS MySQL database without any use of OpenMRS service or data model.
 
-The project is composed of three modules:
+The project is composed of two modules:
 - The core module containing the Camel components. One component to retrieve data from the database and send them and one component
 to receive the data and store them in another database.
-- The sender module which is a Spring Boot application calling the sender's Camel component
-- The receiver module which is a Spring Boot application calling the receiver's Camel component
-
-It is also possible to synchronize the content of a folder. The folder sync is performed via a different Camel route, but files will be transferred through the same endpoint. They will thus be received by the receiver via the same endpoint as the entities.
-To differentiate entities from files at reception, files are encoded in Base64 and the result is placed between the `<FILE>`' and `</FILE>` tags.
+- The app module, which is a Spring Boot application having either the role of the sender, the receiver or both that will launch the Camel routes.
 
 Each major version of OpenMRS leads to a new branch of the project.
 
+The application uses Lombok to allow creating POJO without coding of getters and setters. A plugin needs to be installed to the IDE to add setter and getters at compile time.
+
 # Getting Started
-For each receiver or sender module, the following setup is necessary:
+A sender and a receiver directory are created to simulate a network between a remote database and a central database.
+They both contain a `config` directory with the application.properties and a `routes` directory with the Camel routes as XML files.
+The following configuration is necessary:
 1. Install a Mysql database
 2. Create a schema and import a dump corresponding to the same major version of OpenMRS than the one of the branch you are working on.
-3. Set up the respective application.properties files with the database url and credentials
+3. Set up the sender's application.properties files with the database url and credentials
 4. By default, the exchange of data between the sender and the receiver is done with the 'file' Camel endpoint. 
-You need to create a folder to which the messages will transit and register it in the application.properties files with the following keys/values:
-    * `camel.output.endpoint=file:<folder_path>` for the sender
-    * `camel.input.endpoint=file:<folder_path>` for the receiver
-4. If you want to also synchronize a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
+You need to create a folder into which the messages will transit and register it in the sender's application.properties files with the following keys/values:
+    * `camel.output.endpoint=file:<folder_path>`
+The same path needs to be specified in th receiver's application.properties as follows:
+    * `camel.input.endpoint=file:<folder_path>`
+5. If you want to also synchronize a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
 The property for that purpose is: 
     * `camel.output.endpoint.file.location:<folder_path>`
+6. Each application will be launched with 2 parameters: The path of the application.properties file and the profile with which to launch the application. The values are 'sender' or 'receiver'. 
 
 #Security
 The flow of messages between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors where developed to encrypt and sign (`PGPEncryptService`) message on one side
@@ -53,6 +55,10 @@ The receiver needs to hold it's private key and all the public keys of the sende
 `pgp.receiver.password=<private_key_password>`
 
 **To be detected by the program, the private keys should all end with -sec.asc and the public keys should all end with -pub.asc**
+
+# File synchronization
+It is also possible to synchronize the content of a folder. The folder sync is performed via a different Camel route, but files will be transferred through the same endpoint. They will thus be received by the receiver via the same endpoint as the entities.
+To differentiate entities from files at reception, files are encoded in Base64 and the result is placed between the `<FILE>`' and `</FILE>` tags.
 
 # Build and Test
 Unit ant Integration tests were only coded for the core module.

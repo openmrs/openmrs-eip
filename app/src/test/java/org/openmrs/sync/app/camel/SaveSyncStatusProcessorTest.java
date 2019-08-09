@@ -1,4 +1,4 @@
-package org.openmrs.sync.app.camel.routes;
+package org.openmrs.sync.app.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

@@ -5,6 +5,9 @@ import org.apache.camel.Predicate;
 import org.openmrs.sync.core.camel.TypeEnum;
 import org.springframework.stereotype.Component;
 
+/**
+ * Checks that the body of the exchange is a file
+ */
 @Component("isFilePredicate")
 public class IsFilePredicate implements Predicate {
 
