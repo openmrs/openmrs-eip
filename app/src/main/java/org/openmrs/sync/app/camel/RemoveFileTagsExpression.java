@@ -2,7 +2,7 @@ package org.openmrs.sync.app.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
-import org.openmrs.sync.core.camel.TypeEnum;
+import org.openmrs.sync.component.camel.TypeEnum;
 import org.springframework.stereotype.Component;
 
 /**

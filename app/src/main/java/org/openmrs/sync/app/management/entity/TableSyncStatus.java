@@ -1,8 +1,8 @@
 package org.openmrs.sync.app.management.entity;
 
 import lombok.Data;
-import org.openmrs.sync.core.service.TableToSyncEnum;
-import org.openmrs.sync.core.utils.DateUtils;
+import org.openmrs.sync.component.service.TableToSyncEnum;
+import org.openmrs.sync.component.utils.DateUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

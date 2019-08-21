@@ -2,7 +2,7 @@ package org.openmrs.sync.app;
 
 import org.apache.camel.CamelContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.openmrs.sync.core.camel.StringToLocalDateTimeConverter;
+import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.app.management.init.impl.ManagementDbInit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 @ComponentScan(
         basePackages = {
                 "org.openmrs.sync.app",
-                "org.openmrs.sync.core"
+                "org.openmrs.sync.component",
+                "org.openmrs.sync.map"
         }
 )
 public class SyncApplication {

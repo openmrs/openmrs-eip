@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.core.service.TableToSyncEnum;
+import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.app.management.entity.TableSyncStatus;
 import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
 

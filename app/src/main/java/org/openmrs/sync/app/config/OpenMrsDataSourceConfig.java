@@ -1,6 +1,6 @@
 package org.openmrs.sync.app.config;
 
-import org.openmrs.sync.core.config.DataSourceConfig;
+import org.openmrs.sync.component.config.DataSourceConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,7 +25,7 @@ import static java.util.Collections.singletonMap;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "openmrsEntityManager",
         transactionManagerRef = "openmrsTransactionManager",
-        basePackages = {"org.openmrs.sync.core.repository"}
+        basePackages = {"org.openmrs.sync.component.repository"}
 )
 public class OpenMrsDataSourceConfig implements DataSourceConfig {
 
@@ -47,7 +47,7 @@ public class OpenMrsDataSourceConfig implements DataSourceConfig {
                                                                        @Qualifier("openmrsDataSource") final DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("org.openmrs.sync.core.entity")
+                .packages("org.openmrs.sync.component.entity")
                 .persistenceUnit("openmrs")
                 .properties(
                         singletonMap(

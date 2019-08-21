@@ -1,7 +1,7 @@
 package org.openmrs.sync.app.config;
 
-import org.openmrs.sync.core.config.ReceiverEncryptionProperties;
-import org.openmrs.sync.core.config.SenderEncryptionProperties;
+import org.openmrs.sync.component.config.ReceiverEncryptionProperties;
+import org.openmrs.sync.component.config.SenderEncryptionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

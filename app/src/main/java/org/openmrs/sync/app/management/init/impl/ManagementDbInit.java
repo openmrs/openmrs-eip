@@ -1,7 +1,7 @@
 package org.openmrs.sync.app.management.init.impl;
 
 import org.openmrs.sync.app.SyncProfiles;
-import org.openmrs.sync.core.service.TableToSyncEnum;
+import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.app.management.init.AbstractManagementDbInit;
 import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
 import org.springframework.context.annotation.Profile;

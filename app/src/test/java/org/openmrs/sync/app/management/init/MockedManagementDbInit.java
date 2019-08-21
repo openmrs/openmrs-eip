@@ -1,6 +1,6 @@
 package org.openmrs.sync.app.management.init;
 
-import org.openmrs.sync.core.service.TableToSyncEnum;
+import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
 
 import java.util.Arrays;

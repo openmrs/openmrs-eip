@@ -1,1 +1,1 @@
-class=org.openmrs.sync.core.camel.load.OpenMrsLoadComponent
+class=org.openmrs.sync.component.camel.load.OpenMrsLoadComponent

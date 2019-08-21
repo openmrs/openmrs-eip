@@ -16,6 +16,13 @@
       </when>
       <otherwise>
         <to uri="openmrsLoad"/>
+        <process ref="transformSyncToOdooProcessor"/>
+        <choice>
+          <when>
+            <simple>${in.body} != null</simple>
+            <to uri="odoo"/>
+          </when>
+        </choice>
       </otherwise>
     </choice>
   </route>

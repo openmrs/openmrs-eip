@@ -21,8 +21,18 @@
   <dependencies>
     <dependency>
       <groupId>org.openmrs.sync</groupId>
-      <artifactId>openmrs-sync-core</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <artifactId>openmrs-sync-component</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openmrs.sync</groupId>
+      <artifactId>openmrs-sync-odoo</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openmrs.sync</groupId>
+      <artifactId>openmrs-sync-mapping-to-odoo</artifactId>
+      <version>${version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

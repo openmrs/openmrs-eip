@@ -1,6 +1,6 @@
 package org.openmrs.sync.app.management.repository;
 
-import org.openmrs.sync.core.service.TableToSyncEnum;
+import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.app.management.entity.TableSyncStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
