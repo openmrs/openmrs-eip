@@ -31,7 +31,7 @@ import java.util.Map;
         "org.openmrs.sync.component.mapper",
         "org.openmrs.sync.component.camel"
 })
-public class TestConfig implements DataSourceConfig {
+public class TestConfig {
 
     @Value("${spring.datasource.dialect}")
     private String hibernateDialect;
@@ -41,7 +41,6 @@ public class TestConfig implements DataSourceConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
-    @Override
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
@@ -59,13 +58,11 @@ public class TestConfig implements DataSourceConfig {
     }
 
     @Bean
-    @Override
     public PlatformTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
     @Bean
-    @Override
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
                                                                 final DataSource dataSource) {
         Map<String, String> props = new HashMap<>();

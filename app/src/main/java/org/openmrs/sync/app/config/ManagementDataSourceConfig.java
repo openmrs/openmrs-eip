@@ -1,7 +1,6 @@
 package org.openmrs.sync.app.config;
 
 import org.openmrs.sync.app.SyncProfiles;
-import org.openmrs.sync.component.config.DataSourceConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -30,7 +29,7 @@ import java.util.Map;
         transactionManagerRef = "mngtTransactionManager",
         basePackages = {"org.openmrs.sync.app.management.repository"}
 )
-public class ManagementDataSourceConfig implements DataSourceConfig {
+public class ManagementDataSourceConfig {
 
     @Value("${spring.mngt-datasource.dialect}")
     private String hibernateDialect;
@@ -40,13 +39,11 @@ public class ManagementDataSourceConfig implements DataSourceConfig {
 
     @Bean(name = "mngtDataSource")
     @ConfigurationProperties(prefix = "spring.mngt-datasource")
-    @Override
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Bean(name = "mngtEntityManager")
-    @Override
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
                                                                 @Qualifier("mngtDataSource") final DataSource dataSource) {
 
@@ -64,7 +61,6 @@ public class ManagementDataSourceConfig implements DataSourceConfig {
 
 
     @Bean(name = "mngtTransactionManager")
-    @Override
     public PlatformTransactionManager transactionManager(
             @Qualifier("mngtEntityManager") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
