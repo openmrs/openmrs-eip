@@ -19,7 +19,7 @@ public class TransformSyncToOdooProcessor implements Processor {
 
         SyncModel syncModel = JsonUtils.unmarshal(syncJson, SyncModel.class);
 
-        Optional<OdooModelTypeEnum> modelType = OdooModelTypeEnum.getDerivedOdooEntity(syncModel.getTableToSyncModelClass());
+        Optional<OdooModelTypeEnum> modelType = OdooModelTypeEnum.getDerivedOdooEntityType(syncModel.getTableToSyncModelClass());
 
         String body = null;
         if (modelType.isPresent()) {

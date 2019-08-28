@@ -11,8 +11,8 @@ public enum OdooModelEnum {
 
     private String odooModelName;
 
-    private OdooModelEnum(final String incomingType,
-                          final String odooModelName) {
+    OdooModelEnum(final String incomingType,
+                  final String odooModelName) {
         this.incomingType = incomingType;
         this.odooModelName = odooModelName;
     }

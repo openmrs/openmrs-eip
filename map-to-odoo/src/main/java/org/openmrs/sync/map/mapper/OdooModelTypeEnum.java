@@ -2,14 +2,14 @@ package org.openmrs.sync.map.mapper;
 
 import org.openmrs.sync.common.model.odoo.OdooModel;
 import org.openmrs.sync.common.model.sync.BaseModel;
-import org.openmrs.sync.common.model.sync.PatientModel;
+import org.openmrs.sync.common.model.sync.PersonModel;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
 public enum OdooModelTypeEnum {
-    CUSTOMER(PatientModel.class, new PatientToCustomerMapper());
+    CUSTOMER(PersonModel.class, new PersonToCustomerMapper());
 
     private Class<? extends BaseModel> derivedFromModelClass;
     private Function<BaseModel, OdooModel> mapper;
@@ -28,7 +28,7 @@ public enum OdooModelTypeEnum {
         return mapper;
     }
 
-    public static Optional<OdooModelTypeEnum> getDerivedOdooEntity(final Class<? extends BaseModel> syncTableModelClass) {
+    public static Optional<OdooModelTypeEnum> getDerivedOdooEntityType(final Class<? extends BaseModel> syncTableModelClass) {
         return Arrays.stream(values())
                 .filter(e -> e.getDerivedFromModelClass().equals(syncTableModelClass))
                 .findFirst();

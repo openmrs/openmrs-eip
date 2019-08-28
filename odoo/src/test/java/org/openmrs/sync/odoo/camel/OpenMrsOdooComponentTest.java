@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.camel.extract;
+package org.openmrs.sync.odoo.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
@@ -6,27 +6,27 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.component.camel.extract.fetchmodels.FetchModelsRuleEngine;
+import org.openmrs.sync.odoo.service.OdooService;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.assertTrue;
 
-public class OpenMrsExtractComponentTest {
+public class OpenMrsOdooComponentTest {
 
     @Mock
     private CamelContext context;
 
     @Mock
-    private FetchModelsRuleEngine ruleEngine;
+    private OdooService odooService;
 
-    private OpenMrsExtractComponent component;
+    private OpenMrsOdooComponent component;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        component = new OpenMrsExtractComponent(context, ruleEngine);
+        component = new OpenMrsOdooComponent(context, odooService);
     }
 
     @Test
@@ -34,9 +34,9 @@ public class OpenMrsExtractComponentTest {
         // Given
 
         // When
-        Endpoint result = component.createEndpoint("testUri", "person", new HashMap<>());
+        Endpoint result = component.createEndpoint("testUri", "", new HashMap<>());
 
         // Then
-        assertTrue(result instanceof OpenMrsExtractEndpoint);
+        assertTrue(result instanceof OpenMrsOdooEndpoint);
     }
 }

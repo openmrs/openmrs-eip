@@ -2,15 +2,15 @@ package org.openmrs.sync.map.mapper;
 
 import org.openmrs.sync.common.model.odoo.OdooModel;
 import org.openmrs.sync.common.model.sync.BaseModel;
-import org.openmrs.sync.common.model.sync.PatientModel;
+import org.openmrs.sync.common.model.sync.PersonModel;
 
 import java.util.function.Function;
 
-public class PatientToCustomerMapper implements Function<BaseModel, OdooModel> {
+public class PersonToCustomerMapper implements Function<BaseModel, OdooModel> {
 
     @Override
-    public OdooModel apply(final BaseModel patientModel) {
-        PatientModel model = (PatientModel) patientModel;
+    public OdooModel apply(final BaseModel personModel) {
+        PersonModel model = (PersonModel) personModel;
 
         OdooModel odooModel = new OdooModel();
         odooModel.setType(OdooModelTypeEnum.CUSTOMER.name());

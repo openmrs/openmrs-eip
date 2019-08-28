@@ -20,7 +20,7 @@ public class DecomposedUuid {
         try {
             return (Class<? extends LightEntity>) Class.forName(entityTypeName);
         } catch (ClassNotFoundException e) {
-            throw new OpenMrsSyncException("No entity class exists with the name " + entityTypeName);
+            throw new OpenMrsSyncException("No entity class exists with the name " + entityTypeName, e);
         }
     }
 }
