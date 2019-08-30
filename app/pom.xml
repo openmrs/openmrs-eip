@@ -21,17 +21,7 @@
   <dependencies>
     <dependency>
       <groupId>org.openmrs.sync</groupId>
-      <artifactId>openmrs-sync-component</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openmrs.sync</groupId>
-      <artifactId>openmrs-sync-odoo</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openmrs.sync</groupId>
-      <artifactId>openmrs-sync-mapping-to-odoo</artifactId>
+      <artifactId>camel-openmrs</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>

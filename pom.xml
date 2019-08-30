@@ -9,10 +9,7 @@
 
   <modules>
     <module>app</module>
-    <module>common</module>
-    <module>component</module>
-    <module>odoo</module>
-    <module>map-to-odoo</module>
+    <module>camel-openmrs</module>
   </modules>
 
   <name>OpenMRS synchro parent</name>
