@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Component
+@Component("entityServiceFacade")
 public class EntityServiceFacade {
 
     private List<AbstractEntityService<? extends BaseEntity, ? extends BaseModel>> services;

@@ -3,7 +3,7 @@
     <from uri="seda:sync"/>
     <to uri="log:log"/>
     <recipientList>
-      <simple>openmrsExtract:${body.getTableToSync().name()}?lastSyncDate=${body.getLastSyncDateAsString()}</simple>
+      <simple>openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}</simple>
     </recipientList>
     <split streaming="true">
       <simple>${body}</simple>

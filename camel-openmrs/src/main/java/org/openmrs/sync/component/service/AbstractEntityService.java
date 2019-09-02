@@ -83,7 +83,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     protected List<M> mapEntities(List<E> entities) {
         return entities.stream()
-                .peek(ety -> log.info(getMsg(ety, ety.getUuid(), " extracted")))
                 .map(entityToModelMapper)
                 .collect(Collectors.toList());
     }

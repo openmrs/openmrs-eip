@@ -15,7 +15,7 @@
         <to uri="file:/home/sco/Desktop/res"/>
       </when>
       <otherwise>
-        <to uri="openmrsLoad"/>
+        <to uri="openmrs:load"/>
       </otherwise>
     </choice>
   </route>
