@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.camel;
+package org.openmrs.sync.app;
 
 import org.apache.camel.Exchange;
 import org.json.JSONException;

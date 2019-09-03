@@ -3,31 +3,26 @@ package org.openmrs.sync.app;
 import org.apache.camel.CamelContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
-import org.openmrs.sync.app.management.init.impl.ManagementDbInit;
+import org.openmrs.sync.app.management.init.impl.ManagementDbInitImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.PostConstruct;
 import java.security.Security;
 import java.time.LocalDateTime;
 
-@SpringBootApplication
-@ComponentScan(
-        basePackages = {
-                "org.openmrs.sync.app",
-                "org.openmrs.sync.component",
-                "org.openmrs.sync.map"
-        }
-)
+@SpringBootApplication(scanBasePackages = {
+        "org.openmrs.sync.app",
+        "org.openmrs.sync.component"
+})
 public class SyncApplication {
 
-    private ManagementDbInit managementDbInit;
+    private ManagementDbInitImpl managementDbInit;
 
     private CamelContext camelContext;
 
-    public SyncApplication(@Nullable final ManagementDbInit managementDbInit,
+    public SyncApplication(@Nullable final ManagementDbInitImpl managementDbInit,
                            final CamelContext camelContext) {
         this.managementDbInit = managementDbInit;
         this.camelContext = camelContext;

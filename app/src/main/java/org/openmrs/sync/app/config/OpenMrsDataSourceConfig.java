@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.config;
+package org.openmrs.sync.app.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,7 @@ public class OpenMrsDataSourceConfig {
     @Primary
     @Bean(name = "openmrsEntityManager")
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-                                                                       @Qualifier("openmrsDataSource") final DataSource dataSource) {
+                                                                @Qualifier("openmrsDataSource") final DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages("org.openmrs.sync.component.entity")

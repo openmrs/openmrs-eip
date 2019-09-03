@@ -12,9 +12,9 @@ import java.util.List;
 
 @Profile(SyncProfiles.SENDER)
 @Component
-public class ManagementDbInit extends AbstractManagementDbInit {
+public class ManagementDbInitImpl extends AbstractManagementDbInit {
 
-    public ManagementDbInit(final TableSyncStatusRepository repository) {
+    public ManagementDbInitImpl(final TableSyncStatusRepository repository) {
         super(repository);
     }
 

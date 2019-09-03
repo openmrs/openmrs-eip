@@ -1,5 +1,7 @@
-package org.openmrs.sync.component.config;
+package org.openmrs.sync.app.config;
 
+import org.openmrs.sync.component.config.ReceiverEncryptionProperties;
+import org.openmrs.sync.component.config.SenderEncryptionProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

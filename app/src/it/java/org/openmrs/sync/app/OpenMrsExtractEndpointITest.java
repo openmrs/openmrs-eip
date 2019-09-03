@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.camel;
+package org.openmrs.sync.app;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.openmrs.sync.component.config.TestConfig;
+import org.openmrs.sync.app.config.TestConfig;
+import org.openmrs.sync.component.camel.OpenMrsComponent;
+import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.component.service.security.PGPDecryptService;
 import org.openmrs.sync.component.service.security.PGPEncryptService;
 import org.openmrs.sync.component.utils.DateUtils;

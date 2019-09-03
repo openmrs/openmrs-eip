@@ -16,13 +16,13 @@ public class ManagementDbInitTest {
     @Mock
     private TableSyncStatusRepository repository;
 
-    private ManagementDbInit dbInit;
+    private ManagementDbInitImpl dbInit;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        dbInit = new ManagementDbInit(repository);
+        dbInit = new ManagementDbInitImpl(repository);
     }
 
     @Test
