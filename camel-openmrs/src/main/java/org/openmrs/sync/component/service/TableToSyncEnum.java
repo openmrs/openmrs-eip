@@ -21,7 +21,11 @@ public enum TableToSyncEnum {
     PROVIDER_ATTRIBUTE(ProviderAttribute.class, AttributeModel.class),
     VISIT_ATTRIBUTE(VisitAttribute.class, VisitAttributeModel.class),
     CONCEPT(Concept.class, ConceptModel.class),
-    LOCATION(Location.class, LocationModel.class);
+    LOCATION(Location.class, LocationModel.class),
+    ENCOUNTER_DIAGNOSIS(EncounterDiagnosis.class, EncounterDiagnosisModel.class),
+    CONDITION(Condition.class, ConditionModel.class),
+    PERSON_NAME(PersonName.class, PersonNameModel.class),
+    ALLERGY(Allergy.class, AllergyModel.class);
 
     private Class<? extends BaseEntity> entityClass;
 

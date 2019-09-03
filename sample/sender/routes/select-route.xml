@@ -7,7 +7,7 @@
     </recipientList>
     <split streaming="true">
       <simple>${body}</simple>
-      <process ref="pgpEncryptService"/>
+      <!--<process ref="pgpEncryptService"/>-->
       <to uri="{{camel.output.endpoint}}"/>
     </split>
     <process ref="saveSyncStatusProcessor"/>
