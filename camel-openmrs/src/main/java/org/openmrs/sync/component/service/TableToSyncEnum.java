@@ -25,7 +25,8 @@ public enum TableToSyncEnum {
     ENCOUNTER_DIAGNOSIS(EncounterDiagnosis.class, EncounterDiagnosisModel.class),
     CONDITION(Condition.class, ConditionModel.class),
     PERSON_NAME(PersonName.class, PersonNameModel.class),
-    ALLERGY(Allergy.class, AllergyModel.class);
+    ALLERGY(Allergy.class, AllergyModel.class),
+    PERSON_ADDRESS(PersonAddress.class, PersonAddressModel.class);
 
     private Class<? extends BaseEntity> entityClass;
 
