@@ -73,12 +73,7 @@ public final class FileUtils {
 
     private static List<Path> listKeysFromFolder(final String folderPath,
                                                  final String suffix) throws IOException {
-        String path;
-        if (folderPath.startsWith("folder:")) {
-            path = folderPath.replace("folder:", "");
-        } else {
-            path = System.getProperty("user.dir") + folderPath;
-        }
+        String path = System.getProperty("user.dir") + folderPath;
         try (Stream<Path> paths =
                      Files.find(new File(path).toPath(), 1,
                              (p, attr) -> attr.isRegularFile() && p.getFileName().toString().endsWith(suffix))
