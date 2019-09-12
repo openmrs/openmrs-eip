@@ -33,7 +33,7 @@ public abstract class OpenMrsExtractEndpointITest {
     @EndpointInject(uri = "mock:result")
     protected MockEndpoint resultEndpoint;
 
-    @Produce(uri = "direct:startExtract")
+    @Produce(property = "uri")
     protected ProducerTemplate template;
 
     @Autowired
@@ -44,6 +44,10 @@ public abstract class OpenMrsExtractEndpointITest {
 
     @Autowired
     private PGPEncryptService pgpEncryptService;
+
+    public String getUri() {
+        return "direct:start" + getClass().getSimpleName();
+    }
 
     @Before
     public void init() throws Exception {
@@ -57,13 +61,14 @@ public abstract class OpenMrsExtractEndpointITest {
     @After
     public void teardown() {
         camelContext.removeComponent("openmrs");
+        resultEndpoint.getExchanges().clear();
     }
 
     protected RoutesBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:startExtract")
+                from(getUri())
                         .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
                         .split(body()).streaming()
                         .process(pgpEncryptService)

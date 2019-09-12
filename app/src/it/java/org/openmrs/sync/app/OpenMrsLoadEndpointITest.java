@@ -25,7 +25,7 @@ public abstract class OpenMrsLoadEndpointITest {
     @Autowired
     protected CamelContext camelContext;
 
-    @Produce(uri = "direct:startLoad")
+    @Produce(property = "uri")
     protected ProducerTemplate template;
 
     @Autowired
@@ -33,6 +33,10 @@ public abstract class OpenMrsLoadEndpointITest {
 
     @Autowired
     private PGPDecryptService pgpDecryptService;
+
+    public String getUri() {
+        return "direct:start" + getClass().getSimpleName();
+    }
 
     @Before
     public void init() throws Exception {
@@ -52,7 +56,7 @@ public abstract class OpenMrsLoadEndpointITest {
         return new RouteBuilder() {
             @Override
             public void configure() {
-                from("direct:startLoad")
+                from(getUri())
                         .process(pgpDecryptService)
                         .to("openmrs:load");
             }

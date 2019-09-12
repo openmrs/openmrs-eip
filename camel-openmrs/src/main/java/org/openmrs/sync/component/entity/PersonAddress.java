@@ -2,6 +2,7 @@ package org.openmrs.sync.component.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.openmrs.sync.component.common.Address;
 import org.openmrs.sync.component.entity.light.PersonLight;
 
 import javax.persistence.*;
@@ -24,71 +25,96 @@ public class PersonAddress extends AuditableEntity {
     @Column(name = "preferred")
     private boolean preferred;
 
-    @Column(name = "address1")
-    private String address1;
-
-    @Column(name = "address2")
-    private String address2;
-
-    @Column(name = "address3")
-    private String address3;
-
-    @Column(name = "address4")
-    private String address4;
-
-    @Column(name = "address5")
-    private String address5;
-
-    @Column(name = "address6")
-    private String address6;
-
-    @Column(name = "address7")
-    private String address7;
-
-    @Column(name = "address8")
-    private String address8;
-
-    @Column(name = "address9")
-    private String address9;
-
-    @Column(name = "address10")
-    private String address10;
-
-    @Column(name = "address11")
-    private String address11;
-
-    @Column(name = "address12")
-    private String address12;
-
-    @Column(name = "address13")
-    private String address13;
-
-    @Column(name = "address14")
-    private String address14;
-
-    @Column(name = "address15")
-    private String address15;
-
-    @Column(name = "city_village")
-    private String cityVillage;
-
-    @Column(name = "state_province")
-    private String stateProvince;
-
-    @Column(name = "postal_code")
-    private String postalCode;
-
-    @Column(name = "country")
-    private String country;
-
-    @Column(name = "latitude")
-    private String latitude;
-
-    @Column(name = "longitude")
-    private String longitude;
-
-    @Column(name = "county_district")
-    private String countyDistrict;
+    @Embedded
+    @AttributeOverride(
+            name = "address1",
+            column = @Column(name = "address1")
+    )
+    @AttributeOverride(
+            name = "address2",
+            column = @Column(name = "address2")
+    )
+    @AttributeOverride(
+            name = "address3",
+            column = @Column(name = "address3")
+    )
+    @AttributeOverride(
+            name = "address4",
+            column = @Column(name = "address4")
+    )
+    @AttributeOverride(
+            name = "address5",
+            column = @Column(name = "address5")
+    )
+    @AttributeOverride(
+            name = "address6",
+            column = @Column(name = "address6")
+    )
+    @AttributeOverride(
+            name = "address7",
+            column = @Column(name = "address7")
+    )
+    @AttributeOverride(
+            name = "address8",
+            column = @Column(name = "address8")
+    )
+    @AttributeOverride(
+            name = "address9",
+            column = @Column(name = "address9")
+    )
+    @AttributeOverride(
+            name = "address10",
+            column = @Column(name = "address10")
+    )
+    @AttributeOverride(
+            name = "address11",
+            column = @Column(name = "address11")
+    )
+    @AttributeOverride(
+            name = "address12",
+            column = @Column(name = "address12")
+    )
+    @AttributeOverride(
+            name = "address13",
+            column = @Column(name = "address13")
+    )
+    @AttributeOverride(
+            name = "address14",
+            column = @Column(name = "address14")
+    )
+    @AttributeOverride(
+            name = "address15",
+            column = @Column(name = "address15")
+    )
+    @AttributeOverride(
+            name = "cityVillage",
+            column = @Column(name = "city_village")
+    )
+    @AttributeOverride(
+            name = "stateProvince",
+            column = @Column(name = "state_province")
+    )
+    @AttributeOverride(
+            name = "postalCode",
+            column = @Column(name = "postal_code")
+    )
+    @AttributeOverride(
+            name = "country",
+            column = @Column(name = "country")
+    )
+    @AttributeOverride(
+            name = "latitude",
+            column = @Column(name = "latitude")
+    )
+    @AttributeOverride(
+            name = "longitude",
+            column = @Column(name = "longitude")
+    )
+    @AttributeOverride(
+            name = "countyDistrict",
+            column = @Column(name = "county_district")
+    )
+    private Address address;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;

@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
-public class MetaDataEntity extends BaseEntity {
+public abstract class MetaDataEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "creator")
