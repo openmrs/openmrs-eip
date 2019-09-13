@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
 
-  activemq-remote1:
+  activemq-remote:
     image: webcenter/activemq:latest
     ports:
       # mqtt

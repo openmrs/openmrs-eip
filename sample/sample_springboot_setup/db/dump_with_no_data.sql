@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.7.26, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: openmrs
 -- ------------------------------------------------------
@@ -36,15 +36,6 @@ CREATE TABLE `address_hierarchy_address_to_entry_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `address_hierarchy_address_to_entry_map`
---
-
-LOCK TABLES `address_hierarchy_address_to_entry_map` WRITE;
-/*!40000 ALTER TABLE `address_hierarchy_address_to_entry_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `address_hierarchy_address_to_entry_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `address_hierarchy_entry`
 --
 
@@ -71,15 +62,6 @@ CREATE TABLE `address_hierarchy_entry` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `address_hierarchy_entry`
---
-
-LOCK TABLES `address_hierarchy_entry` WRITE;
-/*!40000 ALTER TABLE `address_hierarchy_entry` DISABLE KEYS */;
-/*!40000 ALTER TABLE `address_hierarchy_entry` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `address_hierarchy_level`
 --
 
@@ -99,15 +81,6 @@ CREATE TABLE `address_hierarchy_level` (
   CONSTRAINT `parent_level` FOREIGN KEY (`parent_level_id`) REFERENCES `address_hierarchy_level` (`address_hierarchy_level_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `address_hierarchy_level`
---
-
-LOCK TABLES `address_hierarchy_level` WRITE;
-/*!40000 ALTER TABLE `address_hierarchy_level` DISABLE KEYS */;
-/*!40000 ALTER TABLE `address_hierarchy_level` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `allergy`
@@ -147,17 +120,8 @@ CREATE TABLE `allergy` (
   CONSTRAINT `allergy_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
   CONSTRAINT `allergy_severity_concept_id_fk` FOREIGN KEY (`severity_concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `allergy_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `allergy`
---
-
-LOCK TABLES `allergy` WRITE;
-/*!40000 ALTER TABLE `allergy` DISABLE KEYS */;
-/*!40000 ALTER TABLE `allergy` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `allergy_reaction`
@@ -178,17 +142,8 @@ CREATE TABLE `allergy_reaction` (
   KEY `allergy_reaction_reaction_concept_id_fk` (`reaction_concept_id`),
   CONSTRAINT `allergy_reaction_allergy_id_fk` FOREIGN KEY (`allergy_id`) REFERENCES `allergy` (`allergy_id`),
   CONSTRAINT `allergy_reaction_reaction_concept_id_fk` FOREIGN KEY (`reaction_concept_id`) REFERENCES `concept` (`concept_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `allergy_reaction`
---
-
-LOCK TABLES `allergy_reaction` WRITE;
-/*!40000 ALTER TABLE `allergy_reaction` DISABLE KEYS */;
-/*!40000 ALTER TABLE `allergy_reaction` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appframework_component_state`
@@ -204,17 +159,8 @@ CREATE TABLE `appframework_component_state` (
   `component_type` varchar(50) NOT NULL,
   `enabled` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`component_state_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appframework_component_state`
---
-
-LOCK TABLES `appframework_component_state` WRITE;
-/*!40000 ALTER TABLE `appframework_component_state` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appframework_component_state` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appframework_user_app`
@@ -229,15 +175,6 @@ CREATE TABLE `appframework_user_app` (
   PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appframework_user_app`
---
-
-LOCK TABLES `appframework_user_app` WRITE;
-/*!40000 ALTER TABLE `appframework_user_app` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appframework_user_app` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_appointment`
@@ -280,17 +217,8 @@ CREATE TABLE `appointmentscheduling_appointment` (
   CONSTRAINT `appointment_time_slot_id` FOREIGN KEY (`time_slot_id`) REFERENCES `appointmentscheduling_time_slot` (`time_slot_id`),
   CONSTRAINT `appointment_visit_id` FOREIGN KEY (`visit_id`) REFERENCES `visit` (`visit_id`),
   CONSTRAINT `appointment_voided_by` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_appointment`
---
-
-LOCK TABLES `appointmentscheduling_appointment` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_appointment_block`
@@ -326,17 +254,8 @@ CREATE TABLE `appointmentscheduling_appointment_block` (
   CONSTRAINT `appointment_block_location_id` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`),
   CONSTRAINT `appointment_block_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`),
   CONSTRAINT `appointment_block_voided_by` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_appointment_block`
---
-
-LOCK TABLES `appointmentscheduling_appointment_block` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_block` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_block` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_appointment_request`
@@ -383,17 +302,8 @@ CREATE TABLE `appointmentscheduling_appointment_request` (
   CONSTRAINT `appointment_request_provider_id` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`),
   CONSTRAINT `appointment_request_requested_by` FOREIGN KEY (`requested_by`) REFERENCES `provider` (`provider_id`),
   CONSTRAINT `appointment_request_voided_by` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_appointment_request`
---
-
-LOCK TABLES `appointmentscheduling_appointment_request` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_request` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_request` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_appointment_status_history`
@@ -413,15 +323,6 @@ CREATE TABLE `appointmentscheduling_appointment_status_history` (
   CONSTRAINT `appointment_status_history_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointmentscheduling_appointment` (`appointment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_appointment_status_history`
---
-
-LOCK TABLES `appointmentscheduling_appointment_status_history` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_status_history` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_status_history` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_appointment_type`
@@ -453,17 +354,8 @@ CREATE TABLE `appointmentscheduling_appointment_type` (
   CONSTRAINT `appointment_type_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `appointment_type_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `appointment_type_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_appointment_type`
---
-
-LOCK TABLES `appointmentscheduling_appointment_type` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_appointment_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_block_type_map`
@@ -481,15 +373,6 @@ CREATE TABLE `appointmentscheduling_block_type_map` (
   CONSTRAINT `appointment_block_type_map_appointment_type_id` FOREIGN KEY (`appointment_type_id`) REFERENCES `appointmentscheduling_appointment_type` (`appointment_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_block_type_map`
---
-
-LOCK TABLES `appointmentscheduling_block_type_map` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_block_type_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_block_type_map` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `appointmentscheduling_time_slot`
@@ -522,17 +405,8 @@ CREATE TABLE `appointmentscheduling_time_slot` (
   CONSTRAINT `appointment_slot_appointment_block_id` FOREIGN KEY (`appointment_block_id`) REFERENCES `appointmentscheduling_appointment_block` (`appointment_block_id`),
   CONSTRAINT `appointment_slot_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `appointment_slot_voided_by` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `appointmentscheduling_time_slot`
---
-
-LOCK TABLES `appointmentscheduling_time_slot` WRITE;
-/*!40000 ALTER TABLE `appointmentscheduling_time_slot` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appointmentscheduling_time_slot` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `calculation_registration`
@@ -549,19 +423,10 @@ CREATE TABLE `calculation_registration` (
   `configuration` text,
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`calculation_registration_id`),
-  UNIQUE KEY `token` (`token`),
-  UNIQUE KEY `uuid` (`uuid`)
+  UNIQUE KEY `uuid` (`uuid`),
+  UNIQUE KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `calculation_registration`
---
-
-LOCK TABLES `calculation_registration` WRITE;
-/*!40000 ALTER TABLE `calculation_registration` DISABLE KEYS */;
-/*!40000 ALTER TABLE `calculation_registration` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `care_setting`
@@ -597,15 +462,6 @@ CREATE TABLE `care_setting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `care_setting`
---
-
-LOCK TABLES `care_setting` WRITE;
-/*!40000 ALTER TABLE `care_setting` DISABLE KEYS */;
-/*!40000 ALTER TABLE `care_setting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `chartsearch_bookmark`
 --
 
@@ -630,15 +486,6 @@ CREATE TABLE `chartsearch_bookmark` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chartsearch_bookmark`
---
-
-LOCK TABLES `chartsearch_bookmark` WRITE;
-/*!40000 ALTER TABLE `chartsearch_bookmark` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_bookmark` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `chartsearch_categories`
 --
 
@@ -654,15 +501,6 @@ CREATE TABLE `chartsearch_categories` (
   PRIMARY KEY (`category_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `chartsearch_categories`
---
-
-LOCK TABLES `chartsearch_categories` WRITE;
-/*!40000 ALTER TABLE `chartsearch_categories` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_categories` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `chartsearch_category_displayname`
@@ -686,15 +524,6 @@ CREATE TABLE `chartsearch_category_displayname` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chartsearch_category_displayname`
---
-
-LOCK TABLES `chartsearch_category_displayname` WRITE;
-/*!40000 ALTER TABLE `chartsearch_category_displayname` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_category_displayname` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `chartsearch_history`
 --
 
@@ -715,15 +544,6 @@ CREATE TABLE `chartsearch_history` (
   CONSTRAINT `history_patient-fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `chartsearch_history`
---
-
-LOCK TABLES `chartsearch_history` WRITE;
-/*!40000 ALTER TABLE `chartsearch_history` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_history` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `chartsearch_note`
@@ -751,15 +571,6 @@ CREATE TABLE `chartsearch_note` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chartsearch_note`
---
-
-LOCK TABLES `chartsearch_note` WRITE;
-/*!40000 ALTER TABLE `chartsearch_note` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_note` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `chartsearch_preference`
 --
 
@@ -785,15 +596,6 @@ CREATE TABLE `chartsearch_preference` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chartsearch_preference`
---
-
-LOCK TABLES `chartsearch_preference` WRITE;
-/*!40000 ALTER TABLE `chartsearch_preference` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_preference` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `chartsearch_synonym_groups`
 --
 
@@ -807,15 +609,6 @@ CREATE TABLE `chartsearch_synonym_groups` (
   PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `chartsearch_synonym_groups`
---
-
-LOCK TABLES `chartsearch_synonym_groups` WRITE;
-/*!40000 ALTER TABLE `chartsearch_synonym_groups` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_synonym_groups` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `chartsearch_synonyms`
@@ -835,15 +628,6 @@ CREATE TABLE `chartsearch_synonyms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chartsearch_synonyms`
---
-
-LOCK TABLES `chartsearch_synonyms` WRITE;
-/*!40000 ALTER TABLE `chartsearch_synonyms` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chartsearch_synonyms` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `clob_datatype_storage`
 --
 
@@ -859,15 +643,6 @@ CREATE TABLE `clob_datatype_storage` (
   UNIQUE KEY `clob_datatype_storage_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `clob_datatype_storage`
---
-
-LOCK TABLES `clob_datatype_storage` WRITE;
-/*!40000 ALTER TABLE `clob_datatype_storage` DISABLE KEYS */;
-/*!40000 ALTER TABLE `clob_datatype_storage` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `cohort`
@@ -901,15 +676,6 @@ CREATE TABLE `cohort` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `cohort`
---
-
-LOCK TABLES `cohort` WRITE;
-/*!40000 ALTER TABLE `cohort` DISABLE KEYS */;
-/*!40000 ALTER TABLE `cohort` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `cohort_member`
 --
 
@@ -931,23 +697,14 @@ CREATE TABLE `cohort_member` (
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`cohort_member_id`),
   UNIQUE KEY `uuid` (`uuid`),
+  KEY `member_patient` (`patient_id`),
   KEY `cohort_member_creator` (`creator`),
   KEY `parent_cohort` (`cohort_id`),
-  KEY `member_patient` (`patient_id`),
   CONSTRAINT `cohort_member_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `member_patient` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
   CONSTRAINT `parent_cohort` FOREIGN KEY (`cohort_id`) REFERENCES `cohort` (`cohort_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `cohort_member`
---
-
-LOCK TABLES `cohort_member` WRITE;
-/*!40000 ALTER TABLE `cohort_member` DISABLE KEYS */;
-/*!40000 ALTER TABLE `cohort_member` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept`
@@ -966,7 +723,7 @@ CREATE TABLE `concept` (
   `class_id` int(11) NOT NULL DEFAULT '0',
   `is_set` tinyint(1) NOT NULL DEFAULT '0',
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `version` varchar(50) DEFAULT NULL,
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
@@ -976,27 +733,20 @@ CREATE TABLE `concept` (
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_id`),
   UNIQUE KEY `concept_uuid_index` (`uuid`),
-  KEY `user_who_changed_concept` (`changed_by`),
   KEY `concept_classes` (`class_id`),
   KEY `concept_creator` (`creator`),
   KEY `concept_datatypes` (`datatype_id`),
+  KEY `user_who_changed_concept` (`changed_by`),
+  KEY `concept_code` (`version`),
+  KEY `concept_ndx` (`version`),
   KEY `user_who_retired_concept` (`retired_by`),
   CONSTRAINT `concept_classes` FOREIGN KEY (`class_id`) REFERENCES `concept_class` (`concept_class_id`),
   CONSTRAINT `concept_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_datatypes` FOREIGN KEY (`datatype_id`) REFERENCES `concept_datatype` (`concept_datatype_id`),
   CONSTRAINT `user_who_changed_concept` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_concept` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=165180 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=173456 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept`
---
-
-LOCK TABLES `concept` WRITE;
-/*!40000 ALTER TABLE `concept` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_answer`
@@ -1011,30 +761,21 @@ CREATE TABLE `concept_answer` (
   `answer_concept` int(11) DEFAULT NULL,
   `answer_drug` int(11) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
-  `sort_weight` double DEFAULT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uuid` char(38) NOT NULL,
+  `sort_weight` double DEFAULT NULL,
   PRIMARY KEY (`concept_answer_id`),
   UNIQUE KEY `concept_answer_uuid_index` (`uuid`),
+  KEY `answer_creator` (`creator`),
   KEY `answer` (`answer_concept`),
   KEY `answers_for_concept` (`concept_id`),
-  KEY `answer_creator` (`creator`),
   KEY `answer_answer_drug_fk` (`answer_drug`),
   CONSTRAINT `answer` FOREIGN KEY (`answer_concept`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `answer_answer_drug_fk` FOREIGN KEY (`answer_drug`) REFERENCES `drug` (`drug_id`),
   CONSTRAINT `answer_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `answers_for_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6567 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=28787 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_answer`
---
-
-LOCK TABLES `concept_answer` WRITE;
-/*!40000 ALTER TABLE `concept_answer` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_answer` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_attribute`
@@ -1069,17 +810,8 @@ CREATE TABLE `concept_attribute` (
   CONSTRAINT `concept_attribute_concept_fk` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `concept_attribute_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_attribute_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6205 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_attribute`
---
-
-LOCK TABLES `concept_attribute` WRITE;
-/*!40000 ALTER TABLE `concept_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_attribute_type`
@@ -1115,17 +847,8 @@ CREATE TABLE `concept_attribute_type` (
   CONSTRAINT `concept_attribute_type_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_attribute_type_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_attribute_type_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_attribute_type`
---
-
-LOCK TABLES `concept_attribute_type` WRITE;
-/*!40000 ALTER TABLE `concept_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_class`
@@ -1139,7 +862,7 @@ CREATE TABLE `concept_class` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `description` varchar(255) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `retired` tinyint(1) NOT NULL DEFAULT '0',
   `retired_by` int(11) DEFAULT NULL,
   `date_retired` datetime DEFAULT NULL,
@@ -1149,26 +872,16 @@ CREATE TABLE `concept_class` (
   `changed_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`concept_class_id`),
   UNIQUE KEY `concept_class_uuid_index` (`uuid`),
-  KEY `concept_class_retired_status` (`retired`),
   KEY `concept_class_creator` (`creator`),
   KEY `user_who_retired_concept_class` (`retired_by`),
+  KEY `concept_class_retired_status` (`retired`),
   KEY `concept_class_name_index` (`name`),
   KEY `concept_class_changed_by` (`changed_by`),
   CONSTRAINT `concept_class_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_class_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_concept_class` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_class`
---
-
-LOCK TABLES `concept_class` WRITE;
-/*!40000 ALTER TABLE `concept_class` DISABLE KEYS */;
-INSERT INTO `concept_class` VALUES (1,'test','Acq. during patient encounter (vitals, labs, etc.)',1,'2004-02-02 00:00:00',0,1,NULL,NULL,'8d4907b2-c2cc-11de-8d13-0010c6dffd0f',NULL,NULL);
-/*!40000 ALTER TABLE `concept_class` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_complex`
@@ -1186,15 +899,6 @@ CREATE TABLE `concept_complex` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concept_complex`
---
-
-LOCK TABLES `concept_complex` WRITE;
-/*!40000 ALTER TABLE `concept_complex` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_complex` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `concept_datatype`
 --
 
@@ -1207,7 +911,7 @@ CREATE TABLE `concept_datatype` (
   `hl7_abbreviation` varchar(3) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `retired` tinyint(1) NOT NULL DEFAULT '0',
   `retired_by` int(11) DEFAULT NULL,
   `date_retired` datetime DEFAULT NULL,
@@ -1215,24 +919,14 @@ CREATE TABLE `concept_datatype` (
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_datatype_id`),
   UNIQUE KEY `concept_datatype_uuid_index` (`uuid`),
-  KEY `concept_datatype_retired_status` (`retired`),
   KEY `concept_datatype_creator` (`creator`),
   KEY `user_who_retired_concept_datatype` (`retired_by`),
+  KEY `concept_datatype_retired_status` (`retired`),
   KEY `concept_datatype_name_index` (`name`),
   CONSTRAINT `concept_datatype_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_concept_datatype` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_datatype`
---
-
-LOCK TABLES `concept_datatype` WRITE;
-/*!40000 ALTER TABLE `concept_datatype` DISABLE KEYS */;
-INSERT INTO `concept_datatype` VALUES (1,'Numeric','NM','Numeric value, including integer or float (e.g., creatinine, weight)',1,'2004-02-02 00:00:00',0,1,NULL,NULL,'8d4a4488-c2cc-11de-8d13-0010c6dffd0f');
-/*!40000 ALTER TABLE `concept_datatype` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_description`
@@ -1247,29 +941,20 @@ CREATE TABLE `concept_description` (
   `description` text NOT NULL,
   `locale` varchar(50) NOT NULL DEFAULT '',
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_description_id`),
   UNIQUE KEY `concept_description_uuid_index` (`uuid`),
-  KEY `user_who_changed_description` (`changed_by`),
-  KEY `description_for_concept` (`concept_id`),
+  KEY `concept_being_described` (`concept_id`),
   KEY `user_who_created_description` (`creator`),
+  KEY `user_who_changed_description` (`changed_by`),
   CONSTRAINT `description_for_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `user_who_changed_description` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_created_description` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18162 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=24082 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_description`
---
-
-LOCK TABLES `concept_description` WRITE;
-/*!40000 ALTER TABLE `concept_description` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_description` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_map_type`
@@ -1286,7 +971,7 @@ CREATE TABLE `concept_map_type` (
   `date_created` datetime NOT NULL,
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
-  `is_hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `is_hidden` tinyint(1) DEFAULT NULL,
   `retired` tinyint(1) NOT NULL DEFAULT '0',
   `retired_by` int(11) DEFAULT NULL,
   `date_retired` datetime DEFAULT NULL,
@@ -1305,15 +990,6 @@ CREATE TABLE `concept_map_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concept_map_type`
---
-
-LOCK TABLES `concept_map_type` WRITE;
-/*!40000 ALTER TABLE `concept_map_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_map_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `concept_name`
 --
 
@@ -1321,43 +997,36 @@ DROP TABLE IF EXISTS `concept_name`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `concept_name` (
-  `concept_name_id` int(11) NOT NULL AUTO_INCREMENT,
   `concept_id` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `locale` varchar(50) NOT NULL DEFAULT '',
-  `locale_preferred` tinyint(1) DEFAULT '0',
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
-  `concept_name_type` varchar(50) DEFAULT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `concept_name_id` int(11) NOT NULL AUTO_INCREMENT,
   `voided` tinyint(1) NOT NULL DEFAULT '0',
   `voided_by` int(11) DEFAULT NULL,
   `date_voided` datetime DEFAULT NULL,
   `void_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
+  `concept_name_type` varchar(50) DEFAULT NULL,
+  `locale_preferred` tinyint(1) DEFAULT '0',
   `date_changed` datetime DEFAULT NULL,
   `changed_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`concept_name_id`),
+  UNIQUE KEY `concept_name_id` (`concept_name_id`),
   UNIQUE KEY `concept_name_uuid_index` (`uuid`),
-  KEY `name_of_concept` (`name`),
-  KEY `name_for_concept` (`concept_id`),
   KEY `user_who_created_name` (`creator`),
-  KEY `user_who_voided_this_name` (`voided_by`),
+  KEY `name_of_concept` (`name`),
+  KEY `concept_id` (`concept_id`),
+  KEY `unique_concept_name_id` (`concept_id`),
+  KEY `user_who_voided_name` (`voided_by`),
   KEY `concept_name_changed_by` (`changed_by`),
   CONSTRAINT `concept_name_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `name_for_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `user_who_created_name` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_voided_this_name` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=142103 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=234030 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_name`
---
-
-LOCK TABLES `concept_name` WRITE;
-/*!40000 ALTER TABLE `concept_name` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_name` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_name_tag`
@@ -1371,7 +1040,7 @@ CREATE TABLE `concept_name_tag` (
   `tag` varchar(50) NOT NULL,
   `description` text,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `voided` tinyint(1) NOT NULL DEFAULT '0',
   `voided_by` int(11) DEFAULT NULL,
   `date_voided` datetime DEFAULT NULL,
@@ -1380,23 +1049,16 @@ CREATE TABLE `concept_name_tag` (
   `date_changed` datetime DEFAULT NULL,
   `changed_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`concept_name_tag_id`),
+  UNIQUE KEY `concept_name_tag_id` (`concept_name_tag_id`),
+  UNIQUE KEY `concept_name_tag_id_2` (`concept_name_tag_id`),
   UNIQUE KEY `concept_name_tag_unique_tags` (`tag`),
   UNIQUE KEY `concept_name_tag_uuid_index` (`uuid`),
   KEY `user_who_created_name_tag` (`creator`),
   KEY `user_who_voided_name_tag` (`voided_by`),
   KEY `concept_name_tag_changed_by` (`changed_by`),
   CONSTRAINT `concept_name_tag_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_name_tag`
---
-
-LOCK TABLES `concept_name_tag` WRITE;
-/*!40000 ALTER TABLE `concept_name_tag` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_name_tag` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_name_tag_map`
@@ -1408,21 +1070,12 @@ DROP TABLE IF EXISTS `concept_name_tag_map`;
 CREATE TABLE `concept_name_tag_map` (
   `concept_name_id` int(11) NOT NULL,
   `concept_name_tag_id` int(11) NOT NULL,
-  KEY `mapped_concept_name` (`concept_name_id`),
-  KEY `mapped_concept_name_tag` (`concept_name_tag_id`),
+  KEY `map_name` (`concept_name_id`),
+  KEY `map_name_tag` (`concept_name_tag_id`),
   CONSTRAINT `mapped_concept_name` FOREIGN KEY (`concept_name_id`) REFERENCES `concept_name` (`concept_name_id`),
   CONSTRAINT `mapped_concept_name_tag` FOREIGN KEY (`concept_name_tag_id`) REFERENCES `concept_name_tag` (`concept_name_tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_name_tag_map`
---
-
-LOCK TABLES `concept_name_tag_map` WRITE;
-/*!40000 ALTER TABLE `concept_name_tag_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_name_tag_map` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_numeric`
@@ -1440,21 +1093,12 @@ CREATE TABLE `concept_numeric` (
   `low_critical` double DEFAULT NULL,
   `low_normal` double DEFAULT NULL,
   `units` varchar(50) DEFAULT NULL,
-  `precise` tinyint(1) NOT NULL DEFAULT '0',
+  `allow_decimal` tinyint(1) DEFAULT NULL,
   `display_precision` int(11) DEFAULT NULL,
   PRIMARY KEY (`concept_id`),
   CONSTRAINT `numeric_attributes` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_numeric`
---
-
-LOCK TABLES `concept_numeric` WRITE;
-/*!40000 ALTER TABLE `concept_numeric` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_numeric` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_proposal`
@@ -1474,7 +1118,7 @@ CREATE TABLE `concept_proposal` (
   `state` varchar(32) NOT NULL DEFAULT 'UNMAPPED',
   `comments` varchar(255) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0002-11-30 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `locale` varchar(50) NOT NULL DEFAULT '',
@@ -1497,15 +1141,6 @@ CREATE TABLE `concept_proposal` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concept_proposal`
---
-
-LOCK TABLES `concept_proposal` WRITE;
-/*!40000 ALTER TABLE `concept_proposal` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_proposal` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `concept_proposal_tag_map`
 --
 
@@ -1523,15 +1158,6 @@ CREATE TABLE `concept_proposal_tag_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concept_proposal_tag_map`
---
-
-LOCK TABLES `concept_proposal_tag_map` WRITE;
-/*!40000 ALTER TABLE `concept_proposal_tag_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_proposal_tag_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `concept_reference_map`
 --
 
@@ -1540,18 +1166,19 @@ DROP TABLE IF EXISTS `concept_reference_map`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `concept_reference_map` (
   `concept_map_id` int(11) NOT NULL AUTO_INCREMENT,
+  `creator` int(11) NOT NULL DEFAULT '0',
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `concept_id` int(11) NOT NULL DEFAULT '0',
+  `uuid` char(38) NOT NULL,
   `concept_reference_term_id` int(11) NOT NULL,
   `concept_map_type_id` int(11) NOT NULL DEFAULT '1',
-  `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
-  `concept_id` int(11) NOT NULL DEFAULT '0',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
-  `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_map_id`),
+  UNIQUE KEY `concept_map_uuid_index` (`uuid`),
   UNIQUE KEY `concept_reference_map_uuid_id` (`uuid`),
-  KEY `map_for_concept` (`concept_id`),
   KEY `map_creator` (`creator`),
+  KEY `map_for_concept` (`concept_id`),
   KEY `mapped_concept_map_type` (`concept_map_type_id`),
   KEY `mapped_user_changed_ref_term` (`changed_by`),
   KEY `mapped_concept_reference_term` (`concept_reference_term_id`),
@@ -1560,17 +1187,8 @@ CREATE TABLE `concept_reference_map` (
   CONSTRAINT `mapped_concept_map_type` FOREIGN KEY (`concept_map_type_id`) REFERENCES `concept_map_type` (`concept_map_type_id`),
   CONSTRAINT `mapped_concept_reference_term` FOREIGN KEY (`concept_reference_term_id`) REFERENCES `concept_reference_term` (`concept_reference_term_id`),
   CONSTRAINT `mapped_user_changed_ref_term` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=283697 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=358695 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_reference_map`
---
-
-LOCK TABLES `concept_reference_map` WRITE;
-/*!40000 ALTER TABLE `concept_reference_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_reference_map` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_reference_source`
@@ -1583,9 +1201,9 @@ CREATE TABLE `concept_reference_source` (
   `concept_source_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   `description` text NOT NULL,
-  `hl7_code` varchar(50) DEFAULT '',
+  `hl7_code` varchar(50) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `retired` tinyint(1) NOT NULL DEFAULT '0',
   `retired_by` int(11) DEFAULT NULL,
   `date_retired` datetime DEFAULT NULL,
@@ -1595,27 +1213,19 @@ CREATE TABLE `concept_reference_source` (
   `date_changed` datetime DEFAULT NULL,
   `changed_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`concept_source_id`),
+  UNIQUE KEY `concept_source_uuid_index` (`uuid`),
   UNIQUE KEY `concept_reference_source_uuid_id` (`uuid`),
   UNIQUE KEY `concept_source_unique_hl7_codes` (`hl7_code`),
   UNIQUE KEY `concept_reference_source_unique_id_unique` (`unique_id`),
-  KEY `unique_hl7_code` (`hl7_code`),
   KEY `concept_source_creator` (`creator`),
-  KEY `user_who_retired_concept_source` (`retired_by`),
+  KEY `user_who_voided_concept_source` (`retired_by`),
+  KEY `unique_hl7_code` (`hl7_code`,`retired`),
   KEY `concept_reference_source_changed_by` (`changed_by`),
   CONSTRAINT `concept_reference_source_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `concept_source_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_concept_source` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_reference_source`
---
-
-LOCK TABLES `concept_reference_source` WRITE;
-/*!40000 ALTER TABLE `concept_reference_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_reference_source` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_reference_term`
@@ -1651,17 +1261,8 @@ CREATE TABLE `concept_reference_term` (
   CONSTRAINT `mapped_user_changed` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `mapped_user_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `mapped_user_retired` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=283697 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=298116 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_reference_term`
---
-
-LOCK TABLES `concept_reference_term` WRITE;
-/*!40000 ALTER TABLE `concept_reference_term` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_reference_term` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_reference_term_map`
@@ -1696,15 +1297,6 @@ CREATE TABLE `concept_reference_term_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concept_reference_term_map`
---
-
-LOCK TABLES `concept_reference_term_map` WRITE;
-/*!40000 ALTER TABLE `concept_reference_term_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_reference_term_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `concept_set`
 --
 
@@ -1717,26 +1309,18 @@ CREATE TABLE `concept_set` (
   `concept_set` int(11) NOT NULL DEFAULT '0',
   `sort_weight` double DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_set_id`),
   UNIQUE KEY `concept_set_uuid_index` (`uuid`),
-  KEY `idx_concept_set_concept` (`concept_id`),
   KEY `has_a` (`concept_set`),
   KEY `user_who_created` (`creator`),
+  KEY `idx_concept_set_concept` (`concept_id`),
   CONSTRAINT `has_a` FOREIGN KEY (`concept_set`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `is_a` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `user_who_created` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2541 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16185 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_set`
---
-
-LOCK TABLES `concept_set` WRITE;
-/*!40000 ALTER TABLE `concept_set` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_set` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_state_conversion`
@@ -1754,22 +1338,14 @@ CREATE TABLE `concept_state_conversion` (
   PRIMARY KEY (`concept_state_conversion_id`),
   UNIQUE KEY `concept_state_conversion_uuid_index` (`uuid`),
   UNIQUE KEY `unique_workflow_concept_in_conversion` (`program_workflow_id`,`concept_id`),
-  KEY `concept_triggers_conversion` (`concept_id`),
-  KEY `conversion_to_state` (`program_workflow_state_id`),
+  KEY `triggering_concept` (`concept_id`),
+  KEY `affected_workflow` (`program_workflow_id`),
+  KEY `resulting_state` (`program_workflow_state_id`),
   CONSTRAINT `concept_triggers_conversion` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `conversion_involves_workflow` FOREIGN KEY (`program_workflow_id`) REFERENCES `program_workflow` (`program_workflow_id`),
   CONSTRAINT `conversion_to_state` FOREIGN KEY (`program_workflow_state_id`) REFERENCES `program_workflow_state` (`program_workflow_state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_state_conversion`
---
-
-LOCK TABLES `concept_state_conversion` WRITE;
-/*!40000 ALTER TABLE `concept_state_conversion` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_state_conversion` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `concept_stop_word`
@@ -1784,18 +1360,10 @@ CREATE TABLE `concept_stop_word` (
   `locale` varchar(50) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`concept_stop_word_id`),
+  UNIQUE KEY `uuid` (`uuid`),
   UNIQUE KEY `Unique_StopWord_Key` (`word`,`locale`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `concept_stop_word`
---
-
-LOCK TABLES `concept_stop_word` WRITE;
-/*!40000 ALTER TABLE `concept_stop_word` DISABLE KEYS */;
-/*!40000 ALTER TABLE `concept_stop_word` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `conditions`
@@ -1806,48 +1374,42 @@ DROP TABLE IF EXISTS `conditions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `conditions` (
   `condition_id` int(11) NOT NULL AUTO_INCREMENT,
-  `previous_condition_id` int(11) DEFAULT NULL,
-  `patient_id` int(11) NOT NULL,
-  `status` varchar(255) NOT NULL,
-  `concept_id` int(11) NOT NULL,
-  `condition_non_coded` varchar(1024) DEFAULT NULL,
+  `additional_detail` varchar(255) DEFAULT NULL,
+  `previous_version` int(11) DEFAULT NULL,
+  `condition_coded` int(11) DEFAULT NULL,
+  `condition_non_coded` varchar(255) DEFAULT NULL,
+  `condition_coded_name` int(11) DEFAULT NULL,
+  `clinical_status` varchar(50) NOT NULL,
+  `verification_status` varchar(50) DEFAULT NULL,
   `onset_date` datetime DEFAULT NULL,
-  `additional_detail` varchar(1024) DEFAULT NULL,
-  `end_date` datetime DEFAULT NULL,
-  `end_reason` int(11) DEFAULT NULL,
-  `creator` int(11) NOT NULL,
   `date_created` datetime NOT NULL,
-  `voided` tinyint(1) NOT NULL,
-  `voided_by` int(11) DEFAULT NULL,
+  `voided` tinyint(1) NOT NULL DEFAULT '0',
   `date_voided` datetime DEFAULT NULL,
   `void_reason` varchar(255) DEFAULT NULL,
-  `uuid` char(38) NOT NULL,
+  `uuid` varchar(38) DEFAULT NULL,
+  `creator` int(11) NOT NULL,
+  `voided_by` int(11) DEFAULT NULL,
+  `changed_by` int(11) DEFAULT NULL,
+  `patient_id` int(11) NOT NULL,
+  `end_date` datetime DEFAULT NULL,
   PRIMARY KEY (`condition_id`),
   UNIQUE KEY `uuid` (`uuid`),
-  UNIQUE KEY `condition_uuid_index` (`uuid`),
-  KEY `conditions_previous_condition_id_fk` (`previous_condition_id`),
-  KEY `conditions_patient_fk` (`patient_id`),
-  KEY `conditions_concept_fk` (`concept_id`),
-  KEY `conditions_end_reason_fk` (`end_reason`),
-  KEY `conditions_created_by_fk` (`creator`),
-  KEY `conditions_voided_by_fk` (`voided_by`),
-  CONSTRAINT `conditions_concept_fk` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
-  CONSTRAINT `conditions_created_by_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `conditions_end_reason_fk` FOREIGN KEY (`end_reason`) REFERENCES `concept` (`concept_id`),
-  CONSTRAINT `conditions_patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`) ON UPDATE CASCADE,
-  CONSTRAINT `conditions_previous_condition_id_fk` FOREIGN KEY (`previous_condition_id`) REFERENCES `conditions` (`condition_id`),
-  CONSTRAINT `conditions_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `condition_previous_version_fk` (`previous_version`),
+  KEY `condition_condition_coded_fk` (`condition_coded`),
+  KEY `condition_condition_coded_name_fk` (`condition_coded_name`),
+  KEY `condition_creator_fk` (`creator`),
+  KEY `condition_changed_by_fk` (`changed_by`),
+  KEY `condition_voided_by_fk` (`voided_by`),
+  KEY `condition_patient_fk` (`patient_id`),
+  CONSTRAINT `condition_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `condition_condition_coded_fk` FOREIGN KEY (`condition_coded`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `condition_condition_coded_name_fk` FOREIGN KEY (`condition_coded_name`) REFERENCES `concept_name` (`concept_name_id`),
+  CONSTRAINT `condition_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `condition_patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
+  CONSTRAINT `condition_previous_version_fk` FOREIGN KEY (`previous_version`) REFERENCES `conditions` (`condition_id`),
+  CONSTRAINT `condition_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `conditions`
---
-
-LOCK TABLES `conditions` WRITE;
-/*!40000 ALTER TABLE `conditions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `conditions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `drug`
@@ -1889,17 +1451,8 @@ CREATE TABLE `drug` (
   CONSTRAINT `drug_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `primary_drug_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `route_concept` FOREIGN KEY (`route`) REFERENCES `concept` (`concept_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=119 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `drug`
---
-
-LOCK TABLES `drug` WRITE;
-/*!40000 ALTER TABLE `drug` DISABLE KEYS */;
-/*!40000 ALTER TABLE `drug` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `drug_ingredient`
@@ -1923,15 +1476,6 @@ CREATE TABLE `drug_ingredient` (
   CONSTRAINT `drug_ingredient_units_fk` FOREIGN KEY (`units`) REFERENCES `concept` (`concept_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `drug_ingredient`
---
-
-LOCK TABLES `drug_ingredient` WRITE;
-/*!40000 ALTER TABLE `drug_ingredient` DISABLE KEYS */;
-/*!40000 ALTER TABLE `drug_ingredient` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `drug_order`
@@ -1977,15 +1521,6 @@ CREATE TABLE `drug_order` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `drug_order`
---
-
-LOCK TABLES `drug_order` WRITE;
-/*!40000 ALTER TABLE `drug_order` DISABLE KEYS */;
-/*!40000 ALTER TABLE `drug_order` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `drug_reference_map`
 --
 
@@ -2024,13 +1559,47 @@ CREATE TABLE `drug_reference_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `drug_reference_map`
+-- Table structure for table `emrapi_conditions`
 --
 
-LOCK TABLES `drug_reference_map` WRITE;
-/*!40000 ALTER TABLE `drug_reference_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `drug_reference_map` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `emrapi_conditions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `emrapi_conditions` (
+  `condition_id` int(11) NOT NULL AUTO_INCREMENT,
+  `previous_condition_id` int(11) DEFAULT NULL,
+  `patient_id` int(11) NOT NULL,
+  `status` varchar(255) NOT NULL,
+  `concept_id` int(11) NOT NULL,
+  `condition_non_coded` varchar(1024) DEFAULT NULL,
+  `onset_date` datetime DEFAULT NULL,
+  `additional_detail` varchar(1024) DEFAULT NULL,
+  `end_date` datetime DEFAULT NULL,
+  `end_reason` int(11) DEFAULT NULL,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL,
+  `voided` tinyint(1) NOT NULL,
+  `voided_by` int(11) DEFAULT NULL,
+  `date_voided` datetime DEFAULT NULL,
+  `void_reason` varchar(255) DEFAULT NULL,
+  `uuid` char(38) NOT NULL,
+  PRIMARY KEY (`condition_id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  UNIQUE KEY `condition_uuid_index` (`uuid`),
+  KEY `conditions_previous_condition_id_fk` (`previous_condition_id`),
+  KEY `conditions_patient_fk` (`patient_id`),
+  KEY `conditions_concept_fk` (`concept_id`),
+  KEY `conditions_end_reason_fk` (`end_reason`),
+  KEY `conditions_created_by_fk` (`creator`),
+  KEY `conditions_voided_by_fk` (`voided_by`),
+  CONSTRAINT `conditions_concept_fk` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `conditions_created_by_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `conditions_end_reason_fk` FOREIGN KEY (`end_reason`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `conditions_patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`) ON UPDATE CASCADE,
+  CONSTRAINT `conditions_previous_condition_id_fk` FOREIGN KEY (`previous_condition_id`) REFERENCES `emrapi_conditions` (`condition_id`),
+  CONSTRAINT `conditions_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `encounter`
@@ -2075,17 +1644,56 @@ CREATE TABLE `encounter` (
   CONSTRAINT `encounter_type_id` FOREIGN KEY (`encounter_type`) REFERENCES `encounter_type` (`encounter_type_id`),
   CONSTRAINT `encounter_visit_id_fk` FOREIGN KEY (`visit_id`) REFERENCES `visit` (`visit_id`),
   CONSTRAINT `user_who_voided_encounter` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `encounter`
+-- Table structure for table `encounter_diagnosis`
 --
 
-LOCK TABLES `encounter` WRITE;
-/*!40000 ALTER TABLE `encounter` DISABLE KEYS */;
-/*!40000 ALTER TABLE `encounter` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `encounter_diagnosis`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `encounter_diagnosis` (
+  `diagnosis_id` int(11) NOT NULL AUTO_INCREMENT,
+  `diagnosis_coded` int(11) DEFAULT NULL,
+  `diagnosis_non_coded` varchar(255) DEFAULT NULL,
+  `diagnosis_coded_name` int(11) DEFAULT NULL,
+  `encounter_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `condition_id` int(11) DEFAULT NULL,
+  `certainty` varchar(255) NOT NULL,
+  `rank` int(11) NOT NULL,
+  `uuid` char(38) NOT NULL,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL,
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `voided` tinyint(1) NOT NULL DEFAULT '0',
+  `voided_by` int(11) DEFAULT NULL,
+  `date_voided` datetime DEFAULT NULL,
+  `void_reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`diagnosis_id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `encounter_diagnosis_encounter_id_fk` (`encounter_id`),
+  KEY `encounter_diagnosis_condition_id_fk` (`condition_id`),
+  KEY `encounter_diagnosis_creator_fk` (`creator`),
+  KEY `encounter_diagnosis_voided_by_fk` (`voided_by`),
+  KEY `encounter_diagnosis_changed_by_fk` (`changed_by`),
+  KEY `encounter_diagnosis_coded_fk` (`diagnosis_coded`),
+  KEY `encounter_diagnosis_coded_name_fk` (`diagnosis_coded_name`),
+  KEY `encounter_diagnosis_patient_fk` (`patient_id`),
+  CONSTRAINT `encounter_diagnosis_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `encounter_diagnosis_coded_fk` FOREIGN KEY (`diagnosis_coded`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `encounter_diagnosis_coded_name_fk` FOREIGN KEY (`diagnosis_coded_name`) REFERENCES `concept_name` (`concept_name_id`),
+  CONSTRAINT `encounter_diagnosis_condition_id_fk` FOREIGN KEY (`condition_id`) REFERENCES `conditions` (`condition_id`),
+  CONSTRAINT `encounter_diagnosis_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `encounter_diagnosis_encounter_id_fk` FOREIGN KEY (`encounter_id`) REFERENCES `encounter` (`encounter_id`),
+  CONSTRAINT `encounter_diagnosis_patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
+  CONSTRAINT `encounter_diagnosis_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
+  CONSTRAINT `encounter_diagnosis_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `encounter_provider`
@@ -2122,17 +1730,8 @@ CREATE TABLE `encounter_provider` (
   CONSTRAINT `encounter_provider_voided_by` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `encounter_role_id_fk` FOREIGN KEY (`encounter_role_id`) REFERENCES `encounter_role` (`encounter_role_id`),
   CONSTRAINT `provider_id_fk` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `encounter_provider`
---
-
-LOCK TABLES `encounter_provider` WRITE;
-/*!40000 ALTER TABLE `encounter_provider` DISABLE KEYS */;
-/*!40000 ALTER TABLE `encounter_provider` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `encounter_role`
@@ -2167,15 +1766,6 @@ CREATE TABLE `encounter_role` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `encounter_role`
---
-
-LOCK TABLES `encounter_role` WRITE;
-/*!40000 ALTER TABLE `encounter_role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `encounter_role` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `encounter_type`
 --
 
@@ -2193,8 +1783,8 @@ CREATE TABLE `encounter_type` (
   `date_retired` datetime DEFAULT NULL,
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
-  `edit_privilege` varchar(255) DEFAULT NULL,
   `view_privilege` varchar(255) DEFAULT NULL,
+  `edit_privilege` varchar(255) DEFAULT NULL,
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   PRIMARY KEY (`encounter_type_id`),
@@ -2211,17 +1801,8 @@ CREATE TABLE `encounter_type` (
   CONSTRAINT `privilege_which_can_view_encounter_type` FOREIGN KEY (`view_privilege`) REFERENCES `privilege` (`privilege`),
   CONSTRAINT `user_who_created_type` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_encounter_type` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `encounter_type`
---
-
-LOCK TABLES `encounter_type` WRITE;
-/*!40000 ALTER TABLE `encounter_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `encounter_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `field`
@@ -2266,15 +1847,6 @@ CREATE TABLE `field` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `field`
---
-
-LOCK TABLES `field` WRITE;
-/*!40000 ALTER TABLE `field` DISABLE KEYS */;
-/*!40000 ALTER TABLE `field` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `field_answer`
 --
 
@@ -2298,15 +1870,6 @@ CREATE TABLE `field_answer` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `field_answer`
---
-
-LOCK TABLES `field_answer` WRITE;
-/*!40000 ALTER TABLE `field_answer` DISABLE KEYS */;
-/*!40000 ALTER TABLE `field_answer` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `field_type`
 --
 
@@ -2327,15 +1890,6 @@ CREATE TABLE `field_type` (
   CONSTRAINT `user_who_created_field_type` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `field_type`
---
-
-LOCK TABLES `field_type` WRITE;
-/*!40000 ALTER TABLE `field_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `field_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `form`
@@ -2376,17 +1930,8 @@ CREATE TABLE `form` (
   CONSTRAINT `user_who_created_form` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_last_changed_form` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_form` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `form`
---
-
-LOCK TABLES `form` WRITE;
-/*!40000 ALTER TABLE `form` DISABLE KEYS */;
-/*!40000 ALTER TABLE `form` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `form_field`
@@ -2428,15 +1973,6 @@ CREATE TABLE `form_field` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `form_field`
---
-
-LOCK TABLES `form_field` WRITE;
-/*!40000 ALTER TABLE `form_field` DISABLE KEYS */;
-/*!40000 ALTER TABLE `form_field` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `form_resource`
 --
 
@@ -2465,15 +2001,6 @@ CREATE TABLE `form_resource` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `form_resource`
---
-
-LOCK TABLES `form_resource` WRITE;
-/*!40000 ALTER TABLE `form_resource` DISABLE KEYS */;
-/*!40000 ALTER TABLE `form_resource` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `global_property`
 --
 
@@ -2500,15 +2027,6 @@ CREATE TABLE `global_property` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `global_property`
---
-
-LOCK TABLES `global_property` WRITE;
-/*!40000 ALTER TABLE `global_property` DISABLE KEYS */;
-/*!40000 ALTER TABLE `global_property` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `hl7_in_archive`
 --
 
@@ -2530,15 +2048,6 @@ CREATE TABLE `hl7_in_archive` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `hl7_in_archive`
---
-
-LOCK TABLES `hl7_in_archive` WRITE;
-/*!40000 ALTER TABLE `hl7_in_archive` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hl7_in_archive` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `hl7_in_error`
 --
 
@@ -2558,15 +2067,6 @@ CREATE TABLE `hl7_in_error` (
   UNIQUE KEY `hl7_in_error_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `hl7_in_error`
---
-
-LOCK TABLES `hl7_in_error` WRITE;
-/*!40000 ALTER TABLE `hl7_in_error` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hl7_in_error` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `hl7_in_queue`
@@ -2593,15 +2093,6 @@ CREATE TABLE `hl7_in_queue` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `hl7_in_queue`
---
-
-LOCK TABLES `hl7_in_queue` WRITE;
-/*!40000 ALTER TABLE `hl7_in_queue` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hl7_in_queue` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `hl7_source`
 --
 
@@ -2621,15 +2112,6 @@ CREATE TABLE `hl7_source` (
   CONSTRAINT `user_who_created_hl7_source` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `hl7_source`
---
-
-LOCK TABLES `hl7_source` WRITE;
-/*!40000 ALTER TABLE `hl7_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hl7_source` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `htmlformentry_html_form`
@@ -2663,17 +2145,8 @@ CREATE TABLE `htmlformentry_html_form` (
   CONSTRAINT `User who changed htmlformentry_htmlform` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `User who created htmlformentry_htmlform` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_html_form` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `htmlformentry_html_form`
---
-
-LOCK TABLES `htmlformentry_html_form` WRITE;
-/*!40000 ALTER TABLE `htmlformentry_html_form` DISABLE KEYS */;
-/*!40000 ALTER TABLE `htmlformentry_html_form` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `idgen_auto_generation_option`
@@ -2700,15 +2173,6 @@ CREATE TABLE `idgen_auto_generation_option` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `idgen_auto_generation_option`
---
-
-LOCK TABLES `idgen_auto_generation_option` WRITE;
-/*!40000 ALTER TABLE `idgen_auto_generation_option` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_auto_generation_option` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `idgen_id_pool`
 --
 
@@ -2730,15 +2194,6 @@ CREATE TABLE `idgen_id_pool` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `idgen_id_pool`
---
-
-LOCK TABLES `idgen_id_pool` WRITE;
-/*!40000 ALTER TABLE `idgen_id_pool` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_id_pool` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `idgen_identifier_source`
 --
 
@@ -2750,9 +2205,9 @@ CREATE TABLE `idgen_identifier_source` (
   `uuid` char(38) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` varchar(1000) DEFAULT NULL,
-  `identifier_type` int(11) NOT NULL,
-  `creator` int(11) NOT NULL,
-  `date_created` datetime NOT NULL,
+  `identifier_type` int(11) NOT NULL DEFAULT '0',
+  `creator` int(11) NOT NULL DEFAULT '0',
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `retired` tinyint(1) NOT NULL DEFAULT '0',
@@ -2760,27 +2215,17 @@ CREATE TABLE `idgen_identifier_source` (
   `date_retired` datetime DEFAULT NULL,
   `retire_reason` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  UNIQUE KEY `uuid` (`uuid`),
-  KEY `changed_by for idgen_identifier_source` (`changed_by`),
-  KEY `retired_by for idgen_identifier_source` (`retired_by`),
+  KEY `id for idgen_identifier_source` (`id`),
   KEY `identifier_type for idgen_identifier_source` (`identifier_type`),
   KEY `creator for idgen_identifier_source` (`creator`),
+  KEY `changed_by for idgen_identifier_source` (`changed_by`),
+  KEY `retired_by for idgen_identifier_source` (`retired_by`),
   CONSTRAINT `changed_by for idgen_identifier_source` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `creator for idgen_identifier_source` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `identifier_type for idgen_identifier_source` FOREIGN KEY (`identifier_type`) REFERENCES `patient_identifier_type` (`patient_identifier_type_id`),
   CONSTRAINT `retired_by for idgen_identifier_source` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `idgen_identifier_source`
---
-
-LOCK TABLES `idgen_identifier_source` WRITE;
-/*!40000 ALTER TABLE `idgen_identifier_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_identifier_source` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `idgen_log_entry`
@@ -2793,26 +2238,17 @@ CREATE TABLE `idgen_log_entry` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `source` int(11) NOT NULL,
   `identifier` varchar(50) NOT NULL,
-  `date_generated` datetime NOT NULL,
+  `date_generated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `generated_by` int(11) NOT NULL,
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
+  KEY `id for idgen_log` (`id`),
   KEY `source for idgen_log` (`source`),
   KEY `generated_by for idgen_log` (`generated_by`),
   CONSTRAINT `generated_by for idgen_log` FOREIGN KEY (`generated_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `source for idgen_log` FOREIGN KEY (`source`) REFERENCES `idgen_identifier_source` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `idgen_log_entry`
---
-
-LOCK TABLES `idgen_log_entry` WRITE;
-/*!40000 ALTER TABLE `idgen_log_entry` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_log_entry` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `idgen_pooled_identifier`
@@ -2829,20 +2265,10 @@ CREATE TABLE `idgen_pooled_identifier` (
   `date_used` datetime DEFAULT NULL,
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uuid` (`uuid`),
   KEY `pool_id for idgen_pooled_identifier` (`pool_id`),
   CONSTRAINT `pool_id for idgen_pooled_identifier` FOREIGN KEY (`pool_id`) REFERENCES `idgen_id_pool` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `idgen_pooled_identifier`
---
-
-LOCK TABLES `idgen_pooled_identifier` WRITE;
-/*!40000 ALTER TABLE `idgen_pooled_identifier` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_pooled_identifier` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `idgen_remote_source`
@@ -2862,15 +2288,6 @@ CREATE TABLE `idgen_remote_source` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `idgen_remote_source`
---
-
-LOCK TABLES `idgen_remote_source` WRITE;
-/*!40000 ALTER TABLE `idgen_remote_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_remote_source` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `idgen_reserved_identifier`
 --
 
@@ -2882,20 +2299,11 @@ CREATE TABLE `idgen_reserved_identifier` (
   `source` int(11) NOT NULL,
   `identifier` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
+  KEY `id for idgen_reserved_identifier` (`id`),
   KEY `source for idgen_reserved_identifier` (`source`),
   CONSTRAINT `source for idgen_reserved_identifier` FOREIGN KEY (`source`) REFERENCES `idgen_identifier_source` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `idgen_reserved_identifier`
---
-
-LOCK TABLES `idgen_reserved_identifier` WRITE;
-/*!40000 ALTER TABLE `idgen_reserved_identifier` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_reserved_identifier` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `idgen_seq_id_gen`
@@ -2909,7 +2317,7 @@ CREATE TABLE `idgen_seq_id_gen` (
   `next_sequence_value` int(11) NOT NULL DEFAULT '-1',
   `base_character_set` varchar(255) NOT NULL,
   `first_identifier_base` varchar(50) NOT NULL,
-  `prefix` varchar(20) DEFAULT NULL,
+  `prefix` varchar(100) DEFAULT NULL,
   `suffix` varchar(20) DEFAULT NULL,
   `min_length` int(11) DEFAULT NULL,
   `max_length` int(11) DEFAULT NULL,
@@ -2917,15 +2325,6 @@ CREATE TABLE `idgen_seq_id_gen` (
   CONSTRAINT `id for idgen_seq_id_gen` FOREIGN KEY (`id`) REFERENCES `idgen_identifier_source` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `idgen_seq_id_gen`
---
-
-LOCK TABLES `idgen_seq_id_gen` WRITE;
-/*!40000 ALTER TABLE `idgen_seq_id_gen` DISABLE KEYS */;
-/*!40000 ALTER TABLE `idgen_seq_id_gen` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `liquibasechangelog`
@@ -2951,15 +2350,6 @@ CREATE TABLE `liquibasechangelog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `liquibasechangelog`
---
-
-LOCK TABLES `liquibasechangelog` WRITE;
-/*!40000 ALTER TABLE `liquibasechangelog` DISABLE KEYS */;
-/*!40000 ALTER TABLE `liquibasechangelog` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `liquibasechangeloglock`
 --
 
@@ -2974,15 +2364,6 @@ CREATE TABLE `liquibasechangeloglock` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `liquibasechangeloglock`
---
-
-LOCK TABLES `liquibasechangeloglock` WRITE;
-/*!40000 ALTER TABLE `liquibasechangeloglock` DISABLE KEYS */;
-/*!40000 ALTER TABLE `liquibasechangeloglock` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `location`
@@ -3039,17 +2420,8 @@ CREATE TABLE `location` (
   CONSTRAINT `parent_location` FOREIGN KEY (`parent_location`) REFERENCES `location` (`location_id`),
   CONSTRAINT `user_who_created_location` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_location` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=247 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `location`
---
-
-LOCK TABLES `location` WRITE;
-/*!40000 ALTER TABLE `location` DISABLE KEYS */;
-/*!40000 ALTER TABLE `location` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `location_attribute`
@@ -3084,17 +2456,8 @@ CREATE TABLE `location_attribute` (
   CONSTRAINT `location_attribute_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `location_attribute_location_fk` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`),
   CONSTRAINT `location_attribute_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `location_attribute`
---
-
-LOCK TABLES `location_attribute` WRITE;
-/*!40000 ALTER TABLE `location_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `location_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `location_attribute_type`
@@ -3131,17 +2494,8 @@ CREATE TABLE `location_attribute_type` (
   CONSTRAINT `location_attribute_type_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `location_attribute_type_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `location_attribute_type_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `location_attribute_type`
---
-
-LOCK TABLES `location_attribute_type` WRITE;
-/*!40000 ALTER TABLE `location_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `location_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `location_tag`
@@ -3175,15 +2529,6 @@ CREATE TABLE `location_tag` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `location_tag`
---
-
-LOCK TABLES `location_tag` WRITE;
-/*!40000 ALTER TABLE `location_tag` DISABLE KEYS */;
-/*!40000 ALTER TABLE `location_tag` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `location_tag_map`
 --
 
@@ -3201,13 +2546,120 @@ CREATE TABLE `location_tag_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `location_tag_map`
+-- Table structure for table `logic_rule_definition`
 --
 
-LOCK TABLES `location_tag_map` WRITE;
-/*!40000 ALTER TABLE `location_tag_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `location_tag_map` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `logic_rule_definition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logic_rule_definition` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` char(38) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  `rule_content` varchar(2048) NOT NULL,
+  `language` varchar(255) NOT NULL,
+  `creator` int(11) NOT NULL DEFAULT '0',
+  `date_created` datetime NOT NULL DEFAULT '0002-11-30 00:00:00',
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `retired` smallint(6) NOT NULL DEFAULT '0',
+  `retired_by` int(11) DEFAULT NULL,
+  `date_retired` datetime DEFAULT NULL,
+  `retire_reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `creator_idx` (`creator`),
+  KEY `changed_by_idx` (`changed_by`),
+  KEY `retired_by_idx` (`retired_by`),
+  CONSTRAINT `changed_by_for_rule_definition` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `creator_for_rule_definition` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `retired_by_for_rule_definition` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `logic_rule_token`
+--
+
+DROP TABLE IF EXISTS `logic_rule_token`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logic_rule_token` (
+  `logic_rule_token_id` int(11) NOT NULL AUTO_INCREMENT,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0002-11-30 00:00:00',
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `token` varchar(512) NOT NULL,
+  `class_name` varchar(512) NOT NULL,
+  `state` varchar(512) DEFAULT NULL,
+  `uuid` char(38) NOT NULL,
+  PRIMARY KEY (`logic_rule_token_id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `token_creator` (`creator`),
+  KEY `token_changed_by` (`changed_by`),
+  CONSTRAINT `token_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `person` (`person_id`),
+  CONSTRAINT `token_creator` FOREIGN KEY (`creator`) REFERENCES `person` (`person_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `logic_rule_token_tag`
+--
+
+DROP TABLE IF EXISTS `logic_rule_token_tag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logic_rule_token_tag` (
+  `logic_rule_token_id` int(11) NOT NULL,
+  `tag` varchar(512) NOT NULL,
+  KEY `token_tag` (`logic_rule_token_id`),
+  CONSTRAINT `token_tag` FOREIGN KEY (`logic_rule_token_id`) REFERENCES `logic_rule_token` (`logic_rule_token_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `logic_token_registration`
+--
+
+DROP TABLE IF EXISTS `logic_token_registration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logic_token_registration` (
+  `token_registration_id` int(11) NOT NULL AUTO_INCREMENT,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0002-11-30 00:00:00',
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `token` varchar(512) NOT NULL,
+  `provider_class_name` varchar(512) NOT NULL,
+  `provider_token` varchar(512) NOT NULL,
+  `configuration` varchar(2000) DEFAULT NULL,
+  `uuid` char(38) NOT NULL,
+  PRIMARY KEY (`token_registration_id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `token_registration_creator` (`creator`),
+  KEY `token_registration_changed_by` (`changed_by`),
+  CONSTRAINT `token_registration_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `token_registration_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `logic_token_registration_tag`
+--
+
+DROP TABLE IF EXISTS `logic_token_registration_tag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logic_token_registration_tag` (
+  `token_registration_id` int(11) NOT NULL,
+  `tag` varchar(512) NOT NULL,
+  KEY `token_registration_tag` (`token_registration_id`),
+  CONSTRAINT `token_registration_tag` FOREIGN KEY (`token_registration_id`) REFERENCES `logic_token_registration` (`token_registration_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `metadatamapping_metadata_set`
@@ -3239,15 +2691,6 @@ CREATE TABLE `metadatamapping_metadata_set` (
   CONSTRAINT `metadatamapping_metadata_set_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `metadatamapping_metadata_set`
---
-
-LOCK TABLES `metadatamapping_metadata_set` WRITE;
-/*!40000 ALTER TABLE `metadatamapping_metadata_set` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatamapping_metadata_set` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `metadatamapping_metadata_set_member`
@@ -3287,15 +2730,6 @@ CREATE TABLE `metadatamapping_metadata_set_member` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `metadatamapping_metadata_set_member`
---
-
-LOCK TABLES `metadatamapping_metadata_set_member` WRITE;
-/*!40000 ALTER TABLE `metadatamapping_metadata_set_member` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatamapping_metadata_set_member` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `metadatamapping_metadata_source`
 --
 
@@ -3326,15 +2760,6 @@ CREATE TABLE `metadatamapping_metadata_source` (
   CONSTRAINT `metadatamapping_metadata_source_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `metadatamapping_metadata_source`
---
-
-LOCK TABLES `metadatamapping_metadata_source` WRITE;
-/*!40000 ALTER TABLE `metadatamapping_metadata_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatamapping_metadata_source` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `metadatamapping_metadata_term_mapping`
@@ -3378,15 +2803,6 @@ CREATE TABLE `metadatamapping_metadata_term_mapping` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `metadatamapping_metadata_term_mapping`
---
-
-LOCK TABLES `metadatamapping_metadata_term_mapping` WRITE;
-/*!40000 ALTER TABLE `metadatamapping_metadata_term_mapping` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatamapping_metadata_term_mapping` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `metadatasharing_exported_package`
 --
 
@@ -3410,15 +2826,6 @@ CREATE TABLE `metadatasharing_exported_package` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `metadatasharing_exported_package`
---
-
-LOCK TABLES `metadatasharing_exported_package` WRITE;
-/*!40000 ALTER TABLE `metadatasharing_exported_package` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatasharing_exported_package` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `metadatasharing_imported_item`
 --
 
@@ -3436,17 +2843,8 @@ CREATE TABLE `metadatasharing_imported_item` (
   `assessed` tinyint(1) NOT NULL,
   PRIMARY KEY (`imported_item_id`),
   KEY `metadatasharing_item_uuid` (`uuid`,`existing_uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=165 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `metadatasharing_imported_item`
---
-
-LOCK TABLES `metadatasharing_imported_item` WRITE;
-/*!40000 ALTER TABLE `metadatasharing_imported_item` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatasharing_imported_item` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `metadatasharing_imported_package`
@@ -3471,17 +2869,8 @@ CREATE TABLE `metadatasharing_imported_package` (
   PRIMARY KEY (`imported_package_id`),
   UNIQUE KEY `uuid` (`uuid`),
   KEY `metadatasharing_package_uuid` (`group_uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `metadatasharing_imported_package`
---
-
-LOCK TABLES `metadatasharing_imported_package` WRITE;
-/*!40000 ALTER TABLE `metadatasharing_imported_package` DISABLE KEYS */;
-/*!40000 ALTER TABLE `metadatasharing_imported_package` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `note`
@@ -3522,15 +2911,6 @@ CREATE TABLE `note` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `note`
---
-
-LOCK TABLES `note` WRITE;
-/*!40000 ALTER TABLE `note` DISABLE KEYS */;
-/*!40000 ALTER TABLE `note` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `notification_alert`
 --
 
@@ -3555,17 +2935,8 @@ CREATE TABLE `notification_alert` (
   KEY `alert_creator` (`creator`),
   CONSTRAINT `alert_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_changed_alert` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `notification_alert`
---
-
-LOCK TABLES `notification_alert` WRITE;
-/*!40000 ALTER TABLE `notification_alert` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notification_alert` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `notification_alert_recipient`
@@ -3588,15 +2959,6 @@ CREATE TABLE `notification_alert_recipient` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `notification_alert_recipient`
---
-
-LOCK TABLES `notification_alert_recipient` WRITE;
-/*!40000 ALTER TABLE `notification_alert_recipient` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notification_alert_recipient` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `notification_template`
 --
 
@@ -3616,15 +2978,6 @@ CREATE TABLE `notification_template` (
   UNIQUE KEY `notification_template_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `notification_template`
---
-
-LOCK TABLES `notification_template` WRITE;
-/*!40000 ALTER TABLE `notification_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notification_template` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `obs`
@@ -3691,17 +3044,8 @@ CREATE TABLE `obs` (
   CONSTRAINT `person_obs` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`) ON UPDATE CASCADE,
   CONSTRAINT `previous_version` FOREIGN KEY (`previous_version`) REFERENCES `obs` (`obs_id`),
   CONSTRAINT `user_who_voided_obs` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2707 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `obs`
---
-
-LOCK TABLES `obs` WRITE;
-/*!40000 ALTER TABLE `obs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `obs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `order_frequency`
@@ -3735,15 +3079,6 @@ CREATE TABLE `order_frequency` (
   CONSTRAINT `order_frequency_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `order_frequency`
---
-
-LOCK TABLES `order_frequency` WRITE;
-/*!40000 ALTER TABLE `order_frequency` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_frequency` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `order_group`
@@ -3784,15 +3119,6 @@ CREATE TABLE `order_group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `order_group`
---
-
-LOCK TABLES `order_group` WRITE;
-/*!40000 ALTER TABLE `order_group` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_group` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `order_set`
 --
 
@@ -3823,15 +3149,6 @@ CREATE TABLE `order_set` (
   CONSTRAINT `order_set_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `order_set`
---
-
-LOCK TABLES `order_set` WRITE;
-/*!40000 ALTER TABLE `order_set` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_set` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `order_set_member`
@@ -3875,15 +3192,6 @@ CREATE TABLE `order_set_member` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `order_set_member`
---
-
-LOCK TABLES `order_set_member` WRITE;
-/*!40000 ALTER TABLE `order_set_member` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_set_member` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `order_type`
 --
 
@@ -3921,15 +3229,6 @@ CREATE TABLE `order_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `order_type`
---
-
-LOCK TABLES `order_type` WRITE;
-/*!40000 ALTER TABLE `order_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `order_type_class_map`
 --
 
@@ -3945,15 +3244,6 @@ CREATE TABLE `order_type_class_map` (
   CONSTRAINT `fk_order_type_order_type_id` FOREIGN KEY (`order_type_id`) REFERENCES `order_type` (`order_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `order_type_class_map`
---
-
-LOCK TABLES `order_type_class_map` WRITE;
-/*!40000 ALTER TABLE `order_type_class_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_type_class_map` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `orders`
@@ -3992,17 +3282,19 @@ CREATE TABLE `orders` (
   `scheduled_date` datetime DEFAULT NULL,
   `order_group_id` int(11) DEFAULT NULL,
   `sort_weight` double DEFAULT NULL,
+  `fulfiller_comment` varchar(1024) DEFAULT NULL,
+  `fulfiller_status` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   UNIQUE KEY `orders_uuid_index` (`uuid`),
   KEY `order_creator` (`creator`),
+  KEY `discontinued_because` (`order_reason`),
   KEY `orders_in_encounter` (`encounter_id`),
   KEY `type_of_order` (`order_type_id`),
+  KEY `orderer_not_drug` (`orderer`),
   KEY `order_for_patient` (`patient_id`),
   KEY `user_who_voided_order` (`voided_by`),
   KEY `previous_order_id_order_id` (`previous_order_id`),
   KEY `orders_care_setting` (`care_setting`),
-  KEY `discontinued_because` (`order_reason`),
-  KEY `fk_orderer_provider` (`orderer`),
   KEY `orders_order_group_id_fk` (`order_group_id`),
   CONSTRAINT `discontinued_because` FOREIGN KEY (`order_reason`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `fk_orderer_provider` FOREIGN KEY (`orderer`) REFERENCES `provider` (`provider_id`),
@@ -4016,15 +3308,6 @@ CREATE TABLE `orders` (
   CONSTRAINT `user_who_voided_order` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `orders`
---
-
-LOCK TABLES `orders` WRITE;
-/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `patient`
@@ -4054,15 +3337,6 @@ CREATE TABLE `patient` (
   CONSTRAINT `user_who_voided_patient` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `patient`
---
-
-LOCK TABLES `patient` WRITE;
-/*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `patient_identifier`
@@ -4102,17 +3376,8 @@ CREATE TABLE `patient_identifier` (
   CONSTRAINT `identifier_voider` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `patient_identifier_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `patient_identifier_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `patient_identifier`
---
-
-LOCK TABLES `patient_identifier` WRITE;
-/*!40000 ALTER TABLE `patient_identifier` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_identifier` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `patient_identifier_type`
@@ -4154,15 +3419,6 @@ CREATE TABLE `patient_identifier_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `patient_identifier_type`
---
-
-LOCK TABLES `patient_identifier_type` WRITE;
-/*!40000 ALTER TABLE `patient_identifier_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_identifier_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `patient_program`
 --
 
@@ -4202,17 +3458,44 @@ CREATE TABLE `patient_program` (
   CONSTRAINT `program_for_patient` FOREIGN KEY (`program_id`) REFERENCES `program` (`program_id`),
   CONSTRAINT `user_who_changed` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_voided_patient_program` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `patient_program`
+-- Table structure for table `patient_program_attribute`
 --
 
-LOCK TABLES `patient_program` WRITE;
-/*!40000 ALTER TABLE `patient_program` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_program` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `patient_program_attribute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `patient_program_attribute` (
+  `patient_program_attribute_id` int(11) NOT NULL AUTO_INCREMENT,
+  `patient_program_id` int(11) NOT NULL,
+  `attribute_type_id` int(11) NOT NULL,
+  `value_reference` text NOT NULL,
+  `uuid` char(38) NOT NULL,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL,
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `voided` tinyint(1) NOT NULL DEFAULT '0',
+  `voided_by` int(11) DEFAULT NULL,
+  `date_voided` datetime DEFAULT NULL,
+  `void_reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`patient_program_attribute_id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `patient_program_attribute_programid_fk` (`patient_program_id`),
+  KEY `patient_program_attribute_attributetype_fk` (`attribute_type_id`),
+  KEY `patient_program_attribute_creator_fk` (`creator`),
+  KEY `patient_program_attribute_changed_by_fk` (`changed_by`),
+  KEY `patient_program_attribute_voided_by_fk` (`voided_by`),
+  CONSTRAINT `patient_program_attribute_attributetype_fk` FOREIGN KEY (`attribute_type_id`) REFERENCES `program_attribute_type` (`program_attribute_type_id`),
+  CONSTRAINT `patient_program_attribute_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `patient_program_attribute_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `patient_program_attribute_programid_fk` FOREIGN KEY (`patient_program_id`) REFERENCES `patient_program` (`patient_program_id`),
+  CONSTRAINT `patient_program_attribute_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `patient_state`
@@ -4248,20 +3531,11 @@ CREATE TABLE `patient_state` (
   CONSTRAINT `patient_state_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `patient_state_voider` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `state_for_patient` FOREIGN KEY (`state`) REFERENCES `program_workflow_state` (`program_workflow_state_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `patient_state`
---
-
-LOCK TABLES `patient_state` WRITE;
-/*!40000 ALTER TABLE `patient_state` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_state` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `personModel`
+-- Table structure for table `person`
 --
 
 DROP TABLE IF EXISTS `person`;
@@ -4286,6 +3560,7 @@ CREATE TABLE `person` (
   `uuid` char(38) NOT NULL,
   `deathdate_estimated` tinyint(1) NOT NULL DEFAULT '0',
   `birthtime` time DEFAULT NULL,
+  `cause_of_death_non_coded` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`person_id`),
   UNIQUE KEY `person_uuid_index` (`uuid`),
   KEY `person_birthdate` (`birthdate`),
@@ -4298,17 +3573,17 @@ CREATE TABLE `person` (
   CONSTRAINT `user_who_changed_person` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_created_person` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_voided_person` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `personModel`
+-- Dumping data for table `person`
 --
 
 LOCK TABLES `person` WRITE;
-/*!40000 ALTER TABLE `personModel` DISABLE KEYS */;
-INSERT INTO `person` VALUES (1,'','1967-10-24',0,0,NULL,NULL,NULL,'2005-01-01 00:00:00',NULL,NULL,0,NULL,NULL,NULL,'admin_user',0,NULL);
-/*!40000 ALTER TABLE `personModel` ENABLE KEYS */;
+/*!40000 ALTER TABLE `person` DISABLE KEYS */;
+INSERT INTO `person` VALUES (1,'M',NULL,0,0,NULL,NULL,NULL,'2005-01-01 00:00:00',NULL,NULL,0,NULL,NULL,NULL,'dd279794-76e9-11e9-8cd9-0242ac1c000b',0,NULL,NULL);
+/*!40000 ALTER TABLE `person` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -4365,17 +3640,8 @@ CREATE TABLE `person_address` (
   CONSTRAINT `patient_address_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `patient_address_void` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `person_address_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `person_address`
---
-
-LOCK TABLES `person_address` WRITE;
-/*!40000 ALTER TABLE `person_address` DISABLE KEYS */;
-/*!40000 ALTER TABLE `person_address` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `person_attribute`
@@ -4410,17 +3676,8 @@ CREATE TABLE `person_attribute` (
   CONSTRAINT `attribute_voider` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `defines_attribute_type` FOREIGN KEY (`person_attribute_type_id`) REFERENCES `person_attribute_type` (`person_attribute_type_id`),
   CONSTRAINT `identifies_person` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `person_attribute`
---
-
-LOCK TABLES `person_attribute` WRITE;
-/*!40000 ALTER TABLE `person_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `person_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `person_attribute_type`
@@ -4464,15 +3721,6 @@ CREATE TABLE `person_attribute_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `person_attribute_type`
---
-
-LOCK TABLES `person_attribute_type` WRITE;
-/*!40000 ALTER TABLE `person_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `person_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `person_merge_log`
 --
 
@@ -4507,15 +3755,6 @@ CREATE TABLE `person_merge_log` (
   CONSTRAINT `person_merge_log_winner` FOREIGN KEY (`winner_person_id`) REFERENCES `person` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `person_merge_log`
---
-
-LOCK TABLES `person_merge_log` WRITE;
-/*!40000 ALTER TABLE `person_merge_log` DISABLE KEYS */;
-/*!40000 ALTER TABLE `person_merge_log` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `person_name`
@@ -4557,17 +3796,8 @@ CREATE TABLE `person_name` (
   CONSTRAINT `name_for_person` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`) ON UPDATE CASCADE,
   CONSTRAINT `user_who_made_name` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_voided_name` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `person_name`
---
-
-LOCK TABLES `person_name` WRITE;
-/*!40000 ALTER TABLE `person_name` DISABLE KEYS */;
-/*!40000 ALTER TABLE `person_name` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `privilege`
@@ -4584,15 +3814,6 @@ CREATE TABLE `privilege` (
   UNIQUE KEY `privilege_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `privilege`
---
-
-LOCK TABLES `privilege` WRITE;
-/*!40000 ALTER TABLE `privilege` DISABLE KEYS */;
-/*!40000 ALTER TABLE `privilege` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `program`
@@ -4623,17 +3844,46 @@ CREATE TABLE `program` (
   CONSTRAINT `program_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `program_outcomes_concept_id_fk` FOREIGN KEY (`outcomes_concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `user_who_changed_program` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `program`
+-- Table structure for table `program_attribute_type`
 --
 
-LOCK TABLES `program` WRITE;
-/*!40000 ALTER TABLE `program` DISABLE KEYS */;
-/*!40000 ALTER TABLE `program` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `program_attribute_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `program_attribute_type` (
+  `program_attribute_type_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(1024) DEFAULT NULL,
+  `datatype` varchar(255) DEFAULT NULL,
+  `datatype_config` text,
+  `preferred_handler` varchar(255) DEFAULT NULL,
+  `handler_config` text,
+  `min_occurs` int(11) NOT NULL,
+  `max_occurs` int(11) DEFAULT NULL,
+  `creator` int(11) NOT NULL,
+  `date_created` datetime NOT NULL,
+  `changed_by` int(11) DEFAULT NULL,
+  `date_changed` datetime DEFAULT NULL,
+  `retired` tinyint(1) NOT NULL DEFAULT '0',
+  `retired_by` int(11) DEFAULT NULL,
+  `date_retired` datetime DEFAULT NULL,
+  `retire_reason` varchar(255) DEFAULT NULL,
+  `uuid` char(38) NOT NULL,
+  PRIMARY KEY (`program_attribute_type_id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `program_attribute_type_creator_fk` (`creator`),
+  KEY `program_attribute_type_changed_by_fk` (`changed_by`),
+  KEY `program_attribute_type_retired_by_fk` (`retired_by`),
+  CONSTRAINT `program_attribute_type_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `program_attribute_type_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `program_attribute_type_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `program_workflow`
@@ -4662,17 +3912,8 @@ CREATE TABLE `program_workflow` (
   CONSTRAINT `workflow_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `workflow_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `workflow_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `program_workflow`
---
-
-LOCK TABLES `program_workflow` WRITE;
-/*!40000 ALTER TABLE `program_workflow` DISABLE KEYS */;
-/*!40000 ALTER TABLE `program_workflow` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `program_workflow_state`
@@ -4703,17 +3944,8 @@ CREATE TABLE `program_workflow_state` (
   CONSTRAINT `state_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
   CONSTRAINT `state_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `workflow_for_state` FOREIGN KEY (`program_workflow_id`) REFERENCES `program_workflow` (`program_workflow_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `program_workflow_state`
---
-
-LOCK TABLES `program_workflow_state` WRITE;
-/*!40000 ALTER TABLE `program_workflow_state` DISABLE KEYS */;
-/*!40000 ALTER TABLE `program_workflow_state` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `provider`
@@ -4737,29 +3969,26 @@ CREATE TABLE `provider` (
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
   `provider_role_id` int(11) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `speciality_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`provider_id`),
   UNIQUE KEY `uuid` (`uuid`),
   KEY `provider_changed_by_fk` (`changed_by`),
   KEY `provider_person_id_fk` (`person_id`),
   KEY `provider_retired_by_fk` (`retired_by`),
   KEY `provider_creator_fk` (`creator`),
-  KEY `provider_ibfk_1` (`provider_role_id`),
+  KEY `provider_role_id` (`provider_role_id`),
+  KEY `provider_role_id_fk` (`role_id`),
+  KEY `provider_speciality_id_fk` (`speciality_id`),
   CONSTRAINT `provider_changed_by_fk` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `provider_creator_fk` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `provider_ibfk_1` FOREIGN KEY (`provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`),
   CONSTRAINT `provider_person_id_fk` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`),
-  CONSTRAINT `provider_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+  CONSTRAINT `provider_retired_by_fk` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `provider_role_id_fk` FOREIGN KEY (`role_id`) REFERENCES `concept` (`concept_id`),
+  CONSTRAINT `provider_speciality_id_fk` FOREIGN KEY (`speciality_id`) REFERENCES `concept` (`concept_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `provider`
---
-
-LOCK TABLES `provider` WRITE;
-/*!40000 ALTER TABLE `provider` DISABLE KEYS */;
-/*!40000 ALTER TABLE `provider` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `provider_attribute`
@@ -4796,15 +4025,6 @@ CREATE TABLE `provider_attribute` (
   CONSTRAINT `provider_attribute_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `provider_attribute`
---
-
-LOCK TABLES `provider_attribute` WRITE;
-/*!40000 ALTER TABLE `provider_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `provider_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `provider_attribute_type`
@@ -4844,15 +4064,6 @@ CREATE TABLE `provider_attribute_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `provider_attribute_type`
---
-
-LOCK TABLES `provider_attribute_type` WRITE;
-/*!40000 ALTER TABLE `provider_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `provider_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `providermanagement_provider_role`
 --
 
@@ -4864,7 +4075,7 @@ CREATE TABLE `providermanagement_provider_role` (
   `name` varchar(255) NOT NULL,
   `description` varchar(1000) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `retired` tinyint(1) NOT NULL DEFAULT '0',
@@ -4872,19 +4083,9 @@ CREATE TABLE `providermanagement_provider_role` (
   `date_retired` datetime DEFAULT NULL,
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
-  PRIMARY KEY (`provider_role_id`),
-  UNIQUE KEY `uuid` (`uuid`)
+  PRIMARY KEY (`provider_role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_provider_role`
---
-
-LOCK TABLES `providermanagement_provider_role` WRITE;
-/*!40000 ALTER TABLE `providermanagement_provider_role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_provider_role` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `providermanagement_provider_role_provider_attribute_type`
@@ -4896,21 +4097,12 @@ DROP TABLE IF EXISTS `providermanagement_provider_role_provider_attribute_type`;
 CREATE TABLE `providermanagement_provider_role_provider_attribute_type` (
   `provider_role_id` int(11) NOT NULL,
   `provider_attribute_type_id` int(11) NOT NULL,
-  KEY `providermanagement_prpat_provider_role_fk` (`provider_role_id`),
-  KEY `providermanagement_prpat_provider_attribute_type_fk` (`provider_attribute_type_id`),
+  KEY `provider_role_id` (`provider_role_id`),
+  KEY `provider_attribute_type_id` (`provider_attribute_type_id`),
   CONSTRAINT `providermanagement_prpat_provider_attribute_type_fk` FOREIGN KEY (`provider_attribute_type_id`) REFERENCES `provider_attribute_type` (`provider_attribute_type_id`),
   CONSTRAINT `providermanagement_prpat_provider_role_fk` FOREIGN KEY (`provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_provider_role_provider_attribute_type`
---
-
-LOCK TABLES `providermanagement_provider_role_provider_attribute_type` WRITE;
-/*!40000 ALTER TABLE `providermanagement_provider_role_provider_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_provider_role_provider_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `providermanagement_provider_role_relationship_type`
@@ -4922,21 +4114,12 @@ DROP TABLE IF EXISTS `providermanagement_provider_role_relationship_type`;
 CREATE TABLE `providermanagement_provider_role_relationship_type` (
   `provider_role_id` int(11) NOT NULL,
   `relationship_type_id` int(11) NOT NULL,
-  KEY `providermanagement_provider_role_relationship_type_ibfk_1` (`provider_role_id`),
-  KEY `providermanagement_provider_role_relationship_type_ibfk_2` (`relationship_type_id`),
+  KEY `provider_role_id` (`provider_role_id`),
+  KEY `relationship_type_id` (`relationship_type_id`),
   CONSTRAINT `providermanagement_provider_role_relationship_type_ibfk_1` FOREIGN KEY (`provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`),
   CONSTRAINT `providermanagement_provider_role_relationship_type_ibfk_2` FOREIGN KEY (`relationship_type_id`) REFERENCES `relationship_type` (`relationship_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_provider_role_relationship_type`
---
-
-LOCK TABLES `providermanagement_provider_role_relationship_type` WRITE;
-/*!40000 ALTER TABLE `providermanagement_provider_role_relationship_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_provider_role_relationship_type` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `providermanagement_provider_role_supervisee_provider_role`
@@ -4948,21 +4131,12 @@ DROP TABLE IF EXISTS `providermanagement_provider_role_supervisee_provider_role`
 CREATE TABLE `providermanagement_provider_role_supervisee_provider_role` (
   `provider_role_id` int(11) NOT NULL,
   `supervisee_provider_role_id` int(11) NOT NULL,
-  KEY `providermanagement_prspr_provider_role_fk` (`provider_role_id`),
-  KEY `providermanagement_prspr_supervisee_role_fk` (`supervisee_provider_role_id`),
+  KEY `provider_role_id` (`provider_role_id`),
+  KEY `supervisee_provider_role_id` (`supervisee_provider_role_id`),
   CONSTRAINT `providermanagement_prspr_provider_role_fk` FOREIGN KEY (`provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`),
   CONSTRAINT `providermanagement_prspr_supervisee_role_fk` FOREIGN KEY (`supervisee_provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_provider_role_supervisee_provider_role`
---
-
-LOCK TABLES `providermanagement_provider_role_supervisee_provider_role` WRITE;
-/*!40000 ALTER TABLE `providermanagement_provider_role_supervisee_provider_role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_provider_role_supervisee_provider_role` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `providermanagement_provider_suggestion`
@@ -4979,7 +4153,7 @@ CREATE TABLE `providermanagement_provider_suggestion` (
   `name` varchar(255) NOT NULL,
   `description` varchar(1000) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `retired` tinyint(1) NOT NULL DEFAULT '0',
@@ -4988,20 +4162,10 @@ CREATE TABLE `providermanagement_provider_suggestion` (
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`provider_suggestion_id`),
-  UNIQUE KEY `uuid` (`uuid`),
-  KEY `providermanagement_provider_suggestion_ibfk_1` (`relationship_type_id`),
+  KEY `relationship_type_id` (`relationship_type_id`),
   CONSTRAINT `providermanagement_provider_suggestion_ibfk_1` FOREIGN KEY (`relationship_type_id`) REFERENCES `relationship_type` (`relationship_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_provider_suggestion`
---
-
-LOCK TABLES `providermanagement_provider_suggestion` WRITE;
-/*!40000 ALTER TABLE `providermanagement_provider_suggestion` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_provider_suggestion` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `providermanagement_supervision_suggestion`
@@ -5019,7 +4183,7 @@ CREATE TABLE `providermanagement_supervision_suggestion` (
   `name` varchar(255) NOT NULL,
   `description` varchar(1000) DEFAULT NULL,
   `creator` int(11) NOT NULL DEFAULT '0',
-  `date_created` datetime NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `retired` tinyint(1) NOT NULL DEFAULT '0',
@@ -5028,20 +4192,10 @@ CREATE TABLE `providermanagement_supervision_suggestion` (
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`supervision_suggestion_id`),
-  UNIQUE KEY `uuid` (`uuid`),
-  KEY `providermanagement_supervision_suggestion_ibfk_1` (`provider_role_id`),
+  KEY `provider_role_id` (`provider_role_id`),
   CONSTRAINT `providermanagement_supervision_suggestion_ibfk_1` FOREIGN KEY (`provider_role_id`) REFERENCES `providermanagement_provider_role` (`provider_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providermanagement_supervision_suggestion`
---
-
-LOCK TABLES `providermanagement_supervision_suggestion` WRITE;
-/*!40000 ALTER TABLE `providermanagement_supervision_suggestion` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providermanagement_supervision_suggestion` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `relationship`
@@ -5080,17 +4234,8 @@ CREATE TABLE `relationship` (
   CONSTRAINT `relation_voider` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `relationship_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `relationship_type_id` FOREIGN KEY (`relationship`) REFERENCES `relationship_type` (`relationship_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `relationship`
---
-
-LOCK TABLES `relationship` WRITE;
-/*!40000 ALTER TABLE `relationship` DISABLE KEYS */;
-/*!40000 ALTER TABLE `relationship` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `relationship_type`
@@ -5127,15 +4272,6 @@ CREATE TABLE `relationship_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `relationship_type`
---
-
-LOCK TABLES `relationship_type` WRITE;
-/*!40000 ALTER TABLE `relationship_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `relationship_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `report_object`
 --
 
@@ -5170,15 +4306,6 @@ CREATE TABLE `report_object` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `report_object`
---
-
-LOCK TABLES `report_object` WRITE;
-/*!40000 ALTER TABLE `report_object` DISABLE KEYS */;
-/*!40000 ALTER TABLE `report_object` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `report_schema_xml`
 --
 
@@ -5195,15 +4322,6 @@ CREATE TABLE `report_schema_xml` (
   UNIQUE KEY `report_schema_xml_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `report_schema_xml`
---
-
-LOCK TABLES `report_schema_xml` WRITE;
-/*!40000 ALTER TABLE `report_schema_xml` DISABLE KEYS */;
-/*!40000 ALTER TABLE `report_schema_xml` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `reporting_report_design`
@@ -5230,24 +4348,15 @@ CREATE TABLE `reporting_report_design` (
   `report_definition_uuid` char(38) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`),
-  KEY `creator_for_reporting_report_design` (`creator`),
-  KEY `changed_by_for_reporting_report_design` (`changed_by`),
-  KEY `retired_by_for_reporting_report_design` (`retired_by`),
+  KEY `creator for reporting_report_design` (`creator`),
+  KEY `changed_by for reporting_report_design` (`changed_by`),
+  KEY `retired_by for reporting_report_design` (`retired_by`),
   KEY `report_definition_uuid_for_reporting_report_design` (`report_definition_uuid`),
   CONSTRAINT `changed_by_for_reporting_report_design` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `creator_for_reporting_report_design` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `retired_by_for_reporting_report_design` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reporting_report_design`
---
-
-LOCK TABLES `reporting_report_design` WRITE;
-/*!40000 ALTER TABLE `reporting_report_design` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reporting_report_design` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `reporting_report_design_resource`
@@ -5275,25 +4384,16 @@ CREATE TABLE `reporting_report_design_resource` (
   `retire_reason` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`),
-  KEY `report_design_id_for_reporting_report_design_resource` (`report_design_id`),
-  KEY `creator_for_reporting_report_design_resource` (`creator`),
-  KEY `changed_by_for_reporting_report_design_resource` (`changed_by`),
-  KEY `retired_by_for_reporting_report_design_resource` (`retired_by`),
+  KEY `report_design_id for reporting_report_design_resource` (`report_design_id`),
+  KEY `creator for reporting_report_design_resource` (`creator`),
+  KEY `changed_by for reporting_report_design_resource` (`changed_by`),
+  KEY `retired_by for reporting_report_design_resource` (`retired_by`),
   CONSTRAINT `changed_by_for_reporting_report_design_resource` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `creator_for_reporting_report_design_resource` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `report_design_id_for_reporting_report_design_resource` FOREIGN KEY (`report_design_id`) REFERENCES `reporting_report_design` (`id`),
   CONSTRAINT `retired_by_for_reporting_report_design_resource` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reporting_report_design_resource`
---
-
-LOCK TABLES `reporting_report_design_resource` WRITE;
-/*!40000 ALTER TABLE `reporting_report_design_resource` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reporting_report_design_resource` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `reporting_report_processor`
@@ -5323,25 +4423,16 @@ CREATE TABLE `reporting_report_processor` (
   `processor_mode` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`),
-  KEY `creator_for_reporting_report_processor` (`creator`),
-  KEY `changed_by_for_reporting_report_processor` (`changed_by`),
-  KEY `retired_by_for_reporting_report_processor` (`retired_by`),
+  KEY `creator for reporting_report_processor` (`creator`),
+  KEY `changed_by for reporting_report_processor` (`changed_by`),
+  KEY `retired_by for reporting_report_processor` (`retired_by`),
   KEY `reporting_report_processor_report_design` (`report_design_id`),
   CONSTRAINT `changed_by_for_reporting_report_processor` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `creator_for_reporting_report_processor` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `reporting_report_processor_report_design` FOREIGN KEY (`report_design_id`) REFERENCES `reporting_report_design` (`id`),
   CONSTRAINT `retired_by_for_reporting_report_processor` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reporting_report_processor`
---
-
-LOCK TABLES `reporting_report_processor` WRITE;
-/*!40000 ALTER TABLE `reporting_report_processor` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reporting_report_processor` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `reporting_report_request`
@@ -5372,19 +4463,10 @@ CREATE TABLE `reporting_report_request` (
   `minimum_days_to_preserve` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`),
-  KEY `requested_by_for_reporting_report_request` (`requested_by`),
+  KEY `requested_by for reporting_report_request` (`requested_by`),
   CONSTRAINT `requested_by_for_reporting_report_request` FOREIGN KEY (`requested_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reporting_report_request`
---
-
-LOCK TABLES `reporting_report_request` WRITE;
-/*!40000 ALTER TABLE `reporting_report_request` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reporting_report_request` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `role`
@@ -5401,15 +4483,6 @@ CREATE TABLE `role` (
   UNIQUE KEY `role_uuid_index` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `role`
---
-
-LOCK TABLES `role` WRITE;
-/*!40000 ALTER TABLE `role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `role_privilege`
@@ -5429,15 +4502,6 @@ CREATE TABLE `role_privilege` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `role_privilege`
---
-
-LOCK TABLES `role_privilege` WRITE;
-/*!40000 ALTER TABLE `role_privilege` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role_privilege` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `role_role`
 --
 
@@ -5453,15 +4517,6 @@ CREATE TABLE `role_role` (
   CONSTRAINT `parent_role` FOREIGN KEY (`parent_role`) REFERENCES `role` (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `role_role`
---
-
-LOCK TABLES `role_role` WRITE;
-/*!40000 ALTER TABLE `role_role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role_role` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `scheduler_task_config`
@@ -5481,7 +4536,7 @@ CREATE TABLE `scheduler_task_config` (
   `start_on_startup` tinyint(1) NOT NULL DEFAULT '0',
   `started` tinyint(1) NOT NULL DEFAULT '0',
   `created_by` int(11) DEFAULT '0',
-  `date_created` datetime DEFAULT NULL,
+  `date_created` datetime DEFAULT '2005-01-01 00:00:00',
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
   `last_execution_time` datetime DEFAULT NULL,
@@ -5492,17 +4547,8 @@ CREATE TABLE `scheduler_task_config` (
   KEY `scheduler_creator` (`created_by`),
   CONSTRAINT `scheduler_changer` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `scheduler_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `scheduler_task_config`
---
-
-LOCK TABLES `scheduler_task_config` WRITE;
-/*!40000 ALTER TABLE `scheduler_task_config` DISABLE KEYS */;
-/*!40000 ALTER TABLE `scheduler_task_config` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `scheduler_task_config_property`
@@ -5521,15 +4567,6 @@ CREATE TABLE `scheduler_task_config_property` (
   CONSTRAINT `task_config_for_property` FOREIGN KEY (`task_config_id`) REFERENCES `scheduler_task_config` (`task_config_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `scheduler_task_config_property`
---
-
-LOCK TABLES `scheduler_task_config_property` WRITE;
-/*!40000 ALTER TABLE `scheduler_task_config_property` DISABLE KEYS */;
-/*!40000 ALTER TABLE `scheduler_task_config_property` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `serialized_object`
@@ -5563,17 +4600,8 @@ CREATE TABLE `serialized_object` (
   CONSTRAINT `serialized_object_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `serialized_object_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `serialized_object_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=301 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `serialized_object`
---
-
-LOCK TABLES `serialized_object` WRITE;
-/*!40000 ALTER TABLE `serialized_object` DISABLE KEYS */;
-/*!40000 ALTER TABLE `serialized_object` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_order`
@@ -5599,15 +4627,6 @@ CREATE TABLE `test_order` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_order`
---
-
-LOCK TABLES `test_order` WRITE;
-/*!40000 ALTER TABLE `test_order` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_order` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `uiframework_user_defined_page_view`
 --
 
@@ -5623,19 +4642,10 @@ CREATE TABLE `uiframework_user_defined_page_view` (
   `creator` int(11) NOT NULL,
   `date_created` datetime NOT NULL,
   PRIMARY KEY (`page_view_id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `uuid` (`uuid`)
+  UNIQUE KEY `uuid` (`uuid`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `uiframework_user_defined_page_view`
---
-
-LOCK TABLES `uiframework_user_defined_page_view` WRITE;
-/*!40000 ALTER TABLE `uiframework_user_defined_page_view` DISABLE KEYS */;
-/*!40000 ALTER TABLE `uiframework_user_defined_page_view` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user_property`
@@ -5654,15 +4664,6 @@ CREATE TABLE `user_property` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_property`
---
-
-LOCK TABLES `user_property` WRITE;
-/*!40000 ALTER TABLE `user_property` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_property` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_role`
 --
 
@@ -5678,15 +4679,6 @@ CREATE TABLE `user_role` (
   CONSTRAINT `user_role_to_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_role`
---
-
-LOCK TABLES `user_role` WRITE;
-/*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
@@ -5713,7 +4705,10 @@ CREATE TABLE `users` (
   `date_retired` datetime DEFAULT NULL,
   `retire_reason` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
+  `activation_key` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`),
   KEY `user_who_changed_user` (`changed_by`),
   KEY `user_creator` (`creator`),
   KEY `user_who_retired_this_user` (`retired_by`),
@@ -5722,7 +4717,7 @@ CREATE TABLE `users` (
   CONSTRAINT `user_creator` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_changed_user` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `user_who_retired_this_user` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5731,7 +4726,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','','6f0be51d599f59dd1269e12e17949f8ecb9ac963e467ac1400cf0a02eb9f8861ce3cca8f6d34d93c0ca34029497542cbadda20c949affb4cb59269ef4912087b','c788c6ad82a157b712392ca695dfcf2eed193d7f',NULL,NULL,1,'2005-01-01 00:00:00',1,'2019-05-15 08:23:29',1,0,NULL,NULL,NULL,'ec14165a-76e9-11e9-8cd9-0242ac1c000b');
+INSERT INTO `users` VALUES (1,'admin','','6f0be51d599f59dd1269e12e17949f8ecb9ac963e467ac1400cf0a02eb9f8861ce3cca8f6d34d93c0ca34029497542cbadda20c949affb4cb59269ef4912087b','c788c6ad82a157b712392ca695dfcf2eed193d7f','',NULL,1,'2005-01-01 00:00:00',NULL,NULL,1,0,NULL,NULL,NULL,'ec14165a-76e9-11e9-8cd9-0242ac1c000b',NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -5775,17 +4770,8 @@ CREATE TABLE `visit` (
   CONSTRAINT `visit_patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`),
   CONSTRAINT `visit_type_fk` FOREIGN KEY (`visit_type_id`) REFERENCES `visit_type` (`visit_type_id`),
   CONSTRAINT `visit_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `visit`
---
-
-LOCK TABLES `visit` WRITE;
-/*!40000 ALTER TABLE `visit` DISABLE KEYS */;
-/*!40000 ALTER TABLE `visit` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `visit_attribute`
@@ -5822,15 +4808,6 @@ CREATE TABLE `visit_attribute` (
   CONSTRAINT `visit_attribute_voided_by_fk` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `visit_attribute`
---
-
-LOCK TABLES `visit_attribute` WRITE;
-/*!40000 ALTER TABLE `visit_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `visit_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `visit_attribute_type`
@@ -5870,15 +4847,6 @@ CREATE TABLE `visit_attribute_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `visit_attribute_type`
---
-
-LOCK TABLES `visit_attribute_type` WRITE;
-/*!40000 ALTER TABLE `visit_attribute_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `visit_attribute_type` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `visit_type`
 --
 
@@ -5908,15 +4876,6 @@ CREATE TABLE `visit_type` (
   CONSTRAINT `visit_type_retired_by` FOREIGN KEY (`retired_by`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `visit_type`
---
-
-LOCK TABLES `visit_type` WRITE;
-/*!40000 ALTER TABLE `visit_type` DISABLE KEYS */;
-/*!40000 ALTER TABLE `visit_type` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -5927,4 +4886,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-16 14:55:19
+-- Dump completed on 2019-09-12 15:46:57

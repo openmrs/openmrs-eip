@@ -11,15 +11,12 @@ Each major version of OpenMRS leads to a new branch of the project.
 
 The application uses Lombok to allow creating POJO without coding of getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
-#Setup
-Before starting up, the following to steps must be done:
-1. Install a Mysql database
-2. Create a schema and import a dump corresponding to the same major version of OpenMRS than the one of the branch you are working on.
-3. Copy and paste an application.properties, properly configured with the help of the following section in the ./app/src/main/resources folder.
-
 # Configuration
-A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the /sample directory.
-Please refer to the [READ.ME](./sample/README.md) for details about configuration.
+A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the /sample/sample_springboot_setup directory.
+Please refer to the [READ.ME](sample/sample_springboot_setup/README.md) for details about configuration.
+
+The synchro application can be used along with ActiveMQ via jms queues. A sample configuration can be found in the /sample/sample_activemq_setup directory.
+Please refer to the [READ.ME](sample/sample_activemq_setup/README.md) for details about configuration.
 
 # File synchronization
 It is also possible to synchronize the content of a folder. The folder sync is performed via a different Camel route, but files will be transferred through the same endpoint. They will thus be received by the receiver via the same endpoint as the entities.
