@@ -2,7 +2,7 @@
   <route id="write">
     <from uri="{{camel.input.endpoint}}"/>
     <convertBodyTo type="java.lang.String"/>
-    <!--<process ref="pgpDecryptService"/>-->
+    <process ref="pgpDecryptService"/>
     <choice>
       <when>
         <method bean="isFilePredicate"/>
