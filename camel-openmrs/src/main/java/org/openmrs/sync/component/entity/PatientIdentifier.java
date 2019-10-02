@@ -16,13 +16,16 @@ import javax.validation.constraints.NotNull;
 @AttributeOverride(name = "id", column = @Column(name = "patient_identifier_id"))
 public class PatientIdentifier extends AuditableEntity {
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private PatientLight patient;
 
+    @NotNull
     @Column(name = "identifier")
     private String identifier;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "identifier_type")
     private PatientIdentifierTypeLight patientIdentifierType;
@@ -32,6 +35,6 @@ public class PatientIdentifier extends AuditableEntity {
     private boolean preferred;
 
     @ManyToOne
-    @JoinColumn(name = "location")
+    @JoinColumn(name = "location_id")
     private LocationLight location;
 }
