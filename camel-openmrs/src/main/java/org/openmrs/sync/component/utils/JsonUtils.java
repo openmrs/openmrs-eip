@@ -40,7 +40,7 @@ public final class JsonUtils {
      * @return the object
      */
     public static <C> C unmarshal(final String json,
-                                      final Class<C> objectClass) {
+                                  final Class<C> objectClass) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             SimpleModule module = new SimpleModule();
