@@ -10,11 +10,11 @@ import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PatientIdentifierServiceImpl extends AbstractEntityService<PatientIdentifier, PatientIdentifierModel> {
+public class PatientIdentifierService extends AbstractEntityService<PatientIdentifier, PatientIdentifierModel> {
 
-    public PatientIdentifierServiceImpl(final SyncEntityRepository<PatientIdentifier> repository,
-                                        final EntityToModelMapper<PatientIdentifier, PatientIdentifierModel> entityToModelMapper,
-                                        final ModelToEntityMapper<PatientIdentifierModel, PatientIdentifier> modelToEntityMapper) {
+    public PatientIdentifierService(final SyncEntityRepository<PatientIdentifier> repository,
+                                    final EntityToModelMapper<PatientIdentifier, PatientIdentifierModel> entityToModelMapper,
+                                    final ModelToEntityMapper<PatientIdentifierModel, PatientIdentifier> modelToEntityMapper) {
         super(repository, entityToModelMapper, modelToEntityMapper);
     }
 
