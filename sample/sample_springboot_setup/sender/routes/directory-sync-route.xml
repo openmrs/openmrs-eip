@@ -7,7 +7,7 @@
     <transform>
       <simple>&lt;FILE&gt;${body}&lt;/FILE&gt;</simple>
     </transform>
-    <process ref="pgpEncryptService"/>
+    <!--<process ref="pgpEncryptService"/>-->
     <to uri="{{camel.output.endpoint}}"/>
   </route>
 </routes>

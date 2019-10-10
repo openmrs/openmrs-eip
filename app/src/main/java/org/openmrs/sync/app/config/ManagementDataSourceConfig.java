@@ -1,15 +1,16 @@
 package org.openmrs.sync.app.config;
 
+import org.h2.Driver;
 import org.openmrs.sync.app.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,10 +38,24 @@ public class ManagementDataSourceConfig {
     @Value("${spring.mngt-datasource.ddlAuto}")
     private String ddlAuto;
 
+    @Value("${spring.mngt-datasource.jdbcUrl}")
+    private String url;
+
+    @Value("${spring.mngt-datasource.username}")
+    private String username;
+
+    @Value("${spring.mngt-datasource.password}")
+    private String password;
+
     @Bean(name = "mngtDataSource")
     @ConfigurationProperties(prefix = "spring.mngt-datasource")
     public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
+        SimpleDriverDataSource sdd = new SimpleDriverDataSource();
+        sdd.setDriverClass(Driver.class);
+        sdd.setUrl(url);
+        sdd.setUsername(username);
+        sdd.setPassword(password);
+        return sdd;
     }
 
     @Bean(name = "mngtEntityManager")

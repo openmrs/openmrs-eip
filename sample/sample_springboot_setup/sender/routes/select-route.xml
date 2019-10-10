@@ -2,12 +2,37 @@
   <route id="select">
     <from uri="seda:sync"/>
     <to uri="log:log"/>
-    <recipientList>
-      <simple>openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}</simple>
-    </recipientList>
+    <toD uri="openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}"/>
+    <to uri="direct:authenticate-to-odoo"/>
     <split streaming="true">
       <simple>${body}</simple>
-      <process ref="pgpEncryptService"/>
+      <!-- TODO
+      1. The HSU/patient is admitted as inpatient.
+      2. The HSE/patient is in the workflow state “approved for services”
+      -->
+      <choice>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
+          <to uri="direct:person-name-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
+          <to uri="direct:person-address-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
+          <to uri="direct:patient-identifier-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
+          <to uri="direct:person-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonModel')]</jsonpath>
+          <to uri="direct:person-to-odoo"/>
+        </when>
+      </choice>
+      <!--<process ref="pgpEncryptService"/>-->
       <to uri="{{camel.output.endpoint}}"/>
     </split>
     <process ref="saveSyncStatusProcessor"/>

@@ -6,11 +6,14 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetToHeaderAggregationStrategy implements AggregationStrategy {
+public class SetOdooTokenToHeaderAggregationStrategy implements AggregationStrategy {
+
+    private static final String HEADER_TOKEN_NAME = "access-token";
+    private static final String HEADER_FIELD_NAME = "access_token";
 
     @Override
     public Exchange aggregate(final Exchange oldExchange, final Exchange newExchange) {
-        oldExchange.getIn().setHeader("access-token", new JSONObject(newExchange.getIn().getBody(String.class)).get("access_token"));
+        oldExchange.getIn().setHeader(HEADER_TOKEN_NAME, new JSONObject(newExchange.getIn().getBody(String.class)).get(HEADER_FIELD_NAME));
         return oldExchange;
     }
 }

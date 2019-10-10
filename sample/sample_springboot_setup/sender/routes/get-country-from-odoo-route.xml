@@ -1,0 +1,24 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="get-country-from-odoo">
+    <from uri="direct:get-country-from-odoo"/>
+    <setProperty propertyName="address-array">
+      <simple>${body}</simple>
+    </setProperty>
+    <setBody>
+      <simple>${null}</simple>
+    </setBody>
+    <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <transform>
+      <jsonpath>$.data[0].id</jsonpath>
+    </transform>
+    <transform>
+      <simple>${property.address-array.add(5,${body})}</simple>
+    </transform>
+    <transform>
+      <simple>${property.address-array.remove(4)}</simple>
+    </transform>
+    <setBody>
+      <simple>${property.address-array}</simple>
+    </setBody>
+  </route>
+</routes>
