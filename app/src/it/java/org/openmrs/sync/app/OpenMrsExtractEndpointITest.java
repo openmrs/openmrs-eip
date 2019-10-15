@@ -70,7 +70,8 @@ public abstract class OpenMrsExtractEndpointITest {
             public void configure() throws Exception {
                 from(getUri())
                         .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
-                        .split(body()).streaming()
+                        .split().jsonpathWriteAsString("$").streaming()
+                        .to("log:json")
                         .process(pgpEncryptService)
                         .to("log:json")
                         .to("mock:result");

@@ -1,15 +1,18 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="patient-identifier-to-odoo">
     <from uri="direct:patient-identifier-to-odoo"/>
+    <!--Extract person uuid from model and set it in a property-->
     <setProperty propertyName="openmrs-person-uuid">
       <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, patientUuid)"/>
     </setProperty>
+    <!--Get Odoo ID from mapping tables and set in property-->
     <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
       <simple>sql:select o.odoo_id from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
     </enrich>
     <transform>
       <jsonpath>$.model.identifier</jsonpath>
     </transform>
+    <!--If the odoo person id is null, the partner is created with the '[Unknown]' name-->
     <choice>
       <when>
         <simple>${property.odoo-person-id} == null</simple>

@@ -3,37 +3,62 @@
     <from uri="seda:sync"/>
     <to uri="log:log"/>
     <toD uri="openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}"/>
-    <to uri="direct:authenticate-to-odoo"/>
+    <!--Authentifaction to Odoo and register token to-->
+    <enrich strategyRef="setOdooTokenToHeaderAggregationStrategy">
+      <constant>{{odoo.url}}/api/auth/token?login={{odoo.username}}&amp;password={{odoo.password}}&amp;db={{odoo.database}}</constant>
+    </enrich>
     <split streaming="true">
-      <simple>${body}</simple>
+      <jsonpath writeAsString="true">$</jsonpath>
       <!-- TODO
       1. The HSU/patient is admitted as inpatient.
       2. The HSE/patient is in the workflow state “approved for services”
       -->
+      <!--If message corresponds to an object to be sent to Odoo, send to both Odoo and OpenMrs. Send only to OpenMrs otherwise-->
       <choice>
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
-          <to uri="direct:person-name-to-odoo"/>
+          <multicast>
+            <to uri="direct:person-name-to-odoo"/>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}"/>
+          </multicast>
         </when>
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
-          <to uri="direct:person-address-to-odoo"/>
+          <multicast>
+            <to uri="direct:person-address-to-odoo"/>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}"/>
+          </multicast>
         </when>
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
-          <to uri="direct:patient-identifier-to-odoo"/>
+          <multicast>
+            <to uri="direct:patient-identifier-to-odoo"/>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}"/>
+          </multicast>
         </when>
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
-          <to uri="direct:person-to-odoo"/>
+          <multicast>
+            <to uri="direct:person-to-odoo"/>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}"/>
+          </multicast>
         </when>
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonModel')]</jsonpath>
-          <to uri="direct:person-to-odoo"/>
+          <multicast>
+            <to uri="direct:person-to-odoo"/>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}"/>
+          </multicast>
         </when>
+        <otherwise>
+          <to uri="{{camel.output.endpoint}}"/>
+        </otherwise>
       </choice>
-      <!--<process ref="pgpEncryptService"/>-->
-      <to uri="{{camel.output.endpoint}}"/>
     </split>
     <process ref="saveSyncStatusProcessor"/>
   </route>

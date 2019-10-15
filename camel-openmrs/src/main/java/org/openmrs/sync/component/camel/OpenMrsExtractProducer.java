@@ -26,16 +26,15 @@ public class OpenMrsExtractProducer extends AbstractOpenMrsProducer {
 
         List<BaseModel> models = ruleEngine.process(params);
 
-        List<String> json = models.stream()
+        List<SyncModel> modelsArray = models.stream()
                 .filter(Objects::nonNull)
-                .map(this::buildTransferObject)
-                .map(JsonUtils::marshall)
+                .map(this::buildSyncModel)
                 .collect(Collectors.toList());
 
-        exchange.getIn().setBody(json);
+        exchange.getIn().setBody(JsonUtils.marshall(modelsArray));
     }
 
-    private SyncModel buildTransferObject(final BaseModel model) {
+    private SyncModel buildSyncModel(final BaseModel model) {
         return SyncModel.builder()
                 .tableToSyncModelClass(params.getTableToSync().getModelClass())
                 .model(model)

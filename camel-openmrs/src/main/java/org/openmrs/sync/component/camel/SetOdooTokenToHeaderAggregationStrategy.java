@@ -5,6 +5,9 @@ import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+/**
+ * Camel strategy to set access token from the REST API to a property in the Camel Context
+ */
 @Component
 public class SetOdooTokenToHeaderAggregationStrategy implements AggregationStrategy {
 

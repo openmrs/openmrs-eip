@@ -12,9 +12,11 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.component.model.PersonModel;
 import org.openmrs.sync.component.service.TableToSyncEnum;
+import org.openmrs.sync.component.utils.JsonUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,10 +64,9 @@ public class OpenMrsExtractProducerTest {
         producer.process(exchange);
 
         // Then
-        List<String> json = (List<String>) exchange.getIn().getBody();
-        assertEquals(2, json.size());
-        JSONAssert.assertEquals(expectedJson("uuid1"), json.get(0), false);
-        JSONAssert.assertEquals(expectedJson("uuid2"), json.get(1), false);
+        String json = exchange.getIn().getBody(String.class);
+        String expectedJson = "[" + expectedJson("uuid1") + "," + expectedJson("uuid2") + "]";
+        JSONAssert.assertEquals(expectedJson, json, false);
     }
 
     private String expectedJson(final String uuid) {

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Camel strategy to set the ODOO_ID to a property in the Camel context
+ */
 @Component
 public class SetOdooIdToPropertyAggregationStrategy implements AggregationStrategy {
 
