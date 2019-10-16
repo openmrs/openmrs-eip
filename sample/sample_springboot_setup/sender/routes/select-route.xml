@@ -47,14 +47,6 @@
             <to uri="{{camel.output.endpoint}}"/>
           </multicast>
         </when>
-        <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonModel')]</jsonpath>
-          <multicast>
-            <to uri="direct:person-to-odoo"/>
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}"/>
-          </multicast>
-        </when>
         <otherwise>
           <to uri="{{camel.output.endpoint}}"/>
         </otherwise>

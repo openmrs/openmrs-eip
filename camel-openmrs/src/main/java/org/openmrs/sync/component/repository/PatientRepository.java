@@ -14,4 +14,7 @@ public interface PatientRepository extends SyncEntityRepository<Patient> {
             "where p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
             "or p.dateChanged >= :lastSyncDate")
     List<Patient> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+
+    @Query("select case when (count(p) > 0) then true else false end from Patient p where p.uuid = :uuid")
+    boolean patientExists(@Param("uuid") String uuid);
 }
