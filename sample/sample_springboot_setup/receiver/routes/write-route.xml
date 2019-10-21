@@ -12,7 +12,7 @@
         <unmarshal>
           <base64/>
         </unmarshal>
-        <to uri="file:/home/sco/Desktop/res"/>
+        <to uri="file:{{camel.input.endpoint.file.location}}"/>
       </when>
       <otherwise>
         <to uri="openmrs:load"/>
