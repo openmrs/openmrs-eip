@@ -8,7 +8,7 @@
       <simple>${null}</simple>
     </setBody>
     <!--Get country from Odoo based on the name entered in OpenMrs-->
-    <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <toD uri="http://192.168.50.193:8069/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <transform>
       <jsonpath>$.data[0].id</jsonpath>
     </transform>

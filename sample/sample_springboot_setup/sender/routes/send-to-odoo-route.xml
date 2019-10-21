@@ -17,7 +17,7 @@
         <setHeader headerName="CamelHttpMethod">
           <constant>POST</constant>
         </setHeader>
-        <toD uri="{{odoo.url}}/api/${property.odoo-endpoint}?is_hsu=true&amp;company_type=hsu&amp;${property.odoo-url}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+        <toD uri="http://192.168.50.193:8069/api/${property.odoo-endpoint}?is_hsu=true&amp;company_type=hsu&amp;${property.odoo-url}&amp;httpClient.cookiePolicy=ignoreCookies"/>
         <setProperty propertyName="odoo-person-id">
           <jsonpath>$.data.id</jsonpath>
         </setProperty>
@@ -28,7 +28,7 @@
         <setHeader headerName="CamelHttpMethod">
           <constant>PUT</constant>
         </setHeader>
-        <toD uri="{{odoo.url}}/api/${property.odoo-endpoint}/${property.odoo-person-id}?${property.odoo-url}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+        <toD uri="http://192.168.50.193:8069/api/${property.odoo-endpoint}/${property.odoo-person-id}?${property.odoo-url}&amp;httpClient.cookiePolicy=ignoreCookies"/>
       </otherwise>
     </choice>
   </route>
