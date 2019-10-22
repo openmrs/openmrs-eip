@@ -1,0 +1,38 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="select">
+    <from uri="direct:sync"/>
+    <to uri="log:log"/>
+    <toD uri="openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}"/>
+    <!--Authentifaction to Odoo and register token to-->
+    <enrich strategyRef="setOdooTokenToHeaderAggregationStrategy">
+      <constant>http://192.168.50.193:8069/api/auth/token?login=admin&amp;password=admin&amp;db=openmrssynctest</constant>
+    </enrich>
+    <split streaming="true">
+      <jsonpath writeAsString="true">$</jsonpath>
+      <!-- TODO
+      1. The HSU/patient is admitted as inpatient.
+      2. The HSE/patient is in the workflow state “approved for services”
+      -->
+      <!--If message corresponds to an object to be sent to Odoo, send to both Odoo and OpenMrs. Send only to OpenMrs otherwise-->
+      <choice>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
+          <to uri="direct:person-name-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
+          <to uri="direct:person-address-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
+          <to uri="direct:patient-identifier-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
+          <to uri="direct:person-to-odoo"/>
+        </when>
+      </choice>
+    </split>
+    <process ref="saveSyncStatusProcessor"/>
+  </route>
+</routes>
