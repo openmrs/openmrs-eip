@@ -3,6 +3,9 @@ package org.openmrs.sync.component.repository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Repository
 public class PatientRepositoryImpl implements PatientRepositoryCustom {
 
@@ -12,15 +15,16 @@ public class PatientRepositoryImpl implements PatientRepositoryCustom {
         this.patientRepository = patientRepository;
     }
 
-    /**
-     * Transforms result from isPatientInGivenWorkflowStateMySQL into a boolean value as MySQL doesn't support boolean returns
-     * @param uuid the uuid of the patient
-     * @param workflowStateCode the workflow state code
-     * @return boolean
-     */
-    public boolean isPatientInGivenWorkflowState(final String uuid, final String workflowStateCode) {
-        int isPatientInGivenWorkflowState = this.patientRepository.isPatientInGivenWorkflowStateMySQL(uuid, workflowStateCode);
+    public boolean isPatientInGivenWorkflowState(final String uuid, final String workflowStateConceptMappingsString) {
+
+        List<String> workflowStateConceptMappings = parseMappings(workflowStateConceptMappingsString);
+
+        int isPatientInGivenWorkflowState = this.patientRepository.isPatientInGivenWorkflowStateMySQL(uuid, workflowStateConceptMappings);
 
         return isPatientInGivenWorkflowState == 1;
+    }
+
+    private List<String> parseMappings(final String workflowStateConceptMappingsString) {
+        return Arrays.asList(workflowStateConceptMappingsString.split(";"));
     }
 }
