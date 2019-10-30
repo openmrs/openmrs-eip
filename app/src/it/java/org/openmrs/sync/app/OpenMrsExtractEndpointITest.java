@@ -64,14 +64,13 @@ public abstract class OpenMrsExtractEndpointITest {
         resultEndpoint.getExchanges().clear();
     }
 
-    protected RoutesBuilder createRouteBuilder() throws Exception {
+    protected RoutesBuilder createRouteBuilder() {
         return new RouteBuilder() {
             @Override
-            public void configure() throws Exception {
+            public void configure() {
                 from(getUri())
                         .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
                         .split().jsonpathWriteAsString("$").streaming()
-                        .to("log:json")
                         .process(pgpEncryptService)
                         .to("log:json")
                         .to("mock:result");

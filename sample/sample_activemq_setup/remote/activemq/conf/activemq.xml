@@ -118,7 +118,12 @@
         </transportConnectors>
 
         <networkConnectors>
-                <networkConnector name="Remote1_To_Central" duplex="false" uri="masterslave:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)" staticBridge="true">
+                <networkConnector name="Remote1_To_Central"
+                                  duplex="false"
+                                  uri="masterslave:(tcp://172.28.0.2:61616,tcp://172.28.0.4:61616)"
+                                  staticBridge="true"
+                                  userName="read"
+                                  password="password">
                         <staticallyIncludedDestinations>
                                 <queue physicalName="openmrs.sync.queue" />
                         </staticallyIncludedDestinations>
@@ -130,6 +135,16 @@
         <shutdownHooks>
             <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
         </shutdownHooks>
+
+        <plugins>
+            <simpleAuthenticationPlugin>
+                <users>
+                    <authenticationUser username="write" password="password" groups="users"/>
+                    <authenticationUser username="read" password="password" groups="users"/>
+                    <authenticationUser username="admin" password="password" groups="admins,users"/>
+                </users>
+            </simpleAuthenticationPlugin>
+        </plugins>
 
     </broker>
 

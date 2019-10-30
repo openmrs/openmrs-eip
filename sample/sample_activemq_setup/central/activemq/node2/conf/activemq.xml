@@ -122,6 +122,15 @@
             <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
         </shutdownHooks>
 
+        <plugins>
+            <simpleAuthenticationPlugin>
+                <users>
+                    <authenticationUser username="read" password="password" groups="users"/>
+                    <authenticationUser username="admin" password="password" groups="admins,users"/>
+                </users>
+            </simpleAuthenticationPlugin>
+        </plugins>
+
     </broker>
 
     <!--
