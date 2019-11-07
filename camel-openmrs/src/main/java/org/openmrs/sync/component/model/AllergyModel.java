@@ -17,5 +17,5 @@ public class AllergyModel extends BaseModel {
 
     private String allergenType;
 
-    private String comment;
+    private String comments;
 }

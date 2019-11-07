@@ -66,6 +66,9 @@ public class Condition extends BaseEntity {
     @JoinColumn(name = "changed_by")
     protected UserLight changedBy;
 
+    @Column(name = "date_changed")
+    protected LocalDateTime dateChanged;
+
     @NotNull
     @Column(name = "voided")
     protected boolean voided;

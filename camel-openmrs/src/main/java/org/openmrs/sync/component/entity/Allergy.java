@@ -36,6 +36,6 @@ public class Allergy extends AuditableEntity {
     @Column(name = "allergen_type")
     private String allergenType;
 
-    @Column(name = "comment")
-    private String comment;
+    @Column(name = "comments")
+    private String comments;
 }
