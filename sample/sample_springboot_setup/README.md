@@ -1,44 +1,132 @@
-#Configuration
-The receiver and sender directory both contain a `routes` directory with the Camel routes as XML files and a sample application.properties file
-The following configuration is necessary:
-1. A docker-compose launching 2 MySQL instances (port 3306 for the central db, 3307 for the remote db) can be found in the /db directory. To launch it, open a command dialog, navigate to the /db folder and run >docker-compose up
-2. Import a dump of each database: an empty dump for the central database, and a full dump for the remote database.
-3. By default, the exchange of data between the sender and the receiver is done with the 'file' Camel endpoint.
-You need to create a folder into which the messages will transit and register it in the sender's application.properties files with the following keys/values:
-(You can use a JMS endpoint, but an activeMQ broker must be [configured](../sample_activemq_setup/README.md)):
-    * camel.input.endpoint=file:<folder_path> (camel.input.endpoint=jms:<jms_queue_name>)
+# Sample configuration
 
-The same path needs to be specified in th receiver's application.properties as follows:
-    * camel.input.endpoint=file:<folder_path> (camel.input.endpoint=jms:<jms_queue_name>)
+This example emulates a scenario where a remote clinic is on the field collecting data and is periodically sending data to the main HQ server, the central server, the receiver.
 
-if you are using ActiveMQ, follow these steps:
+The **sender** is the **remote**. The **receiver** is the **central**.
 
-Uncomment the following lines in sender/application.properties file
+[receiver/](./receiver) and [sender/](./sender) directories both contain a [routes/](./routes) folder with the Camel routes XML files and a sample _application.properties_ file.
 
-* spring.activemq.broker-url=tcp://localhost:62616
+_Note: Most of the paths set in this example are pointing to `/tmp/`, which will get wiped upon next computer restart. Sync information will not be persisted. Use another location if you want to persist across restarts_
 
-* spring.activemq.user=write
+### 1. Launch 'remote' and 'central' MySQL containers
+A Docker Compose project to launch 2 MySQL instances (port `3306` for the central database, `3307` for the remote) can be found in the [db/](./db/) directory. To launch it, run:
+```
+cd sample/sample_springboot_setup/db
+docker-compose up
+```
 
-* spring.activemq.password=password
+### 2. Import database dumps
+Restore a database archive for each database:
 
-Uncomment the following lines in receiver/application.properties file
 
-* spring.activemq.broker-url=failover:(tcp://localhost:63616,tcp://localhost:64616)
+- a dump with not much data for the central database
+```
+cd sample/sample_springboot_setup/db
+cat dump_with_no_data.sql | docker exec -i db_db_central_1 /usr/bin/mysql -u root --password=root openmrs
+```
 
-* spring.activemq.user=read
+- a dump with lots of data for the remote database.
+```
+cd sample/sample_springboot_setup/db
+zcat Dump20190909.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root --password=root openmrs
+```
 
-* spring.activemq.password=password
+This operation will take few minutes.
 
-4. If you want to also synchronize the content of a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
-The property for that purpose is: 
-    * camel.output.endpoint.file.location:<folder_path>
-5. Copy the sender application.properties in /camel-openmrs/src/main/resources and rename it as follows: application-sender.properties
-6. Copy the receiver application.properties in /camel-openmrs/src/main/resources and rename it as follows: application-receiver.properties
-7. Each application will be launched with the profile parameter with which to launch the application. The values are 'sender' or 'receiver'. The profile will also select the right application.properties file accordingly.
 
-#Security
-The flow of messages between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors where developed to encrypt and sign (`PGPEncryptService`) message on one side
-and verify and decrypt (`PGPDecryptService`) on the other side. They simply need to be registered in the corresponding Camel route before being sent or after being received.
+### 3. Configure `file` Camel endpoint (if not using `jms` queues)
+
+By default, the exchange of data between the sender and the receiver is done with the `file` Camel endpoint.
+
+Copy and rename the sample _application.properties_ files:
+```
+cp sample/sample_springboot_setup/sender/application.properties app/src/main/resources/application-sender.properties
+```
+```
+cp sample/sample_springboot_setup/receiver/application.properties app/src/main/resources/application-receiver.properties
+```
+
+Create a folder into which the messages will transit.
+```
+mkdir -p /tmp/openmrs-dbsync/sync
+```
+and register this location in the sender and receiver _application.properties_ file just copied with the appropriate values.
+
+- sender:
+```
+nano camel-openmrs/src/main/resources/application-sender.properties
+```
+and set the following options:
+```
+camel.output.endpoint=file:/tmp/openmrs-dbsync/sync
+```
+```
+# Sender DB (remote) port is 3307
+spring.openmrs-datasource.jdbcUrl=jdbc:mysql://localhost:3307/openmrs
+```
+
+- receiver:
+```
+nano camel-openmrs/src/main/resources/application-receiver.properties
+```
+and set the following option:
+```
+camel.input.endpoint=file:/tmp/openmrs-dbsync/sync
+```
+
+### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
+
+You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../sample_activemq_setup/README.md) first.
+
+Then configure the sender and receiver properties file as follows:
+```
+camel.input.endpoint=jms:openmrs.sync.queue
+```
+
+Uncomment the following lines in **sender-application.properties** file
+```
+spring.activemq.broker-url=tcp://localhost:62616
+spring.activemq.user=write
+spring.activemq.password=password
+```
+
+Uncomment the following lines in **eceiver-application.properties** file
+```
+spring.activemq.broker-url=failover:(tcp://localhost:63616,tcp://localhost:64616)
+spring.activemq.user=read
+spring.activemq.password=password
+```
+
+### 4. Folder synchronization
+If you want to also synchronize the content of a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
+The property for that purpose is:
+```
+camel.output.endpoint.file.location=/tmp/openmrs-dbsync/store
+```
+
+Note: To disable this feature, just delete the route, or rename it to **directory-sync-route.xml.disable**
+
+### 5. Rebuild the project
+
+```
+mvn clean install
+```
+
+### 6. Launch the Spring Boot apps
+Each application will be launched with the appropriate Spring Boot profile parameter. The values are `sender` or `receiver`. The profile will also select the right `application.properties` file.
+- sender app:
+ ```
+cd sample/sample_springboot_setup/sender
+java -jar -Dspring.profiles.active=sender ../../../app/target/openmrs-sync-app-1.0-SNAPSHOT.jar
+```
+- receiver app:
+```
+cd sample/sample_springboot_setup/receiver
+java -jar -Dspring.profiles.active=receiver ../../../app/target/openmrs-sync-app-1.0-SNAPSHOT.jar
+```
+
+# Security
+The flow of messages between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were developed to encrypt and sign (`PGPEncryptService`) message on one side and verify and decrypt (`PGPDecryptService`) on the other side. They simply need to be registered in the corresponding Camel route before being sent or after being received.
 
 The encryption is performed by PGP. So public and private keys shall be generated for each side of the exchange.
 * To encrypt the message, the sender needs the receiver's public key
