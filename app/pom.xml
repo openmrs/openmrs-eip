@@ -22,7 +22,7 @@
     <dependency>
       <groupId>org.openmrs.sync</groupId>
       <artifactId>camel-openmrs</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
