@@ -25,7 +25,7 @@ public final class JsonUtils {
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
 
-            return mapper.writeValueAsString(object).replaceAll("^\"|\"$|\\\\", "");
+            return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             log.error("Error while marshalling object", e);
             throw new OpenMrsSyncException("Error while marshalling object", e);
