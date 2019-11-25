@@ -1,0 +1,77 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="decision-route">
+    <from uri="direct:decision-route"/>
+    <split streaming="true">
+      <jsonpath writeAsString="true">$</jsonpath>
+      <choice>
+        <when>
+          <!--
+          If PatientState has changed, it may be necessary to send patient to Odoo
+          All patient data regarding patient whose state has been changed are retrieved and reprocessed
+          by the route independantly
+           -->
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientStateModel')]</jsonpath>
+          <transform>
+            <jsonpath>$.model.uuid</jsonpath>
+          </transform>
+          <toD uri="sql:select pp.patient_id from patient_state ps left join patient_program pp on pp.patient_program_id = ps.patient_program_id where ps.uuid = '${body}'?dataSource=#openmrsDataSource"/>
+          <setProperty propertyName="openmrs-patient-id">
+            <jsonpath>$.[0].patient_id</jsonpath>
+          </setProperty>
+          <log message="State update for patient ${property.openmrs-patient-id} => Checking to send patient data to Odoo"/>
+          <toD uri="openmrs:extract?tableToSync=PATIENT&amp;entityId=${property.openmrs-patient-id}"/>
+          <to uri="direct:decision-route"/>
+          <toD uri="sql:select pn.person_name_id from person_name pn where pn.person_id = '${property.openmrs-patient-id}'?dataSource=#openmrsDataSource"/>
+          <choice>
+            <when>
+              <simple>${body} != ''</simple>
+              <transform>
+                <jsonpath>$.[0].person_name_id</jsonpath>
+              </transform>
+              <toD uri="openmrs:extract?tableToSync=PERSON_NAME&amp;entityId=${body}"/>
+              <to uri="direct:decision-route"/>
+            </when>
+          </choice>
+          <toD uri="sql:select pa.person_address_id from person_address pa where pa.person_id = '${property.openmrs-patient-id}'?dataSource=#openmrsDataSource"/>
+          <choice>
+            <when>
+              <simple>${body} != ''</simple>
+              <transform>
+                <jsonpath>$.[0].person_address_id</jsonpath>
+              </transform>
+              <toD uri="openmrs:extract?tableToSync=PERSON_ADDRESS&amp;entityId=${body}"/>
+              <to uri="direct:decision-route"/>
+            </when>
+          </choice>
+          <toD uri="sql:select pi.patient_identifier_id from patient_identifier pi where pi.patient_id = '${property.openmrs-patient-id}'?dataSource=#openmrsDataSource"/>
+          <choice>
+            <when>
+              <simple>${body} != ''</simple>
+              <transform>
+                <jsonpath>$.[0].patient_identifier_id</jsonpath>
+              </transform>
+              <toD uri="openmrs:extract?tableToSync=PATIENT_IDENTIFIER&amp;entityId=${body}"/>
+              <to uri="direct:decision-route"/>
+            </when>
+          </choice>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
+          <to uri="direct:person-name-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
+          <to uri="direct:person-address-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
+          <to uri="direct:patient-identifier-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
+          <to uri="direct:patient-to-odoo"/>
+        </when>
+      </choice>
+    </split>
+  </route>
+</routes>

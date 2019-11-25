@@ -9,48 +9,8 @@
     </enrich>
     <split streaming="true">
       <jsonpath writeAsString="true">$</jsonpath>
-      <!-- TODO
-      1. The HSU/patient is admitted as inpatient.
-      2. The HSE/patient is in the workflow state “approved for services”
-      -->
-      <!--If message corresponds to an object to be sent to Odoo, send to both Odoo and OpenMrs. Send only to OpenMrs otherwise-->
-      <choice>
-        <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
-          <multicast>
-            <to uri="direct:person-name-to-odoo"/>
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}"/>
-          </multicast>
-        </when>
-        <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
-          <multicast>
-            <to uri="direct:person-address-to-odoo"/>
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}"/>
-          </multicast>
-        </when>
-        <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
-          <multicast>
-            <to uri="direct:patient-identifier-to-odoo"/>
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}"/>
-          </multicast>
-        </when>
-        <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
-          <multicast>
-            <to uri="direct:person-to-odoo"/>
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}"/>
-          </multicast>
-        </when>
-        <otherwise>
-          <to uri="{{camel.output.endpoint}}"/>
-        </otherwise>
-      </choice>
+      <!--<process ref="pgpEncryptService"/>-->
+      <to uri="{{camel.output.endpoint}}"/>
     </split>
     <process ref="saveSyncStatusProcessor"/>
   </route>

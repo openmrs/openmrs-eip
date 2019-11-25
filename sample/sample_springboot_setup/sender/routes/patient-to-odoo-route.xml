@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="person-to-odoo">
-    <from uri="direct:person-to-odoo"/>
+  <route id="patient-to-odoo">
+    <from uri="direct:patient-to-odoo"/>
     <log message="${body}"/>
     <!--Extract person uuid from model and set it in a property-->
     <setProperty propertyName="openmrs-person-uuid">
