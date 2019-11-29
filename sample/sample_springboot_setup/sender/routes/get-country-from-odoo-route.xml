@@ -9,18 +9,26 @@
     </setBody>
     <!--Get country from Odoo based on the name entered in OpenMrs-->
     <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
-    <transform>
-      <jsonpath>$.data[0].id</jsonpath>
-    </transform>
-    <!--Replace country name with ID returned from above query-->
-    <transform>
-      <simple>${property.address-array.add(5,${body})}</simple>
-    </transform>
-    <transform>
-      <simple>${property.address-array.remove(4)}</simple>
-    </transform>
-    <setBody>
-      <simple>${property.address-array}</simple>
-    </setBody>
+    <choice>
+      <when>
+        <jsonpath>$.[?(@.count>0)]</jsonpath>
+        <transform>
+          <jsonpath>$.data[0].id</jsonpath>
+        </transform>
+        <!--Replace country name with ID returned from above query-->
+        <transform>
+          <simple>${property.address-array.add(5,${body})}</simple>
+        </transform>
+        <transform>
+          <simple>${property.address-array.remove(4)}</simple>
+        </transform>
+        <setBody>
+          <simple>${property.address-array}</simple>
+        </setBody>
+      </when>
+      <otherwise>
+        <log loggingLevel="WARN" message="No country found for label ${property.address-array[4]}"/>
+      </otherwise>
+    </choice>
   </route>
 </routes>
