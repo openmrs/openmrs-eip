@@ -8,10 +8,14 @@
     <choice>
       <when>
         <!--Select only patients-->
-        <method ref="patientRepository" method="isPatientInGivenWorkflowState(${property.openmrs-person-uuid}, {{odoo.approved-for-service-id}})"/>
+        <simple>true</simple>
+        <!--<method ref="patientRepository" method="isPatientInGivenWorkflowState(${property.openmrs-person-uuid}, {{odoo.approved-for-service-id}})"/>-->
         <!--Get Odoo ID from mapping tables and set in property-->
+        <setHeader headerName="property-name">
+          <constant>odoo-person-id</constant>
+        </setHeader>
         <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
-          <simple>sql:select o.odoo_id from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
+          <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
         </enrich>
         <transform>
           <jsonpath>$.model.address.['address1','address2','cityVillage','postalCode','country']</jsonpath>

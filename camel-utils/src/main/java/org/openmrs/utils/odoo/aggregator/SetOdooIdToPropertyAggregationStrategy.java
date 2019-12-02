@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.camel;
+package org.openmrs.utils.odoo.aggregator;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
@@ -13,15 +13,15 @@ import java.util.Map;
 @Component
 public class SetOdooIdToPropertyAggregationStrategy implements AggregationStrategy {
 
-    private static final String ODOO_ID_FIELD_NAME = "ODOO_ID";
-    private static final String ODOO_ID_PROP_NAME = "odoo-person-id";
+    private static final String PROPERTY_NAME = "property-name";
 
     @Override
     public Exchange aggregate(final Exchange oldExchange, final Exchange newExchange) {
         List exchangeBody = newExchange.getIn().getBody(List.class);
 
         if (!exchangeBody.isEmpty()) {
-            oldExchange.setProperty(ODOO_ID_PROP_NAME, ((Map) exchangeBody.get(0)).get(ODOO_ID_FIELD_NAME));
+            String propertyName = oldExchange.getIn().getHeader(PROPERTY_NAME, String.class);
+            oldExchange.setProperty(propertyName, ((Map) exchangeBody.get(0)).get(propertyName));
         }
 
         return oldExchange;

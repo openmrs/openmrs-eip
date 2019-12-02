@@ -8,7 +8,7 @@
           <!--
           If PatientState has changed, it may be necessary to send patient to Odoo
           All patient data regarding patient whose state has been changed are retrieved and reprocessed
-          by the route independantly
+          by the route independently
            -->
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientStateModel')]</jsonpath>
           <transform>
@@ -70,6 +70,10 @@
         <when>
           <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
           <to uri="direct:patient-to-odoo"/>
+        </when>
+        <when>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.ObservationModel)]</jsonpath>
+          <to uri="direct:observation-to-odoo"/>
         </when>
       </choice>
     </split>

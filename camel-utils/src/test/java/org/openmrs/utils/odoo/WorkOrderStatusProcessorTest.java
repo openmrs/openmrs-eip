@@ -1,0 +1,56 @@
+package org.openmrs.utils.odoo;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.openmrs.utils.odoo.manager.WorkOrderStatusManager;
+import org.openmrs.utils.odoo.manager.WorkOrderStatusManagerFactory;
+import org.openmrs.utils.odoo.model.WorkOrder;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class WorkOrderStatusProcessorTest {
+
+    @Mock
+    private WorkOrderStatusManagerFactory factory;
+
+    @Mock
+    private WorkOrderStatusManager manager;
+
+    private WorkOrderStatusProcessor processor;
+
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+
+        processor = new WorkOrderStatusProcessor(factory);
+    }
+
+    @Test
+    public void process_should_put_modified_work_orders_in_body() {
+        // Given
+        Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+        exchange.setProperty("obs-state-value", ObsActionEnum.PAUSE.name());
+        exchange.setProperty("obs-sequence-nb", 1);
+        WorkOrder workOrder = new WorkOrder();
+        List<WorkOrder> workOrders = Collections.singletonList(workOrder);
+        exchange.getIn().setBody(Collections.singletonList(workOrder));
+        when(factory.createManager(ObsActionEnum.PAUSE, 1)).thenReturn(manager);
+
+        // When
+        processor.process(exchange);
+
+        // Then
+        verify(manager).manageStatus(workOrders);
+        assertNotNull(exchange.getIn().getBody());
+    }
+}

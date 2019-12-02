@@ -3,7 +3,7 @@
     <from uri="direct:sync"/>
     <to uri="log:log"/>
     <toD uri="openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}"/>
-    <!--Authentifaction to Odoo and register token to-->
+    <!--Authentifaction to Odoo and register token to header-->
     <enrich strategyRef="setOdooTokenToHeaderAggregationStrategy">
       <constant>{{odoo.url}}/api/auth/token?login={{odoo.username}}&amp;password={{odoo.password}}&amp;db={{odoo.database}}</constant>
     </enrich>

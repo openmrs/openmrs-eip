@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 
 @SpringBootApplication(scanBasePackages = {
         "org.openmrs.sync.app",
-        "org.openmrs.sync.component"
+        "org.openmrs.sync.component",
+        "org.openmrs.utils.odoo"
 })
 public class SyncApplication {
 

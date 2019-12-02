@@ -36,7 +36,8 @@ send-to-odoo-route.xml
 Configure the following Odoo routes with the correct url to Odoo:
 
 - select-route.xml line 8
-- send-to-odoo-route.xml line 20 and 31
+- select-route-only-odoo.xml line 20 and 31
+- get-country-from-odoo-route.xml line 11 
 
 # Run
 

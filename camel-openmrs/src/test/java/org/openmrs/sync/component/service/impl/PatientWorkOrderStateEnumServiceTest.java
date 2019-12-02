@@ -13,7 +13,7 @@ import org.openmrs.sync.component.service.TableToSyncEnum;
 
 import static org.junit.Assert.assertEquals;
 
-public class PatientStateServiceTest {
+public class PatientWorkOrderStateEnumServiceTest {
 
     @Mock
     private SyncEntityRepository<PatientState> repository;

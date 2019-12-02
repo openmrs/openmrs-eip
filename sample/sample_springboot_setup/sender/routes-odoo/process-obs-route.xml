@@ -1,0 +1,152 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="schedule">
+    <from uri="direct:process-obs"/>
+    <!--Extract valueDateTime from obs and set to property-->
+    <setProperty propertyName="openmrs-obs-value-datetime">
+      <jsonpath>$.model.valueDatetime</jsonpath>
+    </setProperty>
+    <!--Get workorder corresponding to given manufacturing order -->
+    <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','WH/MRO/MO/00007')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <transform>
+      <jsonpath>$.data</jsonpath>
+    </transform>
+    <convertBodyTo type="java.lang.String"/>
+    <!--Marshall to java object-->
+    <unmarshal>
+      <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.model.WorkOrder"/>
+    </unmarshal>
+    <!--Set sequence number of the changing workorder to property-->
+    <setProperty propertyName="obs-sequence-nb">
+      <constant>1</constant>
+    </setProperty>
+    <!--Set obs action of the changing workorder to property-->
+    <setProperty propertyName="obs-state-value">
+      <constant>CLOSE</constant>
+    </setProperty>
+    <!--Process workorder to sort them and return the changing workorders induced to keep consistency-->
+    <process ref="workOrderStatusProcessor"/>
+    <log message="${body}"/>
+    <!--Process each changing workorder-->
+    <split streaming="true">
+      <simple>${body}</simple>
+      <setProperty propertyName="workorder-action">
+        <simple>${body.getAction()}</simple>
+      </setProperty>
+      <setProperty propertyName="workorder-new-state">
+        <simple>${body.getAction().getResultingWorkOrderState().getOdooValue()}</simple>
+      </setProperty>
+      <setProperty propertyName="workorder-name">
+        <simple>${body.getWorkOrder().getName()}</simple>
+      </setProperty>
+      <setProperty propertyName="workorder-id">
+        <simple>${body.getWorkOrder().getId()}</simple>
+      </setProperty>
+      <setProperty propertyName="workcenter-id">
+        <simple>${body.getWorkOrder().getWorkCenterId()}</simple>
+      </setProperty>
+      <setProperty propertyName="loss-id">
+        <constant>7</constant>
+      </setProperty>
+      <choice>
+        <when>
+          <!--If action equals START-->
+          <simple>${property.workorder-action} == 'START'</simple>
+          <setHeader headerName="CamelHttpMethod">
+            <constant>POST</constant>
+          </setHeader>
+          <setProperty propertyName="date-start">
+            <method ref="currentDateUTCProvider" method="getDateAsString"/>
+          </setProperty>
+          <setProperty propertyName="user-id">
+            <constant>2</constant>
+          </setProperty>
+          <setBody>
+            <simple>${null}</simple>
+          </setBody>
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?workorder_id=${property.workorder-id}&amp;workcenter_id=${property.workcenter-id}&amp;loss_id=${property.loss-id}&amp;date_start=${property.date-start}&amp;user_id=${property.user-id}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+        </when>
+        <when>
+          <!--If action equals PAUSE or CLOSE-->
+          <simple>${property.workorder-action} == 'PAUSE' || ${property.workorder-action} == 'CLOSE'</simple>
+          <setHeader headerName="CamelHttpMethod">
+            <constant>GET</constant>
+          </setHeader>
+          <setBody>
+            <simple>${null}</simple>
+          </setBody>
+          <!--Get the time line associated to workorder with no end date-->
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}'),('date_end','=',False)]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+          <convertBodyTo type="java.lang.String"/>
+          <choice>
+            <when>
+              <jsonpath>$.[?(@.count>=1)]</jsonpath>
+              <log message="${body}"/>
+              <transform>
+                <jsonpath>$.data</jsonpath>
+              </transform>
+              <transform>
+                <jsonpath>$.[0]</jsonpath>
+              </transform>
+              <transform>
+                <jsonpath>$.id</jsonpath>
+              </transform>
+              <setProperty propertyName="time-id">
+                <simple>${body}</simple>
+              </setProperty>
+              <setProperty propertyName="date-end">
+                <method ref="currentDateUTCProvider" method="getDateAsString"/>
+              </setProperty>
+              <setHeader headerName="CamelHttpMethod">
+                <constant>PUT</constant>
+              </setHeader>
+              <setBody>
+                <simple>${null}</simple>
+              </setBody>
+              <!--Set the end date of the time line-->
+              <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity/${property.time-id}?date_end=${property.date-end}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+            </when>
+          </choice>
+        </when>
+        <when>
+          <!--If action equals CANCEL-->
+          <simple>${property.workorder-action} == 'CANCEL'</simple>
+          <setHeader headerName="CamelHttpMethod">
+            <constant>GET</constant>
+          </setHeader>
+          <setBody>
+            <simple>${null}</simple>
+          </setBody>
+          <!--Get the time lines associated to the work order to delete them all-->
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}')]"/>
+          <transform>
+            <jsonpath>$.data</jsonpath>
+          </transform>
+          <split streaming="true">
+            <jsonpath>$</jsonpath>
+            <transform>
+              <jsonpath>$.id</jsonpath>
+            </transform>
+            <setProperty propertyName="time-id">
+              <simple>${body}</simple>
+            </setProperty>
+            <setHeader headerName="CamelHttpMethod">
+              <constant>DELETE</constant>
+            </setHeader>
+            <setBody>
+              <simple>${null}</simple>
+            </setBody>
+            <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity/${property.time-id}?httpClient.cookiePolicy=ignoreCookies"/>
+          </split>
+        </when>
+      </choice>
+      <!--Send new state to Odoo-->
+      <setHeader headerName="CamelHttpMethod">
+        <constant>PUT</constant>
+      </setHeader>
+      <setBody>
+        <simple>${null}</simple>
+      </setBody>
+      <toD uri="{{odoo.url}}/api/mrp.workorder/${property.workorder-id}?state=${property.workorder-new-state}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    </split>
+  </route>
+</routes>

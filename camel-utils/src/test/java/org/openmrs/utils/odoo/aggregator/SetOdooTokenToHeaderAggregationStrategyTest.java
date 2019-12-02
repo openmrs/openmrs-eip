@@ -1,4 +1,4 @@
-package org.openmrs.sync.component.camel;
+package org.openmrs.utils.odoo.aggregator;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
