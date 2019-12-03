@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * Camel strategy to set the ODOO_ID to a property in the Camel context
+ * The property should be stored in the header with the name property-name
  */
 @Component
 public class SetOdooIdToPropertyAggregationStrategy implements AggregationStrategy {

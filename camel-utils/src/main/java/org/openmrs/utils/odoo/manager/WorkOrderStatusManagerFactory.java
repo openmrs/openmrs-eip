@@ -15,8 +15,15 @@ public class WorkOrderStatusManagerFactory {
         this.rules = rules;
     }
 
-    public WorkOrderStatusManager createManager(final ObsActionEnum state,
-                                                final Integer sequenceNumber) {
-        return new WorkOrderStatusManager(state, sequenceNumber, rules);
+    /**
+     * returns an instance of {@link WorkOrderStatusManager}
+     * @param action to apply to the {@link org.openmrs.utils.odoo.model.WorkOrder}
+     * @param sequenceNumberIndex sequence number of the {@link org.openmrs.utils.odoo.model.WorkOrder}
+     *                       to which apply the above action
+     * @return the instance of {@link WorkOrderStatusManager}
+     */
+    public WorkOrderStatusManager createManager(final ObsActionEnum action,
+                                                final Integer sequenceNumberIndex) {
+        return new WorkOrderStatusManager(action, sequenceNumberIndex, rules);
     }
 }

@@ -18,6 +18,12 @@ public class WorkOrderSorter {
         this.workOrders = workOrders;
     }
 
+    /**
+     * Sorts a list of work orders according each {@link WorkOrder} 'nextWorkOrderId'
+     * Each {@link WorkOrder} has a nextWorkOrderAttribute that links to another (and only one) {@link WorkOrder} in the list
+     * so that the last {@link WorkOrder} nextWorkOrderAttribute value is null
+     * @return the sorted list
+     */
     public List<WorkOrder> sort() {
         if (workOrders == null) {
             return null;

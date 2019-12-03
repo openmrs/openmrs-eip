@@ -4,32 +4,39 @@ import org.openmrs.utils.odoo.model.WorkOrder;
 
 import java.util.List;
 
+/**
+ * The context of the execution to keep work orders in a consistent state
+ * workOrders is the list of work orders of a given manufacturing order
+ * currentWorkOrderSequenceIndex is the index of the work order which is being checked for consistency
+ * originalWorkOrderSequenceIndex is the index of the work order upon which the {@link org.openmrs.utils.odoo.ObsActionEnum}
+ * was originally applied
+ */
 public class WorkOrderStatusTransitionContext {
     private List<WorkOrder> workOrders;
-    private int currentWorkOrderSequenceNumber;
-    private int originalWorkOrderSequenceNumber;
+    private int currentWorkOrderSequenceIndex;
+    private int originalWorkOrderSequenceIndex;
 
     public WorkOrderStatusTransitionContext(final List<WorkOrder> workOrders,
-                                            final int currentWorkOrderSequenceNumber,
-                                            final int originalWorkOrderSequenceNumber) {
+                                            final int currentWorkOrderSequenceIndex,
+                                            final int originalWorkOrderSequenceIndex) {
         this.workOrders = workOrders;
-        this.currentWorkOrderSequenceNumber = currentWorkOrderSequenceNumber;
-        this.originalWorkOrderSequenceNumber = originalWorkOrderSequenceNumber;
+        this.currentWorkOrderSequenceIndex = currentWorkOrderSequenceIndex;
+        this.originalWorkOrderSequenceIndex = originalWorkOrderSequenceIndex;
     }
 
     public WorkOrder getWorkOrder() {
-        return this.workOrders.get(currentWorkOrderSequenceNumber);
+        return this.workOrders.get(currentWorkOrderSequenceIndex);
     }
 
-    public int getOriginalWorkOrderSequenceNumber() {
-        return originalWorkOrderSequenceNumber;
+    public int getOriginalWorkOrderSequenceIndex() {
+        return originalWorkOrderSequenceIndex;
     }
 
     public List<WorkOrder> getWorkOrders() {
         return workOrders;
     }
 
-    public int getCurrentWorkOrderSequenceNumber() {
-        return currentWorkOrderSequenceNumber;
+    public int getCurrentWorkOrderSequenceIndex() {
+        return currentWorkOrderSequenceIndex;
     }
 }

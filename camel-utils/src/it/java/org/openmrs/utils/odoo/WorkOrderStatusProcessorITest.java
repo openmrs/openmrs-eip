@@ -14,11 +14,13 @@ import org.openmrs.utils.odoo.manager.rule.NoWorkOrderReadyBeforeWorkOrderInProg
 import org.openmrs.utils.odoo.manager.rule.OnlyOneWorkOrderInProgressRule;
 import org.openmrs.utils.odoo.manager.rule.WorkOrderStatusTransitionRule;
 import org.openmrs.utils.odoo.model.WorkOrder;
+import org.openmrs.utils.odoo.model.WorkOrderAction;
 import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -54,8 +56,21 @@ public class WorkOrderStatusProcessorITest {
         processor = new WorkOrderStatusProcessor(factory);
     }
 
+    /**
+     * Following work orders:
+     *  ____________________________________________
+     * |    4     |     1    |   3   |   5  |   2   |
+     * |__________|__________|_______|______|______ |
+     * | PROGRESS | PROGRESS | READY | DONE | READY |
+     *
+     * START Work Order 3 should return:
+     *  ________________________________________
+     * |    3     |   1  |   2  |   4   |   5   |
+     * |__________|______|______|_______|_______|
+     * | PROGRESS | DONE | DONE | READY | READY |
+     */
     @Test
-    public void process_should_put_modified_work_orders_in_body() {
+    public void process_START_on_wo_3() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         exchange.setProperty("obs-state-value", ObsActionEnum.START.name());
@@ -67,6 +82,16 @@ public class WorkOrderStatusProcessorITest {
 
         // Then
         assertNotNull(exchange.getIn().getBody());
+        assertEquals(3, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(0).getWorkOrder().getId());
+        assertEquals(WorkOrderStateEnum.PROGRESS, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(0).getWorkOrder().getState());
+        assertEquals(1, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(1).getWorkOrder().getId());
+        assertEquals(WorkOrderStateEnum.DONE, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(1).getWorkOrder().getState());
+        assertEquals(2, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(2).getWorkOrder().getId());
+        assertEquals(WorkOrderStateEnum.DONE, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(2).getWorkOrder().getState());
+        assertEquals(4, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(3).getWorkOrder().getId());
+        assertEquals(WorkOrderStateEnum.READY, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(3).getWorkOrder().getState());
+        assertEquals(5, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(4).getWorkOrder().getId());
+        assertEquals(WorkOrderStateEnum.READY, ((List<WorkOrderAction>) exchange.getIn().getBody()).get(4).getWorkOrder().getState());
     }
 
     private List<WorkOrder> initWorkOrders() {

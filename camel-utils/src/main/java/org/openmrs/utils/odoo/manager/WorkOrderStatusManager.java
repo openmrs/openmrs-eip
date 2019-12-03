@@ -12,27 +12,45 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * The {@link WorkOrderStatusManager} is due to apply the action to the {@link WorkOrder} with the given sequenceNumberIndex
+ * To do so, the list of {@link WorkOrder} in parameter is sorted so that the sequenceNumberIndex corresponds to the
+ * correct {@link WorkOrder}
+ * It is possible that external actions where applied to the {@link WorkOrder}. A list of {@link WorkOrderStatusTransitionRule}
+ * is applied after the action to the other work orders so that their states remain consistent between each other
+ * Basically, the result will be as follows:
+ *
+ * [DONE, DONE, ..., PROGRESS, READY, ...,READY]
+ *
+ */
 @Slf4j
 public class WorkOrderStatusManager {
 
     private ObsActionEnum action;
 
-    private int sequenceNumber;
+    private int sequenceNumberIndex;
 
     private List<WorkOrderStatusTransitionRule> rules;
 
     public WorkOrderStatusManager(final ObsActionEnum action,
-                                  final int sequenceNumber,
+                                  final int sequenceNumberIndex,
                                   final List<WorkOrderStatusTransitionRule> rules) {
         this.action = action;
-        this.sequenceNumber = sequenceNumber;
+        this.sequenceNumberIndex = sequenceNumberIndex;
         this.rules = rules;
     }
 
+    /**
+     * From a given list of {@link WorkOrder}, returns a list of {@link WorkOrderAction} encapsulating
+     * a {@link WorkOrder} and an {@link ObsActionEnum} to apply to it to keep the list of {@link WorkOrder}
+     * in a consistent state
+     * @param workOrders the list of actions to apply
+     * @return a list of {@link WorkOrderAction}
+     */
     public List<WorkOrderAction> manageStatus(final List<WorkOrder> workOrders) {
         List<WorkOrder> sortedWorkOrders = new WorkOrderSorter(workOrders).sort();
 
-        WorkOrder workOrder = sortedWorkOrders.get(sequenceNumber - 1);
+        WorkOrder workOrder = sortedWorkOrders.get(sequenceNumberIndex - 1);
         workOrder.setState(this.action.getResultingWorkOrderState());
         WorkOrderAction workOrderAction = WorkOrderAction.builder()
                 .action(this.action)
@@ -44,8 +62,8 @@ public class WorkOrderStatusManager {
 
         actions.addAll(
                 IntStream.range(0, sortedWorkOrders.size())
-                        .filter(i -> i != sequenceNumber - 1) // Exclude current work order because status was already changed
-                        .mapToObj(i -> new WorkOrderStatusTransitionContext(sortedWorkOrders, i, sequenceNumber - 1))
+                        .filter(i -> i != sequenceNumberIndex - 1) // Exclude current work order because status was already changed
+                        .mapToObj(i -> new WorkOrderStatusTransitionContext(sortedWorkOrders, i, sequenceNumberIndex - 1))
                         .map(this::changeStatusIfNeeded)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList())
