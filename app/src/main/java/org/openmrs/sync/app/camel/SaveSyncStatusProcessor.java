@@ -8,7 +8,6 @@ import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ public class SaveSyncStatusProcessor implements Processor {
     public void process(final Exchange exchange) {
         Optional<TableSyncStatus> statusOptional = repository.findById((Long) exchange.getIn().getHeader("OpenMrsEntitySyncStatusId"));
         statusOptional.ifPresent(status -> {
-            status.setLastSyncDate(LocalDateTime.now(Clock.systemUTC()));
+            status.setLastSyncDate(LocalDateTime.now());
             repository.save(status);
         });
     }
