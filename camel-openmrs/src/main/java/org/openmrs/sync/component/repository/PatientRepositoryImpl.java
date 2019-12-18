@@ -15,6 +15,7 @@ public class PatientRepositoryImpl implements PatientRepositoryCustom {
         this.patientRepository = patientRepository;
     }
 
+    @Override
     public boolean isPatientInGivenWorkflowState(final String uuid, final String workflowStateConceptMappingsString) {
 
         List<String> workflowStateConceptMappings = parseMappings(workflowStateConceptMappingsString);

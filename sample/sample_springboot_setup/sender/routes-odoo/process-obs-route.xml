@@ -1,12 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="schedule">
+  <route id="process-obs">
     <from uri="direct:process-obs"/>
-    <!--Extract valueDateTime from obs and set to property-->
-    <setProperty propertyName="openmrs-obs-value-datetime">
-      <jsonpath>$.model.valueDatetime</jsonpath>
-    </setProperty>
     <!--Get workorder corresponding to given manufacturing order -->
-    <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','WH/MRO/MO/00007')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','${property.obs-manufacturing-order-id}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <transform>
       <jsonpath>$.data</jsonpath>
     </transform>
@@ -15,17 +11,9 @@
     <unmarshal>
       <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.model.WorkOrder"/>
     </unmarshal>
-    <!--Set sequence number of the changing workorder to property-->
-    <setProperty propertyName="obs-sequence-nb">
-      <constant>1</constant>
-    </setProperty>
-    <!--Set obs action of the changing workorder to property-->
-    <setProperty propertyName="obs-state-value">
-      <constant>CLOSE</constant>
-    </setProperty>
     <!--Process workorder to sort them and return the changing workorders induced to keep consistency-->
     <process ref="workOrderStatusProcessor"/>
-    <log message="${body}"/>
+    <log message="Send action to odoo: ${body}"/>
     <!--Process each changing workorder-->
     <split streaming="true">
       <simple>${body}</simple>
@@ -44,8 +32,13 @@
       <setProperty propertyName="workcenter-id">
         <simple>${body.getWorkOrder().getWorkCenterId()}</simple>
       </setProperty>
+      <!--Get loss id-->
+      <setBody>
+        <simple>${null}</simple>
+      </setBody>
+      <to uri="{{odoo.url}}/api/mrp.workcenter.productivity.loss?domain=[('loss_id','=','productive')]"/>
       <setProperty propertyName="loss-id">
-        <constant>7</constant>
+        <jsonpath>$.data[0].id</jsonpath>
       </setProperty>
       <choice>
         <when>

@@ -8,8 +8,7 @@
     <choice>
       <when>
         <!--Select only patients-->
-        <simple>true</simple>
-        <!--<method ref="patientRepository" method="isPatientInGivenWorkflowState(${property.openmrs-person-uuid}, {{odoo.approved-for-service-id}})"/>-->
+        <method ref="patientRepository" method="isPatientInGivenWorkflowState(${property.openmrs-person-uuid}, {{odoo.approved-for-service-id}})"/>
         <!--Get Odoo ID from mapping tables and set in property-->
         <setHeader headerName="property-name">
           <constant>odoo-person-id</constant>

@@ -72,7 +72,7 @@
           <to uri="direct:patient-to-odoo"/>
         </when>
         <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.ObservationModel)]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.ObservationModel')]</jsonpath>
           <to uri="direct:observation-to-odoo"/>
         </when>
       </choice>

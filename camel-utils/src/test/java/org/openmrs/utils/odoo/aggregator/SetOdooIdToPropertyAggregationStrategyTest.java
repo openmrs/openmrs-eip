@@ -25,13 +25,14 @@ public class SetOdooIdToPropertyAggregationStrategyTest {
         map.put("ODOO_ID", "odooId");
         map.put("PERSON_ID", "personId");
         map.put("ID", "id");
+        oldExchange.getIn().setHeader("property-name", "ODOO_ID");
         newExchange.getIn().setBody(Collections.singletonList(map));
 
         // When
         strategy.aggregate(oldExchange, newExchange);
 
         // Then
-        //assertEquals("odooId", oldExchange.getProperty("odoo-person-id"));
+        assertEquals("odooId", oldExchange.getProperty("ODOO_ID"));
     }
 
     @Test
@@ -41,11 +42,12 @@ public class SetOdooIdToPropertyAggregationStrategyTest {
         Exchange oldExchange = new DefaultExchange(camelContext);
         Exchange newExchange = new DefaultExchange(camelContext);
         newExchange.getIn().setBody(Collections.emptyList());
+        oldExchange.getIn().setHeader("property-name", "ODOO_ID");
 
         // When
         strategy.aggregate(oldExchange, newExchange);
 
         // Then
-        //assertNull(oldExchange.getProperty("odoo-person-id"));
+        assertNull(oldExchange.getProperty("odoo-person-id"));
     }
 }

@@ -1,66 +1,77 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="observation-to-odoo">
     <from uri="direct:observation-to-odoo"/>
-    <!--Extract person UUID and set to header-->
-    <setProperty propertyName="openmrs-person-uuid">
-      <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, personUuid)"/>
+    <!--Extract obs UUID and set to header-->
+    <setProperty propertyName="openmrs-obs-group-uuid">
+      <jsonpath>$.model.uuid</jsonpath>
     </setProperty>
-    <!--Extract concept UUID and set to header-->
-    <setProperty propertyName="openmrs-obs-concept-uuid">
-      <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, conceptUuid)"/>
-    </setProperty>
-    <!--Get concept attached to the obs-->
-    <setHeader headerName="property-name">
-      <constant>openmrs-concept-mapping</constant>
-    </setHeader>
-    <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
-      <simple>select concat(crs.name,':',crt.code) as `openmrs-concept-mapping`
-        from concept c
-        left join concept_reference_map crm on crm.concept_id = c.concept_id
-        left join concept_reference_term crt on crt.concept_reference_term_id = crm.concept_reference_term_id
-        left join concept_reference_source crs on crs.concept_source_id = crt.concept_source_id
-        where c.uuid = ${property.openmrs-obs-concept-uuid}
-      </simple>
-    </enrich>
     <choice>
       <when>
-        <!--If concept value is in the defined values-->
-        <simple>${property.openmrs-concept-mapping} in '{{odoo.obs-concept-values}}'</simple>
-        <!--Get corresponding patient identifier-->
-        <setHeader headerName="property-name">
-          <constant>openmrs-patient-identifier</constant>
-        </setHeader>
-        <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
-          <simple>sql:select pi.identifier as `openmrs-patient-identifier` from patient_identifier pi left join person p on p.person_id = pi.patient_id left join patient_identifier_type pit on pit.patient_identifier_type_id = pi.identifier_type where p.uuid = '${property.openmrs-person-uuid}' and pit.uuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'?dataSource=#openmrsDataSource</simple>
-        </enrich>
-        <!--Fetch the latest value for obs whose concept is 'manufacturing-order-concept-ref'-->
-        <setHeader headerName="property-name">
-          <constant>obs-manufacturing-order-id</constant>
-        </setHeader>
-        <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
-          <simple>sql:select o.value_text as `obs-manufacturing-order-id`,
-            max(o.value_datetime)
-            from obs o
-            left join person p on p.id = o.person_id
-            left join concept c on c.concept_id = o.concept_id
-            left join concept_reference_map crm on crm.concept_id = c.concept_id
-            left join concept_reference_term crt on crt.concept_reference_term_id = crm.concept_reference_term_id
-            left join concept_map_type cmt on cmt.concept_map_type_id = crm.concept_map_type_id
-            left join concept_reference_source crs on crs.concept_source_id = crt.concept_source_id
-            where concat(crs.name,':',crt.code) = {{odoo.manufacturing-order-concept-ref}}
-            and p.uuid=${property.openmrs-person-uuid}
-            and group by o.person_id?dataSource=#openmrsDataSource
-          </simple>
-        </enrich>
-        <choice>
-          <when>
-            <simple>${property.obs-manufacturing-order-id} != null</simple>
-            <to uri="direct:process-obs"/>
-          </when>
-          <otherwise>
-            <log loggingLevel="ERROR" message="No manufacturing order found for patient ${property.openmrs-person-uuid} and concept {{odoo.manufacturing-order-concept-ref}}"/>
-          </otherwise>
-        </choice>
+        <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-group-uuid}, {{odoo.obs-section-activity}})"/>
+        <!--Extract person UUID and set to header-->
+        <setProperty propertyName="openmrs-person-uuid">
+          <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, personUuid)"/>
+        </setProperty>
+        <!--Get current obs group id-->
+        <to uri="sql:select o.obs_id from obs o where uuid = :#${property.openmrs-obs-group-uuid}?dataSource=#openmrsDataSource"/>
+        <transform>
+          <jsonpath>$[0].obs_id</jsonpath>
+        </transform>
+        <!--Get all obs of this obs-group-->
+        <to uri="sql:select o.obs_id, o.uuid, o.value_text, o.value_numeric, DATE_FORMAT(o.value_datetime, '%Y-%m-%dT%H:%i:%s') as value_datetime from obs o where obs_group_id = :#${body}?dataSource=#openmrsDataSource"/>
+        <split streaming="true" strategyRef="obsSequenceAggregationStrategy">
+          <jsonpath writeAsString="true">$</jsonpath>
+          <setProperty propertyName="openmrs-obs-uuid">
+            <jsonpath>$.uuid</jsonpath>
+          </setProperty>
+          <choice>
+            <!--If obs is linked to concept 'manufacturing order id'-->
+            <when>
+              <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-uuid}, {{odoo.obs-section-manufacturing-order-id}})"/>
+              <setProperty propertyName="obs-manufacturing-order-id">
+                <jsonpath>$.value_text</jsonpath>
+              </setProperty>
+            </when>
+            <!--If obs is linked to concept 'work order sequence nb'-->
+            <when>
+              <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-uuid}, {{odoo.obs-section-workorder-sequence}})"/>
+              <setProperty propertyName="obs-sequence-nb">
+                <jsonpath>$.value_numeric</jsonpath>
+              </setProperty>
+            </when>
+            <!--If obs is linked to concept 'Start date time'-->
+            <when>
+              <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-uuid}, {{odoo.obs-section-workorder-restart-datetime}})"/>
+              <setProperty propertyName="openmrs-obs-value-datetime">
+                <jsonpath>$.value_datetime</jsonpath>
+              </setProperty>
+              <setProperty propertyName="obs-state-value">
+                <constant>START</constant>
+              </setProperty>
+            </when>
+            <!--If obs is linked to concept 'Pause date time'-->
+            <when>
+              <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-uuid}, {{odoo.obs-section-workorder-pause-datetime}})"/>
+              <setProperty propertyName="openmrs-obs-value-datetime">
+                <jsonpath>$.value_datetime</jsonpath>
+              </setProperty>
+              <setProperty propertyName="obs-state-value">
+                <constant>PAUSE</constant>
+              </setProperty>
+            </when>
+            <!--If obs is linked to concept 'validation date time'-->
+            <when>
+              <method ref="observationRepository" method="isObsLinkedToGivenConceptMapping(${property.openmrs-obs-uuid}, {{odoo.obs-section-workorder-validation-datetime}})"/>
+              <setProperty propertyName="openmrs-obs-value-datetime">
+                <jsonpath>$.value_datetime</jsonpath>
+              </setProperty>
+              <setProperty propertyName="obs-state-value">
+                <constant>CLOSE</constant>
+              </setProperty>
+            </when>
+          </choice>
+        </split>
+        <to uri="direct:process-obs"/>
       </when>
     </choice>
   </route>
