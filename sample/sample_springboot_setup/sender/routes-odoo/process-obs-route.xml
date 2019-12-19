@@ -1,6 +1,26 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="process-obs">
     <from uri="direct:process-obs"/>
+    <!--Get user in Odoo from username If user name not fount in Odoo defaults to admin -->
+    <setBody>
+      <simple>${null}</simple>
+    </setBody>
+    <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]"/>
+    <choice>
+      <when>
+        <jsonpath>$.[?(@.count>0)]</jsonpath>
+        <setProperty propertyName="user-id">
+          <jsonpath>$.data[0].id</jsonpath>
+        </setProperty>
+        <log message="${property.user-id}"/>
+      </when>
+      <otherwise>
+        <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]"/>
+        <setProperty propertyName="user-id">
+          <jsonpath>$.data[0].id</jsonpath>
+        </setProperty>
+      </otherwise>
+    </choice>
     <!--Get workorder corresponding to given manufacturing order -->
     <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','${property.obs-manufacturing-order-id}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <transform>
@@ -47,9 +67,6 @@
           <setHeader headerName="CamelHttpMethod">
             <constant>POST</constant>
           </setHeader>
-          <setProperty propertyName="user-id">
-            <constant>2</constant>
-          </setProperty>
           <setBody>
             <simple>${null}</simple>
           </setBody>
