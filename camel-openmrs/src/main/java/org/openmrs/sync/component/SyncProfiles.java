@@ -1,4 +1,4 @@
-package org.openmrs.sync.app;
+package org.openmrs.sync.component;
 
 public final class SyncProfiles {
 

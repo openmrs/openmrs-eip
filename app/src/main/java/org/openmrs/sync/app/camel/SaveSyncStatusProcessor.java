@@ -2,9 +2,9 @@ package org.openmrs.sync.app.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.openmrs.sync.app.SyncProfiles;
 import org.openmrs.sync.app.management.entity.TableSyncStatus;
 import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
+import org.openmrs.sync.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

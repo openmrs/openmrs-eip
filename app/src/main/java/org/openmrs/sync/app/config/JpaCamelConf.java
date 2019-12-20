@@ -1,7 +1,7 @@
 package org.openmrs.sync.app.config;
 
 import org.apache.camel.component.jpa.JpaComponent;
-import org.openmrs.sync.app.SyncProfiles;
+import org.openmrs.sync.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

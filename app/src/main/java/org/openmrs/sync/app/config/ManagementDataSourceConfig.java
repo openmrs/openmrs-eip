@@ -1,7 +1,7 @@
 package org.openmrs.sync.app.config;
 
 import org.h2.Driver;
-import org.openmrs.sync.app.SyncProfiles;
+import org.openmrs.sync.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;

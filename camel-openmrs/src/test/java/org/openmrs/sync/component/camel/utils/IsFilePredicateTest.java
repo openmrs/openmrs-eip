@@ -1,10 +1,11 @@
-package org.openmrs.sync.app.camel;
+package org.openmrs.sync.component.camel.utils;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.sync.component.camel.utils.IsFilePredicate;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

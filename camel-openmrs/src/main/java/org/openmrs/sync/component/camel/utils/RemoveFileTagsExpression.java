@@ -1,4 +1,4 @@
-package org.openmrs.sync.app.camel;
+package org.openmrs.sync.component.camel.utils;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
