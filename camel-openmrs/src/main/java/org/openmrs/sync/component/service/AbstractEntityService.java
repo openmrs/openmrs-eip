@@ -54,9 +54,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     }
 
     private M saveEntity(final E ety) {
-        if (true) {
-            throw new RuntimeException("BLOP!");
-        }
         return entityToModelMapper.apply(repository.save(ety));
     }
 
