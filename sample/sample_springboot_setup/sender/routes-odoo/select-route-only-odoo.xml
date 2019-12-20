@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="select">
+  <route id="select" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:sync"/>
     <to uri="log:log"/>
     <toD uri="openmrs:extract?tableToSync=${body.getTableToSync().name()}&amp;lastSyncDate=${body.getLastSyncDateAsString()}"/>

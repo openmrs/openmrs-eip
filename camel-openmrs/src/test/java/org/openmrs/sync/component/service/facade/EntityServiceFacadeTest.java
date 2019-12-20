@@ -119,22 +119,4 @@ public class EntityServiceFacadeTest {
         // Then
         verify(personService).save(personModel);
     }
-
-    @Test
-    public void saveModel_should_catch_exception() {
-        // Given
-        PersonModel personModel = new PersonModel();
-        when(personService.getTableToSync()).thenThrow(new OpenMrsSyncException("ERROR"));
-
-        // When
-        facade.saveModel(TableToSyncEnum.PERSON, personModel);
-
-        // Then
-        assertFalse(facade.getErrors().isEmpty());
-        assertEquals(1, facade.getErrors().size());
-        assertEquals(LocalDate.now(), facade.getErrors().get(0).getDate().toLocalDate());
-        assertTrue(facade.getErrors().get(0).getCause() instanceof OpenMrsSyncException);
-        assertEquals("ERROR", facade.getErrors().get(0).getCause().getMessage());
-        assertEquals(personModel, facade.getErrors().get(0).getModel());
-    }
 }

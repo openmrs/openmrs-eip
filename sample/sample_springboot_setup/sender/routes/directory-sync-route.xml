@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="directory-sync">
+  <route id="directory-sync" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="file:{{camel.output.endpoint.file.location}}/docs?noop=true&amp;recursive=true&amp;idempotentKey=${file:name}-${file:modified}&amp;idempotentRepository=#fileSyncIdempotentRepository"/>
     <marshal>
       <base64/>

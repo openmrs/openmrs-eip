@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="decision-route">
+  <route id="decision-route" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:decision-route"/>
     <split streaming="true">
       <jsonpath writeAsString="true">$</jsonpath>

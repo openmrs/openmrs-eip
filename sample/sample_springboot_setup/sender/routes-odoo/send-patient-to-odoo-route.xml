@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="send-to-odoo">
+  <route id="send-to-odoo" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:odoo-route"/>
     <setProperty propertyName="odoo-endpoint">
       <simple>${body.get("endpoint")}</simple>

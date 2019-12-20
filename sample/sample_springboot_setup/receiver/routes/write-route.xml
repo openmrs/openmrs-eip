@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="write">
+  <route id="write" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="{{camel.input.endpoint}}"/>
     <convertBodyTo type="java.lang.String"/>
     <!--<process ref="pgpDecryptService"/>-->

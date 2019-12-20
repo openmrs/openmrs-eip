@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="get-country-from-odoo">
+  <route id="get-country-from-odoo" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:get-country-from-odoo"/>
     <setProperty propertyName="address-array">
       <simple>${body}</simple>

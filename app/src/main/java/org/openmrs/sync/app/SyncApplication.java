@@ -1,11 +1,13 @@
 package org.openmrs.sync.app;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.app.management.init.impl.ManagementDbInitImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.PostConstruct;
@@ -48,5 +50,16 @@ public class SyncApplication {
     @PostConstruct
     private void addBCProvider() {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    /**
+     * Bean to handle messages in error and re-route them to another route
+     * @return deadLetterChannelBuilder
+     */
+    @Bean
+    public DeadLetterChannelBuilder deadLetterChannelBuilder() {
+        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
+        builder.setUseOriginalMessage(true);
+        return builder;
     }
 }

@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="person-name-to-odoo">
+  <route id="person-name-to-odoo" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:person-name-to-odoo"/>
     <!--Extract person uuid from model and set it in a property-->
     <setProperty propertyName="openmrs-person-uuid">

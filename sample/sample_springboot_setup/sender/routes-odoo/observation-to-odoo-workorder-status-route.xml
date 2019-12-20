@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="observation-to-odoo">
+  <route id="observation-to-odoo" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:observation-to-odoo"/>
     <!--Extract obs UUID and set to header-->
     <setProperty propertyName="openmrs-obs-group-uuid">

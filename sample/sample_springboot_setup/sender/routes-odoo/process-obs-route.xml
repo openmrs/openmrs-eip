@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="process-obs">
+  <route id="process-obs" errorHandlerRef="deadLetterChannelBuilder">
     <from uri="direct:process-obs"/>
     <!--Get user in Odoo from username If user name not fount in Odoo defaults to admin -->
     <setBody>
