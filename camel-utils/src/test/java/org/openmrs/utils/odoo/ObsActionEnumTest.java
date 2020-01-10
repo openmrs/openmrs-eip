@@ -1,7 +1,7 @@
 package org.openmrs.utils.odoo;
 
 import org.junit.Test;
-import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 
 import static org.junit.Assert.assertEquals;
 

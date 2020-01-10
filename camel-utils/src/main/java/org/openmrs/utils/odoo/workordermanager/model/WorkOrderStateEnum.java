@@ -1,4 +1,4 @@
-package org.openmrs.utils.odoo.model;
+package org.openmrs.utils.odoo.workordermanager.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

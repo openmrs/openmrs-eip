@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo;
 
-import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 
 public enum ObsActionEnum {
 

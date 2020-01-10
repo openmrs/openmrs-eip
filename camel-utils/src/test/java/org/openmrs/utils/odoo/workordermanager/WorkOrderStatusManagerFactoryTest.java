@@ -1,9 +1,9 @@
-package org.openmrs.utils.odoo.manager;
+package org.openmrs.utils.odoo.workordermanager;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.manager.rule.WorkOrderStatusTransitionRule;
+import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
 
 import java.util.List;
 

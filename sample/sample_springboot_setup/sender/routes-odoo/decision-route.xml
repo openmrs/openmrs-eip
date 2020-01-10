@@ -6,7 +6,7 @@
       <choice>
         <when>
           <!--
-          If PatientState has changed, it may be necessary to send patient to Odoo
+          If PatientState has changed, it may be necessary to send all patient data to Odoo
           All patient data regarding patient whose state has been changed are retrieved and reprocessed
           by the route independently
            -->
@@ -15,12 +15,16 @@
             <jsonpath>$.model.uuid</jsonpath>
           </transform>
           <toD uri="sql:select pp.patient_id from patient_state ps left join patient_program pp on pp.patient_program_id = ps.patient_program_id where ps.uuid = '${body}'?dataSource=#openmrsDataSource"/>
+          <!--Set patient id to property-->
           <setProperty propertyName="openmrs-patient-id">
             <jsonpath>$.[0].patient_id</jsonpath>
           </setProperty>
           <log message="State update for patient ${property.openmrs-patient-id} => Checking to send patient data to Odoo"/>
+          <!--Get patient by id-->
           <toD uri="openmrs:extract?tableToSync=PATIENT&amp;entityId=${property.openmrs-patient-id}"/>
+          <!--Process patient object through decision-route-->
           <to uri="direct:decision-route"/>
+          <!--Get person name id-->
           <toD uri="sql:select pn.person_name_id from person_name pn where pn.person_id = '${property.openmrs-patient-id}'?dataSource=#openmrsDataSource"/>
           <choice>
             <when>
@@ -28,7 +32,9 @@
               <transform>
                 <jsonpath>$.[0].person_name_id</jsonpath>
               </transform>
+              <!--Extract PersonName with person_name_id-->
               <toD uri="openmrs:extract?tableToSync=PERSON_NAME&amp;entityId=${body}"/>
+              <!--Process PersonName object through decision-route-->
               <to uri="direct:decision-route"/>
             </when>
           </choice>
@@ -39,7 +45,9 @@
               <transform>
                 <jsonpath>$.[0].person_address_id</jsonpath>
               </transform>
+              <!--Extract PersonAddress with person_address_id-->
               <toD uri="openmrs:extract?tableToSync=PERSON_ADDRESS&amp;entityId=${body}"/>
+              <!--Process PersonAddress object through decision-route-->
               <to uri="direct:decision-route"/>
             </when>
           </choice>
@@ -50,7 +58,9 @@
               <transform>
                 <jsonpath>$.[0].patient_identifier_id</jsonpath>
               </transform>
+              <!--Extract PatientIdentifier with patient_identifier_id-->
               <toD uri="openmrs:extract?tableToSync=PATIENT_IDENTIFIER&amp;entityId=${body}"/>
+              <!--Process PatientIdentifier object through decision-route-->
               <to uri="direct:decision-route"/>
             </when>
           </choice>

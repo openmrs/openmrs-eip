@@ -17,6 +17,7 @@
         <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
           <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
         </enrich>
+        <!--Put birthDate and gender in array-->
         <transform>
           <jsonpath>$.model.['birthdate','gender']</jsonpath>
         </transform>
@@ -26,6 +27,7 @@
         <setProperty propertyName="patient-data">
           <constant/>
         </setProperty>
+        <!--If birthDate not null-->
         <choice>
           <when>
             <simple>${body[0]} != null</simple>
@@ -34,6 +36,7 @@
             </setProperty>
           </when>
         </choice>
+        <!--If gender not null-->
         <choice>
           <when>
             <simple>${body[1]} == 'M'</simple>

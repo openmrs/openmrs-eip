@@ -9,7 +9,7 @@ The project is composed of two modules:
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
 # OpenMRS Data Model compatibility
-The master branch should be compatible with the data model of the version coming out of the master branch of OpenMRS Core.
+The master branch should be compatible with the data model of the OpenMRS's version currently on the master branch of OpenMrs core
 Each released minor version of OpenMRS will lead to a maintenance branch.
 For example if you intend to synchronise data between an OpenMRS instance running on Core 2.4.x and another OpenMRS instance running on Core 2.3.x, you will use the appropriate build of the OpenMRS Camel component on each end.
 
@@ -17,11 +17,11 @@ For example if you intend to synchronise data between an OpenMRS instance runnin
 A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **sample/sample_springboot_setup** directory.
 Please refer to the [Sample configuration README.md](./sample/sample_springboot_setup/README.md) for details about its configuration.
 
-The synchro application can be used along with ActiveMQ via `jms` queues. A sample configuration can be found in the **/sample/sample_activemq_setup** directory.
+The OpenMRS dbSync can be used with any Camel endpoint between the sender and the receiver including ActiveMQ via `jms` queues. A sample configuration can be found in the **/sample/sample_activemq_setup** directory.
 Please refer to the [Configure ActiveMQ README.md](./sample/sample_activemq_setup/README.md) for details about its configuration.
 
 # File synchronization
-It is also possible to synchronize the content of a folder. The folder sync is performed via a different Camel route, but files will be transferred through the same Camel endpoint as the entities.
+It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, but files will be transferred through the same Camel endpoint as the entities.
 To differentiate entities from files at reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
 
 # Build and Test

@@ -1,11 +1,11 @@
-package org.openmrs.utils.odoo.manager.rule;
+package org.openmrs.utils.odoo.workordermanager.rule;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.model.WorkOrder;
-import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusTransitionContext;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 
 import java.util.Arrays;
 import java.util.Collections;

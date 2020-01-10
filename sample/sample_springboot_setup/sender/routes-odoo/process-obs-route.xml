@@ -29,12 +29,12 @@
     <convertBodyTo type="java.lang.String"/>
     <!--Marshall to java object-->
     <unmarshal>
-      <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.model.WorkOrder"/>
+      <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.workordermanager.model.WorkOrder"/>
     </unmarshal>
-    <!--Process workorder to sort them and return the changing workorders induced to keep consistency-->
+    <!--Process workorder to sort them and return the changing workorders induced to keep consistency -->
     <process ref="workOrderStatusProcessor"/>
     <log message="Send action to odoo: ${body}"/>
-    <!--Process each changing workorder-->
+    <!--Process each changing workorder -->
     <split streaming="true">
       <simple>${body}</simple>
       <setProperty propertyName="workorder-action">

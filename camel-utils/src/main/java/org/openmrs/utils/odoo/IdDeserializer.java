@@ -11,10 +11,11 @@ import java.util.ArrayList;
 public class IdDeserializer extends JsonDeserializer<Integer> {
 
     /**
-     *
-     * @param jsonParser
-     * @param deserializationContext
-     * @return
+     * Deserializes an Odoo id composed of an array with the id at position 0 and the name of the object at position 1
+     * If there is no id for the given field, then the value false is present and null is returned
+     * @param jsonParser the parser
+     * @param deserializationContext the context
+     * @return the integer value of the id or null
      * @throws IOException
      */
     @Override

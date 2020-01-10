@@ -2,9 +2,9 @@ package org.openmrs.utils.odoo;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusManager;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusManagerFactory;
-import org.openmrs.utils.odoo.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManager;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManagerFactory;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

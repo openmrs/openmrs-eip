@@ -1,12 +1,12 @@
-package org.openmrs.utils.odoo.manager.rule;
+package org.openmrs.utils.odoo.workordermanager.rule;
 
 import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusTransitionContext;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 
 public interface WorkOrderStatusTransitionRule {
 
     /**
-     * The condition that defines on which {@link org.openmrs.utils.odoo.model.WorkOrder} to apply the action defined in getAction
+     * The condition that defines on which {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} to apply the action defined in getAction
      * @param context the Camel context
      * @return boolean
      */

@@ -1,6 +1,6 @@
-package org.openmrs.utils.odoo.manager;
+package org.openmrs.utils.odoo.workordermanager;
 
-import org.openmrs.utils.odoo.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 
 import java.util.List;
 

@@ -16,12 +16,14 @@
         <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
           <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
         </enrich>
+        <!--Put givenName and familyName in array-->
         <transform>
           <jsonpath>$.model.['givenName','familyName']</jsonpath>
         </transform>
         <transform>
           <jsonpath>$.[*]</jsonpath>
         </transform>
+        <!--If givenName not null-->
         <choice>
           <when>
             <simple>${body[0]} != null</simple>
@@ -30,6 +32,7 @@
             </setProperty>
           </when>
         </choice>
+        <!--If familyName not null-->
         <choice>
           <when>
             <simple>${body[1]} != null</simple>

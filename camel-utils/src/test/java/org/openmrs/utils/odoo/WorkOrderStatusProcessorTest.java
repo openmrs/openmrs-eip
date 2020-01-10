@@ -7,9 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusManager;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusManagerFactory;
-import org.openmrs.utils.odoo.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManager;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManagerFactory;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 
 import java.util.Collections;
 import java.util.List;

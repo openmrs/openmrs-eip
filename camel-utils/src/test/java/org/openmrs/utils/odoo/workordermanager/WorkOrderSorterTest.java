@@ -1,8 +1,8 @@
-package org.openmrs.utils.odoo.manager;
+package org.openmrs.utils.odoo.workordermanager;
 
 import org.junit.Test;
 import org.openmrs.utils.odoo.exception.OdooException;
-import org.openmrs.utils.odoo.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,15 +1,15 @@
-package org.openmrs.utils.odoo.manager.rule;
+package org.openmrs.utils.odoo.workordermanager.rule;
 
 import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusTransitionContext;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OnlyOneWorkOrderInProgressRule implements WorkOrderStatusTransitionRule {
 
     /**
-     * Tests that only one {@link org.openmrs.utils.odoo.model.WorkOrder} has the state set to PROGRESS
+     * Tests that only one {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} has the state set to PROGRESS
      * @param context the Camel context
      * @return boolean
      */
@@ -25,10 +25,10 @@ public class OnlyOneWorkOrderInProgressRule implements WorkOrderStatusTransition
     }
 
     /**
-     * Any other {@link org.openmrs.utils.odoo.model.WorkOrder} that matches the above condition and
-     * is before the {@link org.openmrs.utils.odoo.model.WorkOrder} at the originalWorkOrderSequenceNumber is closed
-     * Any other {@link org.openmrs.utils.odoo.model.WorkOrder} that matches the above condition and
-     * is after the {@link org.openmrs.utils.odoo.model.WorkOrder} at the originalWorkOrderSequenceNumber is cancelled
+     * Any other {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} that matches the above condition and
+     * is before the {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} at the originalWorkOrderSequenceNumber is closed
+     * Any other {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} that matches the above condition and
+     * is after the {@link org.openmrs.utils.odoo.workordermanager.model.WorkOrder} at the originalWorkOrderSequenceNumber is cancelled
      * @param context the Camel context
      * @return the state
      */

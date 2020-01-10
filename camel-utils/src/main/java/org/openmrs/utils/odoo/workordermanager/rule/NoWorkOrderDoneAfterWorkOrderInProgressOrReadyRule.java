@@ -1,9 +1,9 @@
-package org.openmrs.utils.odoo.manager.rule;
+package org.openmrs.utils.odoo.workordermanager.rule;
 
 import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.model.WorkOrder;
-import org.openmrs.utils.odoo.model.WorkOrderStateEnum;
-import org.openmrs.utils.odoo.manager.WorkOrderStatusTransitionContext;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
