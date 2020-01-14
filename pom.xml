@@ -141,22 +141,4 @@
     </plugins>
   </build>
 
-  <repositories>
-        <repository>
-            <id>tfs-ext.icrc.org-icrc-maven</id>
-            <url>https://tfs.ext.icrc.org/tfs/ICRCCollection/_packaging/icrc-maven/maven/v1</url>
-        </repository>
-  </repositories>
-  
-  <distributionManagement>
-    <snapshotRepository>
-      <id>tfs-ext.icrc.org-icrc-maven</id>
-        <url>https://tfs.ext.icrc.org/tfs/ICRCCollection/_packaging/icrc-maven/maven/v1</url>
-    </snapshotRepository>
-    <repository>
-      <id>tfs-ext.icrc.org-icrc-maven</id>
-      <url>https://tfs.ext.icrc.org/tfs/ICRCCollection/_packaging/icrc-maven/maven/v1</url>
-    </repository>
-  </distributionManagement>
-
 </project>
