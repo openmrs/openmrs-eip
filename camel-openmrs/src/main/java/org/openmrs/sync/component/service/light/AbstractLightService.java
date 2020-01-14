@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.service.light;
 
 import org.openmrs.sync.component.entity.light.LightEntity;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.utils.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -15,9 +15,9 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
     protected static final LocalDateTime DEFAULT_DATE = LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0);
     protected static final long DEFAULT_USER_ID = 1L;
 
-    protected OpenMrsRepository<E> repository;
+    protected OpenmrsRepository<E> repository;
 
-    public AbstractLightService(final OpenMrsRepository<E> repository) {
+    public AbstractLightService(final OpenmrsRepository<E> repository) {
         this.repository = repository;
     }
 

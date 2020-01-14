@@ -2,7 +2,7 @@ package org.openmrs.sync.component.camel;
 
 import org.junit.Test;
 import org.openmrs.sync.component.camel.SyncActionEnum;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +20,7 @@ public class SyncActionEnumTest {
         assertEquals(SyncActionEnum.EXTRACT, result);
     }
 
-    @Test(expected = OpenMrsSyncException.class)
+    @Test(expected = OpenmrsSyncException.class)
     public void getAction_should_throw_exception() {
         // Given
         String actionString = "wrong_action";

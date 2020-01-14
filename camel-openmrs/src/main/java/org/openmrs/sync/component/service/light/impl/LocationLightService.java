@@ -1,14 +1,14 @@
 package org.openmrs.sync.component.service.light.impl;
 
 import org.openmrs.sync.component.entity.light.LocationLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LocationLightService extends AbstractLightService<LocationLight> {
 
-    public LocationLightService(final OpenMrsRepository<LocationLight> repository) {
+    public LocationLightService(final OpenmrsRepository<LocationLight> repository) {
         super(repository);
     }
 

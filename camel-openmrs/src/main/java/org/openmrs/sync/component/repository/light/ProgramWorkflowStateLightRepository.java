@@ -1,10 +1,10 @@
 package org.openmrs.sync.component.repository.light;
 
 import org.openmrs.sync.component.entity.light.ProgramWorkflowStateLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
-public interface ProgramWorkflowStateLightRepository extends OpenMrsRepository<ProgramWorkflowStateLight> {
+public interface ProgramWorkflowStateLightRepository extends OpenmrsRepository<ProgramWorkflowStateLight> {
 
     @Override
     @Cacheable(cacheNames = "programWorkflowState", unless="#result == null")

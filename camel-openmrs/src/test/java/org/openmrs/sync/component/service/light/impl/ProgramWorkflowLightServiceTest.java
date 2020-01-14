@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.light.ConceptLight;
 import org.openmrs.sync.component.entity.light.ProgramLight;
 import org.openmrs.sync.component.entity.light.ProgramWorkflowLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.LightService;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class ProgramWorkflowLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<ProgramWorkflowLight> repository;
+    private OpenmrsRepository<ProgramWorkflowLight> repository;
 
     @Mock
     private LightService<ConceptLight> conceptService;

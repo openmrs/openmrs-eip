@@ -1,5 +1,10 @@
 package org.openmrs.sync.app.config;
 
+import static java.util.Collections.singletonMap;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,11 +19,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
-import static java.util.Collections.singletonMap;
-
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
@@ -26,7 +26,7 @@ import static java.util.Collections.singletonMap;
         transactionManagerRef = "openmrsTransactionManager",
         basePackages = {"org.openmrs.sync.component.repository"}
 )
-public class OpenMrsDataSourceConfig {
+public class OpenmrsDataSourceConfig {
 
     @Value("${spring.openmrs-datasource.dialect}")
     private String hibernateDialect;

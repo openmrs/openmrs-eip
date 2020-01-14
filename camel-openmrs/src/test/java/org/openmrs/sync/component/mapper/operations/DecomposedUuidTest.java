@@ -2,7 +2,7 @@ package org.openmrs.sync.component.mapper.operations;
 
 import org.junit.Test;
 import org.openmrs.sync.component.entity.light.UserLight;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import static org.junit.Assert.*;
 
@@ -35,7 +35,7 @@ public class DecomposedUuidTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenMrsSyncException);
+            assertTrue(e instanceof OpenmrsSyncException);
             assertTrue(e.getCause() instanceof ClassNotFoundException);
             assertEquals("No entity class exists with the name this.class.does.not.Exist", e.getMessage());
         }

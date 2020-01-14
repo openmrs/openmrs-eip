@@ -14,7 +14,7 @@
           <constant>odoo-person-id</constant>
         </setHeader>
         <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
-          <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_open_mrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
+          <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_openmrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
         </enrich>
         <!--Put givenName and familyName in array-->
         <transform>

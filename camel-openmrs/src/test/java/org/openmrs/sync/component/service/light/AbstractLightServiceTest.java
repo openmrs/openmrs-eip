@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.service.light;
 
 import org.openmrs.sync.component.entity.MockedLightEntity;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 public class AbstractLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<MockedLightEntity> repository;
+    private OpenmrsRepository<MockedLightEntity> repository;
 
     private MockedLightService service;
 

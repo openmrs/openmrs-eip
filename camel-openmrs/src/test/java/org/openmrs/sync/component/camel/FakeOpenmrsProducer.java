@@ -4,9 +4,9 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.springframework.context.ApplicationContext;
 
-public class FakeOpenMrsProducer extends AbstractOpenMrsProducer {
+public class FakeOpenmrsProducer extends AbstractOpenmrsProducer {
 
-    public FakeOpenMrsProducer(final Endpoint endpoint,
+    public FakeOpenmrsProducer(final Endpoint endpoint,
                                final ApplicationContext applicationContext,
                                final ProducerParams params) {
         super(endpoint, applicationContext, params);

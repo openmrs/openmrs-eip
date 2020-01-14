@@ -3,7 +3,7 @@ package org.openmrs.sync.component.service.light.impl;
 import org.openmrs.sync.component.entity.light.ConceptLight;
 import org.openmrs.sync.component.entity.light.ProgramWorkflowLight;
 import org.openmrs.sync.component.entity.light.ProgramWorkflowStateLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.openmrs.sync.component.service.light.LightService;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class ProgramWorkflowStateLightService extends AbstractLightService<Progr
 
     private LightService<ProgramWorkflowLight> programWorkflowService;
 
-    public ProgramWorkflowStateLightService(final OpenMrsRepository<ProgramWorkflowStateLight> repository,
+    public ProgramWorkflowStateLightService(final OpenmrsRepository<ProgramWorkflowStateLight> repository,
                                             final LightService<ConceptLight> conceptService,
                                             final LightService<ProgramWorkflowLight> programWorkflowService) {
         super(repository);

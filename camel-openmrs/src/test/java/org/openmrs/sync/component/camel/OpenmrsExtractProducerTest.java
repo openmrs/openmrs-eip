@@ -23,7 +23,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class OpenMrsExtractProducerTest {
+public class OpenmrsExtractProducerTest {
 
     @Mock
     private Endpoint endpoint;
@@ -38,7 +38,7 @@ public class OpenMrsExtractProducerTest {
 
     private ProducerParams params;
 
-    private OpenMrsExtractProducer producer;
+    private OpenmrsExtractProducer producer;
 
     @Before
     public void init() {
@@ -47,7 +47,7 @@ public class OpenMrsExtractProducerTest {
         params = ProducerParams.builder()
                 .tableToSync(TableToSyncEnum.PERSON)
                 .build();
-        producer = new OpenMrsExtractProducer(endpoint, applicationContext, params);
+        producer = new OpenmrsExtractProducer(endpoint, applicationContext, params);
     }
 
     @Test

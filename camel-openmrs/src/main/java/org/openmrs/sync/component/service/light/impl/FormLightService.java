@@ -1,14 +1,14 @@
 package org.openmrs.sync.component.service.light.impl;
 
 import org.openmrs.sync.component.entity.light.FormLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FormLightService extends AbstractLightService<FormLight> {
 
-    public FormLightService(final OpenMrsRepository<FormLight> repository) {
+    public FormLightService(final OpenmrsRepository<FormLight> repository) {
         super(repository);
     }
 

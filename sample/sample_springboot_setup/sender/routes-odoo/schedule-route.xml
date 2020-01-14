@@ -4,7 +4,7 @@
       <to uri="jpa://org.openmrs.sync.app.management.entity.TableSyncStatus?query=select s from org.openmrs.sync.app.management.entity.TableSyncStatus s"/>
       <split streaming="true">
         <simple>${body}</simple>
-        <setHeader headerName="OpenMrsEntitySyncStatusId">
+        <setHeader headerName="OpenmrsEntitySyncStatusId">
           <simple>${in.body.getId()}</simple>
         </setHeader>
         <to uri="direct:sync"/>

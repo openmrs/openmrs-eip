@@ -3,7 +3,7 @@ package org.openmrs.sync.component.service.light.impl;
 import org.openmrs.sync.component.entity.light.ConceptClassLight;
 import org.openmrs.sync.component.entity.light.ConceptDatatypeLight;
 import org.openmrs.sync.component.entity.light.ConceptLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 public class ConceptLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<ConceptLight> repository;
+    private OpenmrsRepository<ConceptLight> repository;
 
     @Mock
     private ConceptClassLightService conceptClassService;

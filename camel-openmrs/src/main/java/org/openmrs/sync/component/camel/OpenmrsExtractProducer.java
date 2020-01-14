@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class OpenMrsExtractProducer extends AbstractOpenMrsProducer {
+public class OpenmrsExtractProducer extends AbstractOpenmrsProducer {
 
-    public OpenMrsExtractProducer(final Endpoint endpoint,
+    public OpenmrsExtractProducer(final Endpoint endpoint,
                                   final ApplicationContext applicationContext,
                                   final ProducerParams params) {
         super(endpoint, applicationContext, params);

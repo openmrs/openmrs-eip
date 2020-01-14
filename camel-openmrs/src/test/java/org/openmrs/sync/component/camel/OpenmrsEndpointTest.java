@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.component.camel.OpenMrsEndpoint;
-import org.openmrs.sync.component.camel.OpenMrsExtractProducer;
+import org.openmrs.sync.component.camel.OpenmrsEndpoint;
+import org.openmrs.sync.component.camel.OpenmrsExtractProducer;
 import org.openmrs.sync.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class OpenMrsEndpointTest {
+public class OpenmrsEndpointTest {
 
     @Mock
     private Component component;
@@ -29,13 +29,13 @@ public class OpenMrsEndpointTest {
     @Mock
     private FetchModelsRuleEngine ruleEngine;
 
-    private OpenMrsEndpoint endpoint;
+    private OpenmrsEndpoint endpoint;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        endpoint = new OpenMrsEndpoint("testEndPoint", component, applicationContext, SyncActionEnum.EXTRACT);
+        endpoint = new OpenmrsEndpoint("testEndPoint", component, applicationContext, SyncActionEnum.EXTRACT);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class OpenMrsEndpointTest {
         Producer producer = endpoint.createProducer();
 
         // Then
-        assertTrue(producer instanceof OpenMrsExtractProducer);
+        assertTrue(producer instanceof OpenmrsExtractProducer);
     }
 
     @Test(expected = UnsupportedOperationException.class)

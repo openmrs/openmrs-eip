@@ -1,16 +1,16 @@
 package org.openmrs.sync.component.camel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.camel.Endpoint;
-import org.apache.camel.Producer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
 
-import static org.junit.Assert.*;
-
-public class AbstractOpenMrsProducerTest {
+public class AbstractOpenmrsProducerTest {
 
     @Mock
     private Endpoint endpoint;
@@ -29,7 +29,7 @@ public class AbstractOpenMrsProducerTest {
         ProducerParams params = ProducerParams.builder().build();
 
         // When
-        FakeOpenMrsProducer result = new FakeOpenMrsProducer(endpoint, applicationContext, params);
+        FakeOpenmrsProducer result = new FakeOpenmrsProducer(endpoint, applicationContext, params);
 
         // Then
         assertNotNull(result.applicationContext);

@@ -6,7 +6,7 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
 
@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @UriEndpoint(
         firstVersion = "1.0.0",
         scheme = "openmrs",
-        title = "OpenMrs",
+        title = "OpenMRS",
         syntax = "openmrs:action",
         producerOnly = true,
         label = "core,java"
 )
-public class OpenMrsEndpoint extends DefaultEndpoint {
+public class OpenmrsEndpoint extends DefaultEndpoint {
 
     @UriPath(name = "action")
     @Metadata(required = "true")
@@ -41,7 +41,7 @@ public class OpenMrsEndpoint extends DefaultEndpoint {
 
     private ApplicationContext applicationContext;
 
-    public OpenMrsEndpoint(final String endpointUri,
+    public OpenmrsEndpoint(final String endpointUri,
                            final Component component,
                            final ApplicationContext applicationContext,
                            final SyncActionEnum action) {
@@ -61,7 +61,7 @@ public class OpenMrsEndpoint extends DefaultEndpoint {
         try {
             return action.getProducerClass().getDeclaredConstructor(Endpoint.class, ApplicationContext.class, ProducerParams.class).newInstance(this, applicationContext, params);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new OpenMrsSyncException("Unable to initialize producer " + action.getProducerClass().getName(), e);
+            throw new OpenmrsSyncException("Unable to initialize producer " + action.getProducerClass().getName(), e);
         }
     }
 
@@ -114,7 +114,7 @@ public class OpenMrsEndpoint extends DefaultEndpoint {
 
     @Override
     public boolean equals(final Object object) {
-        if (object instanceof OpenMrsEndpoint) {
+        if (object instanceof OpenmrsEndpoint) {
             return super.equals(object);
         }
         return false;

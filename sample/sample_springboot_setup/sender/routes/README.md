@@ -32,7 +32,7 @@ None, Trigger of the sync process
 select-route.xml
 
 ####select-route.xml
-Route that receives as a message the table synchronize with the last sync date of that table and uses the OpenMrs Camel component to get all the modified data after that date.
+Route that receives as a message the table synchronize with the last sync date of that table and uses the OpenMRS Camel component to get all the modified data after that date.
 The entities corresponding to the table extracted are then passed to a Camel endpoint that can be for instance a JMS queue or a File endpoint.
 This route also saves the current date as the last sync date for the current table via the processor *saveSyncStatusProcessor*.
 

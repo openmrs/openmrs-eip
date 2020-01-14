@@ -2,7 +2,7 @@ package org.openmrs.sync.component.service.light.impl;
 
 import org.openmrs.sync.component.entity.light.ConceptLight;
 import org.openmrs.sync.component.entity.light.DrugLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.openmrs.sync.component.service.light.LightService;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ public class DrugLightService extends AbstractLightService<DrugLight> {
 
     private LightService<ConceptLight> conceptService;
 
-    public DrugLightService(final OpenMrsRepository<DrugLight> repository,
+    public DrugLightService(final OpenmrsRepository<DrugLight> repository,
                             final LightService<ConceptLight> conceptService) {
         super(repository);
         this.conceptService = conceptService;

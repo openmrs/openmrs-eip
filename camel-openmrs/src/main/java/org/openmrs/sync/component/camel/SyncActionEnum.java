@@ -1,13 +1,13 @@
 package org.openmrs.sync.component.camel;
 
 import org.apache.camel.Producer;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import java.util.Arrays;
 
 public enum SyncActionEnum {
-    EXTRACT(OpenMrsExtractProducer.class),
-    LOAD(OpenMrsLoadProducer.class);
+    EXTRACT(OpenmrsExtractProducer.class),
+    LOAD(OpenmrsLoadProducer.class);
 
     private Class<? extends Producer> producerClass;
 
@@ -23,6 +23,6 @@ public enum SyncActionEnum {
         return Arrays.stream(values())
                 .filter(e -> e.name().equalsIgnoreCase(actionString))
                 .findFirst()
-                .orElseThrow(() -> new OpenMrsSyncException("No action found with name: " + actionString));
+                .orElseThrow(() -> new OpenmrsSyncException("No action found with name: " + actionString));
     }
 }

@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.MockedEntity;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.MockedModel;
 import org.openmrs.sync.component.service.MapperService;
@@ -43,7 +43,7 @@ public class InstantiateModelFunctionTest {
         assertEquals(entity, result.getEntity());
     }
 
-    @Test(expected = OpenMrsSyncException.class)
+    @Test(expected = OpenmrsSyncException.class)
     public void apply_should_throw_exception() {
         // Given
         MockedEntity entity = new MockedEntity(1L, "uuid");

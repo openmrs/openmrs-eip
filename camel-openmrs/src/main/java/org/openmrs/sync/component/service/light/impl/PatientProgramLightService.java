@@ -3,7 +3,7 @@ package org.openmrs.sync.component.service.light.impl;
 import org.openmrs.sync.component.entity.light.PatientLight;
 import org.openmrs.sync.component.entity.light.PatientProgramLight;
 import org.openmrs.sync.component.entity.light.ProgramLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.openmrs.sync.component.service.light.LightService;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class PatientProgramLightService extends AbstractLightService<PatientProg
 
     private LightService<ProgramLight> programService;
 
-    public PatientProgramLightService(final OpenMrsRepository<PatientProgramLight> repository,
+    public PatientProgramLightService(final OpenmrsRepository<PatientProgramLight> repository,
                                       final LightService<PatientLight> patientService,
                                       final LightService<ProgramLight> programService) {
         super(repository);

@@ -1,6 +1,6 @@
 package org.openmrs.sync.component.service.facade;
 
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.component.entity.Patient;

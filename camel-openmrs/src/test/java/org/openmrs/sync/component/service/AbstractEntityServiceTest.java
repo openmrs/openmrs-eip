@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 public class AbstractEntityServiceTest {
 
     @Mock
-    private MockedOpenMrsRepository repository;
+    private MockedOpenmrsRepository repository;
 
     @Mock
     private EntityToModelMapper<MockedEntity, MockedModel> entityToModelMapper;

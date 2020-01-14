@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.light.PatientIdentifierTypeLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class PatientIdentifierTypeLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<PatientIdentifierTypeLight> repository;
+    private OpenmrsRepository<PatientIdentifierTypeLight> repository;
 
     private PatientIdentifierTypeLightService service;
 

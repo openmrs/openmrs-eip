@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.service.light.impl;
 
 import org.openmrs.sync.component.entity.light.UserLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class UserLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<UserLight> repository;
+    private OpenmrsRepository<UserLight> repository;
 
     private UserLightService service;
 

@@ -5,7 +5,7 @@ import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.InMemor
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfigs;
 import org.bouncycastle.openpgp.PGPException;
 import org.openmrs.sync.component.config.EncryptionProperties;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.utils.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -45,7 +45,7 @@ public abstract class AbstractSecurityService {
 
             keyRing.addSecretKey(FileUtils.getPrivateKeysFromFolder(props.getKeysFolderPath()));
         } catch (IOException | PGPException e) {
-            throw new OpenMrsSyncException("Error while initiating key ring", e);
+            throw new OpenmrsSyncException("Error while initiating key ring", e);
         }
     }
 
@@ -53,7 +53,7 @@ public abstract class AbstractSecurityService {
         try {
             keyRing.addPublicKey(keyFile);
         } catch (IOException | PGPException e) {
-            throw new OpenMrsSyncException("Impossible to add key to key ring", e);
+            throw new OpenmrsSyncException("Impossible to add key to key ring", e);
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class AbstractSecurityService {
         try {
             return encryptedOutputStream.toString(UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            throw new OpenMrsSyncException("Error while converting output stream to string", e);
+            throw new OpenmrsSyncException("Error while converting output stream to string", e);
         }
     }
 }

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.light.ConceptDatatypeLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class ConceptDataTypeLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<ConceptDatatypeLight> repository;
+    private OpenmrsRepository<ConceptDatatypeLight> repository;
 
     private ConceptDatatypeLightService service;
 

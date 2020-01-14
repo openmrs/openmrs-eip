@@ -108,7 +108,7 @@ None, Trigger of the sync process
 select-route.xml
 
 ####select-route.xml
-Route that receives as a message the table synchronize with the last sync date of that table and uses the OpenMrs Camel component to get all the modified data after that date.
+Route that receives as a message the table synchronize with the last sync date of that table and uses the OpenMRS Camel component to get all the modified data after that date.
 This route also performs Odoo authentication and places the odoo authentication token in a header.
 This route also saves the current date as the last sync date for the current table via the processor *saveSyncStatusProcessor*
 
@@ -121,9 +121,9 @@ decision-route.xml
 ####send-patient-to-odoo-route.xml
 Route that stores patient data in Odoo. The input is a json sent with the 2 keys *endpoint* and *url*. Endpoint is the object name to modify in odoo (res.partner for patients) and the url is a concatenation of the attributes to change in Odoo as queryParams (eg.: name=toto&birthDate=2019-12-24).
 
-As patient data come from different OpenMrs tables, a H2 management table *OdooOpenMrsIdMapping* is generated to store the mapping between the odoo id of a patient and the OpenMrs patient uuid.
-When the Camel route processes data regarding a patient, if no row is present in the *OdooOpenMrsIdMapping* table, then that means the patient is not already present in Odoo and a POST is performed. A row is also added in the *OdooOpenMrsIdMapping* table.
-If a row is already present in the *OdooOpenMrsIdMapping* table, that means a patient with this id has already been posted to Odoo and a PUT is performed.
+As patient data come from different OpenMRS tables, a H2 management table *OdooOpenmrsIdMapping* is generated to store the mapping between the odoo id of a patient and the OpenMRS patient uuid.
+When the Camel route processes data regarding a patient, if no row is present in the *OdooOpenmrsIdMapping* table, then that means the patient is not already present in Odoo and a POST is performed. A row is also added in the *OdooOpenmrsIdMapping* table.
+If a row is already present in the *OdooOpenmrsIdMapping* table, that means a patient with this id has already been posted to Odoo and a PUT is performed.
 As the name of the patient in Odoo is mandatory, if the data saved does not contain the name, the value *[Unknown]* is set as a partner name.
 
 ######calling routes

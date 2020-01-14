@@ -8,9 +8,9 @@ import org.openmrs.sync.component.service.facade.EntityServiceFacade;
 import org.openmrs.sync.component.utils.JsonUtils;
 import org.springframework.context.ApplicationContext;
 
-public class OpenMrsLoadProducer extends AbstractOpenMrsProducer {
+public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 
-    public OpenMrsLoadProducer(final Endpoint endpoint,
+    public OpenmrsLoadProducer(final Endpoint endpoint,
                                final ApplicationContext applicationContext,
                                final ProducerParams params) {
         super(endpoint, applicationContext, params);

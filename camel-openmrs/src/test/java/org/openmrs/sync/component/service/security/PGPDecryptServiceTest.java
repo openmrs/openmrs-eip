@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.sync.component.config.ReceiverEncryptionProperties;
 import org.openmrs.sync.component.config.SenderEncryptionProperties;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import java.io.IOException;
 import java.security.Security;
@@ -94,7 +94,7 @@ public class PGPDecryptServiceTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenMrsSyncException);
+            assertTrue(e instanceof OpenmrsSyncException);
             assertEquals("Message should start with 'sender:'", e.getMessage());
         }
     }

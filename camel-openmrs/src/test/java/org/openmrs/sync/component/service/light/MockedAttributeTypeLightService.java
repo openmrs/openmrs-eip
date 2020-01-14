@@ -1,11 +1,11 @@
 package org.openmrs.sync.component.service.light;
 
 import org.openmrs.sync.component.entity.light.MockedAttributeTypeLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 public class MockedAttributeTypeLightService extends AbstractAttributeTypeLightService<MockedAttributeTypeLight> {
 
-    public MockedAttributeTypeLightService(final OpenMrsRepository<MockedAttributeTypeLight> repository) {
+    public MockedAttributeTypeLightService(final OpenmrsRepository<MockedAttributeTypeLight> repository) {
         super(repository);
     }
 

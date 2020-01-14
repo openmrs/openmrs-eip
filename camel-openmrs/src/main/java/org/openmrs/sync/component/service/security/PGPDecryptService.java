@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.util.io.Streams;
 import org.openmrs.sync.component.config.ReceiverEncryptionProperties;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -56,7 +56,7 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
             Streams.pipeAll(bouncyGPGInputStream, bufferedOutputStream);
 
         } catch (IOException | PGPException | NoSuchProviderException e) {
-            throw new OpenMrsSyncException("Error during decryption process", e);
+            throw new OpenmrsSyncException("Error during decryption process", e);
         }
 
         return toString(unencryptedOutputStream);
@@ -66,7 +66,7 @@ public class PGPDecryptService extends AbstractSecurityService implements Proces
         String[] splittedString = encryptedMessage.split(LINE_SEPARATOR_REGEX, 2);
 
         if (!splittedString[0].startsWith(HEADER_USER_KEY_PROP)) {
-            throw new OpenMrsSyncException("Message should start with 'sender:'");
+            throw new OpenmrsSyncException("Message should start with 'sender:'");
         }
 
         return splittedString[0].replace(HEADER_USER_KEY_PROP, "");

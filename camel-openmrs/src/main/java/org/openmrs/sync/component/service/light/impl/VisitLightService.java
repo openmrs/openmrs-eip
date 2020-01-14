@@ -4,7 +4,7 @@ import org.openmrs.sync.component.entity.light.PatientLight;
 import org.openmrs.sync.component.entity.light.VisitLight;
 import org.openmrs.sync.component.entity.light.VisitTypeLight;
 import org.openmrs.sync.component.service.light.LightService;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class VisitLightService extends AbstractLightService<VisitLight> {
 
     private LightService<VisitTypeLight> visitTypeService;
 
-    public VisitLightService(final OpenMrsRepository<VisitLight> repository,
+    public VisitLightService(final OpenmrsRepository<VisitLight> repository,
                              final LightService<PatientLight> patientService,
                              final LightService<VisitTypeLight> visitTypeService) {
         super(repository);

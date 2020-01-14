@@ -1,18 +1,17 @@
 package org.openmrs.sync.app;
 
-import org.apache.camel.Exchange;
-import org.json.JSONException;
-import org.junit.Test;
-import org.openmrs.sync.component.entity.light.UserLight;
-import org.openmrs.sync.component.model.PersonAddressModel;
-import org.skyscreamer.jsonassert.JSONAssert;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.camel.Exchange;
+import org.json.JSONException;
+import org.junit.Test;
+import org.openmrs.sync.component.model.PersonModel;
+import org.skyscreamer.jsonassert.JSONAssert;
 
-public class OpenMrsExtractPersonAddressITest extends OpenMrsExtractEndpointITest {
+public class OpenmrsExtractPersonITest extends OpenmrsExtractEndpointITest {
 
     private LocalDateTime date = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
 
@@ -20,7 +19,7 @@ public class OpenMrsExtractPersonAddressITest extends OpenMrsExtractEndpointITes
     public void extract() throws JSONException {
         // Given
         CamelInitObect camelInitObect = CamelInitObect.builder()
-                .tableToSync("person_address")
+                .tableToSync("person")
                 .lastSyncDate(date)
                 .build();
 
@@ -36,10 +35,10 @@ public class OpenMrsExtractPersonAddressITest extends OpenMrsExtractEndpointITes
 
     private String getExpectedJson() {
         return "{" +
-                    "\"tableToSyncModelClass\":\"" + PersonAddressModel.class.getName() + "\"," +
+                    "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
                     "\"model\":{" +
-                        "\"uuid\":\"uuid_person_address\"," +
-                        "\"creatorUuid\":\"" + UserLight.class.getName() + "(user_uuid)\"," +
+                        "\"uuid\":\"dd279794-76e9-11e9-8cd9-0242ac1c000b\"," +
+                        "\"creatorUuid\":null," +
                         "\"dateCreated\":[2005,1,1,0,0]," +
                         "\"changedByUuid\":null," +
                         "\"dateChanged\":null," +
@@ -47,10 +46,14 @@ public class OpenMrsExtractPersonAddressITest extends OpenMrsExtractEndpointITes
                         "\"voidedByUuid\":null," +
                         "\"dateVoided\":null," +
                         "\"voidReason\":null," +
-                        "\"address\":{" +
-                            "\"address1\":\"chemin perdu\"," +
-                            "\"cityVillage\":\"ville\"" +
-                        "}" +
+                        "\"gender\":\"M\"," +
+                        "\"birthdate\":null," +
+                        "\"birthdateEstimated\":false," +
+                        "\"dead\":false," +
+                        "\"deathDate\":null," +
+                        "\"causeOfDeathUuid\":null," +
+                        "\"deathdateEstimated\":false," +
+                        "\"birthtime\":null" +
                     "}" +
                 "}";
     }

@@ -7,7 +7,7 @@
     <setBody>
       <simple>${null}</simple>
     </setBody>
-    <!--Get country from Odoo based on the name entered in OpenMrs-->
+    <!--Get country from Odoo based on the name entered in OpenMRS -->
     <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <choice>
       <when>

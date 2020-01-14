@@ -2,7 +2,7 @@ package org.openmrs.sync.component.utils;
 
 import org.json.JSONException;
 import org.junit.Test;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.PersonModel;
 import org.openmrs.sync.component.model.SyncModel;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -29,7 +29,7 @@ public class JsonUtilsTest {
         JSONAssert.assertEquals(json(), result, false);
     }
 
-    @Test(expected = OpenMrsSyncException.class)
+    @Test(expected = OpenmrsSyncException.class)
     public void marshall_should_throw_exception() {
         // Given
         WrongModel model = new WrongModel();
@@ -63,7 +63,7 @@ public class JsonUtilsTest {
         assertEquals(expected, result);
     }
 
-    @Test(expected = OpenMrsSyncException.class)
+    @Test(expected = OpenmrsSyncException.class)
     public void unmarshall_should_throw_exception() {
         // Given
         String json = badlyFormattedJson();

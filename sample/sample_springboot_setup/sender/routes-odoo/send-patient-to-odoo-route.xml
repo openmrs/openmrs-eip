@@ -21,8 +21,8 @@
         <setProperty propertyName="odoo-person-id">
           <jsonpath>$.data.id</jsonpath>
         </setProperty>
-        <!--If created, save a new row in the mapping table with the Odoo id and the OpenMrs id-->
-        <to uri="sql:insert into odoo_open_mrs_id_mapping(odoo_id, patient_uuid) values (:#${property.odoo-person-id},:#${property.openmrs-person-uuid})?dataSource=#mngtDataSource"/>
+        <!--If created, save a new row in the mapping table with the Odoo id and the OpenMRS id-->
+        <to uri="sql:insert into odoo_openmrs_id_mapping(odoo_id, patient_uuid) values (:#${property.odoo-person-id},:#${property.openmrs-person-uuid})?dataSource=#mngtDataSource"/>
       </when>
       <otherwise>
         <setHeader headerName="CamelHttpMethod">

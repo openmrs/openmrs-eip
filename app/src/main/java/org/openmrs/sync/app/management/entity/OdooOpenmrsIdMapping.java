@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class OdooOpenMrsIdMapping {
+public class OdooOpenmrsIdMapping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

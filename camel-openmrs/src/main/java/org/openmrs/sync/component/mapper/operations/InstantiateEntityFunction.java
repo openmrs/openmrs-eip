@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.mapper.operations;
 
 import org.openmrs.sync.component.entity.BaseEntity;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.service.MapperService;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class InstantiateEntityFunction<E extends BaseEntity, M extends BaseModel
             E instanciatedEntity = entityClass.getDeclaredConstructor().newInstance();
             return new Context<>(instanciatedEntity, model, MappingDirectionEnum.MODEL_TO_ENTITY);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new OpenMrsSyncException("cause while instantiating entity " + entityClass, e);
+            throw new OpenmrsSyncException("cause while instantiating entity " + entityClass, e);
         }
     }
 }

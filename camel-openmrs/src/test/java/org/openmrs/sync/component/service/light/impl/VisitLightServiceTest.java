@@ -8,7 +8,7 @@ import org.openmrs.sync.component.entity.light.PatientLight;
 import org.openmrs.sync.component.entity.light.VisitLight;
 import org.openmrs.sync.component.entity.light.VisitTypeLight;
 import org.openmrs.sync.component.service.light.LightService;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class VisitLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<VisitLight> repository;
+    private OpenmrsRepository<VisitLight> repository;
 
     @Mock
     private LightService<PatientLight> patientService;

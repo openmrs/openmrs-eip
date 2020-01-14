@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.MockedEntity;
 import org.openmrs.sync.component.entity.light.UserLight;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.MockedModel;
 import org.openmrs.sync.component.service.light.LightService;
 import org.openmrs.sync.component.service.light.impl.UserLightService;
@@ -100,7 +100,7 @@ public class LinkLightEntityConsumerTest {
         // Then
     }
 
-    @Test(expected = OpenMrsSyncException.class)
+    @Test(expected = OpenmrsSyncException.class)
     public void apply_should_throw_exception_if_no_service_available_for_getter_return_type() {
         // Given
         MockedEntity entity = new MockedEntity(1L, "uuid");

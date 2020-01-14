@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class OpenMrsComponent extends DefaultComponent {
+public class OpenmrsComponent extends DefaultComponent {
 
     private ApplicationContext applicationContext;
 
-    public OpenMrsComponent(final CamelContext context,
+    public OpenmrsComponent(final CamelContext context,
                             final ApplicationContext applicationContext) {
         super(context);
         this.applicationContext = applicationContext;
@@ -24,6 +24,6 @@ public class OpenMrsComponent extends DefaultComponent {
                                       final String remaining,
                                       final Map<String, Object> parameters) {
         SyncActionEnum action = SyncActionEnum.getAction(remaining);
-        return new OpenMrsEndpoint(uri, this, applicationContext, action);
+        return new OpenmrsEndpoint(uri, this, applicationContext, action);
     }
 }

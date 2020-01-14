@@ -3,7 +3,7 @@ package org.openmrs.sync.component.mapper.operations;
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.sync.component.entity.BaseEntity;
 import org.openmrs.sync.component.entity.light.LightEntity;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.service.light.LightService;
 import org.openmrs.sync.component.utils.ModelUtils;
@@ -56,7 +56,7 @@ public class LinkLightEntityConsumer<E extends BaseEntity, M extends BaseModel> 
         );
 
         if (beanNamesForType.length == 0) {
-            throw new OpenMrsSyncException("Unable to find service of type " + LightService.class +
+            throw new OpenmrsSyncException("Unable to find service of type " + LightService.class +
                     " with class parameter " + entityDesc.getPropertyType());
         }
 

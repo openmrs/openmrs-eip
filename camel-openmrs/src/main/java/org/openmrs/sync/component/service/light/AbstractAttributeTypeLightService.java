@@ -1,11 +1,11 @@
 package org.openmrs.sync.component.service.light;
 
 import org.openmrs.sync.component.entity.light.AttributeTypeLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 public abstract class AbstractAttributeTypeLightService<E extends AttributeTypeLight> extends AbstractLightService<E> {
 
-    public AbstractAttributeTypeLightService(final OpenMrsRepository<E> repository) {
+    public AbstractAttributeTypeLightService(final OpenmrsRepository<E> repository) {
         super(repository);
     }
 

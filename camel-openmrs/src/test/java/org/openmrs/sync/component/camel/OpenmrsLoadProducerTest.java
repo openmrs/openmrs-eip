@@ -1,5 +1,8 @@
 package org.openmrs.sync.component.camel;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -13,10 +16,7 @@ import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.openmrs.sync.component.service.facade.EntityServiceFacade;
 import org.springframework.context.ApplicationContext;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-public class OpenMrsLoadProducerTest {
+public class OpenmrsLoadProducerTest {
 
     @Mock
     private Endpoint endpoint;
@@ -29,19 +29,19 @@ public class OpenMrsLoadProducerTest {
 
     private Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 
-    private OpenMrsLoadProducer producer;
+    private OpenmrsLoadProducer producer;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        producer = new OpenMrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
+        producer = new OpenmrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
     }
 
     @Test
     public void process() {
         // Given
-        exchange.getIn().setHeader("OpenMrsTableSyncName", "person");
+        exchange.getIn().setHeader("OpenmrsTableSyncName", "person");
         exchange.getIn().setBody(json());
         when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 

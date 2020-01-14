@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.service;
 
 import org.openmrs.sync.component.entity.*;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.model.*;
 
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public enum TableToSyncEnum {
         return Arrays.stream(values())
                 .filter(e -> e.getModelClass().equals(tableToSyncClass))
                 .findFirst()
-                .orElseThrow(() -> new OpenMrsSyncException("No enum found for model class " + tableToSyncClass));
+                .orElseThrow(() -> new OpenmrsSyncException("No enum found for model class " + tableToSyncClass));
     }
 
     public static Class<? extends BaseModel> getModelClass(final BaseEntity entity) {
@@ -63,7 +63,7 @@ public enum TableToSyncEnum {
                 .filter(e -> e.getEntityClass().equals(entity.getClass()))
                 .findFirst()
                 .map(TableToSyncEnum::getModelClass)
-                .orElseThrow(() -> new OpenMrsSyncException("No model class found corresponding to entity class " + entity.getClass()));
+                .orElseThrow(() -> new OpenmrsSyncException("No model class found corresponding to entity class " + entity.getClass()));
     }
 
     public static Class<? extends BaseEntity> getEntityClass(final BaseModel model) {
@@ -71,6 +71,6 @@ public enum TableToSyncEnum {
                 .filter(e -> e.getModelClass().equals(model.getClass()))
                 .findFirst()
                 .map(TableToSyncEnum::getEntityClass)
-                .orElseThrow(() -> new OpenMrsSyncException("No entity class found corresponding to model class " + model.getClass()));
+                .orElseThrow(() -> new OpenmrsSyncException("No entity class found corresponding to model class " + model.getClass()));
     }
 }

@@ -3,7 +3,8 @@ package org.openmrs.sync.app;
 import org.apache.camel.Exchange;
 import org.json.JSONException;
 import org.junit.Test;
-import org.openmrs.sync.component.model.PersonModel;
+import org.openmrs.sync.component.entity.light.UserLight;
+import org.openmrs.sync.component.model.PersonAddressModel;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
+public class OpenmrsExtractPersonAddressITest extends OpenmrsExtractEndpointITest {
 
     private LocalDateTime date = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
 
@@ -19,7 +20,7 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
     public void extract() throws JSONException {
         // Given
         CamelInitObect camelInitObect = CamelInitObect.builder()
-                .tableToSync("person")
+                .tableToSync("person_address")
                 .lastSyncDate(date)
                 .build();
 
@@ -35,10 +36,10 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
 
     private String getExpectedJson() {
         return "{" +
-                    "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
+                    "\"tableToSyncModelClass\":\"" + PersonAddressModel.class.getName() + "\"," +
                     "\"model\":{" +
-                        "\"uuid\":\"dd279794-76e9-11e9-8cd9-0242ac1c000b\"," +
-                        "\"creatorUuid\":null," +
+                        "\"uuid\":\"uuid_person_address\"," +
+                        "\"creatorUuid\":\"" + UserLight.class.getName() + "(user_uuid)\"," +
                         "\"dateCreated\":[2005,1,1,0,0]," +
                         "\"changedByUuid\":null," +
                         "\"dateChanged\":null," +
@@ -46,14 +47,10 @@ public class OpenMrsExtractPersonITest extends OpenMrsExtractEndpointITest {
                         "\"voidedByUuid\":null," +
                         "\"dateVoided\":null," +
                         "\"voidReason\":null," +
-                        "\"gender\":\"M\"," +
-                        "\"birthdate\":null," +
-                        "\"birthdateEstimated\":false," +
-                        "\"dead\":false," +
-                        "\"deathDate\":null," +
-                        "\"causeOfDeathUuid\":null," +
-                        "\"deathdateEstimated\":false," +
-                        "\"birthtime\":null" +
+                        "\"address\":{" +
+                            "\"address1\":\"chemin perdu\"," +
+                            "\"cityVillage\":\"ville\"" +
+                        "}" +
                     "}" +
                 "}";
     }

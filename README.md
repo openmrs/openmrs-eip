@@ -9,7 +9,7 @@ The project is composed of two modules:
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
 # OpenMRS Data Model compatibility
-The master branch should be compatible with the data model of the OpenMRS's version currently on the master branch of OpenMrs core
+The master branch should be compatible with the data model of the OpenMRS's version currently on the master branch of OpenMRS core
 Each released minor version of OpenMRS will lead to a maintenance branch.
 For example if you intend to synchronise data between an OpenMRS instance running on Core 2.4.x and another OpenMRS instance running on Core 2.3.x, you will use the appropriate build of the OpenMRS Camel component on each end.
 

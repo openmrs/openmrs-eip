@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
-public interface OpenMrsRepository<E extends BaseEntity> extends JpaRepository<E, Long> {
+public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E, Long> {
 
     /**
      * find entity by uuid

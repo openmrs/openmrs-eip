@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @NoRepositoryBean
-public interface SyncEntityRepository<E extends BaseEntity> extends OpenMrsRepository<E> {
+public interface SyncEntityRepository<E extends BaseEntity> extends OpenmrsRepository<E> {
 
     /**
      * find all entities created or modified after the given date

@@ -1,6 +1,6 @@
 package org.openmrs.sync.component.utils;
 
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -30,12 +30,12 @@ public final class FileUtils {
         List<Path> paths = listKeysFromFolder(folderPath, PRIVATE_KEY_SUFFIX);
 
         if (paths.size() > 1) {
-            throw new OpenMrsSyncException("There should be only one private key. " + paths.size() + " found");
+            throw new OpenmrsSyncException("There should be only one private key. " + paths.size() + " found");
         }
 
         return paths.stream().findFirst()
                 .map(FileUtils::extractKeyFromFile)
-                .orElseThrow(() -> new OpenMrsSyncException("No private key found"));
+                .orElseThrow(() -> new OpenmrsSyncException("No private key found"));
     }
 
     /**
@@ -67,7 +67,7 @@ public final class FileUtils {
 
             return sb.toString().getBytes(UTF_8);
         } catch (IOException e) {
-            throw new OpenMrsSyncException("Impossible to read file", e);
+            throw new OpenmrsSyncException("Impossible to read file", e);
         }
     }
 

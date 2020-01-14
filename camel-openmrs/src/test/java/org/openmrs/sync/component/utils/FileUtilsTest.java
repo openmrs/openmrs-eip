@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.utils;
 
 import org.junit.Test;
-import org.openmrs.sync.component.exception.OpenMrsSyncException;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +34,7 @@ public class FileUtilsTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenMrsSyncException);
+            assertTrue(e instanceof OpenmrsSyncException);
             assertEquals("No private key found", e.getMessage());
         }
     }
@@ -51,7 +51,7 @@ public class FileUtilsTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenMrsSyncException);
+            assertTrue(e instanceof OpenmrsSyncException);
             assertEquals("There should be only one private key. 2 found", e.getMessage());
         }
     }

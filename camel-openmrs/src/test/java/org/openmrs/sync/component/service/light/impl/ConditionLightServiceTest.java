@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.light.ConditionLight;
 import org.openmrs.sync.component.entity.light.PatientLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.LightService;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 public class ConditionLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<ConditionLight> repository;
+    private OpenmrsRepository<ConditionLight> repository;
 
     @Mock
     private LightService<PatientLight> patientService;

@@ -5,14 +5,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.entity.light.LocationAttributeTypeLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 
 import static org.junit.Assert.assertNotNull;
 
 public class LocationAttributeTypeLightServiceTest {
 
     @Mock
-    private OpenMrsRepository<LocationAttributeTypeLight> repository;
+    private OpenmrsRepository<LocationAttributeTypeLight> repository;
 
     private LocationAttributeTypeLightService service;
 

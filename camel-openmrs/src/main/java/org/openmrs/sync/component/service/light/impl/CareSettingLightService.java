@@ -1,14 +1,14 @@
 package org.openmrs.sync.component.service.light.impl;
 
 import org.openmrs.sync.component.entity.light.CareSettingLight;
-import org.openmrs.sync.component.repository.OpenMrsRepository;
+import org.openmrs.sync.component.repository.OpenmrsRepository;
 import org.openmrs.sync.component.service.light.AbstractLightService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CareSettingLightService extends AbstractLightService<CareSettingLight> {
 
-    public CareSettingLightService(final OpenMrsRepository<CareSettingLight> repository) {
+    public CareSettingLightService(final OpenmrsRepository<CareSettingLight> repository) {
         super(repository);
     }
 
