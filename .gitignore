@@ -8,3 +8,5 @@ app/src/main/resources/**/application*.properties
 
 .project
 .settings/
+
+**/.classpath
