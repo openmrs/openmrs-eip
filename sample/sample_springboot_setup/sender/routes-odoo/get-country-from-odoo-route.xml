@@ -4,14 +4,14 @@
     <setProperty propertyName="address-array">
       <simple>${body}</simple>
     </setProperty>
+    <!--Get country from Odoo based on the name entered in OpenMRS -->
     <setBody>
       <simple>${null}</simple>
     </setBody>
-    <!--Get country from Odoo based on the name entered in OpenMRS -->
     <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <choice>
       <when>
-        <jsonpath>$.[?(@.count>0)]</jsonpath>
+        <jsonpath>$.data[?(@.count>0)]</jsonpath>
         <transform>
           <jsonpath>$.data[0].id</jsonpath>
         </transform>
@@ -22,13 +22,19 @@
         <transform>
           <simple>${property.address-array.remove(4)}</simple>
         </transform>
-        <setBody>
-          <simple>${property.address-array}</simple>
-        </setBody>
       </when>
       <otherwise>
         <log loggingLevel="WARN" message="No country found for label ${property.address-array[4]}"/>
+        <transform>
+          <simple>${property.address-array.add(5,'')}</simple>
+        </transform>
+        <transform>
+          <simple>${property.address-array.remove(4)}</simple>
+        </transform>
       </otherwise>
     </choice>
+    <setBody>
+      <simple>${property.address-array}</simple>
+    </setBody>
   </route>
 </routes>
