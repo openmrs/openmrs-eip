@@ -1,6 +1,12 @@
 package org.openmrs.sync.component.camel;
 
-import org.apache.camel.*;
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+
+import org.apache.camel.Component;
+import org.apache.camel.Consumer;
+import org.apache.camel.Processor;
+import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
@@ -9,9 +15,6 @@ import org.apache.camel.spi.UriPath;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
-
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
 
 @UriEndpoint(
         firstVersion = "1.0.0",
@@ -59,7 +62,7 @@ public class OpenmrsEndpoint extends DefaultEndpoint {
                 .uuid(uuid)
                 .build();
         try {
-            return action.getProducerClass().getDeclaredConstructor(Endpoint.class, ApplicationContext.class, ProducerParams.class).newInstance(this, applicationContext, params);
+            return action.getProducerClass().getDeclaredConstructor(OpenmrsEndpoint.class, ApplicationContext.class, ProducerParams.class).newInstance(this, applicationContext, params);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new OpenmrsSyncException("Unable to initialize producer " + action.getProducerClass().getName(), e);
         }

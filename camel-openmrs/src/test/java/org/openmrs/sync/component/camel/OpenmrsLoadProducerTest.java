@@ -3,7 +3,6 @@ package org.openmrs.sync.component.camel;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -19,7 +18,7 @@ import org.springframework.context.ApplicationContext;
 public class OpenmrsLoadProducerTest {
 
     @Mock
-    private Endpoint endpoint;
+    private OpenmrsEndpoint endpoint;
 
     @Mock
     private ApplicationContext applicationContext;

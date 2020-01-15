@@ -3,7 +3,6 @@ package org.openmrs.sync.component.camel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.camel.Endpoint;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -13,7 +12,7 @@ import org.springframework.context.ApplicationContext;
 public class AbstractOpenmrsProducerTest {
 
     @Mock
-    private Endpoint endpoint;
+    private OpenmrsEndpoint endpoint;
 
     @Mock
     private ApplicationContext applicationContext;

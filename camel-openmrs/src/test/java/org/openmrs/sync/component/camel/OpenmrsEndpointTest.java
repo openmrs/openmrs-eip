@@ -1,5 +1,10 @@
 package org.openmrs.sync.component.camel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.time.LocalDateTime;
+
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Producer;
@@ -7,16 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.sync.component.camel.OpenmrsEndpoint;
-import org.openmrs.sync.component.camel.OpenmrsExtractProducer;
 import org.openmrs.sync.component.camel.fetchmodels.FetchModelsRuleEngine;
-import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
-
-import java.time.LocalDateTime;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class OpenmrsEndpointTest {
 

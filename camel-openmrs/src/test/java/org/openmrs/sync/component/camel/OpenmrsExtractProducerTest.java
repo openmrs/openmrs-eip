@@ -1,6 +1,9 @@
 package org.openmrs.sync.component.camel;
 
-import org.apache.camel.Endpoint;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -12,21 +15,13 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.sync.component.model.PersonModel;
 import org.openmrs.sync.component.service.TableToSyncEnum;
-import org.openmrs.sync.component.utils.JsonUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 public class OpenmrsExtractProducerTest {
 
     @Mock
-    private Endpoint endpoint;
+    private OpenmrsEndpoint endpoint;
 
     @Mock
     private ApplicationContext applicationContext;
