@@ -1,22 +1,23 @@
 package org.openmrs.utils.odoo.workordermanager;
 
-import lombok.extern.slf4j.Slf4j;
-import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
-import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
+import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * The {@link WorkOrderStatusManager} is due to apply the action to the {@link WorkOrder} with the given sequenceNumberIndex
  * To do so, the list of {@link WorkOrder} in parameter is sorted so that the sequenceNumberIndex corresponds to the
  * correct {@link WorkOrder}
- * It is possible that external actions were applied to the {@link WorkOrder} via Odoo application betwee two work order updates.
+ * It is possible that external actions were applied to the {@link WorkOrder} via Odoo application between two work order updates.
  * A list of {@link WorkOrderStatusTransitionRule} is applied after the action to the other work orders so that their states
  * remain consistent between each other
  * Basically, the resulting work order states will be as follows:
@@ -78,7 +79,7 @@ public class WorkOrderStatusManager {
         for (WorkOrderStatusTransitionRule rule : rules) {
             if (rule.workOrderMatchesCondition(context)) {
                 ObsActionEnum resultingAction = rule.getAction(context);
-                log.warn("Workorder '" + context.getWorkOrder().getName() + "' in inconstant state => transition to " + resultingAction.getResultingWorkOrderState());
+                log.warn("Work order '" + context.getWorkOrder().getName() + "' is in inconsistant state => being transition to " + resultingAction.getResultingWorkOrderState());
                 context.getWorkOrder().setState(resultingAction.getResultingWorkOrderState());
                 toReturn = WorkOrderAction.builder()
                         .action(rule.getAction(context))

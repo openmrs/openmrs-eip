@@ -15,13 +15,10 @@
         <log message="${property.user-id}"/>
       </when>
       <otherwise>
-        <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]"/>
-        <setProperty propertyName="user-id">
-          <jsonpath>$.data[0].id</jsonpath>
-        </setProperty>
+        <throwException exceptionType="java.lang.IllegalArgumentException" message="OpenMRS user not found in Odoo: ${property.user-id}"/>
       </otherwise>
     </choice>
-    <!--Get workorder corresponding to given manufacturing order -->
+    <!--Get work order corresponding to given manufacturing order -->
     <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','${property.obs-manufacturing-order-id}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <transform>
       <jsonpath>$.data</jsonpath>
@@ -31,7 +28,7 @@
     <unmarshal>
       <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.workordermanager.model.WorkOrder"/>
     </unmarshal>
-    <!--Process workorder to sort them and return the changing workorders induced to keep consistency -->
+    <!--Process work order to sort them and return the changing work orders induced to keep consistency -->
     <process ref="workOrderStatusProcessor"/>
     <log message="Send action to odoo: ${body}"/>
     <!--Process each changing workorder -->
@@ -81,7 +78,7 @@
           <setBody>
             <simple>${null}</simple>
           </setBody>
-          <!--Get the time line associated to workorder with no end date-->
+          <!--Get the timeline associated to work order with no end date-->
           <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}'),('date_end','=',False)]&amp;httpClient.cookiePolicy=ignoreCookies"/>
           <convertBodyTo type="java.lang.String"/>
           <choice>
