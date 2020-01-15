@@ -1,11 +1,11 @@
 package org.openmrs.sync.component.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.openmrs.sync.component.entity.Observation;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public interface ObservationRepository extends SyncEntityRepository<Observation>, ObservationRepositoryCustom {
 
@@ -15,7 +15,7 @@ public interface ObservationRepository extends SyncEntityRepository<Observation>
     List<Observation> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 
     /**
-     * Checks if a patient is a group with the concept mapping 'ICRC:PRP_CC_Section_Activity'
+     * Checks if an obs is coded by the provided concept mapping, eg. 'CIEL:1234'
      * @param uuid the obs uuid
      * @param conceptMapping the concept mapping
      * @return 1 if true, 0 if false
