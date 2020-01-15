@@ -1,9 +1,11 @@
 package org.openmrs.utils.odoo.workordermanager.model;
 
+import org.openmrs.utils.odoo.IdDeserializer;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import lombok.Data;
-import org.openmrs.utils.odoo.IdDeserializer;
 
 @Data
 public class WorkOrder {
