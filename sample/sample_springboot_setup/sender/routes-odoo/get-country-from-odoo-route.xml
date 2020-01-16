@@ -9,9 +9,11 @@
       <simple>${null}</simple>
     </setBody>
     <toD uri="{{odoo.url}}/api/res.country?domain=[('name','=','${property.address-array[4]}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <!--Convert body to string, because the http endpoint returns a CachedOutputStream-->
+    <convertBodyTo type="java.lang.String"/>
     <choice>
       <when>
-        <jsonpath>$.data[?(@.count>0)]</jsonpath>
+        <jsonpath>$.[?(@.count>0)]</jsonpath>
         <transform>
           <jsonpath>$.data[0].id</jsonpath>
         </transform>

@@ -5,7 +5,10 @@
     <setBody>
       <simple>${null}</simple>
     </setBody>
-    <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]"/>
+    <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]" />
+    <!--Convert body to string, because the http endpoint returns a CachedOutputStream-->
+    <convertBodyTo type="java.lang.String"/>
+    <log message="${body}"/>
     <choice>
       <when>
         <jsonpath>$.[?(@.count>0)]</jsonpath>
@@ -53,7 +56,7 @@
       <setBody>
         <simple>${null}</simple>
       </setBody>
-      <to uri="{{odoo.url}}/api/mrp.workcenter.productivity.loss?domain=[('loss_id','=','productive')]"/>
+      <to uri="{{odoo.url}}/api/mrp.workcenter.productivity.loss?domain=[('loss_id','=','productive')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
       <setProperty propertyName="loss-id">
         <jsonpath>$.data[0].id</jsonpath>
       </setProperty>
@@ -118,7 +121,7 @@
             <simple>${null}</simple>
           </setBody>
           <!--Get the time lines associated to the work order to delete them all-->
-          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}')]"/>
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
           <transform>
             <jsonpath>$.data</jsonpath>
           </transform>
