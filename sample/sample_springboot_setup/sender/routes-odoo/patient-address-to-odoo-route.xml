@@ -16,6 +16,7 @@
         <enrich strategyRef="setOdooIdToPropertyAggregationStrategy">
           <simple>sql:select o.odoo_id as `odoo-person-id` from odoo_openmrs_id_mapping o where o.patient_uuid='${property.openmrs-person-uuid}'?dataSource=#mngtDataSource</simple>
         </enrich>
+        <!--Put address1, address2, cityVillage, postalCode and country in array-->
         <transform>
           <jsonpath>$.model.address.['address1','address2','cityVillage','postalCode','country']</jsonpath>
         </transform>

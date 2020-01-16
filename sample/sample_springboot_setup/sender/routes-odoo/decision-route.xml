@@ -19,7 +19,7 @@
           <setProperty propertyName="openmrs-patient-id">
             <jsonpath>$.[0].patient_id</jsonpath>
           </setProperty>
-          <log message="State update for patient ${property.openmrs-patient-id} => Checking to send patient data to Odoo"/>
+          <log message="State update for patient ${property.openmrs-patient-id} => Sending patient data to Odoo"/>
           <!--Get patient by id-->
           <toD uri="openmrs:extract?tableToSync=PATIENT&amp;entityId=${property.openmrs-patient-id}"/>
           <!--Process patient object through decision-route-->
