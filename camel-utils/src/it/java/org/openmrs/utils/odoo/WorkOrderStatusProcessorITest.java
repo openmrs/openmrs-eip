@@ -10,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManager;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManagerFactory;
 import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderDoneAfterWorkOrderInProgressOrReadyRule;
-import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderReadyBeforeWorkOrderInProgressOrDoneRule;
+import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRule;
 import org.openmrs.utils.odoo.workordermanager.rule.OnlyOneWorkOrderInProgressRule;
 import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
@@ -38,7 +38,7 @@ public class WorkOrderStatusProcessorITest {
         MockitoAnnotations.initMocks(this);
 
         List<WorkOrderStatusTransitionRule> rules = Arrays.asList(
-                new NoWorkOrderReadyBeforeWorkOrderInProgressOrDoneRule(),
+                new NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRule(),
                 new NoWorkOrderDoneAfterWorkOrderInProgressOrReadyRule(),
                 new OnlyOneWorkOrderInProgressRule()
         );

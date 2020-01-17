@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class NoWorkOrderReadyBeforeWorkOrderInProgressOrDoneRule implements WorkOrderStatusTransitionRule {
+public class NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRule implements WorkOrderStatusTransitionRule {
 
     /**
      * Tests that a {@link WorkOrder} has the state set as READY when work orders are either
@@ -19,7 +19,7 @@ public class NoWorkOrderReadyBeforeWorkOrderInProgressOrDoneRule implements Work
      */
     @Override
     public boolean workOrderMatchesCondition(final WorkOrderStatusTransitionContext context) {
-        if (context.getWorkOrder().getState() == WorkOrderStateEnum.READY) {
+        if (context.getWorkOrder().getState() == WorkOrderStateEnum.READY || context.getWorkOrder().getState() == WorkOrderStateEnum.PENDING) {
             List<WorkOrder> workOrders = context.getWorkOrders();
             List<WorkOrder> workOrdersAfterCurrent = workOrders
                     .subList(context.getCurrentWorkOrderSequenceIndex() + 1, workOrders.size());
