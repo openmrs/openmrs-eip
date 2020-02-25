@@ -22,13 +22,13 @@ Restore a database archive for each database:
 - a dump with not much data for the central database
 ```
 cd sample/sample_springboot_setup/db
-cat dump_with_no_data.sql | docker exec -i db_db_central_1 /usr/bin/mysql -u root --password=root openmrs
+zcat dump_receiver.zip | docker exec -i db_db_central_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 
 - a dump with lots of data for the remote database.
 ```
 cd sample/sample_springboot_setup/db
-zcat Dump20190909.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root --password=root openmrs
+zcat dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 
 This operation will take few minutes.
@@ -54,7 +54,7 @@ and register this location in the sender and receiver _application.properties_ f
 
 - sender:
 ```
-nano camel-openmrs/src/main/resources/application-sender.properties
+nano app/src/main/resources/application-sender.properties
 ```
 and set the following options:
 ```
@@ -67,7 +67,7 @@ spring.openmrs-datasource.jdbcUrl=jdbc:mysql://localhost:3307/openmrs
 
 - receiver:
 ```
-nano camel-openmrs/src/main/resources/application-receiver.properties
+nano app/src/main/resources/application-receiver.properties
 ```
 and set the following option:
 ```
