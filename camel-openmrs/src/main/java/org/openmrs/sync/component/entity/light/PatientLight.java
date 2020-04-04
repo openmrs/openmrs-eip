@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "patient")
-@PrimaryKeyJoinColumn(name = "patient_id", referencedColumnName = "person_id")
-@AttributeOverride(name = "id", column = @Column(name = "patient_id"))
+@PrimaryKeyJoinColumn(name = "patient_id")
 public class PatientLight extends PersonLight {
 
     @NotNull

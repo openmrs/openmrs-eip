@@ -1,0 +1,74 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="erp-workorder-action-to-odoo" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="direct:erp-workorder-action-to-odoo" />
+
+        <log loggingLevel="DEBUG" message=":" />
+        <log message="Processing WorkOrderState -> ${body}" />
+
+        <setProperty propertyName="obs-state-value">
+            <jsonpath>$.model.action</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="Local Action: ${property.obs-state-value}" />
+
+        <choice>
+            <when>
+                <simple>${property.obs-state-value} == 'RESUME'</simple>
+                <setProperty propertyName="obs-state-value">
+                    <constant>START</constant>
+                </setProperty>
+            </when>
+        </choice>
+
+        <log loggingLevel="DEBUG" message="Effective Odoo State: ${property.obs-state-value}" />
+
+        <setProperty propertyName="wo-uuid">
+            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, workOrderUuid)" />
+        </setProperty>
+
+
+        <setProperty propertyName="creator-uuid">
+            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, creatorUuid)" />
+        </setProperty>
+
+        <setProperty propertyName="openmrs-obs-value-datetime">
+            <jsonpath>$.model.dateCreated</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="Datetime: ${property.openmrs-obs-value-datetime}" />
+
+        <to uri="sql:SELECT u.username FROM users u WHERE uuid = :#${property.creator-uuid}?dataSource=#openmrsDataSource" />
+        <setProperty propertyName="creator-username">
+            <jsonpath>$[0].username</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="User: ${property.creator-username}" />
+
+        <!-- Get the sequence number of associated WO and the MO number (accession_number) -->
+        <to uri="sql:SELECT w.wo_seq_number, o.accession_number FROM icrc_work_order w, orders o
+                 WHERE w.order_id = o.order_id
+                 AND w.uuid = :#${property.wo-uuid}
+                 AND w.voided = 0?dataSource=#openmrsDataSource" />
+
+        <setProperty propertyName="obs-manufacturing-order-id">
+            <jsonpath>$[0].accession_number</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="MO Identifier: ${property.obs-manufacturing-order-id}" />
+
+        <setProperty propertyName="obs-sequence-nb">
+            <jsonpath>$[0].wo_seq_number</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="Sequence Number: ${property.obs-sequence-nb}" />
+
+        <log loggingLevel="DEBUG" message="Forwarding to process-obs route..." />
+
+        <to uri="direct:process-obs"/>
+
+        <log message="Successfully processed WorkOrderState!" />
+
+    </route>
+
+</routes>
