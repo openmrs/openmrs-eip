@@ -21,29 +21,32 @@
             </when>
         </choice>
 
-        <log loggingLevel="DEBUG" message="Effective Odoo State: ${property.obs-state-value}" />
-
         <setProperty propertyName="wo-uuid">
             <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, workOrderUuid)" />
         </setProperty>
 
+        <setProperty propertyName="state-date-created-string">
+            <jsonpath>$.model.dateCreated</jsonpath>
+        </setProperty>
+
+        <setProperty propertyName="dateCreated">
+            <spel>
+                #{new java.text.SimpleDateFormat('yyyy,MM,dd,HH,mm,ss').parse(getProperty('state-date-created-string'))}
+            </spel>
+        </setProperty>
+
+        <setProperty propertyName="openmrs-obs-value-datetime">
+            <simple>${date:exchangeProperty.dateCreated:yyyy-MM-dd HH:mm:ssZ}</simple>
+        </setProperty>
 
         <setProperty propertyName="creator-uuid">
             <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, creatorUuid)" />
         </setProperty>
 
-        <setProperty propertyName="openmrs-obs-value-datetime">
-            <jsonpath>$.model.dateCreated</jsonpath>
-        </setProperty>
-
-        <log loggingLevel="DEBUG" message="Datetime: ${property.openmrs-obs-value-datetime}" />
-
         <to uri="sql:SELECT u.username FROM users u WHERE uuid = :#${property.creator-uuid}?dataSource=#openmrsDataSource" />
         <setProperty propertyName="creator-username">
             <jsonpath>$[0].username</jsonpath>
         </setProperty>
-
-        <log loggingLevel="DEBUG" message="User: ${property.creator-username}" />
 
         <!-- Get the sequence number of associated WO and the MO number (accession_number) -->
         <to uri="sql:SELECT w.wo_seq_number, o.accession_number FROM icrc_work_order w, orders o
@@ -55,19 +58,15 @@
             <jsonpath>$[0].accession_number</jsonpath>
         </setProperty>
 
-        <log loggingLevel="DEBUG" message="MO Identifier: ${property.obs-manufacturing-order-id}" />
-
         <setProperty propertyName="obs-sequence-nb">
             <jsonpath>$[0].wo_seq_number</jsonpath>
         </setProperty>
 
-        <log loggingLevel="DEBUG" message="Sequence Number: ${property.obs-sequence-nb}" />
-
-        <log loggingLevel="DEBUG" message="Forwarding to process-obs route..." />
+        <log message="Forwarding to process-obs route -> State: ${property.obs-state-value} WO Sequence: ${property.obs-sequence-nb} for Erp Order: ${property.obs-manufacturing-order-id} On: ${property.openmrs-obs-value-datetime} By: ${property.creator-username}" />
 
         <to uri="direct:process-obs"/>
-
-        <log message="Successfully processed WorkOrderState!" />
+        
+        <log message="Done processing WorkOrderState!" />
 
     </route>
 

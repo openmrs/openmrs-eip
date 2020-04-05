@@ -5,7 +5,7 @@
     <setBody>
       <simple>${null}</simple>
     </setBody>
-    <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]" />
+    <toD uri="{{odoo.url}}/api/res.users?domain=[('login','=','${property.creator-username}')]&amp;httpClient.cookiePolicy=ignoreCookies" />
     <!--Convert body to string, because the http endpoint returns a CachedOutputStream-->
     <convertBodyTo type="java.lang.String"/>
     <choice>

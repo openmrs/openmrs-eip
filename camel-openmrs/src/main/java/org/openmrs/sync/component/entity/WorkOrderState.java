@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.sync.component.entity.light.ErpWorkOrderLight;
 import org.openmrs.sync.component.entity.light.UserLight;
+import org.openmrs.sync.component.utils.DateUtils;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -55,8 +57,7 @@ public class WorkOrderState extends BaseEntity {
 
     @Override
     public boolean wasModifiedAfter(BaseEntity entity) {
-        return false;
-        // WorkOrderState workOrderState = (WorkOrderState) entity;
-        //return DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), Arrays.asList(workOrderState.getDateCreated()));
+        WorkOrderState workOrderState = (WorkOrderState) entity;
+        return DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), Arrays.asList(workOrderState.getDateCreated()));
     }
 }

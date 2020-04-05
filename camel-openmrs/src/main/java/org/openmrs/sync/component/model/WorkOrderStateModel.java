@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class WorkOrderStateModel extends BaseModel {
 
-    private String Uuid;
-
     private String action;
 
     private String workOrderUuid;
