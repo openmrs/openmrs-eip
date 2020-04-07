@@ -73,8 +73,8 @@ public class WorkOrderStatusProcessorITest {
     public void process_START_on_wo_3() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setProperty("obs-state-value", ObsActionEnum.START.name());
-        exchange.setProperty("obs-sequence-nb", 3);
+        exchange.setProperty("workorder-state-value", ObsActionEnum.START.name());
+        exchange.setProperty("workorder-sequence-nb", 3);
         exchange.getIn().setBody(workOrders);
 
         // When

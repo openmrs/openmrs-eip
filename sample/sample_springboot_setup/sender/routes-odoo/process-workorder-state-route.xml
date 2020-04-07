@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="process-obs" errorHandlerRef="deadLetterChannelBuilder">
-    <from uri="direct:process-obs"/>
+  <route id="process-workorder-state" errorHandlerRef="deadLetterChannelBuilder">
+    <from uri="direct:process-workorder-state"/>
     <!--Get user in Odoo from username If user name not fount in Odoo defaults to admin -->
     <setBody>
       <simple>${null}</simple>
@@ -20,7 +20,7 @@
       </otherwise>
     </choice>
     <!--Get work order corresponding to given manufacturing order -->
-    <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','${property.obs-manufacturing-order-id}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+    <toD uri="{{odoo.url}}/api/mrp.workorder?domain=[('production_id','=','${property.manufacturing-order-id}')]&amp;httpClient.cookiePolicy=ignoreCookies"/>
     <transform>
       <jsonpath>$.data</jsonpath>
     </transform>
@@ -68,7 +68,7 @@
           <setBody>
             <simple>${null}</simple>
           </setBody>
-          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?workorder_id=${property.workorder-id}&amp;workcenter_id=${property.workcenter-id}&amp;loss_id=${property.loss-id}&amp;date_start=${property.openmrs-obs-value-datetime}&amp;user_id=${property.user-id}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?workorder_id=${property.workorder-id}&amp;workcenter_id=${property.workcenter-id}&amp;loss_id=${property.loss-id}&amp;date_start=${property.workorder-value-datetime}&amp;user_id=${property.user-id}&amp;httpClient.cookiePolicy=ignoreCookies"/>
         </when>
         <when>
           <!--If action equals PAUSE or CLOSE-->
@@ -105,7 +105,7 @@
                 <simple>${null}</simple>
               </setBody>
               <!--Set the end date of the time line-->
-              <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity/${property.time-id}?date_end=${property.openmrs-obs-value-datetime}&amp;httpClient.cookiePolicy=ignoreCookies"/>
+              <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity/${property.time-id}?date_end=${property.workorder-value-datetime}&amp;httpClient.cookiePolicy=ignoreCookies"/>
             </when>
           </choice>
         </when>

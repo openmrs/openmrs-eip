@@ -6,16 +6,16 @@
         <log loggingLevel="DEBUG" message=":" />
         <log message="Processing WorkOrderState -> ${body}" />
 
-        <setProperty propertyName="obs-state-value">
+        <setProperty propertyName="workorder-state-value">
             <jsonpath>$.model.action</jsonpath>
         </setProperty>
 
-        <log loggingLevel="DEBUG" message="Local Action: ${property.obs-state-value}" />
+        <log loggingLevel="DEBUG" message="Local Action: ${property.workorder-state-value}" />
 
         <choice>
             <when>
-                <simple>${property.obs-state-value} == 'RESUME'</simple>
-                <setProperty propertyName="obs-state-value">
+                <simple>${property.workorder-state-value} == 'RESUME'</simple>
+                <setProperty propertyName="workorder-state-value">
                     <constant>START</constant>
                 </setProperty>
             </when>
@@ -25,17 +25,40 @@
             <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, workOrderUuid)" />
         </setProperty>
 
-        <setProperty propertyName="state-date-created-string">
+        <setProperty propertyName="date-created">
             <jsonpath>$.model.dateCreated</jsonpath>
         </setProperty>
 
+        <choice>
+            <when>
+                <!-- The time has only hours component -->
+                <simple>${property.date-created.size} == 4</simple>
+                <setProperty propertyName="date-format">
+                    <constant>yyyy,MM,dd,HH</constant>
+                </setProperty>
+            </when>
+            <when>
+                <!-- The time has only hour and minutes components -->
+                <simple>${property.date-created.size} == 5</simple>
+                <setProperty propertyName="date-format">
+                    <constant>yyyy,MM,dd,HH,mm</constant>
+                </setProperty>
+            </when>
+            <otherwise>
+                <!-- Time includes seconds component -->
+                <setProperty propertyName="date-format">
+                    <constant>yyyy,MM,dd,HH,mm,ss</constant>
+                </setProperty>
+            </otherwise>
+        </choice>
+
         <setProperty propertyName="dateCreated">
             <spel>
-                #{new java.text.SimpleDateFormat('yyyy,MM,dd,HH,mm,ss').parse(getProperty('state-date-created-string'))}
+                #{new java.text.SimpleDateFormat(getProperty('date-format')).parse(getProperty('date-created'))}
             </spel>
         </setProperty>
 
-        <setProperty propertyName="openmrs-obs-value-datetime">
+        <setProperty propertyName="workorder-value-datetime">
             <simple>${date:exchangeProperty.dateCreated:yyyy-MM-dd HH:mm:ssZ}</simple>
         </setProperty>
 
@@ -54,18 +77,18 @@
                  AND w.uuid = :#${property.wo-uuid}
                  AND w.voided = 0?dataSource=#openmrsDataSource" />
 
-        <setProperty propertyName="obs-manufacturing-order-id">
+        <setProperty propertyName="manufacturing-order-id">
             <jsonpath>$[0].accession_number</jsonpath>
         </setProperty>
 
-        <setProperty propertyName="obs-sequence-nb">
+        <setProperty propertyName="workorder-sequence-nb">
             <jsonpath>$[0].wo_seq_number</jsonpath>
         </setProperty>
 
-        <log message="Forwarding to process-obs route -> State: ${property.obs-state-value} WO Sequence: ${property.obs-sequence-nb} for Erp Order: ${property.obs-manufacturing-order-id} On: ${property.openmrs-obs-value-datetime} By: ${property.creator-username}" />
+        <log message="Forwarding to process-workorder-state route -> State: ${property.workorder-state-value} WO Sequence: ${property.workorder-sequence-nb} for Erp Order: ${property.manufacturing-order-id} On: ${property.workorder-value-datetime} By: ${property.creator-username}" />
 
-        <to uri="direct:process-obs"/>
-        
+        <to uri="direct:process-workorder-state"/>
+
         <log message="Done processing WorkOrderState!" />
 
     </route>
