@@ -80,7 +80,7 @@
             <simple>${null}</simple>
           </setBody>
           <!--Get the timeline associated to work order with no end date-->
-          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=','${property.workorder-name}'),('date_end','=',False)]&amp;httpClient.cookiePolicy=ignoreCookies"/>
+          <toD uri="{{odoo.url}}/api/mrp.workcenter.productivity?domain=[('workorder_id','=',${property.workorder-id}),('date_end','=',False)]&amp;httpClient.cookiePolicy=ignoreCookies"/>
           <convertBodyTo type="java.lang.String"/>
           <choice>
             <when>
