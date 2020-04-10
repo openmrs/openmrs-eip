@@ -9,13 +9,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManager;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusManagerFactory;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderBeforeAnyFinishedWorkOrderInOdooRule;
 import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderDoneAfterWorkOrderInProgressOrReadyRule;
 import org.openmrs.utils.odoo.workordermanager.rule.NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRule;
 import org.openmrs.utils.odoo.workordermanager.rule.OnlyOneWorkOrderInProgressRule;
 import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,8 @@ public class WorkOrderStatusProcessorITest {
         List<WorkOrderStatusTransitionRule> rules = Arrays.asList(
                 new NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRule(),
                 new NoWorkOrderDoneAfterWorkOrderInProgressOrReadyRule(),
-                new OnlyOneWorkOrderInProgressRule()
+                new OnlyOneWorkOrderInProgressRule(),
+                new NoWorkOrderBeforeAnyFinishedWorkOrderInOdooRule()
         );
 
         WorkOrderStatusManager manager = new WorkOrderStatusManager(
@@ -58,13 +60,13 @@ public class WorkOrderStatusProcessorITest {
 
     /**
      * Following work orders:
-     *  ____________________________________________
+     * ____________________________________________
      * |    4     |     1    |   3   |   5  |   2   |
      * |__________|__________|_______|______|______ |
-     * | PROGRESS | PROGRESS | READY | DONE | READY |
+     * | PROGRESS | PROGRESS | READY | PROGRESS | READY |
      *
      * START Work Order 3 should return:
-     *  ________________________________________
+     * ________________________________________
      * |    3     |   1  |   2  |   4   |   5   |
      * |__________|______|______|_______|_______|
      * | PROGRESS | DONE | DONE | READY | READY |
@@ -117,7 +119,7 @@ public class WorkOrderStatusProcessorITest {
 
         WorkOrder workOrder5 = new WorkOrder();
         workOrder5.setId(5);
-        workOrder5.setState(WorkOrderStateEnum.DONE);
+        workOrder5.setState(WorkOrderStateEnum.PROGRESS);
 
         return Arrays.asList(workOrder4, workOrder1, workOrder3, workOrder5, workOrder2);
     }

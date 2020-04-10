@@ -9,6 +9,7 @@ import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,40 @@ public class WorkOrderStatusManagerTest {
         List<WorkOrderAction> result = manager.manageStatus(workOrders);
 
         // Then
+        assertEquals(2, result.size());
+        assertEquals(workOrder3, result.get(0).getWorkOrder());
+        assertEquals(workOrder1, result.get(1).getWorkOrder());
+    }
+
+    @Test
+    public void manageStatus_shouldNotChangeFinishedWorkOrders() {
+        WorkOrder workOrder1 = new WorkOrder();
+        workOrder1.setState(WorkOrderStateEnum.PENDING);
+        workOrder1.setId(1);
+        workOrder1.setNextWorkOrderId(2);
+        WorkOrder workOrder2 = new WorkOrder();
+        workOrder2.setState(WorkOrderStateEnum.DONE);
+        workOrder2.setId(2);
+        workOrder2.setNextWorkOrderId(3);
+        WorkOrder workOrder3 = new WorkOrder();
+        workOrder3.setState(WorkOrderStateEnum.PENDING);
+        workOrder3.setId(3);
+
+        //Close all rule
+        manager = new WorkOrderStatusManager(ObsActionEnum.START, 3, Collections.singletonList(new WorkOrderStatusTransitionRule() {
+            @Override
+            public boolean workOrderMatchesCondition(WorkOrderStatusTransitionContext context) {
+                return true;
+            }
+
+            @Override
+            public ObsActionEnum getAction(WorkOrderStatusTransitionContext context) {
+                return ObsActionEnum.CLOSE;
+            }
+        }));
+
+        List<WorkOrderAction> result = manager.manageStatus(Arrays.asList(workOrder2, workOrder3, workOrder1));
+
         assertEquals(2, result.size());
         assertEquals(workOrder3, result.get(0).getWorkOrder());
         assertEquals(workOrder1, result.get(1).getWorkOrder());

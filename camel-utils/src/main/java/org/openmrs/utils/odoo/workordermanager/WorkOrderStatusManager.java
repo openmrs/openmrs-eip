@@ -1,17 +1,17 @@
 package org.openmrs.utils.odoo.workordermanager;
 
+import lombok.extern.slf4j.Slf4j;
+import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
+import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
+import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.openmrs.utils.odoo.ObsActionEnum;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
-import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
-import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * The {@link WorkOrderStatusManager} is due to apply the action to the {@link WorkOrder} with the given sequenceNumberIndex
@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
  * Basically, the resulting work order states will be as follows:
  *
  * [DONE, DONE, ..., PROGRESS, READY, ...,READY]
- *
  */
 @Slf4j
 public class WorkOrderStatusManager {
@@ -46,6 +45,7 @@ public class WorkOrderStatusManager {
      * From a given list of {@link WorkOrder}, returns a list of {@link WorkOrderAction} encapsulating
      * a {@link WorkOrder} and an {@link ObsActionEnum} to apply to it to keep the list of {@link WorkOrder}
      * in a consistent state
+     *
      * @param workOrders the list of actions to apply
      * @return a list of {@link WorkOrderAction}
      */
@@ -64,7 +64,9 @@ public class WorkOrderStatusManager {
 
         actions.addAll(
                 IntStream.range(0, sortedWorkOrders.size())
-                        .filter(i -> i != sequenceNumberIndex - 1) // Exclude current work order because status was already changed
+                        //Exclude current work order because status was already changed
+                        //Any finished work order because odoo won't allow us change it anyways
+                        .filter(i -> i != sequenceNumberIndex - 1 && sortedWorkOrders.get(i).getState() != WorkOrderStateEnum.DONE)
                         .mapToObj(i -> new WorkOrderStatusTransitionContext(sortedWorkOrders, i, sequenceNumberIndex - 1))
                         .map(this::changeStatusIfNeeded)
                         .filter(Objects::nonNull)
