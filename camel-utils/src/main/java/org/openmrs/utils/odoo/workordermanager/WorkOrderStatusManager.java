@@ -65,8 +65,8 @@ public class WorkOrderStatusManager {
         actions.addAll(
                 IntStream.range(0, sortedWorkOrders.size())
                         //Exclude current work order because status was already changed
-                        //Any finished work order because odoo won't allow us change it anyways
-                        .filter(i -> i != sequenceNumberIndex - 1 && sortedWorkOrders.get(i).getState() != WorkOrderStateEnum.DONE)
+                        //Any earlier finished work order because odoo won't allow us change it anyways
+                        .filter(i -> canProcess(i, sortedWorkOrders))
                         .mapToObj(i -> new WorkOrderStatusTransitionContext(sortedWorkOrders, i, sequenceNumberIndex - 1))
                         .map(this::changeStatusIfNeeded)
                         .filter(Objects::nonNull)
@@ -74,6 +74,23 @@ public class WorkOrderStatusManager {
         );
 
         return actions;
+    }
+
+    /**
+     * Determines if a work order can be processed or not
+     *
+     * @param i                the index of the work order to check
+     * @param sortedWorkOrders the lst of work orders
+     * @return true if the work order can be processed otherwise false
+     */
+    private boolean canProcess(int i, List<WorkOrder> sortedWorkOrders) {
+        if (i != sequenceNumberIndex - 1 && sortedWorkOrders.get(i).getState() != WorkOrderStateEnum.DONE) {
+            return true;
+        } else if (sortedWorkOrders.get(i).getState() == WorkOrderStateEnum.DONE && i > sequenceNumberIndex - 1) {
+            return true;
+        }
+
+        return false;
     }
 
     private WorkOrderAction changeStatusIfNeeded(final WorkOrderStatusTransitionContext context) {
