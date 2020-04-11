@@ -25,7 +25,7 @@ public class WorkOrderState extends BaseEntity {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "work_order_id")
+    @JoinColumn(name = "erp_work_order_id")
     private ErpWorkOrderLight workOrder;
 
     @NotNull
