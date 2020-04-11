@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager.rule;
 
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
@@ -35,7 +35,7 @@ public class NoWorkOrderDoneAfterWorkOrderInProgressOrReadyRule implements WorkO
      * @return action
      */
     @Override
-    public ObsActionEnum getAction(final WorkOrderStatusTransitionContext context) {
-        return ObsActionEnum.CANCEL;
+    public WorkOrderActionEnum getAction(final WorkOrderStatusTransitionContext context) {
+        return WorkOrderActionEnum.CANCEL;
     }
 }

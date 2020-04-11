@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager.rule;
 
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.exception.OdooException;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 
@@ -27,7 +27,7 @@ public abstract class FailureRule implements WorkOrderStatusTransitionRule {
      * @see WorkOrderStatusTransitionRule#getAction(WorkOrderStatusTransitionContext)
      */
     @Override
-    public ObsActionEnum getAction(WorkOrderStatusTransitionContext context) {
+    public WorkOrderActionEnum getAction(WorkOrderStatusTransitionContext context) {
         return null;
     }
 

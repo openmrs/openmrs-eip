@@ -8,9 +8,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ObsSequenceAggregationStrategyTest {
+public class WorkOrderSequenceAggregationStrategyTest {
 
-    ObsSequenceAggregationStrategy strategy = new ObsSequenceAggregationStrategy();
+    WorkOrderSequenceAggregationStrategy strategy = new WorkOrderSequenceAggregationStrategy();
 
     @Test
     public void aggregate_should_return_oldExchange_with_newExchange_properties() {

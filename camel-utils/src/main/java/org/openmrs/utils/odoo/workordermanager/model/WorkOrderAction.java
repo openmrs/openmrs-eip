@@ -2,13 +2,13 @@ package org.openmrs.utils.odoo.workordermanager.model;
 
 import lombok.Builder;
 import lombok.Value;
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 
 @Value
 @Builder
 public final class WorkOrderAction {
 
-    private ObsActionEnum action;
+    private WorkOrderActionEnum action;
 
     private WorkOrder workOrder;
 }

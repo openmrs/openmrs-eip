@@ -23,7 +23,7 @@ public class WorkOrderStatusProcessor implements Processor {
         List<WorkOrder> workOrders = exchange.getIn().getBody(List.class);
 
         WorkOrderStatusManager manager = factory.createManager(
-                ObsActionEnum.valueOf(exchange.getProperty("workorder-state-value", String.class)),
+                WorkOrderActionEnum.valueOf(exchange.getProperty("workorder-state-value", String.class)),
                 exchange.getProperty("workorder-sequence-nb", Integer.class));
 
         exchange.getIn().setBody(manager.manageStatus(workOrders));

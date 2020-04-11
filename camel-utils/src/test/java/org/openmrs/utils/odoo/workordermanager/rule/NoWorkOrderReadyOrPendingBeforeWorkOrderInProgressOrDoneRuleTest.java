@@ -2,7 +2,7 @@ package org.openmrs.utils.odoo.workordermanager.rule;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
@@ -155,9 +155,9 @@ public class NoWorkOrderReadyOrPendingBeforeWorkOrderInProgressOrDoneRuleTest {
         );
 
         // When
-        ObsActionEnum result = rule.getAction(context);
+        WorkOrderActionEnum result = rule.getAction(context);
 
         // Then
-        assertEquals(ObsActionEnum.CLOSE, result);
+        assertEquals(WorkOrderActionEnum.CLOSE, result);
     }
 }

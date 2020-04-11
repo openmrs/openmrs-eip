@@ -1,5 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager;
 
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
  * The context of the execution to keep work orders in a consistent state
  * workOrders is the list of work orders of a given manufacturing order
  * currentWorkOrderSequenceIndex is the index of the work order which is being checked for consistency
- * originalWorkOrderSequenceIndex is the index of the work order upon which the {@link org.openmrs.utils.odoo.ObsActionEnum}
+ * originalWorkOrderSequenceIndex is the index of the work order upon which the {@link WorkOrderActionEnum}
  * was originally applied
  */
 public class WorkOrderStatusTransitionContext {

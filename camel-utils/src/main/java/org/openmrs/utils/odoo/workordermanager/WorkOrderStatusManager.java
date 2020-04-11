@@ -1,7 +1,7 @@
 package org.openmrs.utils.odoo.workordermanager;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
@@ -27,13 +27,13 @@ import java.util.stream.IntStream;
 @Slf4j
 public class WorkOrderStatusManager {
 
-    private ObsActionEnum action;
+    private WorkOrderActionEnum action;
 
     private int sequenceNumberIndex;
 
     private List<WorkOrderStatusTransitionRule> rules;
 
-    public WorkOrderStatusManager(final ObsActionEnum action,
+    public WorkOrderStatusManager(final WorkOrderActionEnum action,
                                   final int sequenceNumberIndex,
                                   final List<WorkOrderStatusTransitionRule> rules) {
         this.action = action;
@@ -43,7 +43,7 @@ public class WorkOrderStatusManager {
 
     /**
      * From a given list of {@link WorkOrder}, returns a list of {@link WorkOrderAction} encapsulating
-     * a {@link WorkOrder} and an {@link ObsActionEnum} to apply to it to keep the list of {@link WorkOrder}
+     * a {@link WorkOrder} and an {@link WorkOrderActionEnum} to apply to it to keep the list of {@link WorkOrder}
      * in a consistent state
      *
      * @param workOrders the list of actions to apply
@@ -97,7 +97,7 @@ public class WorkOrderStatusManager {
         WorkOrderAction toReturn = null;
         for (WorkOrderStatusTransitionRule rule : rules) {
             if (rule.workOrderMatchesCondition(context)) {
-                ObsActionEnum resultingAction = rule.getAction(context);
+                WorkOrderActionEnum resultingAction = rule.getAction(context);
                 log.warn("Work order '" + context.getWorkOrder().getName() + "' is in inconsistant state => being transition to " + resultingAction.getResultingWorkOrderState());
                 context.getWorkOrder().setState(resultingAction.getResultingWorkOrderState());
                 toReturn = WorkOrderAction.builder()

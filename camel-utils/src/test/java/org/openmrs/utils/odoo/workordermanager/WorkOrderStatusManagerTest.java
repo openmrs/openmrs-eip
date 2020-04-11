@@ -2,7 +2,7 @@ package org.openmrs.utils.odoo.workordermanager;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrder;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderAction;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
@@ -27,7 +27,7 @@ public class WorkOrderStatusManagerTest {
         );
 
         manager = new WorkOrderStatusManager(
-                ObsActionEnum.PAUSE,
+                WorkOrderActionEnum.PAUSE,
                 3,
                 rules);
     }
@@ -72,15 +72,15 @@ public class WorkOrderStatusManagerTest {
         workOrder3.setId(3);
 
         //Close all rule
-        manager = new WorkOrderStatusManager(ObsActionEnum.START, 3, Collections.singletonList(new WorkOrderStatusTransitionRule() {
+        manager = new WorkOrderStatusManager(WorkOrderActionEnum.START, 3, Collections.singletonList(new WorkOrderStatusTransitionRule() {
             @Override
             public boolean workOrderMatchesCondition(WorkOrderStatusTransitionContext context) {
                 return true;
             }
 
             @Override
-            public ObsActionEnum getAction(WorkOrderStatusTransitionContext context) {
-                return ObsActionEnum.CLOSE;
+            public WorkOrderActionEnum getAction(WorkOrderStatusTransitionContext context) {
+                return WorkOrderActionEnum.CLOSE;
             }
         }));
 
@@ -110,15 +110,15 @@ public class WorkOrderStatusManagerTest {
         workOrder4.setId(4);
 
         //Close all rule
-        manager = new WorkOrderStatusManager(ObsActionEnum.START, 3, Collections.singletonList(new WorkOrderStatusTransitionRule() {
+        manager = new WorkOrderStatusManager(WorkOrderActionEnum.START, 3, Collections.singletonList(new WorkOrderStatusTransitionRule() {
             @Override
             public boolean workOrderMatchesCondition(WorkOrderStatusTransitionContext context) {
                 return true;
             }
 
             @Override
-            public ObsActionEnum getAction(WorkOrderStatusTransitionContext context) {
-                return ObsActionEnum.CLOSE;
+            public WorkOrderActionEnum getAction(WorkOrderStatusTransitionContext context) {
+                return WorkOrderActionEnum.CLOSE;
             }
         }));
 
@@ -137,8 +137,8 @@ public class WorkOrderStatusManagerTest {
         }
 
         @Override
-        public ObsActionEnum getAction(final WorkOrderStatusTransitionContext context) {
-            return ObsActionEnum.START;
+        public WorkOrderActionEnum getAction(final WorkOrderStatusTransitionContext context) {
+            return WorkOrderActionEnum.START;
         }
     }
 
@@ -149,8 +149,8 @@ public class WorkOrderStatusManagerTest {
         }
 
         @Override
-        public ObsActionEnum getAction(final WorkOrderStatusTransitionContext context) {
-            return ObsActionEnum.CLOSE;
+        public WorkOrderActionEnum getAction(final WorkOrderStatusTransitionContext context) {
+            return WorkOrderActionEnum.CLOSE;
         }
     }
 }

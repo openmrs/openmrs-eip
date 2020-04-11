@@ -2,7 +2,7 @@ package org.openmrs.utils.odoo;
 
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 
-public enum ObsActionEnum {
+public enum WorkOrderActionEnum {
 
     START(WorkOrderStateEnum.PROGRESS),
     CLOSE(WorkOrderStateEnum.DONE),
@@ -11,7 +11,7 @@ public enum ObsActionEnum {
 
     private WorkOrderStateEnum resultingWorkOrderState;
 
-    ObsActionEnum(final WorkOrderStateEnum resultingWorkOrderState) {
+    WorkOrderActionEnum(final WorkOrderStateEnum resultingWorkOrderState) {
         this.resultingWorkOrderState = resultingWorkOrderState;
     }
 

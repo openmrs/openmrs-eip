@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager;
 
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class WorkOrderStatusManagerFactory {
      *                       to which apply the above action
      * @return the instance of {@link WorkOrderStatusManager}
      */
-    public WorkOrderStatusManager createManager(final ObsActionEnum action,
+    public WorkOrderStatusManager createManager(final WorkOrderActionEnum action,
                                                 final Integer sequenceNumberIndex) {
         return new WorkOrderStatusManager(action, sequenceNumberIndex, rules);
     }

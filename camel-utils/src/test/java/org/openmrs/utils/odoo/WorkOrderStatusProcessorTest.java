@@ -39,12 +39,12 @@ public class WorkOrderStatusProcessorTest {
     public void process_should_put_modified_work_orders_in_body() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setProperty("workorder-state-value", ObsActionEnum.PAUSE.name());
+        exchange.setProperty("workorder-state-value", WorkOrderActionEnum.PAUSE.name());
         exchange.setProperty("workorder-sequence-nb", 1);
         WorkOrder workOrder = new WorkOrder();
         List<WorkOrder> workOrders = Collections.singletonList(workOrder);
         exchange.getIn().setBody(Collections.singletonList(workOrder));
-        when(factory.createManager(ObsActionEnum.PAUSE, 1)).thenReturn(manager);
+        when(factory.createManager(WorkOrderActionEnum.PAUSE, 1)).thenReturn(manager);
 
         // When
         processor.process(exchange);

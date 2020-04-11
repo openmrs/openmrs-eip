@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager.rule;
 
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.model.WorkOrderStateEnum;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 import org.springframework.stereotype.Component;
@@ -33,9 +33,9 @@ public class OnlyOneWorkOrderInProgressRule implements WorkOrderStatusTransition
      * @return the state
      */
     @Override
-    public ObsActionEnum getAction(final WorkOrderStatusTransitionContext context) {
+    public WorkOrderActionEnum getAction(final WorkOrderStatusTransitionContext context) {
         return context.getCurrentWorkOrderSequenceIndex() < context.getOriginalWorkOrderSequenceIndex() ?
-                ObsActionEnum.CLOSE :
-                ObsActionEnum.CANCEL;
+                WorkOrderActionEnum.CLOSE :
+                WorkOrderActionEnum.CANCEL;
     }
 }

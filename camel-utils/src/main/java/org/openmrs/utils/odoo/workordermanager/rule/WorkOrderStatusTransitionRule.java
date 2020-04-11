@@ -1,6 +1,6 @@
 package org.openmrs.utils.odoo.workordermanager.rule;
 
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.WorkOrderStatusTransitionContext;
 
 public interface WorkOrderStatusTransitionRule {
@@ -15,7 +15,7 @@ public interface WorkOrderStatusTransitionRule {
     /**
      * The action
      * @param context the Camel context
-     * @return ObsActionEnum
+     * @return WorkOrderActionEnum
      */
-    ObsActionEnum getAction(WorkOrderStatusTransitionContext context);
+    WorkOrderActionEnum getAction(WorkOrderStatusTransitionContext context);
 }

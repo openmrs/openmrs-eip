@@ -46,12 +46,12 @@ public class WorkOrderStatusProcessorITest {
         );
 
         WorkOrderStatusManager manager = new WorkOrderStatusManager(
-                ObsActionEnum.START,
+                WorkOrderActionEnum.START,
                 3,
                 rules
         );
 
-        when(factory.createManager(ObsActionEnum.START, 3)).thenReturn(manager);
+        when(factory.createManager(WorkOrderActionEnum.START, 3)).thenReturn(manager);
 
         workOrders = initWorkOrders();
 
@@ -75,7 +75,7 @@ public class WorkOrderStatusProcessorITest {
     public void process_START_on_wo_3() {
         // Given
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setProperty("workorder-state-value", ObsActionEnum.START.name());
+        exchange.setProperty("workorder-state-value", WorkOrderActionEnum.START.name());
         exchange.setProperty("workorder-sequence-nb", 3);
         exchange.getIn().setBody(workOrders);
 

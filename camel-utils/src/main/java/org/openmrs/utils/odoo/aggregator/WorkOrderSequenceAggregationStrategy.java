@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * Camel strategy to copy properties from newExchange and put them into oldExchange
  */
 @Component
-public class ObsSequenceAggregationStrategy implements AggregationStrategy {
+public class WorkOrderSequenceAggregationStrategy implements AggregationStrategy {
 
     @Override
     public Exchange aggregate(final Exchange oldExchange, final Exchange newExchange) {

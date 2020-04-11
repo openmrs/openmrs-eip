@@ -2,7 +2,7 @@ package org.openmrs.utils.odoo.workordermanager;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.utils.odoo.ObsActionEnum;
+import org.openmrs.utils.odoo.WorkOrderActionEnum;
 import org.openmrs.utils.odoo.workordermanager.rule.WorkOrderStatusTransitionRule;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class WorkOrderStatusManagerFactoryTest {
     @Test
     public void createManager_should_return_manager() {
         // Given
-        ObsActionEnum state = ObsActionEnum.PAUSE;
+        WorkOrderActionEnum state = WorkOrderActionEnum.PAUSE;
         Integer sequenceNumber = 1;
 
         // When
