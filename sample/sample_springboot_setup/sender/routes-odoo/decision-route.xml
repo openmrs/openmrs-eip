@@ -82,8 +82,8 @@
           <to uri="direct:patient-to-odoo"/>
         </when>
         <when>
-            <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.WorkOrderStateModel')]</jsonpath>
-            <to uri="direct:erp-workorder-action-to-odoo" />
+            <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.ErpWorkOrderStateModel')]</jsonpath>
+            <to uri="direct:create-sync-record" />
         </when>
       </choice>
     </split>

@@ -4,7 +4,7 @@
         <from uri="direct:erp-workorder-action-to-odoo" />
 
         <log loggingLevel="DEBUG" message=":" />
-        <log message="Processing WorkOrderState -> ${body}" />
+        <log message="Processing ErpWorkOrderState -> ${body}" />
 
         <setProperty propertyName="workorder-state-value">
             <jsonpath>$.model.action</jsonpath>
@@ -72,7 +72,7 @@
         </setProperty>
 
         <!-- Get the sequence number of associated WO and the MO number (accession_number) -->
-        <to uri="sql:SELECT w.wo_seq_number, o.accession_number FROM icrc_work_order w, orders o
+        <to uri="sql:SELECT w.wo_seq_number, o.accession_number FROM icrc_erp_work_order w, orders o
                  WHERE w.order_id = o.order_id
                  AND w.uuid = :#${property.wo-uuid}
                  AND w.voided = 0?dataSource=#openmrsDataSource" />
@@ -89,7 +89,7 @@
 
         <to uri="direct:process-workorder-state"/>
 
-        <log message="Done processing WorkOrderState!" />
+        <log message="Done processing ErpWorkOrderState!" />
 
     </route>
 

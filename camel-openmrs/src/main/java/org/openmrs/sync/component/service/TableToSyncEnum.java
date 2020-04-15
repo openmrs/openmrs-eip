@@ -1,8 +1,49 @@
 package org.openmrs.sync.component.service;
 
-import org.openmrs.sync.component.entity.*;
+import org.openmrs.sync.component.entity.Allergy;
+import org.openmrs.sync.component.entity.BaseEntity;
+import org.openmrs.sync.component.entity.Concept;
+import org.openmrs.sync.component.entity.ConceptAttribute;
+import org.openmrs.sync.component.entity.Condition;
+import org.openmrs.sync.component.entity.Encounter;
+import org.openmrs.sync.component.entity.EncounterDiagnosis;
+import org.openmrs.sync.component.entity.Location;
+import org.openmrs.sync.component.entity.LocationAttribute;
+import org.openmrs.sync.component.entity.Observation;
+import org.openmrs.sync.component.entity.Patient;
+import org.openmrs.sync.component.entity.PatientIdentifier;
+import org.openmrs.sync.component.entity.PatientProgram;
+import org.openmrs.sync.component.entity.PatientState;
+import org.openmrs.sync.component.entity.Person;
+import org.openmrs.sync.component.entity.PersonAddress;
+import org.openmrs.sync.component.entity.PersonAttribute;
+import org.openmrs.sync.component.entity.PersonName;
+import org.openmrs.sync.component.entity.ProviderAttribute;
+import org.openmrs.sync.component.entity.Visit;
+import org.openmrs.sync.component.entity.VisitAttribute;
+import org.openmrs.sync.component.entity.ErpWorkOrderState;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
-import org.openmrs.sync.component.model.*;
+import org.openmrs.sync.component.model.AllergyModel;
+import org.openmrs.sync.component.model.AttributeModel;
+import org.openmrs.sync.component.model.BaseModel;
+import org.openmrs.sync.component.model.ConceptAttributeModel;
+import org.openmrs.sync.component.model.ConceptModel;
+import org.openmrs.sync.component.model.ConditionModel;
+import org.openmrs.sync.component.model.EncounterDiagnosisModel;
+import org.openmrs.sync.component.model.EncounterModel;
+import org.openmrs.sync.component.model.LocationModel;
+import org.openmrs.sync.component.model.ObservationModel;
+import org.openmrs.sync.component.model.PatientIdentifierModel;
+import org.openmrs.sync.component.model.PatientModel;
+import org.openmrs.sync.component.model.PatientProgramModel;
+import org.openmrs.sync.component.model.PatientStateModel;
+import org.openmrs.sync.component.model.PersonAddressModel;
+import org.openmrs.sync.component.model.PersonAttributeModel;
+import org.openmrs.sync.component.model.PersonModel;
+import org.openmrs.sync.component.model.PersonNameModel;
+import org.openmrs.sync.component.model.VisitAttributeModel;
+import org.openmrs.sync.component.model.VisitModel;
+import org.openmrs.sync.component.model.ErpWorkOrderStateModel;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -28,7 +69,7 @@ public enum TableToSyncEnum {
     ALLERGY(Allergy.class, AllergyModel.class),
     PERSON_ADDRESS(PersonAddress.class, PersonAddressModel.class),
     PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class),
-    WORK_ORDER_STATE(WorkOrderState.class, WorkOrderStateModel.class);
+    ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
 

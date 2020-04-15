@@ -1,0 +1,52 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="create-sync-record" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="direct:create-sync-record" />
+
+        <log loggingLevel="DEBUG" message=":" />
+        <log message="Creating sync record for ErpWorkOrderState -> ${body}" />
+
+        <!-- TODO Create sync record for WO state if none exists -->
+
+        <setProperty propertyName="entity-uuid">
+            <jsonpath>$.model.uuid</jsonpath>
+        </setProperty>
+
+        <setProperty propertyName="sync-record">
+            <spel>
+                #{new org.openmrs.sync.app.management.entity.SyncRecord()}
+            </spel>
+        </setProperty>
+
+        <script>
+            <spel>
+                #{getProperty('sync-record').setEntityId(getProperty('entity-uuid'))}
+                #{getProperty('sync-record').setEntityClassName('org.openmrs.sync.component.entity.ErpWorkOrderState')}
+            </spel>
+        </script>
+
+        <setProperty propertyName="work-order">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <setBody>
+            <simple>${property.sync-record}</simple>
+        </setBody>
+
+        <log loggingLevel="DEBUG" message="Saving sync record for WorkOrderState..." />
+
+        <to uri="jpa:org.openmrs.sync.app.management.entity.SyncRecord?usePersist=true" />
+
+        <log message="Successfully created sync record for ErpWorkOrderState!" />
+
+        <setBody>
+            <simple>${property.work-order}</simple>
+        </setBody>
+
+        <log message="Forwarding to erp-workorder-action-to-odoo route" />
+
+        <to uri="direct:erp-workorder-action-to-odoo" />
+
+    </route>
+
+</routes>
