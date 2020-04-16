@@ -30,7 +30,7 @@ public class NoErpWorkOrderBeforeAnyFinishedWorkOrderInOdooRule extends FailureR
 
         boolean fail = workOrdersAfterCurrent.stream().anyMatch(wo -> wo.getState() == ErpWorkOrderStateEnum.DONE);
         if (fail) {
-            log.warn("Cannot process work order because there is a finished work order after it in Odoo");
+            log.error("Cannot process work order because there is a finished work order after it in Odoo");
         }
 
         return fail;

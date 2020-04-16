@@ -22,7 +22,7 @@
         </choice>
 
         <setProperty propertyName="wo-uuid">
-            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, workOrderUuid)" />
+            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, erpWorkOrderUuid)" />
         </setProperty>
 
         <setProperty propertyName="date-created">

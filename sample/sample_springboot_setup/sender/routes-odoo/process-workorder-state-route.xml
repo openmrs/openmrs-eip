@@ -27,7 +27,7 @@
     <convertBodyTo type="java.lang.String"/>
     <!--Marshall to java object-->
     <unmarshal>
-      <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.workordermanager.model.WorkOrder"/>
+      <json useList="true" library="Jackson" unmarshalTypeName="org.openmrs.utils.odoo.workordermanager.model.ErpWorkOrder"/>
     </unmarshal>
     <!--Process work order to sort them and return the changing work orders induced to keep consistency -->
     <process ref="workOrderStatusProcessor"/>

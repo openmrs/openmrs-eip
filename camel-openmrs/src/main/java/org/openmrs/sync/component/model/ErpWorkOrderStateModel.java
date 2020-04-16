@@ -9,6 +9,6 @@ public class ErpWorkOrderStateModel extends BaseModel {
 
     private String action;
 
-    private String workOrderUuid;
+    private String erpWorkOrderUuid;
 
 }
