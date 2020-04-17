@@ -9,7 +9,7 @@ import org.openmrs.sync.component.service.AbstractEntityService;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class ErpWorkOrderStateService extends AbstractEntityService<ErpWorkOrderState, ErpWorkOrderStateModel> {
 
     public ErpWorkOrderStateService(SyncEntityRepository<ErpWorkOrderState> repository, EntityToModelMapper<ErpWorkOrderState, ErpWorkOrderStateModel> entityToModelMapper, ModelToEntityMapper<ErpWorkOrderStateModel, ErpWorkOrderState> modelToEntityMapper) {
@@ -18,7 +18,7 @@ public class ErpWorkOrderStateService extends AbstractEntityService<ErpWorkOrder
 
     @Override
     public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.ERP_WORK_ORDER_STATE;
+        return null;//TableToSyncEnum.ICRC_ERP_WORK_ORDER_STATE;
     }
 
 }

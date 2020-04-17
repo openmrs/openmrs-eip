@@ -68,8 +68,8 @@ public enum TableToSyncEnum {
     PERSON_NAME(PersonName.class, PersonNameModel.class),
     ALLERGY(Allergy.class, AllergyModel.class),
     PERSON_ADDRESS(PersonAddress.class, PersonAddressModel.class),
-    PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class),
-    ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
+    PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class);
+    //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
 
