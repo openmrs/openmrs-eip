@@ -20,7 +20,11 @@ public class SyncAttempt extends BaseStatefulEntity {
     private String syncRecordUuid;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "openmrs_db_destination", updatable = false)
+    @JoinColumn(name = "source_db", updatable = false)
+    private OpenmrsDatabase source;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "destination_db", updatable = false)
     private OpenmrsDatabase destination;
 
     /**
@@ -30,6 +34,24 @@ public class SyncAttempt extends BaseStatefulEntity {
      */
     public String getSyncRecordUuid() {
         return syncRecordUuid;
+    }
+
+    /**
+     * Gets the source
+     *
+     * @return the source
+     */
+    public OpenmrsDatabase getSource() {
+        return source;
+    }
+
+    /**
+     * Sets the source
+     *
+     * @param source the source to set
+     */
+    public void setSource(OpenmrsDatabase source) {
+        this.source = source;
     }
 
     /**
@@ -61,7 +83,8 @@ public class SyncAttempt extends BaseStatefulEntity {
 
     @Override
     public String toString() {
-        return "SyncAttempt {destination=" + destination + ", status=" + getStatus() + ", syncRecordUuid=" + syncRecordUuid + "}";
+        return "SyncAttempt {destination=" + destination + ", status=" + getStatus() + ", syncRecordUuid=" +
+                syncRecordUuid + ", uuid=" + getUuid() + "}";
     }
 
 }

@@ -2,6 +2,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="dlc-route">
     <from uri="direct:dlc"/>
-    <log message="Error with message: ${body} with cause: ${exception.getMessage()}"/>
+    <log loggingLevel="ERROR" message="Error with message: ${body} with cause: ${exception.getMessage()}"/>
   </route>
 </routes>

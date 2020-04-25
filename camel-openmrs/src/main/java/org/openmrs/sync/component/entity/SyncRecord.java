@@ -31,6 +31,9 @@ public class SyncRecord extends BaseStatefulEntity {
     @Column(length = 6, updatable = false)
     private Operation operation;
 
+    @Column(name = "openmrs_version", length = 50)
+    private String openmrsVersion;
+
     /**
      * Gets the entityId
      *
@@ -85,9 +88,28 @@ public class SyncRecord extends BaseStatefulEntity {
         this.operation = operation;
     }
 
+    /**
+     * Gets the openmrsVersion
+     *
+     * @return the openmrsVersion
+     */
+    public String getOpenmrsVersion() {
+        return openmrsVersion;
+    }
+
+    /**
+     * Sets the openmrsVersion
+     *
+     * @param openmrsVersion the openmrsVersion to set
+     */
+    public void setOpenmrsVersion(String openmrsVersion) {
+        this.openmrsVersion = openmrsVersion;
+    }
+
     @Override
     public String toString() {
-        return "SyncRecord {entityTable=" + entityTableName + ", operation=" + operation + ", status=" + getStatus() + ", uuid=" + getUuid() + "}";
+        return "SyncRecord {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation +
+                ", status=" + getStatus() + ", uuid=" + getUuid() + "}";
     }
 
 }
