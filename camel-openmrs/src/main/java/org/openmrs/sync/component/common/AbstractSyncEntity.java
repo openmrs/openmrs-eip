@@ -1,8 +1,6 @@
 package org.openmrs.sync.component.common;
 
 import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,16 +18,11 @@ public abstract class AbstractSyncEntity implements Serializable {
     private Long id;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(updatable = false, columnDefinition = "varchar(50) default 'NEW'")
-    private Status status;
-
-    @NotNull
     @Column(name = "date_created", updatable = false)
     private Date dateCreated;
 
     @NotBlank
-    @Column(unique = true, nullable = false, length = 38, updatable = false)
+    @Column(unique = true, length = 38, updatable = false)
     private String uuid;
 
     /**
@@ -39,24 +32,6 @@ public abstract class AbstractSyncEntity implements Serializable {
      */
     public Long getId() {
         return id;
-    }
-
-    /**
-     * Gets the status
-     *
-     * @return the status
-     */
-    public Status getStatus() {
-        return status;
-    }
-
-    /**
-     * Sets the status
-     *
-     * @param status the status to set
-     */
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     /**
@@ -96,15 +71,6 @@ public abstract class AbstractSyncEntity implements Serializable {
     }
 
     /**
-     * Determines if the instance has been processed successful
-     *
-     * @return true if the instance was successfully processed otherwise false
-     */
-    public boolean isSuccessful() {
-        return Status.SUCCESS == getStatus();
-    }
-
-    /**
      * Sets the dateCreated
      *
      * @param dateCreated the dateCreated to set
@@ -136,4 +102,8 @@ public abstract class AbstractSyncEntity implements Serializable {
         return getId() != null ? getId().hashCode() : super.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " uuid: " + getUuid();
+    }
 }
