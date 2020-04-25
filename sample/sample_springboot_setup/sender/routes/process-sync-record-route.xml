@@ -1,0 +1,53 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="process-sync-record" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="direct:process-sync-record" />
+
+        <log loggingLevel="DEBUG" message=":" />
+        
+        <log message="Processing sync record -> ${body}" />
+
+        <log message="Uuid:-> ${body.uuid}" />
+
+        <setProperty propertyName="sync-record">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <toD uri="jpa://org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${body.uuid}'" />
+        
+        <choice>
+            <when>
+                <simple>${body.size()} == 0</simple>
+                <log message="Creating Sync Attempt" />
+                <setProperty propertyName="sync-attempt">
+                    <spel>
+                        #{new org.openmrs.sync.app.management.entity.SyncAttempt()}
+                    </spel>
+                </setProperty>
+
+                <script>
+                    <spel>
+                        #{getProperty('sync-attempt').setSyncRecordUuid(getProperty('sync-record-uuid'))}
+                        #{getProperty('sync-attempt').setStatus(T(org.openmrs.sync.component.common.Status).valueOf('NEW'))}
+                        #{getProperty('sync-attempt').setDateCreated(new java.util.Date())}
+                        #{getProperty('sync-attempt').setUuid(T(java.util.UUID).randomUUID())}
+                    </spel>
+                </script>
+                <setBody>
+                    <simple>${property.sync-attempt}</simple>
+                </setBody>
+                <log message="Saving Sync Attempt ${body}" />
+
+                <to uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?usePersist=true" />
+                <log message="Saved Sync Attempt ${body}" />
+
+                <log message="Successfully created sync attempt" />
+            </when>
+            <otherwise>
+                <log message="Found ${body.size()} existing attempt(s) for sync record" />
+            </otherwise>
+        </choice>
+
+    </route>
+
+</routes>

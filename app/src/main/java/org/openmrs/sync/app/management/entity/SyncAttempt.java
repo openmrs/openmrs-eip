@@ -1,74 +1,38 @@
 package org.openmrs.sync.app.management.entity;
 
+import org.openmrs.sync.component.common.AbstractSyncEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "sync_attempt")
-public class SyncAttempt extends AbstractEntity {
+public class SyncAttempt extends AbstractSyncEntity {
 
     public static final long serialVersionUID = 1;
 
-    public enum Status {
-        SUCCESS, FAILURE
-    }
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "sync_record_id", updatable = false)
-    private SyncRecord syncRecord;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "wo_status", length = 50, nullable = false)
-    private Status status;
+    @NotBlank
+    @Column(name = "sync_record_uuid", length = 38, updatable = false)
+    private String syncRecordUuid;
 
     /**
-     * Gets the syncRecord
+     * Gets the syncRecordUuid
      *
-     * @return the syncRecord
+     * @return the syncRecordUuid
      */
-    public SyncRecord getSyncRecord() {
-        return syncRecord;
+    public String getSyncRecordUuid() {
+        return syncRecordUuid;
     }
 
     /**
-     * Sets the syncRecord
+     * Sets the syncRecordUuid
      *
-     * @param syncRecord the syncRecord to set
+     * @param syncRecordUuid the syncRecordUuid to set
      */
-    public void setSyncRecord(SyncRecord syncRecord) {
-        this.syncRecord = syncRecord;
-    }
-
-    /**
-     * Gets the status
-     *
-     * @return the status
-     */
-    public Status getStatus() {
-        return status;
-    }
-
-    /**
-     * Sets the status
-     *
-     * @param status the status to set
-     */
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    /**
-     * Determines is this attempt was successful
-     *
-     * @return true if the attempt was successful otherwise false
-     */
-    public boolean isSuccessful() {
-        return Status.SUCCESS == getStatus();
+    public void setSyncRecordUuid(String syncRecordUuid) {
+        this.syncRecordUuid = syncRecordUuid;
     }
 
 }
