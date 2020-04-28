@@ -4,72 +4,88 @@
         <from uri="direct:process-sync-record" />
 
         <log message=":" />
-
         <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
 
-        <log message="Processing -> ${body}" />
+        <log message="Processing sync record from ${property.source-db} -> ${body}" />
 
         <setProperty propertyName="sync-record">
             <simple>${body}</simple>
         </setProperty>
 
-        <!-- Exclude source DB  for this sync record -->
-        <toD uri="jpa:org.openmrs.sync.app.management.entity.OpenmrsDatabase?query=SELECT d FROM org.openmrs.sync.app.management.entity.OpenmrsDatabase d" />
+        <!-- Create a new db list excluding the source of the record so that we don't sick back to it -->
+        <setBody>
+            <simple>${property.openmrs-dbs.clone()}</simple>
+        </setBody>
+        <script>
+            <spel>
+                #{body.remove(getProperty('source-db'))}
+            </spel>
+        </script>
 
-        <split streaming="true">
+        <log message="DBs to stage sync attemtps for: ${body}" />
+
+        <split streaming="true" >
             <simple>${body}</simple>
-            <setProperty propertyName="destination-db">
-                <simple>${body}</simple>
-            </setProperty>
+                <setProperty propertyName="destination-db">
+                    <simple>${body}</simple>
+                </setProperty>
 
-            <log message="Staging sync attempt for destination DB: ${body}" />
+                <toD uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${property.sync-record.uuid}' AND a.source = ${property.source-db.id} AND a.destination = ${property.destination-db.id} AND a.status = 'NEW'" />
 
-            <toD uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${property.sync-record.uuid}' AND a.destination = ${property.destination-db.id} AND a.status = 'NEW'" />
+                <choice>
+                    <when>
+                        <simple>${body.size} > 1</simple>
+                        <!-- TODO log error message instead and mark the sync record status as failed and proceed -->
+                        <throwException message="Found multiple new attempts for the same DB -> ${body}"
+                                        exceptionType="org.openmrs.sync.component.exception.OpenmrsSyncException" />
+                    </when>
+                    <when>
+                        <simple>${body.size} == 0</simple>
+                        <setBody>
+                            <spel>
+                                #{new org.openmrs.sync.app.management.entity.SyncAttempt()}
+                            </spel>
+                        </setBody>
+                        <script>
+                            <spel>
+                                #{body.setSyncRecordUuid(getProperty('sync-record').getUuid())}
+                                #{body.setSource(getProperty('source-db'))}
+                                #{body.setDestination(getProperty('destination-db'))}
+                                #{body.setStatus(T(org.openmrs.sync.component.common.Status).valueOf('NEW'))}
+                                #{body.setDateCreated(new java.util.Date())}
+                                #{body.setUuid(T(java.util.UUID).randomUUID())}
+                            </spel>
+                        </script>
 
-            <choice>
-                <when>
-                    <simple>${body.size()} > 1</simple>
-                    <!-- TODO log error message instead and mark the sync record status as failed and proceed -->
-                    <throwException message="Found multiple new attempts for the same DB -> ${body}"
-                                    exceptionType="org.openmrs.sync.component.exception.OpenmrsSyncException" />
-                </when>
-                <when>
-                    <simple>${body.size()} == 0</simple>
-                    <setBody>
-                        <spel>
-                            #{new org.openmrs.sync.app.management.entity.SyncAttempt()}
-                        </spel>
-                    </setBody>
-                    <script>
-                        <spel>
-                            #{body.setSyncRecordUuid(getProperty('sync-record').getUuid())}
-                            #{body.setSource(getProperty('destination-db'))}
-                            #{body.setDestination(getProperty('destination-db'))}
-                            #{body.setStatus(T(org.openmrs.sync.component.common.Status).valueOf('NEW'))}
-                            #{body.setDateCreated(new java.util.Date())}
-                            #{body.setUuid(T(java.util.UUID).randomUUID())}
-                        </spel>
-                    </script>
+                        <log message="Creating ${body}" />
 
-                    <log message="Creating ${body}" />
+                        <to uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?usePersist=true" />
 
-                    <to uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?usePersist=true" />
+                        <log message="Sync attempt staged" />
+                    </when>
+                    <otherwise>
+                        <log message="Found an existing ${body}" />
 
-                    <log message="Successfully staged sync attempt" />
-                </when>
-                <otherwise>
-                    <log message="Found an existing ${body}" />
-
-                    <setBody>
-                        <simple>${body[0]}</simple>
-                    </setBody>
-                </otherwise>
-            </choice>
-            
+                        <setBody>
+                            <simple>${body[0]}</simple>
+                        </setBody>
+                    </otherwise>
+                </choice>
         </split>
 
+        <setBody>
+            <simple>${property.sync-record}</simple>
+        </setBody>
+        <choice>
+            <when>
+                <simple>${body.status} == 'NEW'</simple>
+                <log message="Updating the sync record status to PROCESSING" />
+                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'PROCESSING', start_date = now() WHERE uuid = '${body.uuid}'?dataSource=${property.source-db.name}" />
+            </when>
+        </choice>
+
         <!-- TODO Log count of DBs we have successfully queued to -->
-        <log message="Done staging sync attempts for ${property.sync-record}" />
+        <log message="Done staging sync attempts for ${body}" />
 
     </route>
 

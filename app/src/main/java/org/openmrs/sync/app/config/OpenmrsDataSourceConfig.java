@@ -1,10 +1,5 @@
 package org.openmrs.sync.app.config;
 
-import static java.util.Collections.singletonMap;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,6 +13,11 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
+import static java.util.Collections.singletonMap;
 
 @Configuration
 @EnableTransactionManagement
@@ -61,4 +61,17 @@ public class OpenmrsDataSourceConfig {
             @Qualifier("openmrsEntityManager") final EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
+
+    @Bean(name = "remote-a")
+    @ConfigurationProperties(prefix = "spring.remote-a")
+    public DataSource getRemoteDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "central")
+    @ConfigurationProperties(prefix = "spring.central")
+    public DataSource getCentralDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
 }

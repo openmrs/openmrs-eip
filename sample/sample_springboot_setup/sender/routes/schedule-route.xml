@@ -1,13 +1,26 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="schedule">
     <from uri="scheduler:sync?delay=1m"/>
-      <to uri="jpa://org.openmrs.sync.app.management.entity.TableSyncStatus?query=select s from org.openmrs.sync.app.management.entity.TableSyncStatus s"/>
+      <toD uri="jpa://org.openmrs.sync.app.management.entity.OpenmrsDatabase?query=SELECT d FROM org.openmrs.sync.app.management.entity.OpenmrsDatabase d" />
+      <setProperty propertyName="openmrs-dbs">
+          <simple>${body}</simple>
+      </setProperty>
       <split streaming="true">
-        <simple>${body}</simple>
-        <setHeader headerName="OpenmrsEntitySyncStatusId">
-          <simple>${in.body.getId()}</simple>
-        </setHeader>
-        <to uri="direct:sync"/>
+          <simple>${body}</simple>
+          <setProperty propertyName="source-db">
+              <simple>${body}</simple>
+          </setProperty>
+          <!-- TODO process in configured batch sizes -->
+          <toD uri="sql:SELECT * from dbsync_sync_record WHERE status = 'NEW' or status = 'PROCESSING' ORDER BY date_created?dataSource=${property.source-db.name}&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
+
+          <split streaming="true">
+            <simple>${body}</simple>
+            <setHeader headerName="OpenmrsEntitySyncStatusId">
+              <simple>${in.body.getId()}</simple>
+            </setHeader>
+            <to uri="direct:process-sync-record" />
+          </split>
+
       </split>
   </route>
 </routes>
