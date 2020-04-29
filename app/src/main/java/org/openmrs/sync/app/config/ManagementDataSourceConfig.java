@@ -1,6 +1,5 @@
 package org.openmrs.sync.app.config;
 
-import org.h2.Driver;
 import org.openmrs.sync.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-
+import java.sql.Driver;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,11 +46,14 @@ public class ManagementDataSourceConfig {
     @Value("${spring.mngt-datasource.password}")
     private String password;
 
+    @Value("${spring.mngt-datasource.driverClassName}")
+    private String driverClassName;
+
     @Bean(name = "mngtDataSource")
     @ConfigurationProperties(prefix = "spring.mngt-datasource")
-    public DataSource dataSource() {
+    public DataSource dataSource() throws ClassNotFoundException {
         SimpleDriverDataSource sdd = new SimpleDriverDataSource();
-        sdd.setDriverClass(Driver.class);
+        sdd.setDriverClass((Class<Driver>) Class.forName(driverClassName));
         sdd.setUrl(url);
         sdd.setUsername(username);
         sdd.setPassword(password);

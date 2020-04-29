@@ -30,7 +30,7 @@
                     <simple>${body}</simple>
                 </setProperty>
 
-                <toD uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${property.sync-record.uuid}' AND a.source = ${property.source-db.id} AND a.destination = ${property.destination-db.id} AND a.status = 'NEW'" />
+                <toD uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${property.sync-record.uuid}' AND a.source = ${property.source-db.id} AND a.destination = ${property.destination-db.id} AND (a.status = 'NEW' OR a.status = 'PROCESSING' OR a.status = 'SUCCESS')" />
 
                 <choice>
                     <when>
