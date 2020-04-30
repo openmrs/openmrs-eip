@@ -3,68 +3,50 @@
     <route id="process-sync-record" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="direct:process-sync-record" />
 
-        <log message=":" />
-        <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
+        <doTry>
+            <log message=":" />
+            <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
 
-        <log message="Stage sync attempt for: ${body}" />
+            <log message="Processing sync record: ${body}" />
 
-        <setProperty propertyName="sync-record">
-            <simple>${body}</simple>
-        </setProperty>
+            <setProperty propertyName="sync-record">
+                <simple>${body}</simple>
+            </setProperty>
 
-        <toD uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?query=SELECT a FROM org.openmrs.sync.app.management.entity.SyncAttempt a WHERE a.syncRecordUuid = '${body.uuid}' AND (a.status = 'NEW' OR a.status = 'PROCESSING' OR a.status = 'SUCCESS')" />
+            <log message="Loading entity from DB..." />
 
-        <choice>
-            <when>
-                <simple>${body.size} > 1</simple>
-                <!-- TODO log error message instead and mark the sync record status as failed and proceed -->
-                <throwException message="Found multiple new attempts for the same DB -> ${body}"
-                                exceptionType="org.openmrs.sync.component.exception.OpenmrsSyncException" />
-            </when>
-            <when>
-                <simple>${body.size} == 0</simple>
-                <setBody>
-                    <spel>
-                        #{new org.openmrs.sync.app.management.entity.SyncAttempt()}
-                    </spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setSyncRecordUuid(getProperty('sync-record').getUuid())}
-                        #{body.setStatus(T(org.openmrs.sync.component.common.Status).valueOf('NEW'))}
-                        #{body.setDateCreated(new java.util.Date())}
-                        #{body.setUuid(T(java.util.UUID).randomUUID())}
-                    </spel>
-                </script>
+            <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
 
-                <log message="Creating ${body}" />
+            <!-- TODO cater for scenario where entity could have been deleted before just before this run,
+                one option is to skip this record with hope that there is a delete sync record in the queue -->
 
-                <to uri="jpa:org.openmrs.sync.app.management.entity.SyncAttempt?usePersist=true" />
+            <setBody>
+                <jsonpath>$[0]</jsonpath>
+            </setBody>
+            <marshal>
+                <json library="Jackson"/>
+            </marshal>
 
-                <log message="Sync attempt staged" />
-            </when>
-            <otherwise>
-                <log message="Found an existing ${body}" />
+            <log message="Loaded entity to be written to destination -> ${body}" />
 
-                <setBody>
-                    <simple>${body[0]}</simple>
-                </setBody>
-            </otherwise>
-        </choice>
+            <!--<process ref="pgpEncryptService"/>-->
+            <to uri="{{camel.output.endpoint}}" />
 
-        <setBody>
-            <simple>${property.sync-record}</simple>
-        </setBody>
-        <choice>
-            <when>
-                <simple>${body.status} == 'NEW'</simple>
-                <log message="Updating the sync record status to PROCESSING" />
-                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'PROCESSING', start_date = now() WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
-            </when>
-        </choice>
+            <setBody>
+                <simple>${property.sync-record}</simple>
+            </setBody>
 
-        <!-- TODO Log count of DBs we have successfully queued to -->
-        <log message="Done staging sync attempts" />
+            <log message="Updating the sync record status to SUCCESS" />
+            
+            <toD uri="sql:UPDATE dbsync_sync_record SET status = 'SUCCESS', status_message = null, sync_date = now() WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
+
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <log loggingLevel="ERROR" message="${exception.printStackTrace()}" />
+                <log message="Updating the sync record status to FAILURE" />
+                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'FAILURE', status_message = '${exception.message}', sync_date = now() WHERE uuid = '${property.sync-record.uuid}'?dataSource=openmrsDataSource" />
+            </doCatch>
+        </doTry>
 
     </route>
 

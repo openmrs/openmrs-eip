@@ -1,18 +1,12 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="schedule">
     <from uri="scheduler:sync?delay=1m"/>
-      <doTry>
-          <!-- TODO process in configured batch sizes -->
-          <toD uri="sql:SELECT * from dbsync_sync_record WHERE status = 'NEW' or status = 'PROCESSING' ORDER BY date_created?dataSource=openmrsDataSource&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
+      <!-- TODO process in configured batch sizes -->
+      <toD uri="sql:SELECT * from dbsync_sync_record WHERE status != 'SUCCESS' ORDER BY date_created?dataSource=openmrsDataSource&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
 
-          <split streaming="true">
-              <simple>${body}</simple>
-              <to uri="direct:process-sync-record" />
-          </split>
-          <doCatch>
-              <exception>java.lang.Exception</exception>
-              <log loggingLevel="ERROR" message="${exception.printStackTrace()}" />
-          </doCatch>
-      </doTry>
+      <split streaming="true">
+          <simple>${body}</simple>
+          <to uri="direct:process-sync-record" />
+      </split>
   </route>
 </routes>

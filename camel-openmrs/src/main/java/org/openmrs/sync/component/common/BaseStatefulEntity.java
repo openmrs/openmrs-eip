@@ -18,11 +18,8 @@ public abstract class BaseStatefulEntity extends AbstractSyncEntity {
     @Column(name = "status_message")
     private String statusMessage;
 
-    @Column(name = "start_date")
-    private Date startDate;
-
-    @Column(name = "end_date")
-    private Date endDate;
+    @Column(name = "sync_date")
+    private Date syncDate;
 
     /**
      * Gets the status
@@ -61,39 +58,21 @@ public abstract class BaseStatefulEntity extends AbstractSyncEntity {
     }
 
     /**
-     * Gets the startDate
+     * Gets the syncDate
      *
-     * @return the startDate
+     * @return the syncDate
      */
-    public Date getStartDate() {
-        return startDate;
+    public Date getSyncDate() {
+        return syncDate;
     }
 
     /**
-     * Sets the startDate
+     * Sets the syncDate
      *
-     * @param startDate the startDate to set
+     * @param syncDate the syncDate to set
      */
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    /**
-     * Gets the endDate
-     *
-     * @return the endDate
-     */
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    /**
-     * Sets the endDate
-     *
-     * @param endDate the endDate to set
-     */
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setSyncDate(Date syncDate) {
+        this.syncDate = syncDate;
     }
 
     /**

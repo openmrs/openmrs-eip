@@ -1,10 +1,10 @@
 package org.openmrs.sync.app.config;
 
-import static java.util.Collections.singletonMap;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
+import com.zaxxer.hikari.HikariDataSource;
+import org.openmrs.sync.component.SyncProfiles;
+import org.openmrs.sync.component.exception.OpenmrsSyncException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,11 +13,18 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.util.Arrays;
+
+import static java.util.Collections.singletonMap;
 
 @Configuration
 @EnableTransactionManagement
@@ -28,14 +35,29 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 )
 public class OpenmrsDataSourceConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(OpenmrsDataSourceConfig.class);
+
+    private static final String CONN_INIT_SQL = "SET @skip_create_sync_record = true";
+
     @Value("${spring.openmrs-datasource.dialect}")
     private String hibernateDialect;
 
     @Primary
     @Bean(name = "openmrsDataSource")
     @ConfigurationProperties(prefix = "spring.openmrs-datasource")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
+    public DataSource dataSource(Environment env) {
+        DataSource ds = DataSourceBuilder.create().build();
+        if (Arrays.asList(env.getActiveProfiles()).contains(SyncProfiles.RECEIVER)) {
+            if (ds instanceof HikariDataSource) {
+                log.info("Setting connection init SQL to: " + CONN_INIT_SQL);
+                ((HikariDataSource) ds).setConnectionInitSql(CONN_INIT_SQL);
+            } else {
+                //TODO support other DS types
+                throw new OpenmrsSyncException("Do not know how to initialize datasource of type: " + ds.getClass());
+            }
+        }
+
+        return ds;
     }
 
     @Primary
