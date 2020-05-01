@@ -7,7 +7,6 @@ CREATE TABLE `dbsync_sync_record` (
   `status_message` varchar(255) DEFAULT NULL,
   `sync_date` datetime DEFAULT NULL,
   `date_created` datetime NOT NULL,
-  `openmrs_version` varchar(255) NOT NULL DEFAULT '2.3.0',
   `uuid` char(38) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`)

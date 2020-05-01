@@ -1,6 +1,7 @@
 package org.openmrs.sync.app.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import liquibase.integration.spring.SpringLiquibase;
 import org.openmrs.sync.component.SyncProfiles;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -83,4 +85,18 @@ public class OpenmrsDataSourceConfig {
             @Qualifier("openmrsEntityManager") final EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
+
+    @Profile(SyncProfiles.SENDER)
+    @Bean(name = "liquibase")
+    public SpringLiquibase getSpringLiquibase(@Qualifier("openmrsDataSource") final DataSource dataSource) {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:liquibaseChangeLog.xml");
+        liquibase.setDatabaseChangeLogTable("liquibasechangelog");
+        liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
+        liquibase.setShouldRun(true);
+
+        return liquibase;
+    }
+
 }

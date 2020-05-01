@@ -17,6 +17,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <liquibaseVersion>3.8.9</liquibaseVersion>
   </properties>
 
   <dependencies>
@@ -29,6 +30,22 @@
       <groupId>org.openmrs.utils</groupId>
       <artifactId>camel-utils</artifactId>
       <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${liquibaseVersion}</version>
+      <exclusions>
+          <exclusion>
+              <groupId>ch.qos.logback</groupId>
+              <artifactId>logback-classic</artifactId>
+          </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.9</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
