@@ -28,9 +28,11 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
 
     private static final Logger log = LoggerFactory.getLogger(AddSyncTriggersCustomChangeSet.class);
 
-    private static final String CREATE_SYNC_TRIGGER_TEMPLATE = "create_sync_trigger_template.sql";
+    private static final String CREATE_SYNC_TRIGGER_TEMPLATE = "scripts/create_sync_trigger_template.sql";
 
-    private static final String TRIGGER_NAME_PREFIX = "after_";
+    private static final String DEFAULT_ASSIGN_ENTITY_ID_STMT = "SET @entity_id = ${refRow}.uuid";
+
+    private static final String PATIENT_ASSIGN_ENTITY_ID_STMT = "SELECT uuid INTO @entity_id from person where person_id = ${refRow}.patient_id";
 
     private static final String[] OPERATIONS = new String[]{"INSERT", "UPDATE", "DELETE"};
 
@@ -38,16 +40,12 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
     public void execute(Database database) throws CustomChangeException {
         JdbcConnection jdbcConn = (JdbcConnection) database.getConnection();
         try {
+            //TODO Centralise the trigger logic into a stored procedure to be called by the individual triggers
             InputStream in = getClass().getClassLoader().getResourceAsStream(CREATE_SYNC_TRIGGER_TEMPLATE);
             final String sqlTemplate = IOUtils.toString(in, "UTF-8");
             for (TableToSyncEnum tableToSync : TableToSyncEnum.values()) {
                 String tableName = tableToSync.getEntityClass().getAnnotation(Table.class).name();
-                if ("patient".equals(tableName)) {
-                    //TODO skip concepts
-                    //Use SELECT uuid INTO @old_uuid from person where person_id = OLD.patient_id for patient table
-                    log.info("Skipping adding triggers to " + tableName + " table");
-                    continue;
-                }
+                //TODO skip concepts
 
                 for (String operation : OPERATIONS) {
                     if (triggerExists(tableName, operation, jdbcConn)) {
@@ -64,7 +62,14 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
                         String sql = StringUtils.replace(sqlTemplate, "${tableName}", tableName);
                         sql = StringUtils.replace(sql, "${operationLower}", operation.toLowerCase());
                         sql = StringUtils.replace(sql, "${operationUpper}", operation);
+                        if (!"patient".equalsIgnoreCase(tableName)) {
+                            sql = StringUtils.replace(sql, "${assign_entity_id_statement}", DEFAULT_ASSIGN_ENTITY_ID_STMT);
+                        } else {
+                            //for patient we need to fetch the uuid from the referenced person table
+                            sql = StringUtils.replace(sql, "${assign_entity_id_statement}", PATIENT_ASSIGN_ENTITY_ID_STMT);
+                        }
                         sql = StringUtils.replace(sql, "${refRow}", "INSERT".equals(operation) ? "NEW" : "OLD");
+
                         stmt = jdbcConn.createStatement();
                         stmt.execute(sql);
                     } finally {
