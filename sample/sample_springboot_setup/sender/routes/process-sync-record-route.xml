@@ -17,7 +17,7 @@
                 <when>
                     <simple>${body.operation} == 'DELETE'</simple>
                     <setBody>
-                        <simple>{"DELETE":"${body.entityTableName}:${body.entityId}"}</simple>
+                        <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
                     </setBody>
                 </when>
                 <otherwise>
@@ -53,8 +53,8 @@
             <doCatch>
                 <exception>java.lang.Exception</exception>
                 <log loggingLevel="ERROR" message="${exception.printStackTrace()}" />
-                <log message="Updating the sync record status to FAILURE" />
-                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'FAILURE', status_message = '${exception.message}', sync_date = now() WHERE uuid = '${property.sync-record.uuid}'?dataSource=openmrsDataSource" />
+                <log message="Updating the sync record status to FAILED" />
+                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'FAILED', status_message = '${exception.message}', sync_date = now() WHERE uuid = '${property.sync-record.uuid}'?dataSource=openmrsDataSource" />
             </doCatch>
         </doTry>
 

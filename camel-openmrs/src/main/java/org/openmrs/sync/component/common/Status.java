@@ -1,5 +1,5 @@
 package org.openmrs.sync.component.common;
 
 public enum Status {
-    NEW, PROCESSING, SUCCESS, FAILURE
+    NEW, PROCESSING, SUCCESS, FAILED
 }
