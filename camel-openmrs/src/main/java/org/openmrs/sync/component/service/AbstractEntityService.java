@@ -1,10 +1,10 @@
 package org.openmrs.sync.component.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.entity.BaseEntity;
 import org.openmrs.sync.component.mapper.EntityToModelMapper;
 import org.openmrs.sync.component.mapper.ModelToEntityMapper;
+import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.repository.SyncEntityRepository;
 
 import java.time.LocalDateTime;
@@ -29,6 +29,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     /**
      * get the service entity name
+     *
      * @return enum
      */
     public abstract TableToSyncEnum getTableToSync();
@@ -79,6 +80,16 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
         Optional<E> entity = repository.findById(id);
         return entity.map(entityToModelMapper)
                 .orElse(null);
+    }
+
+    @Override
+    public void delete(String uuid) {
+        E entity = repository.findByUuid(uuid);
+        if (entity != null) {
+            repository.delete(entity);
+        } else {
+            log.warn("No " + getTableToSync().getEntityClass().getName() + " found matching uuid: " + uuid);
+        }
     }
 
     protected List<M> mapEntities(List<E> entities) {

@@ -15,54 +15,58 @@
         <to uri="file:{{camel.input.endpoint.file.location}}"/>
       </when>
       <otherwise>
-          <choice>
-              <when>
-                  <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
-                  <setProperty propertyName="rebuild-search-index">
-                      <constant>true</constant>
-                  </setProperty>
-                  <setProperty propertyName="resource">
-                      <constant>person</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource">
-                      <constant>name</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource-uuid">
-                      <jsonpath>$.model.uuid</jsonpath>
-                  </setProperty>
-              </when>
-              <when>
-                  <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
-                  <setProperty propertyName="rebuild-search-index">
-                      <constant>true</constant>
-                  </setProperty>
-                  <setProperty propertyName="resource">
-                      <constant>patient</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource">
-                      <constant>identifier</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource-uuid">
-                      <jsonpath>$.model.uuid</jsonpath>
-                  </setProperty>
-              </when>
-              <when>
-                  <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAttributeModel')]</jsonpath>
-                  <setProperty propertyName="rebuild-search-index">
-                      <constant>true</constant>
-                  </setProperty>
-                  <setProperty propertyName="resource">
-                      <constant>person</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource">
-                      <constant>attribute</constant>
-                  </setProperty>
-                  <setProperty propertyName="sub-resource-uuid">
-                      <jsonpath>$.model.uuid</jsonpath>
-                  </setProperty>
-              </when>
-          </choice>
-        <to uri="openmrs:load"/>
+          <when>
+              <!-- If this not a record for a deleted entity -->
+              <simple>${body.indexOf('DELETE:')} != 0</simple>
+              <choice>
+                  <when>
+                      <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
+                      <setProperty propertyName="rebuild-search-index">
+                          <constant>true</constant>
+                      </setProperty>
+                      <setProperty propertyName="resource">
+                          <constant>person</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource">
+                          <constant>name</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource-uuid">
+                          <jsonpath>$.model.uuid</jsonpath>
+                      </setProperty>
+                  </when>
+                  <when>
+                      <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
+                      <setProperty propertyName="rebuild-search-index">
+                          <constant>true</constant>
+                      </setProperty>
+                      <setProperty propertyName="resource">
+                          <constant>patient</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource">
+                          <constant>identifier</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource-uuid">
+                          <jsonpath>$.model.uuid</jsonpath>
+                      </setProperty>
+                  </when>
+                  <when>
+                      <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAttributeModel')]</jsonpath>
+                      <setProperty propertyName="rebuild-search-index">
+                          <constant>true</constant>
+                      </setProperty>
+                      <setProperty propertyName="resource">
+                          <constant>person</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource">
+                          <constant>attribute</constant>
+                      </setProperty>
+                      <setProperty propertyName="sub-resource-uuid">
+                          <jsonpath>$.model.uuid</jsonpath>
+                      </setProperty>
+                  </when>
+              </choice>
+          </when>
+          <to uri="openmrs:load"/>
       </otherwise>
     </choice>
       <choice>
@@ -71,9 +75,20 @@
               <setHeader headerName="Content-Type">
                   <constant>application/json</constant>
               </setHeader>
-              <setBody>
-                   <simple>{"resource": "${property.resource}", "subResource": "${property.sub-resource}", "uuid": "${property.sub-resource-uuid}"}</simple>
-               </setBody>
+              <choice>
+                  <when>
+                      <simple>${property.sub-resource-uuid} == null</simple>
+                      <setBody>
+                          <simple>{"resource": "${property.resource}", "subResource": "${property.sub-resource}"}</simple>
+                      </setBody>
+                  </when>
+                  <otherwise>
+                      <setBody>
+                          <simple>{"resource": "${property.resource}", "subResource": "${property.sub-resource}", "uuid": "${property.sub-resource-uuid}"}</simple>
+                      </setBody>
+                  </otherwise>
+              </choice>
+
               <log loggingLevel="DEBUG" message="Rebuilding search Index..." />
               <to uri="{{openmrs.baseUrl}}/ws/rest/v1/searchindexupdate?authMethod=Basic&amp;authUsername={{openmrs.username}}&amp;authPassword={{openmrs.password}}" />
           </when>

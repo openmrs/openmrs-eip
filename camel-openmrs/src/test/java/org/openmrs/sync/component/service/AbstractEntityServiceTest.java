@@ -1,21 +1,27 @@
 package org.openmrs.sync.component.service;
 
-import org.openmrs.sync.component.entity.MockedEntity;
-import org.openmrs.sync.component.mapper.EntityToModelMapper;
-import org.openmrs.sync.component.mapper.ModelToEntityMapper;
-import org.openmrs.sync.component.MockedModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.sync.component.MockedModel;
+import org.openmrs.sync.component.entity.MockedEntity;
+import org.openmrs.sync.component.mapper.EntityToModelMapper;
+import org.openmrs.sync.component.mapper.ModelToEntityMapper;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AbstractEntityServiceTest {
 
@@ -64,7 +70,7 @@ public class AbstractEntityServiceTest {
     public void save_entity_exists() {
         // Given
         MockedModel mockedModel = new MockedModel("uuid");
-        MockedEntity mockedEntity= new MockedEntity(null, "uuid");
+        MockedEntity mockedEntity = new MockedEntity(null, "uuid");
         MockedEntity mockedEntityInDb = new MockedEntity(1L, "uuid");
         when(repository.findByUuid("uuid")).thenReturn(mockedEntityInDb);
         when(repository.save(mockedEntityInDb)).thenReturn(mockedEntity);
@@ -83,7 +89,7 @@ public class AbstractEntityServiceTest {
     public void save_entity_does_not_exist() {
         // Given
         MockedModel mockedModel = new MockedModel("uuid");
-        MockedEntity mockedEntity= new MockedEntity(null, "uuid");
+        MockedEntity mockedEntity = new MockedEntity(null, "uuid");
         when(repository.findByUuid("uuid")).thenReturn(null);
         when(repository.save(mockedEntity)).thenReturn(mockedEntity);
         when(modelToEntityMapper.apply(mockedModel)).thenReturn(mockedEntity);
@@ -187,4 +193,26 @@ public class AbstractEntityServiceTest {
         assertNull(result);
         verify(entityToModelMapper, never()).apply(any());
     }
+
+    @Test
+    public void delete_shouldDeleteTheEntityMatchingTheModelUuid() {
+        final String uuid = "some-uuid";
+        MockedEntity mockedEntity = new MockedEntity(1L, uuid);
+        when(repository.findByUuid(uuid)).thenReturn(mockedEntity);
+
+        mockedEntityService.delete(uuid);
+
+        verify(repository).delete(mockedEntity);
+    }
+
+    @Test
+    public void delete_shouldNotCallDeleteIfThereIsNoEntityMatchingTheModelUuid() {
+        final String uuid = "some-uuid";
+        when(repository.findByUuid(uuid)).thenReturn(null);
+
+        mockedEntityService.delete(uuid);
+
+        verify(repository, never()).delete(any());
+    }
+
 }

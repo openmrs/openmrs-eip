@@ -9,6 +9,7 @@ public interface EntityService<M extends BaseModel> {
 
     /**
      * Saves an entity
+     *
      * @param entity the entity
      * @return BaseModel
      */
@@ -16,28 +17,40 @@ public interface EntityService<M extends BaseModel> {
 
     /**
      * get all models for the entity
+     *
      * @return a list of BaseModel
      */
     List<M> getAllModels();
 
     /**
      * getAll models for the entity
-     * @return a list of BaseModel
+     *
      * @param lastSyncDate
+     * @return a list of BaseModel
      */
     List<M> getModels(LocalDateTime lastSyncDate);
 
     /**
      * get model with the given uuid
-     * @return a BaseModel
+     *
      * @param uuid
+     * @return a BaseModel
      */
     M getModel(final String uuid);
 
     /**
      * get model with the given uuid
-     * @return a BaseModel
+     *
      * @param id
+     * @return a BaseModel
      */
     M getModel(final Long id);
+
+    /**
+     * Deletes the entity from the database that matches the specified uuid
+     *
+     * @param uuid the uuid of the entity to delete
+     */
+    void delete(String uuid);
+
 }
