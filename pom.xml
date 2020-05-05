@@ -141,4 +141,17 @@
     </plugins>
   </build>
 
+  <distributionManagement>
+    <repository>
+        <id>openmrs-repo-releases</id>
+        <name>OpenMRS Nexus Releases</name>
+        <url>https://openmrs.jfrog.io/openmrs/releases</url>
+    </repository>
+    <snapshotRepository>
+        <id>openmrs-repo-snapshots</id>
+        <name>OpenMRS Nexus Snapshots</name>
+        <url>https://openmrs.jfrog.io/openmrs/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 </project>

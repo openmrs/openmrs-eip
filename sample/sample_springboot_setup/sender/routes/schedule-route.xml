@@ -2,7 +2,7 @@
   <route id="schedule">
     <from uri="scheduler:sync?delay=1m"/>
       <!-- TODO process in configured batch sizes -->
-      <toD uri="sql:SELECT * from dbsync_sync_record WHERE status != 'SUCCESS' ORDER BY date_created?dataSource=openmrsDataSource&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
+      <toD uri="sql:SELECT * from dbsync_sync_record WHERE status != 'SUCCESS' ORDER BY date_created LIMIT 50?dataSource=openmrsDataSource&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
 
       <split streaming="true">
           <simple>${body}</simple>
