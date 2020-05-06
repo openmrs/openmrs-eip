@@ -26,11 +26,6 @@
             <column name="operation" type="varchar(6)">
                 <constraints nullable="false" />
             </column>
-            <column name="status" type="varchar(50)" defaultValue="NEW">
-                <constraints nullable="false" />
-            </column>
-            <column name="status_message" type="varchar(255)" />
-            <column name="sync_date" type="datetime" />
             <column name="date_created" type="datetime">
                 <constraints nullable="false" />
             </column>
@@ -38,18 +33,6 @@
                 <constraints nullable="false" unique="true" />
             </column>
         </createTable>
-    </changeSet>
-
-    <changeSet id="2020-04-30-22:01" author="wluyima">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="dbsync_sync_record_status_index"/>
-            </not>
-        </preConditions>
-        <comment>Add an index to the dbsync_sync_record.status column</comment>
-        <createIndex tableName="dbsync_sync_record" indexName="dbsync_sync_record_status_index">
-            <column name="status" />
-        </createIndex>
     </changeSet>
 
     <changeSet id="2020-04-30-22:02" author="wluyima">
@@ -66,6 +49,38 @@
 
     <changeSet id="2020-04-30-22:03" author="wluyima" runAlways="true">
         <customChange class="org.openmrs.sync.app.AddSyncTriggersCustomChangeSet" />
+    </changeSet>
+
+    <changeSet id="2020-05-05-23:00" author="wluyima">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="dbsync_sync_record_archive" />
+            </not>
+        </preConditions>
+        <comment>Add dbsync_sync_record_archive table</comment>
+        <createTable tableName="dbsync_sync_record_archive">
+            <column autoIncrement="true" name="id" type="bigint">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="entity_id" type="varchar(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_table_name" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation" type="varchar(6)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="archive_date" type="datetime">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>

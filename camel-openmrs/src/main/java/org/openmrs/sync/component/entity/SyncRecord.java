@@ -1,7 +1,7 @@
 package org.openmrs.sync.component.entity;
 
 
-import org.openmrs.sync.component.common.BaseStatefulEntity;
+import org.openmrs.sync.component.common.AbstractSyncEntity;
 import org.openmrs.sync.component.common.Operation;
 
 import javax.persistence.Column;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "dbsync_sync_record")
-public class SyncRecord extends BaseStatefulEntity {
+public class SyncRecord extends AbstractSyncEntity {
 
     public static final long serialVersionUID = 1;
 
@@ -88,7 +88,7 @@ public class SyncRecord extends BaseStatefulEntity {
     @Override
     public String toString() {
         return "SyncRecord {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation +
-                ", status=" + getStatus() + ", uuid=" + getUuid() + "}";
+                ", uuid=" + getUuid() + "}";
     }
 
 }

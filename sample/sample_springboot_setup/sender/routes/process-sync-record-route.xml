@@ -3,60 +3,55 @@
     <route id="process-sync-record" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="direct:process-sync-record" />
 
-        <doTry>
-            <log message=":" />
-            <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
+        <log message=":" />
+        <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
 
-            <log message="Processing sync record: ${body}" />
+        <log message="Processing sync record: ${body}" />
 
-            <setProperty propertyName="sync-record">
-                <simple>${body}</simple>
-            </setProperty>
+        <setProperty propertyName="sync-record">
+            <simple>${body}</simple>
+        </setProperty>
 
-            <choice>
-                <when>
-                    <simple>${body.operation} == 'DELETE'</simple>
-                    <setBody>
-                        <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
-                    </setBody>
-                </when>
-                <otherwise>
-                    <log message="Loading entity from DB..." />
+        <choice>
+            <when>
+                <simple>${body.operation} == 'DELETE'</simple>
+                <setBody>
+                    <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
+                </setBody>
+            </when>
+            <otherwise>
+                <log message="Loading entity from DB..." />
 
-                    <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
+                <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
 
-                    <!-- TODO cater for scenario where entity could have been deleted before just before this run,
-                        one option is to skip this record with hope that there is a delete sync record in the queue -->
+                <!-- TODO cater for scenario where entity could have been deleted before just before this run,
+                    one option is to skip this record with hope that there is a delete sync record in the queue -->
 
-                    <setBody>
-                        <jsonpath>$[0]</jsonpath>
-                    </setBody>
-                    <marshal>
-                        <json library="Jackson"/>
-                    </marshal>
-                </otherwise>
-            </choice>
+                <setBody>
+                    <jsonpath>$[0]</jsonpath>
+                </setBody>
+                <marshal>
+                    <json library="Jackson"/>
+                </marshal>
+            </otherwise>
+        </choice>
 
-            <log message="Loaded entity to be written to destination -> ${body}" />
+        <log message="Loaded entity to be written to destination -> ${body}" />
 
-            <!--<process ref="pgpEncryptService"/>-->
-            <to uri="{{camel.output.endpoint}}" />
+        <!--<process ref="pgpEncryptService"/>-->
+        <to uri="{{camel.output.endpoint}}" />
 
-            <setBody>
-                <simple>${property.sync-record}</simple>
-            </setBody>
+        <setBody>
+            <simple>${property.sync-record}</simple>
+        </setBody>
 
-            <log message="Updating the sync record status to SUCCESS" />
-            
-            <toD uri="sql:UPDATE dbsync_sync_record SET status = 'SUCCESS', status_message = null, sync_date = now() WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
+        <log message="Archiving the sync record" />
 
-            <doCatch>
-                <exception>java.lang.Exception</exception>
-                <log loggingLevel="ERROR" message="${exception.printStackTrace()}" />
-                <log message="Updating the sync record status to FAILED" />
-                <toD uri="sql:UPDATE dbsync_sync_record SET status = 'FAILED', status_message = '${exception.message}', sync_date = now() WHERE uuid = '${property.sync-record.uuid}'?dataSource=openmrsDataSource" />
-            </doCatch>
-        </doTry>
+        <toD uri="sql:INSERT INTO dbsync_sync_record_archive(entity_id, entity_table_name, operation, date_created, uuid, archive_date) SELECT entity_id, entity_table_name, operation, date_created, uuid, now() FROM dbsync_sync_record WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
+
+        <log message="Deleting the sync record" />
+
+        <toD uri="sql:DELETE FROM dbsync_sync_record WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
 
     </route>
 
