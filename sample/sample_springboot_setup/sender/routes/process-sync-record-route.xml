@@ -4,7 +4,6 @@
         <from uri="direct:process-sync-record" />
 
         <log message=":" />
-        <!-- TODO set status of the record to processing, wrap all code in a try catch clause and set result status -->
 
         <log message="Processing sync record: ${body}" />
 
@@ -24,7 +23,7 @@
 
                 <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
 
-                <!-- TODO cater for scenario where entity could have been deleted before just before this run,
+                <!-- TODO cater for scenario where entity could have been deleted just before this run,
                     one option is to skip this record with hope that there is a delete sync record in the queue -->
 
                 <setBody>
@@ -36,10 +35,35 @@
             </otherwise>
         </choice>
 
-        <log message="Loaded entity to be written to destination -> ${body}" />
+        <log message="Loaded entity to be written to destinations -> ${body}" />
 
-        <!--<process ref="pgpEncryptService"/>-->
-        <to uri="{{camel.output.endpoint}}" />
+        <setProperty propertyName="entity-payload">
+            <simple>body</simple>
+        </setProperty>
+
+        <log message="Configured destinations -> {{sync-record.destinations.dir}}" />
+
+        <split>
+            <simple>{{sync-record.destinations.dir}}</simple>
+            <setProperty propertyName="sync-record-destination">
+                <simple>body</simple>
+            </setProperty>
+
+            <log message="Publishing to destination: ${property.sync-record-destination}" />
+            
+            <setBody>
+                <simple>${property.sync-record}</simple>
+            </setBody>
+            <marshal>
+                <json library="Jackson" />
+            </marshal>
+            <setBody>
+                <simple>{"syncRecord": ${body}, "entity": ${property.entity-payload}}</simple>
+            </setBody>
+            
+            <!--<process ref="pgpEncryptService"/>-->
+            <toD uri="{{camel.output.endpoint}}/${property.sync-record-destination}" />
+        </split>
 
         <setBody>
             <simple>${property.sync-record}</simple>

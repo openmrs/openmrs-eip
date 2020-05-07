@@ -1,0 +1,12 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="db-sync" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="{{camel.output.endpoint}}/db-sync" />
+
+        <log message="Writing to db sync queue -> ${body}" />
+
+        <to uri="{{camel.output.endpoint}}" />
+
+    </route>
+
+</routes>
