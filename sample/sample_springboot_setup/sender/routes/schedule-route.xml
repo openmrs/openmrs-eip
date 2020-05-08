@@ -6,7 +6,7 @@
 
       <split streaming="true">
           <simple>${body}</simple>
-          <to uri="direct:process-sync-record" />
+          <to uri="direct:publish-sync-record-route" />
       </split>
   </route>
 </routes>

@@ -1,44 +1,14 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="process-sync-record" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="direct:process-sync-record" />
+    <route id="publish-sync-record-route" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="direct:publish-sync-record-route" />
 
         <log message=":" />
 
-        <log message="Processing sync record: ${body}" />
+        <log message="Publishing sync record: ${body}" />
 
         <setProperty propertyName="sync-record">
             <simple>${body}</simple>
-        </setProperty>
-
-        <choice>
-            <when>
-                <simple>${body.operation} == 'DELETE'</simple>
-                <setBody>
-                    <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
-                </setBody>
-            </when>
-            <otherwise>
-                <log message="Loading entity from DB..." />
-
-                <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
-
-                <!-- TODO cater for scenario where entity could have been deleted just before this run,
-                    one option is to skip this record with hope that there is a delete sync record in the queue -->
-
-                <setBody>
-                    <jsonpath>$[0]</jsonpath>
-                </setBody>
-                <marshal>
-                    <json library="Jackson"/>
-                </marshal>
-            </otherwise>
-        </choice>
-
-        <log message="Loaded entity to be written to destinations -> ${body}" />
-
-        <setProperty propertyName="entity-payload">
-            <simple>body</simple>
         </setProperty>
 
         <log message="Configured destinations -> {{sync-record.destinations.dir}}" />
@@ -58,7 +28,7 @@
                 <json library="Jackson" />
             </marshal>
             <setBody>
-                <simple>{"syncRecord": ${body}, "entity": ${property.entity-payload}}</simple>
+                <simple>body</simple>
             </setBody>
             
             <!--<process ref="pgpEncryptService"/>-->

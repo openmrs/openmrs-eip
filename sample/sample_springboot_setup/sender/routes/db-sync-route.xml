@@ -3,7 +3,45 @@
     <route id="db-sync" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="{{camel.output.endpoint}}/db-sync" />
 
-        <log message="Writing to db sync queue -> ${body}" />
+        <log message="Processing sync record: ${body}" />
+
+        <unmarshal>
+            <json library="Jackson" unmarshalTypeName="org.openmrs.sync.component.entity.SyncRecord" />
+        </unmarshal>
+
+        <setProperty propertyName="sync-record">
+            <simple>body</simple>
+        </setProperty>
+
+        <choice>
+            <when>
+                <simple>${body.operation} == 'DELETE'</simple>
+                <setBody>
+                    <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
+                </setBody>
+
+                <log message="Deleted entity payload -> ${body}" />
+            </when>
+            <otherwise>
+                <log message="Loading entity from DB..." />
+
+                <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
+
+                <log message="Loaded entity: -> ${body}" />
+
+                <!-- TODO cater for scenario where entity could have been deleted just before this run,
+                    one option is to skip this record with hope that there is a delete sync record in the queue -->
+
+                <setBody>
+                    <jsonpath>$[0]</jsonpath>
+                </setBody>
+                <marshal>
+                    <json library="Jackson" />
+                </marshal>
+            </otherwise>
+        </choice>
+
+        <log message="Writing entity to sync queue: {{camel.output.endpoint}}" />
 
         <to uri="{{camel.output.endpoint}}" />
 
