@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AllergyModel extends BaseModel {
+public class AllergyModel extends BaseChangeableDataModel {
 
     private String patientUuid;
 

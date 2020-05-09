@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ObservationModel extends BaseModel {
+public class ObservationModel extends BaseDataModel {
 
     private String personUuid;
 

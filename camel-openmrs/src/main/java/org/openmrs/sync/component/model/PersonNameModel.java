@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PersonNameModel extends BaseModel {
+public class PersonNameModel extends BaseChangeableDataModel {
 
     private boolean preferred;
 

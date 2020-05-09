@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ConditionModel extends BaseModel {
+public class ConditionModel extends BaseChangeableDataModel {
 
     private String additionalDetail;
 

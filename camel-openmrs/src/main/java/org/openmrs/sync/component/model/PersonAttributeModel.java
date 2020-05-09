@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PersonAttributeModel extends BaseModel {
+public class PersonAttributeModel extends BaseChangeableDataModel {
 
     private String value;
 

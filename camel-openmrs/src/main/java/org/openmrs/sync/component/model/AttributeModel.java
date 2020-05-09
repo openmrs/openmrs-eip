@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AttributeModel extends BaseModel {
+public class AttributeModel extends BaseChangeableDataModel {
 
     private String referencedEntityUuid;
 

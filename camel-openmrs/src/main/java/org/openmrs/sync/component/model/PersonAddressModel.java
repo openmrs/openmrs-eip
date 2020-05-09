@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PersonAddressModel extends BaseModel {
+public class PersonAddressModel extends BaseChangeableDataModel {
 
     private String personUuid;
 

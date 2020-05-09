@@ -37,7 +37,7 @@ public class ForEachUuidAttributeFunctionTest {
 
         // Then
         assertEquals(entity, result);
-        verify(action, times(5)).accept(any(Context.class), any(String.class));
+        verify(action, times(2)).accept(any(Context.class), any(String.class));
     }
 
     private Context<MockedEntity, MockedModel> getContext(final MockedEntity entity) {

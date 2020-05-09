@@ -13,23 +13,58 @@ public abstract class BaseModel {
 
     private LocalDateTime dateCreated;
 
-    private String changedByUuid;
+    /**
+     * Gets the uuid
+     *
+     * @return the uuid
+     */
+    public String getUuid() {
+        return uuid;
+    }
 
-    private LocalDateTime dateChanged;
+    /**
+     * Sets the uuid
+     *
+     * @param uuid the uuid to set
+     */
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-    private boolean voided;
+    /**
+     * Gets the creatorUuid
+     *
+     * @return the creatorUuid
+     */
+    public String getCreatorUuid() {
+        return creatorUuid;
+    }
 
-    private String voidedByUuid;
+    /**
+     * Sets the creatorUuid
+     *
+     * @param creatorUuid the creatorUuid to set
+     */
+    public void setCreatorUuid(String creatorUuid) {
+        this.creatorUuid = creatorUuid;
+    }
 
-    private LocalDateTime dateVoided;
+    /**
+     * Gets the dateCreated
+     *
+     * @return the dateCreated
+     */
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
 
-    private String voidReason;
+    /**
+     * Sets the dateCreated
+     *
+     * @param dateCreated the dateCreated to set
+     */
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-    private boolean retired;
-
-    private String retiredByUuid;
-
-    private LocalDateTime dateRetired;
-
-    private String retiredReason;
 }

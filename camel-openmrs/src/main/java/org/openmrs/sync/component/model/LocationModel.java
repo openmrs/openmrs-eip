@@ -6,7 +6,7 @@ import org.openmrs.sync.component.common.Address;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class LocationModel extends BaseModel {
+public class LocationModel extends BaseChangeableMetadataModel {
 
     private String name;
 

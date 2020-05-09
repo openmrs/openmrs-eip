@@ -1,7 +1,8 @@
 package org.openmrs.sync.component.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,7 +10,7 @@ import java.time.LocalTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PersonModel extends BaseModel {
+public class PersonModel extends BaseChangeableDataModel {
 
     private String gender;
 

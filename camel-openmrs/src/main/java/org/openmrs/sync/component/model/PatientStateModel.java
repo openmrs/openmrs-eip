@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PatientStateModel extends BaseModel {
+public class PatientStateModel extends BaseChangeableDataModel {
 
     private String patientProgramUuid;
 

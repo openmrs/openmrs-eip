@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class EncounterModel extends BaseModel {
+public class EncounterModel extends BaseChangeableDataModel {
 
     private String encounterTypeUuid;
 

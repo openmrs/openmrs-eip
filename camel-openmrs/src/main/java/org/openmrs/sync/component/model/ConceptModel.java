@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ConceptModel extends BaseModel {
+public class ConceptModel extends BaseChangeableMetadataModel {
 
     private String datatypeUuid;
 
