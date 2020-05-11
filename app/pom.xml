@@ -18,6 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <liquibaseVersion>3.8.9</liquibaseVersion>
+    <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
   </properties>
 
   <dependencies>
@@ -81,6 +82,15 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jpa</artifactId>
     </dependency>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-artemis</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.activemq</groupId>
+          <artifactId>artemis-jms-server</artifactId>
+          <version>2.6.4</version>
+      </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -94,6 +104,16 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-base</artifactId>
+      <version>${camelActiveMqVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-activemq</artifactId>
+      <version>${camelActiveMqVersion}</version>
     </dependency>
   </dependencies>
 

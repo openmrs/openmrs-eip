@@ -11,10 +11,10 @@
             <simple>${body}</simple>
         </setProperty>
 
-        <log message="Configured destinations -> {{sync-record.destinations.dir}}" />
+        <log message="Configured destinations -> {{sync-record.destinations}}" />
 
-        <split>
-            <simple>{{sync-record.destinations.dir}}</simple>
+        <split stopOnException="true">
+            <simple>{{sync-record.destinations}}</simple>
             <setProperty propertyName="sync-record-destination">
                 <simple>body</simple>
             </setProperty>
@@ -32,7 +32,7 @@
             </setBody>
             
             <!--<process ref="pgpEncryptService"/>-->
-            <toD uri="{{camel.output.endpoint}}/${property.sync-record-destination}" />
+            <toD uri="activemq:${property.sync-record-destination}" />
         </split>
 
         <setBody>

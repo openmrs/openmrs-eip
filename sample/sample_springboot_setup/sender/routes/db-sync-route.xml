@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     <route id="db-sync" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="{{camel.output.endpoint}}/db-sync" />
+        <from uri="activemq:db-sync" />
 
         <log message="Processing sync record: ${body}" />
 
