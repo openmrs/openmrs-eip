@@ -50,10 +50,18 @@ public class OrderLight extends VoidableLightEntity {
 
     @NotNull
     @Column(name = "order_action")
-    private String orderAction;
+    private String action;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "care_setting")
     private CareSettingLight careSetting;
+
+    /*@NotNull
+    @Column(name = "date_activated")
+    private LocalDateTime dateActivated;
+
+    @NotNull
+    private String urgency;*/
+
 }
