@@ -91,7 +91,16 @@ public class EntityServiceFacade {
 
     private <E extends BaseEntity, M extends BaseModel> AbstractEntityService<E, M> getService(final TableToSyncEnum tableToSync) {
         return services.stream()
-                .filter(service -> service.getTableToSync().equals(tableToSync))
+                .filter(service -> {
+                    if (service.getTableToSync().equals(tableToSync)) {
+                        return true;
+                    } else if (service.getTableToSync().name().equals(TableToSyncEnum.ORDERS.name()) &&
+                            tableToSync.name().equals(TableToSyncEnum.DRUG_ORDER.name())) {
+                        //TODO Add an implementation that auto discovers subclass tables
+                        return true;
+                    }
+                    return false;
+                })
                 .map(service -> (AbstractEntityService<E, M>) service)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown entity " + tableToSync.name()));

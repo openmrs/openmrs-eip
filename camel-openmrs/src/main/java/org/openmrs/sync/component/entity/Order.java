@@ -1,5 +1,6 @@
 package org.openmrs.sync.component.entity;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.sync.component.entity.light.CareSettingLight;
 import org.openmrs.sync.component.entity.light.ConceptLight;
@@ -13,6 +14,8 @@ import org.openmrs.sync.component.entity.light.ProviderLight;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,7 +26,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "orders")
 @AttributeOverride(name = "id", column = @Column(name = "order_id"))
-@EqualsAndHashCode(callSuper = true)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Order extends BaseDataEntity {
 
     @NotNull

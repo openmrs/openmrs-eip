@@ -34,6 +34,8 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
 
     private static final String PATIENT_ASSIGN_ENTITY_ID_STMT = "SELECT uuid INTO @entity_id from person where person_id = ${refRow}.patient_id";
 
+    private static final String ORDER_SUBCLASS_ASSIGN_ENTITY_ID_STMT = "SELECT uuid INTO @entity_id from orders where order_id = ${refRow}.order_id";
+
     private static final String[] OPERATIONS = new String[]{"INSERT", "UPDATE", "DELETE"};
 
     @Override
@@ -62,11 +64,15 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
                         String sql = StringUtils.replace(sqlTemplate, "${tableName}", tableName);
                         sql = StringUtils.replace(sql, "${operationLower}", operation.toLowerCase());
                         sql = StringUtils.replace(sql, "${operationUpper}", operation);
-                        if (!"patient".equalsIgnoreCase(tableName)) {
-                            sql = StringUtils.replace(sql, "${assign_entity_id_statement}", DEFAULT_ASSIGN_ENTITY_ID_STMT);
-                        } else {
-                            //for patient we need to fetch the uuid from the referenced person table
+                        //TODO Replace these if clauses with an implementation that auto detects tables for subclasses
+                        if ("patient".equalsIgnoreCase(tableName)) {
+                            //for patient, fetch the uuid from the referenced row in the person table
                             sql = StringUtils.replace(sql, "${assign_entity_id_statement}", PATIENT_ASSIGN_ENTITY_ID_STMT);
+                        } else if (TableToSyncEnum.DRUG_ORDER.name().equalsIgnoreCase(tableName)) {
+                            //for order subclasses, fetch the uuid from the referenced row in the orders table
+                            sql = StringUtils.replace(sql, "${assign_entity_id_statement}", ORDER_SUBCLASS_ASSIGN_ENTITY_ID_STMT);
+                        } else {
+                            sql = StringUtils.replace(sql, "${assign_entity_id_statement}", DEFAULT_ASSIGN_ENTITY_ID_STMT);
                         }
                         sql = StringUtils.replace(sql, "${refRow}", "INSERT".equals(operation) ? "NEW" : "OLD");
 

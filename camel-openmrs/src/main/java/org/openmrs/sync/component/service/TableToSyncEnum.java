@@ -5,6 +5,7 @@ import org.openmrs.sync.component.entity.BaseEntity;
 import org.openmrs.sync.component.entity.Concept;
 import org.openmrs.sync.component.entity.ConceptAttribute;
 import org.openmrs.sync.component.entity.Condition;
+import org.openmrs.sync.component.entity.DrugOrder;
 import org.openmrs.sync.component.entity.Encounter;
 import org.openmrs.sync.component.entity.EncounterDiagnosis;
 import org.openmrs.sync.component.entity.Location;
@@ -29,6 +30,7 @@ import org.openmrs.sync.component.model.BaseModel;
 import org.openmrs.sync.component.model.ConceptAttributeModel;
 import org.openmrs.sync.component.model.ConceptModel;
 import org.openmrs.sync.component.model.ConditionModel;
+import org.openmrs.sync.component.model.DrugOrderModel;
 import org.openmrs.sync.component.model.EncounterDiagnosisModel;
 import org.openmrs.sync.component.model.EncounterModel;
 import org.openmrs.sync.component.model.LocationModel;
@@ -69,7 +71,8 @@ public enum TableToSyncEnum {
     ALLERGY(Allergy.class, AllergyModel.class),
     PERSON_ADDRESS(PersonAddress.class, PersonAddressModel.class),
     PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class),
-    ORDERS(Order.class, OrderModel.class);
+    ORDERS(Order.class, OrderModel.class),
+    DRUG_ORDER(DrugOrder.class, DrugOrderModel.class);
     //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
