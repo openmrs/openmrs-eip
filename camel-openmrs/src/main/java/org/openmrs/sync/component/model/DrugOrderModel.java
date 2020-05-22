@@ -35,6 +35,10 @@ public class DrugOrderModel extends OrderModel {
 
     private Boolean dispenseAsWritten;
 
+    private String frequencyUuid;
+
+    private String dosingType;
+
     /**
      * Gets the dose
      *
@@ -303,5 +307,41 @@ public class DrugOrderModel extends OrderModel {
      */
     public void setDispenseAsWritten(Boolean dispenseAsWritten) {
         this.dispenseAsWritten = dispenseAsWritten;
+    }
+
+    /**
+     * Gets the frequencyUuid
+     *
+     * @return the frequencyUuid
+     */
+    public String getFrequencyUuid() {
+        return frequencyUuid;
+    }
+
+    /**
+     * Sets the frequencyUuid
+     *
+     * @param frequencyUuid the frequencyUuid to set
+     */
+    public void setFrequencyUuid(String frequencyUuid) {
+        this.frequencyUuid = frequencyUuid;
+    }
+
+    /**
+     * Gets the dosingType
+     *
+     * @return the dosingType
+     */
+    public String getDosingType() {
+        return dosingType;
+    }
+
+    /**
+     * Sets the dosingType
+     *
+     * @param dosingType the dosingType to set
+     */
+    public void setDosingType(String dosingType) {
+        this.dosingType = dosingType;
     }
 }

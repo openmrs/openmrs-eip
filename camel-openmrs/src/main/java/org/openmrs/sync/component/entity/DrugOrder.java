@@ -2,6 +2,7 @@ package org.openmrs.sync.component.entity;
 
 import org.openmrs.sync.component.entity.light.ConceptLight;
 import org.openmrs.sync.component.entity.light.DrugLight;
+import org.openmrs.sync.component.entity.light.OrderFrequencyLight;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -67,9 +68,12 @@ public class DrugOrder extends Order {
     @Column(name = "drug_non_coded")
     private String drugNonCoded;
 
-    //private OrderFrequency frequency;
+    @ManyToOne
+    @JoinColumn(name = "frequency")
+    private OrderFrequencyLight frequency;
 
-    //private Class<? extends DosingInstructions> dosingType = SimpleDosingInstructions.class;
+    @Column(name = "dosing_type")
+    private String dosingType;
 
     /**
      * Gets the dose
@@ -344,6 +348,42 @@ public class DrugOrder extends Order {
     @Override
     public boolean wasModifiedAfter(BaseEntity entity) {
         return false;
+    }
+
+    /**
+     * Gets the frequency
+     *
+     * @return the frequency
+     */
+    public OrderFrequencyLight getFrequency() {
+        return frequency;
+    }
+
+    /**
+     * Sets the frequency
+     *
+     * @param frequency the frequency to set
+     */
+    public void setFrequency(OrderFrequencyLight frequency) {
+        this.frequency = frequency;
+    }
+
+    /**
+     * Gets the dosingType
+     *
+     * @return the dosingType
+     */
+    public String getDosingType() {
+        return dosingType;
+    }
+
+    /**
+     * Sets the dosingType
+     *
+     * @param dosingType the dosingType to set
+     */
+    public void setDosingType(String dosingType) {
+        this.dosingType = dosingType;
     }
 
 }

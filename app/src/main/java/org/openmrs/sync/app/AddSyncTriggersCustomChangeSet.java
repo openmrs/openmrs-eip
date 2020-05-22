@@ -68,7 +68,8 @@ public class AddSyncTriggersCustomChangeSet implements CustomTaskChange {
                         if ("patient".equalsIgnoreCase(tableName)) {
                             //for patient, fetch the uuid from the referenced row in the person table
                             sql = StringUtils.replace(sql, "${assign_entity_id_statement}", PATIENT_ASSIGN_ENTITY_ID_STMT);
-                        } else if (TableToSyncEnum.DRUG_ORDER.name().equalsIgnoreCase(tableName)) {
+                        } else if (TableToSyncEnum.DRUG_ORDER.name().equalsIgnoreCase(tableName) ||
+                                TableToSyncEnum.TEST_ORDER.name().equalsIgnoreCase(tableName)) {
                             //for order subclasses, fetch the uuid from the referenced row in the orders table
                             sql = StringUtils.replace(sql, "${assign_entity_id_statement}", ORDER_SUBCLASS_ASSIGN_ENTITY_ID_STMT);
                         } else {

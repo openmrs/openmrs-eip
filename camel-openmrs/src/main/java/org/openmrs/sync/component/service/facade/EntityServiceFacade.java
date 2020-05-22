@@ -95,7 +95,8 @@ public class EntityServiceFacade {
                     if (service.getTableToSync().equals(tableToSync)) {
                         return true;
                     } else if (service.getTableToSync().name().equals(TableToSyncEnum.ORDERS.name()) &&
-                            tableToSync.name().equals(TableToSyncEnum.DRUG_ORDER.name())) {
+                            (tableToSync.name().equals(TableToSyncEnum.DRUG_ORDER.name()) ||
+                                    tableToSync.name().equals(TableToSyncEnum.TEST_ORDER.name()))) {
                         //TODO Add an implementation that auto discovers subclass tables
                         return true;
                     }

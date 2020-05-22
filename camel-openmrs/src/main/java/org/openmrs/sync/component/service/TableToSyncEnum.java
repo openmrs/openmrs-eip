@@ -21,6 +21,7 @@ import org.openmrs.sync.component.entity.PersonAddress;
 import org.openmrs.sync.component.entity.PersonAttribute;
 import org.openmrs.sync.component.entity.PersonName;
 import org.openmrs.sync.component.entity.ProviderAttribute;
+import org.openmrs.sync.component.entity.TestOrder;
 import org.openmrs.sync.component.entity.Visit;
 import org.openmrs.sync.component.entity.VisitAttribute;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
@@ -44,6 +45,7 @@ import org.openmrs.sync.component.model.PersonAddressModel;
 import org.openmrs.sync.component.model.PersonAttributeModel;
 import org.openmrs.sync.component.model.PersonModel;
 import org.openmrs.sync.component.model.PersonNameModel;
+import org.openmrs.sync.component.model.TestOrderModel;
 import org.openmrs.sync.component.model.VisitAttributeModel;
 import org.openmrs.sync.component.model.VisitModel;
 
@@ -72,7 +74,8 @@ public enum TableToSyncEnum {
     PERSON_ADDRESS(PersonAddress.class, PersonAddressModel.class),
     PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class),
     ORDERS(Order.class, OrderModel.class),
-    DRUG_ORDER(DrugOrder.class, DrugOrderModel.class);
+    DRUG_ORDER(DrugOrder.class, DrugOrderModel.class),
+    TEST_ORDER(TestOrder.class, TestOrderModel.class);
     //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
