@@ -12,6 +12,7 @@ import org.openmrs.sync.component.entity.Location;
 import org.openmrs.sync.component.entity.LocationAttribute;
 import org.openmrs.sync.component.entity.Observation;
 import org.openmrs.sync.component.entity.Order;
+import org.openmrs.sync.component.entity.OrderFrequency;
 import org.openmrs.sync.component.entity.Patient;
 import org.openmrs.sync.component.entity.PatientIdentifier;
 import org.openmrs.sync.component.entity.PatientProgram;
@@ -36,6 +37,7 @@ import org.openmrs.sync.component.model.EncounterDiagnosisModel;
 import org.openmrs.sync.component.model.EncounterModel;
 import org.openmrs.sync.component.model.LocationModel;
 import org.openmrs.sync.component.model.ObservationModel;
+import org.openmrs.sync.component.model.OrderFrequencyModel;
 import org.openmrs.sync.component.model.OrderModel;
 import org.openmrs.sync.component.model.PatientIdentifierModel;
 import org.openmrs.sync.component.model.PatientModel;
@@ -75,7 +77,8 @@ public enum TableToSyncEnum {
     PATIENT_IDENTIFIER(PatientIdentifier.class, PatientIdentifierModel.class),
     ORDERS(Order.class, OrderModel.class),
     DRUG_ORDER(DrugOrder.class, DrugOrderModel.class),
-    TEST_ORDER(TestOrder.class, TestOrderModel.class);
+    TEST_ORDER(TestOrder.class, TestOrderModel.class),
+    ORDER_FREQUENCY(OrderFrequency.class, OrderFrequencyModel.class);
     //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
