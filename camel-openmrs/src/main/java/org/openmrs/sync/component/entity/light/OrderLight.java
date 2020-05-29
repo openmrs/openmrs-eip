@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -57,11 +58,11 @@ public class OrderLight extends VoidableLightEntity {
     @JoinColumn(name = "care_setting")
     private CareSettingLight careSetting;
 
-    /*@NotNull
+    @NotNull
     @Column(name = "date_activated")
     private LocalDateTime dateActivated;
 
     @NotNull
-    private String urgency;*/
+    private String urgency;
 
 }

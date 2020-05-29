@@ -3,7 +3,7 @@ package org.openmrs.sync.component.model;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public class OrderFrequencyModel extends BaseChangeableDataModel {
+public class OrderFrequencyModel extends BaseChangeableMetadataModel {
 
     private Double frequencyPerDay;
 
