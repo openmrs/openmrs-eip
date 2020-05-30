@@ -19,7 +19,7 @@ public class OpenmrsExtractPersonITest extends OpenmrsExtractEndpointITest {
     public void extract() throws JSONException {
         // Given
         CamelInitObect camelInitObect = CamelInitObect.builder()
-                .tableToSync("person")
+                .tableToSync("PERSON")
                 .lastSyncDate(date)
                 .build();
 

@@ -1,20 +1,20 @@
 package org.openmrs.sync.component.camel;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
-
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
-import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
+import org.apache.camel.support.DefaultEndpoint;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
+
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 
 @UriEndpoint(
         firstVersion = "1.0.0",
@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext;
 public class OpenmrsEndpoint extends DefaultEndpoint {
 
     @UriPath(name = "action")
-    @Metadata(required = "true")
+    @Metadata(required = true)
     private SyncActionEnum action;
 
     @UriParam(label = "tableToSync")

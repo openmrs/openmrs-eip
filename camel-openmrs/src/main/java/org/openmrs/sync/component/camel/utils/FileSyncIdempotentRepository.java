@@ -1,6 +1,6 @@
 package org.openmrs.sync.component.camel.utils;
 
-import org.apache.camel.processor.idempotent.FileIdempotentRepository;
+import org.apache.camel.support.processor.idempotent.FileIdempotentRepository;
 import org.openmrs.sync.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;

@@ -9,7 +9,7 @@
             <json library="Jackson" unmarshalTypeName="org.openmrs.sync.component.entity.SyncRecord" />
         </unmarshal>
 
-        <setProperty propertyName="sync-record">
+        <setProperty name="sync-record">
             <simple>body</simple>
         </setProperty>
 
@@ -25,7 +25,7 @@
             <otherwise>
                 <log message="Loading entity from DB..." />
 
-                <toD uri="openmrs:extract?tableToSync=${body.entityTableName}&amp;uuid=${body.entityId}" />
+                <toD uri="openmrs:extract?tableToSync=${body.entityTableName().toUpperCase()}&amp;uuid=${body.entityId}" />
 
                 <log message="Loaded entity: -> ${body}" />
 

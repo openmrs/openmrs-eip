@@ -1,6 +1,6 @@
 package org.openmrs.sync.component.camel;
 
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.springframework.context.ApplicationContext;
 
 public abstract class AbstractOpenmrsProducer extends DefaultProducer {

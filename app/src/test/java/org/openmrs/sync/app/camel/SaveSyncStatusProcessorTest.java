@@ -1,15 +1,8 @@
 package org.openmrs.sync.app.camel;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.util.Optional;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +12,13 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.sync.app.management.entity.TableSyncStatus;
 import org.openmrs.sync.app.management.repository.TableSyncStatusRepository;
 import org.openmrs.sync.component.service.TableToSyncEnum;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SaveSyncStatusProcessorTest {
 

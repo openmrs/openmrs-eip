@@ -21,46 +21,46 @@
               <choice>
                   <when>
                       <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
-                      <setProperty propertyName="rebuild-search-index">
+                      <setProperty name="rebuild-search-index">
                           <constant>true</constant>
                       </setProperty>
-                      <setProperty propertyName="resource">
+                      <setProperty name="resource">
                           <constant>person</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource">
+                      <setProperty name="sub-resource">
                           <constant>name</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource-uuid">
+                      <setProperty name="sub-resource-uuid">
                           <jsonpath>$.model.uuid</jsonpath>
                       </setProperty>
                   </when>
                   <when>
                       <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
-                      <setProperty propertyName="rebuild-search-index">
+                      <setProperty name="rebuild-search-index">
                           <constant>true</constant>
                       </setProperty>
-                      <setProperty propertyName="resource">
+                      <setProperty name="resource">
                           <constant>patient</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource">
+                      <setProperty name="sub-resource">
                           <constant>identifier</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource-uuid">
+                      <setProperty name="sub-resource-uuid">
                           <jsonpath>$.model.uuid</jsonpath>
                       </setProperty>
                   </when>
                   <when>
                       <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAttributeModel')]</jsonpath>
-                      <setProperty propertyName="rebuild-search-index">
+                      <setProperty name="rebuild-search-index">
                           <constant>true</constant>
                       </setProperty>
-                      <setProperty propertyName="resource">
+                      <setProperty name="resource">
                           <constant>person</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource">
+                      <setProperty name="sub-resource">
                           <constant>attribute</constant>
                       </setProperty>
-                      <setProperty propertyName="sub-resource-uuid">
+                      <setProperty name="sub-resource-uuid">
                           <jsonpath>$.model.uuid</jsonpath>
                       </setProperty>
                   </when>
@@ -71,20 +71,20 @@
     </choice>
       <choice>
           <when>
-              <simple>${property.rebuild-search-index} == true</simple>
-              <setHeader headerName="Content-Type">
+              <simple>${exchangeProperty.rebuild-search-index} == true</simple>
+              <setHeader name="Content-Type">
                   <constant>application/json</constant>
               </setHeader>
               <choice>
                   <when>
-                      <simple>${property.sub-resource-uuid} == null</simple>
+                      <simple>${exchangeProperty.sub-resource-uuid} == null</simple>
                       <setBody>
-                          <simple>{"resource": "${property.resource}", "subResource": "${property.sub-resource}"}</simple>
+                          <simple>{"resource": "${exchangeProperty.resource}", "subResource": "${exchangeProperty.sub-resource}"}</simple>
                       </setBody>
                   </when>
                   <otherwise>
                       <setBody>
-                          <simple>{"resource": "${property.resource}", "subResource": "${property.sub-resource}", "uuid": "${property.sub-resource-uuid}"}</simple>
+                          <simple>{"resource": "${exchangeProperty.resource}", "subResource": "${exchangeProperty.sub-resource}", "uuid": "${exchangeProperty.sub-resource-uuid}"}</simple>
                       </setBody>
                   </otherwise>
               </choice>

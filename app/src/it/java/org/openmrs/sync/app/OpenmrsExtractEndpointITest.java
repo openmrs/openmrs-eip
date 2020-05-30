@@ -2,9 +2,14 @@ package org.openmrs.sync.app;
 
 import lombok.Builder;
 import lombok.Data;
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.EndpointInject;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -18,12 +23,11 @@ import org.openmrs.sync.component.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.Security;
 import java.time.LocalDateTime;
 
-@RunWith(SpringRunner.class)
+@RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = TestConfig.class)
 public abstract class OpenmrsExtractEndpointITest {
 

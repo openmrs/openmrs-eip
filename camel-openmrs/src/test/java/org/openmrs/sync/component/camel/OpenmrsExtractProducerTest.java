@@ -1,12 +1,8 @@
 package org.openmrs.sync.component.camel;
 
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +13,10 @@ import org.openmrs.sync.component.model.PersonModel;
 import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationContext;
+
+import java.util.Arrays;
+
+import static org.mockito.Mockito.when;
 
 public class OpenmrsExtractProducerTest {
 
@@ -66,26 +66,26 @@ public class OpenmrsExtractProducerTest {
 
     private String expectedJson(final String uuid) {
         return "{" +
-                    "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
-                    "\"model\": {" +
-                        "\"uuid\":\"" + uuid + "\"," +
-                        "\"creatorUuid\":null," +
-                        "\"dateCreated\":null," +
-                        "\"changedByUuid\":null," +
-                        "\"dateChanged\":null," +
-                        "\"voided\":false," +
-                        "\"voidedByUuid\":null," +
-                        "\"dateVoided\":null," +
-                        "\"voidReason\":null," +
-                        "\"gender\":null," +
-                        "\"birthdate\":null," +
-                        "\"birthdateEstimated\":false," +
-                        "\"dead\":false," +
-                        "\"deathDate\":null," +
-                        "\"causeOfDeathUuid\":null," +
-                        "\"deathdateEstimated\":false," +
-                        "\"birthtime\":null" +
-                    "}" +
+                "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
+                "\"model\": {" +
+                "\"uuid\":\"" + uuid + "\"," +
+                "\"creatorUuid\":null," +
+                "\"dateCreated\":null," +
+                "\"changedByUuid\":null," +
+                "\"dateChanged\":null," +
+                "\"voided\":false," +
+                "\"voidedByUuid\":null," +
+                "\"dateVoided\":null," +
+                "\"voidReason\":null," +
+                "\"gender\":null," +
+                "\"birthdate\":null," +
+                "\"birthdateEstimated\":false," +
+                "\"dead\":false," +
+                "\"deathDate\":null," +
+                "\"causeOfDeathUuid\":null," +
+                "\"deathdateEstimated\":false," +
+                "\"birthtime\":null" +
+                "}" +
                 "}";
     }
 }

@@ -7,7 +7,7 @@
 
         <log message="Publishing sync record: ${body}" />
 
-        <setProperty propertyName="sync-record">
+        <setProperty name="sync-record">
             <simple>${body}</simple>
         </setProperty>
 
@@ -15,28 +15,28 @@
 
         <split stopOnException="true">
             <simple>{{sync-record.destinations}}</simple>
-            <setProperty propertyName="sync-record-destination">
-                <simple>body</simple>
+            <setProperty name="sync-record-destination">
+                <simple>${body}</simple>
             </setProperty>
 
-            <log message="Publishing to destination: ${property.sync-record-destination}" />
+            <log message="Publishing to destination: ${exchangeProperty.sync-record-destination}" />
             
             <setBody>
-                <simple>${property.sync-record}</simple>
+                <simple>${exchangeProperty.sync-record}</simple>
             </setBody>
             <marshal>
                 <json library="Jackson" />
             </marshal>
             <setBody>
-                <simple>body</simple>
+                <simple>${body}</simple>
             </setBody>
-            
+
             <!--<process ref="pgpEncryptService"/>-->
-            <toD uri="activemq:${property.sync-record-destination}" />
+            <toD uri="activemq:${exchangeProperty.sync-record-destination}" />
         </split>
 
         <setBody>
-            <simple>${property.sync-record}</simple>
+            <simple>${exchangeProperty.sync-record}</simple>
         </setBody>
 
         <log message="Archiving the sync record" />
