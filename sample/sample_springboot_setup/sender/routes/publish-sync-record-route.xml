@@ -35,18 +35,6 @@
             <toD uri="activemq:${exchangeProperty.sync-record-destination}" />
         </split>
 
-        <setBody>
-            <simple>${exchangeProperty.sync-record}</simple>
-        </setBody>
-
-        <log message="Archiving the sync record" />
-
-        <toD uri="sql:INSERT INTO dbsync_sync_record_archive(entity_id, entity_table_name, operation, date_created, uuid, archive_date) SELECT entity_id, entity_table_name, operation, date_created, uuid, now() FROM dbsync_sync_record WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
-
-        <log message="Deleting the sync record" />
-
-        <toD uri="sql:DELETE FROM dbsync_sync_record WHERE uuid = '${body.uuid}'?dataSource=openmrsDataSource" />
-
     </route>
 
 </routes>

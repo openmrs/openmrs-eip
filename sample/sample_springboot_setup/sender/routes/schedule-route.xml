@@ -1,12 +1,22 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="schedule">
-    <from uri="scheduler:sync?delay=60000"/>
-      <!-- TODO process in configured batch sizes -->
-      <toD uri="sql:SELECT * from dbsync_sync_record ORDER BY date_created LIMIT 50?dataSource=openmrsDataSource&amp;outputType=SelectList&amp;outputClass=org.openmrs.sync.component.entity.SyncRecord" />
+    <route id="debezium">
+        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{debezium.db.host}}
+&amp;databasePort={{debezium.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{debezium.db.name}}
+&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}
+&amp;tableWhitelist=openmrs_distro-icrc.orders&amp;offsetFlushIntervalMs=0&amp;snapshotMode=schema_only" />
 
-      <split streaming="true">
-          <simple>${body}</simple>
-          <to uri="direct:publish-sync-record-route" />
-      </split>
-  </route>
+        <log message="Received DB change event: Operation=${headers.CamelDebeziumOperation}, ${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+
+        <when>
+            <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+            <setBody>
+                <spel>
+                    #{new org.openmrs.sync.component.entity.SyncRecord(body.get('uuid'), request.headers.CamelDebeziumSourceMetadata.get('table'), request.headers.CamelDebeziumOperation)}
+                </spel>
+            </setBody>
+
+            <to uri="direct:publish-sync-record-route" />
+        </when>
+        
+    </route>
 </routes>

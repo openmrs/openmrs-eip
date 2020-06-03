@@ -1,35 +1,26 @@
 package org.openmrs.sync.component.entity;
 
 
-import org.openmrs.sync.component.common.AbstractSyncEntity;
-import org.openmrs.sync.component.common.Operation;
+import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-@Entity
-@Table(name = "dbsync_sync_record")
-public class SyncRecord extends AbstractSyncEntity {
+public class SyncRecord implements Serializable {
 
     public static final long serialVersionUID = 1;
 
-    @NotBlank
-    @Column(name = "entity_id", updatable = false)
     private String entityId;
 
-    @NotBlank
-    @Column(name = "entity_table_name", updatable = false)
     private String entityTableName;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(length = 6, updatable = false)
-    private Operation operation;
+    private String operation;
+
+    public SyncRecord() {
+    }
+
+    public SyncRecord(String entityId, String entityTableName, String operation) {
+        this.entityId = entityId;
+        this.entityTableName = entityTableName;
+        this.operation = operation;
+    }
 
     /**
      * Gets the entityId
@@ -72,7 +63,7 @@ public class SyncRecord extends AbstractSyncEntity {
      *
      * @return the operation
      */
-    public Operation getOperation() {
+    public String getOperation() {
         return operation;
     }
 
@@ -81,14 +72,13 @@ public class SyncRecord extends AbstractSyncEntity {
      *
      * @param operation the operation to set
      */
-    public void setOperation(Operation operation) {
+    public void setOperation(String operation) {
         this.operation = operation;
     }
 
     @Override
     public String toString() {
-        return "SyncRecord {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation +
-                ", uuid=" + getUuid() + "}";
+        return "SyncRecord {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation + "}";
     }
 
 }
