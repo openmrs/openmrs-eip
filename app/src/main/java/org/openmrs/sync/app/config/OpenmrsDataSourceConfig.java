@@ -1,7 +1,6 @@
 package org.openmrs.sync.app.config;
 
 import com.zaxxer.hikari.HikariDataSource;
-import liquibase.integration.spring.SpringLiquibase;
 import org.openmrs.sync.component.SyncProfiles;
 import org.openmrs.sync.component.exception.OpenmrsSyncException;
 import org.slf4j.Logger;
@@ -38,7 +37,7 @@ public class OpenmrsDataSourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(OpenmrsDataSourceConfig.class);
 
-    private static final String CONN_INIT_SQL = "SET @skip_create_sync_record = true";
+    private static final String CONN_INIT_SQL = "SET @@sql_log_bin=OFF";
 
     @Value("${spring.openmrs-datasource.dialect}")
     private String hibernateDialect;
@@ -83,20 +82,6 @@ public class OpenmrsDataSourceConfig {
     public PlatformTransactionManager transactionManager(
             @Qualifier("openmrsEntityManager") final EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
-    }
-
-    @Bean(name = "liquibase")
-    public SpringLiquibase getSpringLiquibase(@Qualifier("openmrsDataSource") final DataSource dataSource, Environment env) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:liquibaseChangeLog.xml");
-        liquibase.setDatabaseChangeLogTable("liquibasechangelog");
-        liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
-        if (Arrays.asList(env.getActiveProfiles()).contains(SyncProfiles.RECEIVER)) {
-            liquibase.setShouldRun(false);
-        }
-
-        return liquibase;
     }
 
 }
