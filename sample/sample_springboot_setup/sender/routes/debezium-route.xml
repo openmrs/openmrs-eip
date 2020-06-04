@@ -3,7 +3,7 @@
         <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{debezium.db.host}}
 &amp;databasePort={{debezium.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{debezium.db.name}}
 &amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}
-&amp;tableWhitelist=openmrs_distro-icrc.orders&amp;offsetFlushIntervalMs=0&amp;snapshotMode=schema_only" />
+&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=schema_only" />
 
         <log message="Received DB change event: Operation=${headers.CamelDebeziumOperation}, ${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
 

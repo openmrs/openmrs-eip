@@ -2,17 +2,28 @@ package org.openmrs.sync.app;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.sync.app.management.init.impl.ManagementDbInitImpl;
+import org.openmrs.sync.component.SyncProfiles;
+import org.openmrs.sync.component.camel.StringToLocalDateTimeConverter;
+import org.openmrs.sync.component.service.TableToSyncEnum;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.PostConstruct;
 import java.security.Security;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @SpringBootApplication(scanBasePackages = {
         "org.openmrs.sync.app",
@@ -54,6 +65,7 @@ public class SyncApplication {
 
     /**
      * Bean to handle messages in error and re-route them to another route
+     *
      * @return deadLetterChannelBuilder
      */
     @Bean
@@ -62,4 +74,23 @@ public class SyncApplication {
         builder.setUseOriginalMessage(true);
         return builder;
     }
+
+    @Bean
+    @Profile(SyncProfiles.SENDER)
+    public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
+        //Custom PropertySource that we can dynamically populate with generated property values which
+        //is not possible via the properties file e.g. to specify names of tables to sync.
+        final String dbName = env.getProperty("debezium.db.name");
+        Set<String> tables = new HashSet(TableToSyncEnum.values().length);
+        for (TableToSyncEnum tableToSyncEnum : TableToSyncEnum.values()) {
+            tables.add(dbName + "." + tableToSyncEnum.name());
+        }
+
+        Map<String, Object> props = Collections.singletonMap("debezium.tablesToSync", StringUtils.join(tables, ","));
+        PropertySource customPropSource = new MapPropertySource("custom", props);
+        env.getPropertySources().addLast(customPropSource);
+
+        return customPropSource;
+    }
+
 }
