@@ -1,9 +1,11 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-  <route id="write" errorHandlerRef="deadLetterChannelBuilder">
-    <from uri="{{camel.input.endpoint}}"/>
+  <route id="in-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
+    <from uri="activemq:in-bound-db-sync"/>
     <convertBodyTo type="java.lang.String"/>
-    <!--<process ref="pgpDecryptService"/>-->
-    <choice>
+
+      <log message="Received entity payload to sync: ${body}" />
+
+      <choice>
       <when>
         <method ref="isFilePredicate"/>
         <transform>

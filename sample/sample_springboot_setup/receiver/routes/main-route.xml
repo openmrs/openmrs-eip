@@ -1,0 +1,31 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="main" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="{{camel.input.endpoint}}" />
+        <!--<process ref="pgpDecryptService"/>-->
+        <log message=":" />
+
+        <log message="Received sync payload: ${body}" />
+
+        <setProperty name="sync-payload">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <log message="Configured destinations -> {{sync-payload.destinations}}" />
+
+        <split stopOnException="true">
+            <simple>{{sync-payload.destinations}}</simple>
+            <setProperty name="sync-payload-destination">
+                <simple>${body}</simple>
+            </setProperty>
+
+            <log message="Publishing to destination: ${exchangeProperty.sync-payload-destination}" />
+
+            <setBody>
+                <simple>${exchangeProperty.sync-payload}</simple>
+            </setBody>
+            
+            <toD uri="activemq:${exchangeProperty.sync-payload-destination}" />
+
+        </split>
+    </route>
+</routes>
