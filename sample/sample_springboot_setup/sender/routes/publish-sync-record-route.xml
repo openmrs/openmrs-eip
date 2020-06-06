@@ -3,9 +3,7 @@
     <route id="publish-sync-record-route" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="direct:publish-sync-record-route" />
 
-        <log message=":" />
-
-        <log message="Publishing sync record: ${body}" />
+        <log message="Received sync record -> ${body}" />
 
         <setProperty name="sync-record">
             <simple>${body}</simple>

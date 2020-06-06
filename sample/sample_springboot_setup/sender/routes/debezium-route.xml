@@ -5,7 +5,9 @@
 &amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}
 &amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=schema_only" />
 
-        <log message="Received DB change event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        <log message=":" />
+
+        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
 
         <when>
             <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
@@ -60,6 +62,8 @@
                     #{new org.openmrs.sync.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                 </spel>
             </setBody>
+
+            <log message="Forwarding to publish-sync-record-route -> ${body}" />
 
             <to uri="direct:publish-sync-record-route" />
         </when>
