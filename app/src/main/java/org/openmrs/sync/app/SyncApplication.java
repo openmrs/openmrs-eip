@@ -91,7 +91,7 @@ public class SyncApplication {
     public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
         //Custom PropertySource that we can dynamically populate with generated property values which
         //is not possible via the properties file e.g. to specify names of tables to sync.
-        final String dbName = env.getProperty("debezium.db.name");
+        final String dbName = env.getProperty("openmrs.db.name");
         Set<String> tables = new HashSet(TableToSyncEnum.values().length);
         for (TableToSyncEnum tableToSyncEnum : TableToSyncEnum.values()) {
             //TODO Remove the enum values instead including services
