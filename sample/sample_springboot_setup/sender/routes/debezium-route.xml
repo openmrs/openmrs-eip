@@ -9,9 +9,55 @@
 
         <when>
             <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+            <setProperty name="debezium-table">
+                <simple>${header.CamelDebeziumSourceMetadata.get('table')}</simple>
+            </setProperty>
+            <choice>
+                <when>
+                    <simple>${exchangeProperty.debezium-table} == 'test_order' || ${exchangeProperty.debezium-table} == 'drug_order' || ${exchangeProperty.debezium-table} == 'patient'</simple>
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.debezium-table} == 'patient'</simple>
+                            <setProperty name="debezium-refTable">
+                                <constant>person</constant>
+                            </setProperty>
+                            <setProperty name="debezium-refColumn">
+                                <constant>person_id</constant>
+                            </setProperty>
+                            <setProperty name="debezium-column">
+                                <constant>patient_id</constant>
+                            </setProperty>
+                        </when>
+                        <otherwise>
+                            <setProperty name="debezium-refTable">
+                                <constant>orders</constant>
+                            </setProperty>
+                            <setProperty name="debezium-refColumn">
+                                <constant>order_id</constant>
+                            </setProperty>
+                            <setProperty name="debezium-column">
+                                <constant>order_id</constant>
+                            </setProperty>
+                        </otherwise>
+                    </choice>
+
+                    <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" />
+
+                    <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+
+                    <setProperty name="debezium-entity-id">
+                        <simple>${body[0].get('uuid')}</simple>
+                    </setProperty>
+                </when>
+                <otherwise>
+                    <setProperty name="debezium-entity-id">
+                        <simple>${body.get('uuid')}</simple>
+                    </setProperty>
+                </otherwise>
+            </choice>
             <setBody>
                 <spel>
-                    #{new org.openmrs.sync.component.entity.SyncRecord(body.get('uuid'), request.headers.CamelDebeziumSourceMetadata.get('table'), request.headers.CamelDebeziumOperation)}
+                    #{new org.openmrs.sync.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                 </spel>
             </setBody>
 

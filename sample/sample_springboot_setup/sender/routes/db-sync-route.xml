@@ -27,7 +27,7 @@
 
                 <toD uri="openmrs:extract?tableToSync=${body.entityTableName().toUpperCase()}&amp;uuid=${body.entityId}" />
 
-                <log message="Loaded entity: -> ${body}" />
+                <log message="Loaded entity -> ${body}" />
 
                 <!-- TODO cater for scenario where entity could have been deleted just before this run,
                     one option is to skip this record with hope that there is a delete sync record in the queue -->
