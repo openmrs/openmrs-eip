@@ -33,25 +33,7 @@ zcat dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root 
 
 This operation will take few minutes.
 
-### 3. Enable MySQL binary logging on the Remote instance
-Run the command below to get into the terminal of the remote's MySQL container
-```
-docker exec -it db_db_remote_1 /bin/bash 
-```
-On the commandline inside the container, run the commands below to install nano or your preferred text editor. 
-```
-apt-get update
-apt-get install nano
-```
-Use the text editor to add the details below to the mysql configuration file at **/etc/mysql/my.cnf**, be sure to set a unique server id
-```
-[mysqld]
-server-id=YOUR-UNIQUE-SERVER-ID
-binlog_format=row
-log_bin=bin-log
-```
-
-### 4. Configure `file` Camel endpoint (if not using `jms` queues)
+### 3. Configure `file` Camel endpoint (if not using `jms` queues)
 
 By default, the exchange of data between the sender and the receiver is done with the `file` Camel endpoint.
 
@@ -107,7 +89,7 @@ camel.input.endpoint=file:/tmp/openmrs-dbsync/sync
 spring.artemis.embedded.data-directory=
 ```
 
-### 4-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
+### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
 
 You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../sample_activemq_setup/README.md) first.
 
@@ -130,7 +112,7 @@ spring.activemq.user=read
 spring.activemq.password=password
 ```
 
-### 5. Folder synchronization
+### 4. Folder synchronization
 If you want to also synchronize the content of a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
 The property for that purpose is:
 ```
@@ -139,7 +121,7 @@ camel.output.endpoint.file.location=/tmp/openmrs-dbsync/store
 
 Note: To disable this feature, just delete the route, or rename it to **directory-sync-route.xml.disable**
 
-### 6. Rebuild the project
+### 5. Rebuild the project
 
 ```
 mvn clean install
