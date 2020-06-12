@@ -14,6 +14,13 @@ Each released minor version of OpenMRS will lead to a maintenance branch.
 For example if you intend to synchronise data between an OpenMRS instance running on Core 2.4.x and another OpenMRS instance running on Core 2.3.x, you will use the appropriate build of the OpenMRS Camel component on each end.
 
 # Sample Configuration for Testing
+The application is designed to run in 2 modes i.e. the sender and receiver as show in the diagrams below.
+
+1. Sender
+  ![Sender Diagram](sample/resources/sender.jpg)  
+2. Receiver
+  ![Receiver Diagram](sample/resources/receiver.jpg) 
+
 A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **sample/sample_springboot_setup** directory.
 Please refer to the [Sample configuration README.md](./sample/sample_springboot_setup/README.md) for details about its configuration.
 
