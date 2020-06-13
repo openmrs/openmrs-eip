@@ -57,15 +57,36 @@
                     </setProperty>
                 </otherwise>
             </choice>
-            <setBody>
+
+            <setProperty name="sync-record">
                 <spel>
                     #{new org.openmrs.sync.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                 </spel>
-            </setBody>
+            </setProperty>
 
-            <log message="Forwarding to publish-sync-record-route -> ${body}" />
+            <log message="Configured destinations -> {{sync-record.destinations}}" />
 
-            <to uri="direct:publish-sync-record-route" />
+            <split stopOnException="true">
+                <simple>{{sync-record.destinations}}</simple>
+                <setProperty name="sync-record-destination">
+                    <simple>${body}</simple>
+                </setProperty>
+
+                <log message="Publishing to destination: ${exchangeProperty.sync-record-destination}" />
+
+                <setBody>
+                    <simple>${exchangeProperty.sync-record}</simple>
+                </setBody>
+                <marshal>
+                    <json library="Jackson" />
+                </marshal>
+                <setBody>
+                    <simple>${body}</simple>
+                </setBody>
+
+                <!--<process ref="pgpEncryptService"/>-->
+                <toD uri="activemq:${exchangeProperty.sync-record-destination}" />
+            </split>
         </when>
         
     </route>

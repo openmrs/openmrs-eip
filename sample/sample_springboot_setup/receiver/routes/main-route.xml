@@ -4,27 +4,27 @@
         <!--<process ref="pgpDecryptService"/>-->
         <log message=":" />
 
-        <log message="Received sync payload: ${body}" />
+        <log message="Received entity-payload: ${body}" />
 
-        <setProperty name="sync-payload">
+        <setProperty name="entity-payload">
             <simple>${body}</simple>
         </setProperty>
 
-        <log message="Configured destinations -> {{sync-payload.destinations}}" />
+        <log message="Configured destinations -> {{entity-payload.destinations}}" />
 
         <split stopOnException="true">
-            <simple>{{sync-payload.destinations}}</simple>
-            <setProperty name="sync-payload-destination">
+            <simple>{{entity-payload.destinations}}</simple>
+            <setProperty name="entity-payload-destination">
                 <simple>${body}</simple>
             </setProperty>
 
-            <log message="Publishing to destination: ${exchangeProperty.sync-payload-destination}" />
+            <log message="Publishing to destination: ${exchangeProperty.entity-payload-destination}" />
 
             <setBody>
-                <simple>${exchangeProperty.sync-payload}</simple>
+                <simple>${exchangeProperty.entity-payload}</simple>
             </setBody>
             
-            <toD uri="activemq:${exchangeProperty.sync-payload-destination}" />
+            <toD uri="activemq:${exchangeProperty.entity-payload-destination}" />
 
         </split>
     </route>
