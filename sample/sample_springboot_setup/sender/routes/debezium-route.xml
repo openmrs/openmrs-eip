@@ -58,24 +58,24 @@
                 </otherwise>
             </choice>
 
-            <setProperty name="sync-record">
+            <setProperty name="db-event">
                 <spel>
-                    #{new org.openmrs.eip.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
+                    #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                 </spel>
             </setProperty>
 
-            <log message="Configured destinations -> {{sync-record.destinations}}" />
+            <log message="Configured destinations -> {{db-event.destinations}}" />
 
             <split stopOnException="true">
-                <simple>{{sync-record.destinations}}</simple>
-                <setProperty name="sync-record-destination">
+                <simple>{{db-event.destinations}}</simple>
+                <setProperty name="db-event-destination">
                     <simple>${body}</simple>
                 </setProperty>
 
-                <log message="Publishing to destination: ${exchangeProperty.sync-record-destination}" />
+                <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" />
 
                 <setBody>
-                    <simple>${exchangeProperty.sync-record}</simple>
+                    <simple>${exchangeProperty.db-event}</simple>
                 </setBody>
                 <marshal>
                     <json library="Jackson" />
@@ -85,7 +85,7 @@
                 </setBody>
 
                 <!--<process ref="pgpEncryptService"/>-->
-                <toD uri="activemq:${exchangeProperty.sync-record-destination}" />
+                <toD uri="activemq:${exchangeProperty.db-event-destination}" />
             </split>
         </when>
         

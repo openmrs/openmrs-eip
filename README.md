@@ -41,13 +41,13 @@ Note that the default application that is bundled with the project comes with do
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
 
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs a SyncRecord instance which has 3 fields,
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs a DbEvent instance which has 3 fields,
 the source table name, the uuid of the affected row and the operation(c, u, d) for Create, Update or Delete respectively.
-The debezium route pushes the sync record into an embedded active artemis(activeMQ) instance to all configured message 
+The debezium route pushes the db event into an embedded active artemis(activeMQ) instance to all configured message 
 queues, by default the application has 2 out-bound queues, one for the out-bound DB sync route and the other for the 
 local Odoo system. In theory, you can register as many queues as the systems that need to be notified of changes from 
-the OpenMRS DB, the sender's application.properties file has a property named **sync-record.destinations** which takes 
-a comma separated list of queue names to which the sync record will be published, and you would have to add a consumer 
+the OpenMRS DB, the sender's application.properties file has a property named **db-event.destinations** which takes 
+a comma separated list of queue names to which the db event will be published, and you would have to add a consumer 
 for each registered queue to feed another system. The out-bound DB sync listener route consumes each message from its queue, 
 loads the entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record 
 message queue in another external message broker that is known to the team administering the receiving sync application. 

@@ -3,7 +3,7 @@ package org.openmrs.eip.component.entity;
 
 import java.io.Serializable;
 
-public class SyncRecord implements Serializable {
+public class DbEvent implements Serializable {
 
     public static final long serialVersionUID = 1;
 
@@ -13,10 +13,10 @@ public class SyncRecord implements Serializable {
 
     private String operation;
 
-    public SyncRecord() {
+    public DbEvent() {
     }
 
-    public SyncRecord(String entityId, String entityTableName, String operation) {
+    public DbEvent(String entityId, String entityTableName, String operation) {
         this.entityId = entityId;
         this.entityTableName = entityTableName;
         this.operation = operation;
@@ -78,7 +78,7 @@ public class SyncRecord implements Serializable {
 
     @Override
     public String toString() {
-        return "SyncRecord {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation + "}";
+        return "DbEvent {entityTable=" + entityTableName + ", entityId=" + entityId + ", operation=" + operation + "}";
     }
 
 }

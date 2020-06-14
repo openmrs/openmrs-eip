@@ -3,15 +3,11 @@
     <route id="out-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="activemq:out-bound-db-sync" />
 
-        <log message="Processing sync record: ${body}" />
+        <log message="Processing db event: ${body}" />
 
         <unmarshal>
-            <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.SyncRecord" />
+            <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.DbEvent" />
         </unmarshal>
-
-        <setProperty name="sync-record">
-            <simple>body</simple>
-        </setProperty>
 
         <choice>
             <when>
