@@ -24,7 +24,7 @@
                     <choice>
                         <when>
                             <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]
+                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonNameModel')]
                             </jsonpath>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>
@@ -41,7 +41,7 @@
                         </when>
                         <when>
                             <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]
+                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PatientIdentifierModel')]
                             </jsonpath>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>
@@ -58,7 +58,7 @@
                         </when>
                         <when>
                             <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAttributeModel')]
+                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonAttributeModel')]
                             </jsonpath>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>

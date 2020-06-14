@@ -22,7 +22,7 @@
         </choice>
 
         <setProperty propertyName="wo-uuid">
-            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, erpWorkOrderUuid)" />
+            <method beanType="org.openmrs.eip.component.utils.ModelUtils" method="extractUuid(${body}, erpWorkOrderUuid)" />
         </setProperty>
 
         <setProperty propertyName="date-created">
@@ -63,7 +63,7 @@
         </setProperty>
 
         <setProperty propertyName="creator-uuid">
-            <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, creatorUuid)" />
+            <method beanType="org.openmrs.eip.component.utils.ModelUtils" method="extractUuid(${body}, creatorUuid)" />
         </setProperty>
 
         <to uri="sql:SELECT u.username FROM users u WHERE uuid = :#${property.creator-uuid}?dataSource=#openmrsDataSource" />

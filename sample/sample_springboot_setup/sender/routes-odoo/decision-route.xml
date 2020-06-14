@@ -10,7 +10,7 @@
           All patient data regarding patient whose state has been changed are retrieved and reprocessed
           by the route independently
            -->
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientStateModel')]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PatientStateModel')]</jsonpath>
           <transform>
             <jsonpath>$.model.uuid</jsonpath>
           </transform>
@@ -66,23 +66,23 @@
           </choice>
         </when>
         <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonNameModel')]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonNameModel')]</jsonpath>
           <to uri="direct:person-name-to-odoo"/>
         </when>
         <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PersonAddressModel')]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonAddressModel')]</jsonpath>
           <to uri="direct:person-address-to-odoo"/>
         </when>
         <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientIdentifierModel')]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PatientIdentifierModel')]</jsonpath>
           <to uri="direct:patient-identifier-to-odoo"/>
         </when>
         <when>
-          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.PatientModel')]</jsonpath>
+          <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PatientModel')]</jsonpath>
           <to uri="direct:patient-to-odoo"/>
         </when>
         <when>
-            <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.sync.component.model.ErpWorkOrderStateModel')]</jsonpath>
+            <jsonpath>$.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.ErpWorkOrderStateModel')]</jsonpath>
             <to uri="direct:create-sync-record" />
         </when>
       </choice>

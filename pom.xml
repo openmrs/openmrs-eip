@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openmrs</groupId>
-  <artifactId>openmrs-sync-parent</artifactId>
+  <artifactId>openmrs-eip-parent</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
@@ -13,7 +13,7 @@
     <module>camel-utils</module>
   </modules>
 
-  <name>OpenMRS synchro parent</name>
+  <name>OpenMRS EIP parent</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

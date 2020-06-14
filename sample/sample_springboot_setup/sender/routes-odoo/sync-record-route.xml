@@ -8,24 +8,24 @@
 
         <!-- TODO Create sync record for WO state if none exists -->
 
-        <setProperty propertyName="entity-uuid">
+        <setProperty name="entity-uuid">
             <jsonpath>$.model.uuid</jsonpath>
         </setProperty>
 
-        <setProperty propertyName="sync-record">
+        <setProperty name="sync-record">
             <spel>
-                #{new org.openmrs.sync.app.management.entity.SyncRecord()}
+                #{new org.openmrs.eip.app.management.entity.SyncRecord()}
             </spel>
         </setProperty>
 
         <script>
             <spel>
                 #{getProperty('sync-record').setEntityId(getProperty('entity-uuid'))}
-                #{getProperty('sync-record').setEntityClassName('org.openmrs.sync.component.entity.ErpWorkOrderState')}
+                #{getProperty('sync-record').setEntityClassName('org.openmrs.eip.component.entity.ErpWorkOrderState')}
             </spel>
         </script>
 
-        <setProperty propertyName="work-order">
+        <setProperty name="work-order">
             <simple>${body}</simple>
         </setProperty>
 
@@ -35,7 +35,7 @@
 
         <log loggingLevel="DEBUG" message="Saving sync record for WorkOrderState..." />
 
-        <to uri="jpa:org.openmrs.sync.app.management.entity.SyncRecord?usePersist=true" />
+        <to uri="jpa:org.openmrs.eip.app.management.entity.SyncRecord?usePersist=true" />
 
         <log message="Successfully created sync record for ErpWorkOrderState!" />
 

@@ -6,7 +6,7 @@
         <log message="Processing sync record: ${body}" />
 
         <unmarshal>
-            <json library="Jackson" unmarshalTypeName="org.openmrs.sync.component.entity.SyncRecord" />
+            <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.SyncRecord" />
         </unmarshal>
 
         <setProperty name="sync-record">

@@ -3,7 +3,7 @@
     <from uri="direct:person-name-to-odoo"/>
     <!--Extract person uuid from model and set it in a property-->
     <setProperty propertyName="openmrs-person-uuid">
-      <method beanType="org.openmrs.sync.component.utils.ModelUtils" method="extractUuid(${body}, personUuid)"/>
+      <method beanType="org.openmrs.eip.component.utils.ModelUtils" method="extractUuid(${body}, personUuid)"/>
     </setProperty>
     <choice>
       <when>

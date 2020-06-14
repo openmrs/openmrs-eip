@@ -60,7 +60,7 @@
 
             <setProperty name="sync-record">
                 <spel>
-                    #{new org.openmrs.sync.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
+                    #{new org.openmrs.eip.component.entity.SyncRecord(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                 </spel>
             </setProperty>
 
