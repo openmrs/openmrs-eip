@@ -13,29 +13,29 @@ The master branch should be compatible with the data model of the OpenMRS's vers
 Each released minor version of OpenMRS will lead to a maintenance branch.
 For example if you intend to synchronise data between an OpenMRS instance running on Core 2.4.x and another OpenMRS instance running on Core 2.3.x, you will use the appropriate build of the OpenMRS Camel component on each end.
 
-# Sample Configuration for Testing
+# Distribution Configuration for Testing
 The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM 
 property **spring.profiles.active** with the value set to sender or receiver. The 2 OpenMRS installations that we need 
 to sync between each has its own local Odoo system to integrate with, Odoo is an ERP system. 
 
-A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **sample/sample_springboot_setup** directory.
-Please refer to the [Sample configuration README.md](./sample/sample_springboot_setup/README.md) for details about its configuration.
+A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **distribution/springboot_setup** directory.
+Please refer to the [Distribution configuration README.md](./distribution/springboot_setup/README.md) for details about its configuration.
 
-The OpenMRS dbSync can be used with any Camel endpoint between the sender and the receiver including ActiveMQ via `jms` queues. A sample configuration can be found in the **/sample/sample_activemq_setup** directory.
-Please refer to the [Configure ActiveMQ README.md](./sample/sample_activemq_setup/README.md) for details about its configuration.
+The OpenMRS dbSync can be used with any Camel endpoint between the sender and the receiver including ActiveMQ via `jms` queues. A runnable configuration can be found in the **/distribution/activemq_setup** directory.
+Please refer to the [Configure ActiveMQ README.md](./distribution/activemq_setup/README.md) for details about its configuration.
 
 It's very important to note that technically this is DB to DB sync happening outside of the OpenMRS application, this has implications e.g if you sync something like patient, the search index needs to be triggered for a rebuild,
 the current in-bound DB sync route internally triggers this rebuild for all known indexed entities.
 
 ### Sender
 
-  ![Sender Diagram](sample/resources/sender.jpg)
+  ![Sender Diagram](distribution/resources/sender.jpg)
 
 As seen from the diagram above, the sender is really a spring boot application at the core running with the active 
 profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB 
 changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row, 
 please refer to the inline documentation of the various configuration properties in the sender's application.properties 
-in the sample/sample_springboot_setup/sender folder.
+in the distribution/springboot_setup/sender folder.
 
 Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
@@ -56,7 +56,7 @@ configured Odoo system.
     
 ### Receiver
 
-  ![Receiver Diagram](sample/resources/receiver.jpg) 
+  ![Receiver Diagram](distribution/resources/receiver.jpg) 
 
 As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead 
 running at another physical location with an OpenMRS installation with the active profile set to receiver.
