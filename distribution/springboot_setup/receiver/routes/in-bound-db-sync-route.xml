@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="in-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="activemq:in-bound-db-sync"/>
+        <from uri="direct:in-bound-db-sync"/>
         
         <convertBodyTo type="java.lang.String"/>
 

@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     <route id="out-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="activemq:out-bound-db-sync" />
+        <from uri="direct:out-bound-db-sync" />
 
         <log message="Processing db event: ${body}" />
 
@@ -39,7 +39,7 @@
 
         <log message="Writing entity to sync queue: {{camel.output.endpoint}}" />
 
-        <to uri="{{camel.output.endpoint}}" />
+        <toD uri="{{camel.output.endpoint}}" />
 
     </route>
 

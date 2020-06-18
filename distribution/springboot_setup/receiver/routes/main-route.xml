@@ -24,7 +24,7 @@
                 <simple>${exchangeProperty.entity-payload}</simple>
             </setBody>
             
-            <toD uri="activemq:${exchangeProperty.entity-payload-destination}" />
+            <toD uri="direct:${exchangeProperty.entity-payload-destination}" />
 
         </split>
     </route>

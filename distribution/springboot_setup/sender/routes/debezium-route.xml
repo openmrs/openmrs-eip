@@ -66,7 +66,7 @@
 
             <log message="Configured destinations -> {{db-event.destinations}}" />
 
-            <split stopOnException="true">
+            <split parallelProcessing="true">
                 <simple>{{db-event.destinations}}</simple>
                 <setProperty name="db-event-destination">
                     <simple>${body}</simple>
@@ -85,7 +85,7 @@
                 </setBody>
 
                 <!--<process ref="pgpEncryptService"/>-->
-                <toD uri="activemq:${exchangeProperty.db-event-destination}" />
+                <toD uri="direct:${exchangeProperty.db-event-destination}" />
             </split>
         </when>
         
