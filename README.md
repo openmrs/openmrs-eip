@@ -43,16 +43,14 @@ MySQL binary log is ONLY preconfigured for the remote instance because it assume
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
 read entries in the MySQL binary log of the remote OpenMRS instance, it constructs a DbEvent instance which has 3 fields,
 the source table name, the uuid of the affected row and the operation(c, u, d) for Create, Update or Delete respectively.
-The debezium route pushes the db event into an embedded active artemis(activeMQ) instance to all configured message 
-queues, by default the application has 2 out-bound queues, one for the out-bound DB sync route and the other for the 
-local Odoo system. In theory, you can register as many queues as the systems that need to be notified of changes from 
-the OpenMRS DB, the sender's application.properties file has a property named **db-event.destinations** which takes 
-a comma separated list of queue names to which the db event will be published, and you would have to add a consumer 
-for each registered queue to feed another system. The out-bound DB sync listener route consumes each message from its queue, 
-loads the entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record 
-message queue in another external message broker that is known to the team administering the receiving sync application. 
-The out-bound Odoo listener route consumes messages from its queue too, does its custom processing and then feeds the 
-configured Odoo system.
+The debezium route notifies all configured routes in parallel of the DB event message set as the body. By default, the 
+application has 2 out-bound routes, one for the out-bound DB sync route and the other for the local Odoo system. In 
+theory, you can register as many routes as the systems that need to be notified of changes from the OpenMRS DB, the 
+sender's application.properties file has a property named **db-event.destinations** which takes a comma separated list 
+of route ids to which the db event will be sent. The out-bound DB sync route transforms each message by loading the 
+entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record message queue 
+in an external message broker that is known to the team administering the receiving sync application. The out-bound Odoo 
+route consumes messages from its queue too, does its custom processing and then feeds the configured Odoo system.
     
 ### Receiver
 
@@ -64,13 +62,12 @@ running at another physical location with an OpenMRS installation with the activ
 Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of 
 the entity to be synced into a message broker known to the team administering the receiving sync application, this is 
 where the receiver starts, its main receiver route connects to this external message broker MOST likely over the internet 
-and consumes messages out of sync record queue and pushes the payload into the embedded artemis(activeMQ) instance to 
-all configured message queues, by default the application has 2 in-bound queues, one for the in-bound DB sync route and 
-the other for a local Odoo system. You can register as many queues as the systems that need to be notified of 
-the in-bound entity payload, the sender's application.properties file has a property named **entity-payload.destinations** 
-which takes a comma separated list of queue names to which the entity payload will be published, and you would have to 
-add a consumer for each registered queue to feed another system. The in-bound DB sync listener route consumes each message 
-from its queue and syncs it into the destination OpenMRS instance's MySQL DB. The in-bound Odoo listener route consumes 
+, consumes messages out of sync record queue and calls all configured routes in parallel with the DB event message set 
+as the body. By default, the application has 2 in-bound routes, one for the in-bound DB sync route and the other for a 
+local Odoo system. You can register as many routes as the systems that need to be notified of the in-bound entity payload, 
+the sender's application.properties file has a property named **entity-payload.destinations** which takes a comma separated 
+list of route ids to which the entity payload will be sent to feed another system. The in-bound DB sync route consumes 
+each message from its queue and syncs it into the destination OpenMRS instance's MySQL DB. The in-bound Odoo route consumes 
 messages from its queue too, does its custom processing and then feeds the configured Odoo system.
 
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 

@@ -12,7 +12,7 @@
 
         <log message="Configured destinations -> {{entity-payload.destinations}}" />
 
-        <split stopOnException="true">
+        <split parallelProcessing="true">
             <simple>{{entity-payload.destinations}}</simple>
             <setProperty name="entity-payload-destination">
                 <simple>${body}</simple>

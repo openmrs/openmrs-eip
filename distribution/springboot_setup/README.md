@@ -105,7 +105,7 @@ spring.activemq.user=write
 spring.activemq.password=password
 ```
 
-Uncomment the following lines in **eceiver-application.properties** file
+Uncomment the following lines in **receiver-application.properties** file
 ```
 spring.activemq.broker-url=failover:(tcp://localhost:63616,tcp://localhost:64616)
 spring.activemq.user=read
