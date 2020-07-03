@@ -111,16 +111,18 @@ camel.input.endpoint=jms:openmrs.sync.queue
 
 Uncomment the following lines in **sender-application.properties** file
 ```
-spring.activemq.broker-url=tcp://localhost:62616
-spring.activemq.user=write
-spring.activemq.password=password
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=write
+spring.artemis.password=password
 ```
 
 Uncomment the following lines in **receiver-application.properties** file
 ```
-spring.activemq.broker-url=failover:(tcp://localhost:63616,tcp://localhost:64616)
-spring.activemq.user=read
-spring.activemq.password=password
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=read
+spring.artemis.password=password
 ```
 
 ### 4. Folder synchronization
