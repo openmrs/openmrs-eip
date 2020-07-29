@@ -11,7 +11,7 @@ mvn camel:run -Dspring.profiles.active=sender
 ```
 or run the built **jar**
 ```
-java -jar -Dspring.profiles.active=sender target/openmrs-sync-app-1.0-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=sender target/openmrs-eip-app-1.0-SNAPSHOT.jar
 ```
 
 For more help see the Apache Camel documentation
