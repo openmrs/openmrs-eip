@@ -37,14 +37,6 @@ This operation will take few minutes.
 
 By default, the exchange of data between the sender and the receiver is done with the `file` Camel endpoint.
 
-Copy and rename the _application.properties_ files:
-```
-cp distribution/springboot_setup/sender/application.properties app/src/main/resources/application-sender.properties
-```
-```
-cp distribution/springboot_setup/receiver/application.properties app/src/main/resources/application-receiver.properties
-```
-
 Create a folder into which the messages will transit.
 ```
 mkdir -p /tmp/openmrs-dbsync/sync
@@ -87,6 +79,14 @@ camel.input.endpoint=file:/tmp/openmrs-dbsync/sync
 ```
 # The data directory to be used by artemis, not a good idea to change it once set
 spring.artemis.embedded.data-directory=
+```
+
+Copy and rename the _application.properties_ files:
+```
+cp distribution/springboot_setup/sender/application.properties app/src/main/resources/application-sender.properties
+```
+```
+cp distribution/springboot_setup/receiver/application.properties app/src/main/resources/application-receiver.properties
 ```
 
 ### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
