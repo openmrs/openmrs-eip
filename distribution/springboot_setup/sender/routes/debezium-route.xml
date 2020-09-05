@@ -2,7 +2,7 @@
     <route id="debezium">
         <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=initial&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false" />
 
-        <log message=":" />
+        <log message=":" loggingLevel="DEBUG" />
 
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
 
@@ -40,7 +40,7 @@
                         </otherwise>
                     </choice>
 
-                    <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" />
+                    <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
 
                     <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
 
@@ -61,15 +61,13 @@
                 </spel>
             </setProperty>
 
-            <log message="Configured destinations -> {{db-event.destinations}}" />
-
             <split parallelProcessing="true">
                 <simple>{{db-event.destinations}}</simple>
                 <setProperty name="db-event-destination">
                     <simple>${body}</simple>
                 </setProperty>
 
-                <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" />
+                <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
 
                 <setBody>
                     <simple>${exchangeProperty.db-event}</simple>

@@ -3,7 +3,7 @@
     <route id="out-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="direct:out-bound-db-sync" />
 
-        <log message="Processing db event: ${body}" />
+        <log message="Processing db event: ${body}" loggingLevel="DEBUG" />
 
         <unmarshal>
             <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.DbEvent" />
@@ -16,10 +16,10 @@
                     <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
                 </setBody>
 
-                <log message="Deleted entity payload -> ${body}" />
+                <log message="Deleted entity payload -> ${body}" loggingLevel="DEBUG" />
             </when>
             <otherwise>
-                <log message="Loading entity from DB..." />
+                <log message="Loading entity from DB..." loggingLevel="DEBUG" />
 
                 <toD uri="openmrs:extract?tableToSync=${body.entityTableName().toUpperCase()}&amp;uuid=${body.entityId}" />
 
@@ -37,7 +37,7 @@
             </otherwise>
         </choice>
 
-        <log message="Writing entity to sync queue: {{camel.output.endpoint}}" />
+        <log message="Writing entity to sync queue: {{camel.output.endpoint}}" loggingLevel="DEBUG" />
 
         <toD uri="{{camel.output.endpoint}}" />
 
