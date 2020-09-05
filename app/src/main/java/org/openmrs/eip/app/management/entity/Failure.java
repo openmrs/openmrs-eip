@@ -22,6 +22,12 @@ public class Failure extends AbstractEntity {
     @Column(nullable = false, updatable = false, length = 50)
     private String route;
 
+    @Column(updatable = false)
+    private String message;
+
+    @Column(name = "cause_message", updatable = false)
+    private String causeMessage;
+
     /**
      * Gets the dbEvent
      *
@@ -56,6 +62,42 @@ public class Failure extends AbstractEntity {
      */
     public void setRoute(String route) {
         this.route = route;
+    }
+
+    /**
+     * Gets the message
+     *
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * Sets the message
+     *
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
+     * Gets the causeMessage
+     *
+     * @return the causeMessage
+     */
+    public String getCauseMessage() {
+        return causeMessage;
+    }
+
+    /**
+     * Sets the causeMessage
+     *
+     * @param causeMessage the causeMessage to set
+     */
+    public void setCauseMessage(String causeMessage) {
+        this.causeMessage = causeMessage;
     }
 
     @Override
