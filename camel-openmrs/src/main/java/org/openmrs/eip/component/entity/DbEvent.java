@@ -1,8 +1,10 @@
 package org.openmrs.eip.component.entity;
 
 
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 
+@Embeddable
 public class DbEvent implements Serializable {
 
     public static final long serialVersionUID = 1;
