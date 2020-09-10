@@ -1,0 +1,70 @@
+<!--
+    Route to receive exceptions and log them in the failure table in the management DB.
+    Note that this handler should only be used by routes that are registered to receieve DB events so that when errors
+    are encountered while processing the DB event there is an option to retry.
+ -->
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="recording-error-handler">
+        <from uri="direct:rec-error-handler" />
+
+        <setProperty name="error-msg">
+            <simple>${exception.toString()}</simple>
+        </setProperty>
+
+        <log message="${exchangeProperty.error-msg}" loggingLevel="ERROR" />
+
+        <when>
+            <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
+            <setProperty name="error-msg">
+                <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
+            </setProperty>
+        </when>
+        <when>
+            <simple>${exception.cause} != null</simple>
+            <setProperty name="cause-error-msg">
+                <simple>${exception.cause.toString()}</simple>
+            </setProperty>
+            <when>
+                <simple>${exchangeProperty.cause-error-msg.length()} > 1024</simple>
+                <setProperty name="cause-error-msg">
+                    <simple>${exchangeProperty.cause-error-msg.substring(0, 1024)}</simple>
+                </setProperty>
+            </when>
+        </when>
+        <setProperty name="db-event-failure">
+            <spel>
+                #{new org.openmrs.eip.app.management.entity.Failure()}
+            </spel>
+        </setProperty>
+       <when>
+           <simple>${exchangeProperty.db-event} == null</simple>
+
+           <log message="Instantiating DB event" loggingLevel="DEBUG" />
+
+           <setProperty name="db-event">
+               <spel>
+                   #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'),
+                   request.headers.CamelDebeziumSourceMetadata.get('table'), request.headers.CamelDebeziumOperation)}
+               </spel>
+           </setProperty>
+       </when>
+        <script>
+            <spel>
+                #{getProperty('db-event-failure').setRoute(getProperty('db-event-destination'))}
+                #{getProperty('db-event-failure').setDbEvent(getProperty('db-event'))}
+                #{getProperty('db-event-failure').setMessage(getProperty('error-msg'))}
+                #{getProperty('db-event-failure').setCauseMessage(getProperty('cause-error-msg'))}
+                #{getProperty('db-event-failure').setDateCreated(new java.util.Date())}
+            </spel>
+        </script>
+        <setBody>
+            <simple>${exchangeProperty.db-event-failure}</simple>
+        </setBody>
+
+        <log message="Saving failed DB event -> ${body}" loggingLevel="DEBUG"/>
+
+        <to uri="jpa:org.openmrs.eip.app.management.entity.Failure?usePersist=true"/>
+
+        <log message="Saved failed DB event ${body}" loggingLevel="DEBUG" />
+    </route>
+</routes>

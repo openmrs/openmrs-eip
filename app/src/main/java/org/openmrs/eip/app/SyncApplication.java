@@ -86,6 +86,13 @@ public class SyncApplication {
         return builder;
     }
 
+    @Bean("recordingErrorHandler")
+    public DeadLetterChannelBuilder getRecordingErrorHandler() {
+        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:rec-error-handler");
+        builder.setUseOriginalMessage(true);
+        return builder;
+    }
+
     @Bean
     @Profile(SyncProfiles.SENDER)
     public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {

@@ -18,14 +18,14 @@ public class Failure extends AbstractEntity {
     @AttributeOverride(name = "operation", column = @Column(name = "operation", nullable = false, updatable = false, length = 1))
     private DbEvent dbEvent;
 
-    //the camel route where this event  couldn't be processed
-    @Column(nullable = false, updatable = false, length = 50)
+    //the camel route where this event  couldn't be processed, null is interpreted as all routes
+    @Column(updatable = false, length = 50)
     private String route;
 
-    @Column(updatable = false)
+    @Column(updatable = false, length = 1024)
     private String message;
 
-    @Column(name = "cause_message", updatable = false)
+    @Column(name = "cause_message", updatable = false, length = 1024)
     private String causeMessage;
 
     /**

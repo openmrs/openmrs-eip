@@ -1,9 +1,23 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium">
+    <route id="debezium" errorHandlerRef="recordingErrorHandler">
         <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=initial&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false" />
 
         <log message=":" loggingLevel="DEBUG" />
 
+        <choice>
+            <when>
+                <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                <setProperty name="debezium-entity-id">
+                    <simple>${headers.CamelDebeziumBefore.get('uuid')}</simple>
+                </setProperty>
+            </when>
+            <otherwise>
+                <setProperty name="debezium-entity-id">
+                    <simple>${body.get('uuid')}</simple>
+                </setProperty>
+            </otherwise>
+        </choice>
+        
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
 
         <when>
@@ -48,11 +62,6 @@
                         <simple>${body[0].get('uuid')}</simple>
                     </setProperty>
                 </when>
-                <otherwise>
-                    <setProperty name="debezium-entity-id">
-                        <simple>${body.get('uuid')}</simple>
-                    </setProperty>
-                </otherwise>
             </choice>
 
             <setProperty name="db-event">

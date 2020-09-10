@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
+    <route id="out-bound-db-sync" errorHandlerRef="recordingErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
         <log message="Processing db event: ${body}" loggingLevel="DEBUG" />
@@ -16,7 +16,7 @@
                     <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
                 </setBody>
 
-                <log message="Deleted entity payload -> ${body}" loggingLevel="DEBUG" />
+                <log message="Deleted entity payload -> ${body}" />
             </when>
             <otherwise>
                 <log message="Loading entity from DB..." loggingLevel="DEBUG" />
