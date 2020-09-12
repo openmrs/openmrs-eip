@@ -61,9 +61,9 @@
             <simple>${exchangeProperty.db-event-failure}</simple>
         </setBody>
 
-        <log message="Saving failed DB event -> ${body}" loggingLevel="DEBUG"/>
+        <log message="Saving failed DB event -> ${body}" loggingLevel="DEBUG" />
 
-        <to uri="jpa:org.openmrs.eip.app.management.entity.Failure?usePersist=true"/>
+        <to uri="jpa:org.openmrs.eip.app.management.entity.Failure?usePersist=true" />
 
         <log message="Saved failed DB event ${body}" loggingLevel="DEBUG" />
     </route>

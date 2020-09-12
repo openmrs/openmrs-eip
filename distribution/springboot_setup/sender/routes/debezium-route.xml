@@ -3,7 +3,12 @@
         <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=initial&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false" />
 
         <log message=":" loggingLevel="DEBUG" />
+        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${exchangeProperty.event-body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        <setProperty name="event-body">
+            <simple>${body}</simple>
+        </setProperty>
 
+        <!-- TODO For subclasses, capture the primary key early -->
         <choice>
             <when>
                 <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
@@ -13,12 +18,10 @@
             </when>
             <otherwise>
                 <setProperty name="debezium-entity-id">
-                    <simple>${body.get('uuid')}</simple>
+                    <simple>${exchangeProperty.event-body.get('uuid')}</simple>
                 </setProperty>
             </otherwise>
         </choice>
-        
-        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
         
         <choice>
             <when>
@@ -26,6 +29,15 @@
                 <setProperty name="debezium-table">
                     <simple>${header.CamelDebeziumSourceMetadata.get('table')}</simple>
                 </setProperty>
+
+                <when>
+                    <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                    <toD uri="jpa:Failure?query=SELECT f from Failure f WHERE f.dbEvent.entityTableName='visit' AND f.dbEvent.entityId='uuid-voided'" />
+                    <setProperty name="existing-failures">
+                        <simple>${body}</simple>
+                    </setProperty>
+                </when>
+
                 <choice>
                     <when>
                         <simple>${exchangeProperty.debezium-table} == 'test_order' || ${exchangeProperty.debezium-table} == 'drug_order' || ${exchangeProperty.debezium-table} == 'patient'</simple>
@@ -57,7 +69,7 @@
 
                         <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
 
-                        <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+                        <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
 
                         <setProperty name="debezium-entity-id">
                             <simple>${body[0].get('uuid')}</simple>
@@ -71,30 +83,62 @@
                     </spel>
                 </setProperty>
 
-                <split parallelProcessing="true">
-                    <simple>{{db-event.destinations}}</simple>
-                    <setProperty name="db-event-destination">
-                        <simple>${body}</simple>
-                    </setProperty>
+                <choice>
+                    <!-- For deletes ensure there is no pending failure otherwise downstream systems can't 'delete' what they don't have.
+                         We also don't want a sequence like CREATE -> DELETE -> UPDATE which results in the entity getting recreated
+                         in case of a downstream system which a listener route is sort of synchronizing to. -->
+                    <when>
+                        <simple>${exchangeProperty.existing-failures} != null &amp;&amp; ${exchangeProperty.existing-failures.size()} > 0</simple>
+                        <log message="Moving delete event to failure queue because the entity has ${exchangeProperty.existing-failures.size()} failed event(s) that need to be synced first" />
+                        <setProperty name="delete-event-failure">
+                            <spel>
+                                #{new org.openmrs.eip.app.management.entity.Failure()}
+                            </spel>
+                        </setProperty>
+                        <setProperty name="delete-event-message">
+                            <simple>Cannot process a delete event for an entity with ${exchangeProperty.existing-failures.size()} failed event(s)</simple>
+                        </setProperty>
+                        <script>
+                            <spel>
+                                #{getProperty('delete-event-failure').setDbEvent(getProperty('db-event'))}
+                                #{getProperty('delete-event-failure').setMessage(getProperty('delete-event-message'))}
+                                #{getProperty('delete-event-failure').setDateCreated(new java.util.Date())}
+                            </spel>
+                        </script>
+                        <setBody>
+                            <simple>${exchangeProperty.delete-event-failure}</simple>
+                        </setBody>
+                        <log message="Saving delete event for an entity with failures -> ${body}" loggingLevel="DEBUG" />
+                        <to uri="jpa:org.openmrs.eip.app.management.entity.Failure?usePersist=true" />
+                        <log message="Saved delete event for an entity with failures -> ${body}" loggingLevel="DEBUG" />
+                    </when>
+                    <otherwise>
+                        <split parallelProcessing="true">
+                            <simple>{{db-event.destinations}}</simple>
+                            <setProperty name="db-event-destination">
+                                <simple>${body}</simple>
+                            </setProperty>
 
-                    <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
+                            <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
 
-                    <setBody>
-                        <simple>${exchangeProperty.db-event}</simple>
-                    </setBody>
-                    <marshal>
-                        <json library="Jackson" />
-                    </marshal>
-                    <setBody>
-                        <simple>${body}</simple>
-                    </setBody>
+                            <setBody>
+                                <simple>${exchangeProperty.db-event}</simple>
+                            </setBody>
+                            <marshal>
+                                <json library="Jackson" />
+                            </marshal>
+                            <setBody>
+                                <simple>${body}</simple>
+                            </setBody>
 
-                    <!--<process ref="pgpEncryptService"/>-->
-                    <toD uri="direct:${exchangeProperty.db-event-destination}" />
-                </split>
+                            <!--<process ref="pgpEncryptService"/>-->
+                            <toD uri="direct:${exchangeProperty.db-event-destination}" />
+                        </split>
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
-                <log message="Don't know how to handle DB event operation: ${headers.CamelDebeziumOperation} for entity: ${body}" loggingLevel="ERROR" />
+                <log message="Don't know how to handle DB event operation: ${headers.CamelDebeziumOperation} for entity: ${exchangeProperty.event-body}" loggingLevel="ERROR" />
             </otherwise>
         </choice>
 
