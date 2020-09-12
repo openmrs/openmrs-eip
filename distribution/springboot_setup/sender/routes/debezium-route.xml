@@ -19,79 +19,84 @@
         </choice>
         
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        
+        <choice>
+            <when>
+                <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+                <setProperty name="debezium-table">
+                    <simple>${header.CamelDebeziumSourceMetadata.get('table')}</simple>
+                </setProperty>
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.debezium-table} == 'test_order' || ${exchangeProperty.debezium-table} == 'drug_order' || ${exchangeProperty.debezium-table} == 'patient'</simple>
+                        <choice>
+                            <when>
+                                <simple>${exchangeProperty.debezium-table} == 'patient'</simple>
+                                <setProperty name="debezium-refTable">
+                                    <constant>person</constant>
+                                </setProperty>
+                                <setProperty name="debezium-refColumn">
+                                    <constant>person_id</constant>
+                                </setProperty>
+                                <setProperty name="debezium-column">
+                                    <constant>patient_id</constant>
+                                </setProperty>
+                            </when>
+                            <otherwise>
+                                <setProperty name="debezium-refTable">
+                                    <constant>orders</constant>
+                                </setProperty>
+                                <setProperty name="debezium-refColumn">
+                                    <constant>order_id</constant>
+                                </setProperty>
+                                <setProperty name="debezium-column">
+                                    <constant>order_id</constant>
+                                </setProperty>
+                            </otherwise>
+                        </choice>
 
-        <when>
-            <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
-            <setProperty name="debezium-table">
-                <simple>${header.CamelDebeziumSourceMetadata.get('table')}</simple>
-            </setProperty>
-            <choice>
-                <when>
-                    <simple>${exchangeProperty.debezium-table} == 'test_order' || ${exchangeProperty.debezium-table} == 'drug_order' || ${exchangeProperty.debezium-table} == 'patient'</simple>
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.debezium-table} == 'patient'</simple>
-                            <setProperty name="debezium-refTable">
-                                <constant>person</constant>
-                            </setProperty>
-                            <setProperty name="debezium-refColumn">
-                                <constant>person_id</constant>
-                            </setProperty>
-                            <setProperty name="debezium-column">
-                                <constant>patient_id</constant>
-                            </setProperty>
-                        </when>
-                        <otherwise>
-                            <setProperty name="debezium-refTable">
-                                <constant>orders</constant>
-                            </setProperty>
-                            <setProperty name="debezium-refColumn">
-                                <constant>order_id</constant>
-                            </setProperty>
-                            <setProperty name="debezium-column">
-                                <constant>order_id</constant>
-                            </setProperty>
-                        </otherwise>
-                    </choice>
+                        <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
 
-                    <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
+                        <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
 
-                    <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+                        <setProperty name="debezium-entity-id">
+                            <simple>${body[0].get('uuid')}</simple>
+                        </setProperty>
+                    </when>
+                </choice>
 
-                    <setProperty name="debezium-entity-id">
-                        <simple>${body[0].get('uuid')}</simple>
-                    </setProperty>
-                </when>
-            </choice>
-
-            <setProperty name="db-event">
-                <spel>
-                    #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
-                </spel>
-            </setProperty>
-
-            <split parallelProcessing="true">
-                <simple>{{db-event.destinations}}</simple>
-                <setProperty name="db-event-destination">
-                    <simple>${body}</simple>
+                <setProperty name="db-event">
+                    <spel>
+                        #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
+                    </spel>
                 </setProperty>
 
-                <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
+                <split parallelProcessing="true">
+                    <simple>{{db-event.destinations}}</simple>
+                    <setProperty name="db-event-destination">
+                        <simple>${body}</simple>
+                    </setProperty>
 
-                <setBody>
-                    <simple>${exchangeProperty.db-event}</simple>
-                </setBody>
-                <marshal>
-                    <json library="Jackson" />
-                </marshal>
-                <setBody>
-                    <simple>${body}</simple>
-                </setBody>
+                    <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
 
-                <!--<process ref="pgpEncryptService"/>-->
-                <toD uri="direct:${exchangeProperty.db-event-destination}" />
-            </split>
-        </when>
-        
+                    <setBody>
+                        <simple>${exchangeProperty.db-event}</simple>
+                    </setBody>
+                    <marshal>
+                        <json library="Jackson" />
+                    </marshal>
+                    <setBody>
+                        <simple>${body}</simple>
+                    </setBody>
+
+                    <!--<process ref="pgpEncryptService"/>-->
+                    <toD uri="direct:${exchangeProperty.db-event-destination}" />
+                </split>
+            </when>
+            <otherwise>
+                <log message="Don't know how to handle DB event operation: ${headers.CamelDebeziumOperation} for entity: ${body}" loggingLevel="ERROR" />
+            </otherwise>
+        </choice>
+
     </route>
 </routes>
