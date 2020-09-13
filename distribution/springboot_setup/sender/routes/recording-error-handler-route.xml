@@ -43,7 +43,7 @@
 
            <setProperty name="db-event">
                <spel>
-                   #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'),
+                   #{new org.openmrs.eip.component.entity.DbEvent(getProperty('entity-id'),
                    request.headers.CamelDebeziumSourceMetadata.get('table'), request.headers.CamelDebeziumOperation)}
                </spel>
            </setProperty>

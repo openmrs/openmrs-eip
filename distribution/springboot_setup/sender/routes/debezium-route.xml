@@ -12,12 +12,12 @@
         <choice>
             <when>
                 <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                <setProperty name="debezium-entity-id">
+                <setProperty name="entity-id">
                     <simple>${headers.CamelDebeziumBefore.get('uuid')}</simple>
                 </setProperty>
             </when>
             <otherwise>
-                <setProperty name="debezium-entity-id">
+                <setProperty name="entity-id">
                     <simple>${exchangeProperty.event-body.get('uuid')}</simple>
                 </setProperty>
             </otherwise>
@@ -32,7 +32,7 @@
 
                 <when>
                     <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                    <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.dbEvent.entityTableName='visit' AND r.dbEvent.entityId='uuid-voided'" />
+                    <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.dbEvent.entityTableName='${exchangeProperty.debezium-table}' AND r.dbEvent.entityId='${exchangeProperty.entity-id}'" />
                     <setProperty name="existing-retries">
                         <simple>${body}</simple>
                     </setProperty>
@@ -71,7 +71,7 @@
 
                         <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
 
-                        <setProperty name="debezium-entity-id">
+                        <setProperty name="entity-id">
                             <simple>${body[0].get('uuid')}</simple>
                         </setProperty>
                     </when>
@@ -79,7 +79,7 @@
 
                 <setProperty name="db-event">
                     <spel>
-                        #{new org.openmrs.eip.component.entity.DbEvent(getProperty('debezium-entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
+                        #{new org.openmrs.eip.component.entity.DbEvent(getProperty('entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
                     </spel>
                 </setProperty>
 
