@@ -83,56 +83,41 @@
                     </spel>
                 </setProperty>
 
-                <choice>
-                    <!-- For deletes ensure there is no pending failure otherwise downstream systems can't 'delete' what they don't have.
-                         We also don't want a sequence like CREATE -> DELETE -> UPDATE which results in the entity getting recreated
-                         in case of a downstream system which a listener route is sort of synchronizing to. -->
-                    <when>
-                        <simple>${exchangeProperty.existing-failures} != null &amp;&amp; ${exchangeProperty.existing-failures.size()} > 0</simple>
-                        <log message="Moving delete event to failure queue because the entity has ${exchangeProperty.existing-failures.size()} failed event(s) that need to be synced first" />
-                        <setProperty name="delete-event-failure">
-                            <spel>
-                                #{new org.openmrs.eip.app.management.entity.Failure()}
-                            </spel>
-                        </setProperty>
-                        <setProperty name="delete-event-message">
-                            <simple>Cannot process a delete event for an entity with ${exchangeProperty.existing-failures.size()} failed event(s)</simple>
-                        </setProperty>
-                        <script>
-                            <spel>
-                                #{getProperty('delete-event-failure').setDbEvent(getProperty('db-event'))}
-                                #{getProperty('delete-event-failure').setMessage(getProperty('delete-event-message'))}
-                                #{getProperty('delete-event-failure').setDateCreated(new java.util.Date())}
-                            </spel>
-                        </script>
-                        <setBody>
-                            <simple>${exchangeProperty.delete-event-failure}</simple>
-                        </setBody>
-                        <log message="Saving delete event for an entity with failures -> ${body}" loggingLevel="DEBUG" />
-                        <to uri="jpa:org.openmrs.eip.app.management.entity.Failure?usePersist=true" />
-                        <log message="Saved delete event for an entity with failures -> ${body}" loggingLevel="DEBUG" />
-                    </when>
-                    <otherwise>
-                        <split parallelProcessing="true">
-                            <simple>{{db-event.destinations}}</simple>
-                            <setProperty name="db-event-destination">
-                                <simple>${body}</simple>
-                            </setProperty>
+                <!-- For deletes ensure there is no pending failure otherwise downstream systems can't 'delete' what they don't have.
+                     We also don't want a sequence like CREATE -> DELETE -> UPDATE which results in the entity getting recreated
+                     in case of a downstream system which a listener route is sort of synchronizing to. -->
+                <when>
+                    <simple>${exchangeProperty.existing-failures} != null &amp;&amp; ${exchangeProperty.existing-failures.size()} > 0</simple>
+                    <log message="Moving delete event to failure queue because the entity has ${exchangeProperty.existing-failures.size()} event(s) in the retry queue" />
+                    <setProperty name="delete-event-failure">
+                        <spel>
+                            #{new org.openmrs.eip.app.management.entity.Failure()}
+                        </spel>
+                    </setProperty>
+                    <setProperty name="delete-event-message">
+                        <simple>Cannot process a delete event for an entity with ${exchangeProperty.existing-failures.size()} event(s) in the retry queue</simple>
+                    </setProperty>
+                    <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.delete-event-message}" />
+                </when>
 
-                            <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
+                <split parallelProcessing="true">
+                    <simple>{{db-event.destinations}}</simple>
+                    <setProperty name="db-event-destination">
+                        <simple>${body}</simple>
+                    </setProperty>
 
-                            <setBody>
-                                <simple>${exchangeProperty.db-event}</simple>
-                            </setBody>
-                            <marshal>
-                                <json library="Jackson" />
-                            </marshal>
+                    <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
 
-                            <!--<process ref="pgpEncryptService"/>-->
-                            <toD uri="direct:${exchangeProperty.db-event-destination}" />
-                        </split>
-                    </otherwise>
-                </choice>
+                    <setBody>
+                        <simple>${exchangeProperty.db-event}</simple>
+                    </setBody>
+                    <marshal>
+                        <json library="Jackson" />
+                    </marshal>
+
+                    <!--<process ref="pgpEncryptService"/>-->
+                    <toD uri="direct:${exchangeProperty.db-event-destination}" />
+                </split>
             </when>
             <otherwise>
                 <log message="Don't know how to handle DB event operation: ${headers.CamelDebeziumOperation} for entity: ${exchangeProperty.event-body}" loggingLevel="ERROR" />

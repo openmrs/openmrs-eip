@@ -11,7 +11,7 @@
             <simple>${exception.toString()}</simple>
         </setProperty>
 
-        <log message="${exchangeProperty.error-msg}" loggingLevel="ERROR" />
+        <log message="${exchangeProperty.error-msg}" loggingLevel="DEBUG" />
 
         <when>
             <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
