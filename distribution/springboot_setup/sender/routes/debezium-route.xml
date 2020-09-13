@@ -77,12 +77,6 @@
                     </when>
                 </choice>
 
-                <setProperty name="db-event">
-                    <spel>
-                        #{new org.openmrs.eip.component.entity.DbEvent(getProperty('entity-id'), getProperty('debezium-table'), request.headers.CamelDebeziumOperation)}
-                    </spel>
-                </setProperty>
-
                 <!-- For deletes ensure there is no pending failure otherwise downstream systems can't 'delete' what they don't have.
                      We also don't want a sequence like CREATE -> DELETE -> UPDATE which results in the entity getting recreated
                      in case of a downstream system which a listener route is sort of synchronizing to. -->
@@ -104,13 +98,9 @@
                     <log message="Publishing to destination: ${exchangeProperty.db-event-destination}" loggingLevel="DEBUG" />
 
                     <setBody>
-                        <simple>${exchangeProperty.db-event}</simple>
+                        <simple>${exchangeProperty.event-body}</simple>
                     </setBody>
-                    <marshal>
-                        <json library="Jackson" />
-                    </marshal>
 
-                    <!--<process ref="pgpEncryptService"/>-->
                     <toD uri="direct:${exchangeProperty.db-event-destination}" />
                 </split>
             </when>

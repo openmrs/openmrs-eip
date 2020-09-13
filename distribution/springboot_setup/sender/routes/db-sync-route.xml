@@ -3,21 +3,13 @@
     <route id="out-bound-db-sync" errorHandlerRef="recordingErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
-        <log message="Processing db event: ${body}" loggingLevel="DEBUG" />
-
-        <unmarshal>
-            <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.DbEvent" />
-        </unmarshal>
-
-        <setProperty name="affected-entity-id">
-            <simple>${body.entityId}</simple>
-        </setProperty>
+        <log message="Processing debezium event: ${body}" loggingLevel="DEBUG" />
 
         <choice>
             <when>
-                <simple>${body.operation} == 'd'</simple>
+                <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
                 <setBody>
-                    <simple>DELETE:${body.entityTableName}:${body.entityId}</simple>
+                    <simple>DELETE:${exchangeProperty.debezium-table}:${exchangeProperty.entity-id}</simple>
                 </setBody>
 
                 <log message="Deleted entity payload -> ${body}" />
@@ -25,7 +17,7 @@
             <otherwise>
                 <log message="Loading entity from DB..." loggingLevel="DEBUG" />
 
-                <toD uri="openmrs:extract?tableToSync=${body.entityTableName().toUpperCase()}&amp;uuid=${body.entityId}" />
+                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.debezium-table.toUpperCase()}&amp;uuid=${exchangeProperty.entity-id}" />
 
                 <log message="Loaded entity -> ${body}" />
 
@@ -57,7 +49,7 @@
             </when>
             <otherwise>
                 <!-- TODO Log to a special failures log file or DB -->
-                <log message="No entity found in the database matching identifier: ${exchangeProperty.affected-entity-id}" loggingLevel="ERROR" />
+                <log message="No entity found in the database matching identifier: ${exchangeProperty.entity-id}" loggingLevel="ERROR" />
             </otherwise>
         </choice>
 
