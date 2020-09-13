@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -161,6 +162,12 @@ public class AbstractEntityServiceTest {
         // Then
         assertNotNull(result);
         assertEquals(mockedModel, result);
+    }
+
+    @Test
+    public void getModel_shoulReturnNullIfNoMatchIsFound() {
+        assertNull(mockedEntityService.getModel("uuid"));
+        verify(entityToModelMapper, never()).apply(any());
     }
 
     @Test

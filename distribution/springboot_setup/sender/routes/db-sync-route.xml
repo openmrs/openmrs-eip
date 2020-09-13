@@ -9,6 +9,10 @@
             <json library="Jackson" unmarshalTypeName="org.openmrs.eip.component.entity.DbEvent" />
         </unmarshal>
 
+        <setProperty name="affected-entity-id">
+            <simple>${body.entityId}</simple>
+        </setProperty>
+
         <choice>
             <when>
                 <simple>${body.operation} == 'd'</simple>
@@ -25,21 +29,37 @@
 
                 <log message="Loaded entity -> ${body}" />
 
-                <!-- TODO cater for scenario where entity could have been deleted just before this run,
-                    one option is to skip this record with hope that there is a delete sync record in the queue -->
-
-                <setBody>
-                    <jsonpath>$[0]</jsonpath>
-                </setBody>
-                <marshal>
-                    <json library="Jackson" />
-                </marshal>
+                <choice>
+                    <when>
+                        <simple>${body} != '[]'</simple>
+                        <setBody>
+                            <jsonpath>$[0]</jsonpath>
+                        </setBody>
+                        <marshal>
+                            <json library="Jackson" />
+                        </marshal>
+                    </when>
+                    <otherwise>
+                        <setBody>
+                            <simple>${null}</simple>
+                        </setBody>
+                    </otherwise>
+                </choice>
             </otherwise>
         </choice>
 
-        <log message="Writing entity to sync queue: {{camel.output.endpoint}}" loggingLevel="DEBUG" />
+        <choice>
+            <when>
+                <simple>${body} != null</simple>
+                <log message="Pushing entity to sync queue: {{camel.output.endpoint}}" loggingLevel="DEBUG" />
 
-        <toD uri="{{camel.output.endpoint}}" />
+                <toD uri="{{camel.output.endpoint}}" />
+            </when>
+            <otherwise>
+                <!-- TODO Log to a special failures log file or DB -->
+                <log message="No entity found in the database matching identifier: ${exchangeProperty.affected-entity-id}" loggingLevel="ERROR" />
+            </otherwise>
+        </choice>
 
     </route>
 

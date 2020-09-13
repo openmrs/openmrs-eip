@@ -72,7 +72,8 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     @Override
     public M getModel(final String uuid) {
-        return entityToModelMapper.apply(repository.findByUuid(uuid));
+        E entity  = repository.findByUuid(uuid);
+        return entity != null ? entityToModelMapper.apply(entity) : null;
     }
 
     @Override
