@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "failure")
-public class Failure extends AbstractEntity {
+@Table(name = "retry_queue")
+public class RetryQueueItem extends AbstractEntity {
 
     @Embedded
     @AttributeOverride(name = "entityId", column = @Column(name = "entity_id", nullable = false, updatable = false))
@@ -27,6 +27,9 @@ public class Failure extends AbstractEntity {
 
     @Column(name = "cause_message", updatable = false, length = 1024)
     private String causeMessage;
+
+    @Column(name = "attempt_count", nullable = false)
+    private Integer attemptCount = 1;
 
     /**
      * Gets the dbEvent
@@ -98,6 +101,24 @@ public class Failure extends AbstractEntity {
      */
     public void setCauseMessage(String causeMessage) {
         this.causeMessage = causeMessage;
+    }
+
+    /**
+     * Gets the attemptCount
+     *
+     * @return the attemptCount
+     */
+    public Integer getAttemptCount() {
+        return attemptCount;
+    }
+
+    /**
+     * Sets the attemptCount
+     *
+     * @param attemptCount the attemptCount to set
+     */
+    public void setAttemptCount(Integer attemptCount) {
+        this.attemptCount = attemptCount;
     }
 
     @Override
