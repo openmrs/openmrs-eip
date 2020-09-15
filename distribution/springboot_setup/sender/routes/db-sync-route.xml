@@ -9,7 +9,7 @@
             <when>
                 <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
                 <setBody>
-                    <simple>DELETE:${exchangeProperty.debezium-table}:${exchangeProperty.entity-id}</simple>
+                    <simple>DELETE:${exchangeProperty.event.tableName}:${exchangeProperty.event.identifier}</simple>
                 </setBody>
 
                 <log message="Deleted entity payload -> ${body}" />
@@ -17,7 +17,7 @@
             <otherwise>
                 <log message="Loading entity from DB..." loggingLevel="DEBUG" />
 
-                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.debezium-table.toUpperCase()}&amp;uuid=${exchangeProperty.entity-id}" />
+                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
 
                 <log message="Loaded entity -> ${body}" />
 
@@ -49,7 +49,7 @@
             </when>
             <otherwise>
                 <!-- TODO Log to a special failures log file or DB -->
-                <log message="No entity found in the database matching identifier: ${exchangeProperty.entity-id}" loggingLevel="ERROR" />
+                <log message="No entity found in the database matching identifier: ${exchangeProperty.event.identifier}" loggingLevel="ERROR" />
             </otherwise>
         </choice>
 

@@ -36,22 +36,10 @@
                 #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
             </spel>
         </setProperty>
-       <when>
-           <simple>${exchangeProperty.db-event} == null</simple>
-
-           <log message="Instantiating DB event" loggingLevel="DEBUG" />
-
-           <setProperty name="db-event">
-               <spel>
-                   #{new org.openmrs.eip.component.entity.DbEvent(getProperty('entity-id'),
-                   request.headers.CamelDebeziumSourceMetadata.get('table'), request.headers.CamelDebeziumOperation)}
-               </spel>
-           </setProperty>
-       </when>
         <script>
             <spel>
                 #{getProperty('retry-item').setRoute(getProperty('db-event-destination'))}
-                #{getProperty('retry-item').setDbEvent(getProperty('db-event'))}
+                #{getProperty('retry-item').setEvent(getProperty('event'))}
                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                 #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                 #{getProperty('retry-item').setDateCreated(new java.util.Date())}

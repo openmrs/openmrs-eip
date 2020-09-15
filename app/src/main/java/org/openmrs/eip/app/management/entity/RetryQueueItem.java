@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.management.entity;
 
-import org.openmrs.eip.component.entity.DbEvent;
+import org.openmrs.eip.component.entity.Event;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -13,10 +13,12 @@ import javax.persistence.Table;
 public class RetryQueueItem extends AbstractEntity {
 
     @Embedded
-    @AttributeOverride(name = "entityId", column = @Column(name = "entity_id", nullable = false, updatable = false))
-    @AttributeOverride(name = "entityTableName", column = @Column(name = "entity_table_name", nullable = false, updatable = false, length = 100))
-    @AttributeOverride(name = "operation", column = @Column(name = "operation", nullable = false, updatable = false, length = 1))
-    private DbEvent dbEvent;
+    @AttributeOverride(name = "identifier", column = @Column(nullable = false, updatable = false))
+    @AttributeOverride(name = "primaryKeyId", column = @Column(name = "primary_key_id", nullable = false, updatable = false))
+    @AttributeOverride(name = "tableName", column = @Column(name = "table_name", nullable = false, updatable = false, length = 100))
+    @AttributeOverride(name = "operation", column = @Column(nullable = false, updatable = false, length = 1))
+    @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
+    private Event event;
 
     //the camel route where this event  couldn't be processed, null is interpreted as all routes
     @Column(updatable = false, length = 50)
@@ -32,21 +34,21 @@ public class RetryQueueItem extends AbstractEntity {
     private Integer attemptCount = 1;
 
     /**
-     * Gets the dbEvent
+     * Gets the event
      *
-     * @return the dbEvent
+     * @return the event
      */
-    public DbEvent getDbEvent() {
-        return dbEvent;
+    public Event getEvent() {
+        return event;
     }
 
     /**
-     * Sets the dbEvent
+     * Sets the event
      *
-     * @param dbEvent the dbEvent to set
+     * @param event the event to set
      */
-    public void setDbEvent(DbEvent dbEvent) {
-        this.dbEvent = dbEvent;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     /**
@@ -123,7 +125,7 @@ public class RetryQueueItem extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "route: " + getRoute() + ", " + getDbEvent();
+        return "RetryQueueItem {route=" + getRoute() + ", event=" + getEvent() + "}";
     }
 
 }
