@@ -42,7 +42,7 @@
                 <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
                 
                 <when>
-                    <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                    <simple>${headers.CamelDebeziumOperation} != 'c'</simple>
                     <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
                     <setProperty name="existing-retries">
                         <simple>${body}</simple>
@@ -88,16 +88,15 @@
                     </when>
                 </choice>
 
-                <!-- For deletes ensure there is no pending failure otherwise downstream systems can't 'delete' what they don't have.
-                     We also don't want a sequence like CREATE -> DELETE -> UPDATE which results in the entity getting recreated
-                     in case of a downstream system which a listener route is sort of synchronizing to. -->
+                <!-- For deletes and updates, ensure there is no retry item in the queue to maintain order so that events
+                    that happened earlier don't override those that happened after them -->
                 <when>
                     <simple>${exchangeProperty.existing-retries} != null &amp;&amp; ${exchangeProperty.existing-retries.size()} > 0</simple>
-                    <log message="Moving delete event to failure queue because the entity has ${exchangeProperty.existing-retries.size()} event(s) in the retry queue" />
-                    <setProperty name="delete-event-message">
-                        <simple>Cannot process a delete event for an entity with ${exchangeProperty.existing-retries.size()} event(s) in the retry queue</simple>
+                    <log message="Moving event to failure queue because the entity has ${exchangeProperty.existing-retries.size()} event(s) in the retry queue" />
+                    <setProperty name="retry-event-message">
+                        <simple>Cannot process event for an entity with ${exchangeProperty.existing-retries.size()} event(s) in the retry queue</simple>
                     </setProperty>
-                    <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.delete-event-message}" />
+                    <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
                 </when>
 
                 <split parallelProcessing="true">
