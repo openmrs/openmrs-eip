@@ -13,7 +13,7 @@ import javax.persistence.Table;
 public class RetryQueueItem extends AbstractEntity {
 
     @Embedded
-    @AttributeOverride(name = "identifier", column = @Column(nullable = false, updatable = false))
+    @AttributeOverride(name = "identifier", column = @Column(updatable = false))
     @AttributeOverride(name = "primaryKeyId", column = @Column(name = "primary_key_id", nullable = false, updatable = false))
     @AttributeOverride(name = "tableName", column = @Column(name = "table_name", nullable = false, updatable = false, length = 100))
     @AttributeOverride(name = "operation", column = @Column(nullable = false, updatable = false, length = 1))
