@@ -38,7 +38,7 @@
         </setProperty>
         <script>
             <spel>
-                #{getProperty('retry-item').setRoute(getProperty('db-event-destination'))}
+                #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
                 #{getProperty('retry-item').setEvent(getProperty('event'))}
                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                 #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
