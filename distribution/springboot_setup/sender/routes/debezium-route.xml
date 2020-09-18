@@ -20,11 +20,14 @@
             </spel>
         </script>
 
+        <setProperty name="is-subclass">
+            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
+        </setProperty>
+
         <choice>
             <when>
                 <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
 
-                <!-- TODO For subclasses, capture the primary key early -->
                 <choice>
                     <when>
                         <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
@@ -32,11 +35,12 @@
                             <spel>#{getProperty('event').setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}</spel>
                         </script>
                     </when>
-                    <otherwise>
+                    <when>
+                        <simple>${exchangeProperty.is-subclass} == false</simple>
                         <script>
                             <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
                         </script>
-                    </otherwise>
+                    </when>
                 </choice>
 
                 <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
@@ -53,6 +57,7 @@
                         <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
                     </script>
                 </split>
+
                 <when>
                     <simple>${headers.CamelDebeziumOperation} != 'c'</simple>
                     <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
@@ -79,45 +84,6 @@
                 </when>
                 <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
 
-                <choice>
-                    <when>
-                        <simple>${exchangeProperty.debezium-table} == 'test_order' || ${exchangeProperty.debezium-table} == 'drug_order' || ${exchangeProperty.debezium-table} == 'patient'</simple>
-                        <choice>
-                            <when>
-                                <simple>${exchangeProperty.debezium-table} == 'patient'</simple>
-                                <setProperty name="debezium-refTable">
-                                    <constant>person</constant>
-                                </setProperty>
-                                <setProperty name="debezium-refColumn">
-                                    <constant>person_id</constant>
-                                </setProperty>
-                                <setProperty name="debezium-column">
-                                    <constant>patient_id</constant>
-                                </setProperty>
-                            </when>
-                            <otherwise>
-                                <setProperty name="debezium-refTable">
-                                    <constant>orders</constant>
-                                </setProperty>
-                                <setProperty name="debezium-refColumn">
-                                    <constant>order_id</constant>
-                                </setProperty>
-                                <setProperty name="debezium-column">
-                                    <constant>order_id</constant>
-                                </setProperty>
-                            </otherwise>
-                        </choice>
-
-                        <log message="Looking up uuid for ${exchangeProperty.debezium-table} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
-
-                        <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
-
-                        <script>
-                            <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
-                        </script>
-                    </when>
-                </choice>
-
                 <!-- For deletes and updates, ensure there is no retry items in the queue that was not submitted to any
                     route to maintain order so that events that happened earlier don't override those that happened
                     after them -->
@@ -128,6 +94,44 @@
                         <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get('all-routes')} event(s) in the retry queue</simple>
                     </setProperty>
                     <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-msg}" />
+                </when>
+                
+                <when>
+                    <!-- For a subclass table, fetch the identifier(uuid) from the parent table e.g person.uuid value for patient table joining on the FK -->
+                    <simple>${exchangeProperty.event.identifier} == null &amp;&amp; ${exchangeProperty.is-subclass} == true</simple>
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.event.tableName} == 'patient'</simple>
+                            <setProperty name="debezium-refTable">
+                                <constant>person</constant>
+                            </setProperty>
+                            <setProperty name="debezium-refColumn">
+                                <constant>person_id</constant>
+                            </setProperty>
+                            <setProperty name="debezium-column">
+                                <constant>patient_id</constant>
+                            </setProperty>
+                        </when>
+                        <otherwise>
+                            <setProperty name="debezium-refTable">
+                                <constant>orders</constant>
+                            </setProperty>
+                            <setProperty name="debezium-refColumn">
+                                <constant>order_id</constant>
+                            </setProperty>
+                            <setProperty name="debezium-column">
+                                <constant>order_id</constant>
+                            </setProperty>
+                        </otherwise>
+                    </choice>
+
+                    <log message="Looking up uuid for ${exchangeProperty.event.tableName} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
+
+                    <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+
+                    <script>
+                        <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
+                    </script>
                 </when>
 
                 <split parallelProcessing="true">

@@ -38,6 +38,7 @@
                 <log message="A fatal error occurred while attempting to process events in the retry queue, Error: queue ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
             </when>
             <otherwise>
+                <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
                 <when>
                     <simple>${exchangeProperty.retry-item} == null</simple>
                     <log message="Loading event retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
