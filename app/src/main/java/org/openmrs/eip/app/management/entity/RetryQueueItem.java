@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Date;
 
 @Entity
 @Table(name = "retry_queue")
@@ -32,6 +33,9 @@ public class RetryQueueItem extends AbstractEntity {
 
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount = 1;
+
+    @Column(name = "date_Changed")
+    private Date dateChanged;
 
     /**
      * Gets the event
@@ -121,6 +125,24 @@ public class RetryQueueItem extends AbstractEntity {
      */
     public void setAttemptCount(Integer attemptCount) {
         this.attemptCount = attemptCount;
+    }
+
+    /**
+     * Gets the dateChanged
+     *
+     * @return the dateChanged
+     */
+    public Date getDateChanged() {
+        return dateChanged;
+    }
+
+    /**
+     * Sets the dateChanged
+     *
+     * @param dateChanged the dateChanged to set
+     */
+    public void setDateChanged(Date dateChanged) {
+        this.dateChanged = dateChanged;
     }
 
     @Override

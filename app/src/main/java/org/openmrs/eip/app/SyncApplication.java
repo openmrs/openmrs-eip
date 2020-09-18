@@ -93,6 +93,13 @@ public class SyncApplication {
         return builder;
     }
 
+    @Bean("retryErrorHandler")
+    public DeadLetterChannelBuilder getRetryErrorHandler() {
+        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:retry-error-handler");
+        builder.setUseOriginalMessage(true);
+        return builder;
+    }
+
     @Bean
     @Profile(SyncProfiles.SENDER)
     public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {

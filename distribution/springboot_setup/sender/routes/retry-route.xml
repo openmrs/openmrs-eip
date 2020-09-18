@@ -1,0 +1,32 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="out-bound-retry" errorHandlerRef="retryErrorHandler">
+        <from uri="scheduler:retry?initialDelay={{db-event.retry.initial.delay}}&amp;delay={{db-event.retry.interval}}" />
+
+        <log message="Fetching events in the retry queue" />
+
+        <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r" />
+
+        <log message="Event count in the retry queue ${body.size()}" />
+
+        <split>
+            <simple>${body}</simple>
+            <script><spel>#{T(java.lang.Thread).sleep(3000)}</spel></script>
+            <setProperty name="retry-item-id">
+                <simple>${body}</simple>
+            </setProperty>
+
+            <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
+
+            <setBody>
+                <simple>${body[0]}</simple>
+            </setBody>
+            <log message="Processing ${body}" />
+
+            <toD uri="sql:SELECT uuid FROM me?dataSource=openmrsDataSource" />
+
+            <!--<toD uri="jpa:RetryQueueItem?deleteHandler=retryQueueItemDeleteHandler&amp;preDeleteHandler=retryQueueItemDeleteHandler&amp;query=DELETE FROM RetryQueueItem WHERE id = ${body.id}" />-->
+        </split>
+    </route>
+
+</routes>

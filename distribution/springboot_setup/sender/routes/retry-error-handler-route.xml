@@ -1,0 +1,73 @@
+<!--
+    Route to receive exceptions and log them in the failure table in the management DB.
+    Note that this handler should only be used by routes that are registered to receieve DB events so that when errors
+    are encountered while processing the DB event there is an option to retry.
+ -->
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="retry-error-handler">
+        <from uri="direct:retry-error-handler" />
+
+        <setProperty name="error-msg">
+            <simple>${exception.toString()}</simple>
+        </setProperty>
+
+        <log message="${exchangeProperty.error-msg}" loggingLevel="DEBUG" />
+
+        <when>
+            <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
+            <setProperty name="error-msg">
+                <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
+            </setProperty>
+        </when>
+        <when>
+            <simple>${exception.cause} != null</simple>
+            <setProperty name="cause-error-msg">
+                <simple>${exception.cause.toString()}</simple>
+            </setProperty>
+            <when>
+                <simple>${exchangeProperty.cause-error-msg.length()} > 1024</simple>
+                <setProperty name="cause-error-msg">
+                    <simple>${exchangeProperty.cause-error-msg.substring(0, 1024)}</simple>
+                </setProperty>
+            </when>
+            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="DEBUG" />
+        </when>
+        <choice>
+            <when>
+                <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.retry-item} == null</simple>
+                <log message="A fatal error occurred while attempting to process events in the retry queue, Error: queue ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
+            </when>
+            <otherwise>
+                <when>
+                    <simple>${exchangeProperty.retry-item} == null</simple>
+                    <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
+                    
+                    <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
+                    
+                    <log message="Loaded retry item with id: ${body}" loggingLevel="DEBUG" />
+                    <setProperty name="retry-item">
+                        <simple>${body[0]}</simple>
+                    </setProperty>
+                </when>
+                <script>
+                    <spel>
+                        #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+                        #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
+                        #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
+                        #{getProperty('retry-item').setDateChanged(new java.util.Date())}
+                    </spel>
+                </script>
+                <setBody>
+                    <simple>${exchangeProperty.retry-item}</simple>
+                </setBody>
+
+                <log message="Saving updates for retry queue item -> ${body}" loggingLevel="DEBUG" />
+
+                <to uri="jpa:RetryQueueItem" />
+
+                <log message="Successfully updated retry queue item ${body}" loggingLevel="DEBUG" />
+            </otherwise>
+
+        </choice>
+    </route>
+</routes>
