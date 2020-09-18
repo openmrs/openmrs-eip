@@ -25,10 +25,10 @@ public class RetryQueueItem extends AbstractEntity {
     @Column(updatable = false, length = 50)
     private String route;
 
-    @Column(updatable = false, length = 1024)
+    @Column(length = 1024)
     private String message;
 
-    @Column(name = "cause_message", updatable = false, length = 1024)
+    @Column(name = "cause_message", length = 1024)
     private String causeMessage;
 
     @Column(name = "attempt_count", nullable = false)

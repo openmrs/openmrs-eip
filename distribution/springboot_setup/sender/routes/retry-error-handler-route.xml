@@ -11,7 +11,7 @@
             <simple>${exception.toString()}</simple>
         </setProperty>
 
-        <log message="${exchangeProperty.error-msg}" loggingLevel="DEBUG" />
+        <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="DEBUG" />
 
         <when>
             <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
@@ -40,11 +40,11 @@
             <otherwise>
                 <when>
                     <simple>${exchangeProperty.retry-item} == null</simple>
-                    <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
+                    <log message="Loading event retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
                     
                     <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
                     
-                    <log message="Loaded retry item with id: ${body}" loggingLevel="DEBUG" />
+                    <log message="Loaded: ${body}" loggingLevel="DEBUG" />
                     <setProperty name="retry-item">
                         <simple>${body[0]}</simple>
                     </setProperty>

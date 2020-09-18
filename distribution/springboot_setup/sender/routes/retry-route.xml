@@ -11,10 +11,11 @@
 
         <split>
             <simple>${body}</simple>
-            <script><spel>#{T(java.lang.Thread).sleep(3000)}</spel></script>
             <setProperty name="retry-item-id">
                 <simple>${body}</simple>
             </setProperty>
+
+            <toD uri="sql:SELECT uuid FROM me?dataSource=openmrsDataSource" />
 
             <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
 
@@ -23,9 +24,7 @@
             </setBody>
             <log message="Processing ${body}" />
 
-            <toD uri="sql:SELECT uuid FROM me?dataSource=openmrsDataSource" />
-
-            <!--<toD uri="jpa:RetryQueueItem?deleteHandler=retryQueueItemDeleteHandler&amp;preDeleteHandler=retryQueueItemDeleteHandler&amp;query=DELETE FROM RetryQueueItem WHERE id = ${body.id}" />-->
+            <!--<toD uri="jpa:RetryQueueItem?query=DELETE FROM RetryQueueItem WHERE id = ${body.id}" />-->
         </split>
     </route>
 
