@@ -82,6 +82,7 @@
                         </choice>
                     </split>
                 </when>
+                
                 <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
 
                 <!-- For deletes and updates, ensure there is no retry items in the queue that was not submitted to any
@@ -95,70 +96,8 @@
                     </setProperty>
                     <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-msg}" />
                 </when>
-                
-                <when>
-                    <!-- For a subclass table, fetch the identifier(uuid) from the parent table e.g person.uuid value for patient table joining on the FK -->
-                    <simple>${exchangeProperty.event.identifier} == null &amp;&amp; ${exchangeProperty.is-subclass} == true</simple>
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.event.tableName} == 'patient'</simple>
-                            <setProperty name="debezium-refTable">
-                                <constant>person</constant>
-                            </setProperty>
-                            <setProperty name="debezium-refColumn">
-                                <constant>person_id</constant>
-                            </setProperty>
-                            <setProperty name="debezium-column">
-                                <constant>patient_id</constant>
-                            </setProperty>
-                        </when>
-                        <otherwise>
-                            <setProperty name="debezium-refTable">
-                                <constant>orders</constant>
-                            </setProperty>
-                            <setProperty name="debezium-refColumn">
-                                <constant>order_id</constant>
-                            </setProperty>
-                            <setProperty name="debezium-column">
-                                <constant>order_id</constant>
-                            </setProperty>
-                        </otherwise>
-                    </choice>
 
-                    <log message="Looking up uuid for ${exchangeProperty.event.tableName} from referenced ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
-
-                    <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
-
-                    <script>
-                        <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
-                    </script>
-                </when>
-
-                <split parallelProcessing="true">
-                    <simple>{{db-event.destinations}}</simple>
-                    <setProperty name="db-event-dest">
-                        <simple>${body.trim()}</simple>
-                    </setProperty>
-
-                    <!-- For deletes and updates, ensure there is no retry item sin the queue for this route so that
-                        events that happened earlier don't override those that happened after them -->
-                    <when>
-                        <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
-                        <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
-                        <setProperty name="retry-event-message">
-                            <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
-                        </setProperty>
-                        <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
-                    </when>
-
-                    <log message="Publishing to destination: ${exchangeProperty.db-event-dest}" loggingLevel="DEBUG" />
-
-                    <setBody>
-                        <simple>${exchangeProperty.event}</simple>
-                    </setBody>
-
-                    <toD uri="direct:${exchangeProperty.db-event-dest}"/>
-                </split>
+                <to uri="direct:db-event-processor" />
             </when>
             <otherwise>
                 <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />

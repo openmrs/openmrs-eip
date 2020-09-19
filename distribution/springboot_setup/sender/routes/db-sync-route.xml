@@ -3,7 +3,7 @@
     <route id="out-bound-db-sync" errorHandlerRef="recordingErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
-        <log message="Processing debezium event: ${body}" loggingLevel="DEBUG" />
+        <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />
 
         <choice>
             <when>
@@ -52,6 +52,8 @@
                 <log message="No entity found in the database matching identifier: ${exchangeProperty.event.identifier}" loggingLevel="ERROR" />
             </otherwise>
         </choice>
+
+        <log message="End db-sync-route: ${body}" loggingLevel="DEBUG" />
 
     </route>
 
