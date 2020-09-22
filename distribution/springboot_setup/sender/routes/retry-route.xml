@@ -22,6 +22,10 @@
                 <simple>${body[0]}</simple>
             </setBody>
 
+            <setProperty name="retry-item">
+                <simple>${body}</simple>
+            </setProperty>
+
             <log message="Retry processing: ${body}" />
 
             <setProperty name="event">
