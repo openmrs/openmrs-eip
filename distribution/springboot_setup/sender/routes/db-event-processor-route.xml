@@ -43,8 +43,15 @@
             </script>
         </when>
 
+        <when>
+            <simple>${exchangeProperty.db-event-destinations} == null</simple>
+            <setProperty name="db-event-destinations">
+                <simple>{{db-event.destinations}}</simple>
+            </setProperty>
+        </when>
+
         <split parallelProcessing="true">
-            <simple>{{db-event.destinations}}</simple>
+            <simple>${exchangeProperty.db-event-destinations}</simple>
             <setProperty name="db-event-dest">
                 <simple>${body.trim()}</simple>
             </setProperty>

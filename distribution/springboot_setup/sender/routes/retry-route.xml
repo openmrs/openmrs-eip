@@ -14,15 +14,25 @@
             <setProperty name="retry-item-id">
                 <simple>${body}</simple>
             </setProperty>
-
-            <toD uri="sql:SELECT uuid FROM me?dataSource=openmrsDataSource" />
+            <log message="Loading event retry item with id: ${body}" />
 
             <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
 
             <setBody>
                 <simple>${body[0]}</simple>
             </setBody>
-            <log message="Processing ${body}" />
+
+            <log message="Retry processing: ${body}" />
+
+            <setProperty name="event">
+                <simple>${body.event}</simple>
+            </setProperty>
+
+            <setProperty name="db-event-destinations">
+                <simple>${body.route}</simple>
+            </setProperty>
+
+            <to uri="direct:db-event-processor" />
 
             <!--<toD uri="jpa:RetryQueueItem?query=DELETE FROM RetryQueueItem WHERE id = ${body.id}" />-->
         </split>

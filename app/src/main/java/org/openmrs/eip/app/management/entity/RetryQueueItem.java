@@ -147,7 +147,7 @@ public class RetryQueueItem extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "RetryQueueItem {route=" + getRoute() + ", event=" + getEvent() + "}";
+        return "RetryQueueItem {route=" + route + ", attemptCount=" + attemptCount + ", " + getEvent() + "}";
     }
 
 }
