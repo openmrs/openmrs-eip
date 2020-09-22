@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="db-event-processor" errorHandlerRef="recordingErrorHandler">
+    <route id="db-event-processor" errorHandlerRef="eventErrorHandler">
         <from uri="direct:db-event-processor" />
 
         <log message="Processing db event ${exchangeProperty.event}" loggingLevel="DEBUG" />
