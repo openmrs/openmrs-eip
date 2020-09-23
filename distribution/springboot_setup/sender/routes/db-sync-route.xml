@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-db-sync" errorHandlerRef="eventErrorHandler">
+    <route id="out-bound-db-sync" errorHandlerRef="noErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
         <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />

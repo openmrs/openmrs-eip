@@ -2,6 +2,7 @@ package org.openmrs.eip.app;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.app.management.init.impl.ManagementDbInitImpl;
@@ -93,11 +94,9 @@ public class SyncApplication {
         return builder;
     }
 
-    @Bean("retryErrorHandler")
-    public DeadLetterChannelBuilder getRetryErrorHandler() {
-        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:retry-error-handler");
-        builder.setUseOriginalMessage(true);
-        return builder;
+    @Bean("noErrorHandler")
+    public NoErrorHandlerBuilder getNoErrorHandler() {
+        return new NoErrorHandlerBuilder();
     }
 
     @Bean
