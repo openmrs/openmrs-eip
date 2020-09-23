@@ -21,8 +21,8 @@ public class RetryQueueItem extends AbstractEntity {
     @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
     private Event event;
 
-    //the camel route where this event  couldn't be processed, null is interpreted as all routes
-    @Column(updatable = false, length = 50)
+    //the camel route where this event  couldn't be processed
+    @Column(nullable = false, updatable = false, length = 50)
     private String route;
 
     @Column(length = 1024)

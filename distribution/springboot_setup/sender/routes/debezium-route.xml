@@ -48,9 +48,6 @@
                 <setProperty name="route-retry-count-map">
                     <spel>#{new java.util.HashMap()}</spel>
                 </setProperty>
-                <script>
-                    <spel>#{getProperty('route-retry-count-map').put('all-routes', 0)}</spel>
-                </script>
                 <split>
                     <simple>{{db-event.destinations}}</simple>
                     <script>
@@ -65,12 +62,6 @@
                         <simple>${body}</simple>
                         <choice>
                             <when>
-                                <simple>${body.route} == null</simple>
-                                <script>
-                                    <spel>#{getProperty('route-retry-count-map').put('all-routes', getProperty('route-retry-count-map').get('all-routes') + 1)}</spel>
-                                </script>
-                            </when>
-                            <when>
                                 <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
                                 <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route} for failed event ${body}" />
                             </when>
@@ -84,18 +75,6 @@
                 </when>
                 
                 <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
-
-                <!-- For deletes and updates, ensure there is no retry items in the queue that was not submitted to any
-                    route to maintain order so that events that happened earlier don't override those that happened
-                    after them -->
-                <when>
-                    <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get('all-routes')} > 0</simple>
-                    <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get('all-routes')} event(s) in the retry queue" />
-                    <setProperty name="retry-event-msg">
-                        <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get('all-routes')} event(s) in the retry queue</simple>
-                    </setProperty>
-                    <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-msg}" />
-                </when>
 
                 <to uri="direct:db-event-processor" />
             </when>

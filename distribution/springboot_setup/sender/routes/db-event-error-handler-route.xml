@@ -57,11 +57,44 @@
                     <simple>${exchangeProperty.retry-item}</simple>
                 </setBody>
 
-                <log message="Adding failed DB event to retry queue -> ${body}" loggingLevel="DEBUG" />
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.retry-item.route} != null</simple>
+                        <log message="Adding failed DB event to retry queue -> ${body}" loggingLevel="DEBUG" />
 
-                <to uri="jpa:RetryQueueItem?usePersist=true" />
+                        <to uri="jpa:RetryQueueItem?usePersist=true" />
 
-                <log message="Successfully added DB event to retry queue ${body}" loggingLevel="DEBUG" />
+                        <log message="Successfully added DB event to retry queue ${body}" loggingLevel="DEBUG" />
+                    </when>
+                    <otherwise>
+                        <log message="Adding failed DB event for each registered route" loggingLevel="DEBUG" />
+                        <split parallelProcessing="false">
+                            <simple>{{db-event.destinations}}</simple>
+                            <setProperty name="retry-item-dest">
+                                <simple>${body.trim()}</simple>
+                            </setProperty>
+                            <setBody>
+                                <spel>
+                                    #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
+                                </spel>
+                            </setBody>
+                            <script>
+                                <spel>
+                                    #{body.setRoute(getProperty('retry-item-dest'))}
+                                    #{body.setEvent(getProperty('event'))}
+                                    #{body.setMessage(getProperty('error-msg'))}
+                                    #{body.setCauseMessage(getProperty('cause-error-msg'))}
+                                    #{body.setDateCreated(new java.util.Date())}
+                                </spel>
+                            </script>
+                            <log message="Adding failed DB event to retry queue -> ${body}" loggingLevel="DEBUG" />
+
+                            <to uri="jpa:RetryQueueItem?usePersist=true" />
+
+                            <log message="Successfully added DB event to retry queue ${body}" loggingLevel="DEBUG" />
+                        </split>
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed event -->
