@@ -50,7 +50,7 @@
             </setProperty>
         </when>
 
-        <split parallelProcessing="true">
+        <split parallelProcessing="false">
             <simple>${exchangeProperty.db-event-destinations}</simple>
             <setProperty name="db-event-dest">
                 <simple>${body.trim()}</simple>

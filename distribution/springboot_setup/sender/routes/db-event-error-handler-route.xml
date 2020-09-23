@@ -38,7 +38,7 @@
             <when>
                 <!-- This is a failure when processing a new event -->
                 <simple>${exchangeProperty.retry-item-id} == null</simple>
-                <log message="Handing failure for new event..." loggingLevel="DEBUG" />
+                <log message="Handing failure for new ${exchangeProperty.event}" loggingLevel="DEBUG" />
                 <setProperty name="retry-item">
                     <spel>
                         #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
