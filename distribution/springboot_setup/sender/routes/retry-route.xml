@@ -3,11 +3,14 @@
     <route id="out-bound-retry" errorHandlerRef="eventErrorHandler">
         <from uri="scheduler:retry?initialDelay={{db-event.retry.initial.delay}}&amp;delay={{db-event.retry.interval}}" />
 
-        <log message="Fetching events in the retry queue" />
+        <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
 
         <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r" />
 
-        <log message="Event count in the retry queue ${body.size()}" />
+        <when>
+            <simple>${body.size()} > 0</simple>
+            <log message="Event count in the retry queue ${body.size()}" />
+        </when>
 
         <split parallelProcessing="false">
             <simple>${body}</simple>
