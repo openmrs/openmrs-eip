@@ -9,7 +9,7 @@
 
         <log message="Event count in the retry queue ${body.size()}" />
 
-        <split>
+        <split parallelProcessing="false">
             <simple>${body}</simple>
             <setProperty name="retry-item-id">
                 <simple>${body}</simple>
@@ -26,7 +26,7 @@
                 <simple>${body}</simple>
             </setProperty>
 
-            <log message="Retry processing: ${body}" />
+            <log message="Re-processing: ${body}" />
 
             <setProperty name="event">
                 <simple>${body.event}</simple>
@@ -37,8 +37,6 @@
             </setProperty>
 
             <to uri="direct:db-event-processor" />
-
-            <!--<toD uri="jpa:RetryQueueItem?query=DELETE FROM RetryQueueItem WHERE id = ${body.id}" />-->
         </split>
     </route>
 
