@@ -11,7 +11,7 @@
             <simple>${exception.toString()}</simple>
         </setProperty>
 
-        <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="DEBUG" />
+        <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="WARN" />
 
         <when>
             <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
@@ -38,7 +38,7 @@
             <when>
                 <!-- This is a failure when processing a new event -->
                 <simple>${exchangeProperty.retry-item-id} == null</simple>
-                <log message="Handing failure for new ${exchangeProperty.event}" loggingLevel="DEBUG" />
+                <log message="Adding new item to retry queue for ${exchangeProperty.event}" />
                 <setProperty name="retry-item">
                     <spel>
                         #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
@@ -67,7 +67,7 @@
                         <log message="Successfully added DB event to retry queue ${body}" loggingLevel="DEBUG" />
                     </when>
                     <otherwise>
-                        <log message="Adding failed DB event for each registered route" loggingLevel="DEBUG" />
+                        <log message="Adding failed DB event for each registered route" />
                         <split parallelProcessing="false">
                             <simple>{{db-event.destinations}}</simple>
                             <setProperty name="retry-item-dest">
@@ -104,7 +104,7 @@
                         <log message="A fatal error occurred while attempting to process events in the retry queue, Error: queue ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
-                        <log message="Handing failure for retry item..." loggingLevel="DEBUG" />
+                        <log message="Updating attempt count for ${exchangeProperty.retry-item}" />
 
                         <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
                         <when>
