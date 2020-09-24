@@ -87,9 +87,9 @@ public class SyncApplication {
         return builder;
     }
 
-    @Bean("eventErrorHandler")
-    public DeadLetterChannelBuilder getEventErrorHandler() {
-        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:event-error-handler");
+    @Bean("outBoundErrorHandler")
+    public DeadLetterChannelBuilder getOutBoundErrorHandler() {
+        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
         builder.setUseOriginalMessage(true);
         return builder;
     }

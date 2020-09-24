@@ -4,8 +4,8 @@
     are encountered while processing the DB event there is an option to retry.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="event-error-handler">
-        <from uri="direct:event-error-handler" />
+    <route id="outbound-error-handler">
+        <from uri="direct:outbound-error-handler" />
 
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
