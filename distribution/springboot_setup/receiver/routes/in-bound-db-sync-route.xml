@@ -4,7 +4,7 @@
         
         <convertBodyTo type="java.lang.String" />
 
-        <log message="Received entity payload to sync: ${body}" />
+        <log message="Start in-bound db-sync: ${body}" />
 
         <choice>
             <when>
@@ -107,5 +107,7 @@
                 <to uri="{{openmrs.baseUrl}}/ws/rest/v1/searchindexupdate?authMethod=Basic&amp;authUsername={{openmrs.username}}&amp;authPassword={{openmrs.password}}" />
             </when>
         </choice>
+
+        <log message="End in-bound db-sync: ${body}" loggingLevel="DEBUG" />
     </route>
 </routes>
