@@ -9,7 +9,7 @@
 
         <when>
             <simple>${body.size()} > 0</simple>
-            <log message="Event count in the retry queue ${body.size()}" />
+            <log message="Event count in the retry queue: ${body.size()}" />
         </when>
 
         <split parallelProcessing="false">

@@ -1,0 +1,46 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="inbound-retry" errorHandlerRef="inBoundErrorHandler">
+        <from uri="scheduler:retry?repeatCount=1&amp;initialDelay={{inbound.retry.initial.delay}}&amp;delay={{inbound.retry.interval}}" />
+
+        <log message="Fetching messages in the retry queue" loggingLevel="DEBUG" />
+
+        <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i.id FROM InBoundRetryQueueItem i" />
+
+        <when>
+            <simple>${body.size()} > 0</simple>
+            <log message="Message count in the retry queue: ${body.size()}" />
+        </when>
+
+        <split parallelProcessing="false">
+            <simple>${body}</simple>
+            <setProperty name="retry-item-id">
+                <simple>${body}</simple>
+            </setProperty>
+            <log message="Loading retry item with id: ${body}" />
+
+            <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i FROM InBoundRetryQueueItem i WHERE i.id = ${body}" />
+
+            <setBody>
+                <simple>${body[0]}</simple>
+            </setBody>
+
+            <setProperty name="retry-item">
+                <simple>${body}</simple>
+            </setProperty>
+
+            <log message="Re-processing: ${body}" />
+
+            <setBody>
+                <simple>${body.entityPayload}</simple>
+            </setBody>
+
+            <toD uri="direct:${exchangeProperty.retry-item.route}" />
+
+            <log message="Removing from queue" />
+
+            <toD uri="jpa:InBoundRetryQueueItem?query=DELETE FROM InBoundRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+        </split>
+    </route>
+
+</routes>

@@ -83,13 +83,13 @@
                 the retry-route doesn't work properly with a NoErrorHandler -->
             <when>
                 <simple>${exchangeProperty.retry-item-id} != null</simple>
-                <log message="Removing from queue: ${exchangeProperty.retry-item}" />
+                <log message="Removing from queue" />
 
                 <toD uri="jpa:RetryQueueItem?query=DELETE FROM RetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
             </when>
         </split>
 
-        <log message="Done processing db event ${exchangeProperty.event}" loggingLevel="DEBUG" />
+        <log message="Done processing db event" loggingLevel="DEBUG" />
     </route>
 
 </routes>
