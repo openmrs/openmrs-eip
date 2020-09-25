@@ -94,7 +94,7 @@ public class SyncApplication {
         return builder;
     }
 
-    @Bean("InBoundErrorHandler")
+    @Bean("inBoundErrorHandler")
     public DeadLetterChannelBuilder getInBoundErrorHandler() {
         DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:inbound-error-handler");
         builder.setUseOriginalMessage(true);

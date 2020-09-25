@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver-main" errorHandlerRef="InBoundErrorHandler">
+    <route id="receiver-main" errorHandlerRef="inBoundErrorHandler">
         <from uri="{{camel.input.endpoint}}" />
         <!--<process ref="pgpDecryptService"/>-->
         <log message=":" loggingLevel="DEBUG" />
