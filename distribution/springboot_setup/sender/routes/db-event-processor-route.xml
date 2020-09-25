@@ -57,7 +57,11 @@
             </setProperty>
 
             <!-- For deletes and updates, ensure there is no retry items in the queue for this route for the entity
-                so that events that happened later don't overwrite those that happened before them -->
+                so that events that happened later don't overwrite those that happened before them
+
+                Note that this ONLY applies to new events and not retries, we don't explicitly check for this because
+                the header check for CamelDebeziumOperation and route-retry-count-map will be empty anyways
+            -->
             <when>
                 <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
                 <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
