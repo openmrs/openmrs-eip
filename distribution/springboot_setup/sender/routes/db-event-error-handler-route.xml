@@ -102,7 +102,7 @@
                         <log message="A fatal error occurred while attempting to process events in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
-                        <log message="Updating attempt count for ${exchangeProperty.retry-item}" />
+                        <log message="Updating attempt count for retry item" />
 
                         <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
                         <when>
@@ -129,11 +129,11 @@
                             <simple>${exchangeProperty.retry-item}</simple>
                         </setBody>
 
-                        <log message="Saving updates for retry item -> ${body}" loggingLevel="DEBUG" />
+                        <log message="Saving updates for retry item" loggingLevel="DEBUG" />
 
                         <to uri="jpa:RetryQueueItem" />
 
-                        <log message="Successfully updated retry item ${body}" loggingLevel="DEBUG" />
+                        <log message="Successfully updated retry item" loggingLevel="DEBUG" />
                     </otherwise>
                 </choice>
             </otherwise>

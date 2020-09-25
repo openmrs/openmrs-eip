@@ -36,7 +36,7 @@
             <when>
                 <!-- This is a failure when processing a new message -->
                 <simple>${exchangeProperty.retry-item-id} == null</simple>
-                <log message="Adding new item to retry queue for ${exchangeProperty.entity-payload}" />
+                <log message="Adding new item to retry queue" />
                 <setProperty name="retry-item">
                     <spel>
                         #{new org.openmrs.eip.app.management.entity.InBoundRetryQueueItem()}
@@ -89,11 +89,11 @@
                                     #{body.setDateCreated(new java.util.Date())}
                                 </spel>
                             </script>
-                            <log message="Adding failed message to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
+                            <log message="Adding failed message to retry queue" loggingLevel="DEBUG" />
 
                             <to uri="jpa:InboundRetryQueueItem?usePersist=true" />
 
-                            <log message="Successfully added message to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
+                            <log message="Successfully added message to retry queue" loggingLevel="DEBUG" />
                         </split>
                     </otherwise>
                 </choice>
@@ -106,7 +106,7 @@
                         <log message="A fatal error occurred while attempting to process message in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
-                        <log message="Updating attempt count for ${exchangeProperty.retry-item}" />
+                        <log message="Updating attempt count for retry item" />
 
                         <when>
                             <simple>${exchangeProperty.retry-item} == null</simple>
@@ -132,11 +132,11 @@
                             <simple>${exchangeProperty.retry-item}</simple>
                         </setBody>
 
-                        <log message="Saving updates for retry item -> ${body}" loggingLevel="DEBUG" />
+                        <log message="Saving updates for retry item" loggingLevel="DEBUG" />
 
                         <to uri="jpa:InboundRetryQueueItem" />
 
-                        <log message="Successfully updated retry item ${body}" loggingLevel="DEBUG" />
+                        <log message="Successfully updated retry item" loggingLevel="DEBUG" />
                     </otherwise>
                 </choice>
             </otherwise>
