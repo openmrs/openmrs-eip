@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.HashMap;
 
-@Profile(SyncProfiles.SENDER)
-@Component("fileSyncIdempotentRepository")
+//@Profile(SyncProfiles.SENDER)
+//@Component("fileSyncIdempotentRepository")
 public class FileSyncIdempotentRepository extends FileIdempotentRepository {
 
     private static final String FILE_NAME = "/store";
 
-    public FileSyncIdempotentRepository(@Value("${camel.output.endpoint.file.location}") final String path) {
+    public FileSyncIdempotentRepository(@Value("${camel.output.endpoint.file.locationw}") final String path) {
         super(new File(path + FILE_NAME), new HashMap<>());
     }
 }
