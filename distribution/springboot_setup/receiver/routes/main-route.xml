@@ -27,7 +27,7 @@
                 <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
             </script>
         </split>
-        <toD uri="sql:SELECT uuid FROM me?dataSource=openmrsDataSource" />
+
         <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i from InBoundRetryQueueItem i WHERE i.modelClassName ='${exchangeProperty.model-class}' AND i.identifier='${exchangeProperty.entity-id}'" />
 
         <split stopOnException="true">
@@ -45,20 +45,20 @@
             </choice>
         </split>
 
-        <!--<split parallelProcessing="true">
+        <split parallelProcessing="false">
             <simple>{{entity-payload.destinations}}</simple>
-            <setProperty name="entity-payload-destination">
+            <setProperty name="entity-payload-dest">
                 <simple>${body}</simple>
             </setProperty>
 
-            <log message="Publishing to destination: ${exchangeProperty.entity-payload-destination}" />
+            <log message="Publishing to destination: ${exchangeProperty.entity-payload-dest}" />
 
             <setBody>
                 <simple>${exchangeProperty.entity-payload}</simple>
             </setBody>
             
-            <toD uri="direct:${exchangeProperty.entity-payload-destination}" />
+            <toD uri="direct:${exchangeProperty.entity-payload-dest}" />
 
-        </split>-->
+        </split>
     </route>
 </routes>

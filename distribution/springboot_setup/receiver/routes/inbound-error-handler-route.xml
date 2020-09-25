@@ -46,7 +46,7 @@
                 </setProperty>
                 <script>
                     <spel>
-                        #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
+                        #{getProperty('retry-item').setRoute(getProperty('entity-payload-dest'))}
                         #{getProperty('retry-item').setIdentifier(getProperty('entity-id'))}
                         #{getProperty('retry-item').setModelClassName(getProperty('model-class'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
@@ -61,7 +61,7 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Adding failed DB event to retry queue -> ${body}" loggingLevel="DEBUG" />
+                        <log message="Adding failed DB event to retry queue for route: ${exchangeProperty.retry-item.route} -> ${body}" loggingLevel="DEBUG" />
 
                         <to uri="jpa:InboundRetryQueueItem?usePersist=true" />
 

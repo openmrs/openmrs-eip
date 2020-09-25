@@ -60,7 +60,7 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Adding failed DB event to retry queue -> ${body}" loggingLevel="DEBUG" />
+                        <log message="Adding failed DB event to retry queue for route: ${exchangeProperty.retry-item.route} -> ${body}" loggingLevel="DEBUG" />
 
                         <to uri="jpa:RetryQueueItem?usePersist=true" />
 
