@@ -94,6 +94,13 @@ public class SyncApplication {
         return builder;
     }
 
+    @Bean("InBoundErrorHandler")
+    public DeadLetterChannelBuilder getInBoundErrorHandler() {
+        DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:inbound-error-handler");
+        builder.setUseOriginalMessage(true);
+        return builder;
+    }
+
     @Bean("noErrorHandler")
     public NoErrorHandlerBuilder getNoErrorHandler() {
         return new NoErrorHandlerBuilder();

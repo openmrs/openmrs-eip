@@ -1,8 +1,5 @@
 package org.openmrs.eip.app.management.entity;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,10 +8,53 @@ import javax.persistence.Table;
 @Table(name = "inbound_retry_queue")
 public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 
-    private static final Logger logger = LoggerFactory.getLogger(InBoundRetryQueueItem.class);
+    public static final long serialVersionUID = 1;
+
+    @Column(nullable = false, updatable = false)
+    private String modelClassName;
+
+    //Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
+    @Column(nullable = false, updatable = false)
+    private String identifier;
 
     @Column(name = "entity_payload", columnDefinition = "text")
     private String entityPayload;
+
+    /**
+     * Gets the modelClassName
+     *
+     * @return the modelClassName
+     */
+    public String getModelClassName() {
+        return modelClassName;
+    }
+
+    /**
+     * Sets the modelClassName
+     *
+     * @param modelClassName the modelClassName to set
+     */
+    public void setModelClassName(String modelClassName) {
+        this.modelClassName = modelClassName;
+    }
+
+    /**
+     * Gets the identifier
+     *
+     * @return the identifier
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * Sets the identifier
+     *
+     * @param identifier the identifier to set
+     */
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
     /**
      * Gets the entityPayload
@@ -36,7 +76,8 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 
     @Override
     public String toString() {
-        return "InBoundRetryItem {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", payload=" + entityPayload + "}";
+        return "InBoundRetryQueueItem {route=" + getRoute() + ", identifier=" + identifier + ", modelClassName="
+                + modelClassName + ", attemptCount=" + getAttemptCount() + ", payload=" + entityPayload + "}";
     }
 
 }

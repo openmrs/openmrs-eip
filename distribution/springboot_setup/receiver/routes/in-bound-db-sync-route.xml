@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="in-bound-db-sync" errorHandlerRef="deadLetterChannelBuilder">
+    <route id="in-bound-db-sync" errorHandlerRef="noErrorHandler">
         <from uri="direct:in-bound-db-sync" />
         
         <convertBodyTo type="java.lang.String" />

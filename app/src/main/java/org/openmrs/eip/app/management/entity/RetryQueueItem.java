@@ -12,6 +12,8 @@ import javax.persistence.Table;
 @Table(name = "retry_queue")
 public class RetryQueueItem extends BaseRetryQueueItem {
 
+    public static final long serialVersionUID = 1;
+
     @Embedded
     @AttributeOverride(name = "identifier", column = @Column(updatable = false))
     @AttributeOverride(name = "primaryKeyId", column = @Column(name = "primary_key_id", nullable = false, updatable = false))
