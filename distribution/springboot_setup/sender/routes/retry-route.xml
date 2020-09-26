@@ -5,12 +5,21 @@
 
         <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r" />
+        <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r ORDER BY r.dateCreated ASC" />
 
         <when>
             <simple>${body.size()} > 0</simple>
             <log message="Event count in the retry queue: ${body.size()}" />
         </when>
+
+        <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes from
+             being synced before inserts.
+             Using a synchronized list for thread safety in case we start supporting parallel processing
+             otherwise it's likely the dev might unknowingly not change it at the time.
+         -->
+        <setProperty name="failed-entities">
+            <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
+        </setProperty>
 
         <split parallelProcessing="false">
             <simple>${body}</simple>
@@ -24,18 +33,32 @@
             <setProperty name="retry-item">
                 <simple>${body[0]}</simple>
             </setProperty>
-            <log message="Re-processing: ${exchangeProperty.retry-item}" />
-            <setProperty name="event">
-                <simple>${exchangeProperty.retry-item.event}</simple>
-            </setProperty>
-            <setProperty name="db-event-destinations">
-                <simple>${exchangeProperty.retry-item.route}</simple>
-            </setProperty>
-            <setBody>
-                <simple>${exchangeProperty.event}</simple>
-            </setBody>
 
-            <to uri="direct:db-event-processor" />
+            <choice>
+                <when>
+                    <simple>${exchangeProperty.failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})} == true</simple>
+                    <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because the entity still has older failed event(s) in the queue" />
+                </when>
+                <otherwise>
+                    <log message="Re-processing: ${exchangeProperty.retry-item}" />
+                    <script>
+                        <spel>
+                            #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+                        </spel>
+                    </script>
+                    <setProperty name="event">
+                        <simple>${exchangeProperty.retry-item.event}</simple>
+                    </setProperty>
+                    <setProperty name="db-event-destinations">
+                        <simple>${exchangeProperty.retry-item.route}</simple>
+                    </setProperty>
+                    <setBody>
+                        <simple>${exchangeProperty.event}</simple>
+                    </setBody>
+
+                    <to uri="direct:db-event-processor" />
+                </otherwise>
+            </choice>
         </split>
     </route>
 

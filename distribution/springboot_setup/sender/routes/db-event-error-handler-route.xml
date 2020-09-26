@@ -5,6 +5,14 @@
     <route id="outbound-error-handler">
         <from uri="direct:outbound-error-handler" />
 
+        <when>
+            <simple>${exchangeProperty.retry-item-id} != null</simple>
+            <script>
+                <simple>${exchangeProperty.failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
+            </script>
+        </when>
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.failed-entities}" loggingLevel="DEBUG" />
+
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
         </setProperty>
@@ -119,7 +127,6 @@
 
                         <script>
                             <spel>
-                                #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                                 #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                                 #{getProperty('retry-item').setDateChanged(new java.util.Date())}
