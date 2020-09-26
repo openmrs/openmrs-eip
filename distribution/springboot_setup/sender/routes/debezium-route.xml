@@ -4,9 +4,6 @@
 
         <log message=":" loggingLevel="DEBUG" />
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
-        <setProperty name="event-body">
-            <simple>${body}</simple>
-        </setProperty>
         <setProperty name="event">
             <spel>#{new org.openmrs.eip.component.entity.Event()}</spel>
         </setProperty>
@@ -75,6 +72,9 @@
                 </when>
                 
                 <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
+                <setBody>
+                    <simple>${exchangeProperty.event}</simple>
+                </setBody>
 
                 <to uri="direct:db-event-processor" />
             </when>

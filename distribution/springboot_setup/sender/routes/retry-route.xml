@@ -21,23 +21,19 @@
 
             <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
 
-            <setBody>
-                <simple>${body[0]}</simple>
-            </setBody>
-
             <setProperty name="retry-item">
-                <simple>${body}</simple>
+                <simple>${body[0]}</simple>
             </setProperty>
-
-            <log message="Re-processing: ${body}" />
-
+            <log message="Re-processing: ${exchangeProperty.retry-item}" />
             <setProperty name="event">
-                <simple>${body.event}</simple>
+                <simple>${exchangeProperty.retry-item.event}</simple>
             </setProperty>
-
             <setProperty name="db-event-destinations">
-                <simple>${body.route}</simple>
+                <simple>${exchangeProperty.retry-item.route}</simple>
             </setProperty>
+            <setBody>
+                <simple>${exchangeProperty.event}</simple>
+            </setBody>
 
             <to uri="direct:db-event-processor" />
         </split>

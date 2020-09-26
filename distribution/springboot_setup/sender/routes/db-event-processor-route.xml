@@ -3,14 +3,14 @@
     <route id="db-event-processor" errorHandlerRef="outBoundErrorHandler">
         <from uri="direct:db-event-processor" />
 
-        <log message="Processing db event ${exchangeProperty.event}" loggingLevel="DEBUG" />
+        <log message="Processing db event: ${body}" loggingLevel="DEBUG" />
 
         <when>
             <!-- For a subclass table, fetch the identifier(uuid) from the parent table e.g person.uuid value for patient table joining on the FK -->
-            <simple>${exchangeProperty.event.identifier} == null &amp;&amp; ${exchangeProperty.is-subclass} == true</simple>
+            <simple>${body.identifier} == null &amp;&amp; ${exchangeProperty.is-subclass} == true</simple>
             <choice>
                 <when>
-                    <simple>${exchangeProperty.event.tableName} == 'patient'</simple>
+                    <simple>${body.tableName} == 'patient'</simple>
                     <setProperty name="debezium-refTable">
                         <constant>person</constant>
                     </setProperty>
@@ -34,9 +34,9 @@
                 </otherwise>
             </choice>
 
-            <log message="Looking up uuid for ${exchangeProperty.event.tableName} from ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
+            <log message="Looking up uuid for ${body.tableName} from ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
 
-            <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${exchangeProperty.event-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+            <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
 
             <script>
                 <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
