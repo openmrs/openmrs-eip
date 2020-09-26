@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     <route id="inbound-retry" errorHandlerRef="inBoundErrorHandler">
-        <from uri="scheduler:retry?repeatCount=1&amp;initialDelay={{inbound.retry.initial.delay}}&amp;delay={{inbound.retry.interval}}" />
+        <from uri="scheduler:retry?initialDelay={{inbound.retry.initial.delay}}&amp;delay={{inbound.retry.interval}}" />
 
         <log message="Fetching messages in the retry queue" loggingLevel="DEBUG" />
 
