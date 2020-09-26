@@ -60,7 +60,7 @@
                         <choice>
                             <when>
                                 <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
-                                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route} for retry queue item" />
+                                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route.trim()}" />
                             </when>
                             <otherwise>
                                 <script>
