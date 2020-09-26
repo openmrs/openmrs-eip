@@ -52,7 +52,7 @@
 
             <when>
                 <simple>${exchangeProperty.event-destinations.contains(${exchangeProperty.retry-item.route.trim()})} == false</simple>
-                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.retry-item.route}" />
+                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.retry-item.route.trim()}" />
             </when>
 
             <choice>
