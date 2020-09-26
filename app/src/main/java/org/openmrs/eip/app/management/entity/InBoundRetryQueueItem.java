@@ -17,7 +17,7 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
     @Column(nullable = false, updatable = false)
     private String identifier;
 
-    @Column(name = "entity_payload", columnDefinition = "text")
+    @Column(name = "entity_payload", columnDefinition = "text", nullable = false)
     private String entityPayload;
 
     /**
