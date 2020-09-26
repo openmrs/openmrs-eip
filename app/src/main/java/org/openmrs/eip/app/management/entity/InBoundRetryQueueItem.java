@@ -10,7 +10,7 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 
     public static final long serialVersionUID = 1;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "model_class_name", nullable = false, updatable = false)
     private String modelClassName;
 
     //Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
