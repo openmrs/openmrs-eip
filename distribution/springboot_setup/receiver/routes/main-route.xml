@@ -14,13 +14,13 @@
             <jsonpath>$.model.uuid</jsonpath>
         </setProperty>
 
-        <log message="Configured destinations -> {{entity-payload.destinations}}" loggingLevel="DEBUG" />
+        <log message="Configured destinations -> {{message.destinations}}" loggingLevel="DEBUG" />
 
         <setProperty name="route-retry-count-map">
             <spel>#{new java.util.HashMap()}</spel>
         </setProperty>
         <split>
-            <simple>{{entity-payload.destinations}}</simple>
+            <simple>{{message.destinations}}</simple>
             <script>
                 <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
             </script>
@@ -44,7 +44,7 @@
         </split>
 
         <split parallelProcessing="false">
-            <simple>{{entity-payload.destinations}}</simple>
+            <simple>{{message.destinations}}</simple>
             <setProperty name="entity-payload-dest">
                 <simple>${body}</simple>
             </setProperty>

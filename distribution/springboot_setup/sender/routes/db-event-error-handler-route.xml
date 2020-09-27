@@ -37,7 +37,7 @@
                     <simple>${exchangeProperty.cause-error-msg.substring(0, 1024)}</simple>
                 </setProperty>
             </when>
-            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="DEBUG" />
+            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="WARN" />
         </when>
 
         <choice>

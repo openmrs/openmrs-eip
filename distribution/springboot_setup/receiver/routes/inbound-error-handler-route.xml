@@ -5,6 +5,14 @@
     <route id="inbound-error-handler">
         <from uri="direct:inbound-error-handler" />
 
+        <when>
+            <simple>${exchangeProperty.retry-item-id} != null</simple>
+            <script>
+                <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier}#${exchangeProperty.retry-item.route})}</simple>
+            </script>
+        </when>
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities}" loggingLevel="DEBUG" />
+
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
         </setProperty>
@@ -29,7 +37,7 @@
                     <simple>${exchangeProperty.cause-error-msg.substring(0, 1024)}</simple>
                 </setProperty>
             </when>
-            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="DEBUG" />
+            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="WARN" />
         </when>
 
         <choice>
@@ -69,7 +77,7 @@
                     <otherwise>
                         <log message="Adding failed message for each registered route" />
                         <split parallelProcessing="false">
-                            <simple>{{entity-payload.destinations}}</simple>
+                            <simple>{{message.destinations}}</simple>
                             <setProperty name="retry-item-dest">
                                 <simple>${body.trim()}</simple>
                             </setProperty>
@@ -106,8 +114,6 @@
                         <log message="A fatal error occurred while attempting to process message in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
-                        <log message="Updating attempt count for retry item" />
-
                         <when>
                             <simple>${exchangeProperty.retry-item} == null</simple>
                             <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
@@ -122,7 +128,6 @@
 
                         <script>
                             <spel>
-                                #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                                 #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                                 #{getProperty('retry-item').setDateChanged(new java.util.Date())}

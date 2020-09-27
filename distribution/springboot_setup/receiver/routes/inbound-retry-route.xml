@@ -5,12 +5,31 @@
 
         <log message="Fetching messages in the retry queue" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i.id FROM InBoundRetryQueueItem i" />
+        <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i.id FROM InBoundRetryQueueItem i ORDER BY i.dateCreated ASC" />
 
         <choice>
             <when>
                 <simple>${body.size()} > 0</simple>
                 <log message="Message count in the retry queue: ${body.size()}" />
+
+                <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
+                     before failed insert retries for the same entity for the same route.
+
+                     Using a synchronized list for thread safety in case we start supporting parallel processing
+                     otherwise it's likely the dev might unknowingly not change it at the time.
+                 -->
+                <setProperty name="route-failed-entities">
+                    <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
+                </setProperty>
+                <setProperty name="message-destinations">
+                    <spel>#{new java.util.ArrayList()}</spel>
+                </setProperty>
+                <split>
+                    <simple>{{message.destinations}}</simple>
+                    <script>
+                        <spel>#{getProperty('message-destinations').add(body.trim())}</spel>
+                    </script>
+                </split>
 
                 <split parallelProcessing="false">
                     <simple>${body}</simple>
@@ -21,25 +40,37 @@
 
                     <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i FROM InBoundRetryQueueItem i WHERE i.id = ${body}" />
 
-                    <setBody>
-                        <simple>${body[0]}</simple>
-                    </setBody>
-
                     <setProperty name="retry-item">
-                        <simple>${body}</simple>
+                        <simple>${body[0]}</simple>
                     </setProperty>
+                    <log message="Updating attempt count for retry item" />
 
-                    <log message="Re-processing: ${body}" />
+                    <script>
+                        <spel>
+                            #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+                        </spel>
+                    </script>
 
-                    <setBody>
-                        <simple>${body.entityPayload}</simple>
-                    </setBody>
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier}#${exchangeProperty.retry-item.route})} == true</simple>
+                            <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier} because it still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
+                            <throwException exceptionType="java.lang.Exception" message="Skipped because the entity had older failed message(s) in the queue" />
+                        </when>
+                        <otherwise>
+                            <log message="Re-processing: ${exchangeProperty.retry-item}" />
 
-                    <toD uri="direct:${exchangeProperty.retry-item.route}" />
+                            <setBody>
+                                <simple>${exchangeProperty.retry-item.entityPayload}</simple>
+                            </setBody>
 
-                    <log message="Removing from queue" />
-    
-                    <toD uri="jpa:InBoundRetryQueueItem?query=DELETE FROM InBoundRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+                            <toD uri="direct:${exchangeProperty.retry-item.route}" />
+
+                            <log message="Removing from queue" />
+
+                            <toD uri="jpa:InBoundRetryQueueItem?query=DELETE FROM InBoundRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+                        </otherwise>
+                    </choice>
                 </split>
             </when>
             <otherwise>
