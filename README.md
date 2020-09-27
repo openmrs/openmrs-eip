@@ -65,7 +65,7 @@ where the receiver starts, its main receiver route connects to this external mes
 , consumes messages out of sync record queue and calls all configured routes in parallel with the DB event message set 
 as the body. By default, the application has 2 in-bound routes, one for the in-bound DB sync route and the other for a 
 local Odoo system. You can register as many routes as the systems that need to be notified of the in-bound entity payload, 
-the sender's application.properties file has a property named **entity-payload.destinations** which takes a comma separated 
+the sender's application.properties file has a property named **message.destinations** which takes a comma separated 
 list of route ids to which the entity payload will be sent to feed other systems. The in-bound DB sync route consumes 
 each message from its queue and syncs it into the destination OpenMRS instance's MySQL DB. The in-bound Odoo route consumes 
 messages from its queue too, does its custom processing and then feeds the configured Odoo system.

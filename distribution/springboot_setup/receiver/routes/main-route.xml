@@ -46,7 +46,7 @@
         <split parallelProcessing="false">
             <simple>{{message.destinations}}</simple>
             <setProperty name="entity-payload-dest">
-                <simple>${body}</simple>
+                <simple>${body.trim()}</simple>
             </setProperty>
 
             <!-- Ensure there is no retry items in the queue for this route for this entity so that changes in messages
