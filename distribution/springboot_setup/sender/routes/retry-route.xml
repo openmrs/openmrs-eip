@@ -7,76 +7,81 @@
 
         <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r ORDER BY r.dateCreated ASC" />
 
-        <when>
-            <simple>${body.size()} > 0</simple>
-            <log message="Event count in the retry queue: ${body.size()}" />
-        </when>
-
-        <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
-             before failed insert retries for the same entity for the same route.
-             
-             Using a synchronized list for thread safety in case we start supporting parallel processing
-             otherwise it's likely the dev might unknowingly not change it at the time.
-         -->
-        <setProperty name="route-failed-entities">
-            <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
-        </setProperty>
-        <setProperty name="event-destinations">
-            <spel>#{new java.util.ArrayList()}</spel>
-        </setProperty>
-        <split>
-            <simple>{{db-event.destinations}}</simple>
-            <script>
-                <spel>#{getProperty('event-destinations').add(body.trim())}</spel>
-            </script>
-        </split>
-
-        <split parallelProcessing="false">
-            <simple>${body}</simple>
-            <setProperty name="retry-item-id">
-                <simple>${body}</simple>
-            </setProperty>
-            <log message="Loading event retry item with id: ${body}" />
-
-            <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
-
-            <setProperty name="retry-item">
-                <simple>${body[0]}</simple>
-            </setProperty>
-            <log message="Updating attempt count for retry item" />
-            <script>
-                <spel>
-                    #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
-                </spel>
-            </script>
-
+        <choice>
             <when>
-                <simple>${exchangeProperty.event-destinations.contains(${exchangeProperty.retry-item.route.trim()})} == false</simple>
-                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.retry-item.route.trim()}" />
+                <simple>${body.size()} > 0</simple>
+                <log message="Event count in the retry queue: ${body.size()}" />
+
+                <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
+                     before failed insert retries for the same entity for the same route.
+
+                     Using a synchronized list for thread safety in case we start supporting parallel processing
+                     otherwise it's likely the dev might unknowingly not change it at the time.
+                 -->
+                <setProperty name="route-failed-entities">
+                    <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
+                </setProperty>
+                <setProperty name="event-destinations">
+                    <spel>#{new java.util.ArrayList()}</spel>
+                </setProperty>
+                <split>
+                    <simple>{{db-event.destinations}}</simple>
+                    <script>
+                        <spel>#{getProperty('event-destinations').add(body.trim())}</spel>
+                    </script>
+                </split>
+
+                <split parallelProcessing="false">
+                    <simple>${body}</simple>
+                    <setProperty name="retry-item-id">
+                        <simple>${body}</simple>
+                    </setProperty>
+                    <log message="Loading event retry item with id: ${body}" />
+
+                    <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
+
+                    <setProperty name="retry-item">
+                        <simple>${body[0]}</simple>
+                    </setProperty>
+                    <log message="Updating attempt count for retry item" />
+                    <script>
+                        <spel>
+                            #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+                        </spel>
+                    </script>
+
+                    <when>
+                        <simple>${exchangeProperty.event-destinations.contains(${exchangeProperty.retry-item.route.trim()})} == false</simple>
+                        <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.retry-item.route.trim()}" />
+                    </when>
+
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})} == true</simple>
+                            <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
+                            <throwException exceptionType="java.lang.Exception" message="Skipped because the entity had older failed event(s) in the queue" />
+                        </when>
+                        <otherwise>
+                            <log message="Re-processing: ${exchangeProperty.retry-item}" />
+                            <setProperty name="event">
+                                <simple>${exchangeProperty.retry-item.event}</simple>
+                            </setProperty>
+                            <setProperty name="db-event-destinations">
+                                <simple>${exchangeProperty.retry-item.route}</simple>
+                            </setProperty>
+                            <setBody>
+                                <simple>${exchangeProperty.event}</simple>
+                            </setBody>
+
+                            <to uri="direct:db-event-processor" />
+                        </otherwise>
+                    </choice>
+                </split>
             </when>
-
-            <choice>
-                <when>
-                    <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})} == true</simple>
-                    <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
-                    <throwException exceptionType="java.lang.Exception" message="Skipped because the entity had older failed event(s) in the queue" />
-                </when>
-                <otherwise>
-                    <log message="Re-processing: ${exchangeProperty.retry-item}" />
-                    <setProperty name="event">
-                        <simple>${exchangeProperty.retry-item.event}</simple>
-                    </setProperty>
-                    <setProperty name="db-event-destinations">
-                        <simple>${exchangeProperty.retry-item.route}</simple>
-                    </setProperty>
-                    <setBody>
-                        <simple>${exchangeProperty.event}</simple>
-                    </setBody>
-
-                    <to uri="direct:db-event-processor" />
-                </otherwise>
-            </choice>
-        </split>
+            <otherwise>
+                <log message="No events found in the retry queue" loggingLevel="DEBUG" />
+            </otherwise>
+        </choice>
     </route>
 
 </routes>
