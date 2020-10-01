@@ -3,12 +3,12 @@ package org.openmrs.eip.component.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.eip.component.exception.OpenmrsSyncException;
 import org.openmrs.eip.component.model.BaseModel;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Slf4j
 public final class JsonUtils {
@@ -23,7 +23,9 @@ public final class JsonUtils {
     public static String marshall(final Object object) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(new LocalDateTimeSerializer());
+            mapper.registerModule(module);
 
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -45,8 +47,8 @@ public final class JsonUtils {
             ObjectMapper mapper = new ObjectMapper();
             SimpleModule module = new SimpleModule();
             module.addDeserializer(BaseModel.class, new BaseModelDeserializer());
+            module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
             mapper.registerModule(module);
-            mapper.registerModule(new JavaTimeModule());
 
             return mapper.readValue(json, objectClass);
         } catch (IOException e) {
