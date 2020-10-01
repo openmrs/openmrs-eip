@@ -20,6 +20,6 @@ public class ObservationService extends AbstractEntityService<Observation, Obser
 
     @Override
     public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.OBSERVATION;
+        return TableToSyncEnum.OBS;
     }
 }

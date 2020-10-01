@@ -36,6 +36,6 @@ public class ObservationServiceTest {
 
     @Test
     public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.OBSERVATION, service.getTableToSync());
+        Assert.assertEquals(TableToSyncEnum.OBS, service.getTableToSync());
     }
 }

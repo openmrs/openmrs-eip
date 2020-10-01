@@ -59,7 +59,7 @@ public enum TableToSyncEnum {
     PATIENT(Patient.class, PatientModel.class),
     VISIT(Visit.class, VisitModel.class),
     ENCOUNTER(Encounter.class, EncounterModel.class),
-    OBSERVATION(Observation.class, ObservationModel.class),
+    OBS(Observation.class, ObservationModel.class),
     PERSON_ATTRIBUTE(PersonAttribute.class, PersonAttributeModel.class),
     PATIENT_PROGRAM(PatientProgram.class, PatientProgramModel.class),
     PATIENT_STATE(PatientState.class, PatientStateModel.class),

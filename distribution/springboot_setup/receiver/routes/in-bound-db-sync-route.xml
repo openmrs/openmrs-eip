@@ -108,6 +108,6 @@
             </when>
         </choice>
 
-        <log message="End inbound db-sync" loggingLevel="DEBUG" />
+        <log message="End inbound db-sync" />
     </route>
 </routes>
