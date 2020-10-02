@@ -3,12 +3,14 @@ package org.openmrs.eip.app;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
+import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.app.management.init.impl.ManagementDbInitImpl;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -104,6 +107,12 @@ public class SyncApplication {
     @Bean("noErrorHandler")
     public NoErrorHandlerBuilder getNoErrorHandler() {
         return new NoErrorHandlerBuilder();
+    }
+
+    @Bean("jpaIdempotentRepository")
+    @Profile(SyncProfiles.SENDER)
+    public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
+        return new JpaMessageIdRepository(emf, "complexObsProcessor");
     }
 
     @Bean

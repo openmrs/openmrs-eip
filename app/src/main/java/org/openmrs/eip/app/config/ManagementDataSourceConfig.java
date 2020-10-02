@@ -67,7 +67,7 @@ public class ManagementDataSourceConfig {
 
         return builder
                 .dataSource(dataSource)
-                .packages("org.openmrs.eip.app.management.entity")
+                .packages("org.openmrs.eip.app.management.entity", "org.apache.camel.processor.idempotent.jpa")
                 .persistenceUnit("mngt")
                 .properties(props)
                 .build();
