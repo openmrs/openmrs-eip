@@ -125,14 +125,12 @@ spring.artemis.user=read
 spring.artemis.password=password
 ```
 
-### 4. Folder synchronization
-If you want to also synchronize the content of a folder, you need to specify a path to which will be created a file called 'store' that will keep trace of the files already synchronized to prevent them from being synchronized twice.
+### 4. Compled Obs data synchronization
+To also synchronize the content of the complex data directory.
 The property for that purpose is:
 ```
-camel.output.endpoint.file.location=/tmp/openmrs-dbsync/store
+camel.output.endpoint.complex.obs.data.directory=/tmp/openmrs-dbsync/store
 ```
-
-Note: To disable this feature, just delete the route, or rename it to **directory-sync-route.xml.disable**
 
 ### 5. Rebuild the project
 

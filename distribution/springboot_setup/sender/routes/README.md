@@ -9,9 +9,9 @@ all routes
 ######outgoing routes
 None
 
-####directory-sync-route.xml
-Route that reads the content of a directory passed as input via spring the property *camel.output.endpoint.file.location*.
-The files are marshalled to Base64 and the resulting content is appended with *<FILE>* at the beginning and *</FILE>* at the end. This allow the receiver side of the sync process to differenciate files and entities.
+####outbound-complex-obs-route.xml
+Route that reads the content of the directory passed as input via spring the property *camel.output.endpoint.complex.obs.data.directory*.
+The files are marshalled to Base64 and the resulting content is appended with *<FILE>* at the beginning and *</FILE>* at the end. This allows the receiver side of the sync process to differenciate complex obs files and entities.
 The resulting strings corresponding to the files are then passed to a Camel endpoint that can be for instance a JMS queue or a File endpoint.
 
 It is possible to encrypt the message before dispatching it via the processor *pgpEncryptService*.

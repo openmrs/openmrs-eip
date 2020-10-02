@@ -13,7 +13,7 @@
                 <unmarshal>
                     <base64/>
                 </unmarshal>
-                <to uri="file:{{camel.input.endpoint.file.location}}" />
+                <to uri="file:{{camel.input.endpoint.complex.obs.data.directory}}" />
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
