@@ -50,7 +50,7 @@ public class PGPEncryptService extends AbstractSecurityService implements Proces
         ) {
             Streams.pipeAll(new ByteArrayInputStream(unencryptedMessage.getBytes()), bouncyGPGOutputStream);
 
-            log.info("Encrypted message sent");
+            log.info("Successfully encrypted the message");
 
         } catch (IOException | PGPException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
             throw new OpenmrsSyncException("Error during encryption process", e);

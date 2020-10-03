@@ -13,7 +13,16 @@
         <transform>
             <simple>&lt;FILE&gt;${body}&lt;/FILE&gt;</simple>
         </transform>
-        <!--<process ref="pgpEncryptService" />-->
+
+        <when>
+            <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
+            <log message="Encrypting entity payload.." />
+
+            <process ref="pgpEncryptService" />
+
+            <log message="Encrypted entity payload -> ${body}" loggingLevel="DEBUG" />
+        </when>
+
         <to uri="{{camel.output.endpoint}}" />
         
     </route>

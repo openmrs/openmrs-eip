@@ -1,8 +1,22 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="receiver-main" errorHandlerRef="inBoundErrorHandler">
         <from uri="{{camel.input.endpoint}}" />
-        <!--<process ref="pgpDecryptService"/>-->
         <log message=":" loggingLevel="DEBUG" />
+
+        <when>
+            <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
+            <!--
+                TODO If we can't decrypt the message, put it in some error queue that blocks all future incoming
+                messages
+            -->
+            <log message="Received Raw message -> ${body}" loggingLevel="DEBUG" />
+            <log message="Decrypting message.." />
+
+            <process ref="pgpDecryptService" />
+
+            <log message="Decrypted message -> ${body}" loggingLevel="DEBUG" />
+        </when>
+        
         <choice>
             <when>
                 <method ref="isFilePredicate" />

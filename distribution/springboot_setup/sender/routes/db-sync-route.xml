@@ -43,6 +43,15 @@
         <choice>
             <when>
                 <simple>${body} != null</simple>
+                <when>
+                    <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
+                    <log message="Encrypting entity payload.." />
+                    
+                    <process ref="pgpEncryptService" />
+
+                    <log message="Encrypted entity payload -> ${body}" loggingLevel="DEBUG" />
+                </when>
+                
                 <log message="Pushing entity to sync queue: {{camel.output.endpoint}}" />
 
                 <toD uri="{{camel.output.endpoint}}" />
