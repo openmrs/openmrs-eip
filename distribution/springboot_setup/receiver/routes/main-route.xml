@@ -7,13 +7,9 @@
             <when>
                 <method ref="isFilePredicate" />
                 <log message="Received complex_obs data file: ${headers.CamelFileName}" />
-                <transform>
-                    <method ref="removeFileTagsExpression" />
-                </transform>
-                <unmarshal>
-                    <base64/>
-                </unmarshal>
-                <to uri="file:{{camel.input.endpoint.complex.obs.data.directory}}" />
+                <!-- TODO Broadcast the message to other listeners -->
+
+                <to uri="direct:inbound-complex-obs-sync" />
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
