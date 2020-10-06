@@ -49,7 +49,7 @@
                     
                     <process ref="pgpEncryptService" />
 
-                    <log message="Encrypted entity payload -> ${body}" loggingLevel="DEBUG" />
+                    <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
                 </when>
                 
                 <log message="Pushing entity to sync queue: {{camel.output.endpoint}}" />

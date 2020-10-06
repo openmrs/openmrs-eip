@@ -9,12 +9,12 @@
                 TODO If we can't decrypt the message, put it in some error queue that blocks all future incoming
                 messages
             -->
-            <log message="Received Raw message -> ${body}" loggingLevel="DEBUG" />
+            <log message="Received Raw message -> ${body}" loggingLevel="TRACE" />
             <log message="Decrypting message.." />
 
             <process ref="pgpDecryptService" />
 
-            <log message="Decrypted message -> ${body}" loggingLevel="DEBUG" />
+            <log message="Decrypted message -> ${body}" loggingLevel="TRACE" />
         </when>
         
         <choice>
