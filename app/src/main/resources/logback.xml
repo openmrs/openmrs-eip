@@ -8,11 +8,13 @@
     <property name="LOGS_FILE" value="${LOGS_DIR}${file.separator}${LOGS_FILE_NAME}.${LOGS_FILE_NAME_EXT}" />
     <property name="LOGS_MAX_FILE_SIZE" value="10MB" />
 
+    <!--
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOGS_PATTERN}</pattern>
         </encoder>
     </appender>
+    -->
     
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_FILE}</file>
@@ -27,7 +29,7 @@
     </appender>
 
     <root level="info">
-        <appender-ref ref="console" />
+        <!--<appender-ref ref="console" />-->
         <appender-ref ref="file" />
     </root>
 </configuration>
