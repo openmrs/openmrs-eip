@@ -2,10 +2,11 @@
 
 <configuration>
     <property name="LOGS_PATTERN" value="%-5level %date [%thread] %logger{8}:%line %msg%n" />
-    <property name="LOGS_DIR" value="/home/wyclif/Documents/STORAGE/PROJECTS/openmrs-dbsync/logs" />
+    <property name="LOGS_DIR" value="${user.home}${file.separator}.openmrs-eip${file.separator}logs" />
     <property name="LOGS_FILE_NAME" value="openmrs-eip" />
     <property name="LOGS_FILE_NAME_EXT" value="log" />
-    <property name="LOGS_FILE" value="${LOGS_DIR}/${LOGS_FILE_NAME}.${LOGS_FILE_NAME_EXT}" />
+    <property name="LOGS_FILE" value="${LOGS_DIR}${file.separator}${LOGS_FILE_NAME}.${LOGS_FILE_NAME_EXT}" />
+    <!--<property name="LOGS_MAX_FILE_SIZE" value="20MB" />-->
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -13,20 +14,20 @@
         </encoder>
     </appender>
     
-    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_FILE}</file>
         <encoder>
             <pattern>${LOGS_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- Rollover daily and when the file reaches 30MB -->
-            <fileNamePattern>${LOGS_DIR}/%d{yyyy-MM}/${LOGS_FILE_NAME}-%d{yyyy-MM-dd}-%i.${LOGS_FILE_NAME_EXT}</fileNamePattern>
-            <maxFileSize>30MB</maxFileSize>
+            <!-- Rollover daily and when the file reaches configured max size, default is 10MB -->
+            <fileNamePattern>${LOGS_DIR}${file.separator}%d{yyyy-MM}${file.separator}${LOGS_FILE_NAME}-%d{yyyy-MM-dd}_%i.${LOGS_FILE_NAME_EXT}.gz</fileNamePattern>
+            <maxFileSize>${LOGS_MAX_FILE_SIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
 
     <root level="info">
         <appender-ref ref="console" />
-        <appender-ref ref="rollingFile" />
+        <appender-ref ref="file" />
     </root>
 </configuration>
