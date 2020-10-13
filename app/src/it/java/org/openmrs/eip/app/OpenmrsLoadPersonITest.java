@@ -47,7 +47,7 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
                 "\"model\":{" +
                 "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
                 "\"creatorUuid\":\"" + UserLight.class.getName() + "(1)\"," +
-                "\"dateCreated\":[2019,5,28,13,42,31]," +
+                "\"dateCreated\":\"2019-05-28T13:42:31+00:00\"," +
                 "\"changedByUuid\":null," +
                 "\"dateChanged\":null," +
                 "\"voided\":false," +

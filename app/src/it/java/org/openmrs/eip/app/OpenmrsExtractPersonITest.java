@@ -1,5 +1,8 @@
 package org.openmrs.eip.app;
 
+import static java.time.LocalDateTime.of;
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
@@ -13,7 +16,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 public class OpenmrsExtractPersonITest extends OpenmrsExtractEndpointITest {
 
-    private LocalDateTime date = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+    private LocalDateTime date = of(1970, 1, 1, 0, 0, 0);
 
     @Test
     public void extract() throws JSONException {
@@ -39,7 +42,7 @@ public class OpenmrsExtractPersonITest extends OpenmrsExtractEndpointITest {
                     "\"model\":{" +
                         "\"uuid\":\"dd279794-76e9-11e9-8cd9-0242ac1c000b\"," +
                         "\"creatorUuid\":null," +
-                        "\"dateCreated\":[2005,1,1,0,0]," +
+                        "\"dateCreated\":\"" + of(2005, 1, 1, 0, 0, 0).atZone(systemDefault()).format(ISO_OFFSET_DATE_TIME) + "\"," +
                         "\"changedByUuid\":null," +
                         "\"dateChanged\":null," +
                         "\"voided\":false," +

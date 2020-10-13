@@ -8,6 +8,7 @@ import org.openmrs.eip.component.exception.OpenmrsSyncException;
 import org.openmrs.eip.component.model.BaseModel;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -24,6 +25,7 @@ public final class JsonUtils {
         try {
             ObjectMapper mapper = new ObjectMapper();
             SimpleModule module = new SimpleModule();
+            module.addSerializer(new LocalDateSerializer());
             module.addSerializer(new LocalDateTimeSerializer());
             mapper.registerModule(module);
 
@@ -47,6 +49,7 @@ public final class JsonUtils {
             ObjectMapper mapper = new ObjectMapper();
             SimpleModule module = new SimpleModule();
             module.addDeserializer(BaseModel.class, new BaseModelDeserializer());
+            module.addDeserializer(LocalDate.class, new LocalDateDeserializer());
             module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
             mapper.registerModule(module);
 
