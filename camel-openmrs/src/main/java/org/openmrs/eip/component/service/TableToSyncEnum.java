@@ -45,7 +45,7 @@ import org.openmrs.eip.component.entity.ProviderAttribute;
 import org.openmrs.eip.component.entity.TestOrder;
 import org.openmrs.eip.component.entity.Visit;
 import org.openmrs.eip.component.entity.VisitAttribute;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.OrderFrequencyModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
@@ -107,7 +107,7 @@ public enum TableToSyncEnum {
         return Arrays.stream(values())
                 .filter(e -> e.getModelClass().equals(tableToSyncClass))
                 .findFirst()
-                .orElseThrow(() -> new OpenmrsSyncException("No enum found for model class " + tableToSyncClass));
+                .orElseThrow(() -> new EIPException("No enum found for model class " + tableToSyncClass));
     }
 
     public static Class<? extends BaseModel> getModelClass(final BaseEntity entity) {
@@ -115,7 +115,7 @@ public enum TableToSyncEnum {
                 .filter(e -> e.getEntityClass().equals(entity.getClass()))
                 .findFirst()
                 .map(TableToSyncEnum::getModelClass)
-                .orElseThrow(() -> new OpenmrsSyncException("No model class found corresponding to entity class " + entity.getClass()));
+                .orElseThrow(() -> new EIPException("No model class found corresponding to entity class " + entity.getClass()));
     }
 
     public static Class<? extends BaseEntity> getEntityClass(final BaseModel model) {
@@ -123,6 +123,6 @@ public enum TableToSyncEnum {
                 .filter(e -> e.getModelClass().equals(model.getClass()))
                 .findFirst()
                 .map(TableToSyncEnum::getEntityClass)
-                .orElseThrow(() -> new OpenmrsSyncException("No entity class found corresponding to model class " + model.getClass()));
+                .orElseThrow(() -> new EIPException("No entity class found corresponding to model class " + model.getClass()));
     }
 }

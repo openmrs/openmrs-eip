@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.component.entity.MockedEntity;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.MockedModel;
 import org.openmrs.eip.component.service.light.LightService;
 import org.openmrs.eip.component.service.light.impl.UserLightService;
@@ -100,7 +100,7 @@ public class LinkLightEntityConsumerTest {
         // Then
     }
 
-    @Test(expected = OpenmrsSyncException.class)
+    @Test(expected = EIPException.class)
     public void apply_should_throw_exception_if_no_service_available_for_getter_return_type() {
         // Given
         MockedEntity entity = new MockedEntity(1L, "uuid");

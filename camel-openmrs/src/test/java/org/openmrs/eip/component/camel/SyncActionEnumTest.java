@@ -1,7 +1,7 @@
 package org.openmrs.eip.component.camel;
 
 import org.junit.Test;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +19,7 @@ public class SyncActionEnumTest {
         assertEquals(SyncActionEnum.EXTRACT, result);
     }
 
-    @Test(expected = OpenmrsSyncException.class)
+    @Test(expected = EIPException.class)
     public void getAction_should_throw_exception() {
         // Given
         String actionString = "wrong_action";

@@ -2,7 +2,7 @@ package org.openmrs.eip.app.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,7 +53,7 @@ public class OpenmrsDataSourceConfig {
                 ((HikariDataSource) ds).setConnectionInitSql(CONN_INIT_SQL);
             } else {
                 //TODO support other DS types
-                throw new OpenmrsSyncException("Do not know how to initialize datasource of type: " + ds.getClass());
+                throw new EIPException("Do not know how to initialize datasource of type: " + ds.getClass());
             }
         }
 

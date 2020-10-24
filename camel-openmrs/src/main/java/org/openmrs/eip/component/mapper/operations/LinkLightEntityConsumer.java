@@ -5,7 +5,7 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.utils.ModelUtils;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.light.LightEntity;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.service.light.LightService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
@@ -56,7 +56,7 @@ public class LinkLightEntityConsumer<E extends BaseEntity, M extends BaseModel> 
         );
 
         if (beanNamesForType.length == 0) {
-            throw new OpenmrsSyncException("Unable to find service of type " + LightService.class +
+            throw new EIPException("Unable to find service of type " + LightService.class +
                     " with class parameter " + entityDesc.getPropertyType());
         }
 

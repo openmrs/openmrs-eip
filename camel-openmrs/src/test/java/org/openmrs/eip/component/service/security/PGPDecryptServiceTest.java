@@ -8,7 +8,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.component.config.SenderEncryptionProperties;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.config.ReceiverEncryptionProperties;
 
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class PGPDecryptServiceTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenmrsSyncException);
+            assertTrue(e instanceof EIPException);
             assertEquals("Message should start with 'sender:'", e.getMessage());
         }
     }

@@ -3,7 +3,7 @@ package org.openmrs.eip.component.mapper.operations;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.MapperService;
 import org.openmrs.eip.component.entity.BaseEntity;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +25,7 @@ public class InstantiateModelFunction<E extends BaseEntity, M extends BaseModel>
             M instanciatedModel = modelClass.getConstructor().newInstance();
             return new Context<>(entity, instanciatedModel, MappingDirectionEnum.ENTITY_TO_MODEL);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new OpenmrsSyncException("cause while instantiating entity " + modelClass, e);
+            throw new EIPException("cause while instantiating entity " + modelClass, e);
         }
     }
 }

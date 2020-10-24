@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseModel;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public final class JsonUtils {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             log.error("Error while marshalling object", e);
-            throw new OpenmrsSyncException("Error while marshalling object", e);
+            throw new EIPException("Error while marshalling object", e);
         }
     }
 
@@ -56,7 +56,7 @@ public final class JsonUtils {
             return mapper.readValue(json, objectClass);
         } catch (IOException e) {
             log.error("Error while unmarshalling object", e);
-            throw new OpenmrsSyncException("Error while unmarshalling object", e);
+            throw new EIPException("Error while unmarshalling object", e);
         }
     }
 }

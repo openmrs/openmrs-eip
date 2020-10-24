@@ -10,7 +10,7 @@ import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
 import org.openmrs.eip.component.service.TableToSyncEnum;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.InvocationTargetException;
@@ -64,7 +64,7 @@ public class OpenmrsEndpoint extends DefaultEndpoint {
         try {
             return action.getProducerClass().getDeclaredConstructor(OpenmrsEndpoint.class, ApplicationContext.class, ProducerParams.class).newInstance(this, applicationContext, params);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new OpenmrsSyncException("Unable to initialize producer " + action.getProducerClass().getName(), e);
+            throw new EIPException("Unable to initialize producer " + action.getProducerClass().getName(), e);
         }
     }
 

@@ -5,7 +5,7 @@ import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.MockedModel;
 import org.openmrs.eip.component.entity.MockedEntity;
 import org.openmrs.eip.component.entity.Person;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +35,7 @@ public class TableToSyncEnumTest {
         assertEquals(TableToSyncEnum.PERSON, result);
     }
 
-    @Test(expected = OpenmrsSyncException.class)
+    @Test(expected = EIPException.class)
     public void getTableToSyncEnum_with_model_class_should_throw_exception() {
         // Given
         Class<MockedModel> personModelClass = MockedModel.class;
@@ -58,7 +58,7 @@ public class TableToSyncEnumTest {
         assertEquals(PersonModel.class, result);
     }
 
-    @Test(expected = OpenmrsSyncException.class)
+    @Test(expected = EIPException.class)
     public void getModelClass_should_throw_exception() {
         // Given
         MockedEntity mockedEntity = new MockedEntity(1L, "uuid");

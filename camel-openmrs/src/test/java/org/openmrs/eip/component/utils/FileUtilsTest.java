@@ -1,7 +1,7 @@
 package org.openmrs.eip.component.utils;
 
 import org.junit.Test;
-import org.openmrs.eip.component.exception.OpenmrsSyncException;
+import org.openmrs.eip.component.exception.EIPException;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +34,7 @@ public class FileUtilsTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenmrsSyncException);
+            assertTrue(e instanceof EIPException);
             assertEquals("No private key found", e.getMessage());
         }
     }
@@ -51,7 +51,7 @@ public class FileUtilsTest {
             fail();
         } catch (Exception e) {
             // Then
-            assertTrue(e instanceof OpenmrsSyncException);
+            assertTrue(e instanceof EIPException);
             assertEquals("There should be only one private key. 2 found", e.getMessage());
         }
     }
