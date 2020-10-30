@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-openmrs}
       MYSQL_DATABASE: ${MYSQL_DB:-openmrs}
     ports:
-      - "3308:3306"
+      - "3306:3306"
     volumes:
       - mysql_central:/var/lib/mysql
   db_remote:

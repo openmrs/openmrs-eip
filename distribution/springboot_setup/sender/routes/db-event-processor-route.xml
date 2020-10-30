@@ -36,7 +36,7 @@
 
             <log message="Looking up uuid for ${body.tableName} from ${exchangeProperty.debezium-refTable} table" loggingLevel="DEBUG" />
 
-            <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body-body.get(${exchangeProperty.debezium-column})}'?dataSource=openmrsDataSource" />
+            <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.primaryKeyId}'?dataSource=openmrsDataSource" />
 
             <script>
                 <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
