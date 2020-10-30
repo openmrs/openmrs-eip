@@ -28,9 +28,4 @@ public abstract class LightEntity extends BaseEntity {
     public abstract void setMuteReason(String muteReason);
 
     public abstract void setMutedBy(Long mutedBy);
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity model) {
-        return false;
-    }
 }

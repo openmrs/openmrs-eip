@@ -11,13 +11,10 @@ import org.openmrs.eip.component.entity.light.ObservationLight;
 import org.openmrs.eip.component.entity.light.OrderLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.utils.DateUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -126,15 +123,4 @@ public class Observation extends BaseEntity {
 
     @Column(name = "void_reason")
     protected String voidReason;
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity entity) {
-        Observation observation = (Observation) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(
-                observation.getDateCreated(),
-                observation.getDateVoided());
-        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
-        return dateCreatedAfter || dateVoidedAfter;
-    }
 }

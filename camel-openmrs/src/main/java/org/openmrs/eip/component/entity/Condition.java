@@ -7,13 +7,10 @@ import org.openmrs.eip.component.entity.light.ConceptNameLight;
 import org.openmrs.eip.component.entity.light.ConditionLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.utils.DateUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -86,15 +83,4 @@ public class Condition extends BaseEntity {
 
     @Column(name = "void_reason")
     protected String voidReason;
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity entity) {
-        Condition condition = (Condition) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(
-                condition.getDateCreated(),
-                condition.getDateVoided());
-        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
-        return dateCreatedAfter || dateVoidedAfter;
-    }
 }
