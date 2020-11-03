@@ -17,4 +17,11 @@ public abstract class BaseEntity {
     @NotNull
     @Column(name = "uuid")
     private String uuid;
+
+    /**
+     * Tests if an entity is out of date compared the given entity
+     * @param entity entity to test
+     * @return true if out of date
+     */
+    public abstract boolean wasModifiedAfter(BaseEntity entity);
 }

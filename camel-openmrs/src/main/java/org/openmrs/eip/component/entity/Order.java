@@ -113,6 +113,11 @@ public class Order extends BaseDataEntity {
     @Column(name = "fulfiller_comment")
     private String fulfillerComment;
 
+    @Override
+    public boolean wasModifiedAfter(BaseEntity entity) {
+        return false;
+    }
+
     /**
      * Gets the patient
      *

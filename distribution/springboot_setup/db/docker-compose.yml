@@ -22,7 +22,9 @@ services:
     ports:
       - "3307:3306"
     volumes:
+      - mysql_remote:/var/lib/mysql
       - ./sender-my.cnf:/etc/mysql/my.cnf
 
 volumes:
   mysql_central:
+  mysql_remote:

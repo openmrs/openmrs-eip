@@ -3,6 +3,7 @@ package org.openmrs.eip.component.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.ErpWorkOrderLight;
+import org.openmrs.eip.component.utils.DateUtils;
 import org.openmrs.eip.component.entity.light.UserLight;
 
 import javax.persistence.AttributeOverride;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -52,4 +54,10 @@ public class ErpWorkOrderState extends BaseEntity {
 
     @Column(name = "void_reason")
     protected String voidReason;
+
+    @Override
+    public boolean wasModifiedAfter(BaseEntity entity) {
+        ErpWorkOrderState workOrderState = (ErpWorkOrderState) entity;
+        return DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), Arrays.asList(workOrderState.getDateCreated()));
+    }
 }

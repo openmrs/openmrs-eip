@@ -40,12 +40,12 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
         E ety = modelToEntityMapper.apply(model);
 
-        M modelToReturn;
+        M modelToReturn = model;
 
         if (etyInDb == null) {
             modelToReturn = saveEntity(ety);
             log.info(getMsg(ety, model.getUuid(), " inserted"));
-        } else {
+        } else if (!etyInDb.wasModifiedAfter(ety)) {
             ety.setId(etyInDb.getId());
             modelToReturn = saveEntity(ety);
             log.info(getMsg(ety, model.getUuid(), " updated"));

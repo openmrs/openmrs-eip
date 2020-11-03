@@ -345,6 +345,11 @@ public class DrugOrder extends Order {
         this.drugNonCoded = drugNonCoded;
     }
 
+    @Override
+    public boolean wasModifiedAfter(BaseEntity entity) {
+        return false;
+    }
+
     /**
      * Gets the frequency
      *
