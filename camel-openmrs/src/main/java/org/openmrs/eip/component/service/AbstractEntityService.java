@@ -1,10 +1,11 @@
 package org.openmrs.eip.component.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.entity.BaseEntity;
+import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
+import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 
 import java.time.LocalDateTime;
@@ -49,6 +50,8 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
             ety.setId(etyInDb.getId());
             modelToReturn = saveEntity(ety);
             log.info(getMsg(ety, model.getUuid(), " updated"));
+        } else {
+            throw new ConflictsFoundException();
         }
 
         return modelToReturn;

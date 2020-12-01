@@ -76,9 +76,9 @@
                         that happened later don't overwrite those that happened before them -->
                     <when>
                         <simple>${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} > 0</simple>
-                        <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} messages(s) in the retry queue for route: ${exchangeProperty.entity-payload-dest}" />
+                        <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue for route: ${exchangeProperty.entity-payload-dest}" />
                         <setProperty name="retry-message">
-                            <simple>Cannot process the message because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} messages(s) in the retry queue</simple>
+                            <simple>Cannot process the message because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue</simple>
                         </setProperty>
                         <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-message}" />
                     </when>
