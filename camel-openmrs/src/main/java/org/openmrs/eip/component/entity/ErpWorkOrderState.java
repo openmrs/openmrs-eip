@@ -1,10 +1,7 @@
 package org.openmrs.eip.component.entity;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.ErpWorkOrderLight;
-import org.openmrs.eip.component.utils.DateUtils;
-import org.openmrs.eip.component.entity.light.UserLight;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -13,15 +10,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 
-@Data
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "icrc_erp_work_order_state")
 @AttributeOverride(name = "id", column = @Column(name = "erp_work_order_state_id"))
-public class ErpWorkOrderState extends BaseEntity {
+public class ErpWorkOrderState extends BaseDataEntity {
 
     @NotNull
     @ManyToOne
@@ -32,32 +27,40 @@ public class ErpWorkOrderState extends BaseEntity {
     @Column(name = "wo_action")
     private String action;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "creator")
-    protected UserLight creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    protected LocalDateTime dateCreated;
-
-    @NotNull
-    @Column(name = "voided")
-    protected boolean voided;
-
-    @ManyToOne
-    @JoinColumn(name = "voided_by")
-    protected UserLight voidedBy;
-
-    @Column(name = "date_voided")
-    protected LocalDateTime dateVoided;
-
-    @Column(name = "void_reason")
-    protected String voidReason;
-
-    @Override
-    public boolean wasModifiedAfter(BaseEntity entity) {
-        ErpWorkOrderState workOrderState = (ErpWorkOrderState) entity;
-        return DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), Arrays.asList(workOrderState.getDateCreated()));
+    /**
+     * Gets the erpWorkOrder
+     *
+     * @return the erpWorkOrder
+     */
+    public ErpWorkOrderLight getErpWorkOrder() {
+        return erpWorkOrder;
     }
+
+    /**
+     * Sets the erpWorkOrder
+     *
+     * @param erpWorkOrder the erpWorkOrder to set
+     */
+    public void setErpWorkOrder(ErpWorkOrderLight erpWorkOrder) {
+        this.erpWorkOrder = erpWorkOrder;
+    }
+
+    /**
+     * Gets the action
+     *
+     * @return the action
+     */
+    public String getAction() {
+        return action;
+    }
+
+    /**
+     * Sets the action
+     *
+     * @param action the action to set
+     */
+    public void setAction(String action) {
+        this.action = action;
+    }
+
 }

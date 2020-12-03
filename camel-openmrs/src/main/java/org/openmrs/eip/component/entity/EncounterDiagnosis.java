@@ -8,7 +8,12 @@ import org.openmrs.eip.component.entity.light.ConditionLight;
 import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -16,7 +21,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "encounter_diagnosis")
 @AttributeOverride(name = "id", column = @Column(name = "diagnosis_id"))
-public class EncounterDiagnosis extends AuditableEntity {
+public class EncounterDiagnosis extends BaseChangeableDataEntity {
 
     @ManyToOne
     @JoinColumn(name = "diagnosis_coded")

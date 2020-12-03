@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.entity;
 
 import org.openmrs.eip.component.entity.light.UserLight;
+import org.openmrs.eip.component.utils.DateUtils;
 
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
@@ -8,6 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * OpenMRS data model distinguishes between data and metadata, please refer to the javadocs in OpenMRS on
@@ -15,16 +18,7 @@ import java.time.LocalDateTime;
  * data entities.
  */
 @MappedSuperclass
-public abstract class BaseDataEntity extends BaseEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "creator")
-    protected UserLight creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    protected LocalDateTime dateCreated;
+public abstract class BaseDataEntity extends BaseCreatableEntity {
 
     @NotNull
     @Column(name = "voided")
@@ -40,40 +34,11 @@ public abstract class BaseDataEntity extends BaseEntity {
     @Column(name = "void_reason")
     private String voidReason;
 
-    /**
-     * Gets the creator
-     *
-     * @return the creator
-     */
-    public UserLight getCreator() {
-        return creator;
-    }
-
-    /**
-     * Sets the creator
-     *
-     * @param creator the creator to set
-     */
-    public void setCreator(UserLight creator) {
-        this.creator = creator;
-    }
-
-    /**
-     * Gets the dateCreated
-     *
-     * @return the dateCreated
-     */
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    /**
-     * Sets the dateCreated
-     *
-     * @param dateCreated the dateCreated to set
-     */
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
+    @Override
+    public boolean wasModifiedAfter(final BaseEntity entity) {
+        BaseDataEntity other = (BaseDataEntity) entity;
+        List<LocalDateTime> datesToCheck = Arrays.asList(other.getDateVoided());
+        return DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
     }
 
     /**
@@ -147,4 +112,5 @@ public abstract class BaseDataEntity extends BaseEntity {
     public void setVoidReason(String voidReason) {
         this.voidReason = voidReason;
     }
+
 }

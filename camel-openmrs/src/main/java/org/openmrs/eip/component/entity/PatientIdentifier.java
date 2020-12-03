@@ -6,7 +6,12 @@ import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.PatientIdentifierTypeLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -14,7 +19,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "patient_identifier")
 @AttributeOverride(name = "id", column = @Column(name = "patient_identifier_id"))
-public class PatientIdentifier extends AuditableEntity {
+public class PatientIdentifier extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne

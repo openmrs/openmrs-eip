@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "order_frequency")
 @AttributeOverride(name = "id", column = @Column(name = "order_frequency_id"))
 @EqualsAndHashCode(callSuper = true)
-public class OrderFrequency extends MetaDataEntity {
+public class OrderFrequency extends BaseChangeableMetaDataEntity {
 
     @JoinColumn(name = "frequency_per_day")
     private Double frequencyPerDay;

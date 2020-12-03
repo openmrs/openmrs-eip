@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
-public abstract class Attribute<T extends AttributeTypeLight> extends AuditableEntity {
+public abstract class Attribute<T extends AttributeTypeLight> extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne

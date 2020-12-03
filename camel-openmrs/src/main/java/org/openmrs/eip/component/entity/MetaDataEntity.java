@@ -1,7 +1,5 @@
 package org.openmrs.eip.component.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.utils.DateUtils;
 
@@ -14,25 +12,13 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+/**
+ * OpenMRS data model distinguishes between data and metadata, please refer to the javadocs in OpenMRS on
+ * BaseOpenmrsData and BaseOpenmrsMetadata classes, this is the superclass for classes in this project that represent
+ * metadata entities.
+ */
 @MappedSuperclass
-public abstract class MetaDataEntity extends BaseEntity {
-
-    @ManyToOne
-    @JoinColumn(name = "creator")
-    protected UserLight creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    protected LocalDateTime dateCreated;
-
-    @ManyToOne
-    @JoinColumn(name = "changed_by")
-    protected UserLight changedBy;
-
-    @Column(name = "date_changed")
-    protected LocalDateTime dateChanged;
+public abstract class MetaDataEntity extends BaseCreatableEntity {
 
     @ManyToOne
     @JoinColumn(name = "retired_by")
@@ -49,15 +35,82 @@ public abstract class MetaDataEntity extends BaseEntity {
     private boolean retired;
 
     @Override
-    public boolean wasModifiedAfter(final BaseEntity entity) {
-        MetaDataEntity metaData = (MetaDataEntity) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(
-                metaData.getDateCreated(),
-                metaData.getDateChanged(),
-                metaData.getDateRetired());
-        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
-        boolean dateChangedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateChanged(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateRetired(), datesToCheck);
-        return dateCreatedAfter || dateChangedAfter || dateVoidedAfter;
+    public boolean wasModifiedAfter(BaseEntity entity) {
+        MetaDataEntity other = (MetaDataEntity) entity;
+        List<LocalDateTime> datesToCheck = Arrays.asList(other.getDateRetired());
+        return DateUtils.isDateAfterAtLeastOneInList(getDateRetired(), datesToCheck);
     }
+
+    /**
+     * Gets the retiredBy
+     *
+     * @return the retiredBy
+     */
+    public UserLight getRetiredBy() {
+        return retiredBy;
+    }
+
+    /**
+     * Sets the retiredBy
+     *
+     * @param retiredBy the retiredBy to set
+     */
+    public void setRetiredBy(UserLight retiredBy) {
+        this.retiredBy = retiredBy;
+    }
+
+    /**
+     * Gets the dateRetired
+     *
+     * @return the dateRetired
+     */
+    public LocalDateTime getDateRetired() {
+        return dateRetired;
+    }
+
+    /**
+     * Sets the dateRetired
+     *
+     * @param dateRetired the dateRetired to set
+     */
+    public void setDateRetired(LocalDateTime dateRetired) {
+        this.dateRetired = dateRetired;
+    }
+
+    /**
+     * Gets the retireReason
+     *
+     * @return the retireReason
+     */
+    public String getRetireReason() {
+        return retireReason;
+    }
+
+    /**
+     * Sets the retireReason
+     *
+     * @param retireReason the retireReason to set
+     */
+    public void setRetireReason(String retireReason) {
+        this.retireReason = retireReason;
+    }
+
+    /**
+     * Gets the retired
+     *
+     * @return the retired
+     */
+    public boolean isRetired() {
+        return retired;
+    }
+
+    /**
+     * Sets the retired
+     *
+     * @param retired the retired to set
+     */
+    public void setRetired(boolean retired) {
+        this.retired = retired;
+    }
+
 }

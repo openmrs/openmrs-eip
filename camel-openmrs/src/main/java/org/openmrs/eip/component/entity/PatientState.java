@@ -5,7 +5,12 @@ import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.PatientProgramLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowStateLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -14,7 +19,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "patient_state")
 @AttributeOverride(name = "id", column = @Column(name = "patient_state_id"))
-public class PatientState extends AuditableEntity {
+public class PatientState extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne

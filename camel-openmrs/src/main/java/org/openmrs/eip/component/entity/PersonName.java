@@ -4,7 +4,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.PersonLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -13,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "person_name")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_name_id"))
-public class PersonName extends AuditableEntity {
+public class PersonName extends BaseChangeableDataEntity {
 
     @NotNull
     @Column(name = "preferred")

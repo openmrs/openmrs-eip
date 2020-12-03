@@ -7,7 +7,12 @@ import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.VisitTypeLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -16,7 +21,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "visit")
 @AttributeOverride(name = "id", column = @Column(name = "visit_id"))
-public class Visit extends AuditableEntity {
+public class Visit extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne
