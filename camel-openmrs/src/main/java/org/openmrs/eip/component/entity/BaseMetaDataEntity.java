@@ -18,7 +18,7 @@ import java.util.List;
  * metadata entities.
  */
 @MappedSuperclass
-public abstract class MetaDataEntity extends BaseCreatableEntity {
+public abstract class BaseMetaDataEntity extends BaseCreatableEntity {
 
     @ManyToOne
     @JoinColumn(name = "retired_by")
@@ -36,7 +36,7 @@ public abstract class MetaDataEntity extends BaseCreatableEntity {
 
     @Override
     public boolean wasModifiedAfter(BaseEntity entity) {
-        MetaDataEntity other = (MetaDataEntity) entity;
+        BaseMetaDataEntity other = (BaseMetaDataEntity) entity;
         List<LocalDateTime> datesToCheck = Arrays.asList(other.getDateRetired());
         return DateUtils.isDateAfterAtLeastOneInList(getDateRetired(), datesToCheck);
     }

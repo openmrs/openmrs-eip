@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @MappedSuperclass
-public abstract class BaseChangeableMetaDataEntity extends MetaDataEntity {
+public abstract class BaseChangeableMetaDataEntity extends BaseMetaDataEntity {
 
     @ManyToOne
     @JoinColumn(name = "changed_by")
