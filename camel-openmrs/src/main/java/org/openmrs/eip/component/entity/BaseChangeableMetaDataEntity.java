@@ -24,9 +24,9 @@ public abstract class BaseChangeableMetaDataEntity extends BaseMetaDataEntity {
     @Override
     public boolean wasModifiedAfter(BaseEntity entity) {
         BaseChangeableMetaDataEntity other = (BaseChangeableMetaDataEntity) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(other.getDateChanged());
-        boolean dateChangedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateChanged(), datesToCheck);
-        return dateChangedAfter || super.wasModifiedAfter(entity);
+        List<LocalDateTime> dates = Arrays.asList(getDateChanged(), getDateRetired());
+        List<LocalDateTime> otherDates = Arrays.asList(other.getDateChanged(), other.getDateRetired());
+        return DateUtils.containsLatestDate(dates, otherDates);
     }
 
     /**

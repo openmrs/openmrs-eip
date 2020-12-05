@@ -9,8 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+
+import static java.util.Collections.singleton;
 
 /**
  * OpenMRS data model distinguishes between data and metadata, please refer to the javadocs in OpenMRS on
@@ -37,8 +37,7 @@ public abstract class BaseDataEntity extends BaseCreatableEntity {
     @Override
     public boolean wasModifiedAfter(final BaseEntity entity) {
         BaseDataEntity other = (BaseDataEntity) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(other.getDateVoided());
-        return DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
+        return DateUtils.containsLatestDate(singleton(getDateVoided()), singleton(other.getDateVoided()));
     }
 
     /**

@@ -1,12 +1,11 @@
 package org.openmrs.eip.component.entity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import lombok.Data;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Data
 @MappedSuperclass
 public abstract class BaseEntity {
 
@@ -20,44 +19,7 @@ public abstract class BaseEntity {
     private String uuid;
 
     /**
-     * Gets the id
-     *
-     * @return the id
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Sets the id
-     *
-     * @param id the id to set
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * Gets the uuid
-     *
-     * @return the uuid
-     */
-    public String getUuid() {
-        return uuid;
-    }
-
-    /**
-     * Sets the uuid
-     *
-     * @param uuid the uuid to set
-     */
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    /**
      * Tests if an entity is out of date compared the given entity
-     *
      * @param entity entity to test
      * @return true if out of date
      */
