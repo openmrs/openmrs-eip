@@ -50,10 +50,10 @@ By default, the exchange of data between the sender and the receiver is done wit
 
 Copy and rename the _application.properties_ files:
 ```
-cp distribution/springboot_setup/sender/application.properties app/src/main/resources/application-sender.properties
+cp distribution/springboot_setup/sender/_application.properties app/src/main/resources/application-sender.properties
 ```
 ```
-cp distribution/springboot_setup/receiver/application.properties app/src/main/resources/application-receiver.properties
+cp distribution/springboot_setup/receiver/_application.properties app/src/main/resources/application-receiver.properties
 ```
 
 Create a folder into which the messages will transit.
