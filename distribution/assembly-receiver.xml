@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>receiver</id>
+    <formats>
+        <format>${archiveFormat}</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>receiver/routes/*-route.xml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

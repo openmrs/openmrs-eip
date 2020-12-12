@@ -12,6 +12,7 @@
         <module>app</module>
         <module>camel-openmrs</module>
         <module>camel-utils</module>
+        <module>distribution</module>
     </modules>
 
     <name>OpenMRS EIP parent</name>
