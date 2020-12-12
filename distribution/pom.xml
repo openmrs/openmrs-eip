@@ -5,7 +5,7 @@
     <groupId>org.openmrs</groupId>
     <parent>
         <groupId>org.openmrs</groupId>
-        <artifactId>openmrs-eip-parent</artifactId>
+        <artifactId>openmrs-eip</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -18,6 +18,10 @@
     <properties>
         <fileNamePrefix>openmrs-eip</fileNamePrefix>
         <archiveFormat>zip</archiveFormat>
+        <routesDirectoryName>routes</routesDirectoryName>
+        <appBuildDirectory>${project.parent.basedir}/app/target</appBuildDirectory>
+        <appJarFileName>${project.parent.artifactId}-app-${project.parent.version}.jar</appJarFileName>
+        <routesFilePattern>*-route.xml</routesFilePattern>
     </properties>
 
     <build>
@@ -25,7 +29,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>package-sender</id>
@@ -35,7 +38,6 @@
                         </goals>
                         <configuration>
                             <finalName>${fileNamePrefix}-sender-${project.parent.version}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>assembly-sender.xml</descriptor>
                             </descriptors>
@@ -49,7 +51,6 @@
                         </goals>
                         <configuration>
                             <finalName>${fileNamePrefix}-receiver-${project.parent.version}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>assembly-receiver.xml</descriptor>
                             </descriptors>

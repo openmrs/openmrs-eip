@@ -4,11 +4,19 @@
     <formats>
         <format>${archiveFormat}</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
+            <directory>${appBuildDirectory}</directory>
+            <outputDirectory />
             <includes>
-                <include>sender/routes/*-route.xml</include>
+                <include>${appJarFileName}</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>sender/${routesDirectoryName}</directory>
+            <outputDirectory>${routesDirectoryName}</outputDirectory>
+            <includes>
+                <include>${routesFilePattern}</include>
             </includes>
         </fileSet>
     </fileSets>
