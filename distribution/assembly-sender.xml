@@ -6,6 +6,14 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>sender</directory>
+            <outputDirectory>test</outputDirectory>
+            <includes>
+                <include>sender/${appPropertiesFileName}</include>
+                <include>sender/${startScriptName}</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${appBuildDirectory}</directory>
             <outputDirectory />
             <includes>

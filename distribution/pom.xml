@@ -22,6 +22,8 @@
         <appBuildDirectory>${project.parent.basedir}/app/target</appBuildDirectory>
         <appJarFileName>${project.parent.artifactId}-app-${project.parent.version}.jar</appJarFileName>
         <routesFilePattern>*-route.xml</routesFilePattern>
+        <appPropertiesFileName>_application.properties</appPropertiesFileName>
+        <startScriptName>start.sh</startScriptName>
     </properties>
 
     <build>
