@@ -13,6 +13,7 @@
         <module>camel-openmrs</module>
         <module>camel-utils</module>
         <module>distribution</module>
+        <module>publisher</module>
     </modules>
 
     <name>OpenMRS EIP</name>
