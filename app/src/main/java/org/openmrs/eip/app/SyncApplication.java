@@ -1,5 +1,15 @@
 package org.openmrs.eip.app;
 
+import java.security.Security;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
@@ -20,15 +30,6 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManagerFactory;
-import java.security.Security;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 @SpringBootApplication(scanBasePackages = {
         "org.openmrs.eip.app",
         "org.openmrs.eip.component",
@@ -48,7 +49,7 @@ public class SyncApplication {
         IGNORE_TABLES.add(TableToSyncEnum.LOCATION_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
-        IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
+        //IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
     }
 
     public SyncApplication(@Nullable final ManagementDbInitImpl managementDbInit,

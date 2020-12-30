@@ -1,25 +1,8 @@
 package org.openmrs.eip.component.service;
 
-import org.openmrs.eip.component.model.AllergyModel;
-import org.openmrs.eip.component.model.AttributeModel;
-import org.openmrs.eip.component.model.BaseModel;
-import org.openmrs.eip.component.model.ConceptAttributeModel;
-import org.openmrs.eip.component.model.ConceptModel;
-import org.openmrs.eip.component.model.ConditionModel;
-import org.openmrs.eip.component.model.DrugOrderModel;
-import org.openmrs.eip.component.model.EncounterDiagnosisModel;
-import org.openmrs.eip.component.model.EncounterModel;
-import org.openmrs.eip.component.model.LocationModel;
-import org.openmrs.eip.component.model.ObservationModel;
-import org.openmrs.eip.component.model.PatientIdentifierModel;
-import org.openmrs.eip.component.model.PatientModel;
-import org.openmrs.eip.component.model.PatientProgramModel;
-import org.openmrs.eip.component.model.PatientStateModel;
-import org.openmrs.eip.component.model.PersonAttributeModel;
-import org.openmrs.eip.component.model.PersonModel;
-import org.openmrs.eip.component.model.PersonNameModel;
-import org.openmrs.eip.component.model.VisitAttributeModel;
-import org.openmrs.eip.component.model.VisitModel;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.openmrs.eip.component.entity.Allergy;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.Concept;
@@ -43,16 +26,35 @@ import org.openmrs.eip.component.entity.PersonAttribute;
 import org.openmrs.eip.component.entity.PersonName;
 import org.openmrs.eip.component.entity.ProviderAttribute;
 import org.openmrs.eip.component.entity.TestOrder;
+import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.Visit;
 import org.openmrs.eip.component.entity.VisitAttribute;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.model.AllergyModel;
+import org.openmrs.eip.component.model.AttributeModel;
+import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.ConceptAttributeModel;
+import org.openmrs.eip.component.model.ConceptModel;
+import org.openmrs.eip.component.model.ConditionModel;
+import org.openmrs.eip.component.model.DrugOrderModel;
+import org.openmrs.eip.component.model.EncounterDiagnosisModel;
+import org.openmrs.eip.component.model.EncounterModel;
+import org.openmrs.eip.component.model.LocationModel;
+import org.openmrs.eip.component.model.ObservationModel;
 import org.openmrs.eip.component.model.OrderFrequencyModel;
 import org.openmrs.eip.component.model.OrderModel;
+import org.openmrs.eip.component.model.PatientIdentifierModel;
+import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.PatientProgramModel;
+import org.openmrs.eip.component.model.PatientStateModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
+import org.openmrs.eip.component.model.PersonAttributeModel;
+import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.TestOrderModel;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
+import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.model.VisitAttributeModel;
+import org.openmrs.eip.component.model.VisitModel;
 
 public enum TableToSyncEnum {
     PERSON(Person.class, PersonModel.class),
@@ -78,7 +80,9 @@ public enum TableToSyncEnum {
     ORDERS(Order.class, OrderModel.class),
     DRUG_ORDER(DrugOrder.class, DrugOrderModel.class),
     TEST_ORDER(TestOrder.class, TestOrderModel.class),
+	USERS(User.class, UserModel.class),
     ORDER_FREQUENCY(OrderFrequency.class, OrderFrequencyModel.class);
+	   
     //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;

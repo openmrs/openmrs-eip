@@ -89,14 +89,16 @@
                         </setBody>
                     </otherwise>
                 </choice>
-
+				
+				<!--
                 <log message="Rebuilding search Index..." />
 
                 <setHeader name="CamelHttpMethod">
                     <constant>POST</constant>
                 </setHeader>
-
-                <to uri="{{openmrs.baseUrl}}/ws/rest/v1/searchindexupdate?authMethod=Basic&amp;authUsername={{openmrs.username}}&amp;authPassword={{openmrs.password}}" />
+				-->
+				
+                <!-- <to uri="{{openmrs.baseUrl}}/ws/rest/v1/searchindexupdate?authMethod=Basic&amp;authUsername={{openmrs.username}}&amp;authPassword={{openmrs.password}}" /> -->
             </when>
         </choice>
 
