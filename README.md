@@ -18,8 +18,8 @@ The application is designed to run in one of 2 modes i.e. sender or receiver, yo
 property **spring.profiles.active** with the value set to sender or receiver. The 2 OpenMRS installations that we need 
 to sync between each has its own local Odoo system to integrate with, Odoo is an ERP system. 
 
-A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **distribution/springboot_setup** directory.
-Please refer to the [Distribution configuration README.md](./distribution/springboot_setup/README.md) for details about its configuration.
+A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **distribution** directory.
+Please refer to the [Distribution configuration README.md](./distribution/README.md) for details about its configuration.
 
 The OpenMRS dbSync can be used with any Camel endpoint between the sender and the receiver including ActiveMQ via `jms` queues. A runnable configuration can be found in the **/distribution/activemq_setup** directory.
 Please refer to the [Configure ActiveMQ README.md](./distribution/activemq_setup/README.md) for details about its configuration.
@@ -35,7 +35,7 @@ As seen from the diagram above, the sender is really a spring boot application a
 profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB 
 changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row, 
 please refer to the inline documentation of the various configuration properties in the sender's application.properties 
-in the distribution/springboot_setup/sender folder.
+in the distribution/sender folder.
 
 Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
