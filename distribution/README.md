@@ -11,7 +11,7 @@ _Note: Most of the paths set in this example are pointing to `/tmp/`, which will
 ### 1. Launch 'remote' and 'central' MySQL containers
 A Docker Compose project to launch 2 MySQL instances (port `3306` for the central database, `3307` for the remote) can be found in the [db/](./db/) directory. To launch it, run:
 ```
-cd distribution/springboot_setup/db
+cd distribution/db
 docker-compose up
 ```
 
@@ -21,24 +21,24 @@ Restore a database archive for each database:
 ##### a dump with not much data for the central database
 <sub>Linux</sub>
 ```bash
-cd distribution/springboot_setup/db
+cd distribution/db
 zcat dump_receiver.zip | docker exec -i db_db_central_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 <sub>macOS</sub>
 ```bash
-cd distribution/springboot_setup/db
+cd distribution/db
 unzip -p dump_receiver.zip | docker exec -i db_db_central_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 
 ##### a dump with lots of data for the remote database.
 <sub>Linux</sub>
 ```bash
-cd distribution/springboot_setup/db
+cd distribution/db
 zcat dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 <sub>macOS</sub>
 ```bash
-cd distribution/springboot_setup/db
+cd distribution/db
 unzip -p dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u root --password=root openmrs
 ```
 
@@ -50,10 +50,10 @@ By default, the exchange of data between the sender and the receiver is done wit
 
 Copy and rename the _application.properties_ files:
 ```
-cp distribution/springboot_setup/sender/_application.properties app/src/main/resources/application-sender.properties
+cp distribution/sender/_application.properties app/src/main/resources/application-sender.properties
 ```
 ```
-cp distribution/springboot_setup/receiver/_application.properties app/src/main/resources/application-receiver.properties
+cp distribution/receiver/_application.properties app/src/main/resources/application-receiver.properties
 ```
 
 Create a folder into which the messages will transit.
@@ -142,12 +142,12 @@ mvn clean install
 Each application will be launched with the appropriate Spring Boot profile parameter. The values are `sender` or `receiver`. The profile will also select the right `application.properties` file.
 - sender app:
  ```
-cd distribution/springboot_setup/sender
+cd distribution/sender
 java -jar -Dspring.profiles.active=sender ../../../app/target/openmrs-eip-app-1.0-SNAPSHOT.jar
 ```
 - receiver app:
 ```
-cd distribution/springboot_setup/receiver
+cd distribution/receiver
 java -jar -Dspring.profiles.active=receiver ../../../app/target/openmrs-eip-app-1.0-SNAPSHOT.jar
 ```
 
