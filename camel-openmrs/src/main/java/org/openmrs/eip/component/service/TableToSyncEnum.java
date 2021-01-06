@@ -9,8 +9,10 @@ import org.openmrs.eip.component.entity.Concept;
 import org.openmrs.eip.component.entity.ConceptAttribute;
 import org.openmrs.eip.component.entity.Condition;
 import org.openmrs.eip.component.entity.DrugOrder;
+import org.openmrs.eip.component.entity.Gaac;
 import org.openmrs.eip.component.entity.Encounter;
 import org.openmrs.eip.component.entity.EncounterDiagnosis;
+import org.openmrs.eip.component.entity.EncounterProvider;
 import org.openmrs.eip.component.entity.Location;
 import org.openmrs.eip.component.entity.LocationAttribute;
 import org.openmrs.eip.component.entity.Observation;
@@ -24,7 +26,9 @@ import org.openmrs.eip.component.entity.Person;
 import org.openmrs.eip.component.entity.PersonAddress;
 import org.openmrs.eip.component.entity.PersonAttribute;
 import org.openmrs.eip.component.entity.PersonName;
+import org.openmrs.eip.component.entity.Provider;
 import org.openmrs.eip.component.entity.ProviderAttribute;
+import org.openmrs.eip.component.entity.Relationship;
 import org.openmrs.eip.component.entity.TestOrder;
 import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.Visit;
@@ -39,6 +43,7 @@ import org.openmrs.eip.component.model.ConditionModel;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.EncounterDiagnosisModel;
 import org.openmrs.eip.component.model.EncounterModel;
+import org.openmrs.eip.component.model.EncounterProviderModel;
 import org.openmrs.eip.component.model.LocationModel;
 import org.openmrs.eip.component.model.ObservationModel;
 import org.openmrs.eip.component.model.OrderFrequencyModel;
@@ -51,10 +56,13 @@ import org.openmrs.eip.component.model.PersonAddressModel;
 import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
+import org.openmrs.eip.component.model.ProviderModel;
+import org.openmrs.eip.component.model.RelationshipModel;
 import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.model.VisitAttributeModel;
 import org.openmrs.eip.component.model.VisitModel;
+import org.openmrs.eip.component.model.GaacModel;
 
 public enum TableToSyncEnum {
     PERSON(Person.class, PersonModel.class),
@@ -80,9 +88,14 @@ public enum TableToSyncEnum {
     ORDERS(Order.class, OrderModel.class),
     DRUG_ORDER(DrugOrder.class, DrugOrderModel.class),
     TEST_ORDER(TestOrder.class, TestOrderModel.class),
-	USERS(User.class, UserModel.class),
-    ORDER_FREQUENCY(OrderFrequency.class, OrderFrequencyModel.class);
-	   
+    USERS(User.class, UserModel.class),
+    RELATIONSHIP(Relationship.class, RelationshipModel.class),
+	
+    ORDER_FREQUENCY(OrderFrequency.class, OrderFrequencyModel.class), 
+    PROVIDER(Provider.class, ProviderModel.class),
+	ENCOUNTER_PROVIDER(EncounterProvider.class, EncounterProviderModel.class), 
+	GAAC(Gaac.class, GaacModel.class);
+	      
     //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
