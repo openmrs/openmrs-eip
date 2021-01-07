@@ -11,33 +11,35 @@ import org.apache.camel.spi.UriParam;
         firstVersion = "1.0.0",
         scheme = "openmrseip",
         title = "OpenMRS EIP Publisher",
-        syntax = "openmrseip:listen",
+        syntax = "openmrseip",
         label = "openmrseip",
         consumerOnly = true
 )
 public class DebeziumMySqlEndpointWrapper extends DebeziumEndpoint<MySqlConnectorEmbeddedDebeziumConfiguration> {
 
-    //private DebeziumMySqlEndpoint delegate;
+    private DebeziumMySqlEndpoint delegate;
 
     @UriParam
     private MySqlConnectorEmbeddedDebeziumConfiguration configuration;
 
     public DebeziumMySqlEndpointWrapper() {
+        delegate = new DebeziumMySqlEndpoint();
     }
 
     public DebeziumMySqlEndpointWrapper(String uri, DebeziumMySqlComponentWrapper component, MySqlConnectorEmbeddedDebeziumConfiguration configuration) {
         super(uri, component);
         this.configuration = configuration;
+        delegate = new DebeziumMySqlEndpoint(uri, component.getDelegate(), configuration);
     }
 
     @Override
     public MySqlConnectorEmbeddedDebeziumConfiguration getConfiguration() {
-        return configuration;
+        return delegate.getConfiguration();
     }
 
     @Override
     public void setConfiguration(MySqlConnectorEmbeddedDebeziumConfiguration configuration) {
-        this.configuration = configuration;
+        delegate.setConfiguration(configuration);
     }
 
 }
