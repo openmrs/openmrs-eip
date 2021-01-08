@@ -19,19 +19,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "gaac")
-@AttributeOverride(name = "id", column = @Column(name = "gaac_id"))
-public class Gaac extends AuditableEntity {
+@Table(name = "gaac_family")
+@AttributeOverride(name = "id", column = @Column(name = "family_id"))
+public class GaacFamily extends AuditableEntity {
+	@Column(name = "family_identifier")
+    private String familyIdentifier;
 
-    @Column(name = "name")
-    private String name;
-    
-    @Column(name = "description")
-    private String description;
-    
-    @Column(name = "gaac_identifier")
-    private String gaac_identifier;
-    
     @NotNull
     @Column(name = "start_date")
     protected LocalDateTime startDate;
@@ -43,9 +36,6 @@ public class Gaac extends AuditableEntity {
     @ManyToOne
     @JoinColumn(name = "focal_patient_id")
     private PatientLight focalPatient;
-
-    @Column(name = "affinity_type")
-    private Integer affinityType;
     
     @ManyToOne
     @JoinColumn(name = "location_id")

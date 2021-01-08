@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public class GaacModel extends BaseChangeableDataModel {
-	private String name;
-	private String description;
+public class GaacFamilyModel extends BaseChangeableDataModel {
+	private String familyIdentifier;
 	protected LocalDateTime startDate;
 	protected LocalDateTime endDate;
 	private String focalPatientUuid;
@@ -17,17 +16,11 @@ public class GaacModel extends BaseChangeableDataModel {
 	private String reasonCrumbled;
 	protected LocalDateTime dateCrumbled;
 	
-	public String getName() {
-		return name;
+	public String getFamilyIdentifier() {
+		return familyIdentifier;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
+	public void setFamilyIdentifier(String familyIdentifier) {
+		this.familyIdentifier = familyIdentifier;
 	}
 	public LocalDateTime getStartDate() {
 		return startDate;
@@ -76,5 +69,5 @@ public class GaacModel extends BaseChangeableDataModel {
 	}
 	public void setDateCrumbled(LocalDateTime dateCrumbled) {
 		this.dateCrumbled = dateCrumbled;
-	}	 
+	}	
 }
