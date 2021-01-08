@@ -1,12 +1,12 @@
 package org.openmrs.eip.component.repository.light;
 
-import org.openmrs.eip.component.entity.light.GaacLite;
+import org.openmrs.eip.component.entity.light.GaacFamilyLite;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
-public interface GaacFamilyLightRepository extends OpenmrsRepository<GaacLite> {
+public interface GaacFamilyLightRepository extends OpenmrsRepository<GaacFamilyLite> {
 
     @Override
-    @Cacheable(cacheNames = "gaac", unless="#result == null")
-    GaacLite findByUuid(String uuid);
+    @Cacheable(cacheNames = "gaacFamily", unless="#result == null")
+    GaacFamilyLite findByUuid(String uuid);
 }

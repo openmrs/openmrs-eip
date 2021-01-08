@@ -11,23 +11,24 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "gaac_family")
-@AttributeOverride(name = "id", column = @Column(name = "family_id"))
-public class GaacFamilyLite extends VoidableLightEntity {
-    @Column(name = "family_identifier")
-    private String familyIdentifier;
-    
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationLight location;
-    
+@Table(name = "relationship")
+@AttributeOverride(name = "id", column = @Column(name = "relationship_id"))
+public class RelationshipLight extends VoidableLightEntity {
+	
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "focal_patient_id")
-    private PatientLight focalPatient;
+    @JoinColumn(name = "person_a")
+    private PersonLight persona;
+    
+	@NotNull
+	@Column(name = "relationship")
+    private int relationshipTypeId;
+	
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "person_b")
+    private PersonLight personb;
 }
