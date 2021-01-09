@@ -13,14 +13,17 @@ public class PublisherProducer extends DefaultProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(PublisherProducer.class);
 
-    public PublisherProducer(Endpoint endpoint) {
+    private String listener;
+
+    public PublisherProducer(Endpoint endpoint, String listener) {
         super(endpoint);
+        this.listener = listener;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.info("Registering debezium route");
-        exchange.getContext().addRoutes(new DebeziumRoute());
+        logger.info("Registering debezium route with listener: " + listener);
+        exchange.getContext().addRoutes(new DebeziumRoute(listener));
     }
 
 }

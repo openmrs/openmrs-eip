@@ -13,13 +13,19 @@ public class DebeziumRoute extends RouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DebeziumRoute.class);
 
+    private String listener;
+
+    public DebeziumRoute(String listener) {
+        this.listener = listener;
+    }
+
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         logger.info("Starting debezium...");
 
         from("debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode=initial&snapshotFetchSize=1000&snapshotLockingMode=extended&includeSchemaChanges=false").
                 process(new PublisherProcessor()).
-                to("direct:out-bound-logger"); //TODO support other listener kinds e.g. a spring bean
+                to(listener); //TODO support other listener kinds e.g. a spring bean
 
     }
 

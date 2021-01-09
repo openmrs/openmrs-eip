@@ -20,17 +20,21 @@ public class PublisherEndpoint extends DefaultEndpoint {
 
     private static final Logger logger = LoggerFactory.getLogger(PublisherEndpoint.class);
 
-    public PublisherEndpoint(String endpointUri) {
+    private String listener;
+
+    public PublisherEndpoint(String endpointUri, String listener) {
         this.setEndpointUri(endpointUri);
+        this.listener = listener;
     }
 
     @Override
-    public Producer createProducer() throws Exception {
-        return new PublisherProducer(this);
+    public Producer createProducer() {
+        logger.info("Creating publisher producer with listener: " + listener);
+        return new PublisherProducer(this, listener);
     }
 
     @Override
-    public Consumer createConsumer(Processor processor) throws Exception {
+    public Consumer createConsumer(Processor processor) {
         throw new UnsupportedOperationException();
     }
 

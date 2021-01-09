@@ -14,8 +14,9 @@ public class PublisherComponent extends DefaultComponent {
     private static final Logger logger = LoggerFactory.getLogger(PublisherComponent.class);
 
     @Override
-    protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-        return new PublisherEndpoint(uri);
+    protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) {
+        logger.info("Creating publisher endpoint with uri path: " + remaining);
+        return new PublisherEndpoint(uri, remaining);
     }
 
 }
