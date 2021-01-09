@@ -1,5 +1,6 @@
 package org.openmrs.eip.app;
 
+import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -10,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 @UriEndpoint(
         firstVersion = "1.0.0",
-        scheme = "openmrseip",
+        scheme = "openmrseip-publisher",
         title = "OpenMRS EIP Publisher",
-        syntax = "openmrseip:listener",
+        syntax = "openmrseip-publisher:listener",
         label = "openmrs,eip,publisher",
         producerOnly = true
 )
@@ -22,15 +23,45 @@ public class PublisherEndpoint extends DefaultEndpoint {
 
     private String listener;
 
-    public PublisherEndpoint(String endpointUri, String listener) {
+    private String errorHandlerRef;
+
+    public PublisherEndpoint(String endpointUri, Component component, String listener) {
         this.setEndpointUri(endpointUri);
+        this.setComponent(component);
         this.listener = listener;
+    }
+
+    /**
+     * Gets the listener
+     *
+     * @return the listener
+     */
+    public String getListener() {
+        return listener;
+    }
+
+    /**
+     * Gets the errorHandlerRef
+     *
+     * @return the errorHandlerRef
+     */
+    public String getErrorHandlerRef() {
+        return errorHandlerRef;
+    }
+
+    /**
+     * Sets the errorHandlerRef
+     *
+     * @param errorHandlerRef the errorHandlerRef to set
+     */
+    public void setErrorHandlerRef(String errorHandlerRef) {
+        this.errorHandlerRef = errorHandlerRef;
     }
 
     @Override
     public Producer createProducer() {
-        logger.info("Creating publisher producer with listener: " + listener);
-        return new PublisherProducer(this, listener);
+        logger.info("Creating publisher producer with listener");
+        return new PublisherProducer(this);
     }
 
     @Override
