@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium" errorHandlerRef="outBoundErrorHandler">
-        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode=initial&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false" />
+    <route id="debezium-event-listener" errorHandlerRef="outBoundErrorHandler">
+        <from uri="direct:debezium-event-listener" />
 
         <log message=":" loggingLevel="DEBUG" />
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
