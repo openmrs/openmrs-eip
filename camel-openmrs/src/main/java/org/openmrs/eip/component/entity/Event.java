@@ -23,10 +23,10 @@ public class Event implements Serializable {
     private Boolean snapshot = Boolean.FALSE;
 
     @Transient
-    private Map beforeState;
+    private Map<String, Object> previousState;
 
     @Transient
-    private Map afterState;
+    private Map<String, Object> currentState;
 
     /**
      * Gets the identifier
@@ -119,39 +119,39 @@ public class Event implements Serializable {
     }
 
     /**
-     * Gets the beforeState
+     * Gets the previousState
      *
-     * @return the beforeState
+     * @return the previousState
      */
-    public Map getBeforeState() {
-        return beforeState;
+    public Map<String, Object> getPreviousState() {
+        return previousState;
     }
 
     /**
-     * Sets the beforeState
+     * Sets the previousState
      *
-     * @param beforeState the beforeState to set
+     * @param previousState the previousState to set
      */
-    public void setBeforeState(Map beforeState) {
-        this.beforeState = beforeState;
+    public void setPreviousState(Map<String, Object> previousState) {
+        this.previousState = previousState;
     }
 
     /**
-     * Gets the afterState
+     * Gets the currentState
      *
-     * @return the afterState
+     * @return the currentState
      */
-    public Map getAfterState() {
-        return afterState;
+    public Map<String, Object> getCurrentState() {
+        return currentState;
     }
 
     /**
-     * Sets the afterState
+     * Sets the currentState
      *
-     * @param afterState the afterState to set
+     * @param currentState the currentState to set
      */
-    public void setAfterState(Map afterState) {
-        this.afterState = afterState;
+    public void setCurrentState(Map<String, Object> currentState) {
+        this.currentState = currentState;
     }
 
     @Override

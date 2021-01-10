@@ -3,19 +3,10 @@
         <from uri="direct:debezium-event-listener" />
 
         <log message=":" loggingLevel="DEBUG" />
-        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        <log message="Received DB event: ${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
         <setProperty name="event">
-            <spel>#{new org.openmrs.eip.component.entity.Event()}</spel>
+            <simple>${body}</simple>
         </setProperty>
-        <script>
-            <spel>
-                <!-- TODO Take care of situation where a table has a composite FK -->
-                #{getProperty('event').setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
-                #{getProperty('event').setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
-                #{getProperty('event').setOperation(request.headers.CamelDebeziumOperation)}
-                #{getProperty('event').setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
-            </spel>
-        </script>
 
         <setProperty name="is-subclass">
             <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
@@ -23,19 +14,19 @@
 
         <choice>
             <when>
-                <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+                <simple>${exchangeProperty.event.operation} == 'c' || ${exchangeProperty.event.operation} == 'u' || ${exchangeProperty.event.operation} == 'd'</simple>
                 <when>
                     <simple>${exchangeProperty.is-subclass} == false</simple>
                     <choice>
                         <when>
-                            <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                            <simple>${exchangeProperty.event.operation} == 'd'</simple>
                             <script>
-                                <spel>#{getProperty('event').setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}</spel>
+                                <spel>#{getProperty('event').setIdentifier(getProperty('event').getPreviousState().get('uuid'))}</spel>
                             </script>
                         </when>
                         <otherwise>
                             <script>
-                                <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
+                                <spel>#{getProperty('event').setIdentifier(getProperty('event').getCurrentState().get('uuid'))}</spel>
                             </script>
                         </otherwise>
                     </choice>
@@ -54,7 +45,7 @@
                 </split>
 
                 <when>
-                    <simple>${headers.CamelDebeziumOperation} != 'c'</simple>
+                    <simple>${exchangeProperty.event.operation} != 'c'</simple>
                     <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
                     <split stopOnException="true">
                         <simple>${body}</simple>
@@ -80,7 +71,7 @@
                 <to uri="direct:db-event-processor" />
             </when>
             <otherwise>
-                <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                <log message="Don't know how to handle DB event -> ${exchangeProperty.event}" loggingLevel="ERROR" />
             </otherwise>
         </choice>
 
