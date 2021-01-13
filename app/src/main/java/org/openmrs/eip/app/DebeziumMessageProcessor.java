@@ -14,17 +14,17 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component("publisher-processor")
-public class PublisherProcessor implements Processor {
+@Component("debezium-msg-processor")
+public class DebeziumMessageProcessor implements Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(PublisherProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(DebeziumMessageProcessor.class);
 
     @Override
     public void process(Exchange exchange) {
         Message message = exchange.getMessage();
         Event event = new Event();
         Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
-        //TODO Take care of situation where a table has a composite FK because fields length will be > 1
+        //TODO Take care of situation where a table has a composite PK because fields length will be > 1
         event.setPrimaryKeyId(primaryKeyStruct.get(primaryKeyStruct.schema().fields().get(0)).toString());
         Map<String, Object> sourceMetadata = message.getHeader(DebeziumConstants.HEADER_SOURCE_METADATA, Map.class);
         event.setTableName(sourceMetadata.get(OpenmrsEipConstants.DEBEZIUM_FIELD_TABLE).toString());
@@ -35,7 +35,7 @@ public class PublisherProcessor implements Processor {
             event.setSnapshot(true);
         }
 
-        logger.info("Received debezium event: " + event);
+        logger.info("Received debezium event: " + event + ", Source Metadata: " + sourceMetadata);
 
         if (message.getBody() != null) {
             Map<String, Object> currentState = new HashedMap();
@@ -51,7 +51,7 @@ public class PublisherProcessor implements Processor {
             event.setPreviousState(beforeState);
         }
 
-        message.setBody(event);
+        message.setHeader(OpenmrsEipConstants.HEADER_EVENT, event);
     }
 
 }

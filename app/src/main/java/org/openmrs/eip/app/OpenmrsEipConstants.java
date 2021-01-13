@@ -6,4 +6,6 @@ public class OpenmrsEipConstants {
 
     public static final String DEBEZIUM_FIELD_SNAPSHOT = "snapshot";
 
+    public static final String HEADER_EVENT = "CamelOpenmrsEipEvent";
+
 }

@@ -3,9 +3,9 @@
         <from uri="direct:debezium-event-listener" />
 
         <log message=":" loggingLevel="DEBUG" />
-        <log message="Received DB event: ${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        <log message="Received DB event: ${headers.CamelOpenmrsEipEvent}" />
         <setProperty name="event">
-            <simple>${body}</simple>
+            <simple>${headers.CamelOpenmrsEipEvent}</simple>
         </setProperty>
 
         <setProperty name="is-subclass">
