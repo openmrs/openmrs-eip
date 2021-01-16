@@ -3,16 +3,7 @@
         <from uri="direct:debezium-event-listener" />
 
         <log message=":" loggingLevel="DEBUG" />
-        <log message="Received DB event: ${headers.CamelOpenmrsEipEvent}" />
-        <setProperty name="event">
-            <simple>${headers.CamelOpenmrsEipEvent}</simple>
-        </setProperty>
-
-        <setProperty name="is-subclass">
-            <simple>${headers.CamelOpenmrsEipIsSubclass}</simple>
-        </setProperty>
-
-        <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
+        <log message="Received DB event: ${exchangeProperty.event}" />
 
         <setProperty name="route-retry-count-map">
             <spel>#{new java.util.HashMap()}</spel>

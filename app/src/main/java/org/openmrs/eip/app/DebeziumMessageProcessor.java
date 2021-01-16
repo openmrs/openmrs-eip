@@ -5,31 +5,30 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.component.debezium.DebeziumConstants;
+import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-@Component("debezium-msg-processor")
+/**
+ * This processor creates an {@link Event} object from the debezium payload and sets it as a property on the exchange,
+ * it also invokes the {@link IdentifierSettingProcessor}
+ */
 public class DebeziumMessageProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(DebeziumMessageProcessor.class);
-
-    private static final List<String> SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order", "patient");
 
     @Override
     public void process(Exchange exchange) {
         Message message = exchange.getMessage();
         String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
         if (!"c".equals(op) && !"u".equals(op) && !"d".equals(op)) {
-            throw new EIPException("Don't know how to handle DB event with operation -> " + op);
+            throw new EIPException("Don't know how to handle DB event with operation: " + op);
         }
 
         Event event = new Event();
@@ -42,6 +41,8 @@ public class DebeziumMessageProcessor implements Processor {
 
         Object snapshot = sourceMetadata.getOrDefault(OpenmrsEipConstants.DEBEZIUM_FIELD_SNAPSHOT, "");
         event.setSnapshot(!"false".equalsIgnoreCase(snapshot.toString()));
+
+        exchange.setProperty(OpenmrsEipConstants.PROP_EVENT, event);
 
         logger.info("Received debezium event: " + event + ", Source Metadata: " + sourceMetadata);
 
@@ -59,21 +60,7 @@ public class DebeziumMessageProcessor implements Processor {
             event.setPreviousState(beforeState);
         }
 
-        boolean isSubclassTable = isSubclassTable(event.getTableName());
-        if (!isSubclassTable) {
-            if ("d".equals(op)) {
-                event.setIdentifier(event.getPreviousState().get(OpenmrsEipConstants.FIELD_UUID).toString());
-            } else {
-                event.setIdentifier(event.getCurrentState().get(OpenmrsEipConstants.FIELD_UUID).toString());
-            }
-        }
-
-        message.setHeader(OpenmrsEipConstants.HEADER_IS_SUBCLASS, isSubclassTable);
-        message.setHeader(OpenmrsEipConstants.HEADER_EVENT, event);
-    }
-
-    private boolean isSubclassTable(String tableName) {
-        return SUBCLASS_TABLES.contains(tableName.toLowerCase());
+        DefaultFluentProducerTemplate.on(exchange.getContext()).withProcessor(new IdentifierSettingProcessor());
     }
 
 }

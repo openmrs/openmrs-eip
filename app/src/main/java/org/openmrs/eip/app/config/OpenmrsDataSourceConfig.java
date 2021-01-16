@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import java.util.Arrays;
 
 import static java.util.Collections.singletonMap;
+import static org.openmrs.eip.app.OpenmrsEipConstants.OPENMRS_DATASOURCE_NAME;
 
 @Configuration
 @EnableTransactionManagement
@@ -43,7 +44,7 @@ public class OpenmrsDataSourceConfig {
     private String hibernateDialect;
 
     @Primary
-    @Bean(name = "openmrsDataSource")
+    @Bean(name = OPENMRS_DATASOURCE_NAME)
     @ConfigurationProperties(prefix = "spring.openmrs-datasource")
     public DataSource dataSource(Environment env) {
         DataSource ds = DataSourceBuilder.create().build();
@@ -63,7 +64,7 @@ public class OpenmrsDataSourceConfig {
     @Primary
     @Bean(name = "openmrsEntityManager")
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-                                                                @Qualifier("openmrsDataSource") final DataSource dataSource) {
+                                                                @Qualifier(OPENMRS_DATASOURCE_NAME) final DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages("org.openmrs.eip.component.entity")
