@@ -8,10 +8,13 @@ import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Component("debezium-msg-processor")
@@ -19,21 +22,26 @@ public class DebeziumMessageProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(DebeziumMessageProcessor.class);
 
+    private static final List<String> SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order", "patient");
+
     @Override
     public void process(Exchange exchange) {
         Message message = exchange.getMessage();
+        String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
+        if (!"c".equals(op) && !"u".equals(op) && !"d".equals(op)) {
+            throw new EIPException("Don't know how to handle DB event with operation -> " + op);
+        }
+
         Event event = new Event();
         Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
         //TODO Take care of situation where a table has a composite PK because fields length will be > 1
         event.setPrimaryKeyId(primaryKeyStruct.get(primaryKeyStruct.schema().fields().get(0)).toString());
         Map<String, Object> sourceMetadata = message.getHeader(DebeziumConstants.HEADER_SOURCE_METADATA, Map.class);
         event.setTableName(sourceMetadata.get(OpenmrsEipConstants.DEBEZIUM_FIELD_TABLE).toString());
-        event.setOperation(message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class));
+        event.setOperation(op);
 
         Object snapshot = sourceMetadata.getOrDefault(OpenmrsEipConstants.DEBEZIUM_FIELD_SNAPSHOT, "");
-        if (!"false".equalsIgnoreCase(snapshot.toString())) {
-            event.setSnapshot(true);
-        }
+        event.setSnapshot(!"false".equalsIgnoreCase(snapshot.toString()));
 
         logger.info("Received debezium event: " + event + ", Source Metadata: " + sourceMetadata);
 
@@ -51,7 +59,21 @@ public class DebeziumMessageProcessor implements Processor {
             event.setPreviousState(beforeState);
         }
 
+        boolean isSubclassTable = isSubclassTable(event.getTableName());
+        if (!isSubclassTable) {
+            if ("d".equals(op)) {
+                event.setIdentifier(event.getPreviousState().get(OpenmrsEipConstants.FIELD_UUID).toString());
+            } else {
+                event.setIdentifier(event.getCurrentState().get(OpenmrsEipConstants.FIELD_UUID).toString());
+            }
+        }
+
+        message.setHeader(OpenmrsEipConstants.HEADER_IS_SUBCLASS, isSubclassTable);
         message.setHeader(OpenmrsEipConstants.HEADER_EVENT, event);
+    }
+
+    private boolean isSubclassTable(String tableName) {
+        return SUBCLASS_TABLES.contains(tableName.toLowerCase());
     }
 
 }

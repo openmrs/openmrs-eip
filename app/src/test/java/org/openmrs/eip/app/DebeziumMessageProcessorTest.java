@@ -14,14 +14,19 @@ import org.apache.kafka.connect.data.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.exception.EIPException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.kafka.connect.data.Schema.Type.STRUCT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.OpenmrsEipConstants.FIELD_UUID;
 import static org.openmrs.eip.app.OpenmrsEipConstants.HEADER_EVENT;
 
 public class DebeziumMessageProcessorTest {
@@ -31,6 +36,7 @@ public class DebeziumMessageProcessorTest {
     @Test
     public void process_shouldCreateAnEventAndAddItAsAHeaderForAnUpdate() throws Exception {
         final Integer id = 2;
+        final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
         final String op = "u";
         final String table = "visit";
         final Integer visitTypeId = 3;
@@ -49,20 +55,25 @@ public class DebeziumMessageProcessorTest {
         sourceMetadata.put(OpenmrsEipConstants.DEBEZIUM_FIELD_SNAPSHOT, "false");
         Field visitTypeIdField = new Field("visit_type_id", 0, new ConnectSchema(Type.INT32));
         Field voidReasonField = new Field("void_reason", 1, new ConnectSchema(Type.STRING));
+        Field uuidField = new Field(FIELD_UUID, 2, new ConnectSchema(Type.STRING));
         List<Field> beforeFields = new ArrayList();
         beforeFields.add(visitTypeIdField);
         beforeFields.add(voidReasonField);
+        beforeFields.add(uuidField);
         Struct beforeState = new Struct(new ConnectSchema(STRUCT, false, null, "before", null, null, null, beforeFields, null, null));
         beforeState.put(visitTypeIdField, visitTypeId);
         beforeState.put(voidReasonField, prevVoidReason);
+        beforeState.put(uuidField, uuid);
 
         Field voidReasonCurrent = new Field("void_reason", 1, new ConnectSchema(Type.STRING));
         List<Field> bodyFields = new ArrayList();
         bodyFields.add(visitTypeIdField);
         bodyFields.add(voidReasonCurrent);
+        bodyFields.add(uuidField);
         Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
         currentState.put(visitTypeIdField, visitTypeId);
         currentState.put(voidReasonField, newVoidReason);
+        currentState.put(uuidField, uuid);
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
@@ -75,20 +86,25 @@ public class DebeziumMessageProcessorTest {
         Event event = exchange.getMessage().getHeader(HEADER_EVENT, Event.class);
         assertEquals(table, event.getTableName());
         assertEquals(id.toString(), event.getPrimaryKeyId());
+        assertEquals(uuid, event.getIdentifier());
         assertEquals(op, event.getOperation());
-        Assert.assertFalse(event.getSnapshot());
-        Assert.assertEquals(2, event.getPreviousState().size());
-        Assert.assertEquals(visitTypeId, event.getPreviousState().get("visit_type_id"));
-        Assert.assertEquals(prevVoidReason, event.getPreviousState().get("void_reason"));
-        Assert.assertEquals(2, event.getCurrentState().size());
-        Assert.assertEquals(visitTypeId, event.getCurrentState().get("visit_type_id"));
-        Assert.assertEquals(newVoidReason, event.getCurrentState().get("void_reason"));
+        assertFalse(event.getSnapshot());
+        assertEquals(3, event.getPreviousState().size());
+        assertEquals(visitTypeId, event.getPreviousState().get("visit_type_id"));
+        assertEquals(prevVoidReason, event.getPreviousState().get("void_reason"));
+        assertEquals(uuid, event.getPreviousState().get(FIELD_UUID));
+        assertEquals(3, event.getCurrentState().size());
+        assertEquals(visitTypeId, event.getCurrentState().get("visit_type_id"));
+        assertEquals(newVoidReason, event.getCurrentState().get("void_reason"));
+        assertEquals(uuid, event.getCurrentState().get(FIELD_UUID));
+        assertFalse(message.getHeader(OpenmrsEipConstants.HEADER_IS_SUBCLASS, Boolean.class));
     }
 
     @Test
     public void process_shouldCreateAnEventAndAddItAsAHeaderForAnInsert() throws Exception {
         final Integer id = 2;
-        final String op = "i";
+        final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
+        final String op = "c";
         final String table = "visit";
         final Integer visitTypeId = 3;
         final String voidReason = "Testing";
@@ -110,9 +126,12 @@ public class DebeziumMessageProcessorTest {
         List<Field> bodyFields = new ArrayList();
         bodyFields.add(visitTypeIdField);
         bodyFields.add(currentVoidReason);
+        Field uuidField = new Field(FIELD_UUID, 2, new ConnectSchema(Type.STRING));
+        bodyFields.add(uuidField);
         Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
         currentState.put(visitTypeIdField, visitTypeId);
         currentState.put(voidReasonField, voidReason);
+        currentState.put(uuidField, uuid);
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
@@ -124,17 +143,20 @@ public class DebeziumMessageProcessorTest {
         Event event = exchange.getMessage().getHeader(HEADER_EVENT, Event.class);
         assertEquals(table, event.getTableName());
         assertEquals(id.toString(), event.getPrimaryKeyId());
+        assertEquals(uuid, event.getIdentifier());
         assertEquals(op, event.getOperation());
-        Assert.assertFalse(event.getSnapshot());
+        assertFalse(event.getSnapshot());
         Assert.assertNull(event.getPreviousState());
-        Assert.assertEquals(2, event.getCurrentState().size());
-        Assert.assertEquals(visitTypeId, event.getCurrentState().get("visit_type_id"));
-        Assert.assertEquals(voidReason, event.getCurrentState().get("void_reason"));
+        assertEquals(3, event.getCurrentState().size());
+        assertEquals(visitTypeId, event.getCurrentState().get("visit_type_id"));
+        assertEquals(voidReason, event.getCurrentState().get("void_reason"));
+        assertEquals(uuid, event.getCurrentState().get(FIELD_UUID));
     }
 
     @Test
     public void process_shouldCreateAnEventAndAddItAsAHeaderForADelete() throws Exception {
         final Integer id = 2;
+        final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
         final String op = "d";
         final String table = "visit";
         final Integer visitTypeId = 3;
@@ -152,12 +174,15 @@ public class DebeziumMessageProcessorTest {
         sourceMetadata.put(OpenmrsEipConstants.DEBEZIUM_FIELD_SNAPSHOT, "false");
         Field visitTypeIdField = new Field("visit_type_id", 0, new ConnectSchema(Type.INT32));
         Field voidReasonField = new Field("void_reason", 1, new ConnectSchema(Type.STRING));
+        Field uuidField = new Field(FIELD_UUID, 2, new ConnectSchema(Type.STRING));
         List<Field> beforeFields = new ArrayList();
         beforeFields.add(visitTypeIdField);
         beforeFields.add(voidReasonField);
+        beforeFields.add(uuidField);
         Struct beforeState = new Struct(new ConnectSchema(STRUCT, false, null, "before", null, null, null, beforeFields, null, null));
         beforeState.put(visitTypeIdField, visitTypeId);
         beforeState.put(voidReasonField, voidReason);
+        beforeState.put(uuidField, uuid);
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
@@ -169,11 +194,13 @@ public class DebeziumMessageProcessorTest {
         Event event = exchange.getMessage().getHeader(HEADER_EVENT, Event.class);
         assertEquals(table, event.getTableName());
         assertEquals(id.toString(), event.getPrimaryKeyId());
+        assertEquals(uuid, event.getIdentifier());
         assertEquals(op, event.getOperation());
-        Assert.assertFalse(event.getSnapshot());
-        Assert.assertEquals(2, event.getPreviousState().size());
-        Assert.assertEquals(visitTypeId, event.getPreviousState().get("visit_type_id"));
-        Assert.assertEquals(voidReason, event.getPreviousState().get("void_reason"));
+        assertFalse(event.getSnapshot());
+        assertEquals(3, event.getPreviousState().size());
+        assertEquals(visitTypeId, event.getPreviousState().get("visit_type_id"));
+        assertEquals(voidReason, event.getPreviousState().get("void_reason"));
+        assertEquals(uuid, event.getPreviousState().get(FIELD_UUID));
         Assert.assertNull(event.getCurrentState());
     }
 
@@ -194,10 +221,16 @@ public class DebeziumMessageProcessorTest {
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
 
         processor.process(exchange);
 
-        Assert.assertFalse(exchange.getMessage().getHeader(HEADER_EVENT, Event.class).getSnapshot());
+        assertFalse(exchange.getMessage().getHeader(HEADER_EVENT, Event.class).getSnapshot());
     }
 
     @Test
@@ -216,6 +249,12 @@ public class DebeziumMessageProcessorTest {
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
 
         processor.process(exchange);
 
@@ -239,6 +278,12 @@ public class DebeziumMessageProcessorTest {
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
 
         processor.process(exchange);
 
@@ -262,6 +307,12 @@ public class DebeziumMessageProcessorTest {
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
 
         processor.process(exchange);
 
@@ -285,10 +336,54 @@ public class DebeziumMessageProcessorTest {
 
         message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
         message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
 
         processor.process(exchange);
 
-        Assert.assertFalse(exchange.getMessage().getHeader(HEADER_EVENT, Event.class).getSnapshot());
+        assertFalse(exchange.getMessage().getHeader(HEADER_EVENT, Event.class).getSnapshot());
+    }
+
+    @Test(expected = EIPException.class)
+    public void process_shouldFailForAnUnSupportedDbOperation() throws Exception {
+        Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+        Message message = new DefaultMessage(exchange);
+        exchange.setMessage(message);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "r");
+
+        processor.process(exchange);
+    }
+
+    @Test
+    public void process_shouldSetIsSubclassHeaderToTrueForASubclassTable() throws Exception {
+        final Integer id = 2;
+        Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+        Message message = new DefaultMessage(exchange);
+        exchange.setMessage(message);
+        Field visitId = new Field("patient_id", 0, new ConnectSchema(Type.INT32));
+        List<Field> fields = new ArrayList();
+        fields.add(visitId);
+        Struct primaryKey = new Struct(new ConnectSchema(Type.STRUCT, false, null, "key", null, null, null, fields, null, null));
+        primaryKey.put("patient_id", id);
+        Map<String, Object> sourceMetadata = new HashMap();
+        sourceMetadata.put(OpenmrsEipConstants.DEBEZIUM_FIELD_TABLE, "patient");
+
+        message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
+        message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+        Field uuidField = new Field(FIELD_UUID, 0, new ConnectSchema(Type.STRING));
+        List<Field> bodyFields = Collections.singletonList(uuidField);
+        Struct currentState = new Struct(new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+        currentState.put(uuidField, "some-uuid");
+        message.setBody(currentState);
+        message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
+
+        processor.process(exchange);
+
+        assertTrue(message.getHeader(OpenmrsEipConstants.HEADER_IS_SUBCLASS, Boolean.class));
     }
 
 }

@@ -9,71 +9,46 @@
         </setProperty>
 
         <setProperty name="is-subclass">
-            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
+            <simple>${headers.CamelOpenmrsEipIsSubclass}</simple>
         </setProperty>
 
-        <choice>
-            <when>
-                <simple>${exchangeProperty.event.operation} == 'c' || ${exchangeProperty.event.operation} == 'u' || ${exchangeProperty.event.operation} == 'd'</simple>
-                <when>
-                    <simple>${exchangeProperty.is-subclass} == false</simple>
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.event.operation} == 'd'</simple>
-                            <script>
-                                <spel>#{getProperty('event').setIdentifier(getProperty('event').getPreviousState().get('uuid'))}</spel>
-                            </script>
-                        </when>
-                        <otherwise>
-                            <script>
-                                <spel>#{getProperty('event').setIdentifier(getProperty('event').getCurrentState().get('uuid'))}</spel>
-                            </script>
-                        </otherwise>
-                    </choice>
-                </when>
+        <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
 
-                <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
+        <setProperty name="route-retry-count-map">
+            <spel>#{new java.util.HashMap()}</spel>
+        </setProperty>
+        <split>
+            <simple>{{db-event.destinations}}</simple>
+            <script>
+                <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
+            </script>
+        </split>
 
-                <setProperty name="route-retry-count-map">
-                    <spel>#{new java.util.HashMap()}</spel>
-                </setProperty>
-                <split>
-                    <simple>{{db-event.destinations}}</simple>
-                    <script>
-                        <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
-                    </script>
-                </split>
+        <when>
+            <simple>${exchangeProperty.event.operation} != 'c'</simple>
+            <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+            <split stopOnException="true">
+                <simple>${body}</simple>
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
+                        <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route.trim()}" />
+                    </when>
+                    <otherwise>
+                        <script>
+                            <spel>#{getProperty('route-retry-count-map').put(body.route, getProperty('route-retry-count-map').get(body.route.trim()) + 1)}</spel>
+                        </script>
+                    </otherwise>
+                </choice>
+            </split>
+        </when>
 
-                <when>
-                    <simple>${exchangeProperty.event.operation} != 'c'</simple>
-                    <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
-                    <split stopOnException="true">
-                        <simple>${body}</simple>
-                        <choice>
-                            <when>
-                                <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
-                                <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route.trim()}" />
-                            </when>
-                            <otherwise>
-                                <script>
-                                    <spel>#{getProperty('route-retry-count-map').put(body.route, getProperty('route-retry-count-map').get(body.route.trim()) + 1)}</spel>
-                                </script>
-                            </otherwise>
-                        </choice>
-                    </split>
-                </when>
-                
-                <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
-                <setBody>
-                    <simple>${exchangeProperty.event}</simple>
-                </setBody>
+        <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
+        <setBody>
+            <simple>${exchangeProperty.event}</simple>
+        </setBody>
 
-                <to uri="direct:db-event-processor" />
-            </when>
-            <otherwise>
-                <log message="Don't know how to handle DB event -> ${exchangeProperty.event}" loggingLevel="ERROR" />
-            </otherwise>
-        </choice>
+        <to uri="direct:db-event-processor" />
 
     </route>
 </routes>
