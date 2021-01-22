@@ -10,18 +10,18 @@ import org.slf4j.LoggerFactory;
  * Registers and calls the debezium route
  */
 public class PublisherProducer extends DefaultProducer {
-
-    private static final Logger logger = LoggerFactory.getLogger(PublisherProducer.class);
-
-    public PublisherProducer(Endpoint endpoint) {
-        super(endpoint);
-    }
-
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        logger.info("Registering debezium route");
-
-        exchange.getContext().addRoutes(new DebeziumRoute((PublisherEndpoint) getEndpoint()));
-    }
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(PublisherProducer.class);
+	
+	public PublisherProducer(Endpoint endpoint) {
+		super(endpoint);
+	}
+	
+	@Override
+	public void process(Exchange exchange) throws Exception {
+		logger.info("Registering debezium route");
+		
+		exchange.getContext().addRoutes(new DebeziumRoute((PublisherEndpoint) getEndpoint()));
+	}
+	
 }
