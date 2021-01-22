@@ -1,7 +1,7 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
-import static org.openmrs.eip.app.OpenmrsEipConstants.OPENMRS_DATASOURCE_NAME;
-import static org.openmrs.eip.app.OpenmrsEipConstants.PROP_EVENT;
+import static org.openmrs.eip.publisher.OpenmrsEipConstants.OPENMRS_DATASOURCE_NAME;
+import static org.openmrs.eip.publisher.OpenmrsEipConstants.PROP_EVENT;
 
 import java.util.Arrays;
 import java.util.List;

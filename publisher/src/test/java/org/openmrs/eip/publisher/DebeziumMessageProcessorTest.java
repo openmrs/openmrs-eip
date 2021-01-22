@@ -1,12 +1,12 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
 import static org.apache.kafka.connect.data.Schema.Type.STRUCT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.OpenmrsEipConstants.FIELD_UUID;
-import static org.openmrs.eip.app.OpenmrsEipConstants.PROP_EVENT;
+import static org.openmrs.eip.publisher.OpenmrsEipConstants.FIELD_UUID;
+import static org.openmrs.eip.publisher.OpenmrsEipConstants.PROP_EVENT;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -3,17 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.openmrs</groupId>
+    <groupId>org.openmrs.eip</groupId>
     <artifactId>openmrs-eip</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>app</module>
         <module>camel-openmrs</module>
         <module>camel-utils</module>
-        <module>distribution</module>
         <module>publisher</module>
+        <module>app</module>
+        <module>distribution</module>
     </modules>
 
     <name>OpenMRS EIP</name>

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;

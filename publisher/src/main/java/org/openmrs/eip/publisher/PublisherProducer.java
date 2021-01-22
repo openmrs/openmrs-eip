@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;

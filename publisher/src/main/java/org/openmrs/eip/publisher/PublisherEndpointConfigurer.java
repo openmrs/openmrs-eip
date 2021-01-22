@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spi.GeneratedPropertyConfigurer;

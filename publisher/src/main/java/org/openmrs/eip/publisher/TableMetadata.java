@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.publisher;
 
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.model.BaseModel;
