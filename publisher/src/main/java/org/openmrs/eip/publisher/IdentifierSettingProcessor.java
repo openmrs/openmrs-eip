@@ -1,6 +1,5 @@
 package org.openmrs.eip.publisher;
 
-import static org.openmrs.eip.publisher.OpenmrsEipConstants.OPENMRS_DATASOURCE_NAME;
 import static org.openmrs.eip.publisher.OpenmrsEipConstants.PROP_EVENT;
 
 import java.util.Arrays;
@@ -11,6 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.eip.component.common.CommonConstants;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public class IdentifierSettingProcessor implements Processor {
 			logger.debug("Looking up uuid for " + event.getTableName() + " from " + refTable + " table");
 			
 			String query = "SELECT uuid FROM " + refTable + " WHERE " + refColumn + "=" + event.getPrimaryKeyId()
-			        + "?dataSource=" + OPENMRS_DATASOURCE_NAME;
+			        + "?dataSource=" + CommonConstants.OPENMRS_DATASOURCE_NAME;
 			List<Map> rows = DefaultFluentProducerTemplate.on(exchange.getContext()).to("sql:" + query).request(List.class);
 			event.setIdentifier(rows.get(0).get(OpenmrsEipConstants.FIELD_UUID).toString());
 		}

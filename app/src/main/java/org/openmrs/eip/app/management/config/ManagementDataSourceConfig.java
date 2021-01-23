@@ -73,17 +73,17 @@ public class ManagementDataSourceConfig {
 	public PlatformTransactionManager transactionManager(@Qualifier("mngtEntityManager") EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
 	}
-
-    @Bean(name = "liquibase")
-    public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource, Environment env) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setContexts(env.getActiveProfiles()[0]);
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:liquibase-master.xml");
-        liquibase.setDatabaseChangeLogTable("liquibasechangelog");
-        liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
-        liquibase.setShouldRun(false);
-
-        return liquibase;
-    }
+	
+	@Bean(name = "liquibase")
+	public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource, Environment env) {
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setContexts(env.getActiveProfiles()[0]);
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:liquibase-master.xml");
+		liquibase.setDatabaseChangeLogTable("liquibasechangelog");
+		liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
+		liquibase.setShouldRun(false);
+		
+		return liquibase;
+	}
 }
