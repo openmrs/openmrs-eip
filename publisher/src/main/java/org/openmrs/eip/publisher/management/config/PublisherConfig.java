@@ -1,8 +1,15 @@
 package org.openmrs.eip.publisher.management.config;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.EntityManagerFactory;
+
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
-import org.apache.camel.component.jpa.JpaComponent;
+import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -14,12 +21,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-
-import javax.persistence.EntityManagerFactory;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Configuration
 @EnableCaching
@@ -58,6 +59,12 @@ public class PublisherConfig {
 	@Bean("noErrorHandler")
 	public NoErrorHandlerBuilder getNoErrorHandler() {
 		return new NoErrorHandlerBuilder();
+	}
+	
+	@Bean("jpaIdempotentRepository")
+	@Profile(SyncProfiles.SENDER)
+	public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
+		return new JpaMessageIdRepository(emf, "complexObsProcessor");
 	}
 	
 	@Bean

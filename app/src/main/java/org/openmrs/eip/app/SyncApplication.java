@@ -32,10 +32,4 @@ public class SyncApplication {
 		return builder;
 	}
 	
-	@Bean("jpaIdempotentRepository")
-	@Profile(SyncProfiles.SENDER)
-	public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
-		return new JpaMessageIdRepository(emf, "complexObsProcessor");
-	}
-	
 }
