@@ -28,8 +28,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
-@SpringBootApplication(scanBasePackages = { "org.openmrs.eip.app", "org.openmrs.eip.component", "org.openmrs.utils.odoo",
-        "org.openmrs.eip.publisher" })
+@SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 public class SyncApplication {
 	
 	private CamelContext camelContext;
