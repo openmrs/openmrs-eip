@@ -1,13 +1,20 @@
-package org.openmrs.eip.publisher.config;
+package org.openmrs.eip.component.config;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.component.jpa.JpaComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -15,12 +22,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 @Configuration
+@EnableCaching
 public class CommonConfig {
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
@@ -44,6 +47,11 @@ public class CommonConfig {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
 		builder.setUseOriginalMessage(true);
 		return builder;
+	}
+	
+	@Bean("noErrorHandler")
+	public NoErrorHandlerBuilder getNoErrorHandler() {
+		return new NoErrorHandlerBuilder();
 	}
 	
 	@Bean(value = "jpa")

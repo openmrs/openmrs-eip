@@ -1,12 +1,10 @@
-package org.openmrs.eip.publisher.config;
+package org.openmrs.eip.component.config;
 
 import java.security.Security;
 
 import javax.annotation.PostConstruct;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.openmrs.eip.component.config.ReceiverEncryptionProperties;
-import org.openmrs.eip.component.config.SenderEncryptionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
