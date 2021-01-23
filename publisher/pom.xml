@@ -16,7 +16,6 @@
     
     <properties>
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
-        <liquibaseVersion>4.2.0</liquibaseVersion>
     </properties>
 
     <dependencies>
@@ -91,12 +90,10 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-base</artifactId>
-            <version>${camelActiveMqVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-activemq</artifactId>
-            <version>${camelActiveMqVersion}</version>
         </dependency>
     </dependencies>
 
