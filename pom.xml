@@ -14,6 +14,7 @@
         <module>publisher</module>
         <module>app</module>
         <module>distribution</module>
+        <module>example</module>
     </modules>
 
     <name>OpenMRS EIP</name>
@@ -21,6 +22,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <sprintBootVersion>2.2.7.RELEASE</sprintBootVersion>
+        <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
+        <hibernateVersion>5.4.21.Final</hibernateVersion>
+        <hibernateValidatorVersion>6.1.0.Final</hibernateValidatorVersion>
+        <camelVersion>3.3.0</camelVersion>
         <guava.version>28.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
         <lombok.version>1.18.8</lombok.version>
@@ -35,21 +41,41 @@
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-parent</artifactId>
-                <version>3.3.0</version>
+                <version>${camelVersion}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <type>pom</type>
                 <version>2.1.4.RELEASE</version>
                 <scope>import</scope>
-            </dependency>
+            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${sprintBootVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernateVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernateValidatorVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysqlConnectorVersion}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

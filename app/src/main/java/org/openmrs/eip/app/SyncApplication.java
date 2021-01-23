@@ -1,16 +1,10 @@
 package org.openmrs.eip.app;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
-import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
-import org.openmrs.eip.component.SyncProfiles;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 public class SyncApplication {

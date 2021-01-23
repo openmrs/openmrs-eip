@@ -1,5 +1,6 @@
 package org.openmrs.eip.publisher;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
@@ -7,7 +8,6 @@ import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
@@ -46,7 +46,7 @@ public class DebeziumMessageProcessor implements Processor {
 		logger.info("Received debezium event: " + event + ", Source Metadata: " + sourceMetadata);
 		
 		if (message.getBody() != null) {
-			Map<String, Object> currentState = new HashedMap();
+			Map<String, Object> currentState = new HashMap();
 			Struct bodyStruct = message.getBody(Struct.class);
 			bodyStruct.schema().fields().forEach(field -> currentState.put(field.name(), bodyStruct.get(field)));
 			event.setCurrentState(currentState);
@@ -54,7 +54,7 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		Struct beforeStruct = message.getHeader(DebeziumConstants.HEADER_BEFORE, Struct.class);
 		if (beforeStruct != null) {
-			Map<String, Object> beforeState = new HashedMap();
+			Map<String, Object> beforeState = new HashMap();
 			beforeStruct.schema().fields().forEach(field -> beforeState.put(field.name(), beforeStruct.get(field)));
 			event.setPreviousState(beforeState);
 		}
