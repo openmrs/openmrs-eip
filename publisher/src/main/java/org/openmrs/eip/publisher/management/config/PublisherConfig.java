@@ -1,11 +1,4 @@
-package org.openmrs.eip.component.config;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.EntityManagerFactory;
+package org.openmrs.eip.publisher.management.config;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
@@ -22,9 +15,15 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
+import javax.persistence.EntityManagerFactory;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 @Configuration
 @EnableCaching
-public class CommonConfig {
+public class PublisherConfig {
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
 	
@@ -49,17 +48,16 @@ public class CommonConfig {
 		return builder;
 	}
 	
+	@Bean("outBoundErrorHandler")
+	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
+		builder.setUseOriginalMessage(true);
+		return builder;
+	}
+	
 	@Bean("noErrorHandler")
 	public NoErrorHandlerBuilder getNoErrorHandler() {
 		return new NoErrorHandlerBuilder();
-	}
-	
-	@Bean(value = "jpa")
-	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory) {
-		JpaComponent comp = new JpaComponent();
-		comp.setEntityManagerFactory(entityManagerFactory);
-		
-		return comp;
 	}
 	
 	@Bean

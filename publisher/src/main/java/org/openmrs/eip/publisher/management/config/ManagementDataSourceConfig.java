@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.apache.camel.component.jpa.JpaComponent;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -74,6 +75,14 @@ public class ManagementDataSourceConfig {
 	@Bean(name = "mngtTransactionManager")
 	public PlatformTransactionManager transactionManager(@Qualifier("mngtEntityManager") EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
+	}
+	
+	@Bean(value = "jpa")
+	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory) {
+		JpaComponent comp = new JpaComponent();
+		comp.setEntityManagerFactory(entityManagerFactory);
+		
+		return comp;
 	}
 	
 	@Bean(name = "liquibase")

@@ -4,7 +4,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
-import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,13 +23,6 @@ public class SyncApplication {
 	
 	public static void main(final String[] args) {
 		SpringApplication.run(SyncApplication.class, args);
-	}
-	
-	@Bean("outBoundErrorHandler")
-	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
-		builder.setUseOriginalMessage(true);
-		return builder;
 	}
 	
 	@Bean("inBoundErrorHandler")
