@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
   <route id="schedule">
     <from uri="scheduler:sync?delay=1m"/>
-      <to uri="jpa://org.openmrs.eip.app.management.entity.TableSyncStatus?query=select s from org.openmrs.eip.app.management.entity.TableSyncStatus s"/>
+      <to uri="jpa://org.openmrs.eip.publisher.management.entity.TableSyncStatus?query=select s from org.openmrs.eip.publisher.management.entity.TableSyncStatus s"/>
       <split streaming="true">
         <simple>${body}</simple>
         <setHeader name="OpenmrsEntitySyncStatusId">

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.publisher.management.entity;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;

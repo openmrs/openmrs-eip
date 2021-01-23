@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.publisher.management.entity;
 
 import lombok.Data;
 

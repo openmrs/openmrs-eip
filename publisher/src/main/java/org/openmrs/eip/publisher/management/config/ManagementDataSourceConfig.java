@@ -1,6 +1,12 @@
-package org.openmrs.eip.app.management.config;
+package org.openmrs.eip.publisher.management.config;
 
-import liquibase.integration.spring.SpringLiquibase;
+import java.sql.Driver;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,16 +21,12 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-import java.sql.Driver;
-import java.util.HashMap;
-import java.util.Map;
+import liquibase.integration.spring.SpringLiquibase;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager", basePackages = {
-        "org.openmrs.eip.app.management" })
+        "org.openmrs.eip.publisher.management" })
 public class ManagementDataSourceConfig {
 	
 	@Value("${spring.mngt-datasource.dialect}")
@@ -60,12 +62,12 @@ public class ManagementDataSourceConfig {
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            @Qualifier("mngtDataSource") final DataSource dataSource) {
 		
-		Map<String, String> props = new HashMap<>();
+		Map<String, String> props = new HashMap();
 		props.put("hibernate.dialect", hibernateDialect);
 		props.put("hibernate.hbm2ddl.auto", ddlAuto);
 		
 		return builder.dataSource(dataSource)
-		        .packages("org.openmrs.eip.app.management.entity", "org.apache.camel.processor.idempotent.jpa")
+		        .packages("org.openmrs.eip.publisher.management.entity", "org.apache.camel.processor.idempotent.jpa")
 		        .persistenceUnit("mngt").properties(props).build();
 	}
 	
@@ -86,4 +88,5 @@ public class ManagementDataSourceConfig {
 		
 		return liquibase;
 	}
+	
 }
