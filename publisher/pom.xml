@@ -40,12 +40,6 @@
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-debezium-mysql-starter</artifactId>
             <version>${camelVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
