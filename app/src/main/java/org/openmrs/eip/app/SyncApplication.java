@@ -1,6 +1,5 @@
 package org.openmrs.eip.app;
 
-import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,7 +14,6 @@ import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -56,11 +54,6 @@ public class SyncApplication {
 	private void addTypeConverter() {
 		camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class,
 		    new StringToLocalDateTimeConverter());
-	}
-	
-	@PostConstruct
-	private void addBCProvider() {
-		Security.addProvider(new BouncyCastleProvider());
 	}
 	
 	/**

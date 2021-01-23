@@ -24,7 +24,7 @@ import java.util.Map;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager", basePackages = {
-        "org.openmrs.eip.app.management.repository" })
+        "org.openmrs.eip.app.management" })
 public class ManagementDataSourceConfig {
 	
 	@Value("${spring.mngt-datasource.dialect}")

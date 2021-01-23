@@ -10,7 +10,7 @@
 
     <modules>
         <module>camel-openmrs</module>
-        <module>camel-utils</module>
+        <module>camel-odoo</module>
         <module>publisher</module>
         <module>app</module>
         <module>distribution</module>
