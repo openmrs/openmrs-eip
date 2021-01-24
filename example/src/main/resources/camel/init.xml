@@ -1,0 +1,8 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="test">
+        <from uri="scheduler:test?initialDelay=500&amp;repeatCount=1" />
+        <to uri="openmrseip-publisher:direct:event-listener-example?errorHandlerRef=outBoundErrorHandler" />
+    </route>
+
+</routes>

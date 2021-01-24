@@ -86,11 +86,10 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(name = "liquibase")
-	public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource, Environment env) {
+	public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource) {
 		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setContexts(env.getActiveProfiles()[0]);
 		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:liquibase-master.xml");
+		liquibase.setChangeLog("classpath:liquibase.xml");
 		liquibase.setDatabaseChangeLogTable("liquibasechangelog");
 		liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
 		liquibase.setShouldRun(false);

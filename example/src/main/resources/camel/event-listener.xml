@@ -1,0 +1,11 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--It's important to set the error handler ref to outBoundErrorHandler -->
+    <route id="event-listener-example" errorHandlerRef="outBoundErrorHandler">
+        <from uri="direct:event-listener-example" />
+
+        <log message="Received db event: ${body}" loggingLevel="DEBUG" />
+        <!--<toD uri="sql:SELECT uuid FROM logger?dataSource=openmrsDataSource" />-->
+    </route>
+
+</routes>
