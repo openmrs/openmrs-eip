@@ -1,6 +1,7 @@
 package org.openmrs.eip.publisher.management.config;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class PublisherConfig {
 		return new JpaMessageIdRepository(emf, "complexObsProcessor");
 	}
 	
-	@Bean
+	@Bean("customPropertySource")
 	@Profile(SyncProfiles.SENDER)
 	public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
 		//Custom PropertySource that we can dynamically populate with generated property values which
@@ -83,7 +84,9 @@ public class PublisherConfig {
 			tables.add(dbName + "." + tableToSyncEnum.name());
 		}
 		
-		Map<String, Object> props = Collections.singletonMap("debezium.tablesToSync", StringUtils.join(tables, ","));
+		Map<String, Object> props = new HashMap();
+		props.put("camel.springboot.xml-routes", "classpath:publisher-routes/*.xml,classpath:camel/*.xml");
+		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
 		PropertySource customPropSource = new MapPropertySource("custom", props);
 		env.getPropertySources().addLast(customPropSource);
 		
