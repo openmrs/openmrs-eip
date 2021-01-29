@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium-event-listener" errorHandlerRef="outBoundErrorHandler">
-        <from uri="direct:debezium-event-listener" />
+    <route id="db-event-listener" errorHandlerRef="outBoundErrorHandler">
+        <from uri="direct:db-event-listener" />
 
         <log message=":" loggingLevel="DEBUG" />
         <log message="Received DB event: ${exchangeProperty.event}" />
