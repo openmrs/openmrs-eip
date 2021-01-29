@@ -27,7 +27,7 @@
                 the header check for CamelDebeziumOperation and route-retry-count-map will be empty anyways
             -->
             <when>
-                <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
+                <simple>${exchangeProperty.event.operation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
                 <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
                 <setProperty name="retry-event-message">
                     <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>

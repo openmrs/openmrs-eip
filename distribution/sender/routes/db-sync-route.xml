@@ -7,7 +7,7 @@
 
         <choice>
             <when>
-                <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                <simple>${exchangeProperty.event.operation} == 'd'</simple>
                 <setBody>
                     <simple>DELETE:${exchangeProperty.event.tableName}:${exchangeProperty.event.identifier}</simple>
                 </setBody>
