@@ -13,6 +13,7 @@ import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.openmrs.eip.publisher.OpenmrsEipConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +50,7 @@ public class PublisherConfig {
 		return builder;
 	}
 	
-	@Bean("outBoundErrorHandler")
+	@Bean(OpenmrsEipConstants.ERROR_HANDLER_REF)
 	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
 		builder.setUseOriginalMessage(true);

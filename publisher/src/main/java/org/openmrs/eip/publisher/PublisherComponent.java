@@ -15,8 +15,8 @@ public class PublisherComponent extends DefaultComponent {
 	
 	@Override
 	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) {
-		logger.info("Creating publisher endpoint with uri path: " + remaining);
-		return new PublisherEndpoint(uri, this, remaining);
+		logger.info("Creating publisher endpoint with parameters: " + parameters);
+		return new PublisherEndpoint(uri, this);
 	}
 	
 }
