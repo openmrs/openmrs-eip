@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="outbound-complex-obs-sync" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="file:{{camel.output.endpoint.complex.obs.data.directory}}?noop=true&amp;recursive=false&amp;idempotentKey=${file:name}-${file:modified}&amp;idempotentRepository=#jpaIdempotentRepository" />
+    <route id="complex-obs-sync" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="file:{{openmrs.complex.obs.data.directory}}?noop=true&amp;recursive=false&amp;idempotentKey=${file:name}-${file:modified}&amp;idempotentRepository=#jpaIdempotentRepository" />
         <marshal>
             <base64/>
         </marshal>
