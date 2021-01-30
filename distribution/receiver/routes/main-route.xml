@@ -21,9 +21,8 @@
             <when>
                 <method ref="isFilePredicate" />
                 <log message="Received complex_obs data file: ${headers.CamelFileName}" />
-                <!-- TODO Broadcast the message to other listeners -->
 
-                <to uri="direct:inbound-complex-obs-sync" />
+                <to uri="direct:complex-obs-sync" />
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
