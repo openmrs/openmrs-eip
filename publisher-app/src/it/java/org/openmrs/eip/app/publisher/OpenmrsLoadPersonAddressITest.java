@@ -1,22 +1,22 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.publisher;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.After;
 import org.junit.Test;
-import org.openmrs.eip.component.entity.Person;
+import org.openmrs.eip.component.entity.PersonAddress;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.PersonAddressModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.service.security.PGPEncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 
-public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
+public class OpenmrsLoadPersonAddressITest extends OpenmrsLoadEndpointITest {
 
     @Autowired
-    private SyncEntityRepository<Person> repository;
+    private SyncEntityRepository<PersonAddress> repository;
 
     @Autowired
     private PGPEncryptService pgpEncryptService;
@@ -37,13 +37,13 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
     // TEAR-DOWN
     @After
     public void after() {
-        Person p = repository.findByUuid("818b4ee6-8d68-4849-975d-80ab98016677");
+        PersonAddress p = repository.findByUuid("818b4ee6-8d68-4849-975d-80ab98016677");
         repository.delete(p);
     }
 
     private String getPersonJson() {
         return "{" +
-                "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
+                "\"tableToSyncModelClass\":\"" + PersonAddressModel.class.getName() + "\"," +
                 "\"model\":{" +
                 "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
                 "\"creatorUuid\":\"" + UserLight.class.getName() + "(1)\"," +
@@ -54,14 +54,9 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
                 "\"voidedByUuid\":null," +
                 "\"dateVoided\":null," +
                 "\"voidReason\":null," +
-                "\"gender\":\"F\"," +
-                "\"birthdate\":\"1982-01-06\"," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
+                "\"address\":{" +
+                "\"address1\":\"chemin perdu\"" +
+                "}" +
                 "}" +
                 "}";
     }

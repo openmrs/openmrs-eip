@@ -23,7 +23,6 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
 @Configuration
-@EnableCaching
 public class WatcherConfig {
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
@@ -37,28 +36,11 @@ public class WatcherConfig {
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
 	}
 	
-	/**
-	 * Bean to handle messages in error and re-route them to another route
-	 *
-	 * @return deadLetterChannelBuilder
-	 */
-	@Bean
-	public DeadLetterChannelBuilder deadLetterChannelBuilder() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
-		builder.setUseOriginalMessage(true);
-		return builder;
-	}
-	
 	@Bean(WatcherConstants.ERROR_HANDLER_REF)
-	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
+	public DeadLetterChannelBuilder getWatcherErrorHandler() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:watcher-error-handler");
 		builder.setUseOriginalMessage(true);
 		return builder;
-	}
-	
-	@Bean("noErrorHandler")
-	public NoErrorHandlerBuilder getNoErrorHandler() {
-		return new NoErrorHandlerBuilder();
 	}
 	
 	@Bean("jpaIdempotentRepository")

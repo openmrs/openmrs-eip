@@ -12,12 +12,6 @@
     <packaging>jar</packaging>
     <name>OpenMRS EIP Watcher</name>
     <description>Watches for events from an OpenMRS MySQL database</description>
-    
-    <properties>
-        <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
-        <liquibaseVersion>4.2.0</liquibaseVersion>
-        <h2Version>1.4.200</h2Version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -41,11 +35,6 @@
             <version>${camelVersion}</version>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2Version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-base</artifactId>
         </dependency>
@@ -56,17 +45,6 @@
                 <exclusion>
                     <groupId>org.apache.activemq</groupId>
                     <artifactId>activemq-broker</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibaseVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.publisher;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

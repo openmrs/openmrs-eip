@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.config;
+package org.openmrs.eip.app.publisher.config;
 
 import org.openmrs.eip.component.config.ReceiverEncryptionProperties;
 import org.openmrs.eip.component.config.SenderEncryptionProperties;

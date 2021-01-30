@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.publisher;
 
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
@@ -7,7 +7,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.openmrs.eip.app.config.TestConfig;
+import org.openmrs.eip.app.publisher.config.TestConfig;
 import org.openmrs.eip.component.camel.OpenmrsComponent;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.eip.component.service.security.PGPDecryptService;

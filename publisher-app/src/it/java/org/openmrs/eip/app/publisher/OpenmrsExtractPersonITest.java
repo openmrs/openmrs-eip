@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.publisher;
 
 import static java.time.LocalDateTime.of;
 import static java.time.ZoneId.systemDefault;

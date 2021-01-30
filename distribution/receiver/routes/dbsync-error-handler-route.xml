@@ -2,8 +2,8 @@
     Route to process exceptions and log them in the inbound_retry_queue table in the management DB.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="inbound-error-handler">
-        <from uri="direct:inbound-error-handler" />
+    <route id="dbsync-error-handler">
+        <from uri="direct:dbsync-error-handler" />
 
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>

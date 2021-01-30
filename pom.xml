@@ -12,6 +12,7 @@
         <module>mysql-watcher</module>
         <module>camel-openmrs</module>
         <module>publisher-app</module>
+        <module>dbsync-receiver-app</module>
         <module>example-app</module>
         <module>distribution</module>
         <module>camel-odoo</module>
@@ -27,6 +28,8 @@
         <hibernateVersion>5.4.21.Final</hibernateVersion>
         <hibernateValidatorVersion>6.1.0.Final</hibernateValidatorVersion>
         <camelVersion>3.3.0</camelVersion>
+        <liquibaseVersion>4.2.0</liquibaseVersion>
+        <h2Version>1.4.200</h2Version>
         <guava.version>28.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
         <lombok.version>1.18.8</lombok.version>
@@ -83,6 +86,22 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2Version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibaseVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- testing -->

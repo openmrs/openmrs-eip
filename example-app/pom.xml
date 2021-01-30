@@ -11,11 +11,6 @@
     <name>OpenMRS EIP example app</name>
     <description>Example application to demonstrate usage of the watcher</description>
 
-    <properties>
-        <javaCompilerVersion>1.8</javaCompilerVersion>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
