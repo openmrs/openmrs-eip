@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>openmrs-eip-publisher</artifactId>
+            <artifactId>mysql-watcher</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

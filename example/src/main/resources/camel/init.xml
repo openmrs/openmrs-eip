@@ -2,7 +2,7 @@
 
     <route id="test">
         <from uri="scheduler:test?initialDelay=500&amp;repeatCount=1" />
-        <to uri="openmrseip-publisher:example" />
+        <to uri="openmrs-eip-mysql-watcher:example" />
     </route>
 
 </routes>

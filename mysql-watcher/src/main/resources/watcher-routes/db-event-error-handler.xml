@@ -1,18 +1,18 @@
 <!--
-    Route to process exceptions and log them in the inbound_retry_queue table in the management DB.
+    Route to process exceptions and log them in the outbound_retry_queue table in the management DB.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="inbound-error-handler">
-        <from uri="direct:inbound-error-handler" />
+    <route id="outbound-error-handler">
+        <from uri="direct:outbound-error-handler" />
 
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>
             <script>
-                <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier}#${exchangeProperty.retry-item.route})}</simple>
+                <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})}</simple>
             </script>
         </when>
-        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities.size()}" loggingLevel="DEBUG" />
-        
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities}" loggingLevel="DEBUG" />
+
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
         </setProperty>
@@ -42,20 +42,18 @@
 
         <choice>
             <when>
-                <!-- This is a failure when processing a new message -->
+                <!-- This is a failure when processing a new event -->
                 <simple>${exchangeProperty.retry-item-id} == null</simple>
                 <log message="Adding new item to retry queue" />
                 <setProperty name="retry-item">
                     <spel>
-                        #{new org.openmrs.eip.mysql.watcher.management.entity.InBoundRetryQueueItem()}
+                        #{new org.openmrs.eip.mysql.watcher.management.entity.RetryQueueItem()}
                     </spel>
                 </setProperty>
                 <script>
                     <spel>
-                        #{getProperty('retry-item').setRoute(getProperty('entity-payload-dest'))}
-                        #{getProperty('retry-item').setIdentifier(getProperty('entity-id'))}
-                        #{getProperty('retry-item').setModelClassName(getProperty('model-class'))}
-                        #{getProperty('retry-item').setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
+                        #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
+                        #{getProperty('retry-item').setEvent(getProperty('event'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                         #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                         #{getProperty('retry-item').setDateCreated(new java.util.Date())}
@@ -68,57 +66,56 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Saving retry item" loggingLevel="DEBUG" />
+                        <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:InboundRetryQueueItem?usePersist=true" />
+                        <to uri="jpa:RetryQueueItem?usePersist=true" />
 
-                        <log message="Successfully saved retry item" loggingLevel="DEBUG" />
+                        <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
                     </when>
                     <otherwise>
-                        <log message="Adding failed message for each registered route" />
+                        <log message="Adding failed DB event for each registered route" />
                         <split parallelProcessing="false">
-                            <simple>{{message.destinations}}</simple>
+                            <simple>{{db-event.destinations}}</simple>
                             <setProperty name="retry-item-dest">
                                 <simple>${body.trim()}</simple>
                             </setProperty>
                             <setBody>
                                 <spel>
-                                    #{new org.openmrs.eip.mysql.watcher.management.entity.InBoundRetryQueueItem()}
+                                    #{new org.openmrs.eip.mysql.watcher.management.entity.RetryQueueItem()}
                                 </spel>
                             </setBody>
                             <script>
                                 <spel>
                                     #{body.setRoute(getProperty('retry-item-dest'))}
-                                    #{body.setIdentifier(getProperty('entity-id'))}
-                                    #{body.setModelClassName(getProperty('model-class'))}
-                                    #{body.setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
+                                    #{body.setEvent(getProperty('event'))}
                                     #{body.setMessage(getProperty('error-msg'))}
                                     #{body.setCauseMessage(getProperty('cause-error-msg'))}
                                     #{body.setDateCreated(new java.util.Date())}
                                 </spel>
                             </script>
-                            <log message="Adding failed message to retry queue" loggingLevel="DEBUG" />
+                            <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                            <to uri="jpa:InboundRetryQueueItem?usePersist=true" />
+                            <to uri="jpa:RetryQueueItem?usePersist=true" />
 
-                            <log message="Successfully added message to retry queue" loggingLevel="DEBUG" />
+                            <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
                         </split>
                     </otherwise>
                 </choice>
             </when>
             <otherwise>
-                <!-- This is a failure when re-processing a previously failed message -->
+                <!-- This is a failure when re-processing a previously failed event -->
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.retry-item} == null</simple>
-                        <log message="A fatal error occurred while attempting to process message in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
+                        <log message="A fatal error occurred while attempting to process events in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
+                        <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
                         <when>
                             <simple>${exchangeProperty.retry-item} == null</simple>
                             <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
 
-                            <toD uri="jpa:InboundRetryQueueItem?query=SELECT i FROM InboundRetryQueueItem i WHERE i.id = ${exchangeProperty.retry-item-id}" />
+                            <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
 
                             <log message="Loaded: ${body}" loggingLevel="DEBUG" />
                             <setProperty name="retry-item">
@@ -139,13 +136,13 @@
 
                         <log message="Saving updates for retry item" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:InboundRetryQueueItem" />
+                        <to uri="jpa:RetryQueueItem" />
 
                         <log message="Successfully updated retry item" loggingLevel="DEBUG" />
                     </otherwise>
                 </choice>
             </otherwise>
         </choice>
-        
+
     </route>
 </routes>

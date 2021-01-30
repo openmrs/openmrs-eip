@@ -124,7 +124,7 @@
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
                         <setProperty name="conflict-item">
                             <spel>
-                                #{new org.openmrs.eip.publisher.management.entity.ConflictQueueItem()}
+                                #{new org.openmrs.eip.mysql.watcher.management.entity.ConflictQueueItem()}
                             </spel>
                         </setProperty>
 

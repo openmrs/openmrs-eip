@@ -35,7 +35,7 @@
 
         <log loggingLevel="DEBUG" message="Saving sync record for WorkOrderState..." />
 
-        <to uri="jpa:org.openmrs.eip.publisher.management.entity.DbEvent?usePersist=true" />
+        <to uri="jpa:org.openmrs.eip.mysql.watcher.management.entity.DbEvent?usePersist=true" />
 
         <log message="Successfully created sync record for ErpWorkOrderState!" />
 

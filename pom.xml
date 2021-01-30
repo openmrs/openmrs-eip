@@ -11,7 +11,7 @@
     <modules>
         <module>camel-openmrs</module>
         <module>camel-odoo</module>
-        <module>publisher</module>
+        <module>mysql-watcher</module>
         <module>app</module>
         <module>distribution</module>
         <module>example</module>
