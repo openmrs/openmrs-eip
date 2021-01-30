@@ -9,12 +9,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>camel-openmrs</module>
-        <module>camel-odoo</module>
         <module>mysql-watcher</module>
-        <module>app</module>
+        <module>camel-openmrs</module>
+        <module>publisher-app</module>
+        <module>example-app</module>
         <module>distribution</module>
-        <module>example</module>
+        <module>camel-odoo</module>
     </modules>
 
     <name>OpenMRS EIP</name>
