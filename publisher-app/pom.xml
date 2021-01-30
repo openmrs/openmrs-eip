@@ -8,11 +8,10 @@
         <artifactId>openmrs-eip</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>openmrs-eip-app</artifactId>
+    <artifactId>publisher-app</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
 
-    <name>OpenMRS EIP app</name>
+    <name>OpenMRS EIP Publisher App</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

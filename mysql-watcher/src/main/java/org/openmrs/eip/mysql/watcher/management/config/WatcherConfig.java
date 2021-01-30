@@ -11,7 +11,6 @@ import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,13 +62,11 @@ public class WatcherConfig {
 	}
 	
 	@Bean("jpaIdempotentRepository")
-	@Profile(SyncProfiles.SENDER)
 	public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
 		return new JpaMessageIdRepository(emf, "complexObsProcessor");
 	}
 	
 	@Bean("customPropertySource")
-	@Profile(SyncProfiles.SENDER)
 	public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
 		//Custom PropertySource that we can dynamically populate with generated property values which
 		//is not possible via the properties file e.g. to specify names of tables to sync.

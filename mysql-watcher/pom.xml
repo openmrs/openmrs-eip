@@ -9,7 +9,6 @@
     </parent>
 
     <artifactId>mysql-watcher</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>OpenMRS EIP Watcher</name>
     <description>Watches for events from an OpenMRS MySQL database</description>

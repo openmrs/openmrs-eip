@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.camel.component.jpa.JpaComponent;
+import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,7 +16,6 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -34,9 +34,6 @@ public class ManagementDataSourceConfig {
 	@Value("${spring.mngt-datasource.dialect}")
 	private String hibernateDialect;
 	
-	@Value("${spring.mngt-datasource.ddlAuto}")
-	private String ddlAuto;
-	
 	@Value("${spring.mngt-datasource.jdbcUrl}")
 	private String url;
 	
@@ -51,7 +48,7 @@ public class ManagementDataSourceConfig {
 	
 	@Bean(name = "mngtDataSource")
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
-    @DependsOn("customPropertySource")
+	@DependsOn("customPropertySource")
 	public DataSource dataSource() throws ClassNotFoundException {
 		SimpleDriverDataSource sdd = new SimpleDriverDataSource();
 		sdd.setDriverClass((Class<Driver>) Class.forName(driverClassName));
@@ -66,8 +63,8 @@ public class ManagementDataSourceConfig {
 	                                                            @Qualifier("mngtDataSource") final DataSource dataSource) {
 		
 		Map<String, String> props = new HashMap();
-		props.put("hibernate.dialect", hibernateDialect);
-		props.put("hibernate.hbm2ddl.auto", ddlAuto);
+		props.put(AvailableSettings.DIALECT, hibernateDialect);
+		props.put(AvailableSettings.HBM2DDL_AUTO, "none");
 		
 		return builder.dataSource(dataSource)
 		        .packages("org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa")

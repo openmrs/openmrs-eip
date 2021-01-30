@@ -1,10 +1,12 @@
 package org.openmrs.eip.component.config;
 
-import static java.util.Collections.singletonMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.hibernate.cfg.AvailableSettings;
 import org.openmrs.eip.component.common.CommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +47,12 @@ public class OpenmrsDataSourceConfig {
 	@Bean(name = "openmrsEntityManager")
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            @Qualifier(CommonConstants.OPENMRS_DATASOURCE_NAME) final DataSource dataSource) {
+		Map<String, String> props = new HashMap();
+		props.put(AvailableSettings.DIALECT, hibernateDialect);
+		props.put(AvailableSettings.HBM2DDL_AUTO, "none");
 		
 		return builder.dataSource(dataSource).packages("org.openmrs.eip.component.entity").persistenceUnit("openmrs")
-		        .properties(singletonMap("hibernate.dialect", hibernateDialect)).build();
+		        .properties(props).build();
 	}
 	
 	@Primary
