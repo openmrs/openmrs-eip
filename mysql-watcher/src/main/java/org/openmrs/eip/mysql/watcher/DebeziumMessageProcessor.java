@@ -43,7 +43,7 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		exchange.setProperty(WatcherConstants.PROP_EVENT, event);
 		
-		logger.info("Received debezium event: " + event + ", Source Metadata: " + sourceMetadata);
+		logger.info("Received from debezium: " + event + ", Source Metadata: " + sourceMetadata);
 		
 		if (message.getBody() != null) {
 			Map<String, Object> currentState = new HashMap();

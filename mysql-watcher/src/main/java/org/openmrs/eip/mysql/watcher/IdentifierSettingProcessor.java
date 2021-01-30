@@ -32,7 +32,15 @@ public class IdentifierSettingProcessor implements Processor {
 	@Override
 	public void process(Exchange exchange) {
 		Event event = exchange.getProperty(PROP_EVENT, Event.class);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Received: " + event);
+		}
+		
 		if (StringUtils.isNotBlank(event.getIdentifier())) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Event object already has the identifier set");
+			}
+			
 			return;
 		}
 		
@@ -44,7 +52,12 @@ public class IdentifierSettingProcessor implements Processor {
 		}
 		
 		if (uuid != null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Setting the identifier to the uuid read from the debezium payload");
+			}
+			
 			event.setIdentifier(uuid.toString());
+			
 		} else if (isSubclassTable(event.getTableName())) {
 			//For a subclass table, fetch the identifier(uuid) from the parent table e.g person.uuid value for patient
 			//table joining on the FK
