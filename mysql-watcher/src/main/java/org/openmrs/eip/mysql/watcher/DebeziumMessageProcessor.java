@@ -9,7 +9,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
 import org.apache.kafka.connect.data.Struct;
-import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

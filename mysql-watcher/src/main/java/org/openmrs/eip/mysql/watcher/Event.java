@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.entity;
+package org.openmrs.eip.mysql.watcher;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;

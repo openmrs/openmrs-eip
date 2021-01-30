@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <property name="LOGS_PATTERN" value="%-5level %date [%thread] %logger{8}:%line %msg%n" />
+    <property name="LOGS_DIR" value="${user.home}${file.separator}.openmrs-eip${file.separator}logs" />
+    <property name="LOGS_FILE_NAME" value="openmrs-eip" />
+    <property name="LOGS_FILE_NAME_EXT" value="log" />
+    <property name="LOGS_FILE" value="${LOGS_DIR}${file.separator}${LOGS_FILE_NAME}.${LOGS_FILE_NAME_EXT}" />
+    <property name="LOGS_MAX_FILE_SIZE" value="10MB" />
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOGS_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!--
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_FILE}</file>
+        <encoder>
+            <pattern>${LOGS_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}${file.separator}%d{yyyy-MM}${file.separator}${LOGS_FILE_NAME}-%d{yyyy-MM-dd}_%i.${LOGS_FILE_NAME_EXT}.gz</fileNamePattern>
+            <maxFileSize>${LOGS_MAX_FILE_SIZE}</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    -->
+    <root level="INFO">
+        <appender-ref ref="console" />
+        <!--<appender-ref ref="file" />-->
+    </root>
+</configuration>
