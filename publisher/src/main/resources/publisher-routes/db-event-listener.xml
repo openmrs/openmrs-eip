@@ -2,7 +2,6 @@
     <route id="db-event-listener" errorHandlerRef="outBoundErrorHandler">
         <from uri="direct:db-event-listener" />
 
-        <log message=":" loggingLevel="DEBUG" />
         <log message="Received DB event: ${exchangeProperty.event}" />
 
         <setProperty name="route-retry-count-map">

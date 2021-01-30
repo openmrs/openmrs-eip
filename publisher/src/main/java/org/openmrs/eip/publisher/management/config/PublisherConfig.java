@@ -85,7 +85,6 @@ public class PublisherConfig {
 		}
 		
 		Map<String, Object> props = new HashMap();
-		props.put("camel.springboot.xml-routes", "classpath:publisher-routes/*.xml,classpath:camel/*.xml");
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
 		PropertySource customPropSource = new MapPropertySource("custom", props);
 		env.getPropertySources().addLast(customPropSource);

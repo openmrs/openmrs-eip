@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-retry" errorHandlerRef="outBoundErrorHandler">
+    <route id="outbound-retry" errorHandlerRef="outBoundErrorHandler">
         <from uri="scheduler:retry?initialDelay={{db-event.retry.initial.delay}}&amp;delay={{db-event.retry.interval}}" />
 
         <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
