@@ -1,4 +1,4 @@
-package org.openmrs.eip.mysql.watcher.management.entity;
+package org.openmrs.utils.odoo;
 
 import lombok.Data;
 
