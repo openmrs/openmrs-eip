@@ -1,14 +1,14 @@
 package org.openmrs.eip.component.service;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.component.mapper.ModelToEntityMapper;
 import org.openmrs.eip.component.MockedModel;
 import org.openmrs.eip.component.entity.MockedEntity;
+import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
+import org.openmrs.eip.component.mapper.ModelToEntityMapper;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -104,8 +104,8 @@ public class AbstractEntityServiceTest {
         verify(repository).save(mockedEntity);
     }
 
-    @Test
-    public void save_entity_exists_and_date_changed_after() {
+    @Test(expected = ConflictsFoundException.class)
+    public void save_ShouldFailITheExistingEntityFromTheDbHasLaterModifications() {
         // Given
         MockedModel mockedModel = new MockedModel("uuid");
         MockedEntity mockedEntity = new MockedEntity(null, "uuid");
@@ -113,16 +113,9 @@ public class AbstractEntityServiceTest {
         MockedEntity mockedEntityInDb = new MockedEntity(null, "uuid");
         mockedEntityInDb.setDateChanged(LocalDateTime.of(2019, 6, 2, 0, 0));
         when(repository.findByUuid("uuid")).thenReturn(mockedEntityInDb);
-        when(repository.save(mockedEntity)).thenReturn(mockedEntity);
         when(modelToEntityMapper.apply(mockedModel)).thenReturn(mockedEntity);
-        when(entityToModelMapper.apply(mockedEntity)).thenReturn(mockedModel);
 
-        // When
-        MockedModel result = mockedEntityService.save(mockedModel);
-
-        // Then
-        assertEquals(mockedModel, result);
-        verify(repository, never()).save(mockedEntity);
+        mockedEntityService.save(mockedModel);
     }
 
     @Test

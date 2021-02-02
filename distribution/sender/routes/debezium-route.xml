@@ -24,21 +24,22 @@
         <choice>
             <when>
                 <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
-
-                <choice>
-                    <when>
-                        <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                        <script>
-                            <spel>#{getProperty('event').setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}</spel>
-                        </script>
-                    </when>
-                    <when>
-                        <simple>${exchangeProperty.is-subclass} == false</simple>
-                        <script>
-                            <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
-                        </script>
-                    </when>
-                </choice>
+                <when>
+                    <simple>${exchangeProperty.is-subclass} == false</simple>
+                    <choice>
+                        <when>
+                            <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                            <script>
+                                <spel>#{getProperty('event').setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}</spel>
+                            </script>
+                        </when>
+                        <otherwise>
+                            <script>
+                                <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
+                            </script>
+                        </otherwise>
+                    </choice>
+                </when>
 
                 <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
 

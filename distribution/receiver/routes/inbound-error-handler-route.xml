@@ -11,8 +11,8 @@
                 <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier}#${exchangeProperty.retry-item.route})}</simple>
             </script>
         </when>
-        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities}" loggingLevel="DEBUG" />
-
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities.size()}" loggingLevel="DEBUG" />
+        
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
         </setProperty>
@@ -68,11 +68,11 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Adding failed message to retry queue" loggingLevel="DEBUG" />
+                        <log message="Saving retry item" loggingLevel="DEBUG" />
 
                         <to uri="jpa:InboundRetryQueueItem?usePersist=true" />
 
-                        <log message="Successfully added message to retry queue" loggingLevel="DEBUG" />
+                        <log message="Successfully saved retry item" loggingLevel="DEBUG" />
                     </when>
                     <otherwise>
                         <log message="Adding failed message for each registered route" />

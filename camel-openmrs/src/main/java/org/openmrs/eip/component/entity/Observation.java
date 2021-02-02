@@ -10,21 +10,23 @@ import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.ObservationLight;
 import org.openmrs.eip.component.entity.light.OrderLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
-import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.utils.DateUtils;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "obs")
 @AttributeOverride(name = "id", column = @Column(name = "obs_id"))
-public class Observation extends BaseEntity {
+public class Observation extends BaseDataEntity {
 
     @NotNull
     @ManyToOne
@@ -105,36 +107,4 @@ public class Observation extends BaseEntity {
     @Column(name = "interpretation")
     private String interpretation;
 
-    @ManyToOne
-    @JoinColumn(name = "creator")
-    protected UserLight creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    protected LocalDateTime dateCreated;
-
-    @NotNull
-    @Column(name = "voided")
-    protected boolean voided;
-
-    @ManyToOne
-    @JoinColumn(name = "voided_by")
-    protected UserLight voidedBy;
-
-    @Column(name = "date_voided")
-    protected LocalDateTime dateVoided;
-
-    @Column(name = "void_reason")
-    protected String voidReason;
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity entity) {
-        Observation observation = (Observation) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(
-                observation.getDateCreated(),
-                observation.getDateVoided());
-        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
-        return dateCreatedAfter || dateVoidedAfter;
-    }
 }

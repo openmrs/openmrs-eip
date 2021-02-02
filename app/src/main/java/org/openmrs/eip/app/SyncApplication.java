@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
@@ -16,7 +17,6 @@ import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.openmrs.eip.app.management.init.impl.ManagementDbInitImpl;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -26,9 +26,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.lang.Nullable;
+
+import liquibase.integration.spring.SpringLiquibase;
 
 @SpringBootApplication(scanBasePackages = {
         "org.openmrs.eip.app",
@@ -36,8 +38,6 @@ import org.springframework.lang.Nullable;
         "org.openmrs.utils.odoo"
 })
 public class SyncApplication {
-
-    private ManagementDbInitImpl managementDbInit;
 
     private CamelContext camelContext;
 
@@ -49,24 +49,15 @@ public class SyncApplication {
         IGNORE_TABLES.add(TableToSyncEnum.LOCATION_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
-        //IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
+        IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
     }
 
-    public SyncApplication(@Nullable final ManagementDbInitImpl managementDbInit,
-                           final CamelContext camelContext) {
-        this.managementDbInit = managementDbInit;
+    public SyncApplication(final CamelContext camelContext) {
         this.camelContext = camelContext;
     }
 
     public static void main(final String[] args) {
         SpringApplication.run(SyncApplication.class, args);
-    }
-
-    @PostConstruct
-    private void initDb() {
-        if (managementDbInit != null) {
-            managementDbInit.start();
-        }
     }
 
     @PostConstruct
@@ -137,6 +128,19 @@ public class SyncApplication {
         env.getPropertySources().addLast(customPropSource);
 
         return customPropSource;
+    }
+
+    @Bean(name = "liquibase")
+    public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource, Environment env) {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setContexts(env.getActiveProfiles()[0]);
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:liquibase-master.xml");
+        liquibase.setDatabaseChangeLogTable("liquibasechangelog");
+        liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
+        liquibase.setShouldRun(false);
+
+        return liquibase;
     }
 
 }

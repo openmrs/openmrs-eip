@@ -6,21 +6,22 @@ import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ConceptNameLight;
 import org.openmrs.eip.component.entity.light.ConditionLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
-import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.utils.DateUtils;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "conditions")
 @AttributeOverride(name = "id", column = @Column(name = "condition_id"))
-public class Condition extends BaseEntity {
+public class Condition extends BaseChangeableDataEntity {
 
     @Column(name = "additional_detail")
     private String additionalDetail;
@@ -58,43 +59,4 @@ public class Condition extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @ManyToOne
-    @JoinColumn(name = "creator")
-    protected UserLight creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    protected LocalDateTime dateCreated;
-
-    @ManyToOne
-    @JoinColumn(name = "changed_by")
-    protected UserLight changedBy;
-
-    @Column(name = "date_changed")
-    protected LocalDateTime dateChanged;
-
-    @NotNull
-    @Column(name = "voided")
-    protected boolean voided;
-
-    @ManyToOne
-    @JoinColumn(name = "voided_by")
-    protected UserLight voidedBy;
-
-    @Column(name = "date_voided")
-    protected LocalDateTime dateVoided;
-
-    @Column(name = "void_reason")
-    protected String voidReason;
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity entity) {
-        Condition condition = (Condition) entity;
-        List<LocalDateTime> datesToCheck = Arrays.asList(
-                condition.getDateCreated(),
-                condition.getDateVoided());
-        boolean dateCreatedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateCreated(), datesToCheck);
-        boolean dateVoidedAfter = DateUtils.isDateAfterAtLeastOneInList(getDateVoided(), datesToCheck);
-        return dateCreatedAfter || dateVoidedAfter;
-    }
 }

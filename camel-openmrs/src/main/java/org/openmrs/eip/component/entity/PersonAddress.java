@@ -5,7 +5,15 @@ import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.common.Address;
 import org.openmrs.eip.component.entity.light.PersonLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -15,7 +23,7 @@ import java.time.LocalDateTime;
 @Table(name = "person_address")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_address_id"))
-public class PersonAddress extends AuditableEntity {
+public class PersonAddress extends BaseChangeableDataEntity {
 
     @ManyToOne
     @JoinColumn(name = "person_id")

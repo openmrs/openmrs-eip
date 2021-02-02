@@ -88,21 +88,6 @@ public class ObservationTest {
     }
 
     @Test
-    public void date_created_to_test_after_date_voided_in_param() {
-        // Given
-        Observation entityToTest = new Observation();
-        entityToTest.setDateCreated(DATE2);
-        Observation entityInParam = new Observation();
-        entityInParam.setDateVoided(DATE1);
-
-        // When
-        boolean result = entityToTest.wasModifiedAfter(entityInParam);
-
-        // Then
-        assertTrue(result);
-    }
-
-    @Test
     public void date_voided_to_test_after_date_voided_in_param() {
         // Given
         Observation entityToTest = new Observation();

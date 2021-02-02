@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>receiver</id>
+    <formats>
+        <format>${archiveFormat}</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${appBuildDirectory}</directory>
+            <outputDirectory />
+            <includes>
+                <include>${appJarFileName}</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>receiver/${routesDirectoryName}</directory>
+            <outputDirectory>${routesDirectoryName}</outputDirectory>
+            <includes>
+                <include>${routesFilePattern}</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

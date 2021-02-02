@@ -5,7 +5,12 @@ import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -13,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "allergy")
 @AttributeOverride(name = "id", column = @Column(name = "allergy_id"))
-public class Allergy extends AuditableEntity {
+public class Allergy extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne

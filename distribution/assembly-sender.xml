@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>sender</id>
+    <formats>
+        <format>${archiveFormat}</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>sender</directory>
+            <outputDirectory>test</outputDirectory>
+            <includes>
+                <include>sender/${appPropertiesFileName}</include>
+                <include>sender/${startScriptName}</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${appBuildDirectory}</directory>
+            <outputDirectory />
+            <includes>
+                <include>${appJarFileName}</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>sender/${routesDirectoryName}</directory>
+            <outputDirectory>${routesDirectoryName}</outputDirectory>
+            <includes>
+                <include>${routesFilePattern}</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

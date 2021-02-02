@@ -3,17 +3,34 @@ package org.openmrs.eip.component.utils;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static java.time.LocalDateTime.of;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.component.utils.DateUtils.containsLatestDate;
 
 public class DateUtilsTest {
+
+    private static final int YY = 2020;
+
+    private static final int MM = 12;
+
+    private static final int DD = 3;
+
+    private static final int H = 12;
+
+    private static final int M = 12;
+
+    private static final int S = 12;
 
     @Test
     public void dateToString_should_return_date_as_string() {
         // Given
-        LocalDateTime date = LocalDateTime.of(2019, 6, 5, 16, 59, 22);
+        LocalDateTime date = of(2019, 6, 5, 16, 59, 22);
 
         // When
         String result = DateUtils.dateToString(date);
@@ -43,7 +60,7 @@ public class DateUtilsTest {
         LocalDateTime result = DateUtils.stringToDate(dateAsString);
 
         // Then
-        assertEquals(LocalDateTime.of(2019, 6, 5, 16, 59, 22), result);
+        assertEquals(of(2019, 6, 5, 16, 59, 22), result);
     }
 
     @Test
@@ -59,47 +76,50 @@ public class DateUtilsTest {
     }
 
     @Test
-    public void isDateAfterAtLeastOneInList_should_return_true() {
-        // Given
-        LocalDateTime dateToTest = LocalDateTime.of(2019, 6, 10, 0, 0);
-        LocalDateTime date1 = LocalDateTime.of(2016, 6, 10, 0, 0);
-        LocalDateTime date2 = LocalDateTime.of(2020, 6, 10, 0, 0);
-        LocalDateTime date3 = LocalDateTime.of(2021, 6, 10, 0, 0);
-        List<LocalDateTime> dates = Arrays.asList(date1, date2, date3);
-
-        // When
-        boolean result = DateUtils.isDateAfterAtLeastOneInList(dateToTest, dates);
-
-        // Then
-        assertTrue(result);
+    public void containsLatestDate_shouldReturnFalseIfCollection1ContainsNullValuesOnly() {
+        List<LocalDateTime> dates = asList(null, null);
+        assertFalse(containsLatestDate(dates, dates));
+        assertFalse(containsLatestDate(dates, asList(of(YY, MM, DD, H, M, S))));
     }
 
     @Test
-    public void isDateAfterAtLeastOneInList_should_return_false() {
-        // Given
-        LocalDateTime dateToTest = LocalDateTime.of(2019, 6, 10, 0, 0);
-        LocalDateTime date1 = LocalDateTime.of(2020, 6, 10, 0, 0);
-        LocalDateTime date2 = LocalDateTime.of(2021, 6, 10, 0, 0);
-        LocalDateTime date3 = LocalDateTime.of(2022, 6, 10, 0, 0);
-        List<LocalDateTime> dates = Arrays.asList(date1, date2, date3);
+    public void containsLatestDate_shouldReturnFalseIfCollection1DoesNotContainTheLatestDate() {
+        //matching latest dates with some none null values
+        List<LocalDateTime> dates1 = asList(null, of(YY, MM, DD, H, M, S));
+        List<LocalDateTime> dates2 = asList(of(YY, MM, DD, H, M, S), null);
+        assertFalse(containsLatestDate(dates1, dates2));
 
-        // When
-        boolean result = DateUtils.isDateAfterAtLeastOneInList(dateToTest, dates);
+        //second list contains the latest
+        dates2 = asList(of(YY, MM, DD, H, M, S + 1), null);
+        assertFalse(containsLatestDate(dates1, dates2));
 
-        // Then
-        assertFalse(result);
+        //no nulls where with all dates match
+        dates1 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S));
+        dates2 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S));
+        assertFalse(containsLatestDate(dates1, dates2));
+
+        //no nulls where second list contains the latest
+        dates2 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S + 1));
+        assertFalse(containsLatestDate(dates1, dates2));
+
+        //no nulls where second list contains the earliest and latest
+        dates2 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S + 1), of(YY, MM, DD, H, M, S - 1));
+        assertFalse(containsLatestDate(dates1, dates2));
     }
 
     @Test
-    public void isDateAfterAtLeastOneInList_should_return_false_if_all_null() {
-        // Given
-        LocalDateTime dateToTest = LocalDateTime.of(2019, 6, 10, 0, 0);
-        List<LocalDateTime> dates = Arrays.asList(null, null, null);
+    public void containsLatestDate_shouldReturnTrueIfCollection1ContainsTheLatestDate() {
+        List<LocalDateTime> dates1 = asList(null, of(YY, MM, DD, H, M, S));
+        List<LocalDateTime> dates2 = asList(null, null);
+        assertTrue(containsLatestDate(dates1, dates2));
 
-        // When
-        boolean result = DateUtils.isDateAfterAtLeastOneInList(dateToTest, dates);
+        dates1 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S + 1));
+        dates2 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S));
+        assertTrue(containsLatestDate(dates1, dates2));
 
-        // Then
-        assertFalse(result);
+        //first list contains the earliest and latest
+        dates1 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S + 1), of(YY, MM, DD, H, M, S - 1));
+        assertTrue(containsLatestDate(dates1, dates2));
     }
+
 }

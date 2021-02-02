@@ -8,7 +8,12 @@ import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.VisitLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -17,7 +22,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "encounter")
 @AttributeOverride(name = "id", column = @Column(name = "encounter_id"))
-public class Encounter extends AuditableEntity {
+public class Encounter extends BaseChangeableDataEntity {
 
     @NotNull
     @ManyToOne

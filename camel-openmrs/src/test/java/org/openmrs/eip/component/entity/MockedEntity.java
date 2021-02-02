@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MockedEntity extends AuditableEntity {
+public class MockedEntity extends BaseChangeableDataEntity {
 
     private String field1;
 

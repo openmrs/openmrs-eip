@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.openmrs</groupId>
+    <parent>
+        <groupId>org.openmrs</groupId>
+        <artifactId>openmrs-eip</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openmrs-eip-distribution</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>OpenMRS EIP Distribution</name>
+    <description>Used to build OpenMRS EIP distributions</description>
+
+    <properties>
+        <fileNamePrefix>openmrs-eip</fileNamePrefix>
+        <archiveFormat>zip</archiveFormat>
+        <routesDirectoryName>routes</routesDirectoryName>
+        <appBuildDirectory>${project.parent.basedir}/app/target</appBuildDirectory>
+        <appJarFileName>${project.parent.artifactId}-app-${project.parent.version}.jar</appJarFileName>
+        <routesFilePattern>*-route.xml</routesFilePattern>
+        <appPropertiesFileName>_application.properties</appPropertiesFileName>
+        <startScriptName>start.sh</startScriptName>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-sender</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${fileNamePrefix}-sender-${project.parent.version}</finalName>
+                            <descriptors>
+                                <descriptor>assembly-sender.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>package-receiver</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${fileNamePrefix}-receiver-${project.parent.version}</finalName>
+                            <descriptors>
+                                <descriptor>assembly-receiver.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

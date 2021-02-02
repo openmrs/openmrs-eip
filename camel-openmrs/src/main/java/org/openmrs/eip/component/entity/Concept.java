@@ -5,7 +5,12 @@ import lombok.EqualsAndHashCode;
 import org.openmrs.eip.component.entity.light.ConceptClassLight;
 import org.openmrs.eip.component.entity.light.ConceptDatatypeLight;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -13,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "concept")
 @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
-public class Concept extends MetaDataEntity {
+public class Concept extends BaseChangeableMetaDataEntity {
 
     @NotNull
     @ManyToOne

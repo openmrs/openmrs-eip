@@ -27,17 +27,40 @@
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
-                <setProperty name="entity-payload">
-                    <simple>${body}</simple>
-                </setProperty>
-                <setProperty name="model-class">
-                    <jsonpath>$.tableToSyncModelClass</jsonpath>
-                </setProperty>
-                <setProperty name="entity-id">
-                    <jsonpath>$.model.uuid</jsonpath>
-                </setProperty>
+                <choice>
+                    <when>
+                        <!-- If this not a record for a deleted entity -->
+                        <simple>${body} is 'byte[]'</simple>
+                        <setProperty name="entity-payload">
+                            <simple>${body}</simple>
+                        </setProperty>
+                        <setProperty name="model-class">
+                            <jsonpath>$.tableToSyncModelClass</jsonpath>
+                        </setProperty>
+                        <setProperty name="entity-id">
+                            <jsonpath>$.model.uuid</jsonpath>
+                        </setProperty>
+                    </when>
+                    <otherwise>
+                        <setProperty name="entity-payload">
+                            <simple>${body}</simple>
+                        </setProperty>
+                        <setProperty name="entity-table">
+                            <simple>${body.trim().split(":")[1]}</simple>
+                        </setProperty>
+                        <setProperty name="table-to-sync-enum">
+                            <method beanType="org.openmrs.eip.component.service.TableToSyncEnum" method="getTableToSyncEnum(${exchangeProperty.entity-table})" />
+                        </setProperty>
+                        <setProperty name="model-class">
+                            <simple>${exchangeProperty.table-to-sync-enum.getModelClass().getName()}</simple>
+                        </setProperty>
+                        <setProperty name="entity-id">
+                            <simple>${body.trim().split(":")[2]}</simple>
+                        </setProperty>
+                    </otherwise>
+                </choice>
 
-                <log message="Configured destinations -> {{message.destinations}}" loggingLevel="DEBUG" />
+                <log message="Configured destinations -> {{message.destinations}}" />
 
                 <setProperty name="route-retry-count-map">
                     <spel>#{new java.util.HashMap()}</spel>
@@ -76,9 +99,9 @@
                         that happened later don't overwrite those that happened before them -->
                     <when>
                         <simple>${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} > 0</simple>
-                        <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} messages(s) in the retry queue for route: ${exchangeProperty.entity-payload-dest}" />
+                        <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue for route: ${exchangeProperty.entity-payload-dest}" />
                         <setProperty name="retry-message">
-                            <simple>Cannot process the message because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} messages(s) in the retry queue</simple>
+                            <simple>Cannot process the message because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue</simple>
                         </setProperty>
                         <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-message}" />
                     </when>

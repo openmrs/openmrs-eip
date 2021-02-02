@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Table(name = "person")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AttributeOverride(name = "id", column = @Column(name = "person_id"))
-public class Person extends AuditableEntity {
+public class Person extends BaseChangeableDataEntity {
 
     @Column(name = "gender")
     private String gender;
