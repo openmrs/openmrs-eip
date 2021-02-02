@@ -1,4 +1,4 @@
-package org.openmrs.eip.mysql.watcher.management.config;
+package org.openmrs.eip.mysql.watcher.config;
 
 import java.util.HashMap;
 import java.util.HashSet;

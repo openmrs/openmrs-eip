@@ -1,4 +1,4 @@
-package org.openmrs.eip.mysql.watcher.management.entity;
+package org.openmrs.eip.app.management.entity;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;

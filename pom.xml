@@ -11,6 +11,7 @@
     <modules>
         <module>mysql-watcher</module>
         <module>camel-openmrs</module>
+        <module>common</module>
         <module>publisher-app</module>
         <module>dbsync-receiver-app</module>
         <module>example-app</module>

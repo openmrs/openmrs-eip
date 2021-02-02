@@ -6,6 +6,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.openmrs.eip.app.management.entity.BaseRetryQueueItem;
 import org.openmrs.eip.mysql.watcher.Event;
 
 @Entity

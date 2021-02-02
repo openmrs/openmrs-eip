@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.common;
+package org.openmrs.eip.app.management.config;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
