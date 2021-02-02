@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.PersonLight;
+import org.openmrs.eip.component.entity.light.RelationshipLight;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "relationship")
 @AttributeOverride(name = "id", column = @Column(name = "relationship_id"))
-public class Relationship extends AuditableEntity {
+public class Relationship extends BaseChangeableDataEntity {
 	
     @NotNull
     @ManyToOne
@@ -29,7 +30,8 @@ public class Relationship extends AuditableEntity {
     
 	@NotNull
 	@Column(name = "relationship")
-    private int relationshipTypeId;
+	@ManyToOne
+    private RelationshipLight relationshipType;
 	
     @NotNull
     @ManyToOne

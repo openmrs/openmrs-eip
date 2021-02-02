@@ -10,7 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.openmrs.eip.component.entity.light.GaacFamilyLite;
+import org.openmrs.eip.component.entity.light.GaacFamilyLight;
+import org.openmrs.eip.component.entity.light.GaacReasonLeavingLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.RelationshipLight;
 
@@ -22,11 +23,11 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "gaac_family_member")
 @AttributeOverride(name = "id", column = @Column(name = "family_member_id"))
-public class GaacFamilyMember extends AuditableEntity {
+public class GaacFamilyMember extends BaseChangeableDataEntity {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "family_id")
-    private GaacFamilyLite family;
+    private GaacFamilyLight family;
 
     @NotNull
     @ManyToOne
@@ -44,7 +45,7 @@ public class GaacFamilyMember extends AuditableEntity {
     protected LocalDateTime endDate;
     
     @Column(name = "reason_leaving_type")
-    private Integer reasonLeavingType;
+    private GaacReasonLeavingLight reasonLeavingType;
     
     @Column(name = "leaving")
     private Boolean leaving;

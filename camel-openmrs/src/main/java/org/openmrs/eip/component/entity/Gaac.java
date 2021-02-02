@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.openmrs.eip.component.entity.light.GaacAffinityTypeLight;
 import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
@@ -21,7 +22,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "gaac")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_id"))
-public class Gaac extends AuditableEntity {
+public class Gaac extends BaseChangeableDataEntity {
 
     @Column(name = "name")
     private String name;
@@ -45,8 +46,8 @@ public class Gaac extends AuditableEntity {
     private PatientLight focalPatient;
 
     @Column(name = "affinity_type")
-    private Integer affinityType;
-    
+    private GaacAffinityTypeLight affinityType;
+    		
     @ManyToOne
     @JoinColumn(name = "location_id")
     private LocationLight location;

@@ -10,7 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.openmrs.eip.component.entity.light.GaacLite;
+import org.openmrs.eip.component.entity.light.GaacLight;
+import org.openmrs.eip.component.entity.light.GaacReasonLeavingLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
 import lombok.Data;
@@ -21,11 +22,11 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "gaac_member")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_member_id"))
-public class GaacMember extends AuditableEntity {
+public class GaacMember extends BaseChangeableDataEntity {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "gaac_id")
-    private GaacLite gaac;
+    private GaacLight gaac;
 
     @NotNull
     @ManyToOne
@@ -39,7 +40,7 @@ public class GaacMember extends AuditableEntity {
     protected LocalDateTime endDate;
     
     @Column(name = "reason_leaving_type")
-    private Integer reasonLeavingType;
+    private GaacReasonLeavingLight reasonLeavingType;
     
     @Column(name = "description")
     private String description;

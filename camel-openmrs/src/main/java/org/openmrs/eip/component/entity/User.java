@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-public class User extends MetaDataEntity {
+public class User extends BaseChangeableMetaDataEntity {
 	
 	@NotNull
 	@Column(name = "system_id")
@@ -40,4 +40,11 @@ public class User extends MetaDataEntity {
     @OneToOne
     @JoinColumn(name = "person_id")
     private PersonLight person;
+    
+    
+    @Column(name = "activation_key")
+    private String activationKey;
+    
+    @Column(name = "email")
+    private String email;
 }

@@ -9,11 +9,11 @@ public class ProviderModel extends BaseChangeableMetadataModel {
 	 
     private String identifier;
 	 
-    private String providerRoleId;
+    private String providerRoleUuid;
 
-    private String roleId;
+    private String roleUuid;
     
-    private String specialityId;
+    private String specialityUuid;
 
     private String personUuid;
 
@@ -33,35 +33,35 @@ public class ProviderModel extends BaseChangeableMetadataModel {
 		this.identifier = identifier;
 	}
 
-	public String getProviderRoleId() {
-		return providerRoleId;
-	}
-
-	public void setProviderRoleId(String providerRoleId) {
-		this.providerRoleId = providerRoleId;
-	}
-
-	public String getRoleId() {
-		return roleId;
-	}
-
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
-	}
-
-	public String getSpecialityId() {
-		return specialityId;
-	}
-
-	public void setSpecialityId(String specialityId) {
-		this.specialityId = specialityId;
-	}
-
 	public String getPersonUuid() {
 		return personUuid;
 	}
 
 	public void setPersonUuid(String personUuid) {
 		this.personUuid = personUuid;
+	}
+
+	public String getProviderRoleUuid() {
+		return providerRoleUuid;
+	}
+
+	public void setProviderRoleUuid(String providerRoleUuid) {
+		this.providerRoleUuid = providerRoleUuid;
+	}
+
+	public String getRoleUuid() {
+		return roleUuid;
+	}
+
+	public void setRoleUuid(String roleUuid) {
+		this.roleUuid = roleUuid;
+	}
+
+	public String getSpecialityUuid() {
+		return specialityUuid;
+	}
+
+	public void setSpecialityUuid(String specialityUuid) {
+		this.specialityUuid = specialityUuid;
 	}
 }

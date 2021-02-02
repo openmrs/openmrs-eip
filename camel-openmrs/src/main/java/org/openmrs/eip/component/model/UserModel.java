@@ -17,7 +17,9 @@ public class UserModel extends BaseChangeableMetadataModel {
 	private LocalDateTime dateRetired;
 	private Long retiredBy;
 	private String personUuid;
-	
+    private String activationKey;
+    private String email;
+    
 	public String getSystemId() {
 		return systemId;
 	}
@@ -77,5 +79,17 @@ public class UserModel extends BaseChangeableMetadataModel {
 	}
 	public void setPersonUuid(String personUuid) {
 		this.personUuid = personUuid;
+	}
+	public String getActivationKey() {
+		return activationKey;
+	}
+	public void setActivationKey(String activationKey) {
+		this.activationKey = activationKey;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }

@@ -11,7 +11,7 @@ public class GaacMemberModel extends BaseChangeableDataModel {
     private Boolean leaving;
     private Boolean restart;
     protected LocalDateTime restartDate;
-    private Integer reasonLeavingType;
+    private String reasonLeavingTypeUuid;
     private String description;
     protected LocalDateTime startDate;
     protected LocalDateTime endDate;
@@ -50,13 +50,7 @@ public class GaacMemberModel extends BaseChangeableDataModel {
 	public void setRestartDate(LocalDateTime restartDate) {
 		this.restartDate = restartDate;
 	}
-	public Integer getReasonLeavingType() {
-		return reasonLeavingType;
-	}
-	
-	public void setReasonLeavingType(Integer reasonLeavingType) {
-		this.reasonLeavingType = reasonLeavingType;
-	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -76,5 +70,11 @@ public class GaacMemberModel extends BaseChangeableDataModel {
 	}
 	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
+	}
+	public String getReasonLeavingTypeUuid() {
+		return reasonLeavingTypeUuid;
+	}
+	public void setReasonLeavingTypeUuid(String reasonLeavingTypeUuid) {
+		this.reasonLeavingTypeUuid = reasonLeavingTypeUuid;
 	} 
 }

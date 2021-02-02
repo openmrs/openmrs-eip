@@ -4,11 +4,14 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
+import org.openmrs.eip.component.entity.light.ProviderManagementProviderLight;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "provider")
 @AttributeOverride(name = "id", column = @Column(name = "provider_id"))
-public class Provider extends MetaDataEntity {
+public class Provider extends BaseChangeableMetaDataEntity {
 	
 	@Column(name = "name")
     private String name;
@@ -26,14 +29,17 @@ public class Provider extends MetaDataEntity {
     @Column(name = "identifier")
     private String identifier;
 	 
-    @Column(name = "provider_role_id")
-    private Integer providerRoleId;
+    @ManyToOne
+    @JoinColumn(name = "provider_role_id")
+    private ProviderManagementProviderLight providerRole;
 
-    @Column(name = "role_id")
-    private Integer roleId;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private ConceptLight role;
     
-    @Column(name = "speciality_id")
-    private Integer specialityId;
+    @ManyToOne
+    @JoinColumn(name = "speciality_id")
+    private ConceptLight speciality;
     
     @NotNull
     @OneToOne

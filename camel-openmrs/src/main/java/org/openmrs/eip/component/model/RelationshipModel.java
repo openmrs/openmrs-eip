@@ -10,17 +10,10 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationshipModel extends BaseChangeableDataModel {
     private String personaUuid;
-    private int relationshipTypeId;
+    private String relationshipTypeUuid;
 	private String personbUuid;
     protected LocalDateTime startDate;
     protected LocalDateTime endDate;
-    
-	public int getRelationshipTypeId() {
-		return relationshipTypeId;
-	}
-	public void setRelationshipTypeId(int relationshipTypeId) {
-		this.relationshipTypeId = relationshipTypeId;
-	}
 	
 	public LocalDateTime getStartDate() {
 		return startDate;
@@ -46,5 +39,11 @@ public class RelationshipModel extends BaseChangeableDataModel {
 	}
 	public void setPersonbUuid(String personbUuid) {
 		this.personbUuid = personbUuid;
+	}
+	public String getRelationshipTypeUuid() {
+		return relationshipTypeUuid;
+	}
+	public void setRelationshipTypeUuid(String relationshipTypeUuid) {
+		this.relationshipTypeUuid = relationshipTypeUuid;
 	}
 }

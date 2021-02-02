@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "gaac_family")
 @AttributeOverride(name = "id", column = @Column(name = "family_id"))
-public class GaacFamily extends AuditableEntity {
+public class GaacFamily extends BaseChangeableDataEntity {
 	@Column(name = "family_identifier")
     private String familyIdentifier;
 

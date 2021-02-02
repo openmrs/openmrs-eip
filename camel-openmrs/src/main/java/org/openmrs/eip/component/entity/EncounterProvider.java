@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.EncounterLight;
+import org.openmrs.eip.component.entity.light.EncounterRoleLight;
 import org.openmrs.eip.component.entity.light.ProviderLight;
 
 import lombok.Data;
@@ -19,9 +20,12 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "encounter_provider")
 @AttributeOverride(name = "id", column = @Column(name = "encounter_provider_id"))
-public class EncounterProvider extends AuditableEntity {
-	@JoinColumn(name = "encounter_role_id")
-    private Integer encounterRoleId;
+public class EncounterProvider extends BaseChangeableDataEntity {
+	
+	@NotNull
+    @ManyToOne
+    @JoinColumn(name = "encounter_role_id")
+    private EncounterRoleLight encounterRole;
 
     @NotNull
     @ManyToOne
