@@ -5,7 +5,7 @@
 
         <log message="Fetching messages in the retry queue" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i.id FROM InBoundRetryQueueItem i ORDER BY i.dateCreated ASC" />
+        <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i.id FROM ReceiverRetryQueueItem i ORDER BY i.dateCreated ASC" />
 
         <choice>
             <when>
@@ -38,7 +38,7 @@
                     </setProperty>
                     <log message="Loading retry item with id: ${body}" />
 
-                    <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i FROM InBoundRetryQueueItem i WHERE i.id = ${body}" />
+                    <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i FROM ReceiverRetryQueueItem i WHERE i.id = ${body}" />
 
                     <setProperty name="retry-item">
                         <simple>${body[0]}</simple>
@@ -68,7 +68,7 @@
 
                             <log message="Removing from queue" />
 
-                            <toD uri="jpa:InBoundRetryQueueItem?query=DELETE FROM InBoundRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+                            <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
                         </otherwise>
                     </choice>
                 </split>

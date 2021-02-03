@@ -72,7 +72,7 @@
                     </script>
                 </split>
 
-                <toD uri="jpa:InBoundRetryQueueItem?query=SELECT i from InBoundRetryQueueItem i WHERE i.modelClassName ='${exchangeProperty.model-class}' AND i.identifier='${exchangeProperty.entity-id}'" />
+                <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i from ReceiverRetryQueueItem i WHERE i.modelClassName ='${exchangeProperty.model-class}' AND i.identifier='${exchangeProperty.entity-id}'" />
 
                 <split stopOnException="true">
                     <simple>${body}</simple>
