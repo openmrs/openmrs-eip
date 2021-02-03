@@ -47,7 +47,7 @@
                 <log message="Adding new item to retry queue" />
                 <setProperty name="retry-item">
                     <spel>
-                        #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
+                        #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
                     </spel>
                 </setProperty>
                 <script>
@@ -68,7 +68,7 @@
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
                         <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:RetryQueueItem?usePersist=true" />
+                        <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
                         <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
                     </when>
@@ -81,7 +81,7 @@
                             </setProperty>
                             <setBody>
                                 <spel>
-                                    #{new org.openmrs.eip.app.management.entity.RetryQueueItem()}
+                                    #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
                                 </spel>
                             </setBody>
                             <script>
@@ -95,7 +95,7 @@
                             </script>
                             <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                            <to uri="jpa:RetryQueueItem?usePersist=true" />
+                            <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
                             <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
                         </split>
@@ -115,7 +115,7 @@
                             <simple>${exchangeProperty.retry-item} == null</simple>
                             <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
 
-                            <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
+                            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
 
                             <log message="Loaded: ${body}" loggingLevel="DEBUG" />
                             <setProperty name="retry-item">
@@ -136,7 +136,7 @@
 
                         <log message="Saving updates for retry item" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:RetryQueueItem" />
+                        <to uri="jpa:SenderRetryQueueItem" />
 
                         <log message="Successfully updated retry item" loggingLevel="DEBUG" />
                     </otherwise>
