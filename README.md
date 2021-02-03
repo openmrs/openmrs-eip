@@ -43,14 +43,11 @@ MySQL binary log is ONLY preconfigured for the remote instance because it assume
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
 read entries in the MySQL binary log of the remote OpenMRS instance, it constructs a DbEvent instance which has 3 fields,
 the source table name, the uuid of the affected row and the operation(c, u, d) for Create, Update or Delete respectively.
-The debezium route notifies all configured routes in parallel of the DB event message set as the body. By default, the 
-application has 2 out-bound routes, one for the out-bound DB sync route and the other for the local Odoo system. In 
-theory, you can register as many routes as the systems that need to be notified of changes from the OpenMRS DB, the 
-sender's application.properties file has a property named **db-event.destinations** which takes a comma separated list 
-of route ids to which the db event will be sent. The out-bound DB sync route transforms each message by loading the 
-entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record message queue 
-in an external message broker that is known to the team administering the receiving sync application. The out-bound Odoo 
-route consumes messages from its queue too, does its custom processing and then feeds the configured Odoo system.
+The debezium route notifies the configured route with the DB event message set as the body. The sender's 
+application.properties file has a property named **db-event.destination** which takes the id of the route to which the 
+db event will be sent. The out-bound DB sync route transforms each message by loading the entity by its uuid, serialize 
+it into a custom format and then publishes the payload into a sync record message queue in an external message broker 
+that is known to the team administering the receiving sync application.
     
 ### Receiver
 

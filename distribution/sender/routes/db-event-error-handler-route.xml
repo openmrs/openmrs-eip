@@ -1,5 +1,5 @@
 <!--
-    Route to process exceptions and log them in the outbound_retry_queue table in the management DB.
+    Route to process exceptions and log them in the sender_retry_queue table in the management DB.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="outbound-error-handler">
@@ -8,10 +8,10 @@
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>
             <script>
-                <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})}</simple>
+                <simple>${exchangeProperty.failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
             </script>
         </when>
-        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities}" loggingLevel="DEBUG" />
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.failed-entities}" loggingLevel="DEBUG" />
 
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
@@ -52,7 +52,6 @@
                 </setProperty>
                 <script>
                     <spel>
-                        #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
                         #{getProperty('retry-item').setEvent(getProperty('event'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                         #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
@@ -63,44 +62,11 @@
                     <simple>${exchangeProperty.retry-item}</simple>
                 </setBody>
 
-                <choice>
-                    <when>
-                        <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
+                <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
+                <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
-                        <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
-                    </when>
-                    <otherwise>
-                        <log message="Adding failed DB event for each registered route" />
-                        <split parallelProcessing="false">
-                            <simple>{{db-event.destinations}}</simple>
-                            <setProperty name="retry-item-dest">
-                                <simple>${body.trim()}</simple>
-                            </setProperty>
-                            <setBody>
-                                <spel>
-                                    #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
-                                </spel>
-                            </setBody>
-                            <script>
-                                <spel>
-                                    #{body.setRoute(getProperty('retry-item-dest'))}
-                                    #{body.setEvent(getProperty('event'))}
-                                    #{body.setMessage(getProperty('error-msg'))}
-                                    #{body.setCauseMessage(getProperty('cause-error-msg'))}
-                                    #{body.setDateCreated(new java.util.Date())}
-                                </spel>
-                            </script>
-                            <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
-
-                            <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
-
-                            <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
-                        </split>
-                    </otherwise>
-                </choice>
+                <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed event -->
