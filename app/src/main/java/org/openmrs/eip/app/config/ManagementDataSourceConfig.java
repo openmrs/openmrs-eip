@@ -31,9 +31,6 @@ public class ManagementDataSourceConfig {
     @Value("${spring.mngt-datasource.dialect}")
     private String hibernateDialect;
 
-    @Value("${spring.mngt-datasource.ddlAuto}")
-    private String ddlAuto;
-
     @Value("${spring.mngt-datasource.jdbcUrl}")
     private String url;
 
@@ -63,7 +60,7 @@ public class ManagementDataSourceConfig {
 
         Map<String, String> props = new HashMap<>();
         props.put("hibernate.dialect", hibernateDialect);
-        props.put("hibernate.hbm2ddl.auto", ddlAuto);
+        props.put("hibernate.hbm2ddl.auto", "none");
 
         return builder
                 .dataSource(dataSource)

@@ -136,7 +136,7 @@ public class SyncApplication {
         liquibase.setChangeLog("classpath:liquibase-master.xml");
         liquibase.setDatabaseChangeLogTable("liquibasechangelog");
         liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
-        liquibase.setShouldRun(false);
+        liquibase.setShouldRun(true);
 
         return liquibase;
     }

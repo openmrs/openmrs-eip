@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "retry_queue")
-public class RetryQueueItem extends BaseRetryQueueItem {
+@Table(name = "sender_retry_queue")
+public class SenderRetryQueueItem extends BaseRetryQueueItem {
 
     public static final long serialVersionUID = 1;
 
@@ -42,7 +42,7 @@ public class RetryQueueItem extends BaseRetryQueueItem {
 
     @Override
     public String toString() {
-        return "RetryQueueItem {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
+        return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + "}";
     }
 
 }
