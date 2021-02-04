@@ -60,61 +60,33 @@
                     </otherwise>
                 </choice>
 
-                <log message="Configured destinations -> {{message.destinations}}" />
-
-                <setProperty name="route-retry-count-map">
-                    <spel>#{new java.util.HashMap()}</spel>
+                <setProperty name="retry-count">
+                    <spel>0</spel>
                 </setProperty>
-                <split>
-                    <simple>{{message.destinations}}</simple>
-                    <script>
-                        <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
-                    </script>
-                </split>
 
                 <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i from ReceiverRetryQueueItem i WHERE i.modelClassName ='${exchangeProperty.model-class}' AND i.identifier='${exchangeProperty.entity-id}'" />
+                <setProperty name="retry-count">
+                    <simple>${body.size()}</simple>
+                </setProperty>
 
-                <split stopOnException="true">
-                    <simple>${body}</simple>
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
-                            <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route} for retry queue item" />
-                        </when>
-                        <otherwise>
-                            <script>
-                                <spel>#{getProperty('route-retry-count-map').put(body.route, getProperty('route-retry-count-map').get(body.route.trim()) + 1)}</spel>
-                            </script>
-                        </otherwise>
-                    </choice>
-                </split>
-
-                <split parallelProcessing="false">
-                    <simple>{{message.destinations}}</simple>
-                    <setProperty name="entity-payload-dest">
-                        <simple>${body.trim()}</simple>
+                <!-- Ensure there is no retry items in the queue for this entity so that changes in messages
+                    that happened later don't overwrite those that happened before them -->
+                <when>
+                    <simple>${exchangeProperty.retry-count} > 0</simple>
+                    <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.retry-count} message(s) in the retry queue" />
+                    <setProperty name="retry-message">
+                        <simple>Cannot process the message because the entity has ${exchangeProperty.retry-count} message(s) in the retry queue</simple>
                     </setProperty>
+                    <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-message}" />
+                </when>
 
-                    <!-- Ensure there is no retry items in the queue for this route for this entity so that changes in messages
-                        that happened later don't overwrite those that happened before them -->
-                    <when>
-                        <simple>${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} > 0</simple>
-                        <log message="Moving the message to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue for route: ${exchangeProperty.entity-payload-dest}" />
-                        <setProperty name="retry-message">
-                            <simple>Cannot process the message because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.entity-payload-dest})} message(s) in the retry queue</simple>
-                        </setProperty>
-                        <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-message}" />
-                    </when>
+                <log message="Publishing to destination: {{message.destination}}" loggingLevel="DEBUG" />
 
-                    <log message="Publishing to destination: ${exchangeProperty.entity-payload-dest}" />
+                <setBody>
+                    <simple>${exchangeProperty.entity-payload}</simple>
+                </setBody>
 
-                    <setBody>
-                        <simple>${exchangeProperty.entity-payload}</simple>
-                    </setBody>
-
-                    <toD uri="direct:${exchangeProperty.entity-payload-dest}" />
-
-                </split>
+                <toD uri="direct:{{message.destination}}" />
             </otherwise>
         </choice>
     </route>

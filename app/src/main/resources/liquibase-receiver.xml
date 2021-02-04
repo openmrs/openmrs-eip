@@ -9,12 +9,12 @@
     <changeSet author="wluyima" id="20200202-1100">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="dbsync_receiver_retry_queue"/>
+                <tableExists tableName="receiver_retry_queue"/>
             </not>
         </preConditions>
-        <comment>Adding dbsync_receiver_retry_queue table</comment>
+        <comment>Adding receiver_retry_queue table</comment>
         
-        <createTable tableName="dbsync_receiver_retry_queue">
+        <createTable tableName="receiver_retry_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -24,7 +24,7 @@
             <column name="identifier" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_payload" type="VARCHAR(65535)">
+            <column name="entity_payload" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="attempt_count" type="INT">
@@ -54,7 +54,7 @@
             <column name="date_created" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_payload" type="VARCHAR(65535)">
+            <column name="entity_payload" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="identifier" type="VARCHAR(255)">

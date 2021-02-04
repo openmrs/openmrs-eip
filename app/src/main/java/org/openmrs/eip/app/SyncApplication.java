@@ -106,8 +106,18 @@ public class SyncApplication {
     }
 
     @Bean
+    @Profile(SyncProfiles.RECEIVER)
+    public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
+        Map<String, Object> props = Collections.singletonMap("message.destination", "inbound-db-sync");
+        PropertySource customPropSource = new MapPropertySource("custom", props);
+        env.getPropertySources().addLast(customPropSource);
+
+        return customPropSource;
+    }
+
+    @Bean
     @Profile(SyncProfiles.SENDER)
-    public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
+    public PropertySource getSenderPropertySource(ConfigurableEnvironment env) {
         //Custom PropertySource that we can dynamically populate with generated property values which
         //is not possible via the properties file e.g. to specify names of tables to sync.
         final String dbName = env.getProperty("openmrs.db.name");
