@@ -1,14 +1,14 @@
-package org.openmrs.eip.mysql.watcher.management.entity;
+package org.openmrs.eip.app.db.sync.receiver.management.entity;
 
-import org.openmrs.eip.app.management.entity.BaseRetryQueueItem;
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "inbound_retry_queue")
-public class InBoundRetryQueueItem extends BaseRetryQueueItem {
+@Table(name = "conflict_queue")
+public class ConflictQueueItem extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
 	
@@ -21,6 +21,9 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
 	private String entityPayload;
+	
+	@Column(name = "is_resolved", nullable = false)
+	private Boolean resolved = false;
 	
 	/**
 	 * Gets the modelClassName
@@ -76,10 +79,28 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 		this.entityPayload = entityPayload;
 	}
 	
+	/**
+	 * Gets the resolved
+	 *
+	 * @return the resolved
+	 */
+	public Boolean getResolved() {
+		return resolved;
+	}
+	
+	/**
+	 * Sets the resolved
+	 *
+	 * @param resolved the resolved to set
+	 */
+	public void setResolved(Boolean resolved) {
+		this.resolved = resolved;
+	}
+	
 	@Override
 	public String toString() {
-		return "InBoundRetryQueueItem {route=" + getRoute() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", attemptCount=" + getAttemptCount() + ", payload=" + entityPayload + "}";
+		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", payload="
+		        + entityPayload + "}";
 	}
 	
 }

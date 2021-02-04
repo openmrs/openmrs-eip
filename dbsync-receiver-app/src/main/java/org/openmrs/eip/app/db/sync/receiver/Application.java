@@ -1,10 +1,16 @@
 package org.openmrs.eip.app.db.sync.receiver;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.camel.CamelContext;
-import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.openmrs.eip.app.management.config.Constants;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 public class Application {
@@ -19,11 +25,14 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
 	
-	@Bean("inBoundErrorHandler")
-	public DeadLetterChannelBuilder getInBoundErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dbsync-error-handler");
-		builder.setUseOriginalMessage(true);
-		return builder;
+	@Bean(Constants.PROP_SOURCE_BEAN_NAME)
+	public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
+		Map<String, Object> props = Collections.singletonMap(Constants.PROP_PACKAGES_TO_SCAN,
+		    new String[] { "org.openmrs.eip.app.db.sync.receiver.management.entity" });
+		PropertySource customPropSource = new MapPropertySource("receiverPropSource", props);
+		env.getPropertySources().addLast(customPropSource);
+		
+		return customPropSource;
 	}
 	
 }

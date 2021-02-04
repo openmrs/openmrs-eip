@@ -8,16 +8,13 @@ import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
-import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
@@ -65,7 +62,7 @@ public class WatcherConfig {
 		
 		Map<String, Object> props = new HashMap();
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
-		PropertySource customPropSource = new MapPropertySource("custom", props);
+		PropertySource customPropSource = new MapPropertySource("watcherPropSource", props);
 		env.getPropertySources().addLast(customPropSource);
 		
 		return customPropSource;

@@ -16,6 +16,7 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -27,8 +28,7 @@ import liquibase.integration.spring.SpringLiquibase;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager", basePackages = {
-        "org.openmrs.eip.mysql.watcher.management" })
+@EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager")
 public class ManagementDataSourceConfig {
 	
 	@Value("${spring.mngt-datasource.dialect}")
@@ -48,7 +48,6 @@ public class ManagementDataSourceConfig {
 	
 	@Bean(name = "mngtDataSource")
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
-	@DependsOn("customPropertySource")
 	public DataSource dataSource() throws ClassNotFoundException {
 		SimpleDriverDataSource sdd = new SimpleDriverDataSource();
 		sdd.setDriverClass((Class<Driver>) Class.forName(driverClassName));
@@ -59,15 +58,16 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(name = "mngtEntityManager")
+	@DependsOn(Constants.PROP_SOURCE_BEAN_NAME)
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-	                                                            @Qualifier("mngtDataSource") final DataSource dataSource) {
+	                                                            @Qualifier("mngtDataSource") final DataSource dataSource,
+	                                                            ConfigurableEnvironment env) {
 		
 		Map<String, String> props = new HashMap();
 		props.put(AvailableSettings.DIALECT, hibernateDialect);
 		props.put(AvailableSettings.HBM2DDL_AUTO, "none");
 		
-		return builder.dataSource(dataSource)
-		        .packages("org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa")
+		return builder.dataSource(dataSource).packages(env.getProperty(Constants.PROP_PACKAGES_TO_SCAN, String[].class))
 		        .persistenceUnit("mngt").properties(props).build();
 	}
 	
