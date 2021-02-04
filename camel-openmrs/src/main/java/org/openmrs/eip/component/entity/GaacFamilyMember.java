@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.GaacFamilyLight;
-import org.openmrs.eip.component.entity.light.GaacReasonLeavingLight;
+import org.openmrs.eip.component.entity.light.GaacReasonLeavingTypeLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.RelationshipLight;
 
@@ -45,7 +45,7 @@ public class GaacFamilyMember extends BaseChangeableDataEntity {
     protected LocalDateTime endDate;
     
     @Column(name = "reason_leaving_type")
-    private GaacReasonLeavingLight reasonLeavingType;
+    private GaacReasonLeavingTypeLight reasonLeavingType;
     
     @Column(name = "leaving")
     private Boolean leaving;

@@ -1,10 +1,10 @@
 package org.openmrs.eip.component.entity.light;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -22,12 +22,7 @@ public class GaacFamilyLight extends VoidableLightEntity {
     @Column(name = "family_identifier")
     private String familyIdentifier;
     
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationLight location;
-    
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "focal_patient_id")
-    private PatientLight focalPatient;
+    @Column(name = "start_date")
+    protected LocalDateTime startDate;
 }

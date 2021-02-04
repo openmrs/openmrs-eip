@@ -7,11 +7,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
-import org.openmrs.eip.component.entity.light.ProviderManagementProviderLight;
+import org.openmrs.eip.component.entity.light.ProviderManagementProviderRoleLight;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +30,7 @@ public class Provider extends BaseChangeableMetaDataEntity {
 	 
     @ManyToOne
     @JoinColumn(name = "provider_role_id")
-    private ProviderManagementProviderLight providerRole;
+    private ProviderManagementProviderRoleLight providerRole;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -41,7 +40,6 @@ public class Provider extends BaseChangeableMetaDataEntity {
     @JoinColumn(name = "speciality_id")
     private ConceptLight speciality;
     
-    @NotNull
     @OneToOne
     @JoinColumn(name = "person_id")
     private PersonLight person;

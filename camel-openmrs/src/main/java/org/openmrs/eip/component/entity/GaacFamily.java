@@ -32,7 +32,6 @@ public class GaacFamily extends BaseChangeableDataEntity {
     @Column(name = "end_date")
     protected LocalDateTime endDate;
     
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "focal_patient_id")
     private PatientLight focalPatient;

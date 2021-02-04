@@ -10,7 +10,6 @@ public class GaacFamilyModel extends BaseChangeableDataModel {
 	protected LocalDateTime startDate;
 	protected LocalDateTime endDate;
 	private String focalPatientUuid;
-	private Integer affinityType;
 	private String locationUuid;
 	private Integer crumbled;
 	private String reasonCrumbled;
@@ -39,12 +38,6 @@ public class GaacFamilyModel extends BaseChangeableDataModel {
 	}
 	public void setFocalPatientUuid(String focalPatientUuid) {
 		this.focalPatientUuid = focalPatientUuid;
-	}
-	public Integer getAffinityType() {
-		return affinityType;
-	}
-	public void setAffinityType(Integer affinityType) {
-		this.affinityType = affinityType;
 	}
 	public String getLocationUuid() {
 		return locationUuid;

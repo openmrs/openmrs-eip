@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.PersonLight;
-import org.openmrs.eip.component.entity.light.RelationshipLight;
+import org.openmrs.eip.component.entity.light.RelationshipTypeLight;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +31,7 @@ public class Relationship extends BaseChangeableDataEntity {
 	@NotNull
 	@Column(name = "relationship")
 	@ManyToOne
-    private RelationshipLight relationshipType;
+    private RelationshipTypeLight relationshipType;
 	
     @NotNull
     @ManyToOne

@@ -40,12 +40,12 @@ public class Gaac extends BaseChangeableDataEntity {
     @Column(name = "end_date")
     protected LocalDateTime endDate;
     
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "focal_patient_id")
     private PatientLight focalPatient;
 
-    @Column(name = "affinity_type")
+    @ManyToOne
+    @JoinColumn(name = "affinity_type")
     private GaacAffinityTypeLight affinityType;
     		
     @ManyToOne

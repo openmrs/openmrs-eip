@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RelationshipLightService extends AbstractLightService<RelationshipLight> {
 
-    private LightService<PersonLight> personService;
-
+	  private LightService<PersonLight> personService;
+	  private LightService<RelationshipLight> relationshipService;
+	  					   
     public RelationshipLightService(final OpenmrsRepository<RelationshipLight> repository,
                                    final LightService<PersonLight> personService) {
         super(repository);
@@ -20,12 +21,13 @@ public class RelationshipLightService extends AbstractLightService<RelationshipL
 
     @Override
     protected RelationshipLight createPlaceholderEntity(final String uuid) {
-    	RelationshipLight gaac = new RelationshipLight();
-        gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(DEFAULT_USER_ID);
-        gaac.setPersona(personService.getOrInitPlaceholderEntity());
-        gaac.setPersonb(personService.getOrInitPlaceholderEntity());
+    	RelationshipLight relationship = new RelationshipLight();
+        relationship.setDateCreated(DEFAULT_DATE);
+        relationship.setCreator(DEFAULT_USER_ID);
+        relationship.setPersona(personService.getOrInitPlaceholderEntity());
+        relationship.setPersonb(personService.getOrInitPlaceholderEntity());
+        relationship.setRelationshipType(relationshipService.getOrInitPlaceholderEntity());
         
-        return gaac;
+        return relationship;
     }
 }
