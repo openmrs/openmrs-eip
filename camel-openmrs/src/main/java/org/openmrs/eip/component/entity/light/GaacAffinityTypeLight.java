@@ -19,9 +19,4 @@ public class GaacAffinityTypeLight extends RetireableLightEntity {
     @NotNull
     @Column(name = "name")
     private String name;
-    
-    @NotNull
-    @Column(name = "description")
-    private String description;
-    
 }

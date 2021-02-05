@@ -4,6 +4,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,5 +14,8 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "gaac_reason_leaving_type")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_reason_leaving_type_id"))
-public class GaacReasonLeavingTypeLight extends AttributeTypeLight {
+public class GaacReasonLeavingTypeLight extends RetireableLightEntity {
+    @NotNull
+    @Column(name = "name")
+    private String name;
 }

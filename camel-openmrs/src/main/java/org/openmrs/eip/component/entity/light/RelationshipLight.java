@@ -25,7 +25,7 @@ public class RelationshipLight extends VoidableLightEntity {
     
 	@NotNull
 	@Column(name = "relationship")
-    private RelationshipLight relationshipType;
+    private RelationshipTypeLight relationshipType;
 	
     @NotNull
     @ManyToOne

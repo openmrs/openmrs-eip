@@ -16,7 +16,6 @@ public class GaacAffinityTypeLightService extends AbstractLightService<GaacAffin
     protected GaacAffinityTypeLight createPlaceholderEntity(final String uuid) {
     	GaacAffinityTypeLight type = new GaacAffinityTypeLight();
         type.setName(DEFAULT_STRING);
-        type.setDescription(DEFAULT_STRING);
         type.setCreator(DEFAULT_USER_ID);
         type.setDateCreated(DEFAULT_DATE);
         return type;

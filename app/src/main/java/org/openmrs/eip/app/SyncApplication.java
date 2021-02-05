@@ -49,7 +49,6 @@ public class SyncApplication {
         IGNORE_TABLES.add(TableToSyncEnum.LOCATION_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
-        IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
     }
 
     public SyncApplication(final CamelContext camelContext) {
