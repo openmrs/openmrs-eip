@@ -31,6 +31,7 @@ public class WatcherConfig {
 		IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
 		IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
+		IGNORE_TABLES.add(TableToSyncEnum.ORDER_FREQUENCY);
 	}
 	
 	@Bean(WatcherConstants.ERROR_HANDLER_REF)
