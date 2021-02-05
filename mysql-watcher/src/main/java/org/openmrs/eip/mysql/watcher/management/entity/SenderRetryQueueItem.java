@@ -11,7 +11,7 @@ import org.openmrs.eip.mysql.watcher.Event;
 
 @Entity
 @Table(name = "sender_retry_queue")
-public class RetryQueueItem extends BaseRetryQueueItem {
+public class SenderRetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;
 	
@@ -43,7 +43,7 @@ public class RetryQueueItem extends BaseRetryQueueItem {
 	
 	@Override
 	public String toString() {
-		return "RetryQueueItem {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
+		return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + "}";
 	}
 	
 }
