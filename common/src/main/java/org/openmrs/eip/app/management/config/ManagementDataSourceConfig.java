@@ -91,7 +91,7 @@ public class ManagementDataSourceConfig {
 		liquibase.setChangeLog("classpath:liquibase.xml");
 		liquibase.setDatabaseChangeLogTable("liquibasechangelog");
 		liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
-		liquibase.setShouldRun(false);
+		liquibase.setShouldRun(true);
 		
 		return liquibase;
 	}

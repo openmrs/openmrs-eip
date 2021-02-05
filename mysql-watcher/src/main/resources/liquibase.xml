@@ -1,9 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<databaseChangeLog context="sender"
-                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="wluyima" id="20200205-1001">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_retry_queue"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_retry_queue table</comment>
+
+        <createTable tableName="sender_retry_queue">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_key_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snapshot" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cause_message" type="VARCHAR(1024)"/>
+            <column name="message" type="VARCHAR(1024)"/>
+            <column name="date_created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_changed" type="TIMESTAMP"/>
+        </createTable>
+
+    </changeSet>
+
+    <changeSet author="wluyima" id="20200205-1002">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="hibernate_sequence"/>
+            </not>
+        </preConditions>
+        <comment>Adding hibernate_sequence table</comment>
+
+        <createTable tableName="hibernate_sequence">
+            <column name="next_val" type="BIGINT"/>
+        </createTable>
+
+        <insert tableName="hibernate_sequence">
+            <column name="next_val" value="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20200205-1003">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="camel_messageprocessed"/>
+            </not>
+        </preConditions>
+        <comment>Adding camel_messageprocessed table</comment>
+
+        <createTable tableName="camel_messageprocessed">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="message_id" type="VARCHAR(255)"/>
+            <column name="processor_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>

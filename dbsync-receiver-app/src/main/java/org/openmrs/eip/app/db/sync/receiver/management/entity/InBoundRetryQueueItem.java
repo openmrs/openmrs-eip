@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "inbound_retry_queue")
+@Table(name = "receiver_retry_queue")
 public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;

@@ -10,7 +10,7 @@ import org.openmrs.eip.app.management.entity.BaseRetryQueueItem;
 import org.openmrs.eip.mysql.watcher.Event;
 
 @Entity
-@Table(name = "retry_queue")
+@Table(name = "sender_retry_queue")
 public class RetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;
