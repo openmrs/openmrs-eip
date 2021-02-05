@@ -2,6 +2,7 @@ package org.openmrs.eip.component.service.light.impl;
 
 import org.openmrs.eip.component.entity.light.PersonLight;
 import org.openmrs.eip.component.entity.light.RelationshipLight;
+import org.openmrs.eip.component.entity.light.RelationshipTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
 import org.openmrs.eip.component.service.light.LightService;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class RelationshipLightService extends AbstractLightService<RelationshipLight> {
 
 	  private LightService<PersonLight> personService;
-	  private LightService<RelationshipLight> relationshipService;
+	  private LightService<RelationshipTypeLight> relationshipService;
 	  					   
     public RelationshipLightService(final OpenmrsRepository<RelationshipLight> repository,
                                    final LightService<PersonLight> personService) {
