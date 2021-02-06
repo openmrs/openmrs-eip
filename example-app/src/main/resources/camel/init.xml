@@ -1,8 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="test">
+    <route id="example">
         <from uri="scheduler:test?initialDelay=500&amp;repeatCount=1" />
-        <to uri="openmrs-eip-mysql-watcher:example" />
+        <to uri="openmrs-watcher:example" />
     </route>
 
 </routes>

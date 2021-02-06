@@ -8,7 +8,7 @@ import org.apache.camel.support.DefaultComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component("openmrs-eip-mysql-watcher")
+@Component("openmrs-watcher")
 public class MySqlWatcherComponent extends DefaultComponent {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MySqlWatcherComponent.class);

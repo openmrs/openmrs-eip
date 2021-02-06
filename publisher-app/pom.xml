@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mysql-watcher</artifactId>
+            <artifactId>openmrs-watcher</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
