@@ -41,7 +41,7 @@ Note that the default application that is bundled with the project comes with do
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
 
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an Event instance which has several 
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./camel-openmrs/src/main/java/org/openmrs/eip/component/entity/Event.java) instance which has several 
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the 
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route 
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event 
@@ -69,7 +69,7 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
 2-way sync is currently not supported.
 
-# File synchronization (NOT FOR PRODUCTION)
+# File synchronization ({color:red}NOT FOR PRODUCTION{color})
 It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, 
 but files will be transferred through the same Camel endpoint as the entities. To differentiate entities from files at 
 reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
