@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "receiver_retry_queue")
-public class InBoundRetryQueueItem extends BaseRetryQueueItem {
+public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;
 	
