@@ -20,6 +20,12 @@ import static java.util.Collections.singleton;
 @MappedSuperclass
 public abstract class BaseMetaDataEntity extends BaseCreatableEntity {
 
+    @Column
+    private String name;
+
+    @Column
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "retired_by")
     private UserLight retiredBy;
@@ -38,6 +44,42 @@ public abstract class BaseMetaDataEntity extends BaseCreatableEntity {
     public boolean wasModifiedAfter(BaseEntity entity) {
         BaseMetaDataEntity other = (BaseMetaDataEntity) entity;
         return DateUtils.containsLatestDate(singleton(getDateRetired()), singleton(other.getDateRetired()));
+    }
+
+    /**
+     * Gets the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name
+     *
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets the description
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description
+     *
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
