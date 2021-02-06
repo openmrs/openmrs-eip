@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * In case of a subclass table, this processor retrieves the uuid from it's parent table e.g
  * person.uuid value for patient table
  */
-@Component("id-setting-event-processor")
+@Component(WatcherConstants.ID_SETTING_PROCESSOR)
 public class IdentifierSettingProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(IdentifierSettingProcessor.class);
@@ -43,6 +43,7 @@ public class IdentifierSettingProcessor implements Processor {
 			return;
 		}
 		
+		//TODO For retry items previous and current state are null
 		Object uuid;
 		if ("d".equals(event.getOperation())) {
 			uuid = event.getPreviousState().get(WatcherConstants.FIELD_UUID);

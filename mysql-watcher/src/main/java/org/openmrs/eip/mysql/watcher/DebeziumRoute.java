@@ -1,5 +1,8 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.DBZM_MSG_PROCESSOR;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.ID_SETTING_PROCESSOR;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
@@ -27,7 +30,7 @@ public class DebeziumRoute extends RouteBuilder {
 		
 		RouteDefinition routeDef = from(
 		    "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode=initial&snapshotFetchSize=1000&snapshotLockingMode=extended&includeSchemaChanges=false")
-		            .process(new DebeziumMessageProcessor()).to("direct:db-event-listener");
+		            .process(DBZM_MSG_PROCESSOR).process(ID_SETTING_PROCESSOR).to("direct:db-event-listener");
 		
 		logger.info("Setting debezium route handler to: " + WatcherConstants.ERROR_HANDLER_REF);
 		

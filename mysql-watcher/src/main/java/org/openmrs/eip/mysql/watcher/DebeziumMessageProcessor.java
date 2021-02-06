@@ -7,16 +7,17 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.component.debezium.DebeziumConstants;
-import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * This processor creates an {@link Event} object from the debezium payload and sets it as a
  * property on the exchange, it also invokes the {@link IdentifierSettingProcessor}
  */
+@Component(WatcherConstants.DBZM_MSG_PROCESSOR)
 public class DebeziumMessageProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DebeziumMessageProcessor.class);
@@ -57,8 +58,6 @@ public class DebeziumMessageProcessor implements Processor {
 			beforeStruct.schema().fields().forEach(field -> beforeState.put(field.name(), beforeStruct.get(field)));
 			event.setPreviousState(beforeState);
 		}
-		
-		DefaultFluentProducerTemplate.on(exchange.getContext()).withProcessor(new IdentifierSettingProcessor());
 	}
 	
 }

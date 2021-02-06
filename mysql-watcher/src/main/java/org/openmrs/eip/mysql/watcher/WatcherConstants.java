@@ -12,4 +12,8 @@ public class WatcherConstants {
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
+	public static final String DBZM_MSG_PROCESSOR = "debezium-msg-processor";
+
+	public static final String ID_SETTING_PROCESSOR = "id-setting-event-processor";
+	
 }
