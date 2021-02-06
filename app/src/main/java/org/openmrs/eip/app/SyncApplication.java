@@ -13,6 +13,7 @@ import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -133,6 +134,7 @@ public class SyncApplication {
         }
 
         Map<String, Object> props = Collections.singletonMap("debezium.tablesToSync", StringUtils.join(tables, ","));
+        props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         PropertySource customPropSource = new MapPropertySource("custom", props);
         env.getPropertySources().addLast(customPropSource);
 
