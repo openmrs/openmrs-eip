@@ -46,7 +46,7 @@ the source table name, the uuid of the affected row and the operation(c, u, d) f
 The debezium route notifies all configured routes in parallel of the DB event message set as the body. In 
 theory, you can register as many routes as the systems that need to be notified of changes from the OpenMRS DB, the 
 sender's application.properties file has a property named **db-event.destinations** which takes a comma separated list 
-of route ids to which the db event will be sent. The out-bound DB sync route transforms each message by loading the 
+of camel endpoints to which the db event will be sent. The out-bound DB sync route transforms each message by loading the 
 entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record message queue 
 in an external message broker that is known to the team administering the receiving sync application.
     

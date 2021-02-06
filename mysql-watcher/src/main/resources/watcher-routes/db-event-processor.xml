@@ -41,7 +41,7 @@
                 <simple>${exchangeProperty.event}</simple>
             </setBody>
 
-            <toD uri="direct:${exchangeProperty.db-event-dest}" />
+            <toD uri="${exchangeProperty.db-event-dest}" />
 
             <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because the splitter in
                 the retry-route doesn't work properly with a NoErrorHandler -->

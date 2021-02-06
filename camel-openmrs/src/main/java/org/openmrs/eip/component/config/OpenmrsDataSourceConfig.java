@@ -39,7 +39,7 @@ public class OpenmrsDataSourceConfig {
 	@Primary
 	@Bean(name = CommonConstants.OPENMRS_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.openmrs-datasource")
-	public DataSource dataSource(Environment env) {
+	public DataSource dataSource() {
 		return DataSourceBuilder.create().build();
 	}
 	
