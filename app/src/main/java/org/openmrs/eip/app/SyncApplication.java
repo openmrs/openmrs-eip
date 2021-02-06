@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -133,7 +134,8 @@ public class SyncApplication {
             tables.add(dbName + "." + tableToSyncEnum.name());
         }
 
-        Map<String, Object> props = Collections.singletonMap("debezium.tablesToSync", StringUtils.join(tables, ","));
+        Map<String, Object> props = new HashMap();
+        props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
         props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         PropertySource customPropSource = new MapPropertySource("custom", props);
         env.getPropertySources().addLast(customPropSource);
