@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -55,10 +56,11 @@ public class ManagementDataSourceConfig {
     }
 
     @Bean(name = "mngtEntityManager")
+    @DependsOn("senderPropSource")
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
                                                                 @Qualifier("mngtDataSource") final DataSource dataSource) {
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap();
         props.put("hibernate.dialect", hibernateDialect);
         props.put("hibernate.hbm2ddl.auto", "none");
 

@@ -43,37 +43,51 @@
             </script>
         </when>
 
-        <!-- For deletes and updates, ensure there is no retry items in the queue for the entity
-            so that events that happened later don't overwrite those that happened before them
-
-            Note that this ONLY applies to new events and not retries, we don't explicitly check for this because
-            the header check for CamelDebeziumOperation be false and retry-count will be 0 anyways
-        -->
         <when>
-            <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.retry-count} > 0</simple>
-            <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.retry-count} event(s) in the retry queue" />
-            <setProperty name="retry-event-message">
-                <simple>Cannot process the event because the entity has ${exchangeProperty.retry-count} event(s) in the retry queue</simple>
+            <simple>${exchangeProperty.db-event-destinations} == null</simple>
+            <setProperty name="db-event-destinations">
+                <simple>{{db-event.destinations}}</simple>
             </setProperty>
-            <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
         </when>
 
-        <log message="Publishing to destination: {{db-event.destination}}" loggingLevel="DEBUG" />
+        <split parallelProcessing="false">
+            <simple>${exchangeProperty.db-event-destinations}</simple>
+            <setProperty name="db-event-dest">
+                <simple>${body.trim()}</simple>
+            </setProperty>
 
-        <setBody>
-            <simple>${exchangeProperty.event}</simple>
-        </setBody>
+            <!-- For deletes and updates, ensure there is no retry items in the queue for this route for the entity
+                so that events that happened later don't overwrite those that happened before them
 
-        <toD uri="direct:{{db-event.destination}}" />
+                Note that this ONLY applies to new events and not retries, we don't explicitly check for this because
+                the header check for CamelDebeziumOperation and route-retry-count-map will be empty anyways
+            -->
+            <when>
+                <simple>${headers.CamelDebeziumOperation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
+                <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
+                <setProperty name="retry-event-message">
+                    <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
+                </setProperty>
+                <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
+            </when>
 
-        <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because the splitter in
-            the retry-route doesn't work properly with a NoErrorHandler -->
-        <when>
-            <simple>${exchangeProperty.retry-item-id} != null</simple>
-            <log message="Removing from queue" />
+            <log message="Publishing to destination: ${exchangeProperty.db-event-dest}" loggingLevel="DEBUG" />
 
-            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
-        </when>
+            <setBody>
+                <simple>${exchangeProperty.event}</simple>
+            </setBody>
+
+            <toD uri="direct:${exchangeProperty.db-event-dest}" />
+
+            <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because the splitter in
+                the retry-route doesn't work properly with a NoErrorHandler -->
+            <when>
+                <simple>${exchangeProperty.retry-item-id} != null</simple>
+                <log message="Removing from queue" />
+
+                <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+            </when>
+        </split>
 
         <log message="Done processing db event" loggingLevel="DEBUG" />
     </route>

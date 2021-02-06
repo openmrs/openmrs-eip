@@ -22,6 +22,10 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
     @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
     private Event event;
 
+    //the camel route where this event couldn't be processed
+    @Column(nullable = false, updatable = false, length = 50)
+    private String route;
+
     /**
      * Gets the event
      *
@@ -40,9 +44,27 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
         this.event = event;
     }
 
+    /**
+     * Gets the route
+     *
+     * @return the route
+     */
+    public String getRoute() {
+        return route;
+    }
+
+    /**
+     * Sets the route
+     *
+     * @param route the route to set
+     */
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + "}";
+        return getClass().getSimpleName() + " {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
     }
 
 }

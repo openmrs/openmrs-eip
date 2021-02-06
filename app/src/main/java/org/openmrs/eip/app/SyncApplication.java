@@ -15,6 +15,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -112,13 +113,13 @@ public class SyncApplication {
     @Profile(SyncProfiles.RECEIVER)
     public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
         Map<String, Object> props = Collections.singletonMap("message.destination", "inbound-db-sync");
-        PropertySource customPropSource = new MapPropertySource("custom", props);
+        PropertySource customPropSource = new MapPropertySource("receiverPropSource", props);
         env.getPropertySources().addLast(customPropSource);
 
         return customPropSource;
     }
 
-    @Bean
+    @Bean("senderPropSource")
     @Profile(SyncProfiles.SENDER)
     public PropertySource getSenderPropertySource(ConfigurableEnvironment env) {
         //Custom PropertySource that we can dynamically populate with generated property values which
@@ -137,7 +138,7 @@ public class SyncApplication {
         Map<String, Object> props = new HashMap();
         props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
         props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
-        PropertySource customPropSource = new MapPropertySource("custom", props);
+        PropertySource customPropSource = new MapPropertySource("senderPropSource", props);
         env.getPropertySources().addLast(customPropSource);
 
         return customPropSource;
