@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "conflict_queue")
+@Table(name = "receiver_conflict_queue")
 public class ConflictQueueItem extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
@@ -99,8 +99,8 @@ public class ConflictQueueItem extends AbstractEntity {
 	
 	@Override
 	public String toString() {
-		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", payload="
-		        + entityPayload + "}";
+		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
+		        + ", payload=" + entityPayload + "}";
 	}
 	
 }

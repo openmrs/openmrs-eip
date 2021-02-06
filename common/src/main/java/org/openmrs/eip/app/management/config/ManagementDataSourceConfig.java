@@ -58,7 +58,7 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(name = "mngtEntityManager")
-	@DependsOn(Constants.PROP_SOURCE_BEAN_NAME)
+	@DependsOn({ Constants.COMMON_PROP_SOURCE_BEAN_NAME, Constants.PROP_SOURCE_BEAN_NAME })
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            @Qualifier("mngtDataSource") final DataSource dataSource,
 	                                                            ConfigurableEnvironment env) {

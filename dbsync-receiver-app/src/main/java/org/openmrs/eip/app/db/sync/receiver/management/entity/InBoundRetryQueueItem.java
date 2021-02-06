@@ -78,8 +78,8 @@ public class InBoundRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Override
 	public String toString() {
-		return "InBoundRetryQueueItem {route=" + getRoute() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", attemptCount=" + getAttemptCount() + ", payload=" + entityPayload + "}";
+		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
+		        + ", attemptCount=" + getAttemptCount() + ", payload=" + entityPayload + "}";
 	}
 	
 }

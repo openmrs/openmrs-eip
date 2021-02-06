@@ -11,7 +11,7 @@ import org.openmrs.eip.mysql.watcher.Event;
 
 @Entity
 @Table(name = "sender_retry_queue")
-public class RetryQueueItem extends BaseRetryQueueItem {
+public class SenderRetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;
 	
@@ -23,6 +23,10 @@ public class RetryQueueItem extends BaseRetryQueueItem {
 	@AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
 	private Event event;
 	
+	//the camel route where this event  couldn't be processed
+	@Column(nullable = false, updatable = false, length = 50)
+	private String route;
+	
 	/**
 	 * Gets the event
 	 *
@@ -30,6 +34,24 @@ public class RetryQueueItem extends BaseRetryQueueItem {
 	 */
 	public Event getEvent() {
 		return event;
+	}
+	
+	/**
+	 * Gets the route
+	 *
+	 * @return the route
+	 */
+	public String getRoute() {
+		return route;
+	}
+	
+	/**
+	 * Sets the route
+	 *
+	 * @param route the route to set
+	 */
+	public void setRoute(String route) {
+		this.route = route;
 	}
 	
 	/**
@@ -43,7 +65,8 @@ public class RetryQueueItem extends BaseRetryQueueItem {
 	
 	@Override
 	public String toString() {
-		return "RetryQueueItem {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
+		return getClass().getSimpleName() + " {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event
+		        + "}";
 	}
 	
 }

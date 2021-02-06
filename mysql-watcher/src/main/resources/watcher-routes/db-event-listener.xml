@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="db-event-listener" errorHandlerRef="noErrorHandler">
+    <route id="db-event-listener" errorHandlerRef="outBoundErrorHandler">
         <from uri="direct:db-event-listener" />
 
         <log message="Received DB event: ${exchangeProperty.event}" />
@@ -16,7 +16,7 @@
 
         <when>
             <simple>${exchangeProperty.event.operation} != 'c'</simple>
-            <toD uri="jpa:RetryQueueItem?query=SELECT r from RetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
             <split stopOnException="true">
                 <simple>${body}</simple>
                 <choice>
@@ -33,7 +33,6 @@
             </split>
         </when>
 
-        <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
         <setBody>
             <simple>${exchangeProperty.event}</simple>
         </setBody>
