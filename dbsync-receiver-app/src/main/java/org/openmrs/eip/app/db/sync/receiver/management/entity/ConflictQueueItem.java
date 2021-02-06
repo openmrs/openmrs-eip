@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "receiver_conflict_queue")
+@Table(name = "conflict_queue")
 public class ConflictQueueItem extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;

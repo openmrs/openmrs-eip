@@ -1,5 +1,5 @@
 <!--
-    Route to process exceptions and log them in the sender_retry_queue table in the management DB.
+    Route to process exceptions and log them in the outbound_retry_queue table in the management DB.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="watcher-error-handler" errorHandlerRef="deadLetterChannelBuilder">
@@ -7,11 +7,11 @@
 
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>
-            <log message="Entities with failed retries in current retry run: ${exchangeProperty.failed-entities}" loggingLevel="DEBUG" />
             <script>
-                <simple>${exchangeProperty.failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
+                <simple>${exchangeProperty.route-failed-entities.add(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})}</simple>
             </script>
         </when>
+        <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities}" loggingLevel="DEBUG" />
 
         <setProperty name="error-msg">
             <simple>${exception.toString()}</simple>
@@ -47,11 +47,12 @@
                 <log message="Adding new item to retry queue" />
                 <setProperty name="retry-item">
                     <spel>
-                        #{new org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem()}
+                        #{new org.openmrs.eip.mysql.watcher.management.entity.RetryQueueItem()}
                     </spel>
                 </setProperty>
                 <script>
                     <spel>
+                        #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
                         #{getProperty('retry-item').setEvent(getProperty('event'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                         #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
@@ -62,11 +63,44 @@
                     <simple>${exchangeProperty.retry-item}</simple>
                 </setBody>
 
-                <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.retry-item.route} != null</simple>
+                        <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
 
-                <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
+                        <to uri="jpa:RetryQueueItem?usePersist=true" />
 
-                <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
+                        <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
+                    </when>
+                    <otherwise>
+                        <log message="Adding failed DB event for each registered route" />
+                        <split parallelProcessing="false">
+                            <simple>{{db-event.destinations}}</simple>
+                            <setProperty name="retry-item-dest">
+                                <simple>${body.trim()}</simple>
+                            </setProperty>
+                            <setBody>
+                                <spel>
+                                    #{new org.openmrs.eip.mysql.watcher.management.entity.RetryQueueItem()}
+                                </spel>
+                            </setBody>
+                            <script>
+                                <spel>
+                                    #{body.setRoute(getProperty('retry-item-dest'))}
+                                    #{body.setEvent(getProperty('event'))}
+                                    #{body.setMessage(getProperty('error-msg'))}
+                                    #{body.setCauseMessage(getProperty('cause-error-msg'))}
+                                    #{body.setDateCreated(new java.util.Date())}
+                                </spel>
+                            </script>
+                            <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
+
+                            <to uri="jpa:RetryQueueItem?usePersist=true" />
+
+                            <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
+                        </split>
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed event -->
@@ -81,7 +115,7 @@
                             <simple>${exchangeProperty.retry-item} == null</simple>
                             <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
 
-                            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
+                            <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
 
                             <log message="Loaded: ${body}" loggingLevel="DEBUG" />
                             <setProperty name="retry-item">
@@ -102,7 +136,7 @@
 
                         <log message="Saving updates for retry item" loggingLevel="DEBUG" />
 
-                        <to uri="jpa:SenderRetryQueueItem" />
+                        <to uri="jpa:RetryQueueItem" />
 
                         <log message="Successfully updated retry item" loggingLevel="DEBUG" />
                     </otherwise>
