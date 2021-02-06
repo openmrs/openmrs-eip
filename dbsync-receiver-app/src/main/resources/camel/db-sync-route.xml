@@ -168,6 +168,6 @@
             </otherwise>
         </choice>
 
-        <log message="End inbound db-sync" />
+        <log message="End db-sync route" />
     </route>
 </routes>

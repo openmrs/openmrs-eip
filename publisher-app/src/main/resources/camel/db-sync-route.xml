@@ -62,7 +62,7 @@
             </otherwise>
         </choice>
 
-        <log message="End db-sync-route" loggingLevel="DEBUG" />
+        <log message="End db-sync route" loggingLevel="DEBUG" />
 
     </route>
 
