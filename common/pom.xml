@@ -11,7 +11,8 @@
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
 
-    <name>Provides shared classes and resources between modules</name>
+    <name>OpenMRS EIP Common</name>
+    <description>Provides shared classes and resources between modules</description>
 
     <dependencies>
         <dependency>

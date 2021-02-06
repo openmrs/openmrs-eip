@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="init">
+    <route id="init" errorHandlerRef="deadLetterChannelBuilder">
         <from uri="scheduler:init?initialDelay=1000&amp;repeatCount=1" />
         <to uri="openmrs-eip-mysql-watcher:init" />
     </route>
