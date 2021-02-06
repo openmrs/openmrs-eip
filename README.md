@@ -69,7 +69,7 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
 2-way sync is currently not supported.
 
-# File synchronization ({color:red}NOT FOR PRODUCTION{color})
+# File synchronization (NOT FOR PRODUCTION)
 It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, 
 but files will be transferred through the same Camel endpoint as the entities. To differentiate entities from files at 
 reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
