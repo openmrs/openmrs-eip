@@ -60,8 +60,8 @@ running at another physical location with an OpenMRS installation with the activ
 Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of 
 the entity to be synced into a message broker known to the team administering the receiving sync application, this is 
 where the receiver starts, its main receiver route connects to this external message broker MOST likely over the internet 
-, consumes messages out of sync record queue. The in-bound DB sync route consumes each message from its queue and syncs 
-it into the destination OpenMRS instance's MySQL DB.
+, consumes messages out of sync record queue and calls the in-bound DB sync route which syncs the associated entity to
+the destination OpenMRS instance's MySQL DB.
 
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
 if you need to do 2 way sync, you can turn it on for the destination DB too, but you must be wondering if syncing an 
