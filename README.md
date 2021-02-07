@@ -13,19 +13,7 @@ The application was initially built against the 2.3.x branch should be compatibl
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes 
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
-# Distribution Configuration for Testing
-The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM 
-property **spring.profiles.active** with the value set to sender or receiver.
-
-A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **distribution** directory.
-Please refer to the [Distribution configuration README.md](./distribution/README.md) for details about its configuration.
-
-The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ. 
-You can also use file-based syncing in a development or test environment but we highly discrouage it in production.
-
-It's very important to note that technically this is DB to DB sync happening outside of the OpenMRS application, this 
-has implications e.g if you sync something like person name, the search index needs to be triggered for a rebuild,
-the current receiver DB sync route internally triggers this rebuild for all known indexed entities.
+# Distribution Overview
 
 ### Sender
 
@@ -69,19 +57,16 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
 2-way sync is currently not supported.
 
-# File synchronization (NOT FOR PRODUCTION)
-It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, 
-but files will be transferred through the same Camel endpoint as the entities. To differentiate entities from files at 
-reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
-
-# Build and Test
-Unit ant Integration tests were only coded for the camel-openmrs Maven module.
-Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase. 
-
 # Architecture
 The project has a classic architecture with a service layer and a DAO layer.
 Each action (to get or save entities) of the Camel endpoints comes with the name of the table upon which the action is performed.
 A facade (`EntityServiceFacade`) is used to select the correct service to get or save entities according to the table name passed as a parameter.
+
+It's very important to note that technically when using this application for DB sync, this is DB to DB sync happening 
+outside of the OpenMRS application, this has implications e.g if you sync something like person name, the search index 
+needs to be triggered for a rebuild, the current receiver DB sync route internally triggers this rebuild for all known 
+indexed entities from OpenMRS core, however it might not be up to date with later OpenMRS versions in case more indexed
+entities were added and of course module tables.
 
 Once entities are retrieved from the database they are mapped to a model object. The model contains all non-structured fields of the OpenMRS object and follows a systematic rule for linked structured field: it only stores the _UUID_ of the linked entities.
 
@@ -162,6 +147,22 @@ A lightweight `Encounter` with the correct UUID is created and saved into the ta
 When the linked `Encounter` is eventually unmarshalled on the target side through a subsequent round of synchronization, it will contain the actual UUID of the `Visit` for which the voided placeholder was used. At that point the `Encounter` is thus saved in the target database with a lightweight `Visit` carrying the correct UUID rather than the placeholder lightweight visit.
 
 When all synchronisation rounds have successfully completed all placeholders entities should be "detached", meaning that no other entities should be linked to them anymore.
+
+# Build and Test
+Unit ant Integration tests were only coded for the camel-openmrs Maven module.
+Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
+
+# Installation Guide for DB sync
+
+The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM
+property **spring.profiles.active** with the value set to sender or receiver.
+
+The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ.
+You can also use file-based syncing in a development or test environment but we highly discourage it in production.
+
+A sender and a receiver directory are created containing the necessary routes and configurations to install and configure 
+sender and receiver sync applications at a remote and central database respectively. They are both located in the 
+**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for installation and configuration details.
 
 # Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)

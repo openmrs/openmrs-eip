@@ -44,9 +44,42 @@ unzip -p dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u r
 
 This operation will take few minutes.
 
+### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
+
+You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../activemq_setup/README.md) first.
+
+Then configure the sender properties file as follows:
+```
+camel.input.endpoint=jms:openmrs.sync.queue
+```
+Then configure the receiver properties file as follows:
+```
+camel.input.endpoint=jms:openmrs.sync.queue?subscriptionDurable=true&durableSubscriptionName=DB-SYNC-RECEIVER
+```
+The value for the **durableSubscriptionName** parameter can be any name of your choice, MUST be unique in case of 
+multiple subscriptions and in practice the subscription name should never be changed.
+
+Uncomment the following lines in **sender-application.properties** file
+```
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=write
+spring.artemis.password=password
+```
+
+Uncomment the following lines in **receiver-application.properties** file
+```
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=read
+spring.artemis.password=password
+```
+
 ### 3. Configure `file` Camel endpoint (if not using `jms` queues)
 
-By default, the exchange of data between the sender and the receiver is done with the `file` Camel endpoint.
+**WARNING** SHOULD NOT BE USED IN PRODUCTION
+The exchange of data between the sender and the receiver can done with the `file` Camel endpoint, this approach should 
+only be used in a non production setting e.g. when testing or dyring development.
 
 Copy and rename the _application.properties_ files:
 ```
@@ -98,37 +131,6 @@ camel.input.endpoint=file:/tmp/openmrs-dbsync/sync
 ```
 # The data directory to be used by artemis, not a good idea to change it once set
 spring.artemis.embedded.data-directory=
-```
-
-### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
-
-You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../activemq_setup/README.md) first.
-
-Then configure the sender properties file as follows:
-```
-camel.input.endpoint=jms:openmrs.sync.queue
-```
-Then configure the receiver properties file as follows:
-```
-camel.input.endpoint=jms:openmrs.sync.queue?subscriptionDurable=true&durableSubscriptionName=DB-SYNC-RECEIVER
-```
-The value for the **durableSubscriptionName** parameter can be any name of your choice, MUST be unique in case of 
-multiple subscriptions and in practice the subscription name should never be changed.
-
-Uncomment the following lines in **sender-application.properties** file
-```
-spring.artemis.host=localhost
-spring.artemis.port=62616
-spring.artemis.user=write
-spring.artemis.password=password
-```
-
-Uncomment the following lines in **receiver-application.properties** file
-```
-spring.artemis.host=localhost
-spring.artemis.port=62616
-spring.artemis.user=read
-spring.artemis.password=password
 ```
 
 ### 4. Compled Obs data synchronization
