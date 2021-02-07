@@ -44,7 +44,8 @@ public class GaacFamilyMember extends BaseChangeableDataEntity {
     @Column(name = "end_date")
     protected LocalDateTime endDate;
     
-    @Column(name = "reason_leaving_type")
+    @ManyToOne
+    @JoinColumn(name = "reason_leaving_type")
     private GaacReasonLeavingTypeLight reasonLeavingType;
     
     @Column(name = "leaving")

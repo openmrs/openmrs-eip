@@ -1,3 +1,4 @@
+
 package org.openmrs.eip.component.entity.light;
 
 import javax.persistence.AttributeOverride;
@@ -15,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "relationship_type")
 @AttributeOverride(name = "id", column = @Column(name = "relationship_type_id"))
 public class RelationshipTypeLight extends RetireableLightEntity{
+	
 	@NotNull
     @Column(name = "name")
     private String name;
