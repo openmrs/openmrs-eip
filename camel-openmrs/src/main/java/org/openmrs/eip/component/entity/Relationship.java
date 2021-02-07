@@ -29,7 +29,7 @@ public class Relationship extends BaseChangeableDataEntity {
     private PersonLight persona;
     
 	@NotNull
-	@Column(name = "relationship")
+	@JoinColumn(name = "relationship")
 	@ManyToOne
     private RelationshipTypeLight relationshipType;
 	
