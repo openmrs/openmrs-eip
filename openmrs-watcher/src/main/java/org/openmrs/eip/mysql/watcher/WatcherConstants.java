@@ -10,7 +10,7 @@ public class WatcherConstants {
 	
 	public static final String PROP_EVENT = "event";
 	
-	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
+	public static final String ERROR_HANDLER_REF = "watcherErrorHandler";
 	
 	public static final String DBZM_MSG_PROCESSOR = "debezium-msg-processor";
 

@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="db-event-listener" errorHandlerRef="outBoundErrorHandler">
+    <route id="db-event-listener" errorHandlerRef="watcherErrorHandler">
         <from uri="direct:db-event-listener" />
 
         <log message="Received DB event: ${exchangeProperty.event}" />
