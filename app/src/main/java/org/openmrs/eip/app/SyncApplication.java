@@ -1,16 +1,6 @@
 package org.openmrs.eip.app;
 
-import java.security.Security;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
+import liquibase.integration.spring.SpringLiquibase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
@@ -23,14 +13,25 @@ import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
-import liquibase.integration.spring.SpringLiquibase;
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.security.Security;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @SpringBootApplication(scanBasePackages = {
         "org.openmrs.eip.app",
@@ -49,6 +50,8 @@ public class SyncApplication {
         IGNORE_TABLES.add(TableToSyncEnum.LOCATION_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
         IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
+        IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
+        IGNORE_TABLES.add(TableToSyncEnum.ORDER_FREQUENCY);
     }
 
     public SyncApplication(final CamelContext camelContext) {
@@ -107,8 +110,18 @@ public class SyncApplication {
     }
 
     @Bean
+    @Profile(SyncProfiles.RECEIVER)
+    public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
+        Map<String, Object> props = Collections.singletonMap("message.destination", "inbound-db-sync");
+        PropertySource customPropSource = new MapPropertySource("receiverPropSource", props);
+        env.getPropertySources().addLast(customPropSource);
+
+        return customPropSource;
+    }
+
+    @Bean("senderPropSource")
     @Profile(SyncProfiles.SENDER)
-    public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
+    public PropertySource getSenderPropertySource(ConfigurableEnvironment env) {
         //Custom PropertySource that we can dynamically populate with generated property values which
         //is not possible via the properties file e.g. to specify names of tables to sync.
         final String dbName = env.getProperty("openmrs.db.name");
@@ -122,8 +135,10 @@ public class SyncApplication {
             tables.add(dbName + "." + tableToSyncEnum.name());
         }
 
-        Map<String, Object> props = Collections.singletonMap("debezium.tablesToSync", StringUtils.join(tables, ","));
-        PropertySource customPropSource = new MapPropertySource("custom", props);
+        Map<String, Object> props = new HashMap();
+        props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
+        props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+        PropertySource customPropSource = new MapPropertySource("senderPropSource", props);
         env.getPropertySources().addLast(customPropSource);
 
         return customPropSource;
@@ -137,7 +152,7 @@ public class SyncApplication {
         liquibase.setChangeLog("classpath:liquibase-master.xml");
         liquibase.setDatabaseChangeLogTable("liquibasechangelog");
         liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
-        liquibase.setShouldRun(false);
+        liquibase.setShouldRun(true);
 
         return liquibase;
     }
