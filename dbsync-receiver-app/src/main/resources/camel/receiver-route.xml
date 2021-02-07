@@ -1,6 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver" errorHandlerRef="inBoundErrorHandler">
+    <route id="receiver" errorHandlerRef="receiverErrorHandler">
         <from uri="{{camel.input.endpoint}}" />
+        
         <log message=":" loggingLevel="DEBUG" />
 
         <when>

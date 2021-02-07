@@ -14,7 +14,7 @@ import org.springframework.core.env.PropertySource;
 @Configuration
 public class ReceiverConfig {
 	
-	@Bean("inBoundErrorHandler")
+	@Bean("receiverErrorHandler")
 	public DeadLetterChannelBuilder getReceiverErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dbsync-error-handler");
 		builder.setUseOriginalMessage(true);

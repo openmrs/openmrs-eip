@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="db-sync" errorHandlerRef="noErrorHandler">
+    <route id="db-sync" errorHandlerRef="receiverErrorHandler">
         <from uri="direct:db-sync" />
         
         <convertBodyTo type="java.lang.String" />
