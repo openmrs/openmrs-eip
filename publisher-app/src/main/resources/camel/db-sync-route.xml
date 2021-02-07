@@ -1,9 +1,9 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="db-sync" errorHandlerRef="noErrorHandler">
+    <route id="db-sync" errorHandlerRef="watcherErrorHandler">
         <from uri="direct:db-sync" />
 
-        <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />
+        <log message="Start: db-sync-route: ${body}" loggingLevel="DEBUG" />
 
         <choice>
             <when>
@@ -62,7 +62,7 @@
             </otherwise>
         </choice>
 
-        <log message="End db-sync route" loggingLevel="DEBUG" />
+        <log message="End: db-sync route" loggingLevel="DEBUG" />
 
     </route>
 
