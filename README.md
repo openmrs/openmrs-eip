@@ -1,3 +1,11 @@
+#### Table of Contents
+
+1. [Introduction](#introduction)
+2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
+3. [Distribution Overview](#distribution-overview)
+    1.[Sender](#sender)
+    2.[Receiver](#receiver)
+    
 # Introduction
 This project aims at providing a low-level OpenMRS synchronization module based on [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
 Data is directly pulled from a source OpenMRS MySQL database and pushed to a target OpenMRS MySQL database without any use of the OpenMRS Java API or data model.
@@ -8,7 +16,7 @@ The project is composed of two modules:
 
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
-# OpenMRS Data Model compatibility
+# OpenMRS Data Model Compatibility
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
@@ -29,7 +37,7 @@ Note that the default application that is bundled with the project comes with do
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
 
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./camel-openmrs/src/main/java/org/openmrs/eip/component/entity/Event.java) instance which has several
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
