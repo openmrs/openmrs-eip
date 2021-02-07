@@ -52,7 +52,7 @@
                     <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
                 </when>
                 
-                <log message="Pushing entity to sync queue: {{camel.output.endpoint}}" />
+                <log message="Pushing entity to sync destination: {{camel.output.endpoint}}" />
 
                 <toD uri="{{camel.output.endpoint}}" />
             </when>

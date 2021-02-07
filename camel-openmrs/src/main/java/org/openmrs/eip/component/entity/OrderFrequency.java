@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class OrderFrequency extends BaseChangeableMetaDataEntity {
 
-    @JoinColumn(name = "frequency_per_day")
+    @Column(name = "frequency_per_day")
     private Double frequencyPerDay;
 
     @NotNull

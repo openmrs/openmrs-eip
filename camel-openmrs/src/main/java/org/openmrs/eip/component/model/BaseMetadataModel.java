@@ -2,7 +2,11 @@ package org.openmrs.eip.component.model;
 
 import java.time.LocalDateTime;
 
-public class BaseMetadataModel extends BaseModel {
+public abstract class BaseMetadataModel extends BaseModel {
+
+    private String name;
+
+    private String description;
 
     private boolean retired;
 
@@ -11,6 +15,42 @@ public class BaseMetadataModel extends BaseModel {
     private LocalDateTime dateRetired;
 
     private String retiredReason;
+
+    /**
+     * Gets the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name
+     *
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets the description
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description
+     *
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     /**
      * Gets the retired

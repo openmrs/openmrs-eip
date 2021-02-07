@@ -2,7 +2,7 @@ package org.openmrs.eip.component.model;
 
 import java.time.LocalDateTime;
 
-public class BaseDataModel extends BaseModel {
+public abstract class BaseDataModel extends BaseModel {
 
     private boolean voided;
 

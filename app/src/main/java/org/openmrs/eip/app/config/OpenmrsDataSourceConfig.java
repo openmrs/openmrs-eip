@@ -1,8 +1,5 @@
 package org.openmrs.eip.app.config;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.util.Arrays;
 
 import static java.util.Collections.singletonMap;
 
@@ -37,27 +33,14 @@ public class OpenmrsDataSourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(OpenmrsDataSourceConfig.class);
 
-    private static final String CONN_INIT_SQL = "SET @@sql_log_bin=OFF";
-
     @Value("${spring.openmrs-datasource.dialect}")
     private String hibernateDialect;
 
     @Primary
     @Bean(name = "openmrsDataSource")
     @ConfigurationProperties(prefix = "spring.openmrs-datasource")
-    public DataSource dataSource(Environment env) {
-        DataSource ds = DataSourceBuilder.create().build();
-        if (Arrays.asList(env.getActiveProfiles()).contains(SyncProfiles.RECEIVER)) {
-            if (ds instanceof HikariDataSource) {
-                log.info("Setting connection init SQL to: " + CONN_INIT_SQL);
-                ((HikariDataSource) ds).setConnectionInitSql(CONN_INIT_SQL);
-            } else {
-                //TODO support other DS types
-                throw new EIPException("Do not know how to initialize datasource of type: " + ds.getClass());
-            }
-        }
-
-        return ds;
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
     }
 
     @Primary

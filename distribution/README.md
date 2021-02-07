@@ -104,10 +104,16 @@ spring.artemis.embedded.data-directory=
 
 You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../activemq_setup/README.md) first.
 
-Then configure the sender and receiver properties file as follows:
+Then configure the sender properties file as follows:
 ```
 camel.input.endpoint=jms:openmrs.sync.queue
 ```
+Then configure the receiver properties file as follows:
+```
+camel.input.endpoint=jms:openmrs.sync.queue?subscriptionDurable=true&durableSubscriptionName=DB-SYNC-RECEIVER
+```
+The value for the **durableSubscriptionName** parameter can be any name of your choice, MUST be unique in case of 
+multiple subscriptions and in practice the subscription name should never be changed.
 
 Uncomment the following lines in **sender-application.properties** file
 ```

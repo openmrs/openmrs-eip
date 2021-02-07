@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "retry_queue")
-public class RetryQueueItem extends BaseRetryQueueItem {
+@Table(name = "sender_retry_queue")
+public class SenderRetryQueueItem extends BaseRetryQueueItem {
 
     public static final long serialVersionUID = 1;
 
@@ -21,6 +21,10 @@ public class RetryQueueItem extends BaseRetryQueueItem {
     @AttributeOverride(name = "operation", column = @Column(nullable = false, updatable = false, length = 1))
     @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
     private Event event;
+
+    //the camel route where this event couldn't be processed
+    @Column(nullable = false, updatable = false, length = 50)
+    private String route;
 
     /**
      * Gets the event
@@ -40,9 +44,27 @@ public class RetryQueueItem extends BaseRetryQueueItem {
         this.event = event;
     }
 
+    /**
+     * Gets the route
+     *
+     * @return the route
+     */
+    public String getRoute() {
+        return route;
+    }
+
+    /**
+     * Sets the route
+     *
+     * @param route the route to set
+     */
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
     @Override
     public String toString() {
-        return "RetryQueueItem {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
+        return getClass().getSimpleName() + " {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event + "}";
     }
 
 }

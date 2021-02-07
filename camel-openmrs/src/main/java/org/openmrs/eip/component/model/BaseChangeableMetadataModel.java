@@ -2,7 +2,7 @@ package org.openmrs.eip.component.model;
 
 import java.time.LocalDateTime;
 
-public class BaseChangeableMetadataModel extends BaseMetadataModel {
+public abstract class BaseChangeableMetadataModel extends BaseMetadataModel {
 
     private String changedByUuid;
 

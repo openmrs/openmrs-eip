@@ -1,11 +1,11 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-retry" errorHandlerRef="outBoundErrorHandler">
+    <route id="sender-retry" errorHandlerRef="outBoundErrorHandler">
         <from uri="scheduler:retry?initialDelay={{db-event.retry.initial.delay}}&amp;delay={{db-event.retry.interval}}" />
 
         <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:RetryQueueItem?query=SELECT r.id FROM RetryQueueItem r ORDER BY r.dateCreated ASC" />
+        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r.id FROM SenderRetryQueueItem r ORDER BY r.dateCreated ASC" />
 
         <choice>
             <when>
@@ -38,7 +38,7 @@
                     </setProperty>
                     <log message="Loading event retry item with id: ${body}" />
 
-                    <toD uri="jpa:RetryQueueItem?query=SELECT r FROM RetryQueueItem r WHERE r.id = ${body}" />
+                    <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${body}" />
 
                     <setProperty name="retry-item">
                         <simple>${body[0]}</simple>

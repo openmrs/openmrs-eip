@@ -9,23 +9,23 @@ The project is composed of two modules:
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
 # OpenMRS Data Model compatibility
-The master branch should be compatible with the data model of the OpenMRS's version currently on the master branch of OpenMRS core
-Each released minor version of OpenMRS will lead to a maintenance branch.
-For example if you intend to synchronise data between an OpenMRS instance running on Core 2.4.x and another OpenMRS instance running on Core 2.3.x, you will use the appropriate build of the OpenMRS Camel component on each end.
+The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core 
+2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes 
+between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
 # Distribution Configuration for Testing
 The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM 
-property **spring.profiles.active** with the value set to sender or receiver. The 2 OpenMRS installations that we need 
-to sync between each has its own local Odoo system to integrate with, Odoo is an ERP system. 
+property **spring.profiles.active** with the value set to sender or receiver.
 
 A sender and a receiver directory are created to simulate a network between a remote database and a central database. They are both located in the **distribution** directory.
 Please refer to the [Distribution configuration README.md](./distribution/README.md) for details about its configuration.
 
-The OpenMRS dbSync can be used with any Camel endpoint between the sender and the receiver including ActiveMQ via `jms` queues. A runnable configuration can be found in the **/distribution/activemq_setup** directory.
-Please refer to the [Configure ActiveMQ README.md](./distribution/activemq_setup/README.md) for details about its configuration.
+The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ. 
+You can also use file-based syncing in a development or test environment but we highly discrouage it in production.
 
-It's very important to note that technically this is DB to DB sync happening outside of the OpenMRS application, this has implications e.g if you sync something like patient, the search index needs to be triggered for a rebuild,
-the current in-bound DB sync route internally triggers this rebuild for all known indexed entities.
+It's very important to note that technically this is DB to DB sync happening outside of the OpenMRS application, this 
+has implications e.g if you sync something like person name, the search index needs to be triggered for a rebuild,
+the current receiver DB sync route internally triggers this rebuild for all known indexed entities.
 
 ### Sender
 
@@ -41,16 +41,18 @@ Note that the default application that is bundled with the project comes with do
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
 
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs a DbEvent instance which has 3 fields,
-the source table name, the uuid of the affected row and the operation(c, u, d) for Create, Update or Delete respectively.
-The debezium route notifies all configured routes in parallel of the DB event message set as the body. By default, the 
-application has 2 out-bound routes, one for the out-bound DB sync route and the other for the local Odoo system. In 
-theory, you can register as many routes as the systems that need to be notified of changes from the OpenMRS DB, the 
-sender's application.properties file has a property named **db-event.destinations** which takes a comma separated list 
-of route ids to which the db event will be sent. The out-bound DB sync route transforms each message by loading the 
-entity by its uuid, serialize it into a custom format and then publishes the payload into a sync record message queue 
-in an external message broker that is known to the team administering the receiving sync application. The out-bound Odoo 
-route consumes messages from its queue too, does its custom processing and then feeds the configured Odoo system.
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./camel-openmrs/src/main/java/org/openmrs/eip/component/entity/Event.java) instance which has several 
+fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the 
+operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route 
+sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event 
+to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as 
+the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a 
+named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent. 
+There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each 
+message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a 
+configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended 
+option, it means the message would be pushed to a sync queue in an external message broker that is shared with the 
+receiving sync application.
     
 ### Receiver
 
@@ -60,24 +62,17 @@ As seen from the diagram above, the receiver is exactly the same spring boot app
 running at another physical location with an OpenMRS installation with the active profile set to receiver.
 
 Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of 
-the entity to be synced into a message broker known to the team administering the receiving sync application, this is 
-where the receiver starts, its main receiver route connects to this external message broker MOST likely over the internet 
-, consumes messages out of sync record queue and calls all configured routes in parallel with the DB event message set 
-as the body. By default, the application has 2 in-bound routes, one for the in-bound DB sync route and the other for a 
-local Odoo system. You can register as many routes as the systems that need to be notified of the in-bound entity payload, 
-the sender's application.properties file has a property named **message.destinations** which takes a comma separated 
-list of route ids to which the entity payload will be sent to feed other systems. The in-bound DB sync route consumes 
-each message from its queue and syncs it into the destination OpenMRS instance's MySQL DB. The in-bound Odoo route consumes 
-messages from its queue too, does its custom processing and then feeds the configured Odoo system.
+the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is 
+where the receiver starts, its receiver route connects to this external message broker, consumes messages out of sync 
+queue and calls the DB sync route which syncs the associated entity to the destination OpenMRS instance's MySQL DB.
 
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
-if you need to do 2 way sync, you can turn it on for the destination DB too, but you must be wondering if syncing an 
-entity won't get us into an infinite sync loop, this is taken care of internally by disabling mysql bin logging for the 
-session on the connection objects used when running in receiver mode.
+2-way sync is currently not supported.
 
-# File synchronization
-It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, but files will be transferred through the same Camel endpoint as the entities.
-To differentiate entities from files at reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
+# File synchronization (NOT FOR PRODUCTION)
+It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route, 
+but files will be transferred through the same Camel endpoint as the entities. To differentiate entities from files at 
+reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
 
 # Build and Test
 Unit ant Integration tests were only coded for the camel-openmrs Maven module.

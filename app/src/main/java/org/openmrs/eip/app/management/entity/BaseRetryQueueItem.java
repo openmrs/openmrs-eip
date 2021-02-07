@@ -7,10 +7,6 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class BaseRetryQueueItem extends AbstractEntity {
 
-    //the camel route where this event  couldn't be processed
-    @Column(nullable = false, updatable = false, length = 50)
-    private String route;
-
     @Column(length = 1024)
     private String message;
 
@@ -22,24 +18,6 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 
     @Column(name = "date_Changed")
     private Date dateChanged;
-
-    /**
-     * Gets the route
-     *
-     * @return the route
-     */
-    public String getRoute() {
-        return route;
-    }
-
-    /**
-     * Sets the route
-     *
-     * @param route the route to set
-     */
-    public void setRoute(String route) {
-        this.route = route;
-    }
 
     /**
      * Gets the message
