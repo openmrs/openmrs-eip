@@ -109,7 +109,7 @@ public class SyncApplication {
         return new JpaMessageIdRepository(emf, "complexObsProcessor");
     }
 
-    @Bean
+    @Bean("customPropSource")
     @Profile(SyncProfiles.RECEIVER)
     public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
         Map<String, Object> props = Collections.singletonMap("message.destination", "inbound-db-sync");
@@ -119,7 +119,7 @@ public class SyncApplication {
         return customPropSource;
     }
 
-    @Bean("senderPropSource")
+    @Bean("customPropSource")
     @Profile(SyncProfiles.SENDER)
     public PropertySource getSenderPropertySource(ConfigurableEnvironment env) {
         //Custom PropertySource that we can dynamically populate with generated property values which
