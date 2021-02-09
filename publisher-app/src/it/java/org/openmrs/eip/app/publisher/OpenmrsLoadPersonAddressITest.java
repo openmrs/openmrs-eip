@@ -8,7 +8,6 @@ import org.openmrs.eip.component.entity.PersonAddress;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.model.PersonAddressModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
-import org.openmrs.eip.component.service.security.PGPEncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
@@ -18,14 +17,11 @@ public class OpenmrsLoadPersonAddressITest extends OpenmrsLoadEndpointITest {
     @Autowired
     private SyncEntityRepository<PersonAddress> repository;
 
-    @Autowired
-    private PGPEncryptService pgpEncryptService;
-
     @Test
     public void load() {
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setBody("sender:openmrs-remote@icrc.org\n" + pgpEncryptService.encryptAndSign(getPersonJson()));
+        exchange.getIn().setBody(getPersonJson());
 
         // When
         template.send(exchange);

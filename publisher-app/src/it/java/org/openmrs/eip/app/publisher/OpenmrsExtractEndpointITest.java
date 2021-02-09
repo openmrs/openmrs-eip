@@ -16,9 +16,6 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openmrs.eip.app.publisher.config.TestConfig;
 import org.openmrs.eip.component.camel.OpenmrsComponent;
-import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
-import org.openmrs.eip.component.service.security.PGPDecryptService;
-import org.openmrs.eip.component.service.security.PGPEncryptService;
 import org.openmrs.eip.component.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,12 +40,6 @@ public abstract class OpenmrsExtractEndpointITest {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    protected PGPDecryptService pgpDecryptService;
-
-    @Autowired
-    private PGPEncryptService pgpEncryptService;
-
     public String getUri() {
         return "direct:start" + getClass().getSimpleName();
     }
@@ -58,7 +49,6 @@ public abstract class OpenmrsExtractEndpointITest {
         Security.addProvider(new BouncyCastleProvider());
 
         camelContext.addComponent("openmrs", new OpenmrsComponent(camelContext, applicationContext));
-        camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class, new StringToLocalDateTimeConverter());
         camelContext.addRoutes(createRouteBuilder());
     }
 
@@ -73,9 +63,8 @@ public abstract class OpenmrsExtractEndpointITest {
             @Override
             public void configure() {
                 from(getUri())
-                        .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
+                        .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}"))
                         .split().jsonpathWriteAsString("$").streaming()
-                        .process(pgpEncryptService)
                         .to("log:json")
                         .to("mock:result");
             }

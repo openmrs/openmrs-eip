@@ -16,7 +16,6 @@ import org.openmrs.eip.component.entity.light.ProviderLight;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
-import org.openmrs.eip.component.service.security.PGPEncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
@@ -27,14 +26,11 @@ public class OpenmrsLoadOrderITest extends OpenmrsLoadEndpointITest {
     @Autowired
     private SyncEntityRepository<Order> repo;
 
-    @Autowired
-    private PGPEncryptService pgpEncryptService;
-
     @Test
     public void load() {
         Patient p = new Patient();
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setBody("sender:openmrs-remote@icrc.org\n" + pgpEncryptService.encryptAndSign(getOrderJson()));
+        exchange.getIn().setBody(getOrderJson());
 
         template.send(exchange);
 

@@ -25,7 +25,7 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
     public void load() {
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setBody("sender:openmrs-remote@icrc.org\n" + pgpEncryptService.encryptAndSign(getPersonJson()));
+        exchange.getIn().setBody(getPersonJson());
 
         // When
         template.send(exchange);

@@ -33,7 +33,6 @@ public class OpenmrsExtractPersonAddressITest extends OpenmrsExtractEndpointITes
         // Then
         List<Exchange> result = resultEndpoint.getExchanges();
         assertEquals(1, result.size());
-        pgpDecryptService.process(result.get(0));
         JSONAssert.assertEquals(getExpectedJson(), (String) result.get(0).getIn().getBody(), false);
     }
 
