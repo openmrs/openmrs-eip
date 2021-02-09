@@ -17,6 +17,11 @@ public class EncounterProviderModel extends BaseChangeableDataModel {
 	public String getProviderUuid() {
 		return providerUuid;
 	}
+	
+	public void setProviderUuid(String providerUuid) {
+		this.providerUuid = providerUuid;
+	}
+	
 	public String getEncounterRoleUuid() {
 		return encounterRoleUuid;
 	}
