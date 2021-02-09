@@ -44,9 +44,38 @@ unzip -p dump_sender_2.3.zip | docker exec -i db_db_remote_1 /usr/bin/mysql -u r
 
 This operation will take few minutes.
 
+### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
+
+You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../activemq_setup/README.md) first.
+
+Then configure the sender and receiver properties file as follows:
+```
+camel.input.endpoint=jms:openmrs.sync.queue
+```
+
+Uncomment the following lines in **sender-application.properties** file
+```
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=write
+spring.artemis.password=password
+```
+
+Uncomment the following lines in **receiver-application.properties** file
+```
+spring.artemis.host=localhost
+spring.artemis.port=62616
+spring.artemis.user=read
+spring.artemis.password=password
+```
+
 ### 3. Configure `file` Camel endpoint (if not using `jms` queues)
 
-By default, the exchange of data between the sender and the receiver is done with the `file` Camel endpoint.
+**WARNING** SHOULD NOT BE USED IN PRODUCTION
+The exchange of data between the sender and the receiver can done with the `file` Camel endpoint, this approach should
+only be used in a non production setting e.g. when testing or dyring development.
+
+The exchange of data between the sender and the receiver can be done with the `file` Camel endpoint.
 
 Copy and rename the _application.properties_ files:
 ```
@@ -100,36 +129,11 @@ camel.input.endpoint=file:/tmp/openmrs-dbsync/sync
 spring.artemis.embedded.data-directory=
 ```
 
-### 3-bis. Configure `jms` Camel endpoint, if not using the `file` endpoint
-
-You can also use a JMS endpoint, but an ActiveMQ broker must be [configured](../activemq_setup/README.md) first.
-
-Then configure the sender and receiver properties file as follows:
-```
-camel.input.endpoint=jms:openmrs.sync.queue
-```
-
-Uncomment the following lines in **sender-application.properties** file
-```
-spring.artemis.host=localhost
-spring.artemis.port=62616
-spring.artemis.user=write
-spring.artemis.password=password
-```
-
-Uncomment the following lines in **receiver-application.properties** file
-```
-spring.artemis.host=localhost
-spring.artemis.port=62616
-spring.artemis.user=read
-spring.artemis.password=password
-```
-
-### 4. Compled Obs data synchronization
+### 4. Complex Obs data synchronization
 To also synchronize the content of the complex data directory.
 The property for that purpose is:
 ```
-camel.output.endpoint.complex.obs.data.directory=/tmp/openmrs-dbsync/store
+openmrs.complex.obs.data.directory=
 ```
 
 ### 5. Rebuild the project

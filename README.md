@@ -2,10 +2,14 @@
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Distribution Overview](#distribution-overview)
-    1.[Sender](#sender)
-    2.[Receiver](#receiver)
-    
+3. [Architecture](#architecture)
+4. [Distribution Overview](#distribution-overview)
+    1. [Sender](#sender)
+    2. [Receiver](#receiver)
+5. [Build and Test](#build-and-test)
+6. [Installation Guide for DB sync](#installation-guide-for-db-sync)
+7. [Project Main Dependencies](#project-main-dependencies)
+
 # Introduction
 This project aims at providing a low-level OpenMRS synchronization module based on [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
 Data is directly pulled from a source OpenMRS MySQL database and pushed to a target OpenMRS MySQL database without any use of the OpenMRS Java API or data model.
@@ -20,59 +24,6 @@ The application uses [Lombok](https://projectlombok.org/) to allow creating POJO
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
-
-# Distribution Overview
-
-### Sender
-
-![Sender Diagram](distribution/resources/sender.jpg)
-
-As seen from the diagram above, the sender is really a spring boot application at the core running with the active
-profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB
-changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row,
-please refer to the inline documentation of the various configuration properties in the sender's application.properties
-in the distribution/sender folder.
-
-Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
-MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
-
-When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
-fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
-operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
-sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
-to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as
-the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a
-named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent.
-There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each
-message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a
-configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended
-option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
-receiving sync application.
-
-### Receiver
-
-![Receiver Diagram](distribution/resources/receiver.jpg)
-
-As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead
-running at another physical location with an OpenMRS installation with the active profile set to receiver.
-
-Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of
-the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is
-where the receiver starts, its receiver route connects to this external message broker, consumes messages out of sync
-queue and calls the DB sync route which syncs the associated entity to the destination OpenMRS instance's MySQL DB.
-
-**NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB,
-2-way sync is currently not supported.
-
-# File synchronization (NOT FOR PRODUCTION)
-It is also possible to synchronize the content of a directory. The directory sync is performed via a different Camel route,
-but files will be transferred through the same Camel endpoint as the entities. To differentiate entities from files at
-reception, files are encoded in Base64 and the result is placed between the `<FILE>` and `</FILE>` tags.
-
-# Build and Test
-Unit ant Integration tests were only coded for the camel-openmrs Maven module.
-Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
 
 # Architecture
 The project has a classic architecture with a service layer and a DAO layer.
@@ -164,6 +115,54 @@ A lightweight `Encounter` with the correct UUID is created and saved into the ta
 When the linked `Encounter` is eventually unmarshalled on the target side through a subsequent round of synchronization, it will contain the actual UUID of the `Visit` for which the voided placeholder was used. At that point the `Encounter` is thus saved in the target database with a lightweight `Visit` carrying the correct UUID rather than the placeholder lightweight visit.
 
 When all synchronisation rounds have successfully completed all placeholders entities should be "detached", meaning that no other entities should be linked to them anymore.
+
+# Distribution Overview
+
+### Sender
+
+![Sender Diagram](distribution/resources/sender.jpg)
+
+As seen from the diagram above, the sender is really a spring boot application at the core running with the active
+profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB
+changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row,
+please refer to the inline documentation of the various configuration properties in the sender's application.properties
+in the distribution/sender folder.
+
+Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
+MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
+
+When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
+fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
+operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
+sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
+to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as
+the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a
+named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent.
+There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each
+message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a
+configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended
+option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
+receiving sync application.
+
+### Receiver
+
+![Receiver Diagram](distribution/resources/receiver.jpg)
+
+As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead
+running at another physical location with an OpenMRS installation with the active profile set to receiver.
+
+Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of
+the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is
+where the receiver starts, its receiver route connects to this external message broker, consumes messages out of sync
+queue and calls the DB sync route which syncs the associated entity to the destination OpenMRS instance's MySQL DB.
+
+**NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB,
+2-way sync is currently not supported.
+
+# Build and Test
+Unit ant Integration tests were only coded for the camel-openmrs Maven module.
+Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
 
 # Installation Guide for DB sync
 
