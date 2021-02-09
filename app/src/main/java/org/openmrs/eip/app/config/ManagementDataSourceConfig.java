@@ -56,7 +56,7 @@ public class ManagementDataSourceConfig {
     }
 
     @Bean(name = "mngtEntityManager")
-    @DependsOn("senderPropSource")
+    @DependsOn("customPropSource")
     public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
                                                                 @Qualifier("mngtDataSource") final DataSource dataSource) {
 
