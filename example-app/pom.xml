@@ -8,8 +8,8 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <name>OpenMRS EIP example app</name>
-    <description>Example application to demonstrate usage of the watcher</description>
+    <name>OpenMRS EIP Example App</name>
+    <description>Example application to demonstrate usage of the openmrs-watcher</description>
 
     <dependencies>
         <dependency>

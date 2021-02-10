@@ -12,8 +12,8 @@
         <module>openmrs-watcher</module>
         <module>camel-openmrs</module>
         <module>common</module>
-        <module>publisher-app</module>
         <module>dbsync-receiver-app</module>
+        <module>dbsync-sender-app</module>
         <module>example-app</module>
         <module>distribution</module>
         <module>camel-odoo</module>

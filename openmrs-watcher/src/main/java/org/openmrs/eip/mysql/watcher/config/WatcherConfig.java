@@ -49,10 +49,10 @@ public class WatcherConfig {
 	}
 	
 	@Bean(Constants.PROP_SOURCE_BEAN_NAME)
-	public PropertySource getPublisherPropertySource(ConfigurableEnvironment env) {
+	public PropertySource getWatcherPropertySource(ConfigurableEnvironment env) {
 		Map<String, Object> props = Collections.singletonMap(Constants.PROP_PACKAGES_TO_SCAN,
 		    new String[] { "org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa" });
-		PropertySource customPropSource = new MapPropertySource("publisherPropSource", props);
+		PropertySource customPropSource = new MapPropertySource("watcherPropSource", props);
 		env.getPropertySources().addLast(customPropSource);
 		
 		return customPropSource;
