@@ -49,18 +49,11 @@
     <changeSet author="wluyima" id="20200205-1002">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="hibernate_sequence"/>
+                <sequenceExists sequenceName="hibernate_sequence" />
             </not>
         </preConditions>
-        <comment>Adding hibernate_sequence table</comment>
-
-        <createTable tableName="hibernate_sequence">
-            <column name="next_val" type="BIGINT"/>
-        </createTable>
-
-        <insert tableName="hibernate_sequence">
-            <column name="next_val" value="1"/>
-        </insert>
+        <comment>Adding hibernate_sequence sequence</comment>
+        <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
     </changeSet>
 
     <changeSet author="wluyima" id="20200205-1003">

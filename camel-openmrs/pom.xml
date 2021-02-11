@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <name>OpenMRS EIP API component</name>
+    <name>OpenMRS EIP OpenMRS API component</name>
 
     <properties>
         <bouncy-gpg.version>2.0.1</bouncy-gpg.version>

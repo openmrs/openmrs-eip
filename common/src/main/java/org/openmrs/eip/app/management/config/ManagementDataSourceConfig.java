@@ -89,8 +89,8 @@ public class ManagementDataSourceConfig {
 		SpringLiquibase liquibase = new SpringLiquibase();
 		liquibase.setDataSource(dataSource);
 		liquibase.setChangeLog("classpath:liquibase.xml");
-		liquibase.setDatabaseChangeLogTable("liquibasechangelog");
-		liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
+		liquibase.setDatabaseChangeLogTable("LIQUIBASECHANGELOG");
+		liquibase.setDatabaseChangeLogLockTable("LIQUIBASECHANGELOGLOCK");
 		liquibase.setShouldRun(true);
 		
 		return liquibase;
