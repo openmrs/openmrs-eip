@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "provider")
 @AttributeOverride(name = "id", column = @Column(name = "provider_id"))
 public class Provider extends BaseCreatableEntity {
+	
 	@Column(name = "name")
     private String name;
 	 

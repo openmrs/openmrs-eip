@@ -6,7 +6,8 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class ProviderModel extends BaseModel {
-    private String name;
+    
+	private String name;
 	 
     private String identifier;
 	 
