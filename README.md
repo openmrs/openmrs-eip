@@ -1,4 +1,4 @@
-#### Table of Contents
+# Table of Contents
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
@@ -8,20 +8,21 @@
    3. [Project Main Dependencies](#project-main-dependencies)
 4. [Distribution Overview](#distribution-overview)
     1. [Sender](#sender)
+       1. [Configuration](#sender-configuration)
     2. [Receiver](#receiver)
-5. [Build and Test](#build-and-test)
-6. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
-7. [Developer Guide](#developer-guide)
+        1. [Configuration](#receiver-configuration)
+        2. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
+5. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
+6. [Build and Test](#build-and-test)
+7. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
+8. [Developer Guide](#developer-guide)
 
 # Introduction
-This project aims at providing a low-level OpenMRS synchronization module based on [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
-Data is directly pulled from a source OpenMRS MySQL database and pushed to a target OpenMRS MySQL database without any use of the OpenMRS Java API or data model.
-
-The project is composed of two modules:
-- The Camel component module. The component knows two verbs: _extract_ and _load_. _Extract_ is used to retrieve data from the database and send it into Camel routes. _Load_ is used to receive the data from Camel routes to store it in the database.
-- The app module, which is a Spring Boot application having either the role of the sender, the receiver or both that will launch the Camel routes.
-
-The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
+This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and 
+[Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
+Data is directly pulled from a source OpenMRS MySQL database and wired onto camel routes in an effort to integrate 
+OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end 
+user complimentary applications to sync data from one OpeMRS MySQL DB to another.
 
 # OpenMRS Data Model Compatibility
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
@@ -67,6 +68,10 @@ The project has a classic architecture with a service layer and a DAO layer.
 Each action (to get or save entities) of the Camel endpoints comes with the name of the table upon which the action is 
 performed. A facade (`EntityServiceFacade`) is used to select the correct service to get or save entities according to 
 the table name passed as a parameter.
+
+The project uses an embedded [debezium](https://debezium.io) engine to track insert, update and delete operations of 
+rows in monitored OpenMRS tables, out of the box the only monitored tables are those containing patient demographic and 
+clinical data, this implies that you need to configure MySQL binary logging in the source (sender) OpenMRS DB.
 
 It's very important to note that technically when using this application for DB sync, this is DB to DB sync happening
 outside of the OpenMRS application, this has implications e.g if you sync something like person name, the search index
@@ -156,18 +161,21 @@ When the linked `Encounter` is eventually unmarshalled on the target side throug
 
 When all synchronisation rounds have successfully completed all placeholders entities should be "detached", meaning that no other entities should be linked to them anymore.
 
+The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
+
 ### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
 * [Spring Data](https://spring.io/projects/spring-data)
 * [Apache Camel](https://camel.apache.org/)
+* [Debezium](https://debezium.io)
 * [Lombok](https://projectlombok.org/)
 * [Bouncy Castle](https://www.bouncycastle.org/fr/)
 
 # Distribution Overview
 
-### Sender
+## Sender
 
-![Sender Diagram](distribution/resources/sender.jpg)
+![Sender Diagram](docs/sender/sender.jpg)
 
 As seen from the diagram above, the sender is really a spring boot application at the core running with the active
 profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB
@@ -179,7 +187,7 @@ Note that the default application that is bundled with the project comes with do
 MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
 
 When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
+read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
@@ -192,9 +200,11 @@ configured sync destination, if you're using ActiveMQ to sync between the sender
 option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
 receiving sync application.
 
-### Receiver
+### Sender Configuration
 
-![Receiver Diagram](distribution/resources/receiver.jpg)
+## Receiver
+
+![Receiver Diagram](docs/receiver/receiver.jpg)
 
 As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead
 running at another physical location with an OpenMRS installation with the active profile set to receiver.
@@ -206,6 +216,12 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB,
 2-way sync is currently not supported.
+
+### Receiver Configuration
+
+### Conflict Resolution In The Receiver
+
+# Error Handling and Retry Mechanism
 
 # Build and Test
 Unit ant Integration tests were only coded for the camel-openmrs Maven module.
@@ -221,9 +237,38 @@ You can also use file-based syncing in a development or test environment but we 
 
 A sender and a receiver directory are created containing the necessary routes and configurations to install and configure
 sender and receiver sync applications at a remote and central database respectively. They are both located in the
-**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for installation and configuration details.
+**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for 
+installation and configuration details.
 
 # Developer Guide
 This guide is intended for developers that wish to create custom end user applications to watch for events in an OpenMRS
 database and process them, this can be useful if you wish to integrate OpenMRS with another system based on changes 
 happening in the OpenMRS DB.
+
+### Building Your Own EIP App
+The section is intended for developers wishing create a custom integration apps built on top of the EIP's OpenMRS watcher module.
+Please refer to the [example-app](./example-app) module as a guide. You will notice it's a simple maven spring boot project 
+which includes a dependency on the openmrs-watcher module. The openmrs-watcher dependency comes with a default logback
+configuration file and writes the logs in your home directory under **openmrs-eip/logs** which is a hidden directory and
+another that can write to the console, this can be useful in a DEV environment and tests. 
+
+The `ExampleApplication` class contains the main method which bootstraps the spring application context.
+
+The project has the following xml files containing camel route definitions,
+- `init.xml`: Typically, you need to have a similar route that fires up the debezium engine to start listening for DB events,
+  you can copy this route into your project without any modification, it calls a custom camel `openmrs-watcher` component 
+  which is a thin wrapper around the debezium MySQL component, a lightweight camel route and processors written with 
+  Java DSL that receive debezium events and forward them to your registered camel endpoint(s). The message body that gets 
+  sent to your route is an [Event](openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) object that
+  encapsulates some useful information about the affected row like the DB operation, table name, primary key value, 
+  OpenMRS unique identifier usually a uuid and others, please look at the class for more details.
+- `event-listener`: Similarly, you will also need a listener route in your application that will be notified of DB events, 
+  the single listener in our example app just logs the event but in practice your will do some useful things e.g. 
+  integration with another system.
+**NOTE:** We set the errorHandlerRef of our listener route to `watcherErrorHandler`, this automatically enables the built-in
+  [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
+
+The project also contains a classic spring boot application.properties file, please don't include this file directly on 
+the classpath, instead include it in the same directory as your executable jar file. Please refer to the [Custom App](docs/custom/README.md) 
+config file for documentation of the properties.
+Note: Your routes MUST be on the classpath in a directory named camel in order for the framework to find them.
