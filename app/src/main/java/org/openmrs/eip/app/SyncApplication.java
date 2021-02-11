@@ -15,7 +15,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -150,8 +149,8 @@ public class SyncApplication {
         liquibase.setContexts(env.getActiveProfiles()[0]);
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:liquibase-master.xml");
-        liquibase.setDatabaseChangeLogTable("liquibasechangelog");
-        liquibase.setDatabaseChangeLogLockTable("liquibasechangeloglock");
+        liquibase.setDatabaseChangeLogTable("LIQUIBASECHANGELOG");
+        liquibase.setDatabaseChangeLogLockTable("LIQUIBASECHANGELOGLOCK");
         liquibase.setShouldRun(true);
 
         return liquibase;
