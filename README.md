@@ -2,34 +2,35 @@
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Project Modules And Architecture](#project-modules-and-architecture)
+3. [Architecture](#architecture)
    1. [Modules](#modules)
-   2. [Architecture](#architecture)
-   3. [Project Main Dependencies](#project-main-dependencies)
+   2. [Design Overview](#design-overview)
+   3. [Logging](#logging)
+   4. [Project Main Dependencies](#project-main-dependencies)
 4. [Distribution Overview](#distribution-overview)
     1. [Sender](#sender)
-       1. [Configuration](#sender-configuration)
     2. [Receiver](#receiver)
-        1. [Configuration](#receiver-configuration)
-        2. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
-5. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
-6. [Build and Test](#build-and-test)
+        1. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
+5. [Configuration](#configuration)
+6. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
 7. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
 8. [Developer Guide](#developer-guide)
+    1. [Build and Test](#build-and-test)
+9. [Building Custom Applications](#building-custom-applications)
 
 # Introduction
 This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and 
 [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
 Data is directly pulled from a source OpenMRS MySQL database and wired onto camel routes in an effort to integrate 
 OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end 
-user complimentary applications to sync data from one OpeMRS MySQL DB to another.
+user sister applications to sync data from one OpeMRS MySQL DB to another.
 
 # OpenMRS Data Model Compatibility
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
-# Project Modules And Architecture
+# Architecture
 
 ### Modules
 Below is the high level breakdown of what is contained in each module.
@@ -63,7 +64,7 @@ DB events emitted by a debezium engine.
 #### camel-odoo (TO BE REMOVED)
 - Integration code with an odoo system
 
-### Architecture
+### Design Overview
 The project has a classic architecture with a service layer and a DAO layer.
 Each action (to get or save entities) of the Camel endpoints comes with the name of the table upon which the action is 
 performed. A facade (`EntityServiceFacade`) is used to select the correct service to get or save entities according to 
@@ -163,6 +164,8 @@ When all synchronisation rounds have successfully completed all placeholders ent
 
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
+### Logging
+
 ### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
 * [Spring Data](https://spring.io/projects/spring-data)
@@ -200,8 +203,6 @@ configured sync destination, if you're using ActiveMQ to sync between the sender
 option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
 receiving sync application.
 
-### Sender Configuration
-
 ## Receiver
 
 ![Receiver Diagram](docs/receiver/receiver.jpg)
@@ -217,13 +218,12 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 **NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB,
 2-way sync is currently not supported.
 
-### Receiver Configuration
-
 ### Conflict Resolution In The Receiver
 
 # Error Handling and Retry Mechanism
 
-# Build and Test
+# Developer Guide
+## Build and Test
 Unit ant Integration tests were only coded for the camel-openmrs Maven module.
 Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
 
@@ -245,7 +245,7 @@ This guide is intended for developers that wish to create custom end user applic
 database and process them, this can be useful if you wish to integrate OpenMRS with another system based on changes 
 happening in the OpenMRS DB.
 
-### Building Your Own EIP App
+### Building Custom Applications
 The section is intended for developers wishing create a custom integration apps built on top of the EIP's OpenMRS watcher module.
 Please refer to the [example-app](./example-app) module as a guide. You will notice it's a simple maven spring boot project 
 which includes a dependency on the openmrs-watcher module. The openmrs-watcher dependency comes with a default logback
