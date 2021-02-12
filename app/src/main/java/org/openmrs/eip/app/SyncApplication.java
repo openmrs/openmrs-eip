@@ -1,6 +1,7 @@
 package org.openmrs.eip.app;
 
 import liquibase.integration.spring.SpringLiquibase;
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
@@ -20,8 +21,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.jms.connection.SingleConnectionFactory;
 
 import javax.annotation.PostConstruct;
+import javax.jms.ConnectionFactory;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.security.Security;
@@ -154,6 +157,15 @@ public class SyncApplication {
         liquibase.setShouldRun(true);
 
         return liquibase;
+    }
+
+    @Bean("activeMqConnFactory")
+    @Profile(SyncProfiles.RECEIVER)
+    public ConnectionFactory getConnectionFactory(Environment env) {
+        SingleConnectionFactory cf = new SingleConnectionFactory(new ActiveMQConnectionFactory());
+        cf.setClientId(env.getProperty("activemq.clientId"));
+
+        return cf;
     }
 
 }
