@@ -220,12 +220,15 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 
 ### Conflict Resolution In The Receiver
 
+# Configuration
+For configuration details of DB sync or your custom application, please refer to [Application Properties](docs/properties/README.md)
+
 # Error Handling and Retry Mechanism
 
 # Developer Guide
 ## Build and Test
 Unit ant Integration tests were only coded for the camel-openmrs Maven module.
-Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
+Integration tests are located in the [**app/src/it**](dbsync-sender-app/src/it) folder. They are run by default during the Maven test phase.
 
 # Installation Guide For DB Sync
 
