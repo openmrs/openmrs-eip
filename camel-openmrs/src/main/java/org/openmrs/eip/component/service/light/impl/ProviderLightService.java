@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.service.light.impl;
+ package org.openmrs.eip.component.service.light.impl;
 
 import org.openmrs.eip.component.entity.light.ProviderLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderLightService extends AbstractLightService<ProviderLight> {
-
+	
     public ProviderLightService(final OpenmrsRepository<ProviderLight> repository) {
         super(repository);
     }
