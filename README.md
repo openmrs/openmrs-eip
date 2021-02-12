@@ -7,11 +7,12 @@
    2. [Design Overview](#design-overview)
    3. [Logging](#logging)
    4. [Project Main Dependencies](#project-main-dependencies)
-4. [Distribution Overview](#distribution-overview)
-    1. [Sender](#sender)
-    2. [Receiver](#receiver)
+4. [Configuration](#configuration)
+5. [Distribution Overview](#distribution-overview)
+   1. [Management Database](#management-database)
+   2. [Sender](#sender)
+   3. [Receiver](#receiver)
         1. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
-5. [Configuration](#configuration)
 6. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
 7. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
 8. [Developer Guide](#developer-guide)
@@ -165,6 +166,21 @@ When all synchronisation rounds have successfully completed all placeholders ent
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
 ### Logging
+The DB sync applications are spring boot applications and custom applications are also expected to be spring boot 
+applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and 
+`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}.openmrs-eip/logs` where 
+`{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a 
+dev environment and tests.
+
+For camel-routes, you need to set the logging level using their route ids, for instance if your route id is `my-route`, 
+then you set the logging level as below,
+```
+logging.level.my-route=DEBUG
+```
+
+For built-in routes and all classes in this project, you can globally set their log level by setting the value of the 
+`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to 
+[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
 
 ### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
@@ -174,7 +190,13 @@ The application uses [Lombok](https://projectlombok.org/) to allow creating POJO
 * [Lombok](https://projectlombok.org/)
 * [Bouncy Castle](https://www.bouncycastle.org/fr/)
 
+# Configuration
+For configuration details of DB sync or your custom application, please refer to the [configuration](docs/properties/README.md) page.
+
 # Distribution Overview
+
+## Management Database
+TODO
 
 ## Sender
 
@@ -219,11 +241,31 @@ queue and calls the DB sync route which syncs the associated entity to the desti
 2-way sync is currently not supported.
 
 ### Conflict Resolution In The Receiver
-
-# Configuration
-For configuration details of DB sync or your custom application, please refer to [Application Properties](docs/properties/README.md)
+The receiver has a built-in mechanism to detect conflicts between incoming and the existing state of the entity to be
+synced i.e. if someone edits a row in the receiver and an ‘older’ sync payload reaches the receiver, this implies the
+incoming data is most likely going to overwrite a change made at the receiver. Therefore, there is logic in the receiver
+so that if a record was edited on the receiver side and either its date changed or voided/retired is after both of those
+in the incoming payload, the application won't sync the entity and it will move the message to the `receiver_conflict_queue`
+table. Currently, to resolve the conflict, the entity has to be manually updated in the receiver or sender, then as it
+may dictate adjust date changed in the sender so that it is ahead of date voided/retired of the entity in the receiver
+and then mark the row as resolved in `receiver_conflict_queue` table.
 
 # Error Handling and Retry Mechanism
+The `openmrs-watcher` module on which the DB sync sender is built has a built-in error handling and retry mechanism in 
+case something goes wrong when the sender is processing a DB event, this also applies to any custom application built on 
+top of the openmrs-watcher, the failed event gets pushed into an error queue in the [management database](#management-database) 
+that comes as an embedded H2 DB, this DB can be accessed from a browser at a port and path configured in your 
+application.properties file. The error queue is actually a table named `sender_retry_queue`. In theory this queue should
+be empty all the time, there is a retry route periodically polls the error queue and attempts to reprocess the events, if
+an failed event is finally successfully re-processed, it gets removed out of the error queue. If an enity has an event in 
+the error queue, all subsequent DB events for it are automatically pushed to the queue. It's highly recommended to 
+take a look at this queue regularly for failed events, at least once day and address the root cause for failed events so that 
+they can be re-processed. Otherwise the retry route will indefinitely attempt to reprocesss them. You can configure how often 
+the retry queue can run, please refer to the [configuration](docs/properties/README.md) page.
+
+The DB sync receiver application also ships with a similar built-in error handling and retry mechanism with a separate 
+embedded H2 [management database](#management-database), it uses a table named `receiver_retry_queue` to store failed 
+incoming DB sync messages, please refer to the [configuration](docs/properties/README.md) page.
 
 # Developer Guide
 ## Build and Test
