@@ -191,7 +191,17 @@ For built-in routes and all classes in this project, you can globally set their 
 * [Bouncy Castle](https://www.bouncycastle.org/fr/)
 
 # Configuration
-For configuration details of DB sync or your custom application, please refer to the [configuration](docs/properties/README.md) page.
+This project is built with spring boot therefore you can refer to spring boot's [application.properties](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
+file to further configure the applications and documentation details of each property.
+
+To configure the DB Sync sender app, copy this [sender properties](dbsync-sender-app/application.properties) file, drop it in the same directory 
+as the sender application's jar file.
+
+To configure the DB Sync receiver app, copy this [receiver properties](dbsync-receiver-app/application.properties) file, drop it in the same directory
+as the receiver application's jar file.
+
+Included in each of the properties files above is in-line documentation of each property, be sure to provide all property values,
+the default values should work just fine.
 
 # Distribution Overview
 
@@ -267,11 +277,11 @@ an failed event is finally successfully re-processed, it gets removed out of the
 the error queue, all subsequent DB events for it are automatically pushed to the queue. It's highly recommended to 
 take a look at this queue regularly for failed events, at least once day and address the root cause for failed events so that 
 they can be re-processed. Otherwise the retry route will indefinitely attempt to reprocesss them. You can configure how often 
-the retry queue can run, please refer to the [configuration](docs/properties/README.md) page.
+the retry queue can run, please refer to the [configuration](#configuration) section.
 
 The DB sync receiver application also ships with a similar built-in error handling and retry mechanism with a separate 
 embedded H2 [management database](#management-database), it uses a table named `receiver_retry_queue` to store failed 
-incoming DB sync messages, please refer to the [configuration](docs/properties/README.md) page.
+incoming DB sync messages, please refer to the [configuration](#configuration) section.
 
 # Developer Guide
 ## Build and Test
