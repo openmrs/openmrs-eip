@@ -196,7 +196,13 @@ For configuration details of DB sync or your custom application, please refer to
 # Distribution Overview
 
 ## Management Database
-TODO
+The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing. 
+outbound DB events. Because the DB sync sender application is built on top of it, it also comes it. The DB sync receiver 
+application too comes with a management DB to store failed inbound messages for re-processing.
+
+The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend 
+those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same 
+physical machine as the application to eliminate any possibility of being unreachable.
 
 ## Sender
 
