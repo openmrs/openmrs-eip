@@ -2,19 +2,19 @@
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Architecture](#architecture)
+3. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
+4. [Architecture](#architecture)
    1. [Modules](#modules)
    2. [Design Overview](#design-overview)
    3. [Logging](#logging)
    4. [Project Main Dependencies](#project-main-dependencies)
-4. [Configuration](#configuration)
-5. [Distribution Overview](#distribution-overview)
+5. [Configuration](#configuration)
+6. [Distributions Overview](#distributions-overview)
    1. [Management Database](#management-database)
    2. [Sender](#sender)
    3. [Receiver](#receiver)
         1. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
-6. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
-7. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
+7. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
 8. [Developer Guide](#developer-guide)
     1. [Build and Test](#build-and-test)
 9. [Building Custom Applications](#building-custom-applications)
@@ -30,6 +30,19 @@ user sister applications to sync data from one OpeMRS MySQL DB to another.
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
+
+# Installation Guide For DB Sync
+
+The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM
+property **spring.profiles.active** with the value set to sender or receiver.
+
+The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ.
+You can also use file-based syncing in a development or test environment but we highly discourage it in production.
+
+A sender and a receiver directory are created containing the necessary routes and configurations to install and configure
+sender and receiver sync applications at a remote and central database respectively. They are both located in the
+**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for
+installation and configuration details.
 
 # Architecture
 
@@ -168,7 +181,7 @@ The application uses [Lombok](https://projectlombok.org/) to allow creating POJO
 ### Logging
 The DB sync applications are spring boot applications and custom applications are also expected to be spring boot 
 applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and 
-`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}.openmrs-eip/logs` where 
+`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}/.openmrs-eip/logs` where 
 `{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a 
 dev environment and tests.
 
@@ -180,7 +193,7 @@ logging.level.my-route=DEBUG
 
 For built-in routes and all classes in this project, you can globally set their log level by setting the value of the 
 `openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to 
-[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
+[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
 
 ### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
@@ -203,7 +216,11 @@ as the receiver application's jar file.
 Included in each of the properties files above is in-line documentation of each property, be sure to provide all property values,
 the default values should work just fine.
 
-# Distribution Overview
+# Distributions Overview
+Currently, the end user applications that we distribute are the DB sync sender and receiver applications. In the near 
+future we intend to create more like an all-in-one distribution of DB sync that comes with its own embedded artemis MQ 
+which can be easily fired up on a single machine with all the components pre-configured, this will handy if one wishes to
+quickly set up something usable in a dev or test environment.
 
 ## Management Database
 The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing. 
@@ -288,19 +305,6 @@ incoming DB sync messages, please refer to the [configuration](#configuration) s
 Unit ant Integration tests were only coded for the camel-openmrs Maven module.
 Integration tests are located in the [**app/src/it**](dbsync-sender-app/src/it) folder. They are run by default during the Maven test phase.
 
-# Installation Guide For DB Sync
-
-The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM
-property **spring.profiles.active** with the value set to sender or receiver.
-
-The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ.
-You can also use file-based syncing in a development or test environment but we highly discourage it in production.
-
-A sender and a receiver directory are created containing the necessary routes and configurations to install and configure
-sender and receiver sync applications at a remote and central database respectively. They are both located in the
-**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for 
-installation and configuration details.
-
 # Developer Guide
 This guide is intended for developers that wish to create custom end user applications to watch for events in an OpenMRS
 database and process them, this can be useful if you wish to integrate OpenMRS with another system based on changes 
@@ -326,8 +330,9 @@ The project has the following xml files containing camel route definitions,
 - `event-listener`: Similarly, you will also need a listener route in your application that will be notified of DB events, 
   the single listener in our example app just logs the event but in practice your will do some useful things e.g. 
   integration with another system.
-**NOTE:** We set the errorHandlerRef of our listener route to `watcherErrorHandler`, this automatically enables the built-in
-  [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
+
+**NOTE:** We set the errorHandlerRef in the example listener route to `watcherErrorHandler`, this automatically enables 
+the built-in [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
 
 The project also contains a classic spring boot application.properties file, please don't include this file directly on 
 the classpath, instead include it in the same directory as your executable jar file. Please refer to the [Custom App](docs/custom/README.md) 
