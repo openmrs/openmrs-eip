@@ -32,7 +32,7 @@ The project has the following xml files containing camel route definitions,
 application.properties file inside any of your jars, instead include it in the same directory as your executable jar 
 file at deployment time. 
 
-### Project setup
+### Project Setup
 With the example-app we just went over above in mind, below are the steps to create your own custom app to be notified 
 of DB events and do something useful.
 

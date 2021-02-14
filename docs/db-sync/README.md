@@ -117,8 +117,12 @@ properties that take directory paths as values e.g. log file, complex obs data d
    EIP above, this file should be located in the `dbsync-receiver-app/target` folder.
 3. There is an application.properties file in the `dbsync-receiver-app` directory found at the root of the OpenMR EIP 
    project, copy it to your installation directory.   
-4. Open the `application.properties` you just copied above to the installation directory and set the property values 
+4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values 
    accordingly, carefully read the in-inline documentation as you set each property value.
+   **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
+   an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create 
+   a specific user account for this application and use its username and password as values for the `openmrs.username` 
+   and `openmrs.password` properties respectively in the `application.properties` file in step 2.
 5. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
 ```shell
 java -jar dbsync-receiver-app-{VERSION}.jar
