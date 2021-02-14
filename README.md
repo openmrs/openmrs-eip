@@ -2,7 +2,7 @@
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Installation Guide For DB Sync](#installation-guide-for-db-sync)
+3. [Installation Guide For DB Sync](distribution/README.md)
 4. [Architecture](#architecture)
    1. [Modules](#modules)
    2. [Design Overview](#design-overview)
@@ -35,19 +35,6 @@ available metadata sharing tools. In future releases we want to make the list of
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
-
-# Installation Guide For DB Sync
-
-The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM
-property **spring.profiles.active** with the value set to sender or receiver.
-
-The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ.
-You can also use file-based syncing in a development or test environment but we highly discourage it in production.
-
-A sender and a receiver directory are created containing the necessary routes and configurations to install and configure
-sender and receiver sync applications at a remote and central database respectively. They are both located in the
-**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for
-installation and configuration details.
 
 # Architecture
 
