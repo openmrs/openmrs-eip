@@ -24,9 +24,9 @@ JMS Server, receiver and then sender(s).
 
 ## Requirements
 - A unix operating system (Never been tested on windows)
-- [Apache Maven](#http://maven.apache.org/install.html)
-- [OpenJDK 8](#https://openjdk.java.net/install/)
-- [Git](#https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Apache Maven](http://maven.apache.org/install.html)
+- [OpenJDK 8](https://openjdk.java.net/install/)
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ## Assumptions
 
@@ -36,7 +36,7 @@ will be supported.
 
 #### OpenMRS Instances are already installed
 This guide doesn't cover installation of the sender and receiver OpenMRS instances and databases, if not, please refer 
-to the [OpenMRS](#https://openmrs.org) documentation.
+to the [OpenMRS](https://openmrs.org) documentation.
 
 #### Shared JMS server
 Both the sender and receiver sync applications have access to a single JSM instance in order for them to be able to 
@@ -71,10 +71,10 @@ is kept as a read-only instance.
 ### JMS Server
 In this guide we recommend [ArtemisMQ](https://activemq.apache.org/components/artemis/documentation/) as the preferred
 JMS server and all our documentation and properties file templates assume ArtemisMQ however, you should be able to use
-any of your choice as long as it is supported by spring boot and apache camel's [jms](#https://camel.apache.org/components/latest/jms-component.html)
-or [activemq](#https://camel.apache.org/components/latest/activemq-component.html) components but you would have to make
+any of your choice as long as it is supported by spring boot and apache camel's [jms](https://camel.apache.org/components/latest/jms-component.html)
+or [activemq](https://camel.apache.org/components/latest/activemq-component.html) components but you would have to make
 more changes to the sender and receiver application properties jms settings, please see
-[How to install ArtemisMQ](#https://activemq.apache.org/components/artemis/documentation/latest/using-server.html)
+[How to install ArtemisMQ](https://activemq.apache.org/components/artemis/documentation/latest/using-server.html)
 
 Remember to keep note of the ArtemisMQ broker port and URL to the console application, you can peek at what's going on
 inside your JMS server using the console application.
