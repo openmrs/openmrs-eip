@@ -26,6 +26,11 @@ Data is directly pulled from a source OpenMRS MySQL database and wired onto came
 OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end 
 user sister applications to sync data from one OpeMRS MySQL DB to another.
 
+**Note:** Only specific database tables are watched i.e. only this set of tables get synced in case of DB sync. The list 
+of these tables is defined by this [TableToSyncEnum](camel-openmrs/src/main/java/org/openmrs/eip/component/service/TableToSyncEnum.java)
+with the exception of the metadata tables with the assumption that metadata is already centrally managed using the 
+available metadata sharing tools. In future releases we want to make the list of tables to watch or sync configurable.
+
 # OpenMRS Data Model Compatibility
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
 2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
