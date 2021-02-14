@@ -127,17 +127,36 @@ Make sure no errors are reported when the application starts, you can find the l
 defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
 
 ### Sender
-1. Create an installation directory for your sender app.
-2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-   EIP above, this file should be located in the `dbsync-sender-app/target` folder.
-3. There is an application.properties file in the`dbsync-sender-app` directory found at the root of the OpenMR EIP 
-   project, copy it to your installation directory.
-4. Open the `application.properties` you just copied above to the installation directory and set the properties values
-   accordingly, carefully read the in-inline documentation as you set each property value.
-5. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
-```shell
-java -jar dbsync-sender-app-{VERSION}.jar
-```
+
+1. #### Setup MySQL binlog
+Because the sending application relies on the embedded debezium engine, we need to first setup MySQL binary logging in 
+the sender site's OpenMRS database, please refer to this [enabling the binlog](https://debezium.io/documentation/reference/connectors/mysql.html#enable-mysql-binlog)
+section from the debezium docs, you will need some of the values you set when configuring the sender application, 
+the server-id needs to match the value of `debezium.db.serverId` property in the sender `application.properties` file.
+
+**DO NOT** set the `expire_logs_days` because you never want your logs to expire just in case the sync application is 
+run for a while due to unforeseen circumstances
+
+2. #### Debezium user account
+
+First we need to create a user account the debezium MySQL connector will use to read the sender site's Openmrs MySQl DB.
+This is just a standard practice so that the account is assigned just the privileges it needs to read the MySQL bin-log 
+files without access to the actual OpenMRS DB data, please refer to this [creating a user](https://debezium.io/documentation/reference/connectors/mysql.html#mysql-creating-user) 
+section from the debezium docs, you will need the created user account details when configuring the sender application.
+i.e. `debezium.db.user` and `debezium.db.password` properties in the sender `application.properties` file.
+
+3. #### Installing the Sender Application
+    1. Create an installation directory for your sender app.
+    2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+       EIP above, this file should be located in the `dbsync-sender-app/target` folder.
+    3. There is an application.properties file in the`dbsync-sender-app` directory found at the root of the OpenMR EIP 
+       project, copy it to your installation directory.
+    4. Open the `application.properties` you just copied above to the installation directory and set the properties values 
+       accordingly, carefully read the in-inline documentation as you set each property value.
+    5. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
+    ```shell
+    java -jar dbsync-sender-app-{VERSION}.jar
+    ```
 Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
 defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
 
