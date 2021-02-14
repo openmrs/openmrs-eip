@@ -10,7 +10,7 @@
 5. [Configuration](#configuration)
 6. [Logging](#logging)
 7. [Management Database](#management-database)
-8. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
+8. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
 9. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
@@ -214,7 +214,7 @@ The Management DB by default is an H2 database, it should be possible to use ano
 those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same 
 physical machine as the application to eliminate any possibility of being unreachable.
 
-# Error Handling and Retry Mechanism
+# Error Handling And Retry Mechanism
 The `openmrs-watcher` module on which the DB sync sender is built has a built-in error handling and retry mechanism in 
 case something goes wrong when the sender is processing a DB event, this also applies to any custom application built on 
 top of the openmrs-watcher, the failed event gets pushed into an error queue in the [management database](#management-database) 
