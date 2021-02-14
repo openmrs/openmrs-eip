@@ -2,22 +2,18 @@
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Installation Guide For DB Sync](distribution/README.md)
+3. [Installation Guide For DB Sync](docs/db-sync/README.md)
 4. [Architecture](#architecture)
    1. [Modules](#modules)
    2. [Design Overview](#design-overview)
-   3. [Logging](#logging)
-   4. [Project Main Dependencies](#project-main-dependencies)
+   3. [Project Main Dependencies](#project-main-dependencies)
 5. [Configuration](#configuration)
-6. [Distributions Overview](#distributions-overview)
-   1. [Management Database](#management-database)
-   2. [Sender](#sender)
-   3. [Receiver](#receiver)
-        1. [Conflict Resolution In The Receiver](#conflict-resolution-in-the-receiver)
-7. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
-8. [Developer Guide](#developer-guide)
+6. [Logging](#logging)
+7. [Management Database](#management-database)
+8. [Error Handling and Retry Mechanism](#error-handling-and-retry-mechanism)
+9. [Developer Guide](#developer-guide)
     1. [Build and Test](#build-and-test)
-9. [Building Custom Applications](#building-custom-applications)
+10. [Building Custom Applications](#building-custom-applications)
 
 # Introduction
 This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and 
@@ -170,23 +166,6 @@ When all synchronisation rounds have successfully completed all placeholders ent
 
 The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
 
-### Logging
-The DB sync applications are spring boot applications and custom applications are also expected to be spring boot 
-applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and 
-`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}/.openmrs-eip/logs` where 
-`{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a 
-dev environment and tests.
-
-For camel-routes, you need to set the logging level using their route ids, for instance if your route id is `my-route`, 
-then you set the logging level as below,
-```
-logging.level.my-route=DEBUG
-```
-
-For built-in routes and all classes in this project, you can globally set their log level by setting the value of the 
-`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to 
-[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
-
 ### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
 * [Spring Data](https://spring.io/projects/spring-data)
@@ -199,22 +178,33 @@ For built-in routes and all classes in this project, you can globally set their 
 This project is built with spring boot therefore you can refer to spring boot's [application.properties](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
 file to further configure the applications and documentation details of each property.
 
-To configure the DB Sync sender app, copy this [sender properties](dbsync-sender-app/application.properties) file, drop it in the same directory 
-as the sender application's jar file.
+To configure the DB Sync sender app, copy this [sender properties](dbsync-sender-app/application.properties) file, drop 
+it in the same directory as the sender application's jar file.
 
-To configure the DB Sync receiver app, copy this [receiver properties](dbsync-receiver-app/application.properties) file, drop it in the same directory
-as the receiver application's jar file.
+To configure the DB Sync receiver app, copy this [receiver properties](dbsync-receiver-app/application.properties) file, 
+drop it in the same directory as the receiver application's jar file.
 
-Included in each of the properties files above is in-line documentation of each property, be sure to provide all property values,
-the default values should work just fine.
+Included in each of the properties files above is in-line documentation of each property, be sure to provide all property 
+values, the default values should work just fine.
 
-# Distributions Overview
-Currently, the end user applications that we distribute are the DB sync sender and receiver applications. In the near 
-future we intend to create more like an all-in-one distribution of DB sync that comes with its own embedded artemis MQ 
-which can be easily fired up on a single machine with all the components pre-configured, this will handy if one wishes to
-quickly set up something usable in a dev or test environment.
+# Logging
+The DB sync applications are spring boot applications and custom applications are also expected to be spring boot
+applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and
+`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}/.openmrs-eip/logs` where
+`{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a
+dev environment and tests.
 
-## Management Database
+For camel-routes, you need to set the logging level using their route ids, for instance if your route id is `my-route`,
+then you set the logging level as below.
+```
+logging.level.my-route=DEBUG
+```
+
+For built-in routes and all classes in this project, you can globally set their log level by setting the value of the
+`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to
+[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
+
+# Management Database
 The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing. 
 outbound DB events. Because the DB sync sender application is built on top of it, it also comes it. The DB sync receiver 
 application too comes with a management DB to store failed inbound messages for re-processing.
@@ -222,58 +212,6 @@ application too comes with a management DB to store failed inbound messages for 
 The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend 
 those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same 
 physical machine as the application to eliminate any possibility of being unreachable.
-
-## Sender
-
-![Sender Diagram](docs/sender/sender.jpg)
-
-As seen from the diagram above, the sender is really a spring boot application at the core running with the active
-profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB
-changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row,
-please refer to the inline documentation of the various configuration properties in the sender's application.properties
-in the distribution/sender folder.
-
-Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
-MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
-
-When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
-fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
-operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
-sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
-to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as
-the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a
-named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent.
-There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each
-message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a
-configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended
-option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
-receiving sync application.
-
-## Receiver
-
-![Receiver Diagram](docs/receiver/receiver.jpg)
-
-As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead
-running at another physical location with an OpenMRS installation with the active profile set to receiver.
-
-Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of
-the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is
-where the receiver starts, its receiver route connects to this external message broker, consumes messages out of sync
-queue and calls the DB sync route which syncs the associated entity to the destination OpenMRS instance's MySQL DB.
-
-**NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB,
-2-way sync is currently not supported.
-
-### Conflict Resolution In The Receiver
-The receiver has a built-in mechanism to detect conflicts between incoming and the existing state of the entity to be
-synced i.e. if someone edits a row in the receiver and an ‘older’ sync payload reaches the receiver, this implies the
-incoming data is most likely going to overwrite a change made at the receiver. Therefore, there is logic in the receiver
-so that if a record was edited on the receiver side and either its date changed or voided/retired is after both of those
-in the incoming payload, the application won't sync the entity and it will move the message to the `receiver_conflict_queue`
-table. Currently, to resolve the conflict, the entity has to be manually updated in the receiver or sender, then as it
-may dictate adjust date changed in the sender so that it is ahead of date voided/retired of the entity in the receiver
-and then mark the row as resolved in `receiver_conflict_queue` table.
 
 # Error Handling and Retry Mechanism
 The `openmrs-watcher` module on which the DB sync sender is built has a built-in error handling and retry mechanism in 
@@ -306,8 +244,8 @@ happening in the OpenMRS DB.
 The section is intended for developers wishing create a custom integration apps built on top of the EIP's OpenMRS watcher module.
 Please refer to the [example-app](./example-app) module as a guide. You will notice it's a simple maven spring boot project 
 which includes a dependency on the openmrs-watcher module. The openmrs-watcher dependency comes with a default logback
-configuration file and writes the logs in your home directory under **openmrs-eip/logs** which is a hidden directory and
-another that can write to the console, this can be useful in a DEV environment and tests. 
+configuration file and writes the logs at `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log` where `{USER.HOME}` is the path 
+to your user home directory, another that can write to the console, this can be useful in a DEV environment and tests. 
 
 The `ExampleApplication` class contains the main method which bootstraps the spring application context.
 
