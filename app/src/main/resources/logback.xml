@@ -6,7 +6,6 @@
             <pattern>%-5level %date [%thread] %logger{8}:%line %msg%n</pattern>
         </encoder>
     </appender>
-    -->
 
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_FILE}</file>
