@@ -21,7 +21,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.jms.connection.SingleConnectionFactory;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
@@ -162,7 +162,7 @@ public class SyncApplication {
     @Bean("activeMqConnFactory")
     @Profile(SyncProfiles.RECEIVER)
     public ConnectionFactory getConnectionFactory(Environment env) {
-        SingleConnectionFactory cf = new SingleConnectionFactory(new ActiveMQConnectionFactory());
+        CachingConnectionFactory cf = new CachingConnectionFactory(new ActiveMQConnectionFactory());
         cf.setClientId(env.getProperty("activemq.clientId"));
 
         return cf;
