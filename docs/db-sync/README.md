@@ -198,20 +198,11 @@ The receiver needs to hold it's private key and all the public keys of the sende
 # DB Sync Technical Overview
 
 ## Sender Overview
+The sender is really a spring boot application with custom camel routes, it depends on the `openmrs-watcher` module to 
+track DB changes in the configured sending OpenMRS database.
 
-![Sender Diagram](sender.jpg)
-
-As seen from the diagram above, the sender is really a spring boot application at the core running with the active
-profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB
-changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row,
-please refer to the inline documentation of the various configuration properties in the sender's
-[application.properties](../../dbsync-sender-app/application.properties)
-
-Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
-MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
-
-When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](../../openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
+When the application is fired up in sender mode, the built-in debezium route starts the debezium component which will 
+periodically read entries in the MySQL binlog, it constructs an [Event](../../openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
@@ -225,11 +216,8 @@ option, it means the message would be pushed to a sync queue in an external mess
 receiving sync application.
 
 ## Receiver Overview
-
-![Receiver Diagram](receiver.jpg)
-
-As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead
-running at another physical location with an OpenMRS installation with the active profile set to receiver.
+The receiver is also a spring boot application with its own set of camel routes but instead running at another physical 
+location with an OpenMRS installation.
 
 Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of
 the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is
