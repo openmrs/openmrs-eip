@@ -1,41 +1,77 @@
-### Table of Contents
+# Table of Contents
 
 1. [Introduction](#introduction)
 2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Project Submodules](#project-submodules)
-3. [Architecture](#architecture)
-4. [Project Main Dependencies](#project-main-dependencies)
-4. [Distribution Overview](#distribution-overview)
-    1. [Sender](#sender)
-    2. [Receiver](#receiver)
-5. [Build and Test](#build-and-test)
-6. [Installation Guide for DB sync](#installation-guide-for-db-sync)
+3. [Installation Guide For DB Sync](distribution/docs/README.md)
+4. [Architecture](#architecture)
+    1. [Modules](#modules)
+    2. [Design Overview](#design-overview)
+    3. [Project Main Dependencies](#project-main-dependencies)
+5. [Configuration](#configuration)
+6. [Logging](#logging)
+7. [Management Database](#management-database)
+8. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
+9. [Developer Guide](#developer-guide)
+    1. [Build](#build)
+    2. [Tests](#tests)
 
 # Introduction
-This project aims at providing a low-level OpenMRS synchronization module based on [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
-Data is directly pulled from a source OpenMRS MySQL database and pushed to a target OpenMRS MySQL database without any use of the OpenMRS Java API or data model.
+This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and
+[Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
+Data is directly pulled from a source OpenMRS MySQL database and wired onto camel routes in an effort to integrate
+OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end
+user sister applications to sync data from one OpeMRS MySQL DB to another.
 
-The project is composed of two modules:
-- The Camel component module. The component knows two verbs: _extract_ and _load_. _Extract_ is used to retrieve data from the database and send it into Camel routes. _Load_ is used to receive the data from Camel routes to store it in the database.
-- The app module, which is a Spring Boot application having either the role of the sender, the receiver or both that will launch the Camel routes.
+**Note:** Only specific database tables are watched i.e. only this set of tables get synced in case of DB sync. The list
+of these tables is defined by this [TableToSyncEnum](camel-openmrs/src/main/java/org/openmrs/eip/component/service/TableToSyncEnum.java)
+with the exception of the metadata tables with the assumption that metadata is already centrally managed using the
+available metadata sharing tools. In future releases we want to make the list of tables to watch or sync configurable.
 
-The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
-
-# OpenMRS Data Model compatibility
-The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core 
-2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes 
+# OpenMRS Data Model Compatibility
+The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
+2.3.0, in theory this implies there needs to a maintenance branch for every OpenMRS minor release that has any DB changes
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
-# Project Submodules
-**camel-openmrs**
-**distribution**
-**camel-utils (TO BE REMOVED)**
-camel-utils(TO BE REMOVE)
-
 # Architecture
-The project has a classic architecture with a service layer and a DAO layer.
-Each action (to get or save entities) of the Camel endpoints comes with the name of the table upon which the action is performed.
-A facade (`EntityServiceFacade`) is used to select the correct service to get or save entities according to the table name passed as a parameter.
+
+### Modules
+Below is the high level breakdown of what is contained in each module.
+#### camel-openmrs
+- JPA annotated OpenMRS data model classes and repositories.
+- Services for loading and saving entities from and to the OpenMRS databases.
+- Model classes used for serialization and deserialization purposes by DB sync sender and receiver.
+- The OpenMRS DB datasource configuration.
+- Utility custom camel components used to load and save entities to and from the target databases.
+- Spring configurations and other utility classes
+
+#### app
+- End user application for sending and receiving DB sync data between 2 OpenMRS databases, the application can be run in 
+  2 modes i.e. sender and receiver by activating different spring profiles.
+- The built-in error handling and retry mechanism in case something goes wrong while processing an event.
+- The liquibase changelog files used to create the management database tables.
+- Management datasource configuration.
+- Common spring configurations for end user apps.
+- Base classes used for mapping to the management DB tables.
+
+#### distribution
+
+##### Sender
+- All the camel routes used when the application in run in sender mode
+
+##### Receiver
+- All the camel routes used when the application in run in receiver mode
+
+#### camel-odoo (TO BE REMOVED)
+- Integration code with an odoo system
+
+### Design Overview
+The project has a classic architecture with a service layer and a DAO layer. Each action (to get or save entities) of the
+Camel endpoints comes with the name of the table upon which the action is performed. A facade (`EntityServiceFacade`) is
+used to select the correct service to get or save entities according to the table name passed as a parameter.
+
+The project uses an embedded [debezium](https://debezium.io) engine to track insert, update and delete operations of
+rows in monitored OpenMRS tables, out of the box the only monitored tables are those containing patient demographic and
+clinical data, this implies that you need to configure MySQL binary logging in the source (sender) OpenMRS DB.
 
 It's very important to note that technically when using this application for DB sync, this is DB to DB sync happening
 outside of the OpenMRS application, this has implications e.g if you sync something like person name, the search index
@@ -43,7 +79,9 @@ needs to be triggered for a rebuild, the current receiver DB sync route internal
 indexed entities from OpenMRS core, however it might not be up to date with later OpenMRS versions in case more indexed
 entities were added and of course module tables.
 
-Once entities are retrieved from the database they are mapped to a model object. The model contains all non-structured fields of the OpenMRS object and follows a systematic rule for linked structured field: it only stores the _UUID_ of the linked entities.
+Once entities are retrieved from the database they are mapped to a model object. The model contains all non-structured
+fields of the OpenMRS object and follows a systematic rule for linked structured field: it only stores the _UUID_ of the
+linked entities.
 
 For example let us consider the OpenMRS Camel entities `Observation`, `Encounter` and `Visit`.
 The model corresponding to `Visit` is named `VisitModel` and will look like:
@@ -123,69 +161,75 @@ When the linked `Encounter` is eventually unmarshalled on the target side throug
 
 When all synchronisation rounds have successfully completed all placeholders entities should be "detached", meaning that no other entities should be linked to them anymore.
 
-# Project Main Dependencies
+The application uses [Lombok](https://projectlombok.org/) to allow creating POJOs without coding their getters and setters. A plugin needs to be installed to the IDE to add setters and getters at compile time.
+
+### Project Main Dependencies
 * [Spring Boot](https://spring.io/projects/spring-boot)
 * [Spring Data](https://spring.io/projects/spring-data)
 * [Apache Camel](https://camel.apache.org/)
+* [Debezium](https://debezium.io)
 * [Lombok](https://projectlombok.org/)
 * [Bouncy Castle](https://www.bouncycastle.org/fr/)
 
-# Distribution Overview
+# Configuration
+This project is built with spring boot therefore you can refer to spring boot's [application.properties](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
+file to further configure the applications and documentation details of each property.
 
-### Sender
+For the DB sync sender and receiver configuration, please refer to the [DB sync installation](distribution/docs/README.md) guide.
 
-  ![Sender Diagram](distribution/resources/sender.jpg)
+# Logging
+The DB sync applications are spring boot applications and custom applications are also expected to be spring boot
+applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and
+`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}/.openmrs-eip/logs` where
+`{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a
+dev environment and tests.
 
-As seen from the diagram above, the sender is really a spring boot application at the core running with the active 
-profile set to sender, it uses Apache camel to route messages and uses [debezium](https://debezium.io) to track DB 
-changes in source OpenMRS database by reading the MySQL binary log which MUST be enabled with the format set to row, 
-please refer to the inline documentation of the various configuration properties in the sender's application.properties 
-in the distribution/sender folder.
+For camel-routes, you need to set the logging level using their route ids, for instance if a route id is `my-route`,
+then you set the logging level as below.
+```
+logging.level.my-route=DEBUG
+```
 
-Note that the default application that is bundled with the project comes with dockerized MySQL databases where the
-MySQL binary log is ONLY preconfigured for the remote instance because it assumes a one-way sync from remote to central.
+For built-in routes and all classes in this project, you can globally set their log level by setting the value of the
+`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to
+[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
 
-When the application is fired up in sender mode, the debezium route starts the debezium component which will periodically 
-read entries in the MySQL binary log of the remote OpenMRS instance, it constructs an [Event](./camel-openmrs/src/main/java/org/openmrs/eip/component/entity/Event.java) instance which has several 
-fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the 
-operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route 
-sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event 
-to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as 
-the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a 
-named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent. 
-There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each 
-message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a 
-configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended 
-option, it means the message would be pushed to a sync queue in an external message broker that is shared with the 
-receiving sync application.
-    
-### Receiver
+# Management Database
+Both DB sync applications (sender and receiver) come with an embedded management DB each where they store failed DB 
+entity events for purposes of re-processing, the receiver app also stores the entities with conflicts in a table in this 
+database
 
-  ![Receiver Diagram](distribution/resources/receiver.jpg) 
+The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend
+those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same
+physical machine as the application to eliminate any possibility of being unreachable.
 
-As seen from the diagram above, the receiver is exactly the same spring boot application with Apache camel but instead 
-running at another physical location with an OpenMRS installation with the active profile set to receiver.
+# Error Handling And Retry Mechanism
+Both DB sync applications (sender and receiver) have a built-in error handling and retry mechanism in
+case something goes wrong during execution, the failed event gets pushed into respective error queues in the [management database](#management-database)
+that comes as an embedded H2 database which can be accessed from a browser at a port and path configured in your
+application.properties file. The sender error queue is actually a table named `sender_retry_queue`. In theory this queue should
+be empty all the time, there is a retry route which periodically polls the error queue and attempts to reprocess the events. When
+a failed event is finally successfully re-processed, it gets removed out of the error queue. If an entity has an event in
+the error queue, all subsequent DB events for it are automatically pushed to the queue. It's highly recommended to
+take a look at this queue regularly for failed events, at least once day and address the root cause for failed events so that
+they can be re-processed. Otherwise, the retry route will indefinitely attempt to re-processs them. You can configure how often
+the retry queue should run, please refer to the [configuration](#configuration) section.
 
-Recall from the sender documentation above, that the out-bound DB sync listener route ends by publishing the payload of 
-the entity to be synced to a destination shared with the receiving sync application usually a message broker, this is 
-where the receiver starts, its receiver route connects to this external message broker, consumes messages out of sync 
-queue and calls the DB sync route which syncs the associated entity to the destination OpenMRS instance's MySQL DB.
+The DB sync receiver application uses a table named `receiver_retry_queue` to store failed incoming DB sync messages, 
+please refer to the [configuration](#configuration) section.
 
-**NOTE:** In this default setup since it's a one-way sync, MySQL bin-log isn't turned on for the destination MySQL DB, 
-2-way sync is currently not supported.
+# Developer Guide
+## Build
+From the terminal, navigate to your working directory, clone and build the project to generate the executable artifacts
+by running the commands below.
+```shell
+git clone https://github.com/openmrs/openmrs-eip.git
+cd openmrs-eip
+git checkout 1.x
+mvn clean install
+```
+Make sure the build completed successfully.
 
-# Build and Test
-Unit ant Integration tests were only coded for the camel-openmrs Maven module.
-Integration tests are located in the [**app/src/it**](./app/src/it) folder. They are run by default during the Maven test phase.
-
-# Installation Guide for DB sync
-
-The application is designed to run in one of 2 modes i.e. sender or receiver, you decide one of these via spring's JVM
-property **spring.profiles.active** with the value set to sender or receiver.
-
-The OpenMRS dbSync can be used with a endpoint between the sender and the receiver exchanging sync data via ActiveMQ.
-You can also use file-based syncing in a development or test environment but we highly discourage it in production.
-
-A sender and a receiver directory are created containing the necessary routes and configurations to install and configure 
-sender and receiver sync applications at a remote and central database respectively. They are both located in the 
-**distribution** directory. Please refer to the [Distribution configuration README.md](./distribution/README.md) for installation and configuration details.
+## Tests
+Unit ant Integration tests were only coded for the camel-openmrs Maven module. Integration tests are located in the
+[**app/src/it**](app/src/it) folder. They are run by default during the Maven test phase
