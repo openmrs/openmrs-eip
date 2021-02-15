@@ -38,8 +38,8 @@ between it and it's ancestor, master should be compatible with the latest releas
 ### Modules
 Below is the high level breakdown of what is contained in each module.
 #### camel-openmrs
-- JPA annotated OpenMRS datamodel classes and repositories
-- Services for loading and saving entities from and to the OpenMRS databases  
+- JPA annotated OpenMRS data model classes and repositories.
+- Services for loading and saving entities from and to the OpenMRS databases.  
 - Model classes used for serialization and deserialization purposes by DB sync sender and receiver. 
 - The OpenMRS DB datasource configuration. 
 - Utility custom camel components used to load and save entities to and from the target databases.
@@ -68,10 +68,9 @@ DB events emitted by a debezium engine.
 - Integration code with an odoo system
 
 ### Design Overview
-The project has a classic architecture with a service layer and a DAO layer.
-Each action (to get or save entities) of the Camel endpoints comes with the name of the table upon which the action is 
-performed. A facade (`EntityServiceFacade`) is used to select the correct service to get or save entities according to 
-the table name passed as a parameter.
+The project has a classic architecture with a service layer and a DAO layer. Each action (to get or save entities) of the 
+Camel endpoints comes with the name of the table upon which the action is performed. A facade (`EntityServiceFacade`) is 
+used to select the correct service to get or save entities according to the table name passed as a parameter.
 
 The project uses an embedded [debezium](https://debezium.io) engine to track insert, update and delete operations of 
 rows in monitored OpenMRS tables, out of the box the only monitored tables are those containing patient demographic and 
@@ -179,14 +178,9 @@ The application uses [Lombok](https://projectlombok.org/) to allow creating POJO
 This project is built with spring boot therefore you can refer to spring boot's [application.properties](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html)
 file to further configure the applications and documentation details of each property.
 
-To configure the DB Sync sender app, copy this [sender properties](dbsync-sender-app/application.properties) file, drop 
-it in the same directory as the sender application's jar file.
+For DB sync configuration, please refer to the [DB sync installation](docs/db-sync/README.md) guide.
 
-To configure the DB Sync receiver app, copy this [receiver properties](dbsync-receiver-app/application.properties) file, 
-drop it in the same directory as the receiver application's jar file.
-
-Included in each of the properties files above is in-line documentation of each property, be sure to provide all property 
-values, the default values should work just fine.
+For custom application configuration, please refer to the [custom application set up](docs/custom/README.md) documentation.
 
 # Logging
 The DB sync applications are spring boot applications and custom applications are also expected to be spring boot
@@ -206,9 +200,7 @@ For built-in routes and all classes in this project, you can globally set their 
 [spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
 
 # Management Database
-The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing. 
-outbound DB events. Because the DB sync sender application is built on top of it, it also comes it. The DB sync receiver 
-application too comes with a management DB to store failed inbound messages for re-processing.
+The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing.
 
 The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend 
 those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same 
@@ -220,16 +212,17 @@ case something goes wrong when the sender is processing a DB event, this also ap
 top of the openmrs-watcher, the failed event gets pushed into an error queue in the [management database](#management-database) 
 that comes as an embedded H2 DB, this DB can be accessed from a browser at a port and path configured in your 
 application.properties file. The error queue is actually a table named `sender_retry_queue`. In theory this queue should
-be empty all the time, there is a retry route periodically polls the error queue and attempts to reprocess the events, if
-an failed event is finally successfully re-processed, it gets removed out of the error queue. If an enity has an event in 
+be empty all the time, there is a retry route which periodically polls the error queue and attempts to reprocess the events. When
+a failed event is finally successfully re-processed, it gets removed out of the error queue. If an entity has an event in 
 the error queue, all subsequent DB events for it are automatically pushed to the queue. It's highly recommended to 
 take a look at this queue regularly for failed events, at least once day and address the root cause for failed events so that 
-they can be re-processed. Otherwise the retry route will indefinitely attempt to reprocesss them. You can configure how often 
+they can be re-processed. Otherwise, the retry route will indefinitely attempt to re-processs them. You can configure how often 
 the retry queue can run, please refer to the [configuration](#configuration) section.
 
 The DB sync receiver application also ships with a similar built-in error handling and retry mechanism with a separate 
 embedded H2 [management database](#management-database), it uses a table named `receiver_retry_queue` to store failed 
-incoming DB sync messages, please refer to the [configuration](#configuration) section.
+incoming DB sync messages. You can configure how often the retry queue should run, please refer to the [configuration](#configuration) 
+section.
 
 # Developer Guide
 ## Build

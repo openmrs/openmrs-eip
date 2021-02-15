@@ -53,14 +53,13 @@ of DB events and do something useful.
    future versions we might start using it meaningfully.
 5. A copy of this [application.properties](../../docs/custom/application.properties) will have to be included in the 
    directory where which you will be running your executable jar file.
-6. Add a camel route to be notified of DB, you can copy [`event-listener.xml`](../../example-app/src/main/resources/camel/event-listener.xml)
+6. Add a camel route to be notified of DB changes, you can copy [`event-listener.xml`](../../example-app/src/main/resources/camel/event-listener.xml)
    from the example app, change the route id and make any other additions you deem necessary, it is in this file that 
    your application logic will pick up from, it wil be called everytime a change happens to any row in the watched 
-   OpenMRS database table. 
+   OpenMRS database tables. The value of the `uri` attribute of the first `from` tag in the route has to match the value 
+   of the `db-event.destinations` property in the `application.properties` file you created in step 5. 
    **DO NOT** change the value of the `errorHandlerRef` attribute of the `route tag` otherwise you break the error 
    handling and retry mechanism. In theory, every route in your chain of routes that process a DB event needs to have 
    the same error handler set so that the framework can gracefully handle it and apply the retry mechanism. 
-7. The value of the `uri` attribute of the first `from` tag in the route you created in step 6 has to match the value 
-   of the `db-event.destinations` property in the copy of the `application.properties` file you created in step 5.
-8. Open the copy of the `application.properties` you created in step 5 and set the property values accordingly, 
+7. Open the copy of the `application.properties` you created in step 5 and set the property values accordingly, 
    carefully read the in-inline documentation as you set each property value.
