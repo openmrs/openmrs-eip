@@ -99,6 +99,7 @@ by running the commands below.
 ```shell
 git clone https://github.com/openmrs/openmrs-eip.git
 cd openmrs-eip
+git checkout 1.x
 mvn clean install
 ```
 Make sure the build completed successfully.
@@ -113,10 +114,10 @@ properties that take directory paths as values e.g. log file, complex obs data d
 
 ### Receiver 
 1. Create an installation directory for your receiver app.
-2. Copy to the working directory the `dbsync-receiver-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-   EIP above, this file should be located in the `dbsync-receiver-app/target` folder.
-3. There is an application.properties file in the `dbsync-receiver-app` directory found at the root of the OpenMR EIP 
-   project, copy it to your installation directory.   
+2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+   EIP above, this file should be located in the `app/target` folder.
+3. There is an application.properties file in the `distribution/docs/receiver` directory relative to the root of the 
+   OpenMR EIP project, copy it to your installation directory.   
 4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values 
    accordingly, carefully read the in-inline documentation as you set each property value.
    **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
@@ -125,7 +126,7 @@ properties that take directory paths as values e.g. log file, complex obs data d
    and `openmrs.password` properties respectively in the `application.properties` file in step 2.
 5. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
 ```shell
-java -jar dbsync-receiver-app-{VERSION}.jar
+java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
 ```
 Make sure no errors are reported when the application starts, you can find the logs in the configured directory which 
 defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
@@ -151,13 +152,13 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
 
 3. #### Installing the Sender Application
     1. Create an installation directory for your sender app.
-    2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-       EIP above, this file should be located in the `dbsync-sender-app/target` folder.
+    2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+       EIP above, this file should be located in the `distribution/docs/sender` folder.
     4. Open the `application.properties` you just copied above to the installation directory and set the property values 
        accordingly, carefully read the in-inline documentation as you set each property value.
     5. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
     ```shell
-    java -jar dbsync-sender-app-{VERSION}.jar
+    java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
 Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
 defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
@@ -198,11 +199,10 @@ The receiver needs to hold it's private key and all the public keys of the sende
 # DB Sync Technical Overview
 
 ## Sender Overview
-The sender is really a spring boot application with custom camel routes, it depends on the `openmrs-watcher` module to 
-track DB changes in the configured sending OpenMRS database.
+The sender is really a spring boot application with custom camel routes management database.
 
 When the application is fired up in sender mode, the built-in debezium route starts the debezium component which will 
-periodically read entries in the MySQL binlog, it constructs an [Event](../../openmrs-watcher/src/main/java/org/openmrs/eip/mysql/watcher/Event.java) instance which has several
+periodically read entries in the MySQL binlog, it constructs an [Event](../../camel-openmrs/src/main/java/org/openmrs/eip/component/entity/Event.java) instance which has several
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
