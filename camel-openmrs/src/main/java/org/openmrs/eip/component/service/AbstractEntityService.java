@@ -3,15 +3,18 @@ package org.openmrs.eip.component.service;
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.Patient;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
+import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
+import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.impl.AbstractSubclassEntityService;
 import org.openmrs.eip.component.service.light.AbstractLightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,9 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    private UserLightRepository userLightRepository;
+
     public AbstractEntityService(final SyncEntityRepository<E> repository,
                                  final EntityToModelMapper<E, M> entityToModelMapper,
                                  final ModelToEntityMapper<M, E> modelToEntityMapper) {
@@ -68,12 +74,12 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
         if (etyInDb == null && model instanceof PatientModel && this instanceof AbstractSubclassEntityService) {
             //There is no row yet in the subclass table and we don't yet know the FK, get the parent row by uuid so
             //we can get the id and set it on this subclass
-            Long id = null;
+            Long id;
             BaseEntity parent = ((AbstractSubclassEntityService) this).getParentRepository().findByUuid(model.getUuid());
             if (parent != null) {
                 log.info(model.getClass() + " has no matching row in the subclass table, inserting one");
                 id = parent.getId();
-                insertParentRow(ety, id, model);
+                insertParentRow(ety, id, (BaseDataModel) model);
                 ety.setId(id);
             }
         }
@@ -143,7 +149,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
         return "Entity of type " + ety.getClass().getName() + " with uuid " + uuid + s;
     }
 
-    private void insertParentRow(E ety, Long id, BaseModel model) {
+    private void insertParentRow(E ety, Long id, BaseDataModel model) {
         EntityManager em = entityManagerFactory.createEntityManager();
         EntityTransaction tx = null;
         try {
@@ -154,16 +160,17 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
             if (ety instanceof Patient) {
                 query = em.createNativeQuery(INSERT_PATIENT);
                 query.setParameter(1, id);
-                query.setParameter(2, AbstractLightService.DEFAULT_USER_ID);
-                query.setParameter(3, AbstractLightService.DEFAULT_DATE);
-                query.setParameter(4, false);
+                UserLight user = userLightRepository.findByUuid(model.getUuid());
+                query.setParameter(2, user != null ? user.getId() : AbstractLightService.DEFAULT_USER_ID);
+                query.setParameter(3, model.getDateCreated());
+                query.setParameter(4, model.isVoided());
             } else if (model instanceof TestOrderModel) {
                 query = em.createNativeQuery(INSERT_TEST_ORDER);
                 query.setParameter(1, id);
             } else if (model instanceof DrugOrderModel) {
                 query = em.createNativeQuery(INSERT_DRUG_ORDER);
                 query.setParameter(1, id);
-                query.setParameter(2, false);
+                query.setParameter(2, model.isVoided());
             } else {
                 throw new EIPException("Don't know how to sync: " + model);
             }
