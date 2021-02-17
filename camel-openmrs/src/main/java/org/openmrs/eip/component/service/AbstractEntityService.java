@@ -2,7 +2,6 @@ package org.openmrs.eip.component.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.eip.component.entity.BaseEntity;
-import org.openmrs.eip.component.entity.Order;
 import org.openmrs.eip.component.entity.Patient;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -66,31 +65,17 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
         E ety = modelToEntityMapper.apply(model);
 
-        if ((etyInDb == null && model instanceof PatientModel) || (etyInDb instanceof Order &&
-                (model instanceof TestOrderModel || model instanceof DrugOrderModel))) {
+        if (etyInDb == null && model instanceof PatientModel && this instanceof AbstractSubclassEntityService) {
             //There is no row yet in the subclass table and we don't yet know the FK, get the parent row by uuid so
             //we can get the id and set it on this subclass
-
             Long id = null;
-            if (this instanceof AbstractSubclassEntityService) {
-                BaseEntity parent = ((AbstractSubclassEntityService) this).getParentRepository().findByUuid(model.getUuid());
-                if (parent != null) {
-                    id = parent.getId();
-                }
-
-                if (id == null) {
-                    //We have a problem
-                    throw new EIPException("No row found in tha parent table for: " + model);
-                }
-
-                log.info(model.getClass() + " has no matching row in the parent table, inserting one");
-
+            BaseEntity parent = ((AbstractSubclassEntityService) this).getParentRepository().findByUuid(model.getUuid());
+            if (parent != null) {
+                log.info(model.getClass() + " has no matching row in the subclass table, inserting one");
+                id = parent.getId();
                 insertParentRow(ety, id, model);
-            } else {
-                id = etyInDb.getId();
+                ety.setId(id);
             }
-
-            ety.setId(id);
         }
 
         M modelToReturn;
