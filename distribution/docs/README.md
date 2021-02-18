@@ -97,9 +97,8 @@ inside your JMS server using the console application.
 From the terminal, navigate to your working directory, clone and build the project to generate the executable artifacts 
 by running the commands below.
 ```shell
-git clone https://github.com/openmrs/openmrs-eip.git
+git clone https://github.com/FriendsInGlobalHealth/openmrs-eip.git
 cd openmrs-eip
-git checkout 1.x
 mvn clean install
 ```
 Make sure the build completed successfully.
@@ -123,8 +122,12 @@ properties that take directory paths as values e.g. log file, complex obs data d
    **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
    an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create 
    a specific user account for this application and use its username and password as values for the `openmrs.username` 
-   and `openmrs.password` properties respectively in the `application.properties` file in step 2.
-5. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
+   and `openmrs.password` properties respectively in the `application.properties`.
+5. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/receiver` to 
+   your installation directory.
+6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+   installation directory.
+7. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
 ```shell
 java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
 ```
@@ -154,9 +157,13 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
     1. Create an installation directory for your sender app.
     2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
        EIP above, this file should be located in the `distribution/docs/sender` folder.
-    4. Open the `application.properties` you just copied above to the installation directory and set the property values 
+    3. Open the `application.properties` you just copied above to the installation directory and set the property values 
        accordingly, carefully read the in-inline documentation as you set each property value.
-    5. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
+    4. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/sender` to
+       your installation directory.
+    5. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+       installation directory.
+    6. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
     ```shell
     java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
