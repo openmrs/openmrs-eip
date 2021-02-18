@@ -38,9 +38,12 @@
 
             <toD uri="sql:SELECT uuid FROM ${exchangeProperty.debezium-refTable} WHERE ${exchangeProperty.debezium-refColumn}='${body.primaryKeyId}'?dataSource=openmrsDataSource" />
 
-            <script>
-                <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
-            </script>
+            <when>
+                <simple>${body.size()} == 1</simple>
+                <script>
+                    <spel>#{getProperty('event').setIdentifier(body[0].get('uuid'))}</spel>
+                </script>
+            </when>
         </when>
 
         <when>
