@@ -8,9 +8,16 @@
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>
             <log message="Entities with failed retries in current retry run: ${exchangeProperty.failed-entities.size()}" loggingLevel="DEBUG" />
-            <script>
-                <simple>${exchangeProperty.failed-entities.add(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier})}</simple>
-            </script>
+
+            <setBody>
+                <method beanType="org.openmrs.eip.component.utils.Utils" method="getListOfModelClassHierarchy(${exchangeProperty.retry-item.modelClassName})" />
+            </setBody>
+            <split parallelProcessing="false" >
+                <simple>${body}</simple>
+                <script>
+                    <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.identifier})}</simple>
+                </script>
+            </split>
         </when>
         
         <setProperty name="error-msg">
