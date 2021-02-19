@@ -9,8 +9,11 @@
         <setProperty name="original-msg-body">
             <simple>${body}</simple>
         </setProperty>
+        <setProperty name="model-classes">
+            <method beanType="org.openmrs.eip.component.utils.Utils" method="getModelClassesInHierarchy(${exchangeProperty.model-class})" />
+        </setProperty>
 
-        <toD uri="jpa:ConflictQueueItem?query=SELECT c from ConflictQueueItem c WHERE c.modelClassName ='${exchangeProperty.model-class}' AND c.identifier='${exchangeProperty.entity-id}' AND c.resolved = false" />
+        <toD uri="jpa:ConflictQueueItem?query=SELECT c from ConflictQueueItem c WHERE c.modelClassName IN (${exchangeProperty.model-classes}) AND c.identifier='${exchangeProperty.entity-id}' AND c.resolved = false" />
 
         <choice>
             <when>
