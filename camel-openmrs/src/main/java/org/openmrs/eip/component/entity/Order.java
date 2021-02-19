@@ -44,7 +44,6 @@ public class Order extends BaseDataEntity {
 
     private String instructions;
 
-    @NotNull
     @Column(name = "date_activated")
     private LocalDateTime dateActivated;
 
