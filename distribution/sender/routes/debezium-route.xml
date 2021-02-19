@@ -17,39 +17,12 @@
             </spel>
         </script>
         <setProperty name="table-names">
-            <simple>'${exchangeProperty.event.tableName}'</simple>
+            <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+            <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
         </setProperty>
         <setProperty name="is-subclass">
             <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
         </setProperty>
-        <!--
-            For We need to look up failed events for rows in both the parent and subclass tables
-            TODO This logic should be extensible
-         -->
-        <when>
-            <simple>${exchangeProperty.event.tableName} in 'person,patient'</simple>
-            <setProperty name="table-names">
-                <simple>'person','patient'</simple>
-            </setProperty>
-        </when>
-        <when>
-            <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
-            <setProperty name="table-names">
-                <simple>'orders','test_order','drug_order'</simple>
-            </setProperty>
-        </when>
-        <when>
-            <simple>${exchangeProperty.event.tableName} == 'test_order'</simple>
-            <setProperty name="table-names">
-                <simple>'orders','test_order'</simple>
-            </setProperty>
-        </when>
-        <when>
-            <simple>${exchangeProperty.event.tableName} == 'drug_order'</simple>
-            <setProperty name="table-names">
-                <simple>'orders','drug_order'</simple>
-            </setProperty>
-        </when>
 
         <choice>
             <when>
