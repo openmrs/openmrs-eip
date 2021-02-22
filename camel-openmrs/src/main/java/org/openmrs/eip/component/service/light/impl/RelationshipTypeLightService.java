@@ -15,7 +15,6 @@ public class RelationshipTypeLightService extends AbstractLightService<Relations
     @Override
     protected RelationshipTypeLight createPlaceholderEntity(final String uuid) {
     	RelationshipTypeLight relationshipType = new RelationshipTypeLight();
-        relationshipType.setName(DEFAULT_STRING);
         relationshipType.setCreator(DEFAULT_USER_ID);
         relationshipType.setDateCreated(DEFAULT_DATE);
         relationshipType.setAIsToB(DEFAULT_STRING);

@@ -16,11 +16,6 @@ import lombok.EqualsAndHashCode;
 @Table(name = "relationship_type")
 @AttributeOverride(name = "id", column = @Column(name = "relationship_type_id"))
 public class RelationshipTypeLight extends RetireableLightEntity{
-	
-	@NotNull
-    @Column(name = "name")
-    private String name;
-	
 	@NotNull
     @Column(name = "a_is_to_b")
     private String aIsToB;
@@ -36,5 +31,4 @@ public class RelationshipTypeLight extends RetireableLightEntity{
 	@NotNull
     @Column(name = "preferred")
     private Boolean preferred;
-	
 }
