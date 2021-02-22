@@ -23,7 +23,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_id"))
 public class Gaac extends BaseChangeableDataEntity {
-
+	
+	@NotNull
     @Column(name = "name")
     private String name;
     

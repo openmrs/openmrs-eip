@@ -33,6 +33,7 @@ public class GaacMember extends BaseChangeableDataEntity {
     @JoinColumn(name = "member_id")
     private PatientLight member;
 
+    @NotNull
     @Column(name = "start_date")
     protected LocalDateTime startDate;
     

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -19,9 +21,19 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac_family")
 @AttributeOverride(name = "id", column = @Column(name = "family_id"))
 public class GaacFamilyLight extends VoidableLightEntity {
-    @Column(name = "family_identifier")
+	@NotNull
+	@Column(name = "family_identifier")
     private String familyIdentifier;
     
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private LocationLight location;
+
+    @NotNull
+    @Column(name = "crumbled")
+    private Integer crumbled;
+	    
     @NotNull
     @Column(name = "start_date")
     protected LocalDateTime startDate;

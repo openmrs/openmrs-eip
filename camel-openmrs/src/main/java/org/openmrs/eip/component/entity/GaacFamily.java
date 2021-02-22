@@ -22,7 +22,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac_family")
 @AttributeOverride(name = "id", column = @Column(name = "family_id"))
 public class GaacFamily extends BaseChangeableDataEntity {
-	@Column(name = "family_identifier")
+	@NotNull
+    @Column(name = "family_identifier")
     private String familyIdentifier;
 
     @NotNull
@@ -36,10 +37,12 @@ public class GaacFamily extends BaseChangeableDataEntity {
     @JoinColumn(name = "focal_patient_id")
     private PatientLight focalPatient;
     
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "location_id")
     private LocationLight location;
 
+    @NotNull
     @Column(name = "crumbled")
     private Integer crumbled;
     
