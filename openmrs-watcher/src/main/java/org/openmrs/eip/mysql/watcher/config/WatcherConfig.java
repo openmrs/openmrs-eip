@@ -16,12 +16,14 @@ import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
 @Configuration
+@ComponentScan("org.openmrs.eip.mysql.watcher")
 public class WatcherConfig {
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
