@@ -109,6 +109,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring</artifactId>
+            <version>${camelVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -174,6 +175,18 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -86,8 +86,8 @@ inside your JMS server using the console application.
   later see when configuring our sender and receiver applications.
 - In case you're using a topic like we recommend, after installing ArtemisMQ and creating your broker instance,
   your **MUST** connect the receiver sync application first with a durable topic subscription before any sender sync
-  application connects and publishes any message. Otherwise, any message pushed by a sender to the topic will before you
-  do so won't be delivered to the receiver.
+  application connects and publishes any message. Otherwise, any message pushed by a sender to the topic before you do
+  so won't be delivered to the receiver.
 - With topics, it also implies that whenever you want to onboard a new sender application to sync data from a new site
   that wishes to join the party to push data to the receiver and it's using a different JMS instance or topic name,
   then the receiver **MUST** always connect first so that a durable subscription is created for it before the new sender
