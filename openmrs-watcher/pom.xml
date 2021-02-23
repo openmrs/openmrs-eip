@@ -24,6 +24,13 @@
             <artifactId>camel-debezium-mysql-starter</artifactId>
             <version>${camelVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <type>test-jar</type>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
