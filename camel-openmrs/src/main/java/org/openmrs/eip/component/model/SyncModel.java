@@ -69,4 +69,9 @@ public class SyncModel {
 		this.metadata = metadata;
 	}
 	
+	@Override
+	public String toString() {
+		return "{tableToSyncModelClass=" + tableToSyncModelClass + ", model=" + model + ", metadata=" + metadata + "}";
+	}
+	
 }

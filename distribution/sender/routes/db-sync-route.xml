@@ -25,16 +25,6 @@
                         <setBody>
                             <jsonpath>$[0]</jsonpath>
                         </setBody>
-                        <script>
-                            <spel>
-                                #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                                #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
-                                #{body.metadata.setOperation(getProperty('event').operation)}
-                            </spel>
-                        </script>
-                        <setBody>
-                            <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
-                        </setBody>
                     </when>
                     <otherwise>
                         <setBody>
@@ -48,6 +38,16 @@
         <choice>
             <when>
                 <simple>${body} != null</simple>
+                <script>
+                    <spel>
+                        #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
+                        #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
+                        #{body.metadata.setOperation(getProperty('event').operation)}
+                    </spel>
+                </script>
+                <setBody>
+                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
+                </setBody>
 
                 <log message="Sync data -> ${body}" />
 

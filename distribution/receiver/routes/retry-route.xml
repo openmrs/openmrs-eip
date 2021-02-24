@@ -52,7 +52,7 @@
                             <log message="Re-processing: ${exchangeProperty.retry-item}" />
 
                             <setBody>
-                                <simple>${exchangeProperty.retry-item.entityPayload}</simple>
+                                <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${exchangeProperty.retry-item.entityPayload})" />
                             </setBody>
 
                             <toD uri="direct:{{message.destination}}" />

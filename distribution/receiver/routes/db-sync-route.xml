@@ -1,10 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="inbound-db-sync" errorHandlerRef="noErrorHandler">
         <from uri="direct:inbound-db-sync" />
-        
-        <convertBodyTo type="java.lang.String" />
 
-        <log message="Start inbound db-sync: ${body}" />
+        <log message="Start inbound db-sync: ${body.model}" />
 
         <setProperty name="original-msg-body">
             <simple>${body}</simple>
@@ -30,12 +28,10 @@
                 </setBody>
                 <when>
                     <!-- If this not a record for a deleted entity -->
-                    <simple>${body.indexOf('DELETE:')} != 0</simple>
+                    <simple>${body.metadata.operation} != 'd'</simple>
                     <choice>
                         <when>
-                            <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonNameModel')]
-                            </jsonpath>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PersonNameModel'</simple>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>
                             </setProperty>
@@ -50,9 +46,7 @@
                             </setProperty>
                         </when>
                         <when>
-                            <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PatientIdentifierModel')]
-                            </jsonpath>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PatientIdentifierModel'</simple>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>
                             </setProperty>
@@ -67,9 +61,7 @@
                             </setProperty>
                         </when>
                         <when>
-                            <jsonpath>
-                                $.[?(@.tableToSyncModelClass=='org.openmrs.eip.component.model.PersonAttributeModel')]
-                            </jsonpath>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PersonAttributeModel'</simple>
                             <setProperty name="rebuild-search-index">
                                 <constant>true</constant>
                             </setProperty>

@@ -131,8 +131,8 @@ properties that take directory paths as values e.g. log file, complex obs data d
 ```shell
 java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
 ```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which 
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 ### Sender
 
@@ -168,7 +168,7 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
     java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
 Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 # Security
 Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were

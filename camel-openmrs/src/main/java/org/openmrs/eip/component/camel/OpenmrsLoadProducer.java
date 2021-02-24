@@ -1,10 +1,8 @@
 package org.openmrs.eip.component.camel;
 
 import org.apache.camel.Exchange;
-import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
-import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.springframework.context.ApplicationContext;
 
@@ -27,13 +25,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
     @Override
     public void process(final Exchange exchange) {
         EntityServiceFacade entityServiceFacade = (EntityServiceFacade) applicationContext.getBean("entityServiceFacade");
+        SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
+        TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 
-        String json = (String) exchange.getIn().getBody();
-
-        if (json.startsWith(DELETE_PREFIX)) {
-            String[] fields = StringUtils.split(json.trim(), ":");
-            TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(fields[1].trim());
-            switch (fields[1]) {
+        if ("d".equals(syncModel.getMetadata().getOperation())) {
+            /*switch (fields[1]) {
                 case "person_name":
                     exchange.setProperty(PROP_REBUILD_SEARCH_INDEX, true);
                     exchange.setProperty("resource", "person");
@@ -49,15 +45,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
                     exchange.setProperty(PROP_RESOURCE, "patient");
                     exchange.setProperty(PROP_SUB_RESOURCE, "identifier");
                     break;
-            }
+            }*/
 
-            entityServiceFacade.delete(tableToSyncEnum, fields[2].trim());
+            entityServiceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
         } else {
-            SyncModel to = JsonUtils.unmarshal(json, SyncModel.class);
-
-            TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(to.getTableToSyncModelClass());
-
-            entityServiceFacade.saveModel(tableToSyncEnum, to.getModel());
+            entityServiceFacade.saveModel(tableToSyncEnum, syncModel.getModel());
         }
     }
 
