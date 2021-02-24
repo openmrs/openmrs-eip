@@ -27,22 +27,22 @@
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
+                <setProperty name="entity-payload">
+                    <simple>${body}</simple>
+                </setProperty>
+                <setProperty name="model-class">
+                    <jsonpath>$.tableToSyncModelClass</jsonpath>
+                </setProperty>
+                <setProperty name="entity-id">
+                    <jsonpath>$.model.uuid</jsonpath>
+                </setProperty>
                 <choice>
                     <when>
                         <!-- If this not a record for a deleted entity -->
                         <simple>${body} is 'byte[]'</simple>
-                        <setProperty name="entity-payload">
-                            <simple>${body}</simple>
-                        </setProperty>
-                        <setProperty name="model-class">
-                            <jsonpath>$.tableToSyncModelClass</jsonpath>
-                        </setProperty>
-                        <setProperty name="entity-id">
-                            <jsonpath>$.model.uuid</jsonpath>
-                        </setProperty>
                     </when>
-                    <when>
-                        <!-- Deleted entity and uuid is present -->
+                    <!--<when>
+                        Deleted entity and uuid is present
                         <simple>${body.trim().split(":").length} == 3</simple>
                         <setProperty name="entity-payload">
                             <simple>${body}</simple>
@@ -59,7 +59,7 @@
                         <setProperty name="entity-id">
                             <simple>${body.trim().split(":")[2]}</simple>
                         </setProperty>
-                    </when>
+                    </when>-->
                 </choice>
 
                 <choice>
