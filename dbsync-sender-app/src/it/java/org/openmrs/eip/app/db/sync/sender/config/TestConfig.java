@@ -5,6 +5,7 @@ import org.openmrs.eip.component.config.SenderEncryptionProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = ArtemisAutoConfiguration.class)
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManager",
         basePackages = {"org.openmrs.eip.component.repository"}
