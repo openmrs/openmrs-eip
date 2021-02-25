@@ -3,8 +3,8 @@ package org.openmrs.eip.component.camel;
 import org.apache.camel.Exchange;
 import org.openmrs.eip.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
@@ -30,12 +30,13 @@ public class OpenmrsExtractProducer extends AbstractOpenmrsProducer {
                 .map(this::buildSyncModel)
                 .collect(Collectors.toList());
 
-        exchange.getIn().setBody(JsonUtils.marshall(modelsArray));
+        exchange.getIn().setBody(modelsArray);
     }
 
     private SyncModel buildSyncModel(final BaseModel model) {
         return SyncModel.builder()
                 .tableToSyncModelClass(model.getClass())
+                .metadata(new SyncMetadata())
                 .model(model)
                 .build();
     }

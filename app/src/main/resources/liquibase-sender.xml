@@ -39,10 +39,10 @@
             </column>
             <column name="cause_message" type="VARCHAR(1024)"/>
             <column name="message" type="VARCHAR(1024)"/>
-            <column name="date_created" type="TIMESTAMP">
+            <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_changed" type="TIMESTAMP"/>
+            <column name="date_changed" type="DATETIME"/>
         </createTable>
         
     </changeSet>
@@ -69,7 +69,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="created_at" type="TIMESTAMP"/>
+            <column name="created_at" type="DATETIME"/>
             <column name="message_id" type="VARCHAR(255)"/>
             <column name="processor_name" type="VARCHAR(255)"/>
         </createTable>

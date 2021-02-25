@@ -27,22 +27,22 @@
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
+                <setProperty name="entity-payload">
+                    <simple>${body}</simple>
+                </setProperty>
+                <setProperty name="model-class">
+                    <jsonpath>$.tableToSyncModelClass</jsonpath>
+                </setProperty>
+                <setProperty name="entity-id">
+                    <jsonpath>$.model.uuid</jsonpath>
+                </setProperty>
                 <choice>
                     <when>
                         <!-- If this not a record for a deleted entity -->
                         <simple>${body} is 'byte[]'</simple>
-                        <setProperty name="entity-payload">
-                            <simple>${body}</simple>
-                        </setProperty>
-                        <setProperty name="model-class">
-                            <jsonpath>$.tableToSyncModelClass</jsonpath>
-                        </setProperty>
-                        <setProperty name="entity-id">
-                            <jsonpath>$.model.uuid</jsonpath>
-                        </setProperty>
                     </when>
-                    <when>
-                        <!-- Deleted entity and uuid is present -->
+                    <!--<when>
+                        Deleted entity and uuid is present
                         <simple>${body.trim().split(":").length} == 3</simple>
                         <setProperty name="entity-payload">
                             <simple>${body}</simple>
@@ -59,7 +59,7 @@
                         <setProperty name="entity-id">
                             <simple>${body.trim().split(":")[2]}</simple>
                         </setProperty>
-                    </when>
+                    </when>-->
                 </choice>
 
                 <choice>
@@ -68,8 +68,11 @@
                         <setProperty name="retry-count">
                             <spel>0</spel>
                         </setProperty>
+                        <setProperty name="model-classes">
+                            <method beanType="org.openmrs.eip.component.utils.Utils" method="getModelClassesInHierarchy(${exchangeProperty.model-class})" />
+                        </setProperty>
 
-                        <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i from ReceiverRetryQueueItem i WHERE i.modelClassName ='${exchangeProperty.model-class}' AND i.identifier='${exchangeProperty.entity-id}'" />
+                        <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i from ReceiverRetryQueueItem i WHERE i.modelClassName IN (${exchangeProperty.model-classes}) AND i.identifier='${exchangeProperty.entity-id}'" />
                         <setProperty name="retry-count">
                             <simple>${body.size()}</simple>
                         </setProperty>

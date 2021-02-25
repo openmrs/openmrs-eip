@@ -7,7 +7,7 @@
 
         <choice>
             <when>
-                <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                <simple>${exchangeProperty.event.operation} == 'd'</simple>
                 <setBody>
                     <simple>DELETE:${exchangeProperty.event.tableName}:${exchangeProperty.event.identifier}</simple>
                 </setBody>
@@ -19,17 +19,22 @@
 
                 <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
 
-                <log message="Loaded entity -> ${body}" />
-
                 <choice>
                     <when>
                         <simple>${body} != '[]'</simple>
                         <setBody>
                             <jsonpath>$[0]</jsonpath>
                         </setBody>
-                        <marshal>
-                            <json library="Jackson" />
-                        </marshal>
+                        <script>
+                            <spel>
+                                #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
+                                #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
+                                #{body.metadata.setOperation(getProperty('event').operation)}
+                            </spel>
+                        </script>
+                        <setBody>
+                            <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
+                        </setBody>
                     </when>
                     <otherwise>
                         <setBody>
@@ -43,6 +48,9 @@
         <choice>
             <when>
                 <simple>${body} != null</simple>
+
+                <log message="Sync data -> ${body}" />
+
                 <when>
                     <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
                     <log message="Encrypting entity payload.." />
