@@ -156,14 +156,16 @@ defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to y
 3. #### Installing the Sender Application
     1. Create an installation directory for your sender app.
     2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-       EIP above, this file should be located in the `distribution/docs/sender` folder.
-    3. Open the `application.properties` you just copied above to the installation directory and set the property values 
+       EIP above, this file should be located in the `app/target` folder.
+    3. There is an application.properties file in the `distribution/docs/sender` directory relative to the root of the 
+       OpenMR EIP project, copy it to your installation directory.
+    4. Open the `application.properties` you just copied above to the installation directory and set the property values 
        accordingly, carefully read the in-inline documentation as you set each property value.
-    4. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/sender` to
+    5. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/sender` to
        your installation directory.
-    5. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+    6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
        installation directory.
-    6. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
+    7. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
     ```shell
     java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
