@@ -185,8 +185,8 @@ For custom application configuration, please refer to the [custom application se
 # Logging
 The DB sync applications are spring boot applications and custom applications are also expected to be spring boot
 applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and
-`logback-console.xml`, the `logback.xml` file writes the logs to a file at `{USER.HOME}/.openmrs-eip/logs` where
-`{USER.HOME}` is the user home directory. The `logback-console.xml` writes logs to the console, this can be useful in a
+`logback-console.xml`, the `logback.xml` file writes the logs to a file to `{eip.home}/logs` where `{eip.home}` is the 
+path to the app's installation directory. The `logback-console.xml` writes logs to the console, this can be useful in a 
 dev environment and tests.
 
 For camel-routes, you need to set the logging level using their route ids, for instance if your route id is `my-route`,

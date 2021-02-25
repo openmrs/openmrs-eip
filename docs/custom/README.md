@@ -6,7 +6,7 @@ the OpenMRS DB. Custom apps should be built on top of the EIP's `openmrs-watcher
 
 Please refer to the [example-app](../../example-app) module as a guide. You will notice it's a simple maven spring boot 
 project which has a dependency on the `openmrs-watcher` module that comes with a default logback configuration file 
-and writes the logs at `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log` where `{USER.HOME}` is the path to your user home 
+and writes the logs to `{eip.home}/logs/openmrs-eip.log` where `{eip.home}` is the path to your app's installation
 directory, there is another logback file configured to log to the console, this can be useful in a DEV environment and 
 tests.
 

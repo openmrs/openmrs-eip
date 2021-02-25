@@ -12,6 +12,7 @@ import org.apache.camel.test.spring.CamelSpringRunner;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Base class for camel route tests and processors
@@ -19,6 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @RunWith(CamelSpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
 public abstract class BaseCamelContextTest {
+	
+	@Autowired
+	protected ApplicationContext applicationContext;
 	
 	@Autowired
 	protected DefaultCamelContext camelContext;

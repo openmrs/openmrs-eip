@@ -113,22 +113,24 @@ properties that take directory paths as values e.g. log file, complex obs data d
 
 ### Receiver 
 1. Create an installation directory for your receiver app.
-2. Copy to the working directory the `dbsync-receiver-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+2. Copy to the working directory the `dbsync-receiver-app-{VERSION}.jar` file that was generated when you built OpenMRS
    EIP above, this file should be located in the `dbsync-receiver-app/target` folder.
-3. There is an application.properties file in the `dbsync-receiver-app` directory relative to the root of the OpenMR EIP 
-   project, copy it to your installation directory.   
-4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values 
+3. There is an application.properties file in the `dbsync-receiver-app` directory relative to the root of the OpenMR EIP
+   project, copy it to your installation directory.
+4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values
    accordingly, carefully read the in-inline documentation as you set each property value.
-   **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
-   an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create 
-   a specific user account for this application and use its username and password as values for the `openmrs.username` 
-   and `openmrs.password` properties respectively in the `application.properties` file in step 2.
-5. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
+   **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for
+   an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create
+   a specific user account for this application and use its username and password as values for the `openmrs.username`
+   and `openmrs.password` properties respectively in the `application.properties`.
+5. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+   installation directory.
+6. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
 ```shell
 java -jar dbsync-receiver-app-{VERSION}.jar
 ```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which 
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 ### Sender
 
@@ -151,16 +153,18 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
 
 3. #### Installing the Sender Application
     1. Create an installation directory for your sender app.
-    2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+    2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS
        EIP above, this file should be located in the `dbsync-sender-app/target` folder.
-    4. Open the `application.properties` you just copied above to the installation directory and set the property values 
+    3. Open the `application.properties` you just copied above to the installation directory and set the property values
        accordingly, carefully read the in-inline documentation as you set each property value.
+    4. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to 
+       your installation directory.
     5. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
     ```shell
     java -jar dbsync-sender-app-{VERSION}.jar
     ```
 Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 # Security
 Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were
