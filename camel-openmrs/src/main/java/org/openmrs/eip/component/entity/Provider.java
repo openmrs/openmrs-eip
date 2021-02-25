@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
-import org.openmrs.eip.component.entity.light.ProviderManagementProviderRoleLight;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.utils.DateUtils;
 
@@ -35,9 +34,9 @@ public class Provider extends BaseCreatableEntity {
     @Column(name = "identifier")
     private String identifier;
 	 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "provider_role_id")
-    private ProviderManagementProviderRoleLight providerRole;
+    private ProviderManagementProviderRoleLight providerRole;*/
 
     @ManyToOne
     @JoinColumn(name = "role_id")

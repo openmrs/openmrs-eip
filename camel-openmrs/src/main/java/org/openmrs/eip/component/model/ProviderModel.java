@@ -10,8 +10,6 @@ public class ProviderModel extends BaseModel {
 	private String name;
 	 
     private String identifier;
-	 
-    private String providerRoleUuid;
 
     private String roleUuid;
     
@@ -45,14 +43,6 @@ public class ProviderModel extends BaseModel {
 
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
-	}
-
-	public String getProviderRoleUuid() {
-		return providerRoleUuid;
-	}
-
-	public void setProviderRoleUuid(String providerRoleUuid) {
-		this.providerRoleUuid = providerRoleUuid;
 	}
 
 	public String getRoleUuid() {

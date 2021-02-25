@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_id"))
 public class GaacLight extends VoidableLightEntity {
+	@NotNull
     @Column(name = "name")
     private String name;
  
