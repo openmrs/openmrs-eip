@@ -64,4 +64,8 @@ public class ReceiverSyncStatus extends AbstractEntity {
 		this.lastSyncDate = lastSyncDate;
 	}
 	
+	@Override
+	public String toString() {
+		return "ReceiverSyncStatus {siteInfoId=" + siteInfoId + ", lastSyncDate=" + lastSyncDate + "}";
+	}
 }

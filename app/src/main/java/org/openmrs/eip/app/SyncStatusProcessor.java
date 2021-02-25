@@ -50,38 +50,26 @@ public class SyncStatusProcessor implements Processor {
 			
 			List<ReceiverSyncStatus> statuses = on(exchange.getContext()).to(statusQuery).request(List.class);
 			
-			if (statuses.size() > 1) {
-				logger.error("Found multiple status rows for site: " + siteInfo
-				        + ", please delete one in order to track its last sync date");
-				return;
-			}
-			
 			ReceiverSyncStatus status;
-			boolean exists = false;
+			final Date date = new Date();
 			if (statuses.size() == 0) {
-				status = new ReceiverSyncStatus(siteInfo.getId(), new Date());
+				status = new ReceiverSyncStatus(siteInfo.getId(), date);
+				status.setDateCreated(date);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Inserting initial sync status for " + siteInfo + " as of " + status.getLastSyncDate());
 				}
 			} else {
 				status = statuses.get(0);
-				status.setLastSyncDate(new Date());
-				exists = true;
+				status.setLastSyncDate(date);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Updating last sync date for " + siteInfo + " to " + status.getLastSyncDate());
 				}
 			}
 			
-			exchange.getIn().setBody(status);
-			
-			on(exchange.getContext()).to("jpa:" + statusClass + "?usePersist=true");
+			status = on(exchange.getContext()).withBody(status).to("jpa:" + statusClass).request(ReceiverSyncStatus.class);
 			
 			if (logger.isDebugEnabled()) {
-				if (exists) {
-					logger.debug("Successfully updated last sync date status for: " + siteInfo);
-				} else {
-					logger.debug("Successfully inserted sync status for: " + siteInfo);
-				}
+				logger.debug("Successfully saved sync status for: " + siteInfo + " -> " + status);
 			}
 		}
 		catch (Exception e) {
