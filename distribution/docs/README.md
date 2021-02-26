@@ -129,17 +129,18 @@ properties that take directory paths as values e.g. log file, complex obs data d
     6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
        installation directory.
     7. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
-```shell
-java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
-```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
-defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
+    ```shell
+    java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
+    ```
+    Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+    defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 1. #### Preparation For Sync
     The receiver application individually keeps track of the timestamp it last received a sync payload from each sending 
-    application, in order to this it needs uniquely identify each sending application. Therefore, before any sending 
-    application can start pushing any sync data, the sender needs to obtain this unique identifier from the receiver and 
-    configure it in the sender application properties file, this is explained in detail in the sender installation steps.
+    application in the **receiver_sync_status** table, in order to this it needs uniquely identify each sending application. 
+    Therefore, before any sending application can start pushing any sync data, the sender needs to obtain this unique 
+    identifier from the receiver and configure it in the sender application properties file, this is explained in detail 
+    in the sender installation steps.
     
     To register a sender application, log into the management H2 database console application, to access the management 
     database console please refer to [Management Database](../../README.md#management-database), insert a row in the
@@ -193,8 +194,8 @@ defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to y
     ```shell
     java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
-defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
+    Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+    defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 # Security
 Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were
