@@ -9,8 +9,16 @@
             <when>
                 <simple>${exchangeProperty.event.operation} == 'd'</simple>
                 <setBody>
-                    <simple>DELETE:${exchangeProperty.event.tableName}:${exchangeProperty.event.identifier}</simple>
+                    <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
                 </setBody>
+                <script>
+                    <spel>
+                        #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('event').tableName).modelClass)}
+                        #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
+                        #{body.model.setUuid(getProperty('event').identifier)}
+                        #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
+                    </spel>
+                </script>
 
                 <log message="Deleted entity payload -> ${body}" />
             </when>
@@ -21,7 +29,7 @@
 
                 <choice>
                     <when>
-                        <simple>${body} != '[]'</simple>
+                        <simple>${body.size()} == 1</simple>
                         <setBody>
                             <jsonpath>$[0]</jsonpath>
                         </setBody>

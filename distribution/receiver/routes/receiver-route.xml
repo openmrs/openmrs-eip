@@ -48,32 +48,6 @@
 
                 <choice>
                     <when>
-                        <!-- If this not a record for a deleted entity -->
-                        <simple>${body} is 'byte[]'</simple>
-                    </when>
-                    <!--<when>
-                        Deleted entity and uuid is present
-                        <simple>${body.trim().split(":").length} == 3</simple>
-                        <setProperty name="entity-payload">
-                            <simple>${body}</simple>
-                        </setProperty>
-                        <setProperty name="entity-table">
-                            <simple>${body.trim().split(":")[1]}</simple>
-                        </setProperty>
-                        <setProperty name="table-to-sync-enum">
-                            <method beanType="org.openmrs.eip.component.service.TableToSyncEnum" method="getTableToSyncEnum(${exchangeProperty.entity-table})" />
-                        </setProperty>
-                        <setProperty name="model-class">
-                            <simple>${exchangeProperty.table-to-sync-enum.getModelClass().getName()}</simple>
-                        </setProperty>
-                        <setProperty name="entity-id">
-                            <simple>${body.trim().split(":")[2]}</simple>
-                        </setProperty>
-                    </when>-->
-                </choice>
-
-                <choice>
-                    <when>
                         <simple>${exchangeProperty.entity-id} != null</simple>
                         <setProperty name="retry-count">
                             <spel>0</spel>

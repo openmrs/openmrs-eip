@@ -29,24 +29,6 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
         TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 
         if ("d".equals(syncModel.getMetadata().getOperation())) {
-            /*switch (fields[1]) {
-                case "person_name":
-                    exchange.setProperty(PROP_REBUILD_SEARCH_INDEX, true);
-                    exchange.setProperty("resource", "person");
-                    exchange.setProperty(PROP_SUB_RESOURCE, "name");
-                    break;
-                case "person_attribute":
-                    exchange.setProperty(PROP_REBUILD_SEARCH_INDEX, true);
-                    exchange.setProperty(PROP_RESOURCE, "person");
-                    exchange.setProperty(PROP_SUB_RESOURCE, "attribute");
-                    break;
-                case "patient_identifier":
-                    exchange.setProperty(PROP_REBUILD_SEARCH_INDEX, true);
-                    exchange.setProperty(PROP_RESOURCE, "patient");
-                    exchange.setProperty(PROP_SUB_RESOURCE, "identifier");
-                    break;
-            }*/
-
             entityServiceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
         } else {
             entityServiceFacade.saveModel(tableToSyncEnum, syncModel.getModel());
