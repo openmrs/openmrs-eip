@@ -2,7 +2,7 @@
     <route id="inbound-db-sync" errorHandlerRef="noErrorHandler">
         <from uri="direct:inbound-db-sync" />
 
-        <log message="Start inbound db-sync: ${body.model}" />
+        <log message="Start inbound db-sync: ${body}" />
 
         <setProperty name="original-msg-body">
             <simple>${body}</simple>
