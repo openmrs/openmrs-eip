@@ -7,13 +7,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.SyncMetadata;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.context.ApplicationContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +45,7 @@ public class OpenmrsLoadProducerTest {
     public void process() {
         // Given
         exchange.getIn().setHeader("OpenmrsTableSyncName", "person");
-        exchange.getIn().setBody(json());
+        exchange.getIn().setBody(syncModel());
         when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 
         // When
@@ -58,66 +60,24 @@ public class OpenmrsLoadProducerTest {
     @Test
     public void process_shouldDeleteAnEntity() {
         final String personUuid = "some-uuid";
-        exchange.getIn().setHeader("OpenmrsTableSyncName", "person");
-        exchange.getIn().setBody(OpenmrsLoadProducer.DELETE_PREFIX + "person:" + personUuid);
+        SyncModel syncModel = new SyncModel();
+        syncModel.setTableToSyncModelClass(PersonModel.class);
+        BaseModel model = new PersonModel();
+        model.setUuid(personUuid);
+        syncModel.setModel(model);
+        SyncMetadata metadata = new SyncMetadata();
+        metadata.setOperation("d");
+        syncModel.setMetadata(metadata);
+        exchange.getIn().setBody(syncModel);
         when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 
         producer.process(exchange);
 
         verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
-        assertNull(exchange.getProperty("rebuild-search-index"));
-        assertNull(exchange.getProperty("resource"));
-        assertNull(exchange.getProperty("sub-resource"));
     }
 
-    @Test
-    public void process_shouldDeleteAndSetTheRelevantPropertiesForAPersonName() {
-        final String nameUuid = "some-uuid";
-        exchange.getIn().setHeader("OpenmrsTableSyncName", "person_name");
-        exchange.getIn().setBody(OpenmrsLoadProducer.DELETE_PREFIX + "person_name:" + nameUuid);
-        when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
-
-        producer.process(exchange);
-
-        verify(serviceFacade).delete(TableToSyncEnum.PERSON_NAME, nameUuid);
-        assertEquals(true, exchange.getProperty("rebuild-search-index"));
-        assertEquals("person", exchange.getProperty(OpenmrsLoadProducer.PROP_RESOURCE));
-        assertEquals("name", exchange.getProperty(OpenmrsLoadProducer.PROP_SUB_RESOURCE));
-    }
-
-    @Test
-    public void process_shouldDeleteAndSetTheRelevantPropertiesForAPersonAttribute() {
-        final String attributeUuid = "some-uuid";
-        exchange.getIn().setHeader("OpenmrsTableSyncName", "person_attribute");
-        exchange.getIn().setBody(OpenmrsLoadProducer.DELETE_PREFIX + "person_attribute:" + attributeUuid);
-        when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
-
-        producer.process(exchange);
-
-        verify(serviceFacade).delete(TableToSyncEnum.PERSON_ATTRIBUTE, attributeUuid);
-        assertEquals(true, exchange.getProperty(OpenmrsLoadProducer.PROP_REBUILD_SEARCH_INDEX));
-        assertEquals("person", exchange.getProperty(OpenmrsLoadProducer.PROP_RESOURCE));
-        assertEquals("attribute", exchange.getProperty(OpenmrsLoadProducer.PROP_SUB_RESOURCE));
-    }
-
-    @Test
-    public void process_shouldDeleteAndSetTheRelevantPropertiesForAPatienIdentifier() {
-        final String identifierUuid = "some-uuid";
-        exchange.getIn().setHeader("OpenmrsTableSyncName", "patient_identifier");
-        exchange.getIn().setBody(OpenmrsLoadProducer.DELETE_PREFIX + "patient_identifier:" + identifierUuid);
-        when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
-
-        producer.process(exchange);
-
-        verify(serviceFacade).delete(TableToSyncEnum.PATIENT_IDENTIFIER, identifierUuid);
-        assertEquals(true, exchange.getProperty(OpenmrsLoadProducer.PROP_REBUILD_SEARCH_INDEX));
-        assertEquals("patient", exchange.getProperty(OpenmrsLoadProducer.PROP_RESOURCE));
-        assertEquals("identifier", exchange.getProperty(OpenmrsLoadProducer.PROP_SUB_RESOURCE));
-    }
-
-
-    private String json() {
-        return "{" +
+    private SyncModel syncModel() {
+        return JsonUtils.unmarshalSyncModel("{" +
                 "\"tableToSyncModelClass\": \"" + PersonModel.class.getName() + "\"," +
                 "\"model\": {" +
                 "\"uuid\":\"uuid\"," +
@@ -137,7 +97,7 @@ public class OpenmrsLoadProducerTest {
                 "\"causeOfDeathUuid\":null," +
                 "\"deathdateEstimated\":false," +
                 "\"birthtime\":null" +
-                "}" +
-                "}";
+                "},\"metadata\":{\"operation\":\"c\"}" +
+                "}");
     }
 }

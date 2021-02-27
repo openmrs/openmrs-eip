@@ -4,17 +4,19 @@ import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.json.JSONException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -59,33 +61,9 @@ public class OpenmrsExtractProducerTest {
         producer.process(exchange);
 
         // Then
-        String json = exchange.getIn().getBody(String.class);
-        String expectedJson = "[" + expectedJson("uuid1") + "," + expectedJson("uuid2") + "]";
-        JSONAssert.assertEquals(expectedJson, json, false);
-    }
-
-    private String expectedJson(final String uuid) {
-        return "{" +
-                "\"tableToSyncModelClass\":\"" + PersonModel.class.getName() + "\"," +
-                "\"model\": {" +
-                "\"uuid\":\"" + uuid + "\"," +
-                "\"creatorUuid\":null," +
-                "\"dateCreated\":null," +
-                "\"changedByUuid\":null," +
-                "\"dateChanged\":null," +
-                "\"voided\":false," +
-                "\"voidedByUuid\":null," +
-                "\"dateVoided\":null," +
-                "\"voidReason\":null," +
-                "\"gender\":null," +
-                "\"birthdate\":null," +
-                "\"birthdateEstimated\":false," +
-                "\"dead\":false," +
-                "\"deathDate\":null," +
-                "\"causeOfDeathUuid\":null," +
-                "\"deathdateEstimated\":false," +
-                "\"birthtime\":null" +
-                "}" +
-                "}";
+        List<SyncModel> syncModels = exchange.getIn().getBody(List.class);
+        Assert.assertEquals(2, syncModels.size());
+        Assert.assertEquals("uuid1", syncModels.get(0).getModel().getUuid());
+        Assert.assertEquals("uuid2", syncModels.get(1).getModel().getUuid());
     }
 }

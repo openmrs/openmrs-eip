@@ -8,14 +8,6 @@ import org.springframework.context.ApplicationContext;
 
 public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 
-    public static final String DELETE_PREFIX = "DELETE:";
-
-    public static final String PROP_REBUILD_SEARCH_INDEX = "rebuild-search-index";
-
-    public static final String PROP_RESOURCE = "resource";
-
-    public static final String PROP_SUB_RESOURCE = "sub-resource";
-
     public OpenmrsLoadProducer(final OpenmrsEndpoint endpoint,
                                final ApplicationContext applicationContext,
                                final ProducerParams params) {
