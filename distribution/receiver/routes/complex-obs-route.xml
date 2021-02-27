@@ -3,9 +3,7 @@
         <from uri="direct:inbound-complex-obs-sync"/>
 
         <log message="Processing inbound complex obs data file: ${headers.CamelFileName}" />
-        <transform>
-            <method ref="removeFileTagsExpression" />
-        </transform>
+        
         <unmarshal>
             <base64/>
         </unmarshal>

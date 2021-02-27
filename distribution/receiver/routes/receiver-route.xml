@@ -16,12 +16,27 @@
 
             <log message="Decrypted message -> ${body}" loggingLevel="TRACE" />
         </when>
-        
+
+        <setProperty name="is-file">
+            <method ref="isFilePredicate" />
+        </setProperty>
+
         <choice>
             <when>
-                <method ref="isFilePredicate" />
+                <simple>${exchangeProperty.is-file} == true</simple>
                 <log message="Received complex_obs data file: ${headers.CamelFileName}" />
-                <!-- TODO Broadcast the message to other listeners -->
+
+                <transform>
+                    <method ref="removeFileTagsExpression" />
+                </transform>
+                <setProperty name="sync-metadata">
+                    <simple>${body.split("#")[0]}</simple>
+                </setProperty>
+                <setBody>
+                    <simple>${body.split("#")[1]}</simple>
+                </setBody>
+
+                <process ref="syncStatusProcessor" />
 
                 <to uri="direct:inbound-complex-obs-sync" />
             </when>
