@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContext;
  */
 @RunWith(CamelSpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-public abstract class BaseCamelContextTest {
+public abstract class BaseCamelTest {
 	
 	@Autowired
 	protected ApplicationContext applicationContext;
