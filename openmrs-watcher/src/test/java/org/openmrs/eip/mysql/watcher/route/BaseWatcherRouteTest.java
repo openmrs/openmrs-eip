@@ -39,10 +39,10 @@ public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 		env.getPropertySources().addLast(customPropSource);
 		if (!routesLoaded) {
 			loadXmlRoutesInDirectory("watcher-routes", "watcher-error-handler.xml", "db-event-listener.xml");
+			if (startDebezium()) {
+				loadXmlRoutesInDirectory("camel-test", "init-test.xml");
+			}
 			routesLoaded = true;
-		}
-		if (startDebezium()) {
-			loadXmlRoutesInDirectory("camel-test", "init-test.xml");
 		}
 	}
 	
