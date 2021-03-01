@@ -1,6 +1,5 @@
 package org.openmrs.eip.mysql.watcher.config;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,15 +51,16 @@ public class WatcherConfig {
 	
 	@Bean(Constants.PROP_SOURCE_BEAN_NAME)
 	public PropertySource getWatcherPropertySource(ConfigurableEnvironment env) {
-		Map<String, Object> props = Collections.singletonMap(Constants.PROP_PACKAGES_TO_SCAN,
+		Map<String, Object> props = new HashMap();
+		props.put(Constants.PROP_PACKAGES_TO_SCAN,
 		    new String[] { "org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa" });
-		PropertySource customPropSource = new MapPropertySource("watcherPropSource", props);
+		PropertySource customPropSource = new MapPropertySource(Constants.PROP_SOURCE_BEAN_NAME, props);
 		env.getPropertySources().addLast(customPropSource);
 		
 		return customPropSource;
 	}
 	
-	@Bean("customPropertySource")
+	@Bean(WatcherConstants.PROP_SOURCE_NAME)
 	public PropertySource getCustomPropertySource(ConfigurableEnvironment env) {
 		//Custom PropertySource that we can dynamically populate with generated property values which
 		//is not possible via the properties file e.g. to specify names of tables to sync.
@@ -77,7 +77,8 @@ public class WatcherConfig {
 		
 		Map<String, Object> props = new HashMap();
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
-		PropertySource customPropSource = new MapPropertySource("watcherPropSource", props);
+		props.put(WatcherConstants.PROP_URI_EVENT_PROCESSOR, WatcherConstants.URI_EVENT_PROCESSOR);
+		PropertySource customPropSource = new MapPropertySource(WatcherConstants.PROP_SOURCE_NAME, props);
 		env.getPropertySources().addLast(customPropSource);
 		
 		return customPropSource;
