@@ -27,7 +27,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="route" type="VARCHAR(50)">
+            <column name="destination" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="attempt_count" type="INT">
