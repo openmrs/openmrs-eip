@@ -115,8 +115,8 @@ properties that take directory paths as values e.g. log file, complex obs data d
 1. Create an installation directory for your receiver app.
 2. Copy to the working directory the `dbsync-receiver-app-{VERSION}.jar` file that was generated when you built OpenMRS
    EIP above, this file should be located in the `dbsync-receiver-app/target` folder.
-3. There is an application.properties file in the `dbsync-receiver-app/config` directory relative to the root of the 
-   OpenMR EIP project, copy it to your installation directory.
+3. There is an application.properties file in the `dbsync-receiver-app/configuration` directory relative to the root of 
+   the OpenMR EIP project, copy it to your installation directory.
 4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values
    accordingly, carefully read the in-inline documentation as you set each property value.
    **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for
@@ -155,8 +155,8 @@ defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to y
     1. Create an installation directory for your sender app.
     2. Copy to the working directory the `dbsync-sender-app-{VERSION}.jar` file that was generated when you built OpenMRS
        EIP above, this file should be located in the `dbsync-sender-app/target` folder.
-    3. There is an application.properties file in the `dbsync-sender-app/config` directory relative to the root of the 
-       OpenMR EIP project, copy it to your installation directory.
+    3. There is an application.properties file in the `dbsync-sender-app/configuration` directory relative to the root 
+       of the OpenMR EIP project, copy it to your installation directory.
     4. Open the `application.properties` you just copied above to the installation directory and set the property values
        accordingly, carefully read the in-inline documentation as you set each property value.
     5. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to 
