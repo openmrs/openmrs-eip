@@ -2,7 +2,6 @@ package org.openmrs.eip;
 
 import static org.openmrs.eip.BaseDbBackedCamelTest.mysqlContainer;
 
-import org.hibernate.dialect.MySQLDialect;
 import org.openmrs.eip.app.management.config.Constants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -26,7 +25,6 @@ public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 			propSource.getSource().put("openmrs.db.name", mysqlContainer.getDatabaseName());
 			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl", mysqlContainer.getJdbcUrl());
 			propSource.getSource().put("spring.openmrs-datasource.driverClassName", Driver.class.getName());
-			propSource.getSource().put("spring.openmrs-datasource.dialect", MySQLDialect.class.getName());
 			propSource.getSource().put("spring.openmrs-datasource.username", "root");
 			propSource.getSource().put("spring.openmrs-datasource.password", mysqlContainer.getPassword());
 		}
