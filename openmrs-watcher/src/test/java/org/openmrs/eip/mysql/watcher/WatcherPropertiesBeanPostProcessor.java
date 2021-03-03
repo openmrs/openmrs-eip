@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
 
 import org.springframework.beans.BeansException;
@@ -18,6 +19,7 @@ public class WatcherPropertiesBeanPostProcessor implements BeanPostProcessor {
 		if (WatcherConstants.PROP_SOURCE_NAME.equals(beanName)) {
 			MapPropertySource propSource = (MapPropertySource) bean;
 			propSource.getSource().put(WatcherConstants.PROP_URI_EVENT_PROCESSOR, URI_MOCK_EVENT_PROCESSOR);
+			propSource.getSource().put(WatcherConstants.PROP_URI_ERROR_HANDLER, URI_MOCK_ERROR_HANDLER);
 		}
 		
 		return bean;

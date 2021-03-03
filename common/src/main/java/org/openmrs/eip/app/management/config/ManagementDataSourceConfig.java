@@ -77,9 +77,12 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(value = "jpa")
-	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory) {
+	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory,
+	                        @Qualifier(value = "mngtTransactionManager") PlatformTransactionManager txMgr) {
+		
 		JpaComponent comp = new JpaComponent();
 		comp.setEntityManagerFactory(entityManagerFactory);
+		comp.setTransactionManager(txMgr);
 		
 		return comp;
 	}

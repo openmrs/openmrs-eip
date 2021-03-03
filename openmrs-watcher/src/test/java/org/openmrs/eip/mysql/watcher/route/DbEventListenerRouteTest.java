@@ -1,38 +1,62 @@
 package org.openmrs.eip.mysql.watcher.route;
 
+import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.junit.Assert.assertFalse;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
+import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.mysql.watcher.Event;
+import org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 
+@Ignore
 public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
 	private static final String URI = "direct:db-event-listener";
 	
+	private static final String TABLE_NAME = "person";
+	
+	private static final String ENTITY_CLASS = SenderRetryQueueItem.class.getSimpleName();
+	
 	@EndpointInject(URI_MOCK_EVENT_PROCESSOR)
 	private MockEndpoint mockProcessorEndpoint;
+	
+	@EndpointInject(URI_MOCK_ERROR_HANDLER)
+	private MockEndpoint mockErrorHandlerEndpoint;
 	
 	@Before
 	public void setup() {
 		mockProcessorEndpoint.reset();
+		mockErrorHandlerEndpoint.reset();
 	}
 	
 	private void addStandardExpectations(Event event) {
 		mockProcessorEndpoint.expectedMessageCount(1);
 		mockProcessorEndpoint.expectedBodiesReceived(event);
 		mockProcessorEndpoint.expectedPropertyReceived(PROP_EVENT, event);
-		mockProcessorEndpoint.expectedPropertyReceived(PROP_RETRY_MAP, event);
 	}
 	
 	@Test
 	public void shouldSetTheExchangeProperties() throws Exception {
-		Event event = createEvent("person", "1", "person-uuid", "c");
+		Map<String, Object> props = new HashMap();
+		props.put(PROP_EVENT_DESTINATIONS, URI_MOCK_EVENT_PROCESSOR);
+		PropertySource customPropSource = new MapPropertySource("test", props);
+		env.getPropertySources().addLast(customPropSource);
+		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		Event event = createEvent(TABLE_NAME, "1", "person-uuid", "c");
 		addStandardExpectations(event);
 		Map retryCountMap = new HashMap();
 		retryCountMap.put(URI_MOCK_EVENT_PROCESSOR, 0);
@@ -44,11 +68,46 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldAddTheEntityRetryItemsForTheRoute() throws Exception {
-		Event event = createEvent("person", "1", "person-uuid", "c");
+	@Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
+	public void shouldFailIfTheEntityHasAnItemInTheErrorQueueWithAnInvalidDestination() throws Exception {
+		Map<String, Object> props = new HashMap();
+		props.put(PROP_EVENT_DESTINATIONS, "mock:no-where");
+		PropertySource customPropSource = new MapPropertySource("test", props);
+		env.getPropertySources().addLast(customPropSource);
+		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		mockErrorHandlerEndpoint.expectedMessageCount(1);
+		final String id = "2";
+		String q = "jpa:" + ENTITY_CLASS + "?query=SELECT r from " + ENTITY_CLASS + " r WHERE r.event.tableName='"
+		        + TABLE_NAME + "' AND r.event.primaryKeyId='" + id + "' AND r.route = 'direct:invalid-dest'";
+		List<Map> existingFailures = on(camelContext).to(q).request(List.class);
+		assertFalse(existingFailures.isEmpty());
+		Event event = createEvent(TABLE_NAME, id, "person-uuid-2", "u");
+		
+		producerTemplate.sendBodyAndProperty(URI, null, PROP_EVENT, event);
+		
+		mockErrorHandlerEndpoint.assertIsSatisfied();
+	}
+	
+	@Test
+	@Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
+	public void shouldFailIfTheEntityAlreadyHasAnItemInTheErrorQueue() throws Exception {
+		final String dbSyncUri = "direct:db-sync";
+		final String senaiteUri = "direct:senaite";
+		Map<String, Object> props = new HashMap();
+		props.put(PROP_EVENT_DESTINATIONS, dbSyncUri + "," + senaiteUri);
+		PropertySource customPropSource = new MapPropertySource("test", props);
+		env.getPropertySources().addLast(customPropSource);
+		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		final String id = "1";
+		String q = "jpa:" + ENTITY_CLASS + "?query=SELECT r from " + ENTITY_CLASS + " r WHERE r.event.tableName='"
+		        + TABLE_NAME + "' AND r.event.primaryKeyId='" + id + "' AND r.route = 'direct:db-sync'";
+		List<Map> existingFailures = on(camelContext).to(q).request(List.class);
+		assertFalse(existingFailures.isEmpty());
+		Event event = createEvent(TABLE_NAME, id, "person-uuid-2", "u");
 		addStandardExpectations(event);
 		Map retryCountMap = new HashMap();
-		retryCountMap.put(URI_MOCK_EVENT_PROCESSOR, 0);
+		retryCountMap.put(dbSyncUri, 2);
+		retryCountMap.put(senaiteUri, 1);
 		mockProcessorEndpoint.expectedPropertyReceived(PROP_RETRY_MAP, retryCountMap);
 		
 		producerTemplate.sendBodyAndProperty(URI, null, PROP_EVENT, event);

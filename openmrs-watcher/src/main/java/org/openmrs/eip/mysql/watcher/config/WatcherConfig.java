@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
+
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
 
 @Configuration
 @ComponentScan("org.openmrs.eip.mysql.watcher")
@@ -38,8 +41,9 @@ public class WatcherConfig {
 	}
 	
 	@Bean(WatcherConstants.ERROR_HANDLER_REF)
+	@DependsOn(WatcherConstants.PROP_SOURCE_NAME)
 	public DeadLetterChannelBuilder getWatcherErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:watcher-error-handler");
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
 		builder.setUseOriginalMessage(true);
 		return builder;
 	}
@@ -78,6 +82,7 @@ public class WatcherConfig {
 		Map<String, Object> props = new HashMap();
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
 		props.put(WatcherConstants.PROP_URI_EVENT_PROCESSOR, WatcherConstants.URI_EVENT_PROCESSOR);
+		props.put(PROP_URI_ERROR_HANDLER, WatcherConstants.URI_ERROR_HANDLER);
 		PropertySource customPropSource = new MapPropertySource(WatcherConstants.PROP_SOURCE_NAME, props);
 		env.getPropertySources().addLast(customPropSource);
 		
