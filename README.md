@@ -199,9 +199,14 @@ Both DB sync applications (sender and receiver) come with an embedded management
 entity events for purposes of re-processing, the receiver app also stores the entities with conflicts in a table in this 
 database
 
-The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend
+The management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend
 those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same
 physical machine as the application to eliminate any possibility of being unreachable.
+
+The management database(s) can be accessed from the browser at the http://localhost:{TOMCAT.PORT}/{H2.PATH} where 
+`{TOMCAT.PORT}` and `{H2.PATH}` are the property values set in the associated properties files for `server.port` and 
+`spring.h2.console.path` respectively. **Note** that the property `spring.h2.console.enabled` must be set to true to access 
+the database console application.
 
 # Error Handling And Retry Mechanism
 Both DB sync applications (sender and receiver) have a built-in error handling and retry mechanism in

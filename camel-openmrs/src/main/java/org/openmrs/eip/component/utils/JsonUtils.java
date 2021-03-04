@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.SyncModel;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -59,4 +60,15 @@ public final class JsonUtils {
             throw new EIPException("Error while unmarshalling object", e);
         }
     }
+
+    /**
+     * Utility method to unmarshal a JSON string representing a SyncModel object
+     *
+     * @param json
+     * @return the SyncModel object
+     */
+    public static SyncModel unmarshalSyncModel(String json) {
+        return unmarshal(json, SyncModel.class);
+    }
+    
 }

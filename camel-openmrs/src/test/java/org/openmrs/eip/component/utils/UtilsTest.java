@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.openmrs.eip.component.model.DrugOrderModel;
+import org.openmrs.eip.component.model.OrderModel;
+import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.TestOrderModel;
+import org.openmrs.eip.component.model.VisitModel;
 
 public class UtilsTest {
 	
@@ -87,6 +93,84 @@ public class UtilsTest {
 		assertEquals(2, tables.size());
 		assertTrue(tables.contains("'" + tableName + "'"));
 		assertTrue(tables.contains("'orders'"));
+	}
+	
+	@Test
+	public void getListOfModelClassHierarchy_shouldReturnSubclassAndSuperClassNames() {
+		String className = VisitModel.class.getName();
+		List<String> classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(1, classes.size());
+		assertTrue(classes.contains(className));
+		
+		className = PatientModel.class.getName();
+		classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains(className));
+		assertTrue(classes.contains(PersonModel.class.getName()));
+		
+		className = PersonModel.class.getName();
+		classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains(className));
+		assertTrue(classes.contains(PatientModel.class.getName()));
+		
+		className = OrderModel.class.getName();
+		classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(3, classes.size());
+		assertTrue(classes.contains(className));
+		assertTrue(classes.contains(TestOrderModel.class.getName()));
+		assertTrue(classes.contains(DrugOrderModel.class.getName()));
+		
+		className = TestOrderModel.class.getName();
+		classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains(className));
+		assertTrue(classes.contains(OrderModel.class.getName()));
+		
+		className = DrugOrderModel.class.getName();
+		classes = Utils.getListOfModelClassHierarchy(className);
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains(className));
+		assertTrue(classes.contains(OrderModel.class.getName()));
+	}
+	
+	@Test
+	public void getModelClassesInHierarchy_shouldReturnCommaSeparatedListOfSubclassAndSuperClassNames() {
+		String className = VisitModel.class.getName();
+		List<String> classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(1, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		
+		className = PatientModel.class.getName();
+		classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		assertTrue(classes.contains("'" + PersonModel.class.getName() + "'"));
+		
+		className = PersonModel.class.getName();
+		classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		assertTrue(classes.contains("'" + PatientModel.class.getName() + "'"));
+		
+		className = OrderModel.class.getName();
+		classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(3, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		assertTrue(classes.contains("'" + TestOrderModel.class.getName() + "'"));
+		assertTrue(classes.contains("'" + DrugOrderModel.class.getName() + "'"));
+		
+		className = TestOrderModel.class.getName();
+		classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		assertTrue(classes.contains("'" + OrderModel.class.getName() + "'"));
+		
+		className = DrugOrderModel.class.getName();
+		classes = stream(Utils.getModelClassesInHierarchy(className).split(",")).collect(Collectors.toList());
+		assertEquals(2, classes.size());
+		assertTrue(classes.contains("'" + className + "'"));
+		assertTrue(classes.contains("'" + OrderModel.class.getName() + "'"));
 	}
 	
 }

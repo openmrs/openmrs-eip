@@ -60,7 +60,7 @@ public class JsonUtilsTest {
                 .tableToSyncModelClass(PersonModel.class)
                 .model(expectedModel)
                 .build();
-        assertEquals(expected, result);
+        assertEquals(expected.getModel().getUuid(), result.getModel().getUuid());
     }
 
     @Test(expected = EIPException.class)

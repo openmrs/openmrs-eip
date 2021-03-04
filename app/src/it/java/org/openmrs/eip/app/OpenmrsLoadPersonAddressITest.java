@@ -7,8 +7,9 @@ import org.junit.Test;
 import org.openmrs.eip.component.entity.PersonAddress;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.model.PersonAddressModel;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
-import org.openmrs.eip.component.service.security.PGPEncryptService;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
@@ -18,14 +19,11 @@ public class OpenmrsLoadPersonAddressITest extends OpenmrsLoadEndpointITest {
     @Autowired
     private SyncEntityRepository<PersonAddress> repository;
 
-    @Autowired
-    private PGPEncryptService pgpEncryptService;
-
     @Test
     public void load() {
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getIn().setBody("sender:openmrs-remote@icrc.org\n" + pgpEncryptService.encryptAndSign(getPersonJson()));
+        exchange.getIn().setBody(getPersonModel());
 
         // When
         template.send(exchange);
@@ -41,8 +39,8 @@ public class OpenmrsLoadPersonAddressITest extends OpenmrsLoadEndpointITest {
         repository.delete(p);
     }
 
-    private String getPersonJson() {
-        return "{" +
+    private SyncModel getPersonModel() {
+        return JsonUtils.unmarshalSyncModel("{" +
                 "\"tableToSyncModelClass\":\"" + PersonAddressModel.class.getName() + "\"," +
                 "\"model\":{" +
                 "\"uuid\":\"818b4ee6-8d68-4849-975d-80ab98016677\"," +
@@ -57,7 +55,7 @@ public class OpenmrsLoadPersonAddressITest extends OpenmrsLoadEndpointITest {
                 "\"address\":{" +
                 "\"address1\":\"chemin perdu\"" +
                 "}" +
-                "}" +
-                "}";
+                "},\"metadata\":{\"operation\":\"c\"}" +
+                "}");
     }
 }

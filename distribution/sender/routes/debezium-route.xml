@@ -16,10 +16,6 @@
                 #{getProperty('event').setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
             </spel>
         </script>
-        <setProperty name="table-names">
-            <!-- We need to look up failed events for rows in both the parent and subclass tables -->
-            <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
-        </setProperty>
         <setProperty name="is-subclass">
             <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
         </setProperty>
@@ -55,6 +51,11 @@
                         <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
                     </script>
                 </split>
+                
+                <setProperty name="table-names">
+                    <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+                    <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
+                </setProperty>
 
                 <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.table-names}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
 
