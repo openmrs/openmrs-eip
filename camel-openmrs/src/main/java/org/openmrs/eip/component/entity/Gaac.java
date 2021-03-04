@@ -54,7 +54,7 @@ public class Gaac extends BaseChangeableDataEntity {
     private LocationLight location;
 
     @Column(name = "crumbled")
-    private Integer crumbled;
+    private Boolean crumbled;
     
     @Column(name = "reason_crumbled")
     private String reasonCrumbled;

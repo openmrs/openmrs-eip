@@ -44,7 +44,7 @@ public class GaacFamily extends BaseChangeableDataEntity {
 
     @NotNull
     @Column(name = "crumbled")
-    private Integer crumbled;
+    private Boolean crumbled;
     
     @Column(name = "reason_crumbled")
     private String reasonCrumbled;
