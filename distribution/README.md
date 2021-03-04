@@ -147,12 +147,12 @@ Each application will be launched with the appropriate Spring Boot profile param
 - sender app:
  ```
 cd distribution/sender
-java -jar -Dspring.profiles.active=sender ../../../app/target/openmrs-eip-app-1.0-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=sender ../../../app/target/openmrs-eip-app-2.0-SNAPSHOT.jar
 ```
 - receiver app:
 ```
 cd distribution/receiver
-java -jar -Dspring.profiles.active=receiver ../../../app/target/openmrs-eip-app-1.0-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=receiver ../../../app/target/openmrs-eip-app-2.0-SNAPSHOT.jar
 ```
 
 # Security

@@ -42,7 +42,7 @@ of DB events and do something useful.
     <dependency>
         <groupId>org.openmrs.eip</groupId>
         <artifactId>openmrs-watcher</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </dependency>
     ```
 3. Add a main class for your spring boot application, you can copy [`ExampleApplication`](../../example-app/src/main/java/org/openmrs/eip/example/ExampleApplication.java) 
