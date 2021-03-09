@@ -1,8 +1,11 @@
 package org.openmrs.eip.mysql.watcher.route;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_EVENT_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
 
@@ -19,10 +22,14 @@ import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 @Ignore
+@TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
+@TestPropertySource(properties = PROP_URI_EVENT_PROCESSOR + "=" + URI_MOCK_EVENT_PROCESSOR)
+@TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + URI_MOCK_ERROR_HANDLER)
 public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
 	private static final String URI = "direct:db-event-listener";
@@ -47,6 +54,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		mockProcessorEndpoint.expectedMessageCount(1);
 		mockProcessorEndpoint.expectedBodiesReceived(event);
 		mockProcessorEndpoint.expectedPropertyReceived(PROP_EVENT, event);
+		mockErrorHandlerEndpoint.expectedMessageCount(0);
 	}
 	
 	@Test
@@ -65,6 +73,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		producerTemplate.sendBodyAndProperty(URI, null, PROP_EVENT, event);
 		
 		mockProcessorEndpoint.assertIsSatisfied();
+		mockErrorHandlerEndpoint.assertIsSatisfied();
 	}
 	
 	@Test
@@ -98,11 +107,12 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		PropertySource customPropSource = new MapPropertySource("test", props);
 		env.getPropertySources().addLast(customPropSource);
 		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		
 		final String id = "1";
 		String q = "jpa:" + ENTITY_CLASS + "?query=SELECT r from " + ENTITY_CLASS + " r WHERE r.event.tableName='"
-		        + TABLE_NAME + "' AND r.event.primaryKeyId='" + id + "' AND r.route = 'direct:db-sync'";
+		        + TABLE_NAME + "' AND r.event.primaryKeyId='" + id + "' AND r.route = '" + dbSyncUri + "'";
 		List<Map> existingFailures = on(camelContext).to(q).request(List.class);
-		assertFalse(existingFailures.isEmpty());
+		assertEquals(2, existingFailures.size());
 		Event event = createEvent(TABLE_NAME, id, "person-uuid-2", "u");
 		addStandardExpectations(event);
 		Map retryCountMap = new HashMap();
@@ -113,6 +123,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		producerTemplate.sendBodyAndProperty(URI, null, PROP_EVENT, event);
 		
 		mockProcessorEndpoint.assertIsSatisfied();
+		mockErrorHandlerEndpoint.assertIsSatisfied();
 	}
 	
 }

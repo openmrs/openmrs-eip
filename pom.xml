@@ -37,7 +37,6 @@
         <jsonassert.version>1.5.0</jsonassert.version>
         <json.version>20190722</json.version>
         <testContainersVersion>1.15.2</testContainersVersion>
-        <debeziumTestContainersVersion>1.5.0.Beta1</debeziumTestContainersVersion>
         <exclude.tests>nothing-to-exclude</exclude.tests>
     </properties>
 
@@ -57,12 +56,6 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>mysql</artifactId>
                 <version>${testContainersVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.debezium</groupId>
-                <artifactId>debezium-testing-testcontainers</artifactId>
-                <version>${debeziumTestContainersVersion}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

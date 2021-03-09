@@ -2,17 +2,18 @@ package org.openmrs.eip.mysql.watcher.route;
 
 import org.openmrs.eip.BaseDbBackedCamelTest;
 import org.openmrs.eip.mysql.watcher.Event;
-import org.openmrs.eip.mysql.watcher.WatcherTestConfig;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * Base class for tests for routes that wish to be notified of DB events in the backing OpenMRS
  * database, .
  */
-@Import({ WatcherConfig.class, WatcherTestConfig.class })
+@Import(WatcherConfig.class)
+@TestPropertySource("classpath:watcher-application-test.properties")
 public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	
 	protected static final String PROP_EVENT = "event";
@@ -30,15 +31,6 @@ public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 		event.setOperation(operation);
 		event.setSnapshot(false);
 		return event;
-	}
-	
-	/**
-	 * Subclasses that need the actual debezium events can override this method and return true
-	 * 
-	 * @return true if debezium engine should be started otherwise false
-	 */
-	protected boolean startDebezium() {
-		return false;
 	}
 	
 }

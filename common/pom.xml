@@ -46,10 +46,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.debezium</groupId>
-            <artifactId>debezium-testing-testcontainers</artifactId>
-        </dependency>
     </dependencies>
     
 </project>
