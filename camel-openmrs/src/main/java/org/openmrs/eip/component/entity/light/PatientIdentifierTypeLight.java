@@ -19,4 +19,12 @@ public class PatientIdentifierTypeLight extends RetireableLightEntity {
     @NotNull
     @Column(name = "name")
     private String name;
+
+    @NotNull
+    private Boolean required;
+
+    @NotNull
+    @Column(name="check_digit")
+    private Boolean checkDigit;
+    
 }
