@@ -16,17 +16,33 @@
 
             <log message="Decrypted message -> ${body}" loggingLevel="TRACE" />
         </when>
-        
+
+        <setProperty name="is-file">
+            <method ref="isFilePredicate" />
+        </setProperty>
+
         <choice>
             <when>
-                <method ref="isFilePredicate" />
+                <simple>${exchangeProperty.is-file} == true</simple>
                 <log message="Received complex_obs data file: ${headers.CamelFileName}" />
-                <!-- TODO Broadcast the message to other listeners -->
+
+                <transform>
+                    <method ref="removeFileTagsExpression" />
+                </transform>
+                <setProperty name="sync-metadata">
+                    <simple>${body.split("#")[0]}</simple>
+                </setProperty>
+                <setBody>
+                    <simple>${body.split("#")[1]}</simple>
+                </setBody>
+
+                <process ref="syncStatusProcessor" />
 
                 <to uri="direct:inbound-complex-obs-sync" />
             </when>
             <otherwise>
                 <log message="Received entity-payload: ${body}" />
+
                 <setProperty name="entity-payload">
                     <simple>${body}</simple>
                 </setProperty>
@@ -36,31 +52,14 @@
                 <setProperty name="entity-id">
                     <jsonpath>$.model.uuid</jsonpath>
                 </setProperty>
-                <choice>
-                    <when>
-                        <!-- If this not a record for a deleted entity -->
-                        <simple>${body} is 'byte[]'</simple>
-                    </when>
-                    <!--<when>
-                        Deleted entity and uuid is present
-                        <simple>${body.trim().split(":").length} == 3</simple>
-                        <setProperty name="entity-payload">
-                            <simple>${body}</simple>
-                        </setProperty>
-                        <setProperty name="entity-table">
-                            <simple>${body.trim().split(":")[1]}</simple>
-                        </setProperty>
-                        <setProperty name="table-to-sync-enum">
-                            <method beanType="org.openmrs.eip.component.service.TableToSyncEnum" method="getTableToSyncEnum(${exchangeProperty.entity-table})" />
-                        </setProperty>
-                        <setProperty name="model-class">
-                            <simple>${exchangeProperty.table-to-sync-enum.getModelClass().getName()}</simple>
-                        </setProperty>
-                        <setProperty name="entity-id">
-                            <simple>${body.trim().split(":")[2]}</simple>
-                        </setProperty>
-                    </when>-->
-                </choice>
+                <setBody>
+                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body})" />
+                </setBody>
+                <setProperty name="sync-model">
+                    <simple>${body}</simple>
+                </setProperty>
+
+                <process ref="syncStatusProcessor" />
 
                 <choice>
                     <when>
@@ -91,7 +90,7 @@
                         <log message="Forwarding to {{message.destination}} route" loggingLevel="DEBUG" />
 
                         <setBody>
-                            <simple>${exchangeProperty.entity-payload}</simple>
+                            <simple>${exchangeProperty.sync-model}</simple>
                         </setBody>
 
                         <toD uri="direct:{{message.destination}}" />

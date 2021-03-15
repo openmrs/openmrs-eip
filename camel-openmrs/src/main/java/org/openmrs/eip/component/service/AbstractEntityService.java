@@ -134,6 +134,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
         E entity = repository.findByUuid(uuid);
         if (entity != null) {
             repository.delete(entity);
+            log.info(getMsg(entity, uuid, " deleted"));
         } else {
             log.warn("No " + getTableToSync().getEntityClass().getName() + " found matching uuid: " + uuid);
         }

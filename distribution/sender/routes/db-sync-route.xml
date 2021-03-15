@@ -9,8 +9,16 @@
             <when>
                 <simple>${exchangeProperty.event.operation} == 'd'</simple>
                 <setBody>
-                    <simple>DELETE:${exchangeProperty.event.tableName}:${exchangeProperty.event.identifier}</simple>
+                    <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
                 </setBody>
+                <script>
+                    <spel>
+                        #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('event').tableName).modelClass)}
+                        #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
+                        #{body.model.setUuid(getProperty('event').identifier)}
+                        #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
+                    </spel>
+                </script>
 
                 <log message="Deleted entity payload -> ${body}" />
             </when>
@@ -21,19 +29,9 @@
 
                 <choice>
                     <when>
-                        <simple>${body} != '[]'</simple>
+                        <simple>${body.size()} == 1</simple>
                         <setBody>
                             <jsonpath>$[0]</jsonpath>
-                        </setBody>
-                        <script>
-                            <spel>
-                                #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                                #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
-                                #{body.metadata.setOperation(getProperty('event').operation)}
-                            </spel>
-                        </script>
-                        <setBody>
-                            <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
                         </setBody>
                     </when>
                     <otherwise>
@@ -48,6 +46,16 @@
         <choice>
             <when>
                 <simple>${body} != null</simple>
+                <script>
+                    <spel>
+                        #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
+                        #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
+                        #{body.metadata.setOperation(getProperty('event').operation)}
+                    </spel>
+                </script>
+                <setBody>
+                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
+                </setBody>
 
                 <log message="Sync data -> ${body}" />
 

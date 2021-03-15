@@ -111,32 +111,56 @@ In practice, the sender and receiver applications are installed on separate phys
 on a dev or testing machine this could be the same machine so be careful to use different directories for application 
 properties that take directory paths as values e.g. log file, complex obs data directory and others.
 
-### Receiver 
-1. Create an installation directory for your receiver app.
-2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-   EIP above, this file should be located in the `app/target` folder.
-3. There is an application.properties file in the `distribution/docs/receiver` directory relative to the root of the 
-   OpenMR EIP project, copy it to your installation directory.   
-4. Open the `application.properties` you just copied in step 2 to the installation directory and set the property values 
-   accordingly, carefully read the in-inline documentation as you set each property value.
-   **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
-   an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create 
-   a specific user account for this application and use its username and password as values for the `openmrs.username` 
-   and `openmrs.password` properties respectively in the `application.properties`.
-5. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/receiver` to 
-   your installation directory.
-6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
-   installation directory.
-7. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
-```shell
-java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
-```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which 
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+### Receiver
+1. #### Installing the Receiver Application
+    1. Create an installation directory for your receiver app.
+    2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
+       EIP above, this file should be located in the `app/target` folder.
+    3. There is an application.properties file in the `distribution/docs/receiver` directory relative to the root of the 
+       OpenMR EIP project, copy it to your installation directory.   
+    4. Open the `application.properties` you just copied in step `ii` to the installation directory and set the property values 
+       accordingly, carefully read the in-inline documentation as you set each property value.
+       **Note:** The receiver sync app makes rest calls to trigger search index rebuilds whenever it processes a payload for 
+       an indexed entity e.g. person_name, person_attribute, patient_identifier etc. It's highly recommended that you create 
+       a specific user account for this application and use its username and password as values for the `openmrs.username` 
+       and `openmrs.password` properties respectively in the `application.properties`.
+    5. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/receiver` to 
+       your installation directory.
+    6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+       installation directory.
+    7. Launch the receiver app by navigating to its installation directory from the terminal and run the command below.
+    ```shell
+    java -jar -Dspring.profiles.active=receiver openmrs-eip-app-{VERSION}.jar
+    ```
+    Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+    defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
+
+1. #### Preparation For Sync
+    The receiver application individually keeps track of the timestamp it last received a sync payload from each sending 
+    application in the **receiver_sync_status** table, in order to this it needs uniquely identify each sending application. 
+    Therefore, before any sending application can start pushing any sync data, the sender needs to obtain this unique 
+    identifier from the receiver and configure it in the sender application properties file, this is explained in detail 
+    in the sender installation steps.
+    
+    To register a sender application, log into the management H2 database console application, to access the management 
+    database console please refer to [Management Database](../../README.md#management-database), insert a row in the
+    **site_info** table which has the columns below,
+   
+    - `id`: The database primary key, it's auto generated, you don't have to provide a value
+    - `name`: A unique name for the sender application, this will be used for display purposes
+    - `identifier`: A unique identifier for the sender application
+    - `date_created`: The insertion date of the row
+
+    **Note** The identifier is what is given to the sender application team and should never be changed once the sender 
+    starts pushing any data.
 
 ### Sender
 
-1. #### Setup MySQL binlog
+1.  #### Be Unique
+    You MUST first request a unique sender id from the team that manages the receiver application and you'll configure it
+    in your `application.properties` file.
+
+2. #### Setup MySQL binlog
     Because the sending application relies on the embedded debezium engine, we need to first setup MySQL binary logging in 
     the sender site's OpenMRS database, please refer to this [enabling the binlog](https://debezium.io/documentation/reference/connectors/mysql.html#enable-mysql-binlog)
     section from the debezium docs, you will need some of the values you set when configuring the sender application, 
@@ -145,7 +169,7 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
     **DO NOT** set the `expire_logs_days` because you never want your logs to expire just in case the sync application is 
     run for a while due to unforeseen circumstances
 
-2. #### Debezium user account
+3. #### Debezium user account
 
     First we need to create a user account the debezium MySQL connector will use to read the sender site's Openmrs MySQl DB.
     This is just a standard practice so that the account is assigned just the privileges it needs to read the MySQL bin-log 
@@ -153,22 +177,25 @@ defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} i
     section from the debezium docs, you will need the created user account details when configuring the sender application.
     i.e. `debezium.db.user` and `debezium.db.password` properties in the sender `application.properties` file.
 
-3. #### Installing the Sender Application
+4. #### Installing the Sender Application
     1. Create an installation directory for your sender app.
     2. Copy to the working directory the `openmrs-eip-app-{VERSION}.jar` file that was generated when you built OpenMRS 
-       EIP above, this file should be located in the `distribution/docs/sender` folder.
-    3. Open the `application.properties` you just copied above to the installation directory and set the property values 
-       accordingly, carefully read the in-inline documentation as you set each property value.
-    4. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/sender` to
+       EIP above, this file should be located in the `app/target` folder.
+    3. There is an application.properties file in the `distribution/docs/sender` directory relative to the root of the 
+       OpenMR EIP project, copy it to your installation directory.
+    4. Open the `application.properties` you just copied above to the installation directory and set the property values 
+       accordingly, carefully read the in-inline documentation as you set each property value. Please remember to set the
+       `db-sync.senderId` property value which MUST match the id obtained from the receiver team in the [Be Unique](#be-unique) step.
+    5. Go to the folder where you cloned the git repository and copy the `routes` folder under `distribution/sender` to
        your installation directory.
-    5. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
+    6. It is highly recommended to set the value of the `eip.home` property in your properties file to match the path to your
        installation directory.
-    6. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
+    7. Launch the sender app by navigating to its installation directory from the terminal and run the command below.
     ```shell
     java -jar -Dspring.profiles.active=sender openmrs-eip-app-{VERSION}.jar
     ```
-Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
-defaults to `{USER.HOME}/.openmrs-eip/logs/openmrs-eip.log`, where {USER.HOME} is the path to your user home directory.
+    Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
+    defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
 # Security
 Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were

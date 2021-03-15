@@ -34,6 +34,9 @@
                     <setProperty name="retry-item">
                         <simple>${body[0]}</simple>
                     </setProperty>
+                    <setProperty name="model-class">
+                        <simple>${exchangeProperty.retry-item.modelClassName}</simple>
+                    </setProperty>
                     <log message="Updating attempt count for retry item" />
 
                     <script>
@@ -52,7 +55,7 @@
                             <log message="Re-processing: ${exchangeProperty.retry-item}" />
 
                             <setBody>
-                                <simple>${exchangeProperty.retry-item.entityPayload}</simple>
+                                <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${exchangeProperty.retry-item.entityPayload})" />
                             </setBody>
 
                             <toD uri="direct:{{message.destination}}" />

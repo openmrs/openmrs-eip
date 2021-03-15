@@ -6,7 +6,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet author="wluyima" id="20200202-1100">
+    <changeSet author="wluyima" id="20210202-1100">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="receiver_retry_queue"/>
@@ -39,7 +39,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20200202-1101">
+    <changeSet author="wluyima" id="20210202-1101">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="receiver_conflict_queue"/>
@@ -67,6 +67,60 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210202-1050">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="site_info"/>
+            </not>
+        </preConditions>
+        <comment>Adding site_info table</comment>
+
+        <createTable tableName="site_info">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210202-1055">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_status"/>
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_status table</comment>
+
+        <createTable tableName="receiver_sync_status">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="site_info_id" type="BIGINT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="last_sync_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="sync_status_site_fk"
+                                 baseTableName="receiver_sync_status"
+                                 baseColumnNames="site_info_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
 </databaseChangeLog>

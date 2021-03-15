@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.management.entity;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,17 +14,26 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	
 	//TODO This should be mapped as a @OneToOne association when we build a UI
 	@Column(name = "site_info_id", nullable = false, updatable = false, unique = true)
-	private Integer siteInfoId;
+	private Long siteInfoId;
 	
 	@Column(name = "last_sync_date", nullable = false)
-	private LocalDateTime lastSyncDate;
+	private Date lastSyncDate;
+	
+	public ReceiverSyncStatus() {
+		
+	}
+	
+	public ReceiverSyncStatus(Long siteInfoId, Date lastSyncDate) {
+		this.siteInfoId = siteInfoId;
+		this.lastSyncDate = lastSyncDate;
+	}
 	
 	/**
 	 * Gets the siteInfoId
 	 *
 	 * @return the siteInfoId
 	 */
-	public Integer getSiteInfoId() {
+	public Long getSiteInfoId() {
 		return siteInfoId;
 	}
 	
@@ -33,7 +42,7 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	 *
 	 * @param siteInfoId the siteInfoId to set
 	 */
-	public void setSiteInfoId(Integer siteInfoId) {
+	public void setSiteInfoId(Long siteInfoId) {
 		this.siteInfoId = siteInfoId;
 	}
 	
@@ -42,7 +51,7 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	 *
 	 * @return the lastSyncDate
 	 */
-	public LocalDateTime getLastSyncDate() {
+	public Date getLastSyncDate() {
 		return lastSyncDate;
 	}
 	
@@ -51,8 +60,12 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	 *
 	 * @param lastSyncDate the lastSyncDate to set
 	 */
-	public void setLastSyncDate(LocalDateTime lastSyncDate) {
+	public void setLastSyncDate(Date lastSyncDate) {
 		this.lastSyncDate = lastSyncDate;
 	}
 	
+	@Override
+	public String toString() {
+		return "ReceiverSyncStatus {siteInfoId=" + siteInfoId + ", lastSyncDate=" + lastSyncDate + "}";
+	}
 }

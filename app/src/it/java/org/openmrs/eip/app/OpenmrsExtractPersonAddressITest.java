@@ -10,9 +10,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.time.LocalDateTime.of;
-import static java.time.ZoneId.systemDefault;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 
 public class OpenmrsExtractPersonAddressITest extends OpenmrsExtractEndpointITest {
@@ -43,7 +40,7 @@ public class OpenmrsExtractPersonAddressITest extends OpenmrsExtractEndpointITes
                     "\"model\":{" +
                         "\"uuid\":\"uuid_person_address\"," +
                         "\"creatorUuid\":\"" + UserLight.class.getName() + "(user_uuid)\"," +
-                        "\"dateCreated\":\"" + of(2005, 1, 1, 0, 0, 0).atZone(systemDefault()).format(ISO_OFFSET_DATE_TIME)+ "\"," +
+                        "\"dateCreated\":\"2005-01-01T00:00:00\"," +
                         "\"changedByUuid\":null," +
                         "\"dateChanged\":null," +
                         "\"voided\":false," +

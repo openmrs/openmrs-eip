@@ -56,9 +56,7 @@ public abstract class OpenmrsLoadEndpointITest {
         return new RouteBuilder() {
             @Override
             public void configure() {
-                from(getUri())
-                        .process(pgpDecryptService)
-                        .to("openmrs:load");
+                from(getUri()).to("openmrs:load");
             }
         };
     }

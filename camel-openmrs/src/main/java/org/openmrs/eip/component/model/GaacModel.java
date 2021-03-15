@@ -13,7 +13,7 @@ public class GaacModel extends BaseChangeableDataModel {
 	private String focalPatientUuid;
 	private String affinityTypeUuid;
 	private String locationUuid;
-	private Integer crumbled;
+	private Boolean crumbled;
 	private String reasonCrumbled;
 	protected LocalDateTime dateCrumbled;
 	
@@ -53,12 +53,7 @@ public class GaacModel extends BaseChangeableDataModel {
 	public void setLocationUuid(String locationUuid) {
 		this.locationUuid = locationUuid;
 	}
-	public Integer getCrumbled() {
-		return crumbled;
-	}
-	public void setCrumbled(Integer crumbled) {
-		this.crumbled = crumbled;
-	}
+		
 	public String getReasonCrumbled() {
 		return reasonCrumbled;
 	}
@@ -76,5 +71,11 @@ public class GaacModel extends BaseChangeableDataModel {
 	}
 	public void setAffinityTypeUuid(String affinityTypeUuid) {
 		this.affinityTypeUuid = affinityTypeUuid;
+	}
+	public Boolean getCrumbled() {
+		return crumbled;
+	}
+	public void setCrumbled(Boolean crumbled) {
+		this.crumbled = crumbled;
 	}	 
 }

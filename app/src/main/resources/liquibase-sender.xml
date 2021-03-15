@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet author="wluyima" id="20200201-1101">
+    <changeSet author="wluyima" id="20210201-1101">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="sender_retry_queue"/>
@@ -28,7 +28,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="route" type="VARCHAR(50)">
+            <column name="destination" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="attempt_count" type="INT">
@@ -47,7 +47,7 @@
         
     </changeSet>
 
-    <changeSet author="wluyima" id="20200201-1102">
+    <changeSet author="wluyima" id="20210201-1102">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="hibernate_sequence" />
@@ -57,7 +57,7 @@
         <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
     </changeSet>
 
-    <changeSet author="wluyima" id="20200201-1103">
+    <changeSet author="wluyima" id="20210201-1103">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="camel_messageprocessed"/>

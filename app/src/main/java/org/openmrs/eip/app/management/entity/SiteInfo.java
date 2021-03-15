@@ -13,6 +13,9 @@ public class SiteInfo extends AbstractEntity {
 	@Column(nullable = false, unique = true)
 	private String name;
 	
+	@Column(nullable = false, unique = true)
+	private String identifier;
+	
 	/**
 	 * Gets the name
 	 *
@@ -29,6 +32,24 @@ public class SiteInfo extends AbstractEntity {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	/**
+	 * Gets the identifier
+	 *
+	 * @return the identifier
+	 */
+	public String getIdentifier() {
+		return identifier;
+	}
+	
+	/**
+	 * Sets the identifier
+	 *
+	 * @param identifier the identifier to set
+	 */
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 	
 	@Override

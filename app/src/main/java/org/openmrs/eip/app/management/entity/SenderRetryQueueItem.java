@@ -22,8 +22,8 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
     @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
     private Event event;
 
-    //the camel route where this event couldn't be processed
-    @Column(nullable = false, updatable = false, length = 50)
+    //the destination where this event couldn't be processed, typically a uri
+    @Column(name="destination", nullable = false, updatable = false, length = 50)
     private String route;
 
     /**
