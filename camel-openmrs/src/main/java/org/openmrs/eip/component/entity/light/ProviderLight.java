@@ -14,4 +14,5 @@ import javax.persistence.Table;
 @Table(name = "provider")
 @AttributeOverride(name = "id", column = @Column(name = "provider_id"))
 public class ProviderLight extends RetireableLightEntity {
+	
 }

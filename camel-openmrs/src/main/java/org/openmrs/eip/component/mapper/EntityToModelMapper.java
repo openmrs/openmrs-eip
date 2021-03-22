@@ -1,15 +1,16 @@
 package org.openmrs.eip.component.mapper;
 
-import lombok.extern.slf4j.Slf4j;
-import org.openmrs.eip.component.mapper.operations.Context;
-import org.openmrs.eip.component.model.BaseModel;
-import org.openmrs.eip.component.entity.BaseEntity;
-import org.springframework.stereotype.Component;
-
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+
+import org.openmrs.eip.component.entity.BaseEntity;
+import org.openmrs.eip.component.mapper.operations.Context;
+import org.openmrs.eip.component.model.BaseModel;
+import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -35,7 +36,6 @@ public class EntityToModelMapper<E extends BaseEntity, M extends BaseModel> impl
 
     @Override
     public M apply(final E entity) {
-
         return instantiateModel
                 .andThen(copyStandardFields)
                 .andThen(forEachLinkedEntity(extractUuid))
