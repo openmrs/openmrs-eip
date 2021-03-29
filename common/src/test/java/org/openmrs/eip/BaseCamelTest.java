@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.test.spring.CamelSpringRunner;
@@ -29,6 +30,10 @@ public abstract class BaseCamelTest {
 	
 	@Produce
 	protected ProducerTemplate producerTemplate;
+	
+	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
+		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);
+	}
 	
 	/**
 	 * Loads and registers the routes defined in the files on the classpath with the specified names.

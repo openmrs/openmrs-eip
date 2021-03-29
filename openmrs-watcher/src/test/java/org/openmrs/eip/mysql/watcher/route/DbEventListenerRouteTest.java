@@ -29,7 +29,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 @Ignore
 @TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
 @TestPropertySource(properties = PROP_URI_EVENT_PROCESSOR + "=" + URI_MOCK_EVENT_PROCESSOR)
-@TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + URI_MOCK_ERROR_HANDLER)
 public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
 	private static final String URI = "direct:db-event-listener";
