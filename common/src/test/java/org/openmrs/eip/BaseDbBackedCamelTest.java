@@ -13,6 +13,8 @@ import org.openmrs.eip.component.config.OpenmrsDataSourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
@@ -23,6 +25,7 @@ import org.testcontainers.utility.MountableFile;
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
 @Import({ TestDBConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class })
+@TestExecutionListeners(value = DeleteDataTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @Transactional
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
@@ -33,11 +36,11 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	@Autowired
 	@Qualifier("mngtDataSource")
-    protected DataSource mngtDataSource;
+	protected DataSource mngtDataSource;
 	
 	@Autowired
 	@Qualifier(CommonConstants.OPENMRS_DATASOURCE_NAME)
-    protected DataSource openmrsDataSource;
+	protected DataSource openmrsDataSource;
 	
 	@BeforeClass
 	public static void startContainers() {

@@ -4,7 +4,6 @@ import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
-import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_EVENT_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
@@ -16,7 +15,6 @@ import java.util.Map;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem;
@@ -26,9 +24,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@Ignore
 @TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
 @TestPropertySource(properties = PROP_URI_EVENT_PROCESSOR + "=" + URI_MOCK_EVENT_PROCESSOR)
+@Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
 public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
 	private static final String URI = "direct:db-event-listener";
@@ -76,7 +74,6 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	@Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
 	public void shouldFailIfTheEntityHasAnItemInTheErrorQueueWithAnInvalidDestination() throws Exception {
 		Map<String, Object> props = new HashMap();
 		props.put(PROP_EVENT_DESTINATIONS, "mock:no-where");
@@ -97,7 +94,6 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	@Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
 	public void shouldFailIfTheEntityAlreadyHasAnItemInTheErrorQueue() throws Exception {
 		final String dbSyncUri = "direct:db-sync";
 		final String senaiteUri = "direct:senaite";

@@ -46,7 +46,7 @@ public class ManagementDataSourceConfig {
 	@Value("${spring.mngt-datasource.driverClassName}")
 	private String driverClassName;
 	
-	@Bean(name = "mngtDataSource")
+	@Bean(name = Constants.MGT_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
 	public DataSource dataSource() throws ClassNotFoundException {
 		SimpleDriverDataSource sdd = new SimpleDriverDataSource();
