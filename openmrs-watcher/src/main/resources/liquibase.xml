@@ -74,6 +74,7 @@
         </createTable>
     </changeSet>
 
+	<!--
 	<changeSet author="wluyima" id="20200318-1800">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -121,5 +122,5 @@
 			</column>
 		</createTable>
 	</changeSet>
-
+	-->
 </databaseChangeLog>
