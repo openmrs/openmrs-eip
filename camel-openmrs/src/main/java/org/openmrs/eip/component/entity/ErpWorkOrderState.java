@@ -1,11 +1,9 @@
 package org.openmrs.eip.component.entity;
 
 import lombok.EqualsAndHashCode;
-import org.openmrs.eip.component.entity.light.ErpWorkOrderLight;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -13,15 +11,15 @@ import javax.validation.constraints.NotNull;
 
 
 @EqualsAndHashCode(callSuper = true)
-@Entity
+//@Entity
 @Table(name = "icrc_erp_work_order_state")
 @AttributeOverride(name = "id", column = @Column(name = "erp_work_order_state_id"))
 public class ErpWorkOrderState extends BaseDataEntity {
 
-    @NotNull
+    /*@NotNull
     @ManyToOne
     @JoinColumn(name = "erp_work_order_id")
-    private ErpWorkOrderLight erpWorkOrder;
+    private ErpWorkOrderLight erpWorkOrder;*/
 
     @NotNull
     @Column(name = "wo_action")
@@ -32,18 +30,18 @@ public class ErpWorkOrderState extends BaseDataEntity {
      *
      * @return the erpWorkOrder
      */
-    public ErpWorkOrderLight getErpWorkOrder() {
-        return erpWorkOrder;
-    }
+    //public ErpWorkOrderLight getErpWorkOrder() {
+    //    return erpWorkOrder;
+    //}
 
     /**
      * Sets the erpWorkOrder
      *
      * @param erpWorkOrder the erpWorkOrder to set
      */
-    public void setErpWorkOrder(ErpWorkOrderLight erpWorkOrder) {
-        this.erpWorkOrder = erpWorkOrder;
-    }
+    //public void setErpWorkOrder(ErpWorkOrderLight erpWorkOrder) {
+    //    this.erpWorkOrder = erpWorkOrder;
+    //}
 
     /**
      * Gets the action

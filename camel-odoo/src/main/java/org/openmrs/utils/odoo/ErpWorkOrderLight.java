@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.entity.light;
+package org.openmrs.utils.odoo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,9 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Entity
+//@EqualsAndHashCode(callSuper = true)
+//@Entity
 @Table(name = "icrc_erp_work_order")
 @AttributeOverride(name = "id", column = @Column(name = "erp_work_order_id"))
-public class ErpWorkOrderLight extends VoidableLightEntity {
+public class ErpWorkOrderLight {
 }
