@@ -3,9 +3,9 @@ package org.openmrs.eip.mysql.watcher.route;
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_EVENT_PROCESSOR;
-import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
 
 import java.util.HashMap;
@@ -37,9 +37,6 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
 	@EndpointInject(URI_MOCK_EVENT_PROCESSOR)
 	private MockEndpoint mockProcessorEndpoint;
-	
-	@EndpointInject(URI_MOCK_ERROR_HANDLER)
-	private MockEndpoint mockErrorHandlerEndpoint;
 	
 	@Before
 	public void setup() {
