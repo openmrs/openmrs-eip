@@ -1,8 +1,11 @@
 package org.openmrs.eip;
 
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -10,12 +13,20 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.test.spring.CamelSpringRunner;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 /**
  * Base class for camel route tests and processors
@@ -24,6 +35,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @SpringBootTest(classes = TestConfig.class)
 @TestExecutionListeners(value = DependencyInjectionTestExecutionListener.class)
 public abstract class BaseCamelTest {
+	
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
 	
 	@Autowired
 	protected ApplicationContext applicationContext;
@@ -34,8 +47,32 @@ public abstract class BaseCamelTest {
 	@Produce
 	protected ProducerTemplate producerTemplate;
 	
+	private LoggerContext loggerContext;
+	
 	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
 		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);
+	}
+	
+	@Before
+	public void beforeBaseCamelTest() {
+		if (loggerContext == null) {
+			loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		}
+		
+		((ListAppender) loggerContext.getLogger(ROOT_LOGGER_NAME).getAppender("test")).list.clear();
+	}
+	
+	protected void assertMessageLogged(Level level, String message) {
+		ListAppender<LoggingEvent> app = (ListAppender) loggerContext.getLogger(ROOT_LOGGER_NAME).getAppender("test");
+		List<LoggingEvent> list = app.list;
+		for (LoggingEvent e : list) {
+			if (e.getLevel().equals(level) && e.getMessage().equalsIgnoreCase(message)) {
+				log.trace("Log event satisfied -> [" + level + "] " + message);
+				return;
+			}
+		}
+		
+		Assert.fail("Log event not satisfied -> [" + level + "] " + message);
 	}
 	
 	/**

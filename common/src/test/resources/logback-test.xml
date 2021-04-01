@@ -6,10 +6,16 @@
             <pattern>%-5level %date [%thread] %logger{8}:%line %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="test" class="ch.qos.logback.core.read.ListAppender"/>
+
     <!--
     <logger name="io.debezium.testing" level="DEBUG" />
-    <logger name="org.openmrs.eip" level="DEBUG" />-->
+    <logger name="org.openmrs.eip" level="DEBUG" />
+    -->
+    
     <root level="INFO">
         <appender-ref ref="console" />
+        <appender-ref ref="test" />
     </root>
 </configuration>
