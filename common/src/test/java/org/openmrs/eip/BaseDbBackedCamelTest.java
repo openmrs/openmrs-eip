@@ -14,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.lifecycle.Startables;
@@ -25,7 +26,8 @@ import org.testcontainers.utility.MountableFile;
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
 @Import({ TestDBConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class })
-@TestExecutionListeners(value = DeleteDataTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
+        TransactionalTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @Transactional
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
