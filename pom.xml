@@ -31,7 +31,7 @@
         <camelVersion>3.3.0</camelVersion>
         <liquibaseVersion>4.2.0</liquibaseVersion>
         <h2Version>1.4.200</h2Version>
-        <guava.version>28.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
         <lombok.version>1.18.8</lombok.version>
         <jsonassert.version>1.5.0</jsonassert.version>
