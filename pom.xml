@@ -25,7 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <sprintBootVersion>2.2.7.RELEASE</sprintBootVersion>
-        <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.16</mysqlConnectorVersion>
         <hibernateVersion>5.4.21.Final</hibernateVersion>
         <hibernateValidatorVersion>6.1.0.Final</hibernateValidatorVersion>
         <camelVersion>3.3.0</camelVersion>
