@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import ch.qos.logback.classic.Level;
@@ -35,6 +36,7 @@ import ch.qos.logback.core.read.ListAppender;
 @RunWith(CamelSpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
 @TestExecutionListeners(value = DependencyInjectionTestExecutionListener.class)
+@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
 public abstract class BaseCamelTest {
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
