@@ -12,9 +12,13 @@ import javax.validation.constraints.NotNull;
 @Table(name = "drug")
 @AttributeOverride(name = "id", column = @Column(name = "drug_id"))
 public class DrugLight extends RetireableLightEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "concept_id")
-    private ConceptLight concept;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "concept_id")
+	private ConceptLight concept;
+	
+	@Column(nullable = false)
+	private Boolean combination;
+	
 }
