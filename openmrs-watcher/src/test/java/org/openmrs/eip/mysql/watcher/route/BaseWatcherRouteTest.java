@@ -1,10 +1,5 @@
 package org.openmrs.eip.mysql.watcher.route;
 
-import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
-import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
-
-import org.apache.camel.EndpointInject;
-import org.apache.camel.component.mock.MockEndpoint;
 import org.openmrs.eip.BaseDbBackedCamelTest;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
@@ -19,13 +14,9 @@ import org.springframework.test.context.TestPropertySource;
  */
 @Import(WatcherConfig.class)
 @TestPropertySource("classpath:watcher-application-test.properties")
-@TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + URI_MOCK_ERROR_HANDLER)
 public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
-
-	protected static final String PROP_RETRY_MAP = "route-retry-count-map";
 	
-	@EndpointInject(URI_MOCK_ERROR_HANDLER)
-	protected MockEndpoint mockErrorHandlerEndpoint;
+	protected static final String PROP_RETRY_MAP = "route-retry-count-map";
 	
 	@Autowired
 	protected ConfigurableEnvironment env;

@@ -57,7 +57,8 @@ public abstract class BaseCamelTest {
 	}
 	
 	@Before
-	public void beforeBaseCamelTest() {
+	public void beforeBaseCamelTest() throws Exception {
+		loadXmlRoutesInDirectory("camel-common", "test-error-handler.xml");
 		if (loggerContext == null) {
 			loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		}

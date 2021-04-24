@@ -73,7 +73,7 @@
                                 <simple>${exchangeProperty.event}</simple>
                             </setBody>
 
-                            <to uri="direct:db-event-processor" />
+                            <to uri="{{watcher.uri.event.processor}}" />
                         </otherwise>
                     </choice>
                 </split>

@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_EVENT_PROCESSOR;
+import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_ERROR_HANDLER;
 import static org.openmrs.eip.mysql.watcher.WatcherTestConstants.URI_MOCK_EVENT_PROCESSOR;
 
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 @TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
 @TestPropertySource(properties = PROP_URI_EVENT_PROCESSOR + "=" + URI_MOCK_EVENT_PROCESSOR)
+@TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + URI_MOCK_ERROR_HANDLER)
 @Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))
 public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	
@@ -34,6 +37,9 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	private static final String TABLE_NAME = "person";
 	
 	private static final String ENTITY_CLASS = SenderRetryQueueItem.class.getSimpleName();
+	
+	@EndpointInject(URI_MOCK_ERROR_HANDLER)
+	protected MockEndpoint mockErrorHandlerEndpoint;
 	
 	@EndpointInject(URI_MOCK_EVENT_PROCESSOR)
 	private MockEndpoint mockProcessorEndpoint;
