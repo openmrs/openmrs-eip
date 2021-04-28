@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
@@ -16,6 +17,7 @@ import org.apache.camel.test.spring.CamelSpringRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +117,10 @@ public abstract class BaseCamelTest {
 	 */
 	protected void loadXmlRoutesInDirectory(String directory, String... filenames) throws Exception {
 		loadXmlRoutes(Arrays.stream(filenames).map(f -> Paths.get(directory, f).toString()).toArray(String[]::new));
+	}
+	
+	protected String getErrorMessage(Exchange e) {
+		return e.getProperty("error", EIPException.class).getMessage();
 	}
 	
 }
