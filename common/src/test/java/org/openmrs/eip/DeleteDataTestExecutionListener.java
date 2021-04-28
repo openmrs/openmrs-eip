@@ -3,6 +3,14 @@
  */
 package org.openmrs.eip;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.openmrs.eip.app.management.config.Constants;
@@ -12,14 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Custom TestExecutionListener that resets all tables in the database by deleting all rows in them.
@@ -44,14 +44,17 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from management DB tables...");
-		
-		deleteAllData(dataSource.getConnection());
+		try (Connection c = dataSource.getConnection()) {
+			deleteAllData(c);
+		}
 		
 		dataSource = ctx.getBean(CommonConstants.OPENMRS_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from OpenMRS DB tables...");
 		
-		deleteAllData(dataSource.getConnection());
+		try (Connection c = dataSource.getConnection()) {
+			deleteAllData(c);
+		}
 		
 	}
 	
