@@ -22,10 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
+import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -37,8 +42,11 @@ import ch.qos.logback.core.read.ListAppender;
  */
 @RunWith(CamelSpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-@TestExecutionListeners(value = DependencyInjectionTestExecutionListener.class)
+@TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
+        DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
+        ResetMocksTestExecutionListener.class })
 @TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
+@DirtiesContext
 public abstract class BaseCamelTest {
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
