@@ -64,8 +64,6 @@ actually publishes the events to any registered camel endpoints, currently the e
 DB events emitted by a debezium engine.
 #### distribution (TO BE COMPLETED)
 - Will contain scripts for build ready to run distributions of the sender and receiver apps
-#### camel-odoo (TO BE REMOVED)
-- Integration code with an odoo system
 
 ### Design Overview
 The project has a classic architecture with a service layer and a DAO layer. Each action (to get or save entities) of the 

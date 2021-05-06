@@ -16,7 +16,6 @@
         <module>dbsync-sender-app</module>
         <module>example-app</module>
         <module>distribution</module>
-        <module>camel-odoo</module>
     </modules>
 
     <name>OpenMRS EIP</name>
