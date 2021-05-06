@@ -103,7 +103,7 @@ mvn clean install
 ```
 Make sure the build completed successfully.
 
-At the time of writing this guide, the OpenMRS EIP project is at version `2.0-SNAPSHOT`, you will to replace {VERSION}
+At the time of writing this guide, the OpenMRS EIP project is at version `2.0.0-SNAPSHOT`, you will to replace {VERSION}
 with the actual version number from, this number can be found as part of the generated jar files or from root pom file
 of the OpenMRS EIP project you cloned above.
 
