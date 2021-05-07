@@ -51,7 +51,7 @@ actually publishes the events to any registered camel endpoints, currently the e
 - A custom camel component that client code can use to start the main debezium route.
 - The built-in error handling and retry mechanism in case something goes wrong while processing an event.
 - The sender's liquibase changelog files used to create the management database tables.
-#### common
+#### commons
 - Management datasource configuration.
 - Common spring configurations for end user apps.
 - Base classes used for mapping to the management DB tables.

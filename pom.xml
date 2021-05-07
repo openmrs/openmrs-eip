@@ -11,7 +11,7 @@
     <modules>
         <module>openmrs-watcher</module>
         <module>camel-openmrs</module>
-        <module>common</module>
+        <module>commons</module>
         <module>example-app</module>
     </modules>
 

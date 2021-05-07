@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>commons</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>commons</artifactId>
             <type>test-jar</type>
             <version>${project.parent.version}</version>
             <scope>test</scope>
