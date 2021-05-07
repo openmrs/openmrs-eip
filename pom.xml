@@ -12,10 +12,7 @@
         <module>openmrs-watcher</module>
         <module>camel-openmrs</module>
         <module>common</module>
-        <module>dbsync-receiver-app</module>
-        <module>dbsync-sender-app</module>
         <module>example-app</module>
-        <module>distribution</module>
     </modules>
 
     <name>OpenMRS EIP</name>

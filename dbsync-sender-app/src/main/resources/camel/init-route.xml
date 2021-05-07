@@ -1,8 +1,0 @@
-<routes xmlns="http://camel.apache.org/schema/spring">
-
-    <route id="init" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="scheduler:init?initialDelay=1000&amp;repeatCount=1" />
-        <to uri="openmrs-watcher:init" />
-    </route>
-
-</routes>
