@@ -7,9 +7,8 @@ import java.util.stream.Stream;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.openmrs.eip.app.config.OpenmrsDataSourceConfig;
 import org.openmrs.eip.app.management.config.ManagementDataSourceConfig;
-import org.openmrs.eip.component.common.CommonConstants;
-import org.openmrs.eip.component.config.OpenmrsDataSourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
@@ -41,7 +40,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	protected DataSource mngtDataSource;
 	
 	@Autowired
-	@Qualifier(CommonConstants.OPENMRS_DATASOURCE_NAME)
+	@Qualifier(Constants.OPENMRS_DATASOURCE_NAME)
 	protected DataSource openmrsDataSource;
 	
 	@BeforeClass

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.hibernate.dialect.MySQL5Dialect;
+import org.openmrs.eip.Constants;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;

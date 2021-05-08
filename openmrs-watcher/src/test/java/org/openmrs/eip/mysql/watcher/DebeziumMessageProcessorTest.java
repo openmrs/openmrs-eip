@@ -31,7 +31,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.EIPException;
 
 @Ignore
 public class DebeziumMessageProcessorTest {

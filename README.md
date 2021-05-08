@@ -37,13 +37,6 @@ between it and it's ancestor, master should be compatible with the latest releas
 
 ### Modules
 Below is the high level breakdown of what is contained in each module.
-#### camel-openmrs
-- JPA annotated OpenMRS data model classes and repositories.
-- Services for loading and saving entities from and to the OpenMRS databases.  
-- Model classes used for serialization and deserialization purposes by DB sync sender and receiver. 
-- The OpenMRS DB datasource configuration. 
-- Utility custom camel components used to load and save entities to and from the target databases.
-- Spring configurations and other utility classes
 #### openmrs-watcher
 - The main debezium route that fires up the debezium engine to read the MySQL binary log of the source database.
 - The main listener route that gets called whenever the debezium engine emits a DB event, it calls another route that 
@@ -55,15 +48,9 @@ actually publishes the events to any registered camel endpoints, currently the e
 - Management datasource configuration.
 - Common spring configurations for end user apps.
 - Base classes used for mapping to the management DB tables.
-#### dbsync-sender-app
-- End user application for sending DB sync data from a source DB to an active MQ instance.
-#### dbsync-receiver-app
-- End user application for receiving DB sync data from an active MQ instance and saving it to the destination DB.
 #### example-app
 - Example application to demonstrate usage of the openmrs-watcher as a dependency to create an end user app that process
 DB events emitted by a debezium engine.
-#### distribution (TO BE COMPLETED)
-- Will contain scripts for build ready to run distributions of the sender and receiver apps
 
 ### Design Overview
 The project has a classic architecture with a service layer and a DAO layer. Each action (to get or save entities) of the 
@@ -232,7 +219,3 @@ cd openmrs-eip
 mvn clean install
 ```
 Make sure the build completed successfully.
-
-## Tests
-Unit ant Integration tests were only coded for the camel-openmrs Maven module. Integration tests are located in the 
-[**dbsync-sender-app/src/it**](dbsync-sender-app/src/it) folder. They are run by default during the Maven test phase

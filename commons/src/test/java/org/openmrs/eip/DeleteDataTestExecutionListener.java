@@ -13,8 +13,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.openmrs.eip.app.management.config.Constants;
-import org.openmrs.eip.component.common.CommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -41,14 +39,15 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	@Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
 		ApplicationContext ctx = testContext.getApplicationContext();
-		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME, DataSource.class);
+		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME,
+		    DataSource.class);
 		
 		log.debug("Deleting all data from management DB tables...");
 		try (Connection c = dataSource.getConnection()) {
 			deleteAllData(c);
 		}
 		
-		dataSource = ctx.getBean(CommonConstants.OPENMRS_DATASOURCE_NAME, DataSource.class);
+		dataSource = ctx.getBean(Constants.OPENMRS_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from OpenMRS DB tables...");
 		

@@ -2,7 +2,6 @@ package org.openmrs.eip;
 
 import static org.openmrs.eip.BaseDbBackedCamelTest.mysqlContainer;
 
-import org.openmrs.eip.app.management.config.Constants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.env.MapPropertySource;
