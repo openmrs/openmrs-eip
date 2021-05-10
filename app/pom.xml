@@ -120,8 +120,9 @@
     <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				
-
+                <configuration>
+                    <attach>false</attach>
+                </configuration>
 				<executions>
 					<execution>
 						<goals>
