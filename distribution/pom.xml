@@ -4,7 +4,7 @@
 
     <groupId>org.openmrs</groupId>
     <parent>
-        <groupId>org.openmrs</groupId>
+        <groupId>org.openmrs.eip</groupId>
         <artifactId>openmrs-eip</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
