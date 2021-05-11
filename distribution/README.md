@@ -161,7 +161,7 @@ The flow of messages between the sender and the receiver can be encrypted. For t
 The encryption is performed by PGP. So public and private keys shall be generated for each side of the exchange.
 * To encrypt the message, the sender needs the receiver's public key
 * To sign the message, the sender needs a private key
-* To verify the message, the receiver needs the sender's private key
+* To verify the message, the receiver needs the sender's public key
 * To decrypt the message, the receiver needs a private key
 
 Thus, the sender needs to hold it's own private key and the receiver's public key in a folder and the application.properties file of the sender should be as follows:
@@ -172,7 +172,7 @@ Thus, the sender needs to hold it's own private key and the receiver's public ke
 
 `pgp.sender.password=<private_key_password>`
 
-`pgp.sender.receiverUserId=<reveiver_user_id>`
+`pgp.sender.receiverUserId=<receiver_user_id>`
 
 The receiver needs to hold it's private key and all the public keys of the sender's providing data in a folder and the application.properties file of the sender should be as follows:
 
