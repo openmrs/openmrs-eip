@@ -1,0 +1,29 @@
+<div>
+	<nav class="navbar navbar-expand-lg bg-gradient-dark text-white">
+		<h4 i18n="@@app-title">DB SYNC CONSOLE</h4>
+	</nav>
+</div>
+<div class="ui-bar-header"></div>
+<div class="ui-bar-spacer bg-silver"></div>
+<div>
+	<div class="container mw-100 bg-silver">
+		<nav ngbNav #nav="ngbNav" class="nav-tabs ui-tabs-horizontal" [(activeId)]="activeTab">
+			<ng-container ngbNavItem="sender" >
+				<a ngbNavLink i18n="@@common-sender"><h5>Sender</h5></a>
+				<ng-template ngbNavContent>
+					<sender></sender>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem="receiver">
+				<a ngbNavLink i18n="@@common-receiver"><h5>Receiver</h5></a>
+				<ng-template ngbNavContent>
+					<receiver></receiver>
+				</ng-template>
+			</ng-container>
+		</nav>
+	</div>
+	<div class="container mw-100">
+		<div class="ui-bar-spacer-content"></div>
+		<div [ngbNavOutlet]="nav"></div>
+	</div>
+</div>

@@ -1,0 +1,62 @@
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-table">Table</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-attempts">Attempts</th>
+		<th i18n="@@common-dateAdded">Date Added</th>
+		<th i18n="@@common-action">Action</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.causeMessage != null ? e.causeMessage : e.message}}" [openDelay]="2000">
+		<td>{{e.event?.tableName}}</td>
+		<td>{{e.event?.identifier}}</td>
+		<td>{{e.event?.operation}}</td>
+		<td>{{e.attemptCount}}</td>
+		<td>{{e.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+		<td>
+			<i class="bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSenderError(e)"></i>
+			&nbsp;
+			<i class="bi-trash hover-danger ui-cursor-pointer" [ngbTooltip]="removeTemplate" [openDelay]="1000" (click)="confirmDialog(e)"></i>
+		</td>
+	</tr>
+	</tbody>
+</table>
+
+<!-- Templates -->
+<ng-template #removeTemplate>
+	<span i18n="@@common-remove">Remove from queue</span>
+</ng-template>
+
+<ng-template #viewDetailsTemplate>
+	<span i18n="@@common-view-details">View Details</span>
+</ng-template>
+
+<ng-template #detailsTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-details">Details</h4>
+		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<table border="1" width="100%" class="ui-display-table">
+			<tbody>
+				<tr class="">
+					<th class="text-right align-text-top" i18n="@@common-error">Error</th>
+					<td class="text-left">{{errorToView?.message}}</td>
+				</tr>
+				<tr class="">
+					<th class="text-right align-text-top" i18n="@@common-cause">Cause</th>
+					<td class="text-left">{{errorToView?.causeMessage}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
+	</div>
+</ng-template>
+

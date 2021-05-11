@@ -35,11 +35,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@SpringBootApplication(scanBasePackages = {
-        "org.openmrs.eip.app",
-        "org.openmrs.eip.component",
-        "org.openmrs.utils.odoo"
-})
+@SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 public class SyncApplication {
 
     private CamelContext camelContext;

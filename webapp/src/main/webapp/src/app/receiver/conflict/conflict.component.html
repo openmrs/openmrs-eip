@@ -1,0 +1,54 @@
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+		<tr>
+			<th i18n="@@common-entity">Entity</th>
+			<th i18n="@@common-identifier">Identifier</th>
+			<th i18n="@@common-dateAdded">Date Added</th>
+			<th i18n="@@common-action">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let c of conflicts" class="ui-row-highlight">
+			<td>{{c.modelClassName}}</td>
+			<td>{{c.identifier}}</td>
+			<td>{{c.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+			<td>
+				<i class="bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>
+				&nbsp;
+				<i class="bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="markResolvedTemplate" [openDelay]="1000" (click)="confirmDialog(c)"></i>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<!-- Templates -->
+<ng-template #markResolvedTemplate>
+	<span i18n="@@receiver-conflict-mark-resolved">Mark As Resolved</span>
+</ng-template>
+
+<ng-template #viewDetailsTemplate>
+	<span i18n="@@common-view-details">View Details</span>
+</ng-template>
+
+<ng-template #detailsTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-details">Details</h4>
+		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<table border="1" width="100%" class="table-striped ui-display-table">
+			<tbody>
+				<tr *ngFor="let entry of parsedEntityPayLoad | keyvalue" class="ui-display-table">
+					<th class="text-right align-text-top">{{entry.key}}</th>
+					<td class="text-left">{{entry.value}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
+	</div>
+</ng-template>
+

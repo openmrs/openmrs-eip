@@ -1,0 +1,10 @@
+<div class="modal-header">
+	<h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+</div>
+<div class="modal-body">
+	{{message}}
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-outline-danger" (click)="activeModal.dismiss()" i18n="@@common-cancel">Cancel</button>
+	<button type="button" class="btn btn-outline-primary" (click)="activeModal.close()" i18n="@@common-confirm">Confirm</button>
+</div>

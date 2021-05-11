@@ -1,0 +1,87 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing custom variables */
+@import "~src/assets/custom-variables";
+
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+@import "~bootstrap-icons/font/bootstrap-icons.css";
+
+.ui-bar-header {
+	height: 3px !important;
+	background-color: $themeColorSecondary;
+}
+
+.ui-bar-spacer {
+	height: 20px !important;
+}
+
+.ui-bar-spacer-content {
+	height: 30px !important;
+}
+
+.modal-header {
+	background-color: $colorSilver;
+}
+
+.modal-title {
+	color: $colorMaroon;
+}
+
+.ui-row-highlight:hover {
+	background-color: $colorGray;
+	color: #FFFFFF;
+}
+
+.hover-success:hover {
+	color: $colorSuccess;
+}
+
+.hover-primary:hover {
+	color: $colorPrimary;
+}
+
+.hover-danger:hover {
+	color: $colorDanger;
+}
+
+.ui-display-table tbody tr th {
+	padding-right: 3px !important;
+}
+
+.ui-display-table tbody tr td {
+	padding-left: 4px !important;
+}
+
+.ui-cursor-pointer {
+	cursor: pointer;
+}
+
+.ui-tabs-horizontal .nav-link.active {
+	background-color: white !important;
+	border-top: 3px solid $colorPrimary;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.ui-tabs-horizontal .nav-link {
+	background-color: #e1dfdf;
+}
+
+.ui-tabs-vertical .nav-link.active {
+	color: $textColorDarkGray;
+	border-left: 3px solid $themeColorSecondary;
+	border-right: 0;
+}
+
+.ui-tabs-vertical .nav-link {
+	border-radius: 0;
+	border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
+}
+
+.bg-silver {
+	background-color: $colorSilver;
+}
+
+

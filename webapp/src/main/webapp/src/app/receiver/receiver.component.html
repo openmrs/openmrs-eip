@@ -1,0 +1,31 @@
+<div class="d-flex">
+	<ul ngbNav #nav="ngbNav" class="ui-tabs-vertical" [animation]="false" orientation="vertical">
+		<li ngbNavItem="dashboard" class="border-top border-left rounded-left">
+			<a ngbNavLink i18n="@@common-dashboard">Dashboard</a>
+			<ng-template ngbNavContent>
+				Dashboard
+			</ng-template>
+		</li>
+		<li ngbNavItem="errors" class="border-top border-left rounded-left">
+			<a ngbNavLink i18n="@@common-errors">Errors</a>
+			<ng-template ngbNavContent>
+				<receiver-errors></receiver-errors>
+			</ng-template>
+		</li>
+		<li ngbNavItem="conflicts">
+			<a ngbNavLink i18n="@@receiver-conflicts" class="border-top border-bottom border-left rounded-left">Conflicts</a>
+			<ng-template ngbNavContent>
+				<receiver-conflicts></receiver-conflicts>
+			</ng-template>
+		</li>
+		<li ngbNavItem="outgoing" class="border-bottom border-left rounded-left">
+			<a ngbNavLink i18n="@@sender-outgoing">Outgoing</a>
+			<ng-template ngbNavContent>
+				Outgoing Sync Messages
+			</ng-template>
+		</li>
+	</ul>
+	<div class="container mw-100 border">
+		<div [ngbNavOutlet]="nav" class="mt-4 mb-3"></div>
+	</div>
+</div>
