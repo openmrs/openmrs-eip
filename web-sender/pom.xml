@@ -17,7 +17,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openmrs</groupId>
+            <groupId>org.openmrs.eip</groupId>
             <artifactId>web-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

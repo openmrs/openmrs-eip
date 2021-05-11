@@ -82,7 +82,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		modelRef.closed.subscribe(() => {
 			this.service.updateConflict({...conflict, resolved: true}).subscribe(
 				() => {
-					//this.loadConflicts();
+					this.loadConflicts();
 				}
 			);
 		});

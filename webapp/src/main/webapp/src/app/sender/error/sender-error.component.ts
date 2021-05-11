@@ -81,7 +81,7 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 		modelRef.closed.subscribe(() => {
 			this.service.removeFromQueue(error).subscribe(
 				() => {
-					//this.loadErrors();
+					this.loadErrors();
 				}
 			);
 		});

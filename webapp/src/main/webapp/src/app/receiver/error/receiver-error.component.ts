@@ -86,7 +86,7 @@ export class ReceiverErrorComponent extends BaseListingComponent implements OnIn
 		modelRef.closed.subscribe(() => {
 			this.service.removeFromQueue(error).subscribe(
 				() => {
-					//this.loadErrors();
+					this.loadErrors();
 				}
 			);
 		});
