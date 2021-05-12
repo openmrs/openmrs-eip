@@ -27,6 +27,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- will generate 2 jars:  -->
+                    <!-- the normal jar usable as a dependency-->
+                    <!-- an executable jar with the classifier exe-->
+                    <classifier>exe</classifier>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
