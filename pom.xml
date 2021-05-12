@@ -12,11 +12,11 @@
         <module>app</module>
         <module>camel-openmrs</module>
         <module>camel-utils</module>
-        <module>distribution</module>
+        <module>webapp</module>
         <module>web-common</module>
         <module>web-sender</module>
         <module>web-receiver</module>
-        <module>webapp</module>
+        <module>distribution</module>
     </modules>
 
     <name>OpenMRS EIP</name>

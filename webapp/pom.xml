@@ -10,6 +10,7 @@
 	</parent>
 
 	<artifactId>webapp</artifactId>
+    <packaging>pom</packaging>
 
 	<name>DBsync Web Application</name>
 	<description>Web application for a DB sync application</description>
