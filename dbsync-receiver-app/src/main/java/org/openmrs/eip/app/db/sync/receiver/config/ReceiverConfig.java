@@ -39,10 +39,13 @@ public class ReceiverConfig {
 	
 	@Bean("activeMqConnFactory")
 	public ConnectionFactory getConnectionFactory(Environment env) {
-		CachingConnectionFactory cf = new CachingConnectionFactory(new ActiveMQConnectionFactory());
-		cf.setClientId(env.getProperty("activemq.clientId"));
-		
-		return cf;
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory();
+        cf.setBrokerURL(env.getProperty("spring.artemis.brokerUrl"));
+        cf.setUserName(env.getProperty("spring.artemis.user"));
+        cf.setPassword(env.getProperty("spring.artemis.password"));
+        cf.setClientID(env.getProperty("activemq.clientId"));
+
+        return new CachingConnectionFactory(cf);
 	}
 	
 }
