@@ -10,6 +10,7 @@ import {SenderErrorsLoaded, ViewSenderError} from "./state/error.actions";
 import {Subscription} from "rxjs";
 
 @Component({
+	selector: 'sender-errors',
 	templateUrl: './sender-error.component.html',
 	styleUrls: ['./sender-error.component.scss']
 })

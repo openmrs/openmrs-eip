@@ -1,1 +1,24 @@
-<p>sender works!</p>
+<div class="d-flex">
+	<ul ngbNav #nav="ngbNav" class="ui-tabs-vertical" [animation]="false" orientation="vertical">
+		<li ngbNavItem="dashboard" class="border-top border-left rounded-left">
+			<a ngbNavLink i18n="@@common-dashboard">Dashboard</a>
+			<ng-template ngbNavContent>
+				Dashboard
+			</ng-template>
+		</li>
+		<li ngbNavItem="errors" class="border-top border-left rounded-left">
+			<a ngbNavLink i18n="@@common-errors">Errors</a>
+			<ng-template ngbNavContent>
+				<sender-errors></sender-errors>
+			</ng-template>
+		<li ngbNavItem="pending" class="border-bottom border-left rounded-left">
+			<a ngbNavLink i18n="@@sender-pending">Pending</a>
+			<ng-template ngbNavContent>
+				Pending
+			</ng-template>
+		</li>
+	</ul>
+	<div class="container mw-100 border">
+		<div [ngbNavOutlet]="nav" class="mt-4 mb-3"></div>
+	</div>
+</div>
