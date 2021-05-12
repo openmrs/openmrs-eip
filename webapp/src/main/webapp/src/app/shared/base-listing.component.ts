@@ -2,7 +2,8 @@
  * Base class for listing components that use datatables
  */
 import {Subject} from "rxjs";
-import {Component, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, ViewChild} from "@angular/core";
+import {DataTableDirective} from "angular-datatables";
 
 @Component({template: ''})
 export abstract class BaseListingComponent implements OnDestroy {
@@ -11,6 +12,9 @@ export abstract class BaseListingComponent implements OnDestroy {
 
 	dtTrigger: Subject<any> = new Subject<any>();
 
+	@ViewChild(DataTableDirective, {static: false})
+	datatableElement?: DataTableDirective;
+
 	init(): void {
 		this.dtOptions = {
 			pagingType: 'full_numbers'
@@ -18,6 +22,10 @@ export abstract class BaseListingComponent implements OnDestroy {
 	}
 
 	reRender(): void {
+		this.datatableElement?.dtInstance?.then((dtInstance: DataTables.Api) => {
+			dtInstance.destroy();
+		});
+
 		this.dtTrigger.next();
 	}
 
