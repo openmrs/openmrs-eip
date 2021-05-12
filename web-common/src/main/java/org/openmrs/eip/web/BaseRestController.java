@@ -1,6 +1,7 @@
 package org.openmrs.eip.web;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 
 import java.util.List;
 
@@ -18,19 +19,21 @@ public abstract class BaseRestController {
 	
 	public List<Object> doGetAll() {
 		return on(camelContext)
-		        .to("jpa:" + getClazz().getSimpleName() + "?query=SELECT c FROM " + getClazz().getSimpleName() + " c")
+		        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT)
 		        .request(List.class);
 	}
 	
 	public Object doGet(Integer id) {
-		return on(camelContext).to("jpa:" + getClazz().getSimpleName() + "?query=SELECT c FROM " + getClazz().getSimpleName()
-		        + " c WHERE c.id = " + id).request(getClazz());
+		return on(camelContext).to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id)
+		        .request(getClazz());
 	}
 	
 	public void doDelete(Integer id) {
-		on(camelContext).to(
-		    "jpa:" + getClazz().getSimpleName() + "?query=DELETE FROM " + getClazz().getSimpleName() + " WHERE id = " + id)
-		        .request();
+		on(camelContext).to("jpa:" + getName() + "?query=DELETE FROM " + getName() + " WHERE id = " + id).request();
+	}
+	
+	public String getName() {
+		return getClazz().getSimpleName();
 	}
 	
 	public abstract Class<?> getClazz();
