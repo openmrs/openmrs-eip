@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
@@ -48,9 +49,8 @@ public class ConflictController extends BaseRestController {
 		
 		List<Object> items;
 		if (count > 0) {
-			items = on(camelContext)
-			        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.resolved = false")
-			        .request(List.class);
+			items = on(camelContext).to("jpa:" + getName() + "?query=SELECT c FROM " + getName()
+			        + " c WHERE c.resolved = false &maximumResults=" + DEFAULT_MAX_COUNT).request(List.class);
 			
 			results.put(FIELD_ITEMS, items);
 		} else {
