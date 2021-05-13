@@ -1,5 +1,6 @@
 import {Action} from "@ngrx/store";
 import {SenderError} from "../sender-error";
+import {SenderErrorCountAndItems} from "../sender-error-count-and-items";
 
 export enum SenderErrorActionType {
 	SENDER_ERRORS_LOADED = 'SENDER_ERRORS_LOADED',
@@ -10,7 +11,7 @@ export class SenderErrorsLoaded implements Action {
 
 	readonly type = SenderErrorActionType.SENDER_ERRORS_LOADED;
 
-	constructor(public errors?: SenderError[]) {
+	constructor(public countAndItems?: SenderErrorCountAndItems) {
 	}
 
 }

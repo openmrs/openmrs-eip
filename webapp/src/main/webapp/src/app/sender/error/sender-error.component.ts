@@ -16,7 +16,9 @@ import {Subscription} from "rxjs";
 })
 export class SenderErrorComponent extends BaseListingComponent implements OnInit {
 
-	errors: SenderError[] = [];
+	count?: number;
+
+	errors?: SenderError[];
 
 	errorToView?: SenderError;
 
@@ -42,8 +44,9 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 	ngOnInit(): void {
 		this.init();
 		this.viewSubscription = this.store.pipe(select(GET_SENDER_ERRORS)).subscribe(
-			errors => {
-				this.errors = errors;
+			countAndItems => {
+				this.count = countAndItems.count;
+				this.errors = countAndItems.items;
 				this.reRender();
 			}
 		);
@@ -62,7 +65,7 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 
 	loadErrors(): void {
 		this.service.getErrorCountAndItems().subscribe(countAndItems => {
-			this.store.dispatch(new SenderErrorsLoaded(countAndItems.items));
+			this.store.dispatch(new SenderErrorsLoaded(countAndItems));
 		});
 	}
 

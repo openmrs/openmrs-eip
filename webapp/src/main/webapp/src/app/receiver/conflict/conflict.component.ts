@@ -16,7 +16,9 @@ import {Subscription} from "rxjs";
 })
 export class ConflictComponent extends BaseListingComponent implements OnInit {
 
-	conflicts: Conflict[] = [];
+	count?: number;
+
+	conflicts?: Conflict[];
 
 	conflictToView?: Conflict;
 
@@ -42,8 +44,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	ngOnInit(): void {
 		this.init();
 		this.viewSubscription = this.store.pipe(select(GET_CONFLICTS)).subscribe(
-			conflicts => {
-				this.conflicts = conflicts;
+			countAndItems => {
+				this.count = countAndItems.count;
+				this.conflicts = countAndItems.items;
 				this.reRender();
 			}
 		);
@@ -66,7 +69,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	loadConflicts(): void {
 		this.service.getConflictCountAndItems().subscribe(countAndItems => {
-			this.store.dispatch(new ConflictsLoaded(countAndItems.items));
+			this.store.dispatch(new ConflictsLoaded(countAndItems));
 		});
 	}
 

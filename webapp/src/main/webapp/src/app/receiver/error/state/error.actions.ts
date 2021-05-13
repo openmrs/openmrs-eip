@@ -1,5 +1,6 @@
 import {Action} from "@ngrx/store";
 import {ReceiverError} from "../receiver-error";
+import {ReceiverErrorCountAndItems} from "../receiver-error-count-and-items";
 
 export enum ReceiverErrorActionType {
 	RECEIVER_ERRORS_LOADED = 'RECEIVER_ERRORS_LOADED',
@@ -10,7 +11,7 @@ export class ReceiverErrorsLoaded implements Action {
 
 	readonly type = ReceiverErrorActionType.RECEIVER_ERRORS_LOADED;
 
-	constructor(public errors?: ReceiverError[]) {
+	constructor(public countAndItems?: ReceiverErrorCountAndItems) {
 	}
 
 }

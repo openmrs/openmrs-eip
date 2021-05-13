@@ -1,9 +1,10 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {SenderError} from "../sender-error";
 import {SenderErrorAction, SenderErrorActionType} from "./error.actions";
+import {SenderErrorCountAndItems} from "../sender-error-count-and-items";
 
 export interface SenderErrorState {
-	errors: SenderError[];
+	countAndItems: SenderErrorCountAndItems;
 	errorToView?: SenderError;
 }
 
@@ -11,7 +12,7 @@ const GET_SENDER_ERRORS_FEATURE_STATE = createFeatureSelector<SenderErrorState>(
 
 export const GET_SENDER_ERRORS = createSelector(
 	GET_SENDER_ERRORS_FEATURE_STATE,
-	state => state.errors
+	state => state.countAndItems
 );
 
 export const SENDER_ERROR_TO_VIEW = createSelector(
@@ -20,7 +21,7 @@ export const SENDER_ERROR_TO_VIEW = createSelector(
 );
 
 const initialSenderState: SenderErrorState = {
-	errors: []
+	countAndItems: new SenderErrorCountAndItems()
 };
 
 export function senderErrorReducer(state = initialSenderState, action: SenderErrorAction) {
@@ -30,7 +31,7 @@ export function senderErrorReducer(state = initialSenderState, action: SenderErr
 		case SenderErrorActionType.SENDER_ERRORS_LOADED:
 			return {
 				...state,
-				errors: action.errors
+				countAndItems: action.countAndItems
 			};
 
 		case SenderErrorActionType.VIEW_SENDER_ERROR:

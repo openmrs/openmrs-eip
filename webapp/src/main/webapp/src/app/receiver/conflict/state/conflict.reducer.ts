@@ -1,9 +1,10 @@
 import {ConflictAction, ConflictActionType} from "./conflict.actions";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {Conflict} from "../conflict";
+import {ConflictCountAndItems} from "../confict-count-and-items";
 
 export interface ConflictState {
-	conflicts: Conflict[];
+	countAndItems: ConflictCountAndItems;
 	conflictToView?: Conflict;
 }
 
@@ -11,7 +12,7 @@ const GET_CONFLICTS_FEATURE_STATE = createFeatureSelector<ConflictState>('confli
 
 export const GET_CONFLICTS = createSelector(
 	GET_CONFLICTS_FEATURE_STATE,
-	state => state.conflicts
+	state => state.countAndItems
 );
 
 export const CONFLICT_TO_VIEW = createSelector(
@@ -20,7 +21,7 @@ export const CONFLICT_TO_VIEW = createSelector(
 );
 
 const initialState: ConflictState = {
-	conflicts: []
+	countAndItems: new ConflictCountAndItems()
 };
 
 export function conflictReducer(state = initialState, action: ConflictAction) {
@@ -30,7 +31,7 @@ export function conflictReducer(state = initialState, action: ConflictAction) {
 		case ConflictActionType.CONFLICTS_LOADED:
 			return {
 				...state,
-				conflicts: action.conflicts
+				countAndItems: action.countAndItems
 			};
 
 		case ConflictActionType.VIEW_CONFLICT:

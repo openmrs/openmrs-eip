@@ -1,9 +1,10 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ReceiverError} from "../receiver-error";
 import {ReceiverErrorAction, ReceiverErrorActionType} from "./error.actions";
+import {ReceiverErrorCountAndItems} from "../receiver-error-count-and-items";
 
 export interface ReceiverErrorState {
-	errors: ReceiverError[];
+	countAndItems: ReceiverErrorCountAndItems;
 	errorToView?: ReceiverError;
 }
 
@@ -11,7 +12,7 @@ const GET_RECEIVER_ERRORS_FEATURE_STATE = createFeatureSelector<ReceiverErrorSta
 
 export const GET_RECEIVER_ERRORS = createSelector(
 	GET_RECEIVER_ERRORS_FEATURE_STATE,
-	state => state.errors
+	state => state.countAndItems
 );
 
 export const RECEIVER_ERROR_TO_VIEW = createSelector(
@@ -20,7 +21,7 @@ export const RECEIVER_ERROR_TO_VIEW = createSelector(
 );
 
 const initialReceiverState: ReceiverErrorState = {
-	errors: []
+	countAndItems: new ReceiverErrorCountAndItems()
 };
 
 export function receiverErrorReducer(state = initialReceiverState, action: ReceiverErrorAction) {
@@ -30,7 +31,7 @@ export function receiverErrorReducer(state = initialReceiverState, action: Recei
 		case ReceiverErrorActionType.RECEIVER_ERRORS_LOADED:
 			return {
 				...state,
-				errors: action.errors
+				countAndItems: action.countAndItems
 			};
 
 		case ReceiverErrorActionType.VIEW_RECEIVER_ERROR:
