@@ -2,8 +2,13 @@ package org.openmrs.eip.web;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
+import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
+import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
@@ -17,10 +22,25 @@ public abstract class BaseRestController {
 	@Autowired
 	protected CamelContext camelContext;
 	
-	public List<Object> doGetAll() {
-		return on(camelContext)
-		        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT)
-		        .request(List.class);
+	public Map<String, Object> doGetAll() {
+		Map<String, Object> results = new HashMap(2);
+		Integer count = on(camelContext).to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName())
+		        .request(Integer.class);
+		
+		results.put(FIELD_COUNT, count);
+		
+		List<Object> items;
+		if (count > 0) {
+			items = on(camelContext)
+			        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT)
+			        .request(List.class);
+			
+			results.put(FIELD_ITEMS, items);
+		} else {
+			results.put(FIELD_ITEMS, Collections.emptyList());
+		}
+		
+		return results;
 	}
 	
 	public Object doGet(Integer id) {

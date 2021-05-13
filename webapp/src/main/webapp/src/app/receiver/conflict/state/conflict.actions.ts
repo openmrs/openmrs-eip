@@ -10,7 +10,7 @@ export class ConflictsLoaded implements Action {
 
 	readonly type = ConflictActionType.CONFLICTS_LOADED;
 
-	constructor(public conflicts: Conflict[]) {
+	constructor(public conflicts?: Conflict[]) {
 	}
 
 }

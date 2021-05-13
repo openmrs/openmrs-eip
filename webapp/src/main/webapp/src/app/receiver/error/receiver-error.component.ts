@@ -65,8 +65,8 @@ export class ReceiverErrorComponent extends BaseListingComponent implements OnIn
 	}
 
 	loadErrors(): void {
-		this.service.getAllErrors().subscribe(errors => {
-			this.store.dispatch(new ReceiverErrorsLoaded(errors));
+		this.service.getErrorCountAndItems().subscribe(countAndItems => {
+			this.store.dispatch(new ReceiverErrorsLoaded(countAndItems.items));
 		});
 	}
 

@@ -1,6 +1,6 @@
 package org.openmrs.eip.web.receiver;
 
-import java.util.List;
+import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.web.BaseRestController;
@@ -25,7 +25,7 @@ public class ReceiverErrorController extends BaseRestController {
 	}
 	
 	@GetMapping
-	public List<Object> getAll() {
+	public Map<String, Object> getAll() {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching receiver retry items");
 		}

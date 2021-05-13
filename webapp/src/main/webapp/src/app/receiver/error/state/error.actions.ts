@@ -10,7 +10,7 @@ export class ReceiverErrorsLoaded implements Action {
 
 	readonly type = ReceiverErrorActionType.RECEIVER_ERRORS_LOADED;
 
-	constructor(public errors: ReceiverError[]) {
+	constructor(public errors?: ReceiverError[]) {
 	}
 
 }

@@ -61,8 +61,8 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 	}
 
 	loadErrors(): void {
-		this.service.getAllErrors().subscribe(errors => {
-			this.store.dispatch(new SenderErrorsLoaded(errors));
+		this.service.getErrorCountAndItems().subscribe(countAndItems => {
+			this.store.dispatch(new SenderErrorsLoaded(countAndItems.items));
 		});
 	}
 

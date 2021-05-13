@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {BaseEntity} from "./base-entity";
 import {environment} from "../../environments/environment";
+import {BaseCountAndItems} from "./base-count-and-items";
 
 @Injectable({
 	providedIn: 'root'
@@ -12,8 +13,8 @@ export abstract class BaseService<T extends BaseEntity> {
 	protected constructor(private httpClient: HttpClient) {
 	}
 
-	getAll(resource: string): Observable<T[]> {
-		return this.httpClient.get<T[]>(environment.apiBaseUrl + resource);
+	getCountAndItems(resource: string): Observable<BaseCountAndItems<T>> {
+		return this.httpClient.get<BaseCountAndItems<T>>(environment.apiBaseUrl + resource);
 	}
 
 	update(resource: string, entity: T): Observable<T> {

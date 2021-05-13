@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {Conflict} from "./conflict";
 import {BaseService} from "../../shared/base.service";
+import {ConflictCountAndItems} from "./confict-count-and-items";
 
 const RESOURCE_NAME = 'receiver/conflict';
 
@@ -10,8 +11,8 @@ const RESOURCE_NAME = 'receiver/conflict';
 })
 export class ConflictService extends BaseService<Conflict> {
 
-	getAllConflicts(): Observable<Conflict[]> {
-		return this.getAll(RESOURCE_NAME);
+	getConflictCountAndItems(): Observable<ConflictCountAndItems> {
+		return this.getCountAndItems(RESOURCE_NAME);
 	}
 
 	updateConflict(conflict: Conflict): Observable<Conflict> {

@@ -65,8 +65,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	}
 
 	loadConflicts(): void {
-		this.service.getAllConflicts().subscribe(conflicts => {
-			this.store.dispatch(new ConflictsLoaded(conflicts));
+		this.service.getConflictCountAndItems().subscribe(countAndItems => {
+			this.store.dispatch(new ConflictsLoaded(countAndItems.items));
 		});
 	}
 

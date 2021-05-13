@@ -10,7 +10,7 @@ export class SenderErrorsLoaded implements Action {
 
 	readonly type = SenderErrorActionType.SENDER_ERRORS_LOADED;
 
-	constructor(public errors: SenderError[]) {
+	constructor(public errors?: SenderError[]) {
 	}
 
 }
