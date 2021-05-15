@@ -30,6 +30,9 @@
         <jsonassert.version>1.5.0</jsonassert.version>
         <json.version>20190722</json.version>
         <exclude.tests>nothing-to-exclude</exclude.tests>
+        <springBootVersion>2.1.4.RELEASE</springBootVersion>
+        <springSecurityVersion>5.4.6</springSecurityVersion>
+        <liquibaseVersion>4.2.0</liquibaseVersion>
     </properties>
 
     <dependencyManagement>
@@ -46,8 +49,29 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <type>pom</type>
-                <version>2.1.4.RELEASE</version>
+                <version>${springBootVersion}</version>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibaseVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
