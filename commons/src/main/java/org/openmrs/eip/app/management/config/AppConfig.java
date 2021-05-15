@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
-import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.hibernate.dialect.MySQL5Dialect;
 import org.openmrs.eip.Constants;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
@@ -29,11 +28,6 @@ public class AppConfig {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
 		builder.setUseOriginalMessage(true);
 		return builder;
-	}
-	
-	@Bean("noErrorHandler")
-	public NoErrorHandlerBuilder getNoErrorHandler() {
-		return new NoErrorHandlerBuilder();
 	}
 	
 	@Bean(Constants.COMMON_PROP_SOURCE_BEAN_NAME)
