@@ -3,6 +3,7 @@
  */
 package org.openmrs.eip.web.security.config;
 
+import static org.openmrs.eip.web.RestConstants.API_PATH;
 import static org.openmrs.eip.web.security.SecurityConstants.ROLE_AUTHENTICATED;
 import static org.openmrs.eip.web.security.SecurityConstants.USERS_FILE;
 
@@ -21,6 +22,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +41,12 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
-		http.formLogin();
+		http.formLogin().defaultSuccessUrl("/index.html", true);
+		
+		AuthenticationEntryPoint aep = new CustomAuthenticationEntryPoint();
+		http.exceptionHandling().defaultAuthenticationEntryPointFor(aep, new AntPathRequestMatcher(API_PATH + "**"));
+		http.exceptionHandling().defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/login"),
+		    new AntPathRequestMatcher("/**"));
 	}
 	
 	@Override
