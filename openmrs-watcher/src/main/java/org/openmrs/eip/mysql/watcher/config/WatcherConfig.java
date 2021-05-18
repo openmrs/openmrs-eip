@@ -12,7 +12,6 @@ import javax.persistence.EntityManagerFactory;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.eip.Constants;
 import org.openmrs.eip.Utils;
 import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,17 +38,6 @@ public class WatcherConfig {
 	@Bean("jpaIdempotentRepository")
 	public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
 		return new JpaMessageIdRepository(emf, "complexObsProcessor");
-	}
-	
-	@Bean(Constants.PROP_SOURCE_BEAN_NAME)
-	public PropertySource getWatcherPropertySource(ConfigurableEnvironment env) {
-		Map<String, Object> props = new HashMap();
-		props.put(Constants.PROP_PACKAGES_TO_SCAN,
-		    new String[] { "org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa" });
-		PropertySource customPropSource = new MapPropertySource(Constants.PROP_SOURCE_BEAN_NAME, props);
-		env.getPropertySources().addLast(customPropSource);
-		
-		return customPropSource;
 	}
 	
 	@Bean(WatcherConstants.PROP_SOURCE_NAME)

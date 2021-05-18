@@ -17,7 +17,7 @@ public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 	
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		if (Constants.PROP_SOURCE_BEAN_NAME.equals(beanName)) {
+		if (Constants.COMMON_PROP_SOURCE_BEAN_NAME.equals(beanName)) {
 			MapPropertySource propSource = (MapPropertySource) bean;
 			propSource.getSource().put("openmrs.db.port", BaseDbBackedCamelTest.MYSQL_PORT);
 			propSource.getSource().put("openmrs.db.host", "localhost");

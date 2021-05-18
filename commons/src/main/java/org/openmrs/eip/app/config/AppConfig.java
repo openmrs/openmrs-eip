@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.config;
+package org.openmrs.eip.app.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +36,9 @@ public class AppConfig {
 		props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
 		props.put("spring.jpa.properties.hibernate.dialect", MySQL5Dialect.class.getName());
 		props.put("spring.jpa.properties.hibernate.hbm2ddl.auto", "none");
+		props.put(Constants.PROP_PACKAGES_TO_SCAN,
+		    new String[] { "org.openmrs.eip.mysql.watcher.management.entity", "org.apache.camel.processor.idempotent.jpa" });
+		
 		PropertySource customPropSource = new MapPropertySource("commonPropSource", props);
 		env.getPropertySources().addLast(customPropSource);
 		
