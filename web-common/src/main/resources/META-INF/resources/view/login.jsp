@@ -11,11 +11,11 @@
     <meta http-equiv="Expires" content="0">
     <title>Log In</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
-    <link type="text/css" rel="stylesheet" href="signin.css">
+    <link type="text/css" rel="stylesheet" href="css/signin.css">
 </head>
 <body>
 <div class="container">
-    <c:url value="/authenticate" var="loginProcessingUrl"/>
+    <c:url value="/login" var="loginProcessingUrl"/>
     <form class="form-signin" action="${loginProcessingUrl}" method="post">
         <!-- FormLoginConfigurer#failureUrl is /login?error -->
         <c:if test="${param.error != null}">
