@@ -8,7 +8,7 @@ public class HomePageController {
 	
 	@GetMapping("/")
 	public String home() {
-		return "redirect:index.html";
+		return "home";
 	}
 	
 }

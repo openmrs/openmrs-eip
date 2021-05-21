@@ -58,6 +58,9 @@
                 <directory>../webapp/src/main/webapp/dist/webapp</directory>
                 <targetPath>META-INF/resources</targetPath>
                 <filtering>false</filtering>
+                <excludes>
+                    <exclude>index.html</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>
