@@ -33,6 +33,8 @@
         <springBootVersion>2.1.4.RELEASE</springBootVersion>
         <springSecurityVersion>5.4.6</springSecurityVersion>
         <liquibaseVersion>4.2.0</liquibaseVersion>
+        <tomcatVersion>9.0.17</tomcatVersion>
+        <jstlVersion>1.2</jstlVersion>
     </properties>
 
     <dependencyManagement>
@@ -61,6 +63,21 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
                 <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-taglibs</artifactId>
+                <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>jstl</groupId>
+                <artifactId>jstl</artifactId>
+                <version>${jstlVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-jasper</artifactId>
+                <version>${tomcatVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.liquibase</groupId>

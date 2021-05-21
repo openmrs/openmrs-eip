@@ -4,6 +4,8 @@ public final class RestConstants {
 	
 	public static final String API_PATH = "/api/";
 	
+	public static final String PATH_LOGIN = "/authenticate";
+	
 	public static final String FIELD_COUNT = "count";
 	
 	public static final String FIELD_ITEMS = "items";
