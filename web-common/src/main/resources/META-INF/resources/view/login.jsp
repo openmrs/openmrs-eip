@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +12,7 @@
     <meta http-equiv="Expires" content="0">
     <title>Log In</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
-    <link type="text/css" rel="stylesheet" href="css/signin.css">
+    <link type="text/css" rel="stylesheet" href="css/login.css">
 </head>
 <body>
 <div class="container">
@@ -35,6 +36,7 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
         </div>
+        <sec:csrfInput />
         <div class="form-group">
             <button type="submit" class="btn btn-primary btn-block">Log in</button>
         </div>

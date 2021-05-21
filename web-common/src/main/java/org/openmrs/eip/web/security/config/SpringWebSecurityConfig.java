@@ -41,10 +41,9 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers(PATH_LOGIN).permitAll();
 		http.authorizeRequests().antMatchers("/styles.css").permitAll();
-        http.authorizeRequests().antMatchers("/css/signin.css").permitAll();
+		http.authorizeRequests().antMatchers("/css/login.css").permitAll();
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
 		http.formLogin().loginPage(PATH_LOGIN).defaultSuccessUrl("/index.html", true);
-		http.csrf().disable();
 		http.exceptionHandling().defaultAuthenticationEntryPointFor(new CustomAuthenticationEntryPoint(),
 		    new AntPathRequestMatcher(API_PATH + "**"));
 	}
