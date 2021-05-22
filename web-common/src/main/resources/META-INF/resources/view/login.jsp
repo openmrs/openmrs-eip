@@ -15,7 +15,8 @@
     <link type="text/css" rel="stylesheet" href="css/login.css">
 </head>
 <body>
-<div class="container">
+<%@ include file="header.jsp" %>
+<div id="loginContainer" class="container">
     <c:url value="/login" var="loginProcessingUrl"/>
     <form class="form-signin" action="${loginProcessingUrl}" method="post">
         <!-- FormLoginConfigurer#failureUrl is /login?error -->
@@ -29,11 +30,11 @@
             <div class="alert alert-success" role="alert">You have been logged out</div>
         </c:if>
         <div>
-            <label for="username">Username</label>
+            <label for="username" class="sr-only">Username</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus />
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
+        <div class="form-group mt-4">
+            <label for="password" class="sr-only">Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
         </div>
         <sec:csrfInput />

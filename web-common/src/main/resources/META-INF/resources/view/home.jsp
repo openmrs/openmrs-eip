@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<%@ include file="header.jsp" %>
 <app-root></app-root>
 <script src="runtime.js" defer></script>
 <script src="polyfills.js" defer></script>
