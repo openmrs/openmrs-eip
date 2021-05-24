@@ -84,4 +84,12 @@
 	background-color: $colorSilver;
 }
 
+#app-container .nav-link {
+	color: $colorSilver;
+}
+
+#app-container .nav-link.active {
+	color: $textColorTabs;
+}
+
 

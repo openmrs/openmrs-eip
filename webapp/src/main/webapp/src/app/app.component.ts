@@ -1,15 +1,30 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {AppService} from "./app.service";
+
+export enum SyncMode {
+	SENDER = 'SENDER',
+	RECEIVER = 'RECEIVER'
+}
+
+export class AppProperties {
+	syncMode?: SyncMode;
+}
 
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-	title: string = 'dbsync';
+	constructor(private appService: AppService) {
+	}
 
-	//TODO set based on sync mode using store state
-	activeTab: string = "receiver";
+	syncMode?: SyncMode = SyncMode.SENDER;
+
+	ngOnInit(): void {
+		//TODO use nrgx by dispatching an action
+		this.appService.getAppProperties().subscribe(appProperties => this.syncMode = appProperties.syncMode)
+	}
 
 }
