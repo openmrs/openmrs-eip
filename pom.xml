@@ -16,6 +16,7 @@
         <module>web-common</module>
         <module>web-sender</module>
         <module>web-receiver</module>
+        <module>owa</module>
         <module>distribution</module>
     </modules>
 

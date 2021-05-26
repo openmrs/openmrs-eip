@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "name": "DB Sync",
+  "description": "DB Sync Console Application",
+  "launch_path": "index.html",
+  "icons": {
+    "48": "img/sync_48.png"
+  },
+  "developer": {
+    "url": "https://www.vumc.org/global-health/friends-global-health",
+    "name": "Friends in Global Health",
+    "company": "Friends in Global Health",
+    "email": "globalhealth@vumc.org"
+  },
+  "activities": {
+    "openmrs": {
+      "href": "*"
+    }
+  }
+}
