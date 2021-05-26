@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
 	constructor(private appService: AppService) {
 	}
 
-	syncMode?: SyncMode = SyncMode.SENDER;
+	syncMode?: SyncMode;
 
 	ngOnInit(): void {
 		//TODO use nrgx by dispatching an action

@@ -3,7 +3,7 @@
 		<li ngbNavItem="dashboard" class="border-top border-left rounded-left">
 			<a ngbNavLink i18n="@@common-dashboard">Dashboard</a>
 			<ng-template ngbNavContent>
-				Dashboard
+				<span class="font-italic">Running in Receiver Mode</span>
 			</ng-template>
 		</li>
 		<li ngbNavItem="errors" class="border-top border-left rounded-left">
@@ -16,12 +16,6 @@
 			<a ngbNavLink i18n="@@receiver-conflicts" class="border-top border-bottom border-left rounded-left">Conflicts</a>
 			<ng-template ngbNavContent>
 				<receiver-conflicts></receiver-conflicts>
-			</ng-template>
-		</li>
-		<li ngbNavItem="outgoing" class="border-bottom border-left rounded-left">
-			<a ngbNavLink i18n="@@sender-outgoing">Outgoing</a>
-			<ng-template ngbNavContent>
-				Outgoing Sync Messages
 			</ng-template>
 		</li>
 	</ul>

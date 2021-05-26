@@ -5,6 +5,10 @@
         <span class="navbar-brand">DB SYNC</span>
         <sec:authorize access="isFullyAuthenticated()">
             <form class="form-inline" action="/logout" method="post">
+                <i class="bi bi-person ui-icon-sm"></i>
+                &nbsp;
+                <sec:authentication property="principal.username" />
+                &nbsp;
                 <button type="submit" class="btn btn-outline-light">Log Out</button>
                 <sec:csrfInput />
             </form>

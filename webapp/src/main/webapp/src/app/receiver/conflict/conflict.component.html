@@ -17,9 +17,9 @@
 			<td>{{c.identifier}}</td>
 			<td>{{c.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 			<td>
-				<i class="bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>
+				<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>
 				&nbsp;
-				<i class="bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="markResolvedTemplate" [openDelay]="1000" (click)="confirmDialog(c)"></i>
+				<i class="bi bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="markResolvedTemplate" [openDelay]="1000" (click)="confirmDialog(c)"></i>
 			</td>
 		</tr>
 	</tbody>
