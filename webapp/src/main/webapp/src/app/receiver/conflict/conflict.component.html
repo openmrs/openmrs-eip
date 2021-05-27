@@ -13,7 +13,7 @@
 	</thead>
 	<tbody>
 		<tr *ngFor="let c of conflicts" class="ui-row-highlight">
-			<td>{{c.modelClassName}}</td>
+			<td>{{c.modelClassName | clazz}}</td>
 			<td>{{c.identifier}}</td>
 			<td>{{c.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 			<td>

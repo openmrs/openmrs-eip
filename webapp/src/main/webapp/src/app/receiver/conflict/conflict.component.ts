@@ -117,4 +117,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		super.ngOnDestroy();
 	}
 
+	getSimpleClassName(className?: string) {
+		return className?.substring(className.lastIndexOf('.') + 1, className.lastIndexOf('Model'));
+	}
+
 }
