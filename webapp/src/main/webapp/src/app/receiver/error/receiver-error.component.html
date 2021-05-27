@@ -14,7 +14,7 @@
 	</thead>
 	<tbody>
 	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.causeMessage != null ? e.causeMessage : e.message}}" [openDelay]="2000">
-		<td>{{e.modelClassName | clazz}}</td>
+		<td>{{e.modelClassName | modelClass}}</td>
 		<td>{{e.identifier}}</td>
 		<td>{{e.attemptCount}}</td>
 		<td>{{e.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>

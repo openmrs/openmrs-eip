@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: 'clazz'})
+@Pipe({name: 'modelClass'})
 export class ClassPipe implements PipeTransform {
 
 	transform(className: any, ...args: any[]): any {
