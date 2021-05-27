@@ -10,6 +10,7 @@
             <includes>
                 <include>index.html</include>
                 <include>manifest.webapp</include>
+                <include>js/**</include>
                 <include>img/**</include>
             </includes>
         </fileSet>
