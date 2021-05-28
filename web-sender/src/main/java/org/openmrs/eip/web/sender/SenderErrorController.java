@@ -3,7 +3,7 @@ package org.openmrs.eip.web.sender;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
-import org.openmrs.eip.web.BaseRestController;
+import org.openmrs.eip.web.contoller.BaseRestController;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

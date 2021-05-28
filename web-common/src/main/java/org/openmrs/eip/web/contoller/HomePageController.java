@@ -1,4 +1,4 @@
-package org.openmrs.eip.web;
+package org.openmrs.eip.web.contoller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,8 +1,9 @@
-package org.openmrs.eip.web;
+package org.openmrs.eip.web.contoller;
 
 import java.util.Collections;
 import java.util.Map;
 
+import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.openmrs.eip.web;
+package org.openmrs.eip.web.contoller;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
