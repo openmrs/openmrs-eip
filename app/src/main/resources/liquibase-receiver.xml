@@ -123,4 +123,30 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet author="wluyima" id="20210528-1201">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="exception_type" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add exception_type column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="exception_type" type="VARCHAR(255)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210528-1202">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="cause_exception_type" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add cause_exception_type column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="cause_exception_type" type="VARCHAR(255)" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

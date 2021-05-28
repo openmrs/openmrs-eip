@@ -19,9 +19,12 @@
                 </script>
             </split>
         </when>
-        
+
+        <setProperty name="exceptionType">
+            <simple>${exception.getClass().getName()}</simple>
+        </setProperty>
         <setProperty name="error-msg">
-            <simple>${exception.toString()}</simple>
+            <simple>${exception.getMessage()}</simple>
         </setProperty>
 
         <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="WARN" />
@@ -33,10 +36,17 @@
             </setProperty>
         </when>
 
+        <setProperty name="rootCause">
+            <method beanType="org.apache.commons.lang3.exception.ExceptionUtils" method="getRootCause(${exception})" />
+        </setProperty>
+
         <when>
-            <simple>${exception.cause} != null</simple>
+            <simple>${exception.cause} != null &amp;&amp; ${exchangeProperty.rootCause} != null</simple>
+            <setProperty name="causeExceptionType">
+                <simple>${exchangeProperty.rootCause.getClass().getName()}</simple>
+            </setProperty>
             <setProperty name="cause-error-msg">
-                <simple>${exception.cause.toString()}</simple>
+                <simple>${exchangeProperty.rootCause.getMessage()}</simple>
             </setProperty>
             <when>
                 <simple>${exchangeProperty.cause-error-msg.length()} > 1024</simple>
@@ -62,7 +72,9 @@
                         #{getProperty('retry-item').setIdentifier(getProperty('entity-id'))}
                         #{getProperty('retry-item').setModelClassName(getProperty('model-class'))}
                         #{getProperty('retry-item').setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
+                        #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
+                        #{getProperty('retry-item').setCauseExceptionType(getProperty('causeExceptionType'))}
                         #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                         #{getProperty('retry-item').setDateCreated(new java.util.Date())}
                     </spel>
