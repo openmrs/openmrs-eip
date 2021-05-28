@@ -6,18 +6,18 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {DataTablesModule} from "angular-datatables";
 import {ConfirmDialogComponent} from "./dialogs/confirm.component";
 import {HttpErrorInterceptor} from "./http-error.interceptor";
-import {ClassPipe} from "./pipes/class.pipe";
+import {ModelClassPipe} from "./pipes/model-class.pipe";
 
 
 @NgModule({
-	declarations: [ConfirmDialogComponent, ClassPipe],
+	declarations: [ConfirmDialogComponent, ModelClassPipe],
 	exports: [
 		CommonModule,
 		BrowserModule,
 		HttpClientModule,
 		NgbModule,
 		DataTablesModule,
-		ClassPipe
+		ModelClassPipe
 	],
 	providers: [
 		{
