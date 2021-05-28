@@ -24,7 +24,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	modalRef?: NgbModalRef;
 
-	parsedEntityPayLoad?: Object;
+	parsedEntityPayLoad?: any;
 
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
