@@ -51,7 +51,9 @@
 							<table class="text-dark">
 								<tr *ngFor="let e of dashboard?.entries.errors['exceptionCountMap'] | keyvalue">
 									<td>
-										<span>{{e.key === 'uncategorized' ? unCategorizedLabel : e.key}}</span>
+										<span ngbTooltip="{{e.key === 'uncategorized' ? '' : e.key}}" [openDelay]="1000">
+											{{e.key === 'uncategorized' ? unCategorizedLabel : e.key | classname}}
+										</span>
 									</td>
 									<td>
 										<span class="badge border">{{e.value}}</span>

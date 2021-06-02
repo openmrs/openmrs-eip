@@ -8,16 +8,18 @@ import {ConfirmDialogComponent} from "./dialogs/confirm.component";
 import {HttpErrorInterceptor} from "./http-error.interceptor";
 import {ModelClassPipe} from "./pipes/model-class.pipe";
 import {GlobalErrorHandler} from "./global-error.handler";
+import {ClassNamePipe} from "./pipes/class-name.pipe";
 
 
 @NgModule({
-	declarations: [ConfirmDialogComponent, ModelClassPipe],
+	declarations: [ConfirmDialogComponent, ClassNamePipe, ModelClassPipe],
 	exports: [
 		CommonModule,
 		BrowserModule,
 		HttpClientModule,
 		NgbModule,
 		DataTablesModule,
+		ClassNamePipe,
 		ModelClassPipe
 	],
 	providers: [

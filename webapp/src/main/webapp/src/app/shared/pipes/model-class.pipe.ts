@@ -1,10 +1,12 @@
 import {Pipe, PipeTransform} from "@angular/core";
+import {BaseClassPipe} from "./base-class.pipe";
 
 @Pipe({name: 'modelClass'})
-export class ModelClassPipe implements PipeTransform {
+export class ModelClassPipe extends BaseClassPipe implements PipeTransform {
 
 	transform(className: any, ...args: any[]): any {
-		return className?.substring(className.lastIndexOf('.') + 1, className.lastIndexOf('Model'));
+		let simpleClassName = this.getSimpleName(className);
+		return simpleClassName.substring(0, simpleClassName.lastIndexOf('Model'));
 	}
 
 }
