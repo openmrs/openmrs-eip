@@ -2,9 +2,9 @@ import {BaseEntity} from "./base-entity";
 
 export abstract class BaseErrorEntity extends BaseEntity {
 
-	message?: string;
+	exceptionType?: string;
 
-	causeMessage?: string;
+	message?: string;
 
 	attemptCount?: number;
 

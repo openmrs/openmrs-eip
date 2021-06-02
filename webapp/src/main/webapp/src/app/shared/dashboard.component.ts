@@ -7,6 +7,8 @@ export abstract class DashboardComponent implements OnInit {
 
 	dashboard?: Dashboard;
 
+	unCategorizedLabel: string = $localize`:@@common-error-uncategorized:Uncategorized`;
+
 	constructor(private service: DashboardService) {
 	}
 

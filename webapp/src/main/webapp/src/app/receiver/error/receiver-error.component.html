@@ -13,7 +13,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.causeMessage != null ? e.causeMessage : e.message}}" [openDelay]="2000">
+	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.message}}" [openDelay]="2000">
 		<td>{{e.modelClassName | modelClass}}</td>
 		<td>{{e.identifier}}</td>
 		<td>{{e.attemptCount}}</td>
@@ -50,12 +50,8 @@
 		<table border="1" width="100%" class="ui-display-table">
 			<tbody>
 				<tr>
-					<th class="text-right align-text-top" i18n="@@common-details">Error</th>
+					<th class="text-right align-text-top" i18n="@@common-error-message">Error Message</th>
 					<td class="text-left">{{errorToView?.message}}</td>
-				</tr>
-				<tr>
-					<th class="text-right align-text-top" i18n="@@common-cause">Cause</th>
-					<td class="text-left">{{errorToView?.causeMessage}}</td>
 				</tr>
 				<tr *ngIf="parsedEntityPayLoad.metadata.operation !== 'd'">
 					<th class="text-right align-text-top" i18n="@@common-payload">Payload</th>

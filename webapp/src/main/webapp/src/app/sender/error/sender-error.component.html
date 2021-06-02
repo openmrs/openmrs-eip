@@ -12,7 +12,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.causeMessage != null ? e.causeMessage : e.message}}" [openDelay]="2000">
+	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.message}}" [openDelay]="2000">
 		<td>{{e.event?.tableName}}</td>
 		<td>{{e.event?.identifier}}</td>
 		<td>{{e.event?.operation}}</td>
@@ -46,13 +46,9 @@
 	<div class="modal-body">
 		<table border="1" width="100%" class="ui-display-table">
 			<tbody>
-				<tr class="">
-					<th class="text-right align-text-top" i18n="@@common-error">Error</th>
+				<tr>
+					<th class="text-right align-text-top" i18n="@@common-error-message">Error Message</th>
 					<td class="text-left">{{errorToView?.message}}</td>
-				</tr>
-				<tr class="">
-					<th class="text-right align-text-top" i18n="@@common-cause">Cause</th>
-					<td class="text-left">{{errorToView?.causeMessage}}</td>
 				</tr>
 			</tbody>
 		</table>

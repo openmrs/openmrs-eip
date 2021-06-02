@@ -88,17 +88,31 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="wluyima" id="20210528-1104">
+    <changeSet author="wluyima" id="20210601-1406">
         <preConditions onFail="MARK_RAN">
+            <columnExists columnName="message" tableName="sender_retry_queue" />
+            <columnExists columnName="cause_message" tableName="sender_retry_queue" />
             <not>
-                <columnExists columnName="cause_exception_type" tableName="sender_retry_queue" />
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM sender_retry_queue WHERE cause_message IS NOT NULL
+                </sqlCheck>
             </not>
         </preConditions>
-        <comment>Add cause_exception_type column to sender_retry_queue table</comment>
+        <comment>Copying values from sender_retry_queue.cause_message to sender_retry_queue.message column</comment>
 
-        <addColumn tableName="sender_retry_queue">
-            <column name="cause_exception_type" type="VARCHAR(255)" />
-        </addColumn>
+        <update tableName="sender_retry_queue">
+            <column name="message" valueComputed="cause_message" />
+            <where>cause_message IS NOT NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210601-1407">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="cause_message" tableName="sender_retry_queue" />
+        </preConditions>
+        <comment>Drop sender_retry_queue.cause_message column</comment>
+
+        <dropColumn tableName="sender_retry_queue" columnName="cause_message" />
     </changeSet>
 
 </databaseChangeLog>

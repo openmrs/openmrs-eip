@@ -51,7 +51,7 @@
 							<table class="text-dark">
 								<tr *ngFor="let e of dashboard?.entries.errors['exceptionCountMap'] | keyvalue">
 									<td>
-										<span>{{e.key}}</span>
+										<span>{{e.key === 'uncategorized' ? unCategorizedLabel : e.key}}</span>
 									</td>
 									<td>
 										<span class="badge border">{{e.value}}</span>

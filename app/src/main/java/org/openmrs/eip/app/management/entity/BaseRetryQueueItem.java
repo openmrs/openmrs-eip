@@ -11,14 +11,8 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	@Column(name = "exception_type")
 	private String exceptionType;
 	
-	@Column(name = "cause_exception_type")
-	private String causeExceptionType;
-	
 	@Column(length = 1024)
 	private String message;
-	
-	@Column(name = "cause_message", length = 1024)
-	private String causeMessage;
 	
 	@Column(name = "attempt_count", nullable = false)
 	private Integer attemptCount = 1;
@@ -45,24 +39,6 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the causeExceptionType
-	 *
-	 * @return the causeExceptionType
-	 */
-	public String getCauseExceptionType() {
-		return causeExceptionType;
-	}
-	
-	/**
-	 * Sets the causeExceptionType
-	 *
-	 * @param causeExceptionType the causeExceptionType to set
-	 */
-	public void setCauseExceptionType(String causeExceptionType) {
-		this.causeExceptionType = causeExceptionType;
-	}
-	
-	/**
 	 * Gets the message
 	 *
 	 * @return the message
@@ -78,24 +54,6 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
-	}
-	
-	/**
-	 * Gets the causeMessage
-	 *
-	 * @return the causeMessage
-	 */
-	public String getCauseMessage() {
-		return causeMessage;
-	}
-	
-	/**
-	 * Sets the causeMessage
-	 *
-	 * @param causeMessage the causeMessage to set
-	 */
-	public void setCauseMessage(String causeMessage) {
-		this.causeMessage = causeMessage;
 	}
 	
 	/**

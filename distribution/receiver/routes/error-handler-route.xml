@@ -21,20 +21,13 @@
         </when>
 
         <setProperty name="exceptionType">
-            <simple>${exception.getClass().getName()}</simple>
+            <simple>${exception.class.name}</simple>
         </setProperty>
         <setProperty name="error-msg">
-            <simple>${exception.getMessage()}</simple>
+            <simple>${exception.message}</simple>
         </setProperty>
 
         <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="WARN" />
-
-        <when>
-            <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
-            <setProperty name="error-msg">
-                <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
-            </setProperty>
-        </when>
 
         <setProperty name="rootCause">
             <method beanType="org.apache.commons.lang3.exception.ExceptionUtils" method="getRootCause(${exception})" />
@@ -42,19 +35,25 @@
 
         <when>
             <simple>${exception.cause} != null &amp;&amp; ${exchangeProperty.rootCause} != null</simple>
-            <setProperty name="causeExceptionType">
-                <simple>${exchangeProperty.rootCause.getClass().getName()}</simple>
+            <setProperty name="exceptionType">
+                <simple>${exchangeProperty.rootCause.class.name}</simple>
             </setProperty>
-            <setProperty name="cause-error-msg">
-                <simple>${exchangeProperty.rootCause.getMessage()}</simple>
-            </setProperty>
+
             <when>
-                <simple>${exchangeProperty.cause-error-msg.length()} > 1024</simple>
-                <setProperty name="cause-error-msg">
-                    <simple>${exchangeProperty.cause-error-msg.substring(0, 1024)}</simple>
+                <simple>${exchangeProperty.rootCause.message} != null</simple>
+                <setProperty name="error-msg">
+                    <simple>${exchangeProperty.rootCause.message}</simple>
                 </setProperty>
+
+                <log message="Cause: ${exchangeProperty.rootCause.message}" loggingLevel="WARN" />
             </when>
-            <log message="Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="WARN" />
+        </when>
+
+        <when>
+            <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
+            <setProperty name="error-msg">
+                <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
+            </setProperty>
         </when>
 
         <choice>
@@ -74,8 +73,6 @@
                         #{getProperty('retry-item').setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
                         #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
-                        #{getProperty('retry-item').setCauseExceptionType(getProperty('causeExceptionType'))}
-                        #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                         #{getProperty('retry-item').setDateCreated(new java.util.Date())}
                     </spel>
                 </script>
@@ -94,7 +91,7 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.retry-item} == null</simple>
-                        <log message="A fatal error occurred while attempting to process message in the retry queue, Error: ${exchangeProperty.error-msg} Cause: ${exchangeProperty.cause-error-msg}" loggingLevel="ERROR" />
+                        <log message="A fatal error occurred while attempting to process message in the retry queue, Error: ${exchangeProperty.error-msg}" loggingLevel="ERROR" />
                     </when>
                     <otherwise>
                         <when>
@@ -111,8 +108,8 @@
 
                         <script>
                             <spel>
+                                #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
-                                #{getProperty('retry-item').setCauseMessage(getProperty('cause-error-msg'))}
                                 #{getProperty('retry-item').setDateChanged(new java.util.Date())}
                             </spel>
                         </script>
