@@ -68,7 +68,7 @@
                 <setProperty name="retry-event-message">
                     <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
                 </setProperty>
-                <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
+                <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="${exchangeProperty.retry-event-message}" />
             </when>
 
             <log message="Publishing to destination: ${exchangeProperty.db-event-dest}" loggingLevel="DEBUG" />
