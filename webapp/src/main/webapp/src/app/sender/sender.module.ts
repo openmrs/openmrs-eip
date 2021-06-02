@@ -4,12 +4,16 @@ import {SharedModule} from "../shared/shared.module";
 import {StoreModule} from "@ngrx/store";
 import {senderErrorReducer} from "./error/state/error.reducer";
 import {SenderComponent} from './sender.component';
+import {TableStatsComponent} from "./stats/table-stats.component";
+import {SenderDashboardComponent} from "./dashboard/sender-dashboard.component";
 
 
 @NgModule({
 	declarations: [
 		SenderComponent,
-		SenderErrorComponent
+		SenderErrorComponent,
+		SenderDashboardComponent,
+		TableStatsComponent
 	],
 	imports: [
 		SharedModule,
