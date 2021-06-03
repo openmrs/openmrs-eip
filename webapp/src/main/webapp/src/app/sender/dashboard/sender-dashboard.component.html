@@ -2,39 +2,45 @@
 	<div class="row">
 		<div class="col-6">
 			<div class="card mb-3">
-				<div class="card-header text-danger text-center"><span class="h5" i18n="@@common-errors">Errors</span></div>
+				<div class="card-header text-danger text-center">
+					<span class="h5" i18n="@@common-error-queue">Event Error Queue</span>
+				</div>
 				<ul class="list-group list-group-flush">
 					<li class="list-group-item">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
 						<div class="ml-3 mr-3">
 							<table class="text-dark">
 								<tr>
-									<td>
-										<span i18n="@@common-total-count">Total Count</span>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-error-count">Total Count Of Event Errors</span>
 									</td>
-									<td>
-										<span class="badge border">0</span>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.errors['totalCount']}}</span>
 									</td>
 								</tr>
 								<tr>
-									<td>
-										<span i18n="@@common-connection-related">Connection Related</span>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-connection-related">Connection Related Event Errors</span>
 									</td>
-									<td><span class="badge border">0</span></td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.errors['connectionErrorCount']}}</span>
+									</td>
 								</tr>
 								<tr>
-									<td>
-										<span i18n="@@common-most-encountered">Most Encountered</span>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-most-encountered">Most Encountered Event Error</span>
 									</td>
-									<td>
-										<span class="badge border">0</span>
+									<td class="pl-2">
+										<span *ngFor="let e of dashboard?.entries.errors['mostEncounteredErrors']">
+											<span class="badge border border-secondary" ngbTooltip="{{e}}" [openDelay]="1000">{{e | classname}}</span>&nbsp;
+										</span>
 									</td>
 								</tr>
 							</table>
 						</div>
 					</li>
 					<li class="list-group-item">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-by-table">By Table</div>
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-by-table">By Database Table</div>
 						<div class="ml-3 mr-3">
 							<table>
 								<tr>
@@ -46,17 +52,18 @@
 						</div>
 					</li>
 					<li class="list-group-item">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-by-error-type">By Error Type</div>
+						<div class="h6 card-title ui-text-theme-secondary">
+							<span i18n="@@common-by-error-type">By Error Type</span>&nbsp;
+							<span class="text-danger" i18n="@@common-advanced-users">(For Advanced Users)</span>
+						</div>
 						<div class="ml-3 mr-3">
 							<table class="text-dark">
 								<tr *ngFor="let e of dashboard?.entries.errors['exceptionCountMap'] | keyvalue">
 									<td>
-										<span ngbTooltip="{{e.key === 'uncategorized' ? '' : e.key}}" [openDelay]="1000">
-											{{e.key === 'uncategorized' ? unCategorizedLabel : e.key | classname}}
-										</span>
+										<span ngbTooltip="{{e.key}}" [openDelay]="1000">{{e.key | classname}}</span>
 									</td>
-									<td>
-										<span class="badge border">{{e.value}}</span>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{e.value}}</span>
 									</td>
 								</tr>
 							</table>
