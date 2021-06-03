@@ -4,18 +4,19 @@ import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.utils.collections.ConcurrentHashSet;
 import org.apache.camel.CamelContext;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
 import org.openmrs.eip.component.DatabaseOperation;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.web.Dashboard;
 import org.openmrs.eip.web.contoller.DashboardGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,6 @@ import org.springframework.stereotype.Component;
 public class SenderDashboardGenerator implements DashboardGenerator {
 	
 	private static final String ENTITY_NAME = SenderRetryQueueItem.class.getSimpleName();
-	
-	private static final Set<String> CONN_EX_CLASSES;
-	
-	static {
-		CONN_EX_CLASSES = new HashSet();
-		//CONN_EX_CLASSES.add()
-	}
 	
 	protected CamelContext camelContext;
 	
@@ -48,7 +42,7 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		final Map<String, Map> tableStatsMap = new ConcurrentHashMap();
 		final Map exceptionCountMap = new ConcurrentHashMap();
 		final AtomicInteger totalErrorCount = new AtomicInteger();
-		final AtomicInteger connectionErrorCount = new AtomicInteger();
+		final AtomicInteger activeMqRelatedErrorCount = new AtomicInteger();
 		final AtomicInteger mostEncounteredErrorCount = new AtomicInteger();
 		final Set<Object> mostEncounteredErrors = new ConcurrentHashSet();
 		
@@ -80,11 +74,17 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 			        + ENTITY_NAME + " GROUP BY exceptionType").request(List.class);
 			
 			items.parallelStream().forEach(values -> {
-				final Object exception = values[0];
+				final String exception = values[0].toString();
 				final Integer count = Integer.valueOf(values[1].toString());
 				exceptionCountMap.put(exception, count);
-				if (CONN_EX_CLASSES.contains(exception)) {
-					connectionErrorCount.addAndGet(count);
+				
+				try {
+					if (ActiveMQException.class.isAssignableFrom(getClass().getClassLoader().loadClass(exception))) {
+						activeMqRelatedErrorCount.addAndGet(count);
+					}
+				}
+				catch (ClassNotFoundException e) {
+					throw new EIPException("Failed to load exception class " + exception, e);
 				}
 				
 				synchronized (this) {
@@ -103,7 +103,7 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		Dashboard dashboard = new Dashboard();
 		Map<String, Object> errors = new ConcurrentHashMap(2);
 		errors.put("totalCount", totalErrorCount);
-		errors.put("connectionErrorCount", connectionErrorCount);
+		errors.put("activeMqRelatedErrorCount", activeMqRelatedErrorCount);
 		errors.put("mostEncounteredErrors", mostEncounteredErrors);
 		errors.put("tableStatsMap", tableStatsMap);
 		errors.put("exceptionCountMap", exceptionCountMap);
