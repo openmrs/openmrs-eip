@@ -16,13 +16,16 @@ import org.apache.camel.CamelContext;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
 import org.openmrs.eip.component.DatabaseOperation;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.web.Dashboard;
 import org.openmrs.eip.web.contoller.DashboardGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile(SyncProfiles.SENDER)
 public class SenderDashboardGenerator implements DashboardGenerator {
 	
 	private static final String ENTITY_NAME = SenderRetryQueueItem.class.getSimpleName();

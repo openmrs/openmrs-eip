@@ -18,8 +18,8 @@
     <dependencies>
         <dependency>
             <groupId>org.openmrs.eip</groupId>
-            <artifactId>openmrs-eip-app</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>app-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

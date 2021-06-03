@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
+        <module>app-api</module>
         <module>app</module>
         <module>camel-openmrs</module>
         <module>camel-utils</module>
@@ -36,6 +37,7 @@
         <liquibaseVersion>4.2.0</liquibaseVersion>
         <tomcatVersion>9.0.17</tomcatVersion>
         <jstlVersion>1.2</jstlVersion>
+        <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
     </properties>
 
     <dependencyManagement>
