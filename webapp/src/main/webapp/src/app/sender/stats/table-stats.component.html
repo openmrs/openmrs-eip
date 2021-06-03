@@ -1,12 +1,30 @@
-<table class="text-dark" width="100%">
-	<tr>
-		<td>
-			<span class="text-dark">{{tableName}}</span>
+<table class="text-center">
+	<tr class="h5">
+		<td class="pr-1 pl-1">
+			<span class="badge badge-dark" i18n="@@common-table-name">Table Name</span>
 		</td>
-		<td align="right">
-			<span class="badge border text-success">{{stats.c}}</span>
-			<span class="badge border text-secondary">{{stats.u}}</span>
-			<span class="badge border text-danger">{{stats.d}}</span>
+		<td class="pr-1 pl-1">
+			<span class="badge badge-success" i18n="@@common-inserts">Inserts</span>
+		</td>
+		<td class="pr-1 pl-1">
+			<span class="badge badge-secondary" i18n="@@common-updates">Updates</span>
+		</td>
+		<td class="pr-1 pl-1">
+			<span class="badge badge-danger" i18n="@@common-deletes">Deletes</span>
+		</td>
+	</tr>
+	<tr *ngFor="let e of tableStatsMap | keyvalue">
+		<td class="text-right pr-2 pl-2">
+			{{e.key}}
+		</td>
+		<td>
+			<span class="badge border border-secondary">{{e.value.c}}</span>
+		</td>
+		<td>
+			<span class="badge border border-secondary">{{e.value.u}}</span>
+		</td>
+		<td>
+			<span class="badge border border-secondary">{{e.value.d}}</span>
 		</td>
 	</tr>
 </table>

@@ -7,9 +7,6 @@ import {Component, Input} from "@angular/core";
 export class TableStatsComponent {
 
 	@Input()
-	tableName?: any;
-
-	@Input()
-	stats?: any;
+	tableStatsMap?: Map<string, any>;
 
 }

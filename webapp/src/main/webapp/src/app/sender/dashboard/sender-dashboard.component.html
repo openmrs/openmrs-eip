@@ -30,15 +30,9 @@
 						</div>
 					</li>
 					<li class="list-group-item">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-by-table">By Database Table</div>
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
 						<div class="ml-3 mr-3">
-							<table>
-								<tr>
-									<td>
-										<table-stats *ngFor="let e of dashboard?.entries.errors['tableStatsMap'] | keyvalue" [tableName]="e.key" [stats]="e.value"></table-stats>
-									</td>
-								</tr>
-							</table>
+							<table-stats [tableStatsMap]="dashboard?.entries.errors['tableStatsMap']"></table-stats>
 						</div>
 					</li>
 					<li class="list-group-item">
