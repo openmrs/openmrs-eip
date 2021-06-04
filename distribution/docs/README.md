@@ -3,11 +3,14 @@
 1. [Introduction](#introduction)
 2. [Requirements](#requirements)
 3. [Assumptions](#assumptions)
-5. [Installation](#installation)
+4. [Installation](#installation)
     1. [JMS Server](#jms-server)
     2. [Building OpenMRS EIP](#building-openmrs-eip)
     3. [Receiver](#receiver)
     4. [Sender](#sender)
+5. [Console](#console)
+    1. [User Account Management](#user-account-management)
+    2. [Open Webapp Setup](#open-webapp-setup)
 6. [Security](#security)
 7. [DB Sync Technical Overview](#db-sync-technical-overview)
     1. [Sender Overview](#sender-overview)
@@ -197,7 +200,45 @@ properties that take directory paths as values e.g. log file, complex obs data d
     Make sure no errors are reported when the application starts, you can find the logs in the configured directory which
     defaults to `{eip.home}/logs/openmrs-eip.log`, where {eip.home} is the path to your installation directory.
 
-# Security
+## Console
+
+The sender and receiver each come with a built-in user interface which can be accessed at http://localhost:{server.port} 
+where {server.port} is the value of the `server.port` property in the sender/receiver application.properties file.
+
+#### User Account Management
+Tha console applications require user authentication, below is how to setup user accounts
+
+1. Create a file named dbsync-users.properties in your sender/receiver installation directory.
+2. Add user account entries to the where the keys are the usernames and the values are their respective passwords as
+   shown below;
+    ```
+    admin=test
+    manager=secret
+    ```
+In the example above, we have defined 2 user accounts, the first user has username **admin**, password **test**
+and the second user has username **manager**, password **secret**
+
+#### Open Webapp Setup
+The console can also be accessed from an OpenMRS instance as an [open webapp](https://wiki.openmrs.org/x/C4KIBQ) 
+by doing the following;
+
+1. Install the [open webapp module](https://addons.openmrs.org/show/org.openmrs.module.open-web-apps-module) in OpenMRS
+2. Navigate to the main administration page, click on **Manage Apps** under the **Open Web Apps Module** section
+3. Set the value of the **App Base URL** field to `/{openmrsContextPath}/owa` where {openmrsContextPath} is the context
+   path of the OpenMRS web application, usually it is `openmrs` which would make the value `/openmrs/owa` in most cases.
+4. Keep note of the value of the **App Folder Path** field, you will need it below in step 6.
+5. Then click on **Manage Apps** from the breadcrumbs links, click on the **Browse** button and select the generated
+   `owa-{version}.zip` file in `owa/target` folder of this project where {version} is this project version and then finally 
+   click the **Upload** button.
+6. Using your favorite editor, edit the file located at {owaAppFolderPath}/owa-{version}/js/config.js where {owaAppFolderPath} 
+   is the value you noted in step 4 above and {version} is this project version. And then set the value of the `dbSyncUrl` 
+   to the URL of the sender/receiver console i.e. http://localhost:{server.port}
+
+You are all set, to access the DB sync console, click on the installed owa from the **Manage Apps** page.
+
+**WARNING!!** **DO NOT** expose the DB sync console on the public internet.
+    
+## Security
 Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were
 developed to encrypt and sign (`PGPEncryptService`) message on one side and verify and decrypt (`PGPDecryptService`) on 
 the other side. They simply need to be registered in the corresponding Camel route before being sent or after being 
@@ -230,9 +271,9 @@ The receiver needs to hold it's private key and all the public keys of the sende
 **To be detected by the program, the private keys should all end with -sec.asc and the public keys should all end with 
 -pub.asc**
 
-# DB Sync Technical Overview
+## DB Sync Technical Overview
 
-## Sender Overview
+### Sender Overview
 The sender is really a spring boot application with custom camel routes management database.
 
 When the application is fired up in sender mode, the built-in debezium route starts the debezium component which will 
@@ -249,7 +290,7 @@ configured sync destination, if you're using ActiveMQ to sync between the sender
 option, it means the message would be pushed to a sync queue in an external message broker that is shared with the
 receiving sync application.
 
-## Receiver Overview
+### Receiver Overview
 The receiver is also a spring boot application with its own set of camel routes but instead running at another physical 
 location with an OpenMRS installation.
 
