@@ -203,38 +203,39 @@ properties that take directory paths as values e.g. log file, complex obs data d
 ## Console
 
 The sender and receiver each come with a built-in user interface which can be accessed at http://localhost:{server.port} 
-where {server.port} is the value of the `server.port` property in the sender/receiver application.properties file.
+where {server.port} is the value of the `server.port` property in the sender/receiver `application.properties` file.
 
-#### User Account Management
-Tha console applications require user authentication, below is how to setup user accounts
+### User Account Management
+Tha console applications require user authentication, below is how to setup user accounts;
 
-1. Create a file named dbsync-users.properties in your sender/receiver installation directory.
-2. Add user account entries to the where the keys are the usernames and the values are their respective passwords as
-   shown below;
-    ```
-    admin=test
-    manager=secret
-    ```
-In the example above, we have defined 2 user accounts, the first user has username **admin**, password **test**
-and the second user has username **manager**, password **secret**
+1. Create a file named `dbsync-users.properties` in your sender/receiver installation directory.
+2. Add user account entries to the above file where the keys are the usernames and the values are their respective 
+   passwords as demonstrated below;
+```
+admin=test
+manager=secret
+```
+In the example above, we have defined 2 user accounts, the first user has username **admin**, password **test** and the 
+second user has username **manager**, password **secret**
 
-#### Open Webapp Setup
+### Open Webapp Setup
 The console can also be accessed from an OpenMRS instance as an [open webapp](https://wiki.openmrs.org/x/C4KIBQ) 
 by doing the following;
 
-1. Install the [open webapp module](https://addons.openmrs.org/show/org.openmrs.module.open-web-apps-module) in OpenMRS
+1. Install the [open webapp module](https://addons.openmrs.org/show/org.openmrs.module.open-web-apps-module) in the 
+   associated OpenMRS instance.
 2. Navigate to the main administration page, click on **Manage Apps** under the **Open Web Apps Module** section
 3. Set the value of the **App Base URL** field to `/{openmrsContextPath}/owa` where {openmrsContextPath} is the context
-   path of the OpenMRS web application, usually it is `openmrs` which would make the value `/openmrs/owa` in most cases.
-4. Keep note of the value of the **App Folder Path** field, you will need it below in step 6.
-5. Then click on **Manage Apps** from the breadcrumbs links, click on the **Browse** button and select the generated
-   `owa-{version}.zip` file in `owa/target` folder of this project where {version} is this project version and then finally 
-   click the **Upload** button.
+   path of the OpenMRS instance, usually it is `openmrs` which would make the field value `/openmrs/owa` in most cases.
+4. Keep note of the value of the **App Folder Path** field, you will need it in step 6 below.
+5. Click on **Manage Apps** from the breadcrumbs links, click on the **Browse** button and select the generated
+   `owa-{version}.zip` file in the `owa/target` folder of this project where {version} is this project version and then 
+   finally click the **Upload** button.
 6. Using your favorite editor, edit the file located at {owaAppFolderPath}/owa-{version}/js/config.js where {owaAppFolderPath} 
-   is the value you noted in step 4 above and {version} is this project version. And then set the value of the `dbSyncUrl` 
+   is the value you noted in step 4 above and {version} is this project version, then set the value of the `dbSyncUrl` 
    to the URL of the sender/receiver console i.e. http://localhost:{server.port}
 
-You are all set, to access the DB sync console, click on the installed owa from the **Manage Apps** page.
+You are all set! To access the DB sync console, click on the installed owa from the **Manage Apps** page.
 
 **WARNING!!** **DO NOT** expose the DB sync console on the public internet.
     
