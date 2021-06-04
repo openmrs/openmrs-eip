@@ -1,6 +1,17 @@
 version: "3.3"
 
 services:
+  db_central:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-openmrs}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-openmrs}
+      MYSQL_DATABASE: ${MYSQL_DB:-openmrs}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_central:/var/lib/mysql
   db_remote:
     image: mysql:5.6
     environment:
@@ -9,10 +20,11 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-openmrs}
       MYSQL_DATABASE: ${MYSQL_DB:-openmrs}
     ports:
-      - "3309:3306"
+      - "3308:3306"
     volumes:
       - mysql_remote:/var/lib/mysql
       - ./sender-my.cnf:/etc/mysql/my.cnf
 
 volumes:
+  mysql_central:
   mysql_remote:
