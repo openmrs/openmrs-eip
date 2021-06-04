@@ -61,9 +61,6 @@ Below is the high level breakdown of what is contained in each module.
 ##### Receiver
 - All the camel routes used when the application in run in receiver mode
 
-#### camel-odoo (TO BE REMOVED)
-- Integration code with an odoo system
-
 ### Design Overview
 The project has a classic architecture with a service layer and a DAO layer. Each action (to get or save entities) of the
 Camel endpoints comes with the name of the table upon which the action is performed. A facade (`EntityServiceFacade`) is

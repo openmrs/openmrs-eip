@@ -12,7 +12,6 @@
         <module>app-api</module>
         <module>app</module>
         <module>camel-openmrs</module>
-        <module>camel-utils</module>
         <module>webapp</module>
         <module>web-common</module>
         <module>web-sender</module>
