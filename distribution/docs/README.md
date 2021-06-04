@@ -211,10 +211,10 @@ Tha console applications require user authentication, below is how to setup user
 1. Create a file named `dbsync-users.properties` in your sender/receiver installation directory.
 2. Add user account entries to the above file where the keys are the usernames and the values are their respective 
    passwords as demonstrated below;
-```
-admin=test
-manager=secret
-```
+   ```
+   admin=test
+   manager=secret
+   ```
 In the example above, we have defined 2 user accounts, the first user has username **admin**, password **test** and the 
 second user has username **manager**, password **secret**
 
