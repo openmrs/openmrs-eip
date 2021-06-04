@@ -1,8 +1,8 @@
 {
-  "version": "1.0",
+  "version": "${project.parent.version}",
   "name": "DB Sync",
   "description": "DB Sync Console Application",
-  "launch_path": "index.html",
+  "launch_path": "index.${projectBuildNumber}.html",
   "icons": {
     "48": "img/sync_48.png"
   },

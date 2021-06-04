@@ -5,14 +5,29 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
+
     <fileSets>
         <fileSet>
             <includes>
-                <include>index.html</include>
-                <include>manifest.webapp</include>
-                <include>js/**</include>
                 <include>img/**</include>
             </includes>
         </fileSet>
     </fileSets>
+
+    <files>
+        <file>
+            <filtered>true</filtered>
+            <source>index.html</source>
+            <destName>index.${projectBuildNumber}.html</destName>
+        </file>
+        <file>
+            <filtered>true</filtered>
+            <source>manifest.webapp</source>
+        </file>
+        <file>
+            <filtered>true</filtered>
+            <source>js/config.js</source>
+            <destName>js/config.${projectBuildNumber}.js</destName>
+        </file>
+    </files>
 </assembly>

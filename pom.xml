@@ -25,6 +25,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.build.timestamp.format>yyyy.MM.dd.HH.mm.ss.sss</maven.build.timestamp.format>
+        <projectBuildNumber>${maven.build.timestamp}</projectBuildNumber>
         <guava.version>28.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
         <lombok.version>1.18.8</lombok.version>
@@ -37,7 +39,15 @@
         <tomcatVersion>9.0.17</tomcatVersion>
         <jstlVersion>1.2</jstlVersion>
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
+        <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com:openmrs/openmrs-eip</connection>
+        <developerConnection>scm:git:git@github.com:openmrs/openmrs-eip</developerConnection>
+        <url>https://github.com/openmrs/openmrs-eip</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencyManagement>
         <dependencies>
@@ -153,7 +163,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>${assemblyPluginVersion}</version>
                     <configuration>
                         <appendAssemblyId>false</appendAssemblyId>
                     </configuration>
