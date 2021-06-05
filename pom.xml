@@ -25,6 +25,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <projectDefaultLocale>en</projectDefaultLocale>
         <maven.build.timestamp.format>yyyy.MM.dd.HH.mm.ss.sss</maven.build.timestamp.format>
         <projectBuildNumber>${maven.build.timestamp}</projectBuildNumber>
         <guava.version>28.0-jre</guava.version>
@@ -40,6 +41,7 @@
         <jstlVersion>1.2</jstlVersion>
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
+        <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
     </properties>
 
     <scm>
@@ -167,6 +169,11 @@
                     <configuration>
                         <appendAssemblyId>false</appendAssemblyId>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.coderplus.maven.plugins</groupId>
+                    <artifactId>copy-rename-maven-plugin</artifactId>
+                    <version>${copyRenamePluginVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
