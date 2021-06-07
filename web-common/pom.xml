@@ -53,6 +53,79 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>${copyRenamePluginVersion}</version>
+                        <executions>
+                            <execution>
+                                <id>rename-angular-resources</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>rename</goal>
+                                </goals>
+                                <configuration>
+                                    <fileSets>
+                                        <!-- Rename JS files -->
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/main.js</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/main.${projectBuildNumber}.js</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/polyfills.js</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/polyfills.${projectBuildNumber}.js</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/runtime.js</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/runtime.${projectBuildNumber}.js</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/scripts.js</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/scripts.${projectBuildNumber}.js</destinationFile>
+                                        </fileSet>
+
+                                        <!-- Rename CSS files -->
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/styles.css</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/styles.${projectBuildNumber}.css</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/css/login.css</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/css/login.${projectBuildNumber}.css</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.scss</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.${projectBuildNumber}.scss</destinationFile>
+                                        </fileSet>
+                                    </fileSets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <resource>
+                        <directory>../webapp/src/main/webapp/dist/webapp</directory>
+                        <targetPath>META-INF/resources</targetPath>
+                        <filtering>false</filtering>
+                        <excludes>
+                            <exclude>index.html</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>

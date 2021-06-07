@@ -17,10 +17,17 @@
 
 	<properties>
 		<nodeVersion>v15.11.0</nodeVersion>
+        <buildCommand>build</buildCommand>
 		<testScript>test</testScript>
 	</properties>
 	
 	<profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <buildCommand>build-prod</buildCommand>
+            </properties>
+        </profile>
 		<profile>
 			<id>headless</id>
 			<properties>
@@ -63,7 +70,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>run build</arguments>
+							<arguments>run ${buildCommand}</arguments>
 						</configuration>
 					</execution>
 					<execution>
