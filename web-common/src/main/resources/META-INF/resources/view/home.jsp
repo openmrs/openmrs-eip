@@ -1,3 +1,5 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!doctype html>
 <html lang="${projectDefaultLocale}">
 <head>
@@ -17,7 +19,10 @@
 <script src="runtime.${projectBuildNumber}.js" defer></script>
 <script src="polyfills.${projectBuildNumber}.js" defer></script>
 <script src="scripts.${projectBuildNumber}.js" defer></script>
-<script src="vendor.${projectBuildNumber}.js" defer></script>
 <script src="main.${projectBuildNumber}.js" defer></script>
+<c:set var="excludeVendorJs" value="${excludeVendorJs}" />
+<c:if test="${!excludeVendorJs}">
+    <script src="vendor.${projectBuildNumber}.js" defer></script>
+</c:if>
 </body>
 </html>
