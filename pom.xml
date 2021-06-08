@@ -42,7 +42,7 @@
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
         <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
-        <excludeVendorJs>false</excludeVendorJs>
+        <includeVendorJs>false</includeVendorJs>
     </properties>
 
     <scm>

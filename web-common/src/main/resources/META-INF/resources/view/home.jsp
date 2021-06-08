@@ -20,8 +20,8 @@
 <script src="polyfills.${projectBuildNumber}.js" defer></script>
 <script src="scripts.${projectBuildNumber}.js" defer></script>
 <script src="main.${projectBuildNumber}.js" defer></script>
-<c:set var="excludeVendorJs" value="${excludeVendorJs}" />
-<c:if test="${!excludeVendorJs}">
+<c:set var="includeVendorJs" value="${includeVendorJs}" />
+<c:if test="${includeVendorJs}">
     <script src="vendor.${projectBuildNumber}.js" defer></script>
 </c:if>
 </body>

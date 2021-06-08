@@ -23,9 +23,9 @@
 	
 	<profiles>
         <profile>
-            <id>prod</id>
+            <id>dev</id>
             <properties>
-                <buildCommand>build-prod</buildCommand>
+                <buildCommand>build-dev</buildCommand>
             </properties>
         </profile>
 		<profile>

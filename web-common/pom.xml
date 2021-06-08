@@ -55,9 +55,9 @@
 
     <profiles>
         <profile>
-            <id>prod</id>
+            <id>dev</id>
             <properties>
-                <excludeVendorJs>true</excludeVendorJs>
+                <includeVendorJs>true</includeVendorJs>
             </properties>
             <build>
                 <plugins>
@@ -91,6 +91,10 @@
                                             <sourceFile>${project.build.outputDirectory}/META-INF/resources/scripts.js</sourceFile>
                                             <destinationFile>${project.build.outputDirectory}/META-INF/resources/scripts.${projectBuildNumber}.js</destinationFile>
                                         </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/vendor.js</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/vendor.${projectBuildNumber}.js</destinationFile>
+                                        </fileSet>
 
                                         <!-- Rename CSS files -->
                                         <fileSet>
@@ -105,6 +109,41 @@
                                             <sourceFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.scss</sourceFile>
                                             <destinationFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.${projectBuildNumber}.scss</destinationFile>
                                         </fileSet>
+
+                                        <!-- Rename images and icons files -->
+                                        <!--
+                                            TODO add buildNumber to bootstrap icons and images too, currently they are all referenced
+                                            inside the generated styles.css which means we need to update the url references
+
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_asc.png</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_asc.${projectBuildNumber}.png</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_asc_disabled.png</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_asc_disabled.${projectBuildNumber}.png</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_both.png</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_both.${projectBuildNumber}.png</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_desc.png</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_desc.${projectBuildNumber}.png</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_desc_disabled.png</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_desc_disabled.${projectBuildNumber}.png</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.woff</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.${projectBuildNumber}.woff</destinationFile>
+                                        </fileSet>
+                                        <fileSet>
+                                            <sourceFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.woff2</sourceFile>
+                                            <destinationFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.${projectBuildNumber}.woff2</destinationFile>
+                                        </fileSet>
+                                        -->
                                     </fileSets>
                                 </configuration>
                             </execution>
@@ -162,10 +201,6 @@
                                     <sourceFile>${project.build.outputDirectory}/META-INF/resources/scripts.js</sourceFile>
                                     <destinationFile>${project.build.outputDirectory}/META-INF/resources/scripts.${projectBuildNumber}.js</destinationFile>
                                 </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/vendor.js</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/vendor.${projectBuildNumber}.js</destinationFile>
-                                </fileSet>
 
                                 <!-- Rename CSS files -->
                                 <fileSet>
@@ -180,48 +215,13 @@
                                     <sourceFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.scss</sourceFile>
                                     <destinationFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.${projectBuildNumber}.scss</destinationFile>
                                 </fileSet>
-
-                                <!-- Rename images and icons files -->
-                                <!--
-                                    TODO add buildNumber to bootstrap icons and images too, currently they are all referenced
-                                    inside the generated styles.css which means we need to update the url references
-
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_asc.png</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_asc.${projectBuildNumber}.png</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_asc_disabled.png</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_asc_disabled.${projectBuildNumber}.png</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_both.png</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_both.${projectBuildNumber}.png</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_desc.png</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_desc.${projectBuildNumber}.png</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/sort_desc_disabled.png</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/sort_desc_disabled.${projectBuildNumber}.png</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.woff</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.${projectBuildNumber}.woff</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.woff2</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/bootstrap-icons.${projectBuildNumber}.woff2</destinationFile>
-                                </fileSet>
-                                -->
                             </fileSets>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-        
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

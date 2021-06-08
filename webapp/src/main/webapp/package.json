@@ -4,8 +4,8 @@
 	"scripts": {
 		"ng": "ng",
 		"start": "ng serve",
-		"build": "ng build --source-map=false",
-		"build-prod": "ng build --configuration=production --source-map=false --output-hashing=none",
+		"build-dev": "ng build --source-map=false",
+		"build": "ng build --configuration=production --source-map=false --output-hashing=none",
 		"test": "ng test --no-watch",
 		"test-headless": "ng test --no-watch --browsers ChromeHeadless",
 		"lint": "ng lint",
