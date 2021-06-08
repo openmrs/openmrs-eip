@@ -2,375 +2,221 @@
 <xliff version="2.0" xmlns="urn:oasis:names:tc:xliff:document:2.0" srcLang="en">
 	<file id="ngi18n" original="ng.template">
 		<unit id="common-sender">
-			<notes>
-				<note category="location">src/app/app.component.html:5</note>
-			</notes>
 			<segment>
 				<source>Sender</source>
 			</segment>
 		</unit>
 		<unit id="common-receiver">
-			<notes>
-				<note category="location">src/app/app.component.html:11</note>
-			</notes>
 			<segment>
 				<source>Receiver</source>
 			</segment>
 		</unit>
 		<unit id="common-total-count">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:2</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:2</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:1</note>
-			</notes>
 			<segment>
 				<source>Total Count</source>
 			</segment>
 		</unit>
 		<unit id="common-entity">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:8</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:8</note>
-			</notes>
 			<segment>
 				<source>Entity</source>
 			</segment>
 		</unit>
 		<unit id="common-identifier">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:9</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:9</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:7</note>
-			</notes>
 			<segment>
 				<source>Identifier</source>
 			</segment>
 		</unit>
 		<unit id="common-dateAdded">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:10</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:11</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:10</note>
-			</notes>
 			<segment>
 				<source>Date Added</source>
 			</segment>
 		</unit>
 		<unit id="common-action">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:11</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:12</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:11</note>
-			</notes>
 			<segment>
 				<source>Action</source>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-mark-resolved">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:30</note>
-			</notes>
 			<segment>
 				<source>Mark As Resolved</source>
 			</segment>
 		</unit>
 		<unit id="common-view-details">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:34</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:36</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:36</note>
-			</notes>
 			<segment>
 				<source>View Details</source>
 			</segment>
 		</unit>
 		<unit id="common-details">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:39</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:41</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:41</note>
-			</notes>
 			<segment>
 				<source>Details</source>
 			</segment>
 		</unit>
 		<unit id="common-close">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.html:55</note>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:77</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:61</note>
-			</notes>
 			<segment>
 				<source>Close</source>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-confirm-resolve-title">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.ts:82</note>
-			</notes>
 			<segment>
 				<source>Confirm Resolution</source>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-confirm-resolve-message">
-			<notes>
-				<note category="location">src/app/receiver/conflict/conflict.component.ts:83</note>
-			</notes>
 			<segment>
 				<source>Are you sure you want to mark the conflict as resolved?</source>
 			</segment>
 		</unit>
 		<unit id="common-attempts">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:10</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:9</note>
-			</notes>
 			<segment>
 				<source>Attempts</source>
 			</segment>
 		</unit>
 		<unit id="common-remove">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:32</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:32</note>
-			</notes>
 			<segment>
 				<source>Remove from queue</source>
 			</segment>
 		</unit>
 		<unit id="receiver-error-deleted">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:48</note>
-			</notes>
 			<segment>
 				<source>Deleted Entity</source>
 			</segment>
 		</unit>
 		<unit id="common-error-type">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:53</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:50</note>
-			</notes>
 			<segment>
 				<source>Error Type</source>
 			</segment>
 		</unit>
 		<unit id="common-error-message">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:57</note>
-				<note category="location">src/app/sender/error/sender-error.component.html:54</note>
-			</notes>
 			<segment>
 				<source>Error Message</source>
 			</segment>
 		</unit>
 		<unit id="common-payload">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.html:61</note>
-			</notes>
 			<segment>
 				<source>Payload</source>
 			</segment>
 		</unit>
 		<unit id="receiver-error-confirm-remove-title">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.ts:86</note>
-			</notes>
 			<segment>
 				<source>Confirm Removal</source>
 			</segment>
 		</unit>
 		<unit id="receiver-error-confirm-remove-message">
-			<notes>
-				<note category="location">src/app/receiver/error/receiver-error.component.ts:87</note>
-			</notes>
 			<segment>
 				<source>Are you sure you want to remove the error from the queue?</source>
 			</segment>
 		</unit>
 		<unit id="common-dashboard">
-			<notes>
-				<note category="location">src/app/receiver/receiver.component.html:4</note>
-				<note category="location">src/app/sender/sender.component.html:4</note>
-			</notes>
 			<segment>
 				<source>Dashboard</source>
 			</segment>
 		</unit>
 		<unit id="common-errors">
-			<notes>
-				<note category="location">src/app/receiver/receiver.component.html:10</note>
-				<note category="location">src/app/sender/sender.component.html:10</note>
-			</notes>
 			<segment>
 				<source>Errors</source>
 			</segment>
 		</unit>
 		<unit id="receiver-conflicts">
-			<notes>
-				<note category="location">src/app/receiver/receiver.component.html:16</note>
-			</notes>
 			<segment>
 				<source>Conflicts</source>
 			</segment>
 		</unit>
 		<unit id="common-error-queue">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:6</note>
-			</notes>
 			<segment>
 				<source>Event Error Queue</source>
 			</segment>
 		</unit>
 		<unit id="common-loading">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:10</note>
-			</notes>
 			<segment>
 				<source>Loading</source>
 			</segment>
 		</unit>
 		<unit id="common-no-errors-msg">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:14</note>
-			</notes>
 			<segment>
 				<source>No errors, everything looks good!</source>
 			</segment>
 		</unit>
 		<unit id="common-quick-summary">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:17</note>
-			</notes>
 			<segment>
 				<source>Quick Summary</source>
 			</segment>
 		</unit>
 		<unit id="common-total-error-count">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:22</note>
-			</notes>
 			<segment>
 				<source>Total Count Of Event Errors</source>
 			</segment>
 		</unit>
 		<unit id="common-activemq-related-errors">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:30</note>
-			</notes>
 			<segment>
 				<source>ActiveMQ Related Event Errors</source>
 			</segment>
 		</unit>
 		<unit id="common-db-table-breakdown">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:40</note>
-			</notes>
 			<segment>
 				<source>Database Table Breakdown</source>
 			</segment>
 		</unit>
 		<unit id="common-advanced-users">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:47,48</note>
-			</notes>
 			<segment>
 				<source>For Advanced Users</source>
 			</segment>
 		</unit>
 		<unit id="common-most-encountered-errors">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:51</note>
-			</notes>
 			<segment>
 				<source>Most Encountered Event Error(s)</source>
 			</segment>
 		</unit>
 		<unit id="common-error-type-breakdown">
-			<notes>
-				<note category="location">src/app/sender/dashboard/sender-dashboard.component.html:59</note>
-			</notes>
 			<segment>
 				<source>Error Type Breakdown</source>
 			</segment>
 		</unit>
 		<unit id="common-table-name">
-			<notes>
-				<note category="location">src/app/sender/error/sender-error.component.html:6</note>
-				<note category="location">src/app/sender/stats/table-stats.component.html:5</note>
-			</notes>
 			<segment>
 				<source>Table Name</source>
 			</segment>
 		</unit>
 		<unit id="common-operation">
-			<notes>
-				<note category="location">src/app/sender/error/sender-error.component.html:8</note>
-			</notes>
 			<segment>
 				<source>Operation</source>
 			</segment>
 		</unit>
 		<unit id="sender-error-confirm-remove-title">
-			<notes>
-				<note category="location">src/app/sender/error/sender-error.component.ts:82</note>
-			</notes>
 			<segment>
 				<source>Confirm Removal</source>
 			</segment>
 		</unit>
 		<unit id="sender-error-confirm-remove-message">
-			<notes>
-				<note category="location">src/app/sender/error/sender-error.component.ts:83</note>
-			</notes>
 			<segment>
 				<source>Are you sure you want to remove the error from the queue?</source>
 			</segment>
 		</unit>
 		<unit id="common-inserts">
-			<notes>
-				<note category="location">src/app/sender/stats/table-stats.component.html:8</note>
-			</notes>
 			<segment>
 				<source>Inserts</source>
 			</segment>
 		</unit>
 		<unit id="common-updates">
-			<notes>
-				<note category="location">src/app/sender/stats/table-stats.component.html:11</note>
-			</notes>
 			<segment>
 				<source>Updates</source>
 			</segment>
 		</unit>
 		<unit id="common-deletes">
-			<notes>
-				<note category="location">src/app/sender/stats/table-stats.component.html:14</note>
-			</notes>
 			<segment>
 				<source>Deletes</source>
 			</segment>
 		</unit>
 		<unit id="common-error-uncategorized">
-			<notes>
-				<note category="location">src/app/shared/dashboard.component.ts:10</note>
-			</notes>
 			<segment>
 				<source>Uncategorized</source>
 			</segment>
 		</unit>
 		<unit id="common-cancel">
-			<notes>
-				<note category="location">src/app/shared/dialogs/confirm.component.html:8</note>
-			</notes>
 			<segment>
 				<source>Cancel</source>
 			</segment>
 		</unit>
 		<unit id="common-confirm">
-			<notes>
-				<note category="location">src/app/shared/dialogs/confirm.component.html:9</note>
-			</notes>
 			<segment>
 				<source>Confirm</source>
 			</segment>
