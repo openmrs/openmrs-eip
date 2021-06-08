@@ -11,8 +11,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Log In</title>
-    <link rel="icon" type="image/x-icon" href="favicon.${projectBuildNumber}.ico">
-    <link type="text/css" rel="stylesheet" href="styles.${projectBuildNumber}.css">
+    <link rel="icon" type="image/x-icon" href="${localeDir}favicon.${projectBuildNumber}.ico">
+    <link type="text/css" rel="stylesheet" href="${localeDir}styles.${projectBuildNumber}.css">
     <link type="text/css" rel="stylesheet" href="css/login.${projectBuildNumber}.css">
 </head>
 <body>
