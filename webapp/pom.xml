@@ -15,27 +15,6 @@
 	<name>DBsync Web Application</name>
 	<description>Web application for a DB sync application</description>
 
-	<properties>
-		<nodeVersion>v15.11.0</nodeVersion>
-        <buildCommand>build</buildCommand>
-		<testScript>test</testScript>
-	</properties>
-	
-	<profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <buildCommand>build-dev</buildCommand>
-            </properties>
-        </profile>
-		<profile>
-			<id>headless</id>
-			<properties>
-				<testScript>test-headless</testScript>
-			</properties>
-		</profile>
-	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>

@@ -25,7 +25,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <projectDefaultLocale>en</projectDefaultLocale>
         <maven.build.timestamp.format>yyyy.MM.dd.HH.mm.ss.sss</maven.build.timestamp.format>
         <projectBuildNumber>${maven.build.timestamp}</projectBuildNumber>
         <guava.version>28.0-jre</guava.version>
@@ -42,7 +41,14 @@
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
         <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
+
+        <!-- UI properties -->
+        <projectDefaultLocale>pt</projectDefaultLocale>
+        <nodeVersion>v15.11.0</nodeVersion>
         <includeVendorJs>false</includeVendorJs>
+        <buildCommand>build</buildCommand>
+        <localeDir>pt/</localeDir>
+        <testScript>test</testScript>
     </properties>
 
     <scm>
@@ -151,6 +157,21 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <projectDefaultLocale>en</projectDefaultLocale>
+                <includeVendorJs>true</includeVendorJs>
+                <buildCommand>build-dev</buildCommand>
+                <localeDir></localeDir>
+            </properties>
+        </profile>
+        <profile>
+            <id>headless</id>
+            <properties>
+                <testScript>test-headless</testScript>
+            </properties>
+        </profile>
         <profile>
             <id>skipITests</id>
             <properties>

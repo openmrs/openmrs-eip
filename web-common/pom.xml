@@ -57,9 +57,6 @@
     <profiles>
         <profile>
             <id>dev</id>
-            <properties>
-                <includeVendorJs>true</includeVendorJs>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -187,34 +184,34 @@
                             <fileSets>
                                 <!-- Rename JS files -->
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/main.js</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/main.${projectBuildNumber}.js</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}main.js</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}main.${projectBuildNumber}.js</destinationFile>
                                 </fileSet>
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/polyfills.js</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/polyfills.${projectBuildNumber}.js</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}polyfills.js</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}polyfills.${projectBuildNumber}.js</destinationFile>
                                 </fileSet>
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/runtime.js</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/runtime.${projectBuildNumber}.js</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}runtime.js</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}runtime.${projectBuildNumber}.js</destinationFile>
                                 </fileSet>
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/scripts.js</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/scripts.${projectBuildNumber}.js</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}scripts.js</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}scripts.${projectBuildNumber}.js</destinationFile>
                                 </fileSet>
 
                                 <!-- Rename CSS files -->
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/styles.css</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/styles.${projectBuildNumber}.css</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}styles.css</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}styles.${projectBuildNumber}.css</destinationFile>
                                 </fileSet>
                                 <fileSet>
                                     <sourceFile>${project.build.outputDirectory}/META-INF/resources/css/login.css</sourceFile>
                                     <destinationFile>${project.build.outputDirectory}/META-INF/resources/css/login.${projectBuildNumber}.css</destinationFile>
                                 </fileSet>
                                 <fileSet>
-                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.scss</sourceFile>
-                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources/assets/_custom-variables.${projectBuildNumber}.scss</destinationFile>
+                                    <sourceFile>${project.build.outputDirectory}/META-INF/resources/${localeDir}assets/_custom-variables.scss</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/resources${localeDir}/assets/_custom-variables.${projectBuildNumber}.scss</destinationFile>
                                 </fileSet>
                             </fileSets>
                         </configuration>

@@ -11,15 +11,15 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styles.${projectBuildNumber}.css">
+    <link rel="stylesheet" href="${localeDir}styles.${projectBuildNumber}.css">
 </head>
 <body>
 <%@ include file="header.jsp" %>
 <app-root></app-root>
-<script src="runtime.${projectBuildNumber}.js" defer></script>
-<script src="polyfills.${projectBuildNumber}.js" defer></script>
-<script src="scripts.${projectBuildNumber}.js" defer></script>
-<script src="main.${projectBuildNumber}.js" defer></script>
+<script src="${localeDir}runtime.${projectBuildNumber}.js" defer></script>
+<script src="${localeDir}polyfills.${projectBuildNumber}.js" defer></script>
+<script src="${localeDir}scripts.${projectBuildNumber}.js" defer></script>
+<script src="${localeDir}main.${projectBuildNumber}.js" defer></script>
 <c:set var="includeVendorJs" value="${includeVendorJs}" />
 <c:if test="${includeVendorJs}">
     <script src="vendor.${projectBuildNumber}.js" defer></script>
