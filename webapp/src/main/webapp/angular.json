@@ -19,8 +19,8 @@
 			"i18n": {
 				"sourceLocale": "en",
 				"locales": {
-					"fr": {
-						"translation": "src/locale/messages.fr.xlf"
+					"pt": {
+						"translation": "src/locale/messages.pt.xlf"
 					}
 				}
 			},
@@ -49,9 +49,9 @@
 						]
 					},
 					"configurations": {
-						"fr": {
+						"pt": {
 							"localize": [
-								"fr"
+								"pt"
 							]
 						},
 						"production": {
@@ -89,8 +89,8 @@
 						"browserTarget": "webapp:build"
 					},
 					"configurations": {
-						"fr": {
-							"browserTarget": "webapp:build:fr"
+						"pt": {
+							"browserTarget": "webapp:build:pt"
 						},
 						"production": {
 							"browserTarget": "webapp:build:production"
