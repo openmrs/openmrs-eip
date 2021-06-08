@@ -1,7 +1,5 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
 <!doctype html>
-<html lang="${projectDefaultLocale}">
+<html lang="${projectLocale}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +9,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <link rel="icon" type="image/x-icon" href="${localeDir}favicon.${projectBuildNumber}.ico">
     <link rel="stylesheet" href="${localeDir}styles.${projectBuildNumber}.css">
 </head>
 <body>
@@ -20,9 +19,5 @@
 <script src="${localeDir}polyfills.${projectBuildNumber}.js" defer></script>
 <script src="${localeDir}scripts.${projectBuildNumber}.js" defer></script>
 <script src="${localeDir}main.${projectBuildNumber}.js" defer></script>
-<c:set var="includeVendorJs" value="${includeVendorJs}" />
-<c:if test="${includeVendorJs}">
-    <script src="vendor.${projectBuildNumber}.js" defer></script>
-</c:if>
 </body>
 </html>

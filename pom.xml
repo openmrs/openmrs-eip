@@ -43,11 +43,10 @@
         <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
 
         <!-- UI properties -->
-        <projectDefaultLocale>pt</projectDefaultLocale>
+        <projectLocale>en</projectLocale>
         <nodeVersion>v15.11.0</nodeVersion>
-        <includeVendorJs>false</includeVendorJs>
         <buildCommand>build</buildCommand>
-        <localeDir>pt/</localeDir>
+        <localeDir></localeDir>
         <testScript>test</testScript>
     </properties>
 
@@ -158,12 +157,11 @@
 
     <profiles>
         <profile>
-            <id>dev</id>
+            <id>pt</id>
             <properties>
-                <projectDefaultLocale>en</projectDefaultLocale>
-                <includeVendorJs>true</includeVendorJs>
-                <buildCommand>build-dev</buildCommand>
-                <localeDir></localeDir>
+                <projectLocale>pt</projectLocale>
+                <buildCommand>build-pt</buildCommand>
+                <localeDir>pt/</localeDir>
             </properties>
         </profile>
         <profile>

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
 <!DOCTYPE html>
-<html lang="${projectDefaultLocale}">
+<html lang="${projectLocale}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +11,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Log In</title>
+    <link rel="icon" type="image/x-icon" href="favicon.${projectBuildNumber}.ico">
     <link type="text/css" rel="stylesheet" href="styles.${projectBuildNumber}.css">
     <link type="text/css" rel="stylesheet" href="css/login.${projectBuildNumber}.css">
 </head>
