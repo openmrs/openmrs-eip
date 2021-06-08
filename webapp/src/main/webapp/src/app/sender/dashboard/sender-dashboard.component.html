@@ -6,7 +6,14 @@
 					<span class="h5" i18n="@@common-error-queue">Event Error Queue</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<li class="list-group-item">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@common-no-errors-msg">No errors, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
 						<div class="ml-3 mr-3">
 							<table class="text-dark">
@@ -18,7 +25,7 @@
 										<span class="badge border border-secondary">{{dashboard?.entries.errors['totalCount']}}</span>
 									</td>
 								</tr>
-								<tr>
+								<tr [hidden]="dashboard?.entries.errors['activeMqRelatedErrorCount'] == 0">
 									<td class="ui-no-wrap">
 										<span i18n="@@common-activemq-related-errors">ActiveMQ Related Event Errors</span>
 									</td>
@@ -29,13 +36,13 @@
 							</table>
 						</div>
 					</li>
-					<li class="list-group-item">
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
 						<div class="ml-3 mr-3">
 							<table-stats [tableStatsMap]="dashboard?.entries.errors['tableStatsMap']"></table-stats>
 						</div>
 					</li>
-					<li class="list-group-item">
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
 						<div class="h6 card-title text-danger" i18n="@@common-advanced-users">
 							For Advanced Users
 						</div>
