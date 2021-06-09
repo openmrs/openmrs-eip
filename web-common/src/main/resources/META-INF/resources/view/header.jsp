@@ -1,4 +1,5 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <div>
     <nav class="navbar navbar-expand-lg bg-gradient-dark text-white justify-content-between">
@@ -9,7 +10,7 @@
                 &nbsp;
                 <sec:authentication property="principal.username" />
                 &nbsp;
-                <button type="submit" class="btn btn-outline-light">Log Out</button>
+                <button type="submit" class="btn btn-outline-light"><spring:message code="logout.label" /></button>
                 <sec:csrfInput />
             </form>
         </sec:authorize>

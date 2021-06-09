@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <!DOCTYPE html>
 <html lang="${projectLocale}">
@@ -23,24 +24,24 @@
         <!-- FormLoginConfigurer#failureUrl is /login?error -->
         <c:if test="${param.error != null}">
             <div class="alert alert-danger" role="alert">
-                <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}" />
+                <spring:message code="login.fail" />
             </div>
         </c:if>
         <!-- the configured LogoutConfigurer#logoutSuccessUrl is /login?logout -->
         <c:if test="${param.logout != null}">
-            <div class="alert alert-success" role="alert">You have been logged out</div>
+            <div class="alert alert-success" role="alert"><spring:message code="login.logged.out" /></div>
         </c:if>
         <div>
-            <label for="username" class="sr-only">Username</label>
-            <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus />
+            <label for="username" class="sr-only"><spring:message code="login.username" /></label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="<spring:message code="login.username" />" required autofocus />
         </div>
         <div class="form-group mt-4">
-            <label for="password" class="sr-only">Password</label>
-            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
+            <label for="password" class="sr-only"><spring:message code="login.password" /></label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="<spring:message code="login.password" />" required />
         </div>
         <sec:csrfInput />
         <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Log in</button>
+            <button type="submit" class="btn btn-primary btn-block"><spring:message code="login.label" /></button>
         </div>
     </form>
 </div>
