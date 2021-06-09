@@ -45,8 +45,10 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		if (h2ConsoleProperties.getEnabled()) {
 			String path = h2ConsoleProperties.getPath();
-			String urlMapping = path + (path.endsWith("/") ? "**" : "/**");
-			http.authorizeRequests().antMatchers(urlMapping).permitAll();
+			String h2UrlMapping = path + (path.endsWith("/") ? "**" : "/**");
+			http.authorizeRequests().antMatchers(h2UrlMapping).permitAll();
+			http.csrf().ignoringAntMatchers(h2UrlMapping);
+			http.headers().frameOptions().sameOrigin();
 		}
 		
 		http.authorizeRequests().antMatchers(PATH_LOGIN).permitAll();
