@@ -6,4 +6,8 @@ public class SecurityConstants {
 	
 	public static final String USERS_FILE = "dbsync-users.properties";
 	
+	public static final String LOCALE_FILE = "dbsync-locale.properties";
+	
+	public static final String DEFAULT_LOCALE_PROP_NAME = "locale.default";
+	
 }
