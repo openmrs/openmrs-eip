@@ -14,7 +14,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -34,12 +36,25 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private Environment env;
+	
+	@Autowired
+	private H2ConsoleProperties h2ConsoleProperties;
+	
 	/**
 	 * @see WebSecurityConfigurerAdapter#configure(HttpSecurity)
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		if (h2ConsoleProperties.getEnabled()) {
+			String path = h2ConsoleProperties.getPath();
+			String urlMapping = path + (path.endsWith("/") ? "**" : "/**");
+			http.authorizeRequests().antMatchers(urlMapping).permitAll();
+		}
+		
 		http.authorizeRequests().antMatchers(PATH_LOGIN).permitAll();
+		http.authorizeRequests().antMatchers("/favicon.*.ico").permitAll();
 		http.authorizeRequests().antMatchers("/favicon.*.ico").permitAll();
 		http.authorizeRequests().antMatchers("/*/favicon.*.ico").permitAll();
 		http.authorizeRequests().antMatchers("/styles.*.css").permitAll();
