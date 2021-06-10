@@ -17,7 +17,7 @@
 }
 
 .ui-bar-spacer-content {
-	height: 5px !important;
+	height: 10px !important;
 }
 
 .modal-header {
@@ -58,14 +58,14 @@
 }
 
 .ui-tabs-vertical .nav-link {
-	color: $colorWhite;
-	background-color: $themeColorSecondary;
+	color: $colorLightSilver;
+	background-color: $colorSecondary;
 	border-bottom-left-radius: 4px;
 	border-top-left-radius: 4px;
 }
 
 .ui-tabs-vertical .nav-link:hover {
-	color: $colorSilver;
+	color: $colorWhite;
 }
 
 .ui-tabs-vertical .nav-link.active {
