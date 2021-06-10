@@ -57,39 +57,46 @@
 	cursor: pointer;
 }
 
-.ui-tabs-horizontal .nav-link.active {
-	background-color: white !important;
-	border-top: 3px solid $colorPrimary;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
+.ui-tabs-vertical .nav-link {
+	color: $colorWhite;
+	background-color: $themeColorSecondary;
+	border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
 }
 
-.ui-tabs-horizontal .nav-link {
-	background-color: #e1dfdf;
+.ui-tabs-vertical .nav-link:hover {
+	color: $colorSilver;
 }
 
 .ui-tabs-vertical .nav-link.active {
 	color: $textColorDarkGray;
+	background-color: $colorWhite;
 	border-left: 3px solid $themeColorSecondary;
-	border-right: 0;
 }
 
-.ui-tabs-vertical .nav-link {
-	border-radius: 0;
-	border-bottom-left-radius: 4px;
-	border-top-left-radius: 4px;
+.ui-tabs-vertical .nav-link.active:hover {
+	color: $textColorDarkGray;
 }
 
 .bg-silver {
 	background-color: $colorSilver;
 }
 
+.bg-dark-silver {
+	background-color: $colorDarkSilver;
+}
+
 #app-container .nav-link {
+	@extend .bg-silver;
 	color: $colorSilver;
 }
 
 #app-container .nav-link.active {
-	color: $textColorTabs;
+	color: $textColorDarkGray;
+	background-color: white !important;
+	border-top: 3px solid $colorPrimary;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
 }
 
 .ui-icon-sm {
