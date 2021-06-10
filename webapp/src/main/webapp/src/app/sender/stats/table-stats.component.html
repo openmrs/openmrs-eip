@@ -1,32 +1,32 @@
 <table class="text-center border table-striped">
 	<thead>
-		<tr>
-			<th class="pr-1 pl-1">
-				<span class="text-dark" i18n="@@common-table-name">Table Name</span>
-			</th>
-			<th class="pr-1 pl-1">
-				<span class="text-success" i18n="@@common-inserts">Inserts</span>
-			</th>
-			<th class="pr-1 pl-1">
-				<span class="text-secondary" i18n="@@common-updates">Updates</span>
-			</th>
-			<th class="pr-1 pl-1">
-				<span class="text-danger" i18n="@@common-deletes">Deletes</span>
-			</th>
+		<tr class="bg-light-silver">
+			<td class="pr-1 pl-1 border border-secondary">
+				<span class="h6 text-dark" i18n="@@common-table-name">Table Name</span>
+			</td>
+			<td class="pr-1 pl-1 border border-secondary">
+				<span class="h6 text-dark" i18n="@@common-inserts">Inserts</span>
+			</td>
+			<td class="pr-1 pl-1 border border-secondary">
+				<span class="h6 text-dark" i18n="@@common-updates">Updates</span>
+			</td>
+			<td class="pr-1 pl-1 border border-secondary">
+				<span class="h6 text-dark" i18n="@@common-deletes">Deletes</span>
+			</td>
 		</tr>
 	</thead>
 	<tbody>
 		<tr *ngFor="let e of tableStatsMap | keyvalue">
-			<td class="text-right pr-2 pl-2">
+			<td class="text-right pr-2 pl-2 border-bottom-0">
 				{{e.key}}
 			</td>
-			<td>
+			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{e.value.c}}</span>
 			</td>
-			<td>
+			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{e.value.u}}</span>
 			</td>
-			<td>
+			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{e.value.d}}</span>
 			</td>
 		</tr>

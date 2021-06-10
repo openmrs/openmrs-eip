@@ -12,7 +12,7 @@
     <link rel="icon" type="image/x-icon" href="${localeDir}favicon.${projectBuildNumber}.ico">
     <link rel="stylesheet" href="${localeDir}styles.${projectBuildNumber}.css">
 </head>
-<body class="bg-dark-silver">
+<body class="bg-light-silver">
 <%@ include file="header.jsp" %>
 <app-root></app-root>
 <script src="${localeDir}runtime.${projectBuildNumber}.js" defer></script>
