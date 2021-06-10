@@ -87,8 +87,8 @@
 }
 
 #app-container .nav-link {
-	@extend .bg-silver;
-	color: $colorSilver;
+	@extend .bg-light-silver;
+	color: $colorLightSilver;
 }
 
 #app-container .nav-link.active {
