@@ -4,221 +4,266 @@
 		<unit id="common-sender">
 			<segment>
 				<source>Sender</source>
+				<target>Remetente</target>
 			</segment>
 		</unit>
 		<unit id="common-receiver">
 			<segment>
 				<source>Receiver</source>
+				<target>Receptor</target>
 			</segment>
 		</unit>
 		<unit id="common-total-count">
 			<segment>
 				<source>Total Count</source>
+				<target>Total de Registos</target>
 			</segment>
 		</unit>
 		<unit id="common-entity">
 			<segment>
 				<source>Entity</source>
+				<target>Entidade</target>
 			</segment>
 		</unit>
 		<unit id="common-identifier">
 			<segment>
 				<source>Identifier</source>
+				<target>Identificador</target>
 			</segment>
 		</unit>
 		<unit id="common-dateAdded">
 			<segment>
 				<source>Date Added</source>
+				<target>Data criação</target>
 			</segment>
 		</unit>
 		<unit id="common-action">
 			<segment>
 				<source>Action</source>
+				<target>Acção</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-mark-resolved">
 			<segment>
 				<source>Mark As Resolved</source>
+				<target>Marcar como resolvido</target>
 			</segment>
 		</unit>
 		<unit id="common-view-details">
 			<segment>
 				<source>View Details</source>
+				<target>Ver Detalhes</target>
 			</segment>
 		</unit>
 		<unit id="common-details">
 			<segment>
 				<source>Details</source>
+				<target>Detalhes</target>
 			</segment>
 		</unit>
 		<unit id="common-close">
 			<segment>
 				<source>Close</source>
+				<target>Fechar</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-confirm-resolve-title">
 			<segment>
 				<source>Confirm Resolution</source>
+				<target>Confirmar Resolução</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-confirm-resolve-message">
 			<segment>
 				<source>Are you sure you want to mark the conflict as resolved?</source>
+				<target>Tem certeza que deseja marcar este conflito como resolvido?</target>
 			</segment>
 		</unit>
 		<unit id="common-attempts">
 			<segment>
 				<source>Attempts</source>
+				<target>Tentativas</target>
 			</segment>
 		</unit>
 		<unit id="common-remove">
 			<segment>
 				<source>Remove from queue</source>
+				<target>Remover da fila</target>
 			</segment>
 		</unit>
 		<unit id="receiver-error-deleted">
 			<segment>
 				<source>Deleted Entity</source>
+				<target>Remover Entidade</target>
 			</segment>
 		</unit>
 		<unit id="common-error-type">
 			<segment>
 				<source>Error Type</source>
+				<target>Tipo de Erro</target>
 			</segment>
 		</unit>
 		<unit id="common-error-message">
 			<segment>
 				<source>Error Message</source>
+				<target>Mensagem de Erro</target>
 			</segment>
 		</unit>
 		<unit id="common-payload">
 			<segment>
 				<source>Payload</source>
+				<target>Dados</target>
 			</segment>
 		</unit>
 		<unit id="receiver-error-confirm-remove-title">
 			<segment>
 				<source>Confirm Removal</source>
+				<target>Confirmação da Remoção</target>
 			</segment>
 		</unit>
 		<unit id="receiver-error-confirm-remove-message">
 			<segment>
 				<source>Are you sure you want to remove the error from the queue?</source>
+				<target>Tem certeza de que deseja remover este erro da fila?</target>
 			</segment>
 		</unit>
 		<unit id="common-dashboard">
 			<segment>
 				<source>Dashboard</source>
+				<target>Painel</target>
 			</segment>
 		</unit>
 		<unit id="common-errors">
 			<segment>
 				<source>Errors</source>
+				<target>Erros</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflicts">
 			<segment>
 				<source>Conflicts</source>
+				<target>Conflitos</target>
 			</segment>
 		</unit>
 		<unit id="common-error-queue">
 			<segment>
 				<source>Event Error Queue</source>
+				<target>Fila de Eventos com Erros</target>
 			</segment>
 		</unit>
 		<unit id="common-loading">
 			<segment>
 				<source>Loading</source>
+				<target>Carregando</target>
 			</segment>
 		</unit>
 		<unit id="common-no-errors-msg">
 			<segment>
 				<source>No errors, everything looks good!</source>
+				<target>Sem erros, tudo parece estar bem!</target>
 			</segment>
 		</unit>
 		<unit id="common-quick-summary">
 			<segment>
 				<source>Quick Summary</source>
+				<target>Resumo rápido</target>
 			</segment>
 		</unit>
 		<unit id="common-total-error-count">
 			<segment>
 				<source>Total Count Of Event Errors</source>
+				<target>Total de Eventos com Erro</target>
 			</segment>
 		</unit>
 		<unit id="common-activemq-related-errors">
 			<segment>
 				<source>ActiveMQ Related Event Errors</source>
+				<target>Erros Relacionados com ActiveMQ</target>
 			</segment>
 		</unit>
 		<unit id="common-db-table-breakdown">
 			<segment>
 				<source>Database Table Breakdown</source>
+				<target>Detalhes das Tabelas</target>
 			</segment>
 		</unit>
 		<unit id="common-advanced-users">
 			<segment>
 				<source>For Advanced Users</source>
+				<target>Para Utilizadores Avançados</target>
+				
 			</segment>
 		</unit>
 		<unit id="common-most-encountered-errors">
 			<segment>
 				<source>Most Encountered Event Error(s)</source>
+				<target>Erros mais Encontrados</target>
 			</segment>
 		</unit>
 		<unit id="common-error-type-breakdown">
 			<segment>
 				<source>Error Type Breakdown</source>
+				<target>Detalhes Tipos Erro</target>
 			</segment>
 		</unit>
 		<unit id="common-table-name">
 			<segment>
 				<source>Table Name</source>
+				<target>Nome da Tabela</target>
 			</segment>
 		</unit>
 		<unit id="common-operation">
 			<segment>
 				<source>Operation</source>
+				<target>Operação</target>
 			</segment>
 		</unit>
 		<unit id="sender-error-confirm-remove-title">
 			<segment>
 				<source>Confirm Removal</source>
+				<target>Confirmação da Remoção</target>
 			</segment>
 		</unit>
 		<unit id="sender-error-confirm-remove-message">
 			<segment>
 				<source>Are you sure you want to remove the error from the queue?</source>
+				<target>Tem certeza que pretende remover este erro da fila?</target>
 			</segment>
 		</unit>
 		<unit id="common-inserts">
 			<segment>
 				<source>Inserts</source>
+				<target>Inserções</target>
 			</segment>
 		</unit>
 		<unit id="common-updates">
 			<segment>
 				<source>Updates</source>
+				<target>Actualizações</target>
 			</segment>
 		</unit>
 		<unit id="common-deletes">
 			<segment>
 				<source>Deletes</source>
+				<target>Remoções</target>
 			</segment>
 		</unit>
 		<unit id="common-error-uncategorized">
 			<segment>
 				<source>Uncategorized</source>
+				<target>Sem categoria</target>
 			</segment>
 		</unit>
 		<unit id="common-cancel">
 			<segment>
 				<source>Cancel</source>
+				<target>Cancelar</target>
 			</segment>
 		</unit>
 		<unit id="common-confirm">
 			<segment>
 				<source>Confirm</source>
+				<target>Confirma</target>
 			</segment>
 		</unit>
 	</file>
