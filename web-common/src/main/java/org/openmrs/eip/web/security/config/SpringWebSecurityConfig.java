@@ -35,7 +35,7 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	@Autowired
+	@Autowired(required = false)
 	private H2ConsoleProperties h2ConsoleProperties;
 	
 	/**
@@ -43,7 +43,7 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		if (h2ConsoleProperties.getEnabled()) {
+		if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled()) {
 			String path = h2ConsoleProperties.getPath();
 			String h2UrlMapping = path + (path.endsWith("/") ? "**" : "/**");
 			http.authorizeRequests().antMatchers(h2UrlMapping).permitAll();
