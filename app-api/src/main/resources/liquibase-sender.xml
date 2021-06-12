@@ -84,7 +84,9 @@
         <comment>Add exception_type column to sender_retry_queue table</comment>
 
         <addColumn tableName="sender_retry_queue">
-            <column name="exception_type" type="VARCHAR(255)" />
+            <column name="exception_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </addColumn>
     </changeSet>
 

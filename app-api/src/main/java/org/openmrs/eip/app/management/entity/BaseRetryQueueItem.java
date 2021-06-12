@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class BaseRetryQueueItem extends AbstractEntity {
 	
-	@Column(name = "exception_type")
+	@Column(name = "exception_type", nullable = false)
 	private String exceptionType;
 	
 	@Column(length = 1024)
