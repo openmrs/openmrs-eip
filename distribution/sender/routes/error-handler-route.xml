@@ -110,7 +110,7 @@
                             </script>
                             <log message="Adding failed DB event to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
 
-                            <to uri="jpa:RetryQueueItem?usePersist=true" />
+                            <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
                             <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
                         </split>
