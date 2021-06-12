@@ -65,7 +65,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		props.put(PROP_EVENT_DESTINATIONS, URI_MOCK_EVENT_PROCESSOR);
 		PropertySource customPropSource = new MapPropertySource("test", props);
 		env.getPropertySources().addLast(customPropSource);
-		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		loadXmlRoutesInCamelDirectory("db-event-listener.xml");
 		Event event = createEvent(TABLE_NAME, "1", "person-uuid", "c");
 		addStandardExpectations(event);
 		Map retryCountMap = new HashMap();
@@ -84,7 +84,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		props.put(PROP_EVENT_DESTINATIONS, "mock:no-where");
 		PropertySource customPropSource = new MapPropertySource("test", props);
 		env.getPropertySources().addLast(customPropSource);
-		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		loadXmlRoutesInCamelDirectory("db-event-listener.xml");
 		mockErrorHandlerEndpoint.expectedMessageCount(1);
 		final String id = "2";
 		String q = "jpa:" + ENTITY_CLASS + "?query=SELECT r from " + ENTITY_CLASS + " r WHERE r.event.tableName='"
@@ -106,7 +106,7 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 		props.put(PROP_EVENT_DESTINATIONS, dbSyncUri + "," + senaiteUri);
 		PropertySource customPropSource = new MapPropertySource("test", props);
 		env.getPropertySources().addLast(customPropSource);
-		loadXmlRoutesInDirectory("watcher-routes", "db-event-listener.xml");
+		loadXmlRoutesInCamelDirectory("db-event-listener.xml");
 		
 		final String id = "1";
 		String q = "jpa:" + ENTITY_CLASS + "?query=SELECT r from " + ENTITY_CLASS + " r WHERE r.event.tableName='"

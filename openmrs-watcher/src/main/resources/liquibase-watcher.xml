@@ -36,7 +36,9 @@
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="cause_message" type="VARCHAR(1024)"/>
+            <column name="exception_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="message" type="VARCHAR(1024)"/>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>

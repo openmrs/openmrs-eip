@@ -1,8 +1,9 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import java.util.Date;
 
 @MappedSuperclass
 public abstract class BaseRetryQueueItem extends AbstractEntity {
@@ -10,8 +11,8 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	@Column(length = 1024)
 	private String message;
 	
-	@Column(name = "cause_message", length = 1024)
-	private String causeMessage;
+	@Column(name = "exception_type", nullable = false)
+	private String exceptionType;
 	
 	@Column(name = "attempt_count", nullable = false)
 	private Integer attemptCount = 1;
@@ -38,21 +39,21 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the causeMessage
+	 * Gets the exceptionType
 	 *
-	 * @return the causeMessage
+	 * @return the exceptionType
 	 */
-	public String getCauseMessage() {
-		return causeMessage;
+	public String getExceptionType() {
+		return exceptionType;
 	}
 	
 	/**
-	 * Sets the causeMessage
+	 * Sets the exceptionType
 	 *
-	 * @param causeMessage the causeMessage to set
+	 * @param exceptionType the exceptionType to set
 	 */
-	public void setCauseMessage(String causeMessage) {
-		this.causeMessage = causeMessage;
+	public void setExceptionType(String exceptionType) {
+		this.exceptionType = exceptionType;
 	}
 	
 	/**
