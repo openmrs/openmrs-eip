@@ -75,7 +75,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20210528-1103">
+    <changeSet author="wluyima" id="20210612-1103">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists columnName="exception_type" tableName="sender_retry_queue" />

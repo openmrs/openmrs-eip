@@ -7,6 +7,10 @@
 @import '~bootstrap/scss/bootstrap';
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
+body {
+	color: $textColorDarkGray;
+}
+
 .ui-bar-header {
 	height: 3px !important;
 	background-color: $themeColorSecondary;
@@ -86,14 +90,7 @@
 	background-color: $colorLightSilver;
 }
 
-#app-container .nav-link {
-	@extend .bg-light-silver;
-	color: $colorLightSilver;
-}
-
 #app-container .nav-link.active {
-	color: $textColorDarkGray;
-	background-color: white !important;
 	border-top: 3px solid $colorPrimary;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;

@@ -1,7 +1,7 @@
 <div>
 	<div id="app-container" class="container mw-100 mt-2">
-		<nav ngbNav #nav="ngbNav" class="nav-tabs ui-tabs-horizontal justify-content-end" [(activeId)]="syncMode">
-			<ng-container ngbNavItem="SENDER" [disabled]="syncMode == 'RECEIVER'">
+		<nav ngbNav #nav="ngbNav" class="nav-tabs ui-tabs-horizontal justify-content-end">
+			<!--<ng-container ngbNavItem="SENDER" [disabled]="syncMode == 'RECEIVER'">
 				<a ngbNavLink><h5 i18n="@@common-sender">Sender</h5></a>
 				<ng-template ngbNavContent>
 					<sender></sender>
@@ -11,6 +11,14 @@
 				<a ngbNavLink><h5 i18n="@@common-receiver">Receiver</h5></a>
 				<ng-template ngbNavContent>
 					<receiver></receiver>
+				</ng-template>
+			</ng-container>-->
+			<ng-container ngbNavItem>
+				<a ngbNavLink [hidden]="!syncMode || syncMode == 'RECEIVER'"><h5 i18n="@@common-sender">Sender</h5></a>
+				<a ngbNavLink [hidden]="!syncMode || syncMode == 'SENDER'"><h5 i18n="@@common-receiver">Receiver</h5></a>
+				<ng-template ngbNavContent>
+					<sender [hidden]="!syncMode || syncMode == 'RECEIVER'"></sender>
+					<receiver [hidden]="!syncMode || syncMode == 'SENDER'"></receiver>
 				</ng-template>
 			</ng-container>
 		</nav>
