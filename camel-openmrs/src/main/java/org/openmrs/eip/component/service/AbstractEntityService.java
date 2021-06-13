@@ -1,6 +1,18 @@
 package org.openmrs.eip.component.service;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+
+import org.openmrs.eip.component.entity.BaseDataEntity;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.Patient;
 import org.openmrs.eip.component.entity.light.UserLight;
@@ -19,14 +31,7 @@ import org.openmrs.eip.component.service.impl.AbstractSubclassEntityService;
 import org.openmrs.eip.component.service.light.AbstractLightService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractEntityService<E extends BaseEntity, M extends BaseModel> implements EntityService<M> {
@@ -85,11 +90,16 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
         }
 
         M modelToReturn;
+        boolean isEtyInDbPlaceHolder = false;
+        if(etyInDb != null && etyInDb instanceof BaseDataEntity){
+            BaseDataEntity bde = (BaseDataEntity) etyInDb;
+            isEtyInDbPlaceHolder = bde.isVoided() && DEFAULT_VOID_REASON.equals(bde.getVoidReason());
+        }
 
         if (etyInDb == null) {
             modelToReturn = saveEntity(ety);
             log.info(getMsg(ety, model.getUuid(), " inserted"));
-        } else if (!etyInDb.wasModifiedAfter(ety)) {
+        } else if (isEtyInDbPlaceHolder || !etyInDb.wasModifiedAfter(ety)) {
             ety.setId(etyInDb.getId());
             modelToReturn = saveEntity(ety);
             log.info(getMsg(ety, model.getUuid(), " updated"));
