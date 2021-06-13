@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="inbound-db-sync" errorHandlerRef="noErrorHandler">
+    <route id="inbound-db-sync" errorHandlerRef="inBoundErrorHandler">
         <from uri="direct:inbound-db-sync" />
 
         <log message="Start inbound db-sync: ${body}" />
