@@ -1,0 +1,46 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="debezium-queue-reader" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="scheduler:debezium-reader?initialDelay={{db-event-reader.initial.delay}}&amp;delay={{db-event-reader.interval}}" />
+
+        <log message="Fetching events in the debezium event queue" loggingLevel="DEBUG" />
+
+        <toD uri="jpa:DebeziumEvent?query=SELECT e.id FROM DebeziumEvent e ORDER BY id ASC&amp;maximumResults=100" />
+
+        <choice>
+            <when>
+                <simple>${body.size()} > 0</simple>
+                <log message="Event count in the debezium event queue: ${body.size()}" />
+
+                <split parallelProcessing="false" stopOnException="true">
+                    <simple>${body}</simple>
+
+                    <log message=":" loggingLevel="DEBUG" />
+
+                    <log message="Loading debezium event with id: ${body}" loggingLevel="DEBUG" />
+
+                    <setProperty name="debeziumEventId">
+                        <simple>${body}</simple>
+                    </setProperty>
+
+                    <toD uri="jpa:DebeziumEvent?query=SELECT e FROM DebeziumEvent e WHERE e.id = ${body}" />
+
+                    <setBody>
+                        <simple>${body[0]}</simple>
+                    </setBody>
+
+                    <to uri="direct:debezium-event-processor" />
+
+                    <log message="Removing the event from the debezium event queue: ${exchangeProperty.debeziumEventId}" loggingLevel="DEBUG" />
+
+                    <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.debeziumEventId}" />
+
+                    <log message="Successfully removed from the debezium queue the event with id: ${exchangeProperty.debeziumEventId}" loggingLevel="DEBUG" />
+                </split>
+            </when>
+            <otherwise>
+                <log message="No events found in the debezium event queue" loggingLevel="DEBUG" />
+            </otherwise>
+        </choice>
+        
+    </route>
+</routes>
