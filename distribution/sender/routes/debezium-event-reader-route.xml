@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="debezium-event-reader" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="scheduler:debezium-reader?initialDelay={{debezium-event-reader.initial.delay}}&amp;delay={{debezium-event-reader.interval}}" />
+        <from uri="scheduler:debezium-reader?initialDelay={{debezium-event-reader.initial.delay}}&amp;delay={{debezium-event-reader.repeat.interval}}" />
 
         <log message="Fetching events in the debezium event queue" loggingLevel="DEBUG" />
 
