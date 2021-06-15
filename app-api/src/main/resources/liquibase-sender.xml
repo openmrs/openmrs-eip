@@ -75,7 +75,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20210612-1103">
+    <changeSet author="wluyima" id="20210614-2201">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists columnName="exception_type" tableName="sender_retry_queue" />
@@ -84,10 +84,32 @@
         <comment>Add exception_type column to sender_retry_queue table</comment>
 
         <addColumn tableName="sender_retry_queue">
-            <column name="exception_type" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="exception_type" type="VARCHAR(255)" />
         </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210614-2202">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM sender_retry_queue
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Setting sender_retry_queue.exception_type for existing rows</comment>
+
+        <update tableName="sender_retry_queue">
+            <column name="exception_type" value="org.openmrs.eip.component.exception.EIPException" />
+        </update>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210614-2203">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="sender_retry_queue" columnName="exception_type" />
+        </preConditions>
+        <comment>Adding not null constraint to sender_retry_queue.exception_type</comment>
+
+        <addNotNullConstraint tableName="sender_retry_queue" columnName="exception_type" />
     </changeSet>
 
     <changeSet author="wluyima" id="20210601-1406">
