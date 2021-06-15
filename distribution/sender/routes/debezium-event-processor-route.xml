@@ -4,7 +4,10 @@
 
         <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
         <log message="Processing debezium event: ${body}" />
-        
+
+        <setProperty name="dbzmEvent">
+            <simple>${body}</simple>
+        </setProperty>
         <setProperty name="event">
             <simple>${body.event}</simple>
         </setProperty>

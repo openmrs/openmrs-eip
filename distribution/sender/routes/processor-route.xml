@@ -87,6 +87,15 @@
 
                 <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
             </when>
+
+            <when>
+                <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+
+                <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+
+                <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+            </when>
         </split>
 
         <log message="Done processing db event" loggingLevel="DEBUG" />

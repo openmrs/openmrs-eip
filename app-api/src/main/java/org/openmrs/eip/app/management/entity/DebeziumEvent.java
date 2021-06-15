@@ -42,7 +42,7 @@ public class DebeziumEvent extends AbstractEntity {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " {event=" + event + "}";
+		return getClass().getSimpleName() + " {id=" + getId() + ", event=" + event + "}";
 	}
 	
 }
