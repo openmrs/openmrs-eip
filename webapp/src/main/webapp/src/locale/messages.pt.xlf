@@ -191,7 +191,7 @@
 			<segment>
 				<source>For Advanced Users</source>
 				<target>Para Utilizadores Avançados</target>
-				
+
 			</segment>
 		</unit>
 		<unit id="common-most-encountered-errors">
@@ -264,6 +264,36 @@
 			<segment>
 				<source>Confirm</source>
 				<target>Confirma</target>
+			</segment>
+		</unit>
+		<unit id="sender-pending">
+			<segment>
+				<source>Pending</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-databaseId">
+			<segment>
+				<source>Database Id</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-insert">
+			<segment>
+				<source>Insert</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-update">
+			<segment>
+				<source>Update</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-delete">
+			<segment>
+				<source>Delete</source>
+				<target></target>
 			</segment>
 		</unit>
 	</file>

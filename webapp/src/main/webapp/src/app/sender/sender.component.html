@@ -12,12 +12,12 @@
 				<sender-errors></sender-errors>
 			</ng-template>
 		</li>
-		<!--<li ngbNavItem="pending">
+		<li ngbNavItem="pending">
 			<a ngbNavLink i18n="@@sender-pending">Pending</a>
 			<ng-template ngbNavContent>
-				Pending
+				<db-events></db-events>
 			</ng-template>
-		</li>-->
+		</li>
 	</ul>
 	<div class="container mw-100 bg-white">
 		<div [ngbNavOutlet]="nav" class="mt-2 mb-3 tab-content-container"></div>
