@@ -43,7 +43,7 @@ export class ReceiverErrorComponent extends BaseListingComponent implements OnIn
 
 	ngOnInit(): void {
 		this.init();
-		this.viewSubscription = this.store.pipe(select(GET_RECEIVER_ERRORS)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_ERRORS)).subscribe(
 			countAndItems => {
 				this.count = countAndItems.count;
 				this.errors = countAndItems.items;
@@ -51,7 +51,7 @@ export class ReceiverErrorComponent extends BaseListingComponent implements OnIn
 			}
 		);
 
-		this.loadedSubscription = this.store.pipe(select(RECEIVER_ERROR_TO_VIEW)).subscribe(
+		this.viewSubscription = this.store.pipe(select(RECEIVER_ERROR_TO_VIEW)).subscribe(
 			error => {
 				this.errorToView = error;
 				if (this.errorToView) {

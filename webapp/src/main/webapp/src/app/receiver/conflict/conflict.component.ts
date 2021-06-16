@@ -43,7 +43,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.init();
-		this.viewSubscription = this.store.pipe(select(GET_CONFLICTS)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_CONFLICTS)).subscribe(
 			countAndItems => {
 				this.count = countAndItems.count;
 				this.conflicts = countAndItems.items;
@@ -51,7 +51,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 			}
 		);
 
-		this.loadedSubscription = this.store.pipe(select(CONFLICT_TO_VIEW)).subscribe(
+		this.viewSubscription = this.store.pipe(select(CONFLICT_TO_VIEW)).subscribe(
 			conflict => {
 				this.conflictToView = conflict;
 				if (this.conflictToView) {

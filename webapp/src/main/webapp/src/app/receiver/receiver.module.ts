@@ -16,7 +16,7 @@ import {ReceiverComponent} from './receiver.component';
 	imports: [
 		SharedModule,
 		StoreModule.forFeature('conflictQueue', conflictReducer),
-		StoreModule.forFeature('receiverErrorQueue', receiverErrorReducer),
+		StoreModule.forFeature('receiverErrorQueue', receiverErrorReducer)
 	], exports: [ReceiverComponent]
 })
 

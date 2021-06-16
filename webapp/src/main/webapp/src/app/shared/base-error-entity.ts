@@ -8,6 +8,4 @@ export abstract class BaseErrorEntity extends BaseEntity {
 
 	attemptCount?: number;
 
-	dateCreated?: string;
-
 }

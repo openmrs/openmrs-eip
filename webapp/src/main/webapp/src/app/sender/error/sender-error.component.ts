@@ -43,7 +43,7 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 
 	ngOnInit(): void {
 		this.init();
-		this.viewSubscription = this.store.pipe(select(GET_SENDER_ERRORS)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_SENDER_ERRORS)).subscribe(
 			countAndItems => {
 				this.count = countAndItems.count;
 				this.errors = countAndItems.items;
@@ -51,7 +51,7 @@ export class SenderErrorComponent extends BaseListingComponent implements OnInit
 			}
 		);
 
-		this.loadedSubscription = this.store.pipe(select(SENDER_ERROR_TO_VIEW)).subscribe(
+		this.viewSubscription = this.store.pipe(select(SENDER_ERROR_TO_VIEW)).subscribe(
 			error => {
 				this.errorToView = error;
 				if (this.errorToView) {
