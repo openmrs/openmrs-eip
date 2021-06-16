@@ -14,9 +14,16 @@
             </script>
         </split>
 
+        <setProperty name="table-names">
+            <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+            <method beanType="org.openmrs.eip.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
+        </setProperty>
+
         <when>
             <simple>${exchangeProperty.event.operation} != 'c'</simple>
-            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName='${exchangeProperty.event.tableName}' AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+
+            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.table-names}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+
             <split stopOnException="true">
                 <simple>${body}</simple>
                 <choice>
