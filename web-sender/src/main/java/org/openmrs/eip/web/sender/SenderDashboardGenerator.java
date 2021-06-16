@@ -3,7 +3,6 @@ package org.openmrs.eip.web.sender;
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.utils.collections.ConcurrentHashSet;
 import org.apache.camel.CamelContext;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
 import org.openmrs.eip.component.DatabaseOperation;
 import org.openmrs.eip.component.SyncProfiles;
@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
 @Profile(SyncProfiles.SENDER)
 public class SenderDashboardGenerator implements DashboardGenerator {
 	
-	private static final String ENTITY_NAME = SenderRetryQueueItem.class.getSimpleName();
+	private static final String ERROR_ENTITY_NAME = SenderRetryQueueItem.class.getSimpleName();
+	
+	private static final String EVENT_ENTITY_NAME = DebeziumEvent.class.getSimpleName();
 	
 	protected CamelContext camelContext;
 	
@@ -48,33 +50,54 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		final AtomicInteger activeMqRelatedErrorCount = new AtomicInteger();
 		final AtomicInteger mostEncounteredErrorCount = new AtomicInteger();
 		final Set<Object> mostEncounteredErrors = new ConcurrentHashSet();
+		final Map<String, Map> eventsTableStatsMap = new ConcurrentHashMap();
+		final AtomicInteger totalEventCount = new AtomicInteger();
 		
 		AppUtils.getTablesToSync().parallelStream().forEach(table -> {
 			Arrays.stream(DatabaseOperation.values()).parallel().forEach(op -> {
 				//TODO Filter on route i.e. where it matches direct:out-bound-db-sync
 				String tableName = table.toLowerCase();
-				Integer count = on(camelContext)
-				        .to("jpa:" + ENTITY_NAME + "?query=SELECT count(*) FROM " + ENTITY_NAME
+				Integer errorCount = on(camelContext)
+				        .to("jpa:" + ERROR_ENTITY_NAME + "?query=SELECT count(*) FROM " + ERROR_ENTITY_NAME
 				                + " WHERE LOWER(event.tableName) = '" + tableName + "' AND event.operation = '" + op + "'")
 				        .request(Integer.class);
 				
-				totalErrorCount.addAndGet(count);
+				totalErrorCount.addAndGet(errorCount);
 				
-				if (count > 0) {
+				if (errorCount > 0) {
 					synchronized (this) {
 						if (tableStatsMap.get(tableName) == null) {
 							tableStatsMap.put(tableName, new ConcurrentHashMap());
 						}
 					}
 					
-					tableStatsMap.get(tableName).put(op, count);
+					tableStatsMap.get(tableName).put(op, errorCount);
 				}
+				
+				Integer eventCount = on(camelContext)
+				        .to("jpa:" + EVENT_ENTITY_NAME + "?query=SELECT count(*) FROM " + EVENT_ENTITY_NAME
+				                + " WHERE LOWER(event.tableName) = '" + tableName + "' AND event.operation = '" + op + "'")
+				        .request(Integer.class);
+				
+				totalEventCount.addAndGet(eventCount);
+				
+				if (eventCount > 0) {
+					synchronized (this) {
+						if (eventsTableStatsMap.get(tableName) == null) {
+							eventsTableStatsMap.put(tableName, new ConcurrentHashMap());
+						}
+					}
+					
+					eventsTableStatsMap.get(tableName).put(op, eventCount);
+				}
+				
 			});
 		});
 		
 		if (!tableStatsMap.isEmpty()) {
-			List<Object[]> items = on(camelContext).to("jpa:" + ENTITY_NAME + "?query=SELECT exceptionType, count(*) FROM "
-			        + ENTITY_NAME + " GROUP BY exceptionType").request(List.class);
+			List<Object[]> items = on(camelContext).to("jpa:" + ERROR_ENTITY_NAME
+			        + "?query=SELECT exceptionType, count(*) FROM " + ERROR_ENTITY_NAME + " GROUP BY exceptionType")
+			        .request(List.class);
 			
 			items.parallelStream().forEach(values -> {
 				final String exception = values[0].toString();
@@ -104,14 +127,18 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		}
 		
 		Dashboard dashboard = new Dashboard();
-		Map<String, Object> errors = new ConcurrentHashMap(2);
+		Map<String, Object> errors = new ConcurrentHashMap();
 		errors.put("totalCount", totalErrorCount);
 		errors.put("activeMqRelatedErrorCount", activeMqRelatedErrorCount);
 		errors.put("mostEncounteredErrors", mostEncounteredErrors);
 		errors.put("tableStatsMap", tableStatsMap);
 		errors.put("exceptionCountMap", exceptionCountMap);
 		dashboard.add("errors", errors);
-		dashboard.add("pending", Collections.emptyList());
+		
+		Map<String, Object> pendingEvents = new ConcurrentHashMap();
+		pendingEvents.put("totalCount", totalEventCount);
+		pendingEvents.put("tableStatsMap", eventsTableStatsMap);
+		dashboard.add("pendingEvents", pendingEvents);
 		
 		return dashboard;
 	}

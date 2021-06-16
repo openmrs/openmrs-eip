@@ -296,5 +296,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="sender-pending-events">
+			<segment>
+				<source>Pending Events</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-total-pending-count">
+			<segment>
+				<source>Total Count Of Pending Events</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-no-pending-msg">
+			<segment>
+				<source>No pending events, everything looks good!</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
