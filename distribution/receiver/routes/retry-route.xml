@@ -64,9 +64,11 @@
 
                             <toD uri="direct:{{message.destination}}" />
 
-                            <log message="Removing from queue" />
+                            <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
                             <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+
+                            <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
                         </otherwise>
                     </choice>
                 </split>
