@@ -171,7 +171,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
             if (ety instanceof Patient) {
                 query = em.createNativeQuery(INSERT_PATIENT);
                 query.setParameter(1, id);
-                UserLight user = userLightRepository.findByUuid(model.getUuid());
+                UserLight user = userLightRepository.findByUuid(model.getCreatorUuid());
                 query.setParameter(2, user != null ? user.getId() : AbstractLightService.DEFAULT_USER_ID);
                 query.setParameter(3, model.getDateCreated());
                 query.setParameter(4, model.isVoided());
