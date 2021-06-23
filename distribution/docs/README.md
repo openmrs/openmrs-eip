@@ -37,6 +37,13 @@ JMS Server, receiver and then sender(s).
 Currently, the receiver application doesn't sync data back to a sender but in future release support for two-way sync 
 will be supported.
 
+#### Time Zone and Calendar system
+The DB sync sender and receiver applications MUST be running on the same calendar system. It's also highly recommended
+to run both the sender and receiver in UTC. If another timezone is preferred, it would be best to run both of them in
+the same time zone. With that said, the application should be able to sync data between a sender and receiver in different
+time zones by converting the Datetime field values to the receiver's time zone. This conversion is not done for Time ONLY
+fields and Date fields with no Time component.
+
 #### OpenMRS Instances are already installed
 This guide doesn't cover installation of the sender and receiver OpenMRS instances and databases, if not, please refer 
 to the [OpenMRS](https://openmrs.org) documentation.
@@ -104,6 +111,12 @@ git clone https://github.com/FriendsInGlobalHealth/openmrs-eip.git
 cd openmrs-eip
 mvn clean install
 ```
+
+If you want to run the application in Portuguese, then you need to set the profile for the maven build to **pt** like below
+```
+mvn clean install -P pt
+```
+
 Make sure the build completed successfully.
 
 At the time of writing this guide, the OpenMRS EIP project is at version `1.0-SNAPSHOT`, you will to replace {VERSION}

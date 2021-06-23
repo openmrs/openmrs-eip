@@ -1,17 +1,18 @@
 # Table of Contents
 
 1. [Introduction](#introduction)
-2. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
-3. [Installation Guide For DB Sync](distribution/docs/README.md)
-4. [Architecture](#architecture)
+2. [Key Things To Note](#key-things-to-note)  
+3. [OpenMRS Data Model Compatibility](#openmrs-data-model-compatibility)
+4. [Installation Guide For DB Sync](distribution/docs/README.md)
+5. [Architecture](#architecture)
     1. [Modules](#modules)
     2. [Design Overview](#design-overview)
     3. [Project Main Dependencies](#project-main-dependencies)
-5. [Configuration](#configuration)
-6. [Logging](#logging)
-7. [Management Database](#management-database)
-8. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-9. [Developer Guide](#developer-guide)
+6. [Configuration](#configuration)
+7. [Logging](#logging)
+8. [Management Database](#management-database)
+9. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
+10. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
@@ -22,10 +23,13 @@ Data is directly pulled from a source OpenMRS MySQL database and wired onto came
 OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end
 user sister applications to sync data from one OpeMRS MySQL DB to another.
 
-**Note:** Only specific database tables are watched i.e. only this set of tables get synced in case of DB sync. The list
+# Key Things To Note
+- Only specific database tables are watched i.e. only this set of tables get synced in case of DB sync. The list
 of these tables is defined by this [TableToSyncEnum](camel-openmrs/src/main/java/org/openmrs/eip/component/service/TableToSyncEnum.java)
 with the exception of the metadata tables with the assumption that metadata is already centrally managed using the
 available metadata sharing tools. In future releases we want to make the list of tables to watch or sync configurable.
+
+- The DB sync sender and receiver applications MUST be running on the same calendar system.    
 
 # OpenMRS Data Model Compatibility
 The application was initially built against the 2.3.x branch should be compatible with the data model of the OpenMRS core
