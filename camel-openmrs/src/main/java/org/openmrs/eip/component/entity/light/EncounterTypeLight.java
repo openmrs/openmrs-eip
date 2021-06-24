@@ -7,6 +7,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,6 +16,8 @@ import javax.persistence.Table;
 @AttributeOverride(name = "id", column = @Column(name = "encounter_type_id"))
 public class EncounterTypeLight extends RetireableLightEntity {
 
+    @NotNull
     @Column(name = "name")
     private String name;
+    
 }
