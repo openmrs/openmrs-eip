@@ -9,22 +9,18 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.BaseDataEntity;
 import org.openmrs.eip.component.entity.BaseEntity;
-import org.openmrs.eip.component.entity.Patient;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
-import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseModel;
-import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.PatientModel;
-import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.impl.AbstractSubclassEntityService;
@@ -84,7 +80,13 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
             if (parent != null) {
                 log.info(model.getClass() + " has no matching row in the subclass table, inserting one");
                 id = parent.getId();
-                insertParentRow(ety, id, (BaseDataModel) model);
+                PatientModel pModel = (PatientModel) model;
+                UserLight user = SyncContext.getBean(UserLightRepository.class).findByUuid(pModel.getPatientCreatorUuid());
+                Long creatorId = user != null ? user.getId() : AbstractLightService.DEFAULT_USER_ID;
+
+                PatientServiceUtils.createPatient(id, pModel.getUuid(), pModel.isPatientVoided(), creatorId,
+                        pModel.getPatientDateCreated());
+
                 ety.setId(id);
             }
         }
@@ -158,48 +160,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 
     private String getMsg(final E ety, final String uuid, final String s) {
         return "Entity of type " + ety.getClass().getName() + " with uuid " + uuid + s;
-    }
-
-    private void insertParentRow(E ety, Long id, BaseDataModel model) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-
-            Query query;
-            if (ety instanceof Patient) {
-                query = em.createNativeQuery(INSERT_PATIENT);
-                query.setParameter(1, id);
-                UserLight user = userLightRepository.findByUuid(model.getCreatorUuid());
-                query.setParameter(2, user != null ? user.getId() : AbstractLightService.DEFAULT_USER_ID);
-                query.setParameter(3, model.getDateCreated());
-                query.setParameter(4, model.isVoided());
-            } else if (model instanceof TestOrderModel) {
-                query = em.createNativeQuery(INSERT_TEST_ORDER);
-                query.setParameter(1, id);
-            } else if (model instanceof DrugOrderModel) {
-                query = em.createNativeQuery(INSERT_DRUG_ORDER);
-                query.setParameter(1, id);
-                query.setParameter(2, model.isVoided());
-            } else {
-                throw new EIPException("Don't know how to sync: " + model);
-            }
-
-            query.executeUpdate();
-
-            tx.commit();
-        } catch (Exception e) {
-            log.info("Failed to insert row for subclass entity: " + ety);
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw e;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
     }
 
     private Long getOrderId(BaseModel model) {

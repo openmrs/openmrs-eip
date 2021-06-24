@@ -1,13 +1,20 @@
 package org.openmrs.eip.component.service.light;
 
+import lombok.extern.slf4j.Slf4j;
+import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.entity.Person;
 import org.openmrs.eip.component.entity.light.LightEntity;
+import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
+import org.openmrs.eip.component.repository.PersonRepository;
+import org.openmrs.eip.component.service.PatientServiceUtils;
 import org.openmrs.eip.component.utils.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+@Slf4j
 public abstract class AbstractLightService<E extends LightEntity> implements LightService<E> {
 
     private static final String DEFAULT_UUID_PREFIX= "PLACEHOLDER_";
@@ -63,6 +70,23 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 
             entity.setUuid(uuid);
             voidPlaceholder(entity);
+
+            if (entity instanceof PatientLight) {
+                //There is no row yet in the patient table and we don't yet know the FK, get the person row by uuid so
+                //we can get the id and set it on this subclass, but we also need to insert the patient row.
+                Long id;
+                Person person = SyncContext.getBean(PersonRepository.class).findByUuid(uuid);
+                if (person != null) {
+                    log.info("No matching row in the patient table, inserting one");
+                    id = person.getId();
+                    PatientLight p = (PatientLight) entity;
+                    Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : DEFAULT_USER_ID;
+
+                    PatientServiceUtils.createPatient(id, uuid, p.isVoided(), creatorId, p.getPatientDateCreated());
+
+                    entity.setId(id);
+                }
+            }
 
             entity = repository.save(entity);
         }
