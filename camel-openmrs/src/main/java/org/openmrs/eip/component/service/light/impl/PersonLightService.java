@@ -17,9 +17,6 @@ public class PersonLightService extends AbstractLightService<PersonLight> {
         PersonLight person = new PersonLight();
         person.setCreator(DEFAULT_USER_ID);
         person.setDateCreated(DEFAULT_DATE);
-        person.setDead(false);
-        person.setBirthdateEstimated(false);
-        person.setDeathdateEstimated(false);
         return person;
     }
 }
