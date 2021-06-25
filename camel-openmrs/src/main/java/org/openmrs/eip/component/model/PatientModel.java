@@ -26,8 +26,6 @@ public class PatientModel extends PersonModel {
 
     private String patientVoidReason;
 
-    private boolean deathdateEstimated;
-
     private LocalTime birthtime;
 
     /**
@@ -190,24 +188,6 @@ public class PatientModel extends PersonModel {
      */
     public void setPatientVoidReason(String patientVoidReason) {
         this.patientVoidReason = patientVoidReason;
-    }
-
-    /**
-     * Gets the deathdateEstimated
-     *
-     * @return the deathdateEstimated
-     */
-    public boolean isDeathdateEstimated() {
-        return deathdateEstimated;
-    }
-
-    /**
-     * Sets the deathdateEstimated
-     *
-     * @param deathdateEstimated the deathdateEstimated to set
-     */
-    public void setDeathdateEstimated(boolean deathdateEstimated) {
-        this.deathdateEstimated = deathdateEstimated;
     }
 
     /**
