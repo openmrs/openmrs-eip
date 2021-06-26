@@ -54,6 +54,10 @@ public class OrderLightService extends AbstractLightService<OrderLight> {
         order.setEncounter(encounterService.getOrInitPlaceholderEntity());
         order.setPatient(patientService.getOrInitPlaceholderEntity());
         order.setCareSetting(careSettingService.getOrInitPlaceholderEntity());
+        order.setOrderNumber(DEFAULT_STRING);
+        order.setAction(DEFAULT_STRING);
+        order.setUrgency(DEFAULT_STRING);
+        
         return order;
     }
 }

@@ -19,6 +19,7 @@ import java.time.Month;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_STRING;
 
 public class OrderLightServiceTest {
 
@@ -86,6 +87,9 @@ public class OrderLightServiceTest {
         order.setEncounter(getEncounter());
         order.setPatient(getPatient());
         order.setCareSetting(getCareSetting());
+        order.setUrgency(DEFAULT_STRING);
+        order.setAction(DEFAULT_STRING);
+        order.setOrderNumber(DEFAULT_STRING);
         return order;
     }
 

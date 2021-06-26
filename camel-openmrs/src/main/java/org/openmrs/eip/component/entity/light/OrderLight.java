@@ -59,10 +59,6 @@ public class OrderLight extends VoidableLightEntity {
     private CareSettingLight careSetting;
 
     @NotNull
-    @Column(name = "date_activated")
-    private LocalDateTime dateActivated;
-
-    @NotNull
     private String urgency;
 
 }
