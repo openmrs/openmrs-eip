@@ -153,4 +153,11 @@ public class SyncApplication {
 		return new CachingConnectionFactory(cf);
 	}
 	
+	@Bean
+	public DeadLetterChannelBuilder shutdownErrorHandler() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:shutdown-route");
+		builder.setUseOriginalMessage(true);
+		return builder;
+	}
+	
 }

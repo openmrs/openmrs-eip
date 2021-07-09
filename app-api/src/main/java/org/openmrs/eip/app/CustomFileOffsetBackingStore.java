@@ -13,20 +13,39 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	protected static final Logger log = LoggerFactory.getLogger(CustomFileOffsetBackingStore.class);
 	
-	private static Boolean canSave = false;
+	private static boolean disabled = false;
 	
+	private static final Object LOCK = new Object();
+	
+	public synchronized static void disable() {
+		disabled = true;
+		if (log.isDebugEnabled()) {
+			log.debug("Disabled saving of offsets");
+		}
+	}
+	
+	public synchronized static boolean isDisabled() {
+		return disabled;
+	}
+	
+	/**
+	 * @see FileOffsetBackingStore#save()
+	 */
 	@Override
 	protected void save() {
-		if (!canSave) {
-			log.info("Skipping saving of latest offset");
-			return;
+		synchronized (LOCK) {
+			log.error("In CustomFileOffsetBackingStore.save: " + Thread.currentThread() + " -> disabled: " + disabled);
+			if (disabled) {
+				log.info("Skipping saving of offset because an error was encountered while processing a source record");
+				return;
+			}
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Saving binlog offset");
+			}
+			
+			super.save();
 		}
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Saving binlog position");
-		}
-		
-		super.save();
 	}
 	
 }

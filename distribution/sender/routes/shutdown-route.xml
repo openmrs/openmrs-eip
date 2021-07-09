@@ -1,0 +1,19 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="shutdown-route">
+        <from uri="direct:shutdown-route" />
+
+        <script>
+            <method beanType="org.openmrs.eip.app.CustomFileOffsetBackingStore" method="disable()" />
+        </script>
+        
+        <!-- TODO Send a notification to the configured emails -->
+
+        <log loggingLevel="ERROR" message="Error with message: ${body}" />
+        <log loggingLevel="ERROR" message="Cause: ${exception.message}" />
+        <log message="Shutting down the application..." />
+
+        <script>
+            <method beanType="java.lang.System" method="exit(129)" />
+        </script>
+    </route>
+</routes>

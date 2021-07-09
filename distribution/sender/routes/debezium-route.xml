@@ -1,65 +1,78 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode={{debezium.snapshotMode}}&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false&amp;maxBatchSize={{debezium.reader.maxBatchSize}}&amp;offsetStorage=org.openmrs.eip.app.CustomFileOffsetBackingStore" />
+    <route id="debezium" errorHandlerRef="shutdownErrorHandler">
+        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode={{debezium.snapshotMode}}&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false&amp;maxBatchSize={{debezium.reader.maxBatchSize}}&amp;offsetStorage=org.openmrs.eip.app.CustomFileOffsetBackingStore&amp;offsetCommitTimeoutMs=15000" />
 
         <log message=":" loggingLevel="DEBUG"/>
+        
+        <setProperty name="deferDebeziumEvent">
+            <method beanType="org.openmrs.eip.app.CustomFileOffsetBackingStore" method="isDisabled()" />
+        </setProperty>
+
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
-
-        <setProperty name="debeziumEvent">
-            <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
-        </setProperty>
-        <script>
-            <spel>
-                <!-- TODO Take care of situation where a table has a composite FK -->
-                #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.component.entity.Event())}
-                #{getProperty('debeziumEvent').event.setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
-                #{getProperty('debeziumEvent').event.setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
-                #{getProperty('debeziumEvent').event.setOperation(request.headers.CamelDebeziumOperation)}
-                #{getProperty('debeziumEvent').event.setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
-                #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
-            </spel>
-        </script>
-
-        <setProperty name="isSubclassTable">
-            <spel>
-                #{getProperty('debeziumEvent').event.tableName == 'test_order' || getProperty('debeziumEvent').event.tableName == 'drug_order' || getProperty('debeziumEvent').event.tableName == 'patient'}
-            </spel>
-        </setProperty>
 
         <choice>
             <when>
-                <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
-                <when>
-                    <simple>${exchangeProperty.isSubclassTable} == false</simple>
-                    <choice>
+                <simple>${exchangeProperty.deferDebeziumEvent} == false</simple>
+                <setProperty name="debeziumEvent">
+                    <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
+                </setProperty>
+                <script>
+                    <spel>
+                        <!-- TODO Take care of situation where a table has a composite FK -->
+                        #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.component.entity.Event())}
+                        #{getProperty('debeziumEvent').event.setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
+                        #{getProperty('debeziumEvent').event.setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
+                        #{getProperty('debeziumEvent').event.setOperation(request.headers.CamelDebeziumOperation)}
+                        #{getProperty('debeziumEvent').event.setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
+                        #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
+                    </spel>
+                </script>
+
+                <setProperty name="isSubclassTable">
+                    <spel>
+                        #{getProperty('debeziumEvent').event.tableName == 'test_order' || getProperty('debeziumEvent').event.tableName == 'drug_order' || getProperty('debeziumEvent').event.tableName == 'patient'}
+                    </spel>
+                </setProperty>
+
+                <choice>
+                    <when>
+                        <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
                         <when>
-                            <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                            <script>
-                                <spel>
-                                    #{getProperty('debeziumEvent').event.setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}
-                                </spel>
-                            </script>
+                            <simple>${exchangeProperty.isSubclassTable} == false</simple>
+                            <choice>
+                                <when>
+                                    <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                                    <script>
+                                        <spel>
+                                            #{getProperty('debeziumEvent').event.setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}
+                                        </spel>
+                                    </script>
+                                </when>
+                                <otherwise>
+                                    <script>
+                                        <spel>#{getProperty('debeziumEvent').event.setIdentifier(body.get('uuid'))}</spel>
+                                    </script>
+                                </otherwise>
+                            </choice>
                         </when>
-                        <otherwise>
-                            <script>
-                                <spel>#{getProperty('debeziumEvent').event.setIdentifier(body.get('uuid'))}</spel>
-                            </script>
-                        </otherwise>
-                    </choice>
-                </when>
 
-                <setBody>
-                    <simple>${exchangeProperty.debeziumEvent}</simple>
-                </setBody>
+                        <setBody>
+                            <simple>${exchangeProperty.debeziumEvent}</simple>
+                        </setBody>
 
-                <log message="Saving debezium event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
+                        <log message="Saving debezium event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
 
-                <to uri="jpa:DebeziumEvent?usePersist=true" />
+                        <to uri="jpa:DebeziumEvent?usePersist=true" />
 
-                <log message="Debezium event saved to event queue" loggingLevel="INFO" />
+                        <log message="Debezium event saved to event queue" loggingLevel="INFO" />
+                    </when>
+                    <otherwise>
+                        <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
-                <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                <log message="Deferring DB event because an error was encountered while processing a previous one" loggingLevel="DEBUG" />
             </otherwise>
         </choice>
 
