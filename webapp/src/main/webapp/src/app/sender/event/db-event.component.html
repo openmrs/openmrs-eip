@@ -1,0 +1,26 @@
+<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span></h5>
+<div class="ui-bar-spacer"></div>
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-table-name">Table Name</th>
+		<th i18n="@@common-databaseId">Database Id</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-dateAdded">Date Added</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let e of events">
+		<td>{{e.event?.tableName}}</td>
+		<td>{{e.event?.primaryKeyId}}</td>
+		<td>{{e.event?.identifier}}</td>
+		<td>
+			<span class="text-success" [hidden]="e.event?.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="e.event?.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="e.event?.operation != 'd'" i18n="@@common-delete">Delete</span>
+		</td>
+		<td>{{e.dateCreated | date:'yyyy-MM-dd HH:mm:ss.SSS'}}</td>
+	</tr>
+	</tbody>
+</table>

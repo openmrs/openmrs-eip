@@ -1,90 +1,82 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium" errorHandlerRef="outBoundErrorHandler">
-        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode={{debezium.snapshotMode}}&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false" />
+    <route id="debezium" errorHandlerRef="shutdownErrorHandler">
+        <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode={{debezium.snapshotMode}}&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=extended&amp;includeSchemaChanges=false&amp;maxBatchSize={{debezium.reader.maxBatchSize}}&amp;offsetStorage=org.openmrs.eip.app.CustomFileOffsetBackingStore&amp;offsetCommitTimeoutMs=15000" />
 
-        <log message=":" loggingLevel="DEBUG" />
+        <log message=":" loggingLevel="DEBUG"/>
+        
+        <setProperty name="deferDebeziumEvent">
+            <method beanType="org.openmrs.eip.app.CustomFileOffsetBackingStore" method="isDisabled()" />
+        </setProperty>
+
         <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
-        <setProperty name="event">
-            <spel>#{new org.openmrs.eip.component.entity.Event()}</spel>
-        </setProperty>
-        <script>
-            <spel>
-                <!-- TODO Take care of situation where a table has a composite FK -->
-                #{getProperty('event').setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
-                #{getProperty('event').setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
-                #{getProperty('event').setOperation(request.headers.CamelDebeziumOperation)}
-                #{getProperty('event').setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
-            </spel>
-        </script>
-        <setProperty name="is-subclass">
-            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
-        </setProperty>
 
         <choice>
             <when>
-                <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
-                <when>
-                    <simple>${exchangeProperty.is-subclass} == false</simple>
-                    <choice>
-                        <when>
-                            <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                            <script>
-                                <spel>#{getProperty('event').setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}</spel>
-                            </script>
-                        </when>
-                        <otherwise>
-                            <script>
-                                <spel>#{getProperty('event').setIdentifier(body.get('uuid'))}</spel>
-                            </script>
-                        </otherwise>
-                    </choice>
-                </when>
-
-                <log message="${exchangeProperty.event}" loggingLevel="DEBUG" />
-
-                <setProperty name="route-retry-count-map">
-                    <spel>#{new java.util.HashMap()}</spel>
+                <simple>${exchangeProperty.deferDebeziumEvent} == false</simple>
+                <setProperty name="debeziumEvent">
+                    <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
                 </setProperty>
-                <split>
-                    <simple>{{db-event.destinations}}</simple>
-                    <script>
-                        <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
-                    </script>
-                </split>
-                
-                <setProperty name="table-names">
-                    <!-- We need to look up failed events for rows in both the parent and subclass tables -->
-                    <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
+                <script>
+                    <spel>
+                        <!-- TODO Take care of situation where a table has a composite FK -->
+                        #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.component.entity.Event())}
+                        #{getProperty('debeziumEvent').event.setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
+                        #{getProperty('debeziumEvent').event.setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
+                        #{getProperty('debeziumEvent').event.setOperation(request.headers.CamelDebeziumOperation)}
+                        #{getProperty('debeziumEvent').event.setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
+                        #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
+                    </spel>
+                </script>
+
+                <setProperty name="isSubclassTable">
+                    <spel>
+                        #{getProperty('debeziumEvent').event.tableName == 'test_order' || getProperty('debeziumEvent').event.tableName == 'drug_order' || getProperty('debeziumEvent').event.tableName == 'patient'}
+                    </spel>
                 </setProperty>
 
-                <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.table-names}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
-
-                <split stopOnException="true">
-                    <simple>${body}</simple>
-                    <choice>
+                <choice>
+                    <when>
+                        <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
                         <when>
-                            <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
-                            <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route.trim()}" />
+                            <simple>${exchangeProperty.isSubclassTable} == false</simple>
+                            <choice>
+                                <when>
+                                    <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                                    <script>
+                                        <spel>
+                                            #{getProperty('debeziumEvent').event.setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}
+                                        </spel>
+                                    </script>
+                                </when>
+                                <otherwise>
+                                    <script>
+                                        <spel>#{getProperty('debeziumEvent').event.setIdentifier(body.get('uuid'))}</spel>
+                                    </script>
+                                </otherwise>
+                            </choice>
                         </when>
-                        <otherwise>
-                            <script>
-                                <spel>#{getProperty('route-retry-count-map').put(body.route, getProperty('route-retry-count-map').get(body.route.trim()) + 1)}</spel>
-                            </script>
-                        </otherwise>
-                    </choice>
-                </split>
-                
-                <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
-                <setBody>
-                    <simple>${exchangeProperty.event}</simple>
-                </setBody>
 
-                <to uri="direct:db-event-processor" />
+                        <setBody>
+                            <simple>${exchangeProperty.debeziumEvent}</simple>
+                        </setBody>
+
+                        <log message="Saving debezium event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
+
+                        <to uri="jpa:DebeziumEvent?usePersist=true" />
+
+                        <log message="Debezium event saved to event queue" loggingLevel="INFO" />
+                    </when>
+                    <otherwise>
+                        <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
-                <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                <log message="Deferring DB event because an error was encountered while processing a previous one" loggingLevel="DEBUG" />
             </otherwise>
         </choice>
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
 
     </route>
 </routes>

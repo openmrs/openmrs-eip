@@ -139,4 +139,35 @@
         <dropColumn tableName="sender_retry_queue" columnName="cause_message" />
     </changeSet>
 
+    <changeSet author="jpboane" id="20210613-1200">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="debezium_event_queue"/>
+            </not>
+        </preConditions>
+        <comment>Adding debezium_event_queue table</comment>
+
+        <createTable tableName="debezium_event_queue">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_key_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snapshot" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

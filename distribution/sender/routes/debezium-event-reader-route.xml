@@ -1,0 +1,28 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="debezium-event-reader" errorHandlerRef="deadLetterChannelBuilder">
+        <from uri="scheduler:debezium-reader?initialDelay={{debezium-event-reader.initial.delay}}&amp;delay={{debezium-event-reader.repeat.interval}}" />
+
+        <log loggingLevel="DEBUG" message="Fetching next 1000 events in the debezium event queue" />
+
+        <toD uri="jpa:DebeziumEvent?query=SELECT e FROM DebeziumEvent e ORDER BY id ASC&amp;maximumResults=1000" />
+
+        <choice>
+            <when>
+                <simple>${body.size()} > 0</simple>
+                <log message="Read ${body.size()} items from the debezium event queue" />
+
+                <split parallelProcessing="false">
+                    <simple>${body}</simple>
+
+                    <log loggingLevel="DEBUG" message=":" />
+
+                    <to uri="direct:debezium-event-processor" />
+                </split>
+            </when>
+            <otherwise>
+                <log loggingLevel="DEBUG" message="No events found in the debezium event queue" />
+            </otherwise>
+        </choice>
+        
+    </route>
+</routes>

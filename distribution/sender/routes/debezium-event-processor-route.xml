@@ -1,0 +1,61 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="debezium-event-processor" errorHandlerRef="outBoundErrorHandler">
+        <from uri="direct:debezium-event-processor" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+        <log message="Processing debezium event: ${body}" />
+
+        <setProperty name="dbzmEvent">
+            <simple>${body}</simple>
+        </setProperty>
+        <setProperty name="event">
+            <simple>${body.event}</simple>
+        </setProperty>
+        <setProperty name="is-subclass">
+            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
+        </setProperty>
+
+        <setProperty name="route-retry-count-map">
+            <spel>#{new java.util.HashMap()}</spel>
+        </setProperty>
+        <split>
+            <simple>{{db-event.destinations}}</simple>
+            <script>
+                <spel>#{getProperty('route-retry-count-map').put(body.trim(), 0)}</spel>
+            </script>
+        </split>
+
+        <setProperty name="table-names">
+            <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+            <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
+        </setProperty>
+
+        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.table-names}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+
+        <split stopOnException="true">
+            <simple>${body}</simple>
+            <choice>
+                <when>
+                    <simple>${exchangeProperty.route-retry-count-map.containsKey(${body.route.trim()})} != true</simple>
+                    <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${body.route.trim()}" />
+                </when>
+                <otherwise>
+                    <script>
+                        <spel>#{getProperty('route-retry-count-map').put(body.route, getProperty('route-retry-count-map').get(body.route.trim()) + 1)}</spel>
+                    </script>
+                </otherwise>
+            </choice>
+        </split>
+
+        <log message="Route and retryCount map -> ${exchangeProperty.route-retry-count-map}" loggingLevel="DEBUG" />
+        
+        <setBody>
+            <simple>${exchangeProperty.event}</simple>
+        </setBody>
+
+        <to uri="direct:db-event-processor" />
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+
+    </route>
+</routes>

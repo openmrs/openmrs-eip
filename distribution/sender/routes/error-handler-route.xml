@@ -81,11 +81,11 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Adding failed DB event to retry queue" loggingLevel="DEBUG" />
+                        <log message="Saving failed DB event to retry queue" loggingLevel="DEBUG" />
 
                         <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
-                        <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
+                        <log message="Successfully saved DB event to retry queue" loggingLevel="DEBUG" />
                     </when>
                     <otherwise>
                         <log message="Adding failed DB event for each registered route" />
@@ -108,14 +108,23 @@
                                     #{body.setDateCreated(new java.util.Date())}
                                 </spel>
                             </script>
-                            <log message="Adding failed DB event to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
+                            <log message="Saving failed DB event to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
 
                             <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
-                            <log message="Successfully added DB event to retry queue" loggingLevel="DEBUG" />
+                            <log message="Successfully saved DB event to retry queue" loggingLevel="DEBUG" />
                         </split>
                     </otherwise>
                 </choice>
+
+                <when>
+                    <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                    <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+
+                    <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+
+                    <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+                </when>
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed event -->
