@@ -34,7 +34,6 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	@Override
 	protected void save() {
 		synchronized (LOCK) {
-			log.error("In CustomFileOffsetBackingStore.save: " + Thread.currentThread() + " -> disabled: " + disabled);
 			if (disabled) {
 				log.info("Skipping saving of offset because an error was encountered while processing a source record");
 				return;
