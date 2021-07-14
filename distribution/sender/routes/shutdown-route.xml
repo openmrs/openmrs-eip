@@ -13,7 +13,7 @@
         <log message="Shutting down the application..." />
 
         <script>
-            <method beanType="java.lang.System" method="exit(129)" />
+            <method beanType="org.openmrs.eip.app.SyncApplication" method="shutdown()" />
         </script>
     </route>
 </routes>
