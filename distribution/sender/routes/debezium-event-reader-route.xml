@@ -9,7 +9,7 @@
         <choice>
             <when>
                 <simple>${body.size()} > 0</simple>
-                <log message="Read ${body.size()} items from the debezium event queue" />
+                <log message="Read ${body.size()} item(s) from the debezium event queue" />
 
                 <split parallelProcessing="false">
                     <simple>${body}</simple>

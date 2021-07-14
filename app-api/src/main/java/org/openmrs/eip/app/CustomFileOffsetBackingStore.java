@@ -35,7 +35,7 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	protected void save() {
 		synchronized (LOCK) {
 			if (disabled) {
-				log.info("Skipping saving of offset because an error was encountered while processing a source record");
+				log.warn("Skipping saving of offset because an error was encountered while processing a source record");
 				return;
 			}
 			

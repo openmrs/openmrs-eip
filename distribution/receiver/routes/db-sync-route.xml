@@ -120,6 +120,15 @@
                         </when>
                     </choice>
 
+                    <when>
+                        <simple>${exchangeProperty.retry-item} == null</simple>
+                        <log loggingLevel="DEBUG" message="Enabling message acknowledgement after syncing new message successfully" />
+
+                        <script>
+                            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+                        </script>
+                    </when>
+
                     <doCatch>
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
                         <setProperty name="conflict-item">
@@ -163,6 +172,15 @@
                         <to uri="jpa:ConflictQueueItem" />
 
                         <log message="Successfully added message to conflict queue" loggingLevel="DEBUG" />
+
+                        <when>
+                            <simple>${exchangeProperty.retry-item} == null</simple>
+                            <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to conflict queue" />
+
+                            <script>
+                                <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+                            </script>
+                        </when>
                     </doCatch>
                 </doTry>
             </otherwise>

@@ -9,6 +9,11 @@
         </unmarshal>
 
         <to uri="file:{{camel.input.endpoint.complex.obs.data.directory}}" />
-        
+
+        <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving complex obs" />
+
+        <script>
+            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+        </script>
     </route>
 </routes>
