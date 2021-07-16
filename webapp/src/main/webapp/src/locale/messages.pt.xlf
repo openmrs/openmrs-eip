@@ -269,49 +269,49 @@
 		<unit id="sender-pending">
 			<segment>
 				<source>Pending</source>
-				<target></target>
+				<target>Pendentes</target>
 			</segment>
 		</unit>
 		<unit id="common-databaseId">
 			<segment>
 				<source>Database Id</source>
-				<target></target>
+				<target>ID Base de Dados</target>
 			</segment>
 		</unit>
 		<unit id="common-insert">
 			<segment>
 				<source>Insert</source>
-				<target></target>
+				<target>Insercoes</target>
 			</segment>
 		</unit>
 		<unit id="common-update">
 			<segment>
 				<source>Update</source>
-				<target></target>
+				<target>Actualizacoes</target>
 			</segment>
 		</unit>
 		<unit id="common-delete">
 			<segment>
 				<source>Delete</source>
-				<target></target>
+				<target>Remocoes</target>
 			</segment>
 		</unit>
 		<unit id="sender-pending-events">
 			<segment>
 				<source>Pending Events</source>
-				<target></target>
+				<target>Eventos Pendentes</target>
 			</segment>
 		</unit>
 		<unit id="common-total-pending-count">
 			<segment>
 				<source>Total Count Of Pending Events</source>
-				<target></target>
+				<target>Total de Eventos Pendentes</target>
 			</segment>
 		</unit>
 		<unit id="common-no-pending-msg">
 			<segment>
 				<source>No pending events, everything looks good!</source>
-				<target></target>
+				<target>Nao ha eventos pendentes! Tudo parece bem!</target>
 			</segment>
 		</unit>
 	</file>
