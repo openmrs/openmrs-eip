@@ -10,15 +10,19 @@
             <constant>application/x-www-form-urlencoded</constant>
         </setHeader>
 
+        <setHeader name="CamelHttpMethod">
+            <constant>POST</constant>
+        </setHeader>
+
         <setBody>
             <constant>grant_type=client_credentials&amp;client_id={{oauth.client.id}}&amp;client_secret={{oauth.client.secret}}&amp;scope={{oauth.client.scope}}</constant>
         </setBody>
 
-        <toD uri="{{oauth.access.token.uri}}?httpMethod=POST" />
+        <toD uri="{{oauth.access.token.uri}}" />
 
         <when>
             <simple>${headers.CamelHttpResponseCode} != 200</simple>
-            <throwException exceptionType="org.openmrs.eip.EIPException" message="Failed to retrieve OAuth token, response statuc code: ${headers.CamelHttpResponseCode}" />
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="Failed to retrieve OAuth token, response status code: ${headers.CamelHttpResponseCode}" />
         </when>
 
         <setBody>
