@@ -15,16 +15,14 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	private static boolean disabled = false;
 	
-	private static final Object LOCK = new Object();
-	
-	public synchronized static void disable() {
+	public static void disable() {
 		disabled = true;
 		if (log.isDebugEnabled()) {
 			log.debug("Disabled saving of offsets");
 		}
 	}
 	
-	public synchronized static boolean isDisabled() {
+	public static boolean isDisabled() {
 		return disabled;
 	}
 	
@@ -33,7 +31,7 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	 */
 	@Override
 	protected void save() {
-		synchronized (LOCK) {
+		synchronized (CustomFileOffsetBackingStore.class) {
 			if (disabled) {
 				log.warn("Skipping saving of offset because an error was encountered while processing a source record");
 				return;
