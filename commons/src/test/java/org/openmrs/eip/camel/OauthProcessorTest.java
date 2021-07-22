@@ -1,25 +1,42 @@
 package org.openmrs.eip.camel;
 
-import static java.util.Collections.singletonMap;
+import static java.time.Instant.ofEpochSecond;
+import static java.time.ZoneId.systemDefault;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.openmrs.eip.camel.OauthProcessor.HTTP_AUTH_SCHEME;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.reflect.Whitebox.getInternalState;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
-import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.Constants;
-import org.springframework.util.ReflectionUtils;
-import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
+import org.openmrs.eip.EIPException;
+import org.openmrs.eip.OauthToken;
+import org.openmrs.eip.Utils;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Utils.class)
 public class OauthProcessorTest {
 	
 	@Mock
@@ -28,39 +45,107 @@ public class OauthProcessorTest {
 	@Mock
 	private ExtendedCamelContext mockCamelContext;
 	
+	@Mock
+	private OauthToken mockOauthToken;
+	
 	private OauthProcessor processor = new OauthProcessor();
 	
 	@Before
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		setField("producerTemplate", processor, mockProducerTemplate);
-	}
-	
-	private void setField(String name, Object target, Object value) {
-		Field field = FieldUtils.getField(target.getClass(), name, true);
-		ReflectionUtils.setField(field, target, value);
+		setInternalState(processor, "producerTemplate", mockProducerTemplate);
 	}
 	
 	@Test
 	public void process_shouldSkipSettingTheOauthHeaderIfDisabled() throws Exception {
 		processor.process(null);
 		
-		Mockito.verifyNoInteractions(mockProducerTemplate);
+		verifyNoInteractions(mockProducerTemplate);
 	}
 	
 	@Test
-	public void process_shouldCallTheOauthRouteAndSetTheOauthHeaderIfEnabled() throws Exception {
-		final String expectedToken = "some-token";
-		setField("isOauthEnabled", processor, true);
-		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class))
-		        .thenReturn(singletonMap(OauthProcessor.FIELD_TOKEN, expectedToken));
-		
+	public void process_shouldReturnTheCachedTokenIfItIsNotExpired() throws Exception {
+		final String testToken = "testToken";
+		when(mockOauthToken.getAccessToken()).thenReturn(testToken);
+		when(mockOauthToken.isExpired(any(LocalDateTime.class))).thenReturn(false);
+		setInternalState(processor, "oauthToken", mockOauthToken);
+		setInternalState(processor, "isOauthEnabled", true);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
 		processor.process(exchange);
 		
-		Assert.assertEquals(OauthProcessor.HTTP_AUTH_SCHEME + " " + expectedToken,
-		    exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+		verifyNoInteractions(mockProducerTemplate);
+		assertEquals(HTTP_AUTH_SCHEME + " " + testToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+	}
+	
+	@Test
+	public void process_shouldGetNewTokenAndSetTheHeaderIfEnabledAndThereIsNoCachedToken() throws Exception {
+		final String expectedToken = "some-token";
+		final long expiresIn = 300;
+		final long testSeconds = 1626898515;
+		setInternalState(processor, "isOauthEnabled", true);
+		Map<String, Object> testResponse = new HashMap();
+		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedToken);
+		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
+		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
+		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		assertNull(getInternalState(processor, "oauthToken"));
+		mockStatic(Utils.class);
+		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		processor.process(exchange);
+		
+		OauthToken cachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(cachedOauthToken);
+		assertEquals(expectedToken, cachedOauthToken.getAccessToken());
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
+		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+	}
+	
+	@Test
+	public void process_shouldCallGetNewTokenAndSetTheHeaderIfEnabledAndTheCachedTokenIsExpired() throws Exception {
+		when(mockOauthToken.getAccessToken()).thenReturn("am-expired");
+		when(mockOauthToken.isExpired(any(LocalDateTime.class))).thenReturn(true);
+		setInternalState(processor, "oauthToken", mockOauthToken);
+		
+		final String expectedNewToken = "some-token-1";
+		final long expiresIn = 360;
+		final long testSeconds = 1626898515;
+		setInternalState(processor, "isOauthEnabled", true);
+		Map<String, Object> testResponse = new HashMap();
+		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedNewToken);
+		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
+		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
+		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		setInternalState(processor, "oauthToken", mockOauthToken);
+		mockStatic(Utils.class);
+		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		processor.process(exchange);
+		
+		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(newCachedOauthToken);
+		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
+		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+	}
+	
+	@Test
+	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() throws Exception {
+		setInternalState(processor, "isOauthEnabled", true);
+		Map<String, Object> testResponse = new HashMap();
+		testResponse.put(OauthProcessor.FIELD_TOKEN, "some-token");
+		final String type = "MAC";
+		testResponse.put(OauthProcessor.FIELD_TYPE, type);
+		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		assertNull(getInternalState(processor, "oauthToken"));
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		assertThrows("Unsupported oauth token type: " + type, EIPException.class, () -> processor.process(exchange));
 	}
 	
 }

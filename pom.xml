@@ -32,6 +32,7 @@
         <json.version>20190722</json.version>
         <testContainersVersion>1.15.2</testContainersVersion>
         <exclude.tests>nothing-to-exclude</exclude.tests>
+        <powerMockVersion>2.0.9</powerMockVersion>
     </properties>
 
     <dependencyManagement>
@@ -51,6 +52,18 @@
                 <artifactId>mysql</artifactId>
                 <version>${testContainersVersion}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <scope>test</scope>
+                <version>${powerMockVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito2</artifactId>
+                <scope>test</scope>
+                <version>${powerMockVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

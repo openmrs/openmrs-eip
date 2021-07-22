@@ -9,6 +9,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.EIPException;
 import org.openmrs.eip.OauthToken;
 import org.openmrs.eip.Utils;
 import org.slf4j.Logger;
@@ -46,10 +47,6 @@ public class OauthProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Checking if Oauth is enabled");
-		}
-		
 		if (!isOauthEnabled) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Oauth is not enabled, skip fetching token");
@@ -70,7 +67,7 @@ public class OauthProcessor implements Processor {
 				
 				Object type = response.get(FIELD_TYPE);
 				if (type == null || !HTTP_AUTH_SCHEME.equalsIgnoreCase(type.toString())) {
-					throw new Exception("Unsupported oauth token type: " + type);
+					throw new EIPException("Unsupported oauth token type: " + type);
 				}
 				
 				long expiresAt = currentSeconds + Long.valueOf(response.get(FIELD_EXPIRES_IN).toString());
