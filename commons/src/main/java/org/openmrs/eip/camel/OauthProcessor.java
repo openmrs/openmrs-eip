@@ -77,6 +77,8 @@ public class OauthProcessor implements Processor {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Using cached oauth token");
 				}
+				
+				//TODO verify if token is still valid, e.g. in the event the IDP was restarted or if token is revoked
 			}
 			
 			exchange.getIn().setHeader(HTTP_HEADER_AUTH, HTTP_AUTH_SCHEME + " " + oauthToken.getAccessToken());
