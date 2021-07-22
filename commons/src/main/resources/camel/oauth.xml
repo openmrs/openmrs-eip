@@ -4,7 +4,7 @@
         <from uri="direct:oauth" />
 
         <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
-        <log message="Fetching Oauth token with clientId={{oauth.client.id}}, scope={{oauth.client.scope}}, from server at {{oauth.access.token.uri}}" />
+        <log message="Fetching oauth token with clientId={{oauth.client.id}}, scope={{oauth.client.scope}}, from server at {{oauth.access.token.uri}}" />
 
         <setHeader name="Content-Type">
             <constant>application/x-www-form-urlencoded</constant>
@@ -29,7 +29,7 @@
             <jsonpath>$</jsonpath>
         </setBody>
 
-        <log message="Successfully obtained Oauth token" />
+        <log message="Successfully obtained oauth token" />
 
         <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
     </route>
