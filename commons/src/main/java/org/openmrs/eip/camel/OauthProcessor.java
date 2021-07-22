@@ -1,12 +1,16 @@
 package org.openmrs.eip.camel;
 
+import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
+
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.Constants;
+import org.openmrs.eip.OauthToken;
+import org.openmrs.eip.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +34,9 @@ public class OauthProcessor implements Processor {
 	
 	public static final String FIELD_EXPIRES_IN = "expires_in";
 	
-	public static final String FIELD_REFRESH_EXPIRES_IN = "refresh_expires_in";
-	
-	public static final String FIELD_REFRESH_TOKEN = "refresh_token";
-	
 	public static final String FIELD_TYPE = "token_type";
+	
+	private OauthToken oauthToken;
 	
 	@Produce
 	private ProducerTemplate producerTemplate;
@@ -44,15 +46,44 @@ public class OauthProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		logger.info("Checking if Oauth is enabled");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Checking if Oauth is enabled");
+		}
+		
 		if (!isOauthEnabled) {
-			logger.info("Oauth is not enabled, skip fetching token");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Oauth is not enabled, skip fetching token");
+			}
 			return;
 		}
 		
-		Map response = producerTemplate.requestBody(OAUTH_URI, null, Map.class);
-		
-		exchange.getIn().setHeader(Constants.HTTP_HEADER_AUTH, HTTP_AUTH_SCHEME + " " + response.get(FIELD_TOKEN));
+		synchronized (this) {
+			if (oauthToken == null || oauthToken.isExpired(LocalDateTime.now())) {
+				if (oauthToken != null) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Cached oauth token is expired, fetching a new one");
+					}
+				}
+				
+				long currentSeconds = Utils.getCurrentSeconds();
+				Map response = producerTemplate.requestBody(OAUTH_URI, null, Map.class);
+				
+				Object type = response.get(FIELD_TYPE);
+				if (type == null || !HTTP_AUTH_SCHEME.equalsIgnoreCase(type.toString())) {
+					throw new Exception("Unsupported oauth token type: " + type);
+				}
+				
+				long expiresAt = currentSeconds + Long.valueOf(response.get(FIELD_EXPIRES_IN).toString());
+				
+				oauthToken = new OauthToken(response.get(FIELD_TOKEN).toString(), expiresAt);
+			} else {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Using cached oauth token");
+				}
+			}
+			
+			exchange.getIn().setHeader(HTTP_HEADER_AUTH, HTTP_AUTH_SCHEME + " " + oauthToken.getAccessToken());
+		}
 	}
 	
 }

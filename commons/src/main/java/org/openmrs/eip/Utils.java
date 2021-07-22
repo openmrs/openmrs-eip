@@ -55,4 +55,13 @@ public class Utils {
 		return String.join(",", tables.stream().map(tName -> "'" + tName + "'").collect(Collectors.toList()));
 	}
 	
+	/**
+	 * Gets the current seconds since the epoch
+	 * 
+	 * @return the difference in seconds between the current time and the epoch
+	 */
+	public static long getCurrentSeconds() {
+		return System.currentTimeMillis() / 1000;
+	}
+	
 }
