@@ -9,12 +9,13 @@
    3. [Project Main Dependencies](#project-main-dependencies)
 5. [Configuration](#configuration)
 6. [Logging](#logging)
-7. [Management Database](#management-database)
-8. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-9. [Developer Guide](#developer-guide)
+7. [Metrics](#metrics)   
+8. [Management Database](#management-database)
+9. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
+10. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
-10. [Building Custom Applications](docs/custom/README.md)
+11. [Building Custom Applications](docs/custom/README.md)
 
 # Introduction
 This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and 
@@ -168,17 +169,21 @@ For DB sync configuration, please refer to the [DB sync installation](docs/db-sy
 For custom application configuration, please refer to the [custom application set up](docs/custom/README.md) documentation.
 
 # Logging
-The DB sync applications are spring boot applications and custom applications are also expected to be spring boot
-applications. The end user applications come with built-in logback files on the classpath i.e. `logback.xml` and
-`logback-console.xml`, the `logback.xml` file writes the logs to a file to `{eip.home}/logs` where `{eip.home}` is the 
-path to the app's installation directory. The `logback-console.xml` writes logs to the console, this can be useful in a 
-dev environment and tests.
+Custom applications are also expected to be spring boot applications. The end user applications come with built-in 
+logback files on the classpath i.e. `logback.xml` and `logback-console.xml`, the `logback.xml` file writes the logs to a 
+file to `{eip.home}/logs` where `{eip.home}` is the path to the app's installation directory. The `logback-console.xml` 
+writes logs to the console, this can be useful in a dev environment and tests.
 
 For camel-routes, you need to set the logging level using their route ids, for instance if your route id is `my-route`,
 then you set the logging level as below.
 ```
 logging.level.my-route=DEBUG
 ```
+
+# Metrics
+There is built-in support for metrics via spring's actuator, it is not enabled by default, custom applications can be 
+setup and configured to enable and expose endpoints for metrics. Please refer to the [custom application set up](docs/custom/README.md) 
+documentation for how to do this.
 
 For built-in routes and all classes in this project, you can globally set their log level by setting the value of the
 `openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to

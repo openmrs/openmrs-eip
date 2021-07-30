@@ -63,3 +63,19 @@ of DB events and do something useful.
    the same error handler set so that the framework can gracefully handle it and apply the retry mechanism. 
 7. Open the copy of the `application.properties` you created in step 5 and set the property values accordingly, 
    carefully read the in-inline documentation as you set each property value.
+   
+### Metrics Setup
+1. Add `commons-web` as a dependency to your pom.xml file, below is what your maven dependency should look like.
+    ```xml
+    <dependency>
+        <groupId>org.openmrs.eip</groupId>
+        <artifactId>commons-web</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+    ```
+2. You can then enable and expose different endpoints via standard spring boot's maintenance properties, please refer to
+   spring boot's official application properties documentation for the respective spring boot version.
+   
+**NOTE:** Adding the `commons-web` dependency turns on the web layer for your spring boot application, so be sure to 
+secure the exposed endpoints and in general the web application especially if the application is exposed to the public 
+internet. 
