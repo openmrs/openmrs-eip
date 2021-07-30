@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>OpenMRS EIP Commons</name>
-    <description>Provides shared classes and resources between modules</description>
+    <description>Provides shared classes and resources</description>
 
     <dependencies>
         <dependency>
