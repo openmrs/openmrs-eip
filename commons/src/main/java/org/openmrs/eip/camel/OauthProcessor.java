@@ -42,7 +42,7 @@ public class OauthProcessor implements Processor {
 	@Produce
 	private ProducerTemplate producerTemplate;
 	
-	@Value("${oauth.enabled}")
+	@Value("${oauth.enabled:false}")
 	private boolean isOauthEnabled;
 	
 	@Override
