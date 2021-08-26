@@ -19,10 +19,7 @@ public class DebeziumRoute extends RouteBuilder {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DebeziumRoute.class);
 	
-	private MySqlWatcherEndpoint endpoint;
-	
-	public DebeziumRoute(MySqlWatcherEndpoint endpoint) {
-		this.endpoint = endpoint;
+	public DebeziumRoute() {
 	}
 	
 	@Override

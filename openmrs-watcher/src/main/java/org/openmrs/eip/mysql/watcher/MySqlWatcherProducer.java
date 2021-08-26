@@ -21,7 +21,7 @@ public class MySqlWatcherProducer extends DefaultProducer {
 	public void process(Exchange exchange) throws Exception {
 		logger.info("Registering debezium route");
 		
-		exchange.getContext().addRoutes(new DebeziumRoute((MySqlWatcherEndpoint) getEndpoint()));
+		exchange.getContext().addRoutes(new DebeziumRoute());
 	}
 	
 }
