@@ -187,4 +187,26 @@
         <dropColumn tableName="receiver_retry_queue" columnName="cause_message" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20210825-1712">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="site_info_identifier_uk" tableName="site_info" columnNames="identifier" />
+            </not>
+        </preConditions>
+        <comment>Add unique constraint to site_info.identifier column</comment>
+
+        <addUniqueConstraint constraintName="site_info_identifier_uk" tableName="site_info" columnNames="identifier" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20210825-1713">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="site_info_name_uk" tableName="site_info" columnNames="name" />
+            </not>
+        </preConditions>
+        <comment>Add unique constraint to site_info.name column</comment>
+
+        <addUniqueConstraint constraintName="site_info_name_uk" tableName="site_info" columnNames="name" />
+    </changeSet>
+
 </databaseChangeLog>
