@@ -190,17 +190,17 @@ For built-in routes and all classes in this project, you can globally set their 
 [spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
 
 # Management Database
-The `openmrs-watcher` comes with an embedded management DB where it stores failed DB events for purposes of re-processing.
+The `openmrs-watcher` requires configuration of a management database where it stores useful data for proper functioning.
 
-The Management DB by default is an H2 database, it should be possible to use another DB system but we highly recommend 
-those that are embeddable since they can be bootstrapped with the application, the DB should also reside on the same 
-physical machine as the application to eliminate any possibility of being unreachable.
+The Management DB has been tested with MySQL and H2, you should be able to use any other relational database supported 
+by hibernate, it is highly recommended that the management DB resides on the same physical machine as the application to 
+eliminate any possibility of being unreachable and lower latency hence better performance.
 
 # Error Handling And Retry Mechanism
 The `openmrs-watcher` module on which the DB sync sender is built has a built-in error handling and retry mechanism in 
 case something goes wrong when the sender is processing a DB event, this also applies to any custom application built on 
-top of the openmrs-watcher, the failed event gets pushed into an error queue in the [management database](#management-database) 
-that comes as an embedded H2 DB, this DB can be accessed from a browser at a port and path configured in your 
+top of the openmrs-watcher, the failed event gets pushed into an error queue in the [management database](#management-database), 
+If you are using H2, the management DB can be accessed from a browser at a port and path configured in your 
 application.properties file. The error queue is actually a table named `sender_retry_queue`. In theory this queue should
 be empty all the time, there is a retry route which periodically polls the error queue and attempts to reprocess the events. When
 a failed event is finally successfully re-processed, it gets removed out of the error queue. If an entity has an event in 
@@ -208,11 +208,6 @@ the error queue, all subsequent DB events for it are automatically pushed to the
 take a look at this queue regularly for failed events, at least once day and address the root cause for failed events so that 
 they can be re-processed. Otherwise, the retry route will indefinitely attempt to re-processs them. You can configure how often 
 the retry queue can run, please refer to the [configuration](#configuration) section.
-
-The DB sync receiver application also ships with a similar built-in error handling and retry mechanism with a separate 
-embedded H2 [management database](#management-database), it uses a table named `receiver_retry_queue` to store failed 
-incoming DB sync messages. You can configure how often the retry queue should run, please refer to the [configuration](#configuration) 
-section.
 
 # Developer Guide
 ## Build
