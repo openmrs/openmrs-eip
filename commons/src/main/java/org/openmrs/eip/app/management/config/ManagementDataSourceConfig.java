@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.camel.component.jpa.JpaComponent;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.dialect.MySQL5Dialect;
 import org.openmrs.eip.Constants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,24 +33,31 @@ import liquibase.integration.spring.SpringLiquibase;
 @EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager")
 public class ManagementDataSourceConfig {
 	
-	@Value("${spring.mngt-datasource.dialect}")
+	@Value("${spring.mngt-datasource.dialect:#{null}}")
 	private String hibernateDialect;
 	
-	@Value("${spring.mngt-datasource.jdbcUrl}")
+	@Value("${spring.mngt-datasource.jdbcUrl:#{null}}")
 	private String url;
 	
-	@Value("${spring.mngt-datasource.username}")
+	@Value("${spring.mngt-datasource.username:#{null}}")
 	private String username;
 	
-	@Value("${spring.mngt-datasource.password}")
+	@Value("${spring.mngt-datasource.password:#{null}}")
 	private String password;
 	
-	@Value("${spring.mngt-datasource.driverClassName}")
+	@Value("${spring.mngt-datasource.driverClassName:#{null}}")
 	private String driverClassName;
 	
 	@Bean(name = Constants.MGT_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
-	public DataSource dataSource() throws ClassNotFoundException {
+	public DataSource dataSource(@Qualifier(Constants.OPENMRS_DATASOURCE_NAME) DataSource openmrsDatasource)
+	    throws ClassNotFoundException {
+		
+		//If no mgt DB is specified, use OpenMRS DB
+		if (url == null) {
+			return openmrsDatasource;
+		}
+		
 		SimpleDriverDataSource sdd = new SimpleDriverDataSource();
 		sdd.setDriverClass((Class<Driver>) Class.forName(driverClassName));
 		sdd.setUrl(url);
@@ -65,7 +73,9 @@ public class ManagementDataSourceConfig {
 	                                                            ConfigurableEnvironment env) {
 		
 		Map<String, String> props = new HashMap();
-		props.put(AvailableSettings.DIALECT, hibernateDialect);
+		//Set to mysql dialect since if we have defaulted to using OpenMRS DB for mgt
+		//TODO support postgres
+		props.put(AvailableSettings.DIALECT, url != null ? hibernateDialect : MySQL5Dialect.class.getName());
 		props.put(AvailableSettings.HBM2DDL_AUTO, "none");
 		
 		return builder.dataSource(dataSource).packages(env.getProperty(Constants.PROP_PACKAGES_TO_SCAN, String[].class))
