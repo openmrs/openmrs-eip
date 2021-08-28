@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="inbound-complex-obs-sync" errorHandlerRef="deadLetterChannelBuilder">
+    <route id="inbound-complex-obs-sync" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:inbound-complex-obs-sync"/>
 
         <log message="Processing inbound complex obs data file: ${headers.CamelFileName}" />
