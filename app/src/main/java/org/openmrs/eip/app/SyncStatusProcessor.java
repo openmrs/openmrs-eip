@@ -79,8 +79,8 @@ public class SyncStatusProcessor implements Processor {
 				logger.debug("Successfully saved sync status for: " + siteInfo + " -> " + status);
 			}
 		}
-		catch (Exception e) {
-			logger.error("Failed to update sync status for: " + siteInfo, e);
+		catch (Throwable t) {
+			logger.error("Failed to update sync status for: " + siteInfo, t);
 		}
 		
 	}

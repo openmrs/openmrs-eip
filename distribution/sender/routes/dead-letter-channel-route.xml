@@ -1,9 +1,9 @@
 <!--Route to receive all message in error and log them-->
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="dlc-route">
-        <from uri="direct:dlc"/>
+        <from uri="direct:dlc" />
 
-        <log loggingLevel="ERROR" message="Error with message: ${body}"/>
-        <log loggingLevel="ERROR" message="Cause: ${exception.message}"/>
+        <log loggingLevel="ERROR" message="An error occurred" />
+        <log loggingLevel="ERROR" message="Cause: ${exception.message}" />
     </route>
 </routes>

@@ -124,9 +124,9 @@
                         <simple>${exchangeProperty.retry-item} == null</simple>
                         <log loggingLevel="DEBUG" message="Enabling message acknowledgement after syncing new message successfully" />
 
-                        <script>
-                            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-                        </script>
+                        <!--<script>
+                            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
+                        </script>-->
                     </when>
 
                     <doCatch>
@@ -177,9 +177,9 @@
                             <simple>${exchangeProperty.retry-item} == null</simple>
                             <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to conflict queue" />
 
-                            <script>
-                                <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-                            </script>
+                            <!--<script>
+                                <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
+                            </script>-->
                         </when>
                     </doCatch>
                 </doTry>

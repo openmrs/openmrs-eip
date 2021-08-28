@@ -87,9 +87,9 @@
                 <log message="Successfully saved retry item" loggingLevel="DEBUG" />
                 <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to retry queue" />
 
-                <script>
-                    <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-                </script>
+                <!--<script>
+                    <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
+                </script>-->
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed message -->

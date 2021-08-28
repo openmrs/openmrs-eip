@@ -2,7 +2,7 @@
     Route to process exceptions and log them in the outbound_retry_queue table in the management DB.
  -->
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="outbound-error-handler">
+    <route id="outbound-error-handler" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:outbound-error-handler" />
 
         <when>
