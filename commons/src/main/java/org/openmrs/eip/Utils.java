@@ -64,4 +64,12 @@ public class Utils {
 		return System.currentTimeMillis() / 1000;
 	}
 	
+	/**
+	 * Shuts down the application
+	 */
+	public static void shutdown() {
+		//Shutdown in a new thread to ensure other background shutdown threads complete too
+		new Thread(() -> System.exit(129)).start();
+	}
+	
 }

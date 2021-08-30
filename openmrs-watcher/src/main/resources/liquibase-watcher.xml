@@ -118,7 +118,7 @@
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP">
+            <column name="date_created" type="TIMESTAMP(3)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

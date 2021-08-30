@@ -29,6 +29,13 @@ public class AppConfig {
 		return builder;
 	}
 	
+	@Bean("shutdownErrorHandler")
+	public DeadLetterChannelBuilder shutdownErrorHandler() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:watcher-shutdown-route");
+		builder.setUseOriginalMessage(true);
+		return builder;
+	}
+	
 	@Bean(Constants.COMMON_PROP_SOURCE_BEAN_NAME)
 	public PropertySource getCommonPropertySource(ConfigurableEnvironment env) {
 		Map<String, Object> props = new HashMap();
