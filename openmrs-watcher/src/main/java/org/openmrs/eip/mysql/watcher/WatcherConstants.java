@@ -32,6 +32,4 @@ public class WatcherConstants {
 	
 	public static final String PROP_SOURCE_NAME = "watcherPropSource";
 	
-	public static final String EX_PROP_DEFERRED = "deferDebeziumEvent";
-	
 }
