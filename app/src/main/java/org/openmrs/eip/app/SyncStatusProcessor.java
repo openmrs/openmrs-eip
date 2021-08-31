@@ -33,15 +33,7 @@ public class SyncStatusProcessor implements Processor {
 				metadata = exchange.getIn().getBody(SyncModel.class).getMetadata();
 			}
 			
-			String siteClass = SiteInfo.class.getSimpleName();
-			final String siteQuery = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s WHERE s.identifier = '"
-			        + metadata.getSourceIdentifier() + "'";
-			
-			List<SiteInfo> sites = on(exchange.getContext()).to(siteQuery).request(List.class);
-			
-			if (sites.size() == 1) {
-				siteInfo = sites.get(0);
-			}
+			siteInfo = ReceiverContext.getSiteInfo(metadata.getSourceIdentifier());
 			
 			if (siteInfo == null) {
 				logger.error("No site info found with identifier: " + metadata.getSourceIdentifier()
@@ -51,6 +43,8 @@ public class SyncStatusProcessor implements Processor {
 			
 			String statusClass = ReceiverSyncStatus.class.getSimpleName();
 			final String statusParamsProp = "status-params";
+			//TODO cache all SyncStatues to avoid this lookup query
+			//TODO Find a smart way to minimise the calls so that we don't update the status on every message
 			exchange.setProperty(statusParamsProp, Collections.singletonMap("siteInfoId", siteInfo.getId()));
 			final String statusQuery = "jpa:" + statusClass + " ?query=SELECT s FROM " + statusClass
 			        + " s WHERE s.siteInfoId = " + siteInfo.getId();

@@ -85,9 +85,9 @@
                 <to uri="jpa:ReceiverRetryQueueItem?usePersist=true" />
 
                 <log message="Successfully saved retry item" loggingLevel="DEBUG" />
-                <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to retry queue" />
+                <!--<log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to retry queue" />
 
-                <!--<script>
+                <script>
                     <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
                 </script>-->
             </when>

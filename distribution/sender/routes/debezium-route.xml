@@ -8,7 +8,7 @@
             <method beanType="org.openmrs.eip.app.CustomFileOffsetBackingStore" method="isDisabled()" />
         </setProperty>
 
-        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+        <log message="Received DB event: Operation=${headers.CamelDebeziumOperation}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
 
         <choice>
             <when>
@@ -64,10 +64,10 @@
 
                         <to uri="jpa:DebeziumEvent?usePersist=true" />
 
-                        <log message="Debezium event saved to event queue" loggingLevel="INFO" />
+                        <log message="Debezium event saved to event queue" />
                     </when>
                     <otherwise>
-                        <log message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Body=${body}, Metadata=${headers.CamelDebeziumSourceMetadata}" loggingLevel="ERROR" />
+                        <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
                     </otherwise>
                 </choice>
             </when>

@@ -8,8 +8,7 @@
         
         <!-- TODO Send a notification to the configured emails -->
 
-        <log loggingLevel="ERROR" message="Error with message: ${body}" />
-        <log loggingLevel="ERROR" message="Cause: ${exception.message}" />
+        <log loggingLevel="ERROR" message="An error occurred, cause: ${exception.message}" />
         <log message="Shutting down the application..." />
 
         <script>

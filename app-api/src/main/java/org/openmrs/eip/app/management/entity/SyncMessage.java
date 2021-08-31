@@ -103,8 +103,8 @@ public class SyncMessage extends AbstractEntity {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName + ", site="
-		        + site + "}";
+		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
+		        + modelClassName + ", site=" + site + "}";
 	}
 	
 }

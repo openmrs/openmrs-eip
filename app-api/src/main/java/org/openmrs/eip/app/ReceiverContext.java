@@ -1,5 +1,6 @@
 package org.openmrs.eip.app;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,16 +20,11 @@ public final class ReceiverContext {
 	
 	private static Map<String, SiteInfo> siteNameAndInfoMap = null;
 	
-	/**
-	 * Gets {@link SiteInfo} that matches the specified identifier
-	 * 
-	 * @return {@link SiteInfo} object
-	 */
-	public static SiteInfo getSiteInfo(String identifier) {
+	private static Map<String, SiteInfo> getSiteNameAndInfoMap() {
 		if (siteNameAndInfoMap == null) {
 			synchronized (ReceiverContext.class) {
 				if (siteNameAndInfoMap == null) {
-					log.info("Loading SiteInfo...");
+					log.info("Loading sites...");
 					
 					ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 					String siteClass = SiteInfo.class.getSimpleName();
@@ -37,16 +33,34 @@ public final class ReceiverContext {
 					siteNameAndInfoMap = new ConcurrentHashMap(sites.size());
 					sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
 					
-					if (log.isTraceEnabled()) {
-						log.trace("Loaded sites: " + sites);
+					if (log.isDebugEnabled()) {
+						log.debug("Loaded sites: " + sites);
 					}
 					
-					log.info("Successfully loaded SiteInfo");
+					log.info("Successfully loaded " + sites.size() + " site(s)");
 				}
 			}
 		}
 		
-		return siteNameAndInfoMap.get(identifier.toLowerCase());
+		return siteNameAndInfoMap;
+	}
+	
+	/**
+	 * Gets {@link SiteInfo} that matches the specified identifier
+	 * 
+	 * @return {@link SiteInfo} object
+	 */
+	public static SiteInfo getSiteInfo(String identifier) {
+		return getSiteNameAndInfoMap().get(identifier.toLowerCase());
+	}
+	
+	/**
+	 * Gets all sites
+	 * 
+	 * @return a collection of {@link SiteInfo} objects
+	 */
+	public static Collection<SiteInfo> getSites() {
+		return getSiteNameAndInfoMap().values();
 	}
 	
 }

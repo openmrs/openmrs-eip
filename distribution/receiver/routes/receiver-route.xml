@@ -36,7 +36,7 @@
                 </setBody>
 
                 <!-- Complex Obs can be too large to store in the DB, for now process in serial -->
-                <!-- TODO Find a smart way to store them so they can processed in parallel -->
+                <!-- TODO Find a smart way to store them so they can also be processed in parallel -->
                 <to uri="seda:update-site-last-sync-date" />
 
                 <to uri="direct:inbound-complex-obs-sync" />
@@ -50,15 +50,6 @@
             <otherwise>
                 <log loggingLevel="DEBUG" message="Received entity-payload: ${body}" />
 
-                <setProperty name="entity-payload">
-                    <simple>${body}</simple>
-                </setProperty>
-                <setProperty name="model-class">
-                    <jsonpath>$.tableToSyncModelClass</jsonpath>
-                </setProperty>
-                <setProperty name="entity-id">
-                    <jsonpath>$.model.uuid</jsonpath>
-                </setProperty>
                 <setBody>
                     <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body})" />
                 </setBody>
@@ -94,7 +85,9 @@
 
                 <to uri="jpa:SyncMessage?usePersist=true" />
 
-                <log loggingLevel="DEBUG" message="Successfully saved received message, enabling message acknowledgement" />
+                <log message="Successfully saved received message" />
+
+                <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
 
                 <script>
                     <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />

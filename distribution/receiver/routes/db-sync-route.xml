@@ -2,7 +2,7 @@
     <route id="inbound-db-sync" errorHandlerRef="inBoundErrorHandler">
         <from uri="direct:inbound-db-sync" />
 
-        <log message="Start inbound db-sync: ${body}" />
+        <log loggingLevel="DEBUG" message="Start: ${routeId}" />
 
         <setProperty name="original-msg-body">
             <simple>${body}</simple>
@@ -122,9 +122,9 @@
 
                     <when>
                         <simple>${exchangeProperty.retry-item} == null</simple>
-                        <log loggingLevel="DEBUG" message="Enabling message acknowledgement after syncing new message successfully" />
+                        <!--<log loggingLevel="DEBUG" message="Enabling message acknowledgement after syncing new message successfully" />
 
-                        <!--<script>
+                        <script>
                             <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
                         </script>-->
                     </when>
@@ -175,9 +175,9 @@
 
                         <when>
                             <simple>${exchangeProperty.retry-item} == null</simple>
-                            <log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to conflict queue" />
+                            <!--<log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to conflict queue" />
 
-                            <!--<script>
+                            <script>
                                 <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
                             </script>-->
                         </when>
@@ -186,6 +186,6 @@
             </otherwise>
         </choice>
 
-        <log message="End inbound db-sync" />
+        <log loggingLevel="DEBUG" message="End: ${routeId}" />
     </route>
 </routes>
