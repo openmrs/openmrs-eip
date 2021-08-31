@@ -24,6 +24,8 @@ public class DebeziumMessageProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) {
+		logger.info("Received debezium event");
+		
 		Message message = exchange.getMessage();
 		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
 		if (!"c".equals(op) && !"u".equals(op) && !"d".equals(op)) {
@@ -43,7 +45,7 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		exchange.setProperty(WatcherConstants.PROP_EVENT, event);
 		
-		logger.info("Received from debezium: " + event + ", Source Metadata: " + sourceMetadata);
+		logger.info("Event details: " + event + ", Source Metadata: " + sourceMetadata);
 		
 		if (message.getBody() != null) {
 			Map<String, Object> currentState = new HashMap();

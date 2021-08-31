@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.apache.camel.LoggingLevel.DEBUG;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DBZM_MSG_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.ID_SETTING_PROCESSOR;
@@ -28,12 +29,27 @@ public class DebeziumRoute extends RouteBuilder {
 		
 		RouteDefinition routeDef = from(
 		    "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode={{debezium.snapshotMode}}&snapshotFetchSize=1000&snapshotLockingMode=extended&includeSchemaChanges=false&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage=org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore&offsetCommitTimeoutMs=15000")
-		            .routeId(DEBEZIUM_ROUTE_ID).process(DBZM_MSG_PROCESSOR).process(ID_SETTING_PROCESSOR)
-		            .to("direct:debezium-event-listener");
+		            .routeId(DEBEZIUM_ROUTE_ID);
 		
-		logger.info("Setting debezium route handler to: " + WatcherConstants.ERROR_HANDLER_REF);
+		logger.info("Setting debezium route handler to: " + WatcherConstants.SHUTDOWN_HANDLER_REF);
 		
-		routeDef.setErrorHandlerRef(WatcherConstants.ERROR_HANDLER_REF);
+		routeDef.setErrorHandlerRef(WatcherConstants.SHUTDOWN_HANDLER_REF);
+		
+		routeDef.choice()
+		        
+		        .when(exchange -> !CustomFileOffsetBackingStore.isDisabled())
+		        
+		        .process(DBZM_MSG_PROCESSOR)
+		        
+		        .process(ID_SETTING_PROCESSOR)
+		        
+		        .to("direct:debezium-event-listener")
+		        
+		        .otherwise()
+		        
+		        .log(DEBUG, "Deferring DB event because an error was encountered while processing a previous one")
+		        
+		        .end();
 	}
 	
 }
