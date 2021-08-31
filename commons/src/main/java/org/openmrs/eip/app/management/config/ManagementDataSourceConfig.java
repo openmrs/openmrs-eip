@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.management.config;
 
-import java.sql.Driver;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,13 +12,13 @@ import org.openmrs.eip.Constants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -50,12 +49,7 @@ public class ManagementDataSourceConfig {
 	@Bean(name = Constants.MGT_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
 	public DataSource dataSource() throws ClassNotFoundException {
-		SimpleDriverDataSource sdd = new SimpleDriverDataSource();
-		sdd.setDriverClass((Class<Driver>) Class.forName(driverClassName));
-		sdd.setUrl(url);
-		sdd.setUsername(username);
-		sdd.setPassword(password);
-		return sdd;
+		return DataSourceBuilder.create().build();
 	}
 	
 	@Bean(name = "mngtEntityManager")
