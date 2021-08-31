@@ -13,7 +13,7 @@
                 #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.mysql.watcher.Event())}
                 #{getProperty('debeziumEvent').event.setPrimaryKeyId(request.headers.CamelDebeziumKey.get(request.headers.CamelDebeziumKey.schema().fields().get(0)))}
                 #{getProperty('debeziumEvent').event.setTableName(request.headers.CamelDebeziumSourceMetadata.get('table'))}
-                
+                #{getProperty('debeziumEvent').event.setOperation(request.headers.CamelDebeziumOperation)}
                 #{getProperty('debeziumEvent').event.setSnapshot(request.headers.CamelDebeziumSourceMetadata.get('snapshot') != 'false')}
                 #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
             </spel>
