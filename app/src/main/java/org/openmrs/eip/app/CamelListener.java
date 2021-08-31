@@ -39,7 +39,7 @@ public class CamelListener extends EventNotifierSupport {
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteSyncMessageProcessor(site, producerTemplate));
+				executor.execute(new SiteMessageProcessor(site, producerTemplate));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);

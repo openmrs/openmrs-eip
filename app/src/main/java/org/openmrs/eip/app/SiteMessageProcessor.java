@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 /**
  * An instance of this class processes sync messages for a single site
  */
-public class SiteSyncMessageProcessor implements Runnable {
+public class SiteMessageProcessor implements Runnable {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SiteSyncMessageProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(SiteMessageProcessor.class);
 	
 	private static final String PARAM_SITE = "site";
 	
@@ -34,7 +34,7 @@ public class SiteSyncMessageProcessor implements Runnable {
 	 * @param site sync messages from this site will be processed by this instance
 	 * @param producerTemplate {@link ProducerTemplate} object
 	 */
-	public SiteSyncMessageProcessor(SiteInfo site, ProducerTemplate producerTemplate) {
+	public SiteMessageProcessor(SiteInfo site, ProducerTemplate producerTemplate) {
 		this.site = site;
 		this.producerTemplate = producerTemplate;
 	}
