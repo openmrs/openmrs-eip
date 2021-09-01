@@ -68,9 +68,11 @@
                     <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
                 </when>
                 
-                <log message="Pushing entity to sync destination: {{camel.output.endpoint}}" />
+                <log message="Sending entity to sync destination: {{camel.output.endpoint}}" />
 
                 <toD uri="{{camel.output.endpoint}}" />
+
+                <log message="Entity sent!" />
             </when>
             <otherwise>
                 <!-- TODO Log to a special failures log file or DB -->

@@ -79,8 +79,7 @@
 
             <toD uri="direct:${exchangeProperty.db-event-dest}" />
 
-            <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because the splitter in
-                the retry-route doesn't work properly with a NoErrorHandler -->
+            <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because inside a split exceptions are swallowed  -->
             <when>
                 <simple>${exchangeProperty.retry-item-id} != null</simple>
                 <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
@@ -96,7 +95,7 @@
 
                 <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
 
-                <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+                <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
             </when>
         </split>
 

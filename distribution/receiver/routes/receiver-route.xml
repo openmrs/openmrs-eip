@@ -1,6 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="receiver-main" errorHandlerRef="shutdownErrorHandler">
         <from uri="{{camel.input.endpoint}}" />
+        
+        <log message="Received sync message" />
 
         <when>
             <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
@@ -50,6 +52,15 @@
             <otherwise>
                 <log loggingLevel="DEBUG" message="Received entity-payload: ${body}" />
 
+                <setProperty name="entity-payload">
+                    <simple>${body}</simple>
+                </setProperty>
+                <setProperty name="model-class">
+                    <jsonpath>$.tableToSyncModelClass</jsonpath>
+                </setProperty>
+                <setProperty name="entity-id">
+                    <jsonpath>$.model.uuid</jsonpath>
+                </setProperty>
                 <setBody>
                     <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body})" />
                 </setBody>

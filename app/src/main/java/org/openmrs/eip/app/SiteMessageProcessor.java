@@ -21,10 +21,11 @@ public class SiteMessageProcessor implements Runnable {
 	
 	private static final String PARAM_SITE = "site";
 	
+	private static final String ENTITY = SyncMessage.class.getSimpleName();
+	
 	//Order by dateCreated may be just in case the DB is migrated and id change
-	private static final String GET_JPA_URI = "jpa:" + SyncMessage.class.getSimpleName() + "?query=SELECT m FROM "
-	        + SyncMessage.class.getSimpleName() + " m WHERE m.site = :" + PARAM_SITE + " ORDER BY id ASC &maximumResults="
-	        + MAX_COUNT;
+	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
+	        + PARAM_SITE + " ORDER BY id ASC &maximumResults=" + MAX_COUNT;
 	
 	private SiteInfo site;
 	
@@ -43,6 +44,7 @@ public class SiteMessageProcessor implements Runnable {
 	public void run() {
 		
 		do {
+			Thread.currentThread().setName(site.getIdentifier());
 			if (log.isDebugEnabled()) {
 				log.debug("Fetching next batch of messages to sync for site: " + site);
 			}
@@ -52,9 +54,18 @@ public class SiteMessageProcessor implements Runnable {
 				    JpaConstants.JPA_PARAMETERS_HEADER, singletonMap(PARAM_SITE, site), List.class);
 				
 				if (syncMessages.isEmpty()) {
-					log.info("No sync message found from site: " + site);
+					if (log.isDebugEnabled()) {
+						log.debug("No sync message found from site: " + site);
+					}
+					
 					//TODO Make the delay configurable
-					Thread.sleep(15000);
+					try {
+						Thread.sleep(15000);
+					}
+					catch (InterruptedException e) {
+						//ignore
+					}
+					
 					continue;
 				}
 				
@@ -66,6 +77,16 @@ public class SiteMessageProcessor implements Runnable {
 					
 					try {
 						producerTemplate.sendBody("direct:message-processor", msg);
+						
+						if (log.isDebugEnabled()) {
+							log.debug("Removing sync message from the queue");
+						}
+
+						//TODO test if message is deleted when an error if encountered in error handler
+						producerTemplate.sendBody(
+						    "jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
+						
+						log.info("Successfully removed the sync message from the queue");
 					}
 					catch (Throwable t) {
 						//TODO Gracefully stop this, all other threads, and the application

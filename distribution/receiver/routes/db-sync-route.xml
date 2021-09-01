@@ -120,15 +120,6 @@
                         </when>
                     </choice>
 
-                    <when>
-                        <simple>${exchangeProperty.retry-item} == null</simple>
-                        <!--<log loggingLevel="DEBUG" message="Enabling message acknowledgement after syncing new message successfully" />
-
-                        <script>
-                            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
-                        </script>-->
-                    </when>
-
                     <doCatch>
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
                         <setProperty name="conflict-item">
@@ -136,6 +127,8 @@
                                 #{new org.openmrs.eip.app.management.entity.ConflictQueueItem()}
                             </spel>
                         </setProperty>
+
+                        <log message="Adding message to conflict queue" />
 
                         <choice>
                             <when>
@@ -167,20 +160,11 @@
                             <simple>${exchangeProperty.conflict-item}</simple>
                         </setBody>
 
-                        <log message="Adding message to conflict queue" loggingLevel="DEBUG" />
+                        <log message="Saving conflict item" loggingLevel="DEBUG" />
 
                         <to uri="jpa:ConflictQueueItem" />
 
-                        <log message="Successfully added message to conflict queue" loggingLevel="DEBUG" />
-
-                        <when>
-                            <simple>${exchangeProperty.retry-item} == null</simple>
-                            <!--<log loggingLevel="DEBUG" message="Enabling message acknowledgement after saving message to conflict queue" />
-
-                            <script>
-                                <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="removeFromSyncMessageQueue()" />
-                            </script>-->
-                        </when>
+                        <log message="Successfully saved conflict item" loggingLevel="DEBUG" />
                     </doCatch>
                 </doTry>
             </otherwise>
