@@ -118,6 +118,16 @@
                         </split>
                     </otherwise>
                 </choice>
+
+                <!-- This should possibly be in debezium-event-reader route after we can support multiple destinations-->
+                <when>
+                    <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                    <log loggingLevel="DEBUG" message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+
+                    <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+
+                    <log loggingLevel="DEBUG" message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+                </when>
             </when>
             <otherwise>
                 <!-- This is a failure when re-processing a previously failed event -->

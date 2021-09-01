@@ -53,6 +53,16 @@
 
                 <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
             </when>
+
+            <!-- This should possibly be in debezium-event-reader route after we can support multiple destinations-->
+            <when>
+                <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                <log loggingLevel="DEBUG" message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+
+                <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+
+                <log loggingLevel="DEBUG" message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+            </when>
         </split>
 
         <log message="Done processing db event" loggingLevel="DEBUG" />
