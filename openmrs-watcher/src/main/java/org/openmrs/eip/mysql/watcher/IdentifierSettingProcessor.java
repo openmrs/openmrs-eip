@@ -43,11 +43,11 @@ public class IdentifierSettingProcessor implements Processor {
 			return;
 		}
 		
-		//TODO For retry items previous and current state are null
-		Object uuid;
-		if ("d".equals(event.getOperation())) {
+		//TODO For subclass events and retry items previous and current state are null
+		Object uuid = null;
+		if ("d".equals(event.getOperation()) && event.getPreviousState() != null) {
 			uuid = event.getPreviousState().get(WatcherConstants.FIELD_UUID);
-		} else {
+		} else if (event.getCurrentState() != null) {
 			uuid = event.getCurrentState().get(WatcherConstants.FIELD_UUID);
 		}
 		
