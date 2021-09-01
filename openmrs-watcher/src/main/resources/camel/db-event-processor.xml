@@ -54,7 +54,9 @@
                 <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
             </when>
 
-            <!-- This should possibly be in debezium-event-reader route after we can support multiple destinations-->
+            <!-- This should possibly be in debezium-event-reader route after we can support multiple destinations
+                after https://issues.openmrs.org/browse/EIP-42 is addressed
+            -->
             <when>
                 <simple>${exchangeProperty.dbzmEvent} != null</simple>
                 <log loggingLevel="DEBUG" message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
