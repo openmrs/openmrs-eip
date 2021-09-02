@@ -31,7 +31,7 @@ public class CamelListener extends EventNotifierSupport {
 	public void notify(CamelEvent event) {
 		
 		if (event instanceof CamelContextStartedEvent) {
-			log.info("Starting sync message processor threads, one per site");
+			log.info("Starting sync message consumer threads, one per site");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
 			executor = Executors.newFixedThreadPool(sites.size());
@@ -39,7 +39,7 @@ public class CamelListener extends EventNotifierSupport {
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteMessageProcessor(site, producerTemplate));
+				executor.execute(new SiteMessageConsumer(site, producerTemplate));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);

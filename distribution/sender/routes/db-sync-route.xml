@@ -27,6 +27,8 @@
 
                 <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
 
+                <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
+
                 <choice>
                     <when>
                         <simple>${body.size()} == 1</simple>
@@ -56,8 +58,6 @@
                 <setBody>
                     <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
                 </setBody>
-
-                <log message="Sync data -> ${body}" />
 
                 <when>
                     <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>

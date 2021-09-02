@@ -13,11 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An instance of this class processes sync messages for a single site
+ * An instance of this class consumers sync messages for a single site and forwards them to the
+ * message processor route
  */
-public class SiteMessageProcessor implements Runnable {
+public class SiteMessageConsumer implements Runnable {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SiteMessageProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(SiteMessageConsumer.class);
 	
 	private static final String PARAM_SITE = "site";
 	
@@ -35,7 +36,7 @@ public class SiteMessageProcessor implements Runnable {
 	 * @param site sync messages from this site will be processed by this instance
 	 * @param producerTemplate {@link ProducerTemplate} object
 	 */
-	public SiteMessageProcessor(SiteInfo site, ProducerTemplate producerTemplate) {
+	public SiteMessageConsumer(SiteInfo site, ProducerTemplate producerTemplate) {
 		this.site = site;
 		this.producerTemplate = producerTemplate;
 	}
@@ -81,7 +82,7 @@ public class SiteMessageProcessor implements Runnable {
 						if (log.isDebugEnabled()) {
 							log.debug("Removing sync message from the queue");
 						}
-
+						
 						//TODO test if message is deleted when an error if encountered in error handler
 						producerTemplate.sendBody(
 						    "jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
