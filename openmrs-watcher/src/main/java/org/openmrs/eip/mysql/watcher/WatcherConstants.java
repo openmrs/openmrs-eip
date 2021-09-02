@@ -12,7 +12,7 @@ public class WatcherConstants {
 	
 	public static final String DEBEZIUM_ROUTE_ID = "debezium-route";
 	
-	public static final String SHUTDOWN_HANDLER_REF = "shutdownErrorHandler";
+	public static final String SHUTDOWN_HANDLER_REF = "watcherShutdownErrorHandler";
 	
 	public static final String ERROR_HANDLER_REF = "watcherErrorHandler";
 	

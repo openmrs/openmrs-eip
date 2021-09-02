@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="watcher-shutdown-route">
-        <from uri="direct:watcher-shutdown-route" />
+    <route id="watcher-shutdown">
+        <from uri="direct:watcher-shutdown" />
 
         <script>
             <method beanType="org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore" method="disable()" />

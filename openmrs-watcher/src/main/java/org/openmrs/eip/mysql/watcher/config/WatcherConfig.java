@@ -40,6 +40,13 @@ public class WatcherConfig {
 		return builder;
 	}
 	
+	@Bean(WatcherConstants.SHUTDOWN_HANDLER_REF)
+	public DeadLetterChannelBuilder watcherShutdownErrorHandler() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:watcher-shutdown");
+		builder.setUseOriginalMessage(true);
+		return builder;
+	}
+	
 	@Bean("jpaIdempotentRepository")
 	public JpaMessageIdRepository getJpaIdempotentRepository(@Qualifier("mngtEntityManager") EntityManagerFactory emf) {
 		return new JpaMessageIdRepository(emf, "complexObsProcessor");

@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="debezium-event-listener" errorHandlerRef="shutdownErrorHandler">
+    <route id="debezium-event-listener" errorHandlerRef="watcherShutdownErrorHandler">
         <from uri="direct:debezium-event-listener" />
         
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />
