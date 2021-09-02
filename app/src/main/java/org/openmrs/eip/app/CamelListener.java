@@ -47,8 +47,8 @@ public class CamelListener extends EventNotifierSupport {
 			});
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
-			log.info("Shutting down sync message consumers");
-			executor.shutdownNow();
+			ReceiverContext.setStopSignal();
+			//executor.shutdownNow();
 		}
 		
 	}

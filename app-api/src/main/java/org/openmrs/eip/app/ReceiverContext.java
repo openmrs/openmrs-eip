@@ -20,6 +20,8 @@ public final class ReceiverContext {
 	
 	private static Map<String, SiteInfo> siteNameAndInfoMap = null;
 	
+	private static boolean isStopping = false;
+	
 	private static Map<String, SiteInfo> getSiteNameAndInfoMap() {
 		if (siteNameAndInfoMap == null) {
 			synchronized (ReceiverContext.class) {
@@ -61,6 +63,24 @@ public final class ReceiverContext {
 	 */
 	public static Collection<SiteInfo> getSites() {
 		return getSiteNameAndInfoMap().values();
+	}
+	
+	/**
+	 * Turn on a flag which is monitored by sync message consumers to allow them to gracefully stop
+	 * message consumption and processing before the application comes to a stop.
+	 */
+	public static void setStopSignal() {
+		isStopping = true;
+		log.info("Received application stop signal");
+	}
+	
+	/**
+	 * Checks if the application stop signal has been received
+	 * 
+	 * @return true if the application is stopping otherwise false
+	 */
+	public static boolean isStopSignalReceived() {
+		return isStopping;
 	}
 	
 }

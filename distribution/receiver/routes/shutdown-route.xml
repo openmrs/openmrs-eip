@@ -4,11 +4,20 @@
 
         <!-- TODO Send a notification to the configured emails -->
 
-        <log loggingLevel="ERROR" message="An error occurred, cause: ${exception.message}" />
-        <log message="Shutting down the application..." />
+        <choice>
+            <when>
+                <method beanType="org.openmrs.eip.app.ReceiverContext" method="isStopSignalReceived()" />
+                <log message="The application is already shutting down" />
+            </when>
+            <otherwise>
+                <log loggingLevel="ERROR" message="An error occurred, cause: ${exception.message}" />
+                <log message="Shutting down the application..." />
 
-        <script>
-            <method beanType="org.openmrs.eip.app.SyncApplication" method="shutdown()" />
-        </script>
+                <script>
+                    <method beanType="org.openmrs.eip.app.SyncApplication" method="shutdown()" />
+                </script>
+            </otherwise>
+        </choice>
+
     </route>
 </routes>

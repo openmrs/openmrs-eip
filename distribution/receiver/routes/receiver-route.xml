@@ -68,6 +68,8 @@
                     <simple>${body}</simple>
                 </setProperty>
 
+                <log message="Entity: ${exchangeProperty.model-class}, identifier=${exchangeProperty.entity-id}" />
+
                 <log loggingLevel="DEBUG" message="Queuing update of last sync date for sending site" />
 
                 <to uri="seda:update-site-last-sync-date" />

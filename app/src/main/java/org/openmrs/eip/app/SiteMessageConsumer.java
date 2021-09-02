@@ -33,7 +33,7 @@ public class SiteMessageConsumer implements Runnable {
 	private ProducerTemplate producerTemplate;
 	
 	/**
-	 * @param site sync messages from this site will be processed by this instance
+	 * @param site sync messages from this site will be consumed by this instance
 	 * @param producerTemplate {@link ProducerTemplate} object
 	 */
 	public SiteMessageConsumer(SiteInfo site, ProducerTemplate producerTemplate) {
@@ -65,16 +65,25 @@ public class SiteMessageConsumer implements Runnable {
 					}
 					catch (InterruptedException e) {
 						//ignore
+						log.info("Sync message consumer for site: " + site + " has been interrupted");
 					}
 					
 					continue;
 				}
 				
-				log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
+				log.info("Consuming " + syncMessages.size() + " message(s) from site: " + site);
 				
 				for (SyncMessage msg : syncMessages) {
+					if (ReceiverContext.isStopSignalReceived()) {
+						log.info("Sync message consumer for site: " + site + " has detected a stop signal");
+						break;
+					}
+					
+					//TODO Use simple classname
 					Thread.currentThread().setName(site.getIdentifier() + "-" + msg.getModelClassName() + "-"
 					        + msg.getIdentifier() + "-" + msg.getId());
+
+                    log.info("Submitting sync message to the processor");
 					
 					try {
 						producerTemplate.sendBody("direct:message-processor", msg);
@@ -92,16 +101,20 @@ public class SiteMessageConsumer implements Runnable {
 					catch (Throwable t) {
 						//TODO Gracefully stop this, all other threads, and the application
 						//TODO Even better, add a retry mechanism for a number of times before giving up
-						log.error("An error occurred while processing message: " + msg, t);
+						if (!ReceiverContext.isStopSignalReceived()) {
+							log.error("An error occurred while consuming message: " + msg, t);
+						}
 					}
 				}
 			}
 			catch (Throwable t) {
 				//TODO After a certain failure count may be we should shutdown the application
-				log.error("Exception thrown in thread processing messages for site: " + site, t);
+				log.error("Exception thrown in thread consuming messages for site: " + site, t);
 			}
 			
-		} while (true);
+		} while (!ReceiverContext.isStopSignalReceived());
+		
+		log.info("Sync message consumer for site: " + site + " has shutdown");
 		
 	}
 	
