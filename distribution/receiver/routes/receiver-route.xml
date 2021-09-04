@@ -43,11 +43,7 @@
 
                 <to uri="direct:inbound-complex-obs-sync" />
 
-                <log loggingLevel="DEBUG" message="Successfully saved complex obs file: ${headers.CamelFileName}, enabling message acknowledgement" />
-
-                <script>
-                    <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-                </script>
+                <log message="Successfully saved complex obs file: ${headers.CamelFileName}" />
             </when>
             <otherwise>
                 <log loggingLevel="DEBUG" message="Received entity-payload: ${body}" />
@@ -99,13 +95,13 @@
                 <to uri="jpa:SyncMessage?usePersist=true" />
 
                 <log message="Successfully saved received message" />
-
-                <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
-
-                <script>
-                    <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-                </script>
             </otherwise>
         </choice>
+
+        <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
+
+        <script>
+            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+        </script>
     </route>
 </routes>

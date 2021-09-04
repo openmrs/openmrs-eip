@@ -1,9 +1,9 @@
 package org.openmrs.eip.app;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.SiteInfo;
@@ -32,7 +32,7 @@ public final class ReceiverContext {
 					String siteClass = SiteInfo.class.getSimpleName();
 					final String siteUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s";
 					List<SiteInfo> sites = producerTemplate.requestBody(siteUri, null, List.class);
-					siteNameAndInfoMap = new ConcurrentHashMap(sites.size());
+					siteNameAndInfoMap = new HashMap(sites.size());
 					sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
 					
 					if (log.isDebugEnabled()) {

@@ -2,6 +2,7 @@ package org.openmrs.eip.app;
 
 import static java.util.Collections.singletonMap;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
+import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An instance of this class consumers sync messages for a single site and forwards them to the
+ * An instance of this class consumes sync messages for a single site and forwards them to the
  * message processor route
  */
 public class SiteMessageConsumer implements Runnable {
@@ -26,11 +27,13 @@ public class SiteMessageConsumer implements Runnable {
 	
 	//Order by dateCreated may be just in case the DB is migrated and id change
 	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY id ASC &maximumResults=" + MAX_COUNT;
+	        + PARAM_SITE + " ORDER BY m.id ASC &maximumResults=" + MAX_COUNT;
 	
 	private SiteInfo site;
 	
 	private ProducerTemplate producerTemplate;
+	
+	private boolean errorEncountered = false;
 	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
@@ -46,6 +49,7 @@ public class SiteMessageConsumer implements Runnable {
 		
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
+			
 			if (log.isDebugEnabled()) {
 				log.debug("Fetching next batch of messages to sync for site: " + site);
 			}
@@ -61,7 +65,7 @@ public class SiteMessageConsumer implements Runnable {
 					
 					//TODO Make the delay configurable
 					try {
-						Thread.sleep(15000);
+						Thread.sleep(WAIT_IN_SECONDS * 1000);
 					}
 					catch (InterruptedException e) {
 						//ignore
@@ -71,50 +75,50 @@ public class SiteMessageConsumer implements Runnable {
 					continue;
 				}
 				
-				log.info("Consuming " + syncMessages.size() + " message(s) from site: " + site);
+				processMessages(syncMessages);
 				
-				for (SyncMessage msg : syncMessages) {
-					if (ReceiverContext.isStopSignalReceived()) {
-						log.info("Sync message consumer for site: " + site + " has detected a stop signal");
-						break;
-					}
-					
-					//TODO Use simple classname
-					Thread.currentThread().setName(site.getIdentifier() + "-" + msg.getModelClassName() + "-"
-					        + msg.getIdentifier() + "-" + msg.getId());
-
-                    log.info("Submitting sync message to the processor");
-					
-					try {
-						producerTemplate.sendBody("direct:message-processor", msg);
-						
-						if (log.isDebugEnabled()) {
-							log.debug("Removing sync message from the queue");
-						}
-						
-						//TODO test if message is deleted when an error if encountered in error handler
-						producerTemplate.sendBody(
-						    "jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
-						
-						log.info("Successfully removed the sync message from the queue");
-					}
-					catch (Throwable t) {
-						//TODO Gracefully stop this, all other threads, and the application
-						//TODO Even better, add a retry mechanism for a number of times before giving up
-						if (!ReceiverContext.isStopSignalReceived()) {
-							log.error("An error occurred while consuming message: " + msg, t);
-						}
-					}
-				}
 			}
 			catch (Throwable t) {
 				//TODO After a certain failure count may be we should shutdown the application
-				log.error("Exception thrown in thread consuming messages for site: " + site, t);
+				//TODO Even better, add a retry mechanism for a number of times before giving up
+				if (!ReceiverContext.isStopSignalReceived()) {
+					log.error("Stopping message consumer thread for site: " + site + " because an error occurred", t);
+					
+					errorEncountered = true;
+					break;
+				}
 			}
 			
-		} while (!ReceiverContext.isStopSignalReceived());
+		} while (!ReceiverContext.isStopSignalReceived() && !errorEncountered);
 		
-		log.info("Sync message consumer for site: " + site + " has shutdown");
+		log.info("Sync message consumer for site: " + site + " has stopped");
+		
+	}
+	
+	private void processMessages(List<SyncMessage> syncMessages) {
+		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
+		
+		for (SyncMessage msg : syncMessages) {
+			if (ReceiverContext.isStopSignalReceived()) {
+				log.info("Sync message consumer for site: " + site + " has detected a stop signal");
+				break;
+			}
+			
+			Thread.currentThread().setName(site.getIdentifier() + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-"
+			        + msg.getIdentifier() + "-" + msg.getId());
+			
+			log.info("Submitting sync message to the processor");
+			
+			producerTemplate.sendBody("direct:message-processor", msg);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Removing sync message from the queue");
+			}
+			
+			producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
+			
+			log.info("Successfully removed the sync message from the queue");
+		}
 		
 	}
 	
