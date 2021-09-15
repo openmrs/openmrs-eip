@@ -5,12 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.core.env.Environment;
+
 public class Utils {
-	
-	private static final String[] WATCHED_TABLES = new String[] { "PERSON", "PATIENT", "VISIT", "ENCOUNTER", "OBS",
-	        "PERSON_ATTRIBUTE", "PATIENT_PROGRAM", "PATIENT_STATE", "VISIT_ATTRIBUTE", "ENCOUNTER_DIAGNOSIS", "CONDITION",
-	        "PERSON_NAME", "ALLERGY", "PERSON_ADDRESS", "PATIENT_IDENTIFIER", "ORDERS", "DRUG_ORDER", "TEST_ORDER",
-	        "RELATIONSHIP", "ENCOUNTER_PROVIDER", "ORDER_GROUP", "PATIENT_PROGRAM_ATTRIBUTE" };
 	
 	/**
 	 * Gets a list of all watched table names
@@ -18,7 +15,8 @@ public class Utils {
 	 * @return
 	 */
 	public static List<String> getWatchedTables() {
-		return Arrays.asList(WATCHED_TABLES);
+		String watchedTables = WatcherContext.getBean(Environment.class).getProperty(Constants.PROP_WATCHED_TABLES);
+		return Arrays.asList(watchedTables.split(","));
 	}
 	
 	/**

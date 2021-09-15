@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.core.env.Environment;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(WatcherContext.class)
 public class UtilsTest {
 	
 	@Test
@@ -87,6 +95,19 @@ public class UtilsTest {
 		assertEquals(2, tables.size());
 		assertTrue(tables.contains("'" + tableName + "'"));
 		assertTrue(tables.contains("'orders'"));
+	}
+	
+	@Test
+	public void getWatchedTables_shouldReturnTheWatchedTableNames() {
+		PowerMockito.mockStatic(WatcherContext.class);
+		Environment mockEnv = Mockito.mock(Environment.class);
+		Mockito.when(WatcherContext.getBean(Environment.class)).thenReturn(mockEnv);
+		Mockito.when(mockEnv.getProperty(Constants.PROP_WATCHED_TABLES)).thenReturn("person,patient,visit");
+		List<String> watchedTables = Utils.getWatchedTables();
+		assertEquals(3, watchedTables.size());
+		assertTrue(watchedTables.contains("person"));
+		assertTrue(watchedTables.contains("patient"));
+		assertTrue(watchedTables.contains("visit"));
 	}
 	
 }
