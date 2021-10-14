@@ -1,8 +1,5 @@
 package org.openmrs.eip.web.receiver;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.camel.CamelContext;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.component.SyncProfiles;
@@ -30,16 +27,7 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 	 */
 	@Override
 	public Dashboard generate() {
-		final Map<String, Map> tableStatsMap = new ConcurrentHashMap();
-		final Map exceptionCountMap = new ConcurrentHashMap();
-		
-		Dashboard dashboard = new Dashboard();
-		Map<String, Map> errors = new ConcurrentHashMap(2);
-		errors.put("tableStatsMap", tableStatsMap);
-		errors.put("exceptionCountMap", exceptionCountMap);
-		dashboard.add("errors", errors);
-		
-		return dashboard;
+		return null;
 	}
 	
 }
