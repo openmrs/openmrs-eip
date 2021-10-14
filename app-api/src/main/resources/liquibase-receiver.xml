@@ -129,6 +129,43 @@
 
         <addNotNullConstraint tableName="site_info" columnName="site_district" columnDataType="VARCHAR(255)"/>
     </changeSet>
+    
+    <changeSet author="jpboane" id="20211014-1814">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+                <columnExists columnName="site_instance_name" tableName="site_info"/>
+            </not>
+        </preConditions>
+        <comment>Add site_instance_name column to site_info table</comment>
+
+        <addColumn tableName="site_info">
+            <column name="site_instance_name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet author="jpboane" id="20211014-1816">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_instance_name" tableName="site_info" />
+        </preConditions>
+        <comment>Update site_instance_name field on site_info table</comment>
+
+        <update tableName="site_info">
+            <column name="site_instance_name"  valueComputed="name"/>
+            <where>site_instance_name IS NULL</where>
+        </update>
+    </changeSet>
+    
+    <changeSet author="jpboane" id="20211014-1817">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_instance_name" tableName="site_info" />
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM site_info WHERE site_instance_name IS NULL
+            </sqlCheck>
+        </preConditions>
+        <comment>Adding not null constraint to site_info.site_instance_name</comment>
+
+        <addNotNullConstraint tableName="site_info" columnName="site_instance_name" columnDataType="VARCHAR(255)"/>
+    </changeSet>
 
     <changeSet author="wluyima" id="20210202-1055">
         <preConditions onFail="MARK_RAN">
