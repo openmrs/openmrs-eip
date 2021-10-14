@@ -93,7 +93,7 @@
         </createTable>
     </changeSet>
 
- 	 <changeSet author="jpboane" id="20211014-1411">
+ 	<changeSet author="jpboane" id="20211014-1411">
         <preConditions onFail="MARK_RAN">
         	<not>
                 <columnExists columnName="site_district" tableName="site_info"/>
@@ -106,6 +106,30 @@
         </addColumn>
     </changeSet>
     
+    <changeSet author="jpboane" id="20211014-1725">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_district" tableName="site_info" />
+        </preConditions>
+        <comment>Update site_district field on site_info table</comment>
+
+        <update tableName="site_info">
+            <column name="site_district"  value="AKNOWN"/>
+            <where>site_district IS NULL</where>
+        </update>
+    </changeSet>
+    
+    <changeSet author="jpboane" id="20211014-1733">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_district" tableName="site_info" />
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM site_info WHERE site_district IS NULL
+            </sqlCheck>
+        </preConditions>
+        <comment>Adding not null constraint to site_info.site_district</comment>
+
+        <addNotNullConstraint tableName="site_info" columnName="site_district" columnDataType="VARCHAR(255)"/>
+    </changeSet>
+
     <changeSet author="wluyima" id="20210202-1055">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -190,7 +214,7 @@
             <where>cause_message IS NOT NULL</where>
         </update>
     </changeSet>
-
+    
     <changeSet author="wluyima" id="20210601-1411">
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="cause_message" tableName="receiver_retry_queue" />

@@ -16,6 +16,7 @@ public class SiteInfo extends AbstractEntity {
 	@Column(nullable = false, unique = true)
 	private String identifier;
 	
+	@Column(name = "site_district", nullable = false, unique = true)
 	private String siteDistrict;
 	
 	/**
