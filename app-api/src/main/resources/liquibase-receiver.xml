@@ -93,6 +93,19 @@
         </createTable>
     </changeSet>
 
+ 	 <changeSet author="jpboane" id="20211014-1411">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+                <columnExists columnName="site_district" tableName="site_info"/>
+            </not>
+        </preConditions>
+        <comment>Add site_district column to site_info table</comment>
+
+        <addColumn tableName="site_info">
+            <column name="site_district" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
     <changeSet author="wluyima" id="20210202-1055">
         <preConditions onFail="MARK_RAN">
             <not>

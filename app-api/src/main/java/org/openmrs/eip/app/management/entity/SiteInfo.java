@@ -16,6 +16,8 @@ public class SiteInfo extends AbstractEntity {
 	@Column(nullable = false, unique = true)
 	private String identifier;
 	
+	private String siteDistrict;
+	
 	/**
 	 * Gets the name
 	 *
@@ -52,6 +54,14 @@ public class SiteInfo extends AbstractEntity {
 		this.identifier = identifier;
 	}
 	
+	public String getSiteDistrict() {
+		return siteDistrict;
+	}
+
+	public void setSiteDistrict(String siteDistrict) {
+		this.siteDistrict = siteDistrict;
+	}
+
 	@Override
 	public String toString() {
 		return getName();
