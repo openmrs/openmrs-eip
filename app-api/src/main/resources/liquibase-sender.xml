@@ -109,7 +109,7 @@
         </preConditions>
         <comment>Adding not null constraint to sender_retry_queue.exception_type</comment>
 
-        <addNotNullConstraint tableName="sender_retry_queue" columnName="exception_type" />
+       <addNotNullConstraint tableName="sender_retry_queue" columnName="exception_type" columnDataType="VARCHAR(255)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20210601-1406">
