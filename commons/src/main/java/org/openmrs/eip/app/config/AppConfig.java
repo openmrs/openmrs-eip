@@ -14,7 +14,7 @@ import org.springframework.core.env.PropertySource;
 
 @Configuration
 @EnableCaching
-@org.springframework.context.annotation.PropertySource("application-common.properties")
+@org.springframework.context.annotation.PropertySource("classpath:application-common.properties")
 public class AppConfig {
 	
 	/**

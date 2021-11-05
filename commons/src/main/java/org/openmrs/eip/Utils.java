@@ -15,7 +15,7 @@ public class Utils {
 	 * @return
 	 */
 	public static List<String> getWatchedTables() {
-		String watchedTables = WatcherContext.getBean(Environment.class).getProperty(Constants.PROP_WATCHED_TABLES);
+		String watchedTables = AppContext.getBean(Environment.class).getProperty(Constants.PROP_WATCHED_TABLES);
 		return Arrays.asList(watchedTables.split(","));
 	}
 	

@@ -31,7 +31,7 @@ import org.testcontainers.utility.MountableFile;
 @Transactional
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
-	protected static MySQLContainer mysqlContainer = new MySQLContainer<>(parse("mysql:5.6"));
+	protected static MySQLContainer mysqlContainer = new MySQLContainer<>(parse("mysql:5.7.31"));
 	
 	protected static Integer MYSQL_PORT;
 	
