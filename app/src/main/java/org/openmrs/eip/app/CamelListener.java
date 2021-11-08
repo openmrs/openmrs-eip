@@ -52,19 +52,21 @@ public class CamelListener extends EventNotifierSupport {
 			ReceiverContext.setStopSignal();
 			log.info("Shutting down executor for message consumer threads");
 			
-			executor.shutdown();
-			
-			try {
-				int wait = WAIT_IN_SECONDS + 10;
-				log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
+			if (executor != null) {
+				executor.shutdown();
 				
-				executor.awaitTermination(wait, TimeUnit.SECONDS);
-				
-				log.info("The message consumer threads have successfully terminated");
-				log.info("Successfully shutdown executor for message consumer threads");
-			}
-			catch (InterruptedException e) {
-				log.error("An error occurred while waiting for message consumer threads to terminate");
+				try {
+					int wait = WAIT_IN_SECONDS + 10;
+					log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
+					
+					executor.awaitTermination(wait, TimeUnit.SECONDS);
+					
+					log.info("The message consumer threads have successfully terminated, done shutting down the "
+					        + "executor for message consumer threads");
+				}
+				catch (InterruptedException e) {
+					log.error("An error occurred while waiting for message consumer threads to terminate");
+				}
 			}
 		}
 		

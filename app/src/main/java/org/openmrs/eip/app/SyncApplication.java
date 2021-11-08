@@ -13,6 +13,7 @@ import javax.jms.ConnectionFactory;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
@@ -38,6 +39,8 @@ import liquibase.integration.spring.SpringLiquibase;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 public class SyncApplication {
+	
+	private static final long REDELIVERY_DELAY = 300000;
 	
 	private CamelContext camelContext;
 	
@@ -149,6 +152,12 @@ public class SyncApplication {
 		cf.setUserName(env.getProperty("spring.artemis.user"));
 		cf.setPassword(env.getProperty("spring.artemis.password"));
 		cf.setClientID(env.getProperty("activemq.clientId"));
+		
+		RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
+		redeliveryPolicy.setMaximumRedeliveries(RedeliveryPolicy.NO_MAXIMUM_REDELIVERIES);
+		redeliveryPolicy.setInitialRedeliveryDelay(REDELIVERY_DELAY);
+		redeliveryPolicy.setRedeliveryDelay(REDELIVERY_DELAY);
+		cf.setRedeliveryPolicy(redeliveryPolicy);
 		
 		return new CachingConnectionFactory(cf);
 	}
