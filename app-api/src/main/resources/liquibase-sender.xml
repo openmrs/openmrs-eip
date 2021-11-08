@@ -47,7 +47,7 @@
         
     </changeSet>
 
-    <changeSet author="wluyima" id="20210201-1102">
+    <changeSet author="wluyima" id="20210201-1102" dbms="!mysql">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="hibernate_sequence" />
@@ -55,6 +55,23 @@
         </preConditions>
         <comment>Adding hibernate_sequence sequence</comment>
         <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211108-1420" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="hibernate_sequence" />
+            </not>
+        </preConditions>
+        <comment>Adding hibernate_sequence table</comment>
+
+        <createTable tableName="hibernate_sequence">
+            <column name="next_val" type="BIGINT" />
+        </createTable>
+
+        <insert tableName="hibernate_sequence">
+            <column name="next_val" value="1" />
+        </insert>
     </changeSet>
 
     <changeSet author="wluyima" id="20210201-1103">
@@ -104,12 +121,13 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20210614-2203">
+        <validCheckSum>8:acd2f3dc18a6360a5e80450c2f8247a1</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="sender_retry_queue" columnName="exception_type" />
         </preConditions>
         <comment>Adding not null constraint to sender_retry_queue.exception_type</comment>
 
-       <addNotNullConstraint tableName="sender_retry_queue" columnName="exception_type" columnDataType="VARCHAR(255)"/>
+        <addNotNullConstraint tableName="sender_retry_queue" columnName="exception_type" columnDataType="VARCHAR(255)" />
     </changeSet>
 
     <changeSet author="wluyima" id="20210601-1406">

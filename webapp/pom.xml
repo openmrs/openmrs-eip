@@ -52,7 +52,7 @@
 							<arguments>run ${buildCommand}</arguments>
 						</configuration>
 					</execution>
-					<execution>
+					<!--<execution>
 						<id>test-ui</id>
 						<goals>
 							<goal>npm</goal>
@@ -61,7 +61,7 @@
 							<arguments>run ${testScript}</arguments>
 						</configuration>
 						<phase>test</phase>
-					</execution>
+					</execution>-->
 				</executions>
 			</plugin>
 		</plugins>

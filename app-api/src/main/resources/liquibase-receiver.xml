@@ -226,12 +226,13 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20210614-2103">
+        <validCheckSum>8:16f10e37d5d264987862487d8cdd4bde</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="receiver_retry_queue" columnName="exception_type" />
         </preConditions>
         <comment>Adding not null constraint to receiver_retry_queue.exception_type</comment>
 
-        <addNotNullConstraint tableName="receiver_retry_queue" columnName="exception_type" />
+        <addNotNullConstraint tableName="receiver_retry_queue" columnName="exception_type" columnDataType="VARCHAR(255)" />
     </changeSet>
 
     <changeSet author="wluyima" id="20210601-1410">
