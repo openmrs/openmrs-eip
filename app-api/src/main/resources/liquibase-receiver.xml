@@ -320,4 +320,42 @@
                                  referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20211111-1400">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="site_id" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add site_id column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="site_id" type="BIGINT" />
+        </addColumn>
+
+        <addForeignKeyConstraint constraintName="receiver_retry_queue_site_fk"
+                                 baseTableName="receiver_retry_queue"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211111-1401">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="site_id" tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Add site_id column to receiver_conflict_queue table</comment>
+
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="site_id" type="BIGINT" />
+        </addColumn>
+
+        <addForeignKeyConstraint constraintName="receiver_conflict_queue_site_fk"
+                                 baseTableName="receiver_conflict_queue"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id" />
+    </changeSet>
+
 </databaseChangeLog>

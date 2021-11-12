@@ -7,6 +7,7 @@
 		<tr>
 			<th i18n="@@common-entity">Entity</th>
 			<th i18n="@@common-identifier">Identifier</th>
+			<th i18n="@@common-sender-site">Sender Site</th>
 			<th i18n="@@common-dateAdded">Date Added</th>
 			<th i18n="@@common-action">Action</th>
 		</tr>
@@ -15,6 +16,7 @@
 		<tr *ngFor="let c of conflicts" class="ui-row-highlight">
 			<td>{{c.modelClassName | modelClass}}</td>
 			<td>{{c.identifier}}</td>
+			<td>{{c.site?.name}}</td>
 			<td>{{c.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 			<td>
 				<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>

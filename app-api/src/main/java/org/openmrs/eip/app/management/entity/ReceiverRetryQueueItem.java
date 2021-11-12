@@ -2,6 +2,8 @@ package org.openmrs.eip.app.management.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -19,6 +21,10 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
 	private String entityPayload;
+	
+	@ManyToOne
+	@JoinColumn(name = "site_id", updatable = false)
+	private SiteInfo site;
 	
 	/**
 	 * Gets the modelClassName
@@ -74,10 +80,28 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 		this.entityPayload = entityPayload;
 	}
 	
+	/**
+	 * Gets the site
+	 *
+	 * @return the site
+	 */
+	public SiteInfo getSite() {
+		return site;
+	}
+	
+	/**
+	 * Sets the site
+	 *
+	 * @param site the site to set
+	 */
+	public void setSite(SiteInfo site) {
+		this.site = site;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
-		        + ", attemptCount=" + getAttemptCount() + "}";
+		        + ", attemptCount=" + getAttemptCount() + ", site=" + site + "}";
 	}
 	
 }

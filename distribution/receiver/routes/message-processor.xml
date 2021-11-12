@@ -15,6 +15,9 @@
         <setProperty name="entity-id">
             <simple>${body.identifier}</simple>
         </setProperty>
+        <setProperty name="site">
+            <simple>${body.site}</simple>
+        </setProperty>
         <setBody>
             <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body.entityPayload})" />
         </setBody>

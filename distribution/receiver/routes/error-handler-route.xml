@@ -80,6 +80,7 @@
                                 #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                                 #{getProperty('retry-item').setDateCreated(new java.util.Date())}
+                                #{getProperty('retry-item').setSite(getProperty('site'))}
                             </spel>
                         </script>
                         <setBody>

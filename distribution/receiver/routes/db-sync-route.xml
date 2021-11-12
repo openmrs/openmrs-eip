@@ -140,6 +140,7 @@
                                         #{getProperty('conflict-item').setModelClassName(getProperty('model-class'))}
                                         #{getProperty('conflict-item').setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
                                         #{getProperty('conflict-item').setDateCreated(new java.util.Date())}
+                                        #{getProperty('conflict-item').setSite(getProperty('site'))}
                                     </spel>
                                 </script>
                             </when>
@@ -151,6 +152,7 @@
                                         #{getProperty('conflict-item').setModelClassName(getProperty('retry-item').getModelClassName())}
                                         #{getProperty('conflict-item').setEntityPayload(getProperty('retry-item').getEntityPayload())}
                                         #{getProperty('conflict-item').setDateCreated(new java.util.Date())}
+                                        #{getProperty('conflict-item').setSite(getProperty('retry-item').getSite())}
                                     </spel>
                                 </script>
                             </otherwise>

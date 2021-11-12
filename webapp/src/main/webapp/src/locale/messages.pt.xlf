@@ -314,5 +314,11 @@
 				<target>Nao ha eventos pendentes! Tudo parece bem!</target>
 			</segment>
 		</unit>
+		<unit id="common-sender-site">
+			<segment>
+				<source>Sender Site</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
