@@ -122,6 +122,7 @@
 
     <changeSet author="wluyima" id="20210614-2203">
         <validCheckSum>8:acd2f3dc18a6360a5e80450c2f8247a1</validCheckSum>
+        <validCheckSum>8:a5a40b2d833be32179a6da62fbbb9f7c</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="sender_retry_queue" columnName="exception_type" />
         </preConditions>
