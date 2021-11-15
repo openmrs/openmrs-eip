@@ -317,7 +317,7 @@
 		<unit id="common-sender-site">
 			<segment>
 				<source>Sender Site</source>
-				<target></target>
+				<target>Site Origem</target>
 			</segment>
 		</unit>
 	</file>
