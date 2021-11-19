@@ -24,6 +24,10 @@ public class WatcherConstants {
 	
 	public static final String PROP_URI_EVENT_PROCESSOR = "watcher.uri.event.processor";
 	
+	public static final String PROP_DBZM_OFFSET_STORAGE_CLASS = "debezium.offsetStorage";
+	
+	public static final String PROP_DBZM_OFFSET_HISTORY_CLASS = "debezium.databaseHistory";
+	
 	public static final String PROP_URI_ERROR_HANDLER = "watcher.uri.error.handler";
 	
 	public static final String URI_EVENT_PROCESSOR = "direct:db-event-processor";

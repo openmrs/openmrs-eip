@@ -14,6 +14,7 @@ import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
+import org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore;
 import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,8 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
+
+import io.debezium.relational.history.FileDatabaseHistory;
 
 @Configuration
 @ComponentScan("org.openmrs.eip.mysql.watcher")
@@ -69,6 +72,14 @@ public class WatcherConfig {
 		}
 		
 		Map<String, Object> props = new HashMap();
+		if (StringUtils.isBlank(env.getProperty(WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS))) {
+			props.put(WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS, CustomFileOffsetBackingStore.class.getName());
+		}
+		
+		if (StringUtils.isBlank(env.getProperty(WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS))) {
+			props.put(WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS, FileDatabaseHistory.class.getName());
+		}
+		
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
 		props.put(WatcherConstants.PROP_URI_EVENT_PROCESSOR, WatcherConstants.URI_EVENT_PROCESSOR);
 		props.put(PROP_URI_ERROR_HANDLER, WatcherConstants.URI_ERROR_HANDLER);

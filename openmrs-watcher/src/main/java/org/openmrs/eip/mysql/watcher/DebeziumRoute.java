@@ -28,8 +28,10 @@ public class DebeziumRoute extends RouteBuilder {
 		logger.info("Starting debezium...");
 		
 		RouteDefinition routeDef = from(
-		    "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode={{debezium.snapshotMode}}&snapshotFetchSize=1000&snapshotLockingMode={{debezium.snapshotLockingMode}}&includeSchemaChanges=false&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage=org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore&offsetCommitTimeoutMs=15000")
-		            .routeId(DEBEZIUM_ROUTE_ID);
+		    "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode={{debezium.snapshotMode}}&snapshotFetchSize=1000&snapshotLockingMode={{debezium.snapshotLockingMode}}&includeSchemaChanges=false&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage={{"
+		            + WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS + "}}&databaseHistory={{"
+		            + WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS + "}}&offsetCommitTimeoutMs=15000")
+		                    .routeId(DEBEZIUM_ROUTE_ID);
 		
 		logger.info("Setting debezium route handler to: " + WatcherConstants.SHUTDOWN_HANDLER_REF);
 		
