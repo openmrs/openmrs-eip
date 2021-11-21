@@ -44,7 +44,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	protected DataSource openmrsDataSource;
 	
 	@BeforeClass
-	public static void startContainers() {
+	public static void startMysql() {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
 		mysqlContainer.withCopyFileToContainer(MountableFile.forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
