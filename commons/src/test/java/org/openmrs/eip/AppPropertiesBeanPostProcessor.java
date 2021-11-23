@@ -19,7 +19,7 @@ public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if (Constants.COMMON_PROP_SOURCE_BEAN_NAME.equals(beanName)) {
 			MapPropertySource propSource = (MapPropertySource) bean;
-			propSource.getSource().put("openmrs.db.port", BaseDbBackedCamelTest.MYSQL_PORT);
+			propSource.getSource().put("openmrs.db.port", BaseDbBackedCamelTest.mysqlPort);
 			propSource.getSource().put("openmrs.db.host", "localhost");
 			propSource.getSource().put("openmrs.db.name", mysqlContainer.getDatabaseName());
 			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl", mysqlContainer.getJdbcUrl());

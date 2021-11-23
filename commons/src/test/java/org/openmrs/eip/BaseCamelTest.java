@@ -45,10 +45,11 @@ import ch.qos.logback.core.read.ListAppender;
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
 @TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
+@TestPropertySource(properties = "camel.component.direct.block=false")
 @DirtiesContext
 public abstract class BaseCamelTest {
 	
-	private static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
+	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
 	
 	@Autowired
 	protected ApplicationContext applicationContext;
