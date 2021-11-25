@@ -33,7 +33,7 @@ import org.testcontainers.lifecycle.Startables;
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
-	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.6");
+	protected static MySQLContainer mysqlContainer = new MySQLContainer("5.7.31");
 	
 	protected static Integer mysqlPort;
 	
