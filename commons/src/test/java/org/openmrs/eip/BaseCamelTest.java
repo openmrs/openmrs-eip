@@ -46,6 +46,7 @@ import ch.qos.logback.core.read.ListAppender;
         ResetMocksTestExecutionListener.class })
 @TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
 @TestPropertySource(properties = "camel.component.direct.block=false")
+@TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
 @DirtiesContext
 public abstract class BaseCamelTest {
 	

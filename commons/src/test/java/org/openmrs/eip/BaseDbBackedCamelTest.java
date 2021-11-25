@@ -17,8 +17,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.lifecycle.Startables;
 
@@ -26,18 +24,16 @@ import org.testcontainers.lifecycle.Startables;
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
 @Import({ TestDBConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class })
-@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
-        TransactionalTestExecutionListener.class })
+@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")
 @TestPropertySource(properties = "spring.mngt-datasource.jdbcUrl=jdbc:h2:mem:test;DB_CLOSE_DELAY=30;LOCK_TIMEOUT=10000")
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
-@Transactional
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
-	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.7.31");
+	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.6");
 	
 	protected static Integer mysqlPort;
 	
