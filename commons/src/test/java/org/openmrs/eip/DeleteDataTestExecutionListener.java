@@ -39,12 +39,11 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	@Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
 		ApplicationContext ctx = testContext.getApplicationContext();
-		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME,
-		    DataSource.class);
+		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from management DB tables...");
 		try (Connection c = dataSource.getConnection()) {
-			deleteAllData(c);
+			deleteAllData(c, "TEST");
 		}
 		
 		dataSource = ctx.getBean(Constants.OPENMRS_DATASOURCE_NAME, DataSource.class);
@@ -52,7 +51,7 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		log.debug("Deleting all data from OpenMRS DB tables...");
 		
 		try (Connection c = dataSource.getConnection()) {
-			deleteAllData(c);
+			deleteAllData(c, "openmrs");
 		}
 		
 	}
@@ -61,9 +60,10 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	 * Resets all tables in the test database by deleting all the rows in them
 	 *
 	 * @param connection JDBC Connection object
+	 * @param dbName the name of the database containing the tables from which to delete the rows
 	 */
-	private void deleteAllData(Connection connection) throws SQLException {
-		List<String> tables = getTableNames(connection);
+	private void deleteAllData(Connection connection, String dbName) throws SQLException {
+		List<String> tables = getTableNames(connection, dbName);
 		Statement statement = connection.createStatement();
 		try {
 			statement.execute(DISABLE_KEYS);
@@ -79,10 +79,10 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		}
 	}
 	
-	private static List<String> getTableNames(Connection connection) throws SQLException {
+	private static List<String> getTableNames(Connection connection, String dbName) throws SQLException {
 		DatabaseMetaData dbmd = connection.getMetaData();
-		ResultSet tables = dbmd.getTables(null, null, null, new String[] { "TABLE" });
-		List<String> tableNames = new ArrayList<>();
+		ResultSet tables = dbmd.getTables(dbName, null, null, new String[] { "TABLE" });
+		List<String> tableNames = new ArrayList();
 		while (tables.next()) {
 			tableNames.add(tables.getString("TABLE_NAME"));
 		}

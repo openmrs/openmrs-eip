@@ -7,6 +7,7 @@ import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.openmrs.eip.Constants;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
@@ -14,6 +15,7 @@ import org.springframework.core.env.PropertySource;
 
 @Configuration
 @EnableCaching
+@ComponentScan("org.openmrs.eip")
 @org.springframework.context.annotation.PropertySource("classpath:application-common.properties")
 public class AppConfig {
 	

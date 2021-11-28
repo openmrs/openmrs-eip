@@ -23,7 +23,7 @@ import org.testcontainers.lifecycle.Startables;
 /**
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
-@Import({ TestDBConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class })
+@Import({ TestDBConfig.class})
 @TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")

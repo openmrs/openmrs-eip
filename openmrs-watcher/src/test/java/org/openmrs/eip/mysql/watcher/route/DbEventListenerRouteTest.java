@@ -29,6 +29,8 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 @Ignore
 @TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
+@TestPropertySource(properties = "eip.watchedTables=person")
+@TestPropertySource(properties = "db-event.destinations=mock:db-event-processor")
 @TestPropertySource(properties = PROP_URI_EVENT_PROCESSOR + "=" + URI_MOCK_EVENT_PROCESSOR)
 @TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + URI_MOCK_ERROR_HANDLER)
 @Sql(value = "classpath:sender_retry_queue.sql", config = @SqlConfig(dataSource = "mngtDataSource", transactionManager = "mngtTransactionManager"))

@@ -11,7 +11,7 @@ import com.mysql.jdbc.Driver;
 /**
  * Test BeanPostProcessor that injects the OpenMRS datasource properties values after the
  * {@link org.testcontainers.containers.MySQLContainer} has been started and available. This is
- * necessary primarily for setting the MySQL port and the jdbc url with the correct port.
+ * necessary primarily for setting the MySQL port and the jdbc url.
  */
 public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 	
