@@ -23,8 +23,8 @@ The project has the following xml files containing camel route definitions,
   integration with another system.
 
 ### Things to note
-- The main class `ExampleApplication` has the `@SpringBootApplication` annotation with the `scanBasePackages` attribute 
-  value set to `org.openmrs.eip`, this is important for spring to pick up important framework beans.
+- The main class `ExampleApplication` has the `@SpringBootApplication` and an import of `AppConfig` class, this is 
+  important for spring to pick up framework beans and properly build the application context.
 - We set the errorHandlerRef in the example listener route to `watcherErrorHandler`, this automatically enables the 
   built-in [Error Handling And Retry Mechanism](../../README.md#error-handling-and-retry-mechanism)
 - The routes are located on the classpath in a directory named `camel` in order for the framework to find and load them.
@@ -46,7 +46,8 @@ of DB events and do something useful.
     </dependency>
     ```
 3. Add a main class for your spring boot application, you can copy [`ExampleApplication`](../../example-app/src/main/java/org/openmrs/eip/example/ExampleApplication.java) 
-   from the example app, change the route id and make any other additions you deem necessary.
+   from the example app, change the route id and make any other additions you deem necessary. You MUST add an import for the [`AppConfig`](../../commons/src/main/java/org/openmrs/eip/app/config/AppConfig.java) 
+   in order for the spring application to be built properly.
 4. Add a camel route to start the `openmrs-watcher` component, you can copy [`init.xml`](../../example-app/src/main/resources/camel/init.xml)
    from the example app and make any necessary modifications if needed, the uri of the `openmrs-watcher` 
    endpoint is of the form `openmrs-watcher:{NAME}` where {NAME} is a logical name, there is no meaning to it but for 

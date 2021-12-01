@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.config;
+package org.openmrs.eip.config;
 
 import javax.sql.DataSource;
 
