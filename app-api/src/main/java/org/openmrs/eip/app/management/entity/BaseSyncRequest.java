@@ -1,6 +1,10 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
@@ -17,18 +21,24 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 		PENDING, FOUND, NOT_FOUND
 	}
 	
+	@NotNull
+	@Column(name = "model_class_name", nullable = false, updatable = false)
+	private String modelClassName;
+	
+	@NotNull
 	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
-	@Column(name = "table_name", nullable = false, updatable = false)
-	private String tableName;
-	
 	@NotNull
-	@Column(length = 38, nullable = false, unique = true, updatable = false)
+	@Column(nullable = false, unique = true, updatable = false, length = 38)
 	private String uuid;
 	
 	@NotNull
-	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 50)
 	private Resolution resolution;
+	
+	@Column(name = "date_changed")
+	private Date dateChanged;
 	
 }
