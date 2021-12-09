@@ -358,4 +358,41 @@
                                  referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20211208-1400">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_request" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_request table</comment>
+
+        <createTable tableName="receiver_sync_request">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="model_class_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="site_id" type="BIGINT" />
+            <column name="status" type="VARCHAR(50)" />
+            <column name="resolution" type="VARCHAR(50)" />
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="DATETIME" />
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="receiver_sync_request_site_fk"
+                                 baseTableName="receiver_sync_request"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id" />
+    </changeSet>
+
 </databaseChangeLog>

@@ -189,4 +189,34 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20211208-1405">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_request" />
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_request table</comment>
+
+        <createTable tableName="sender_sync_request">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="model_class_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="VARCHAR(50)" />
+            <column name="resolution" type="VARCHAR(50)" />
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="DATETIME" />
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
