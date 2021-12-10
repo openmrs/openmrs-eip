@@ -17,7 +17,7 @@ public abstract class BaseRetryQueueItem extends AbstractEntity {
 	@Column(name = "attempt_count", nullable = false)
 	private Integer attemptCount = 1;
 	
-	@Column(name = "date_Changed")
+	@Column(name = "date_changed")
 	private Date dateChanged;
 	
 	/**
