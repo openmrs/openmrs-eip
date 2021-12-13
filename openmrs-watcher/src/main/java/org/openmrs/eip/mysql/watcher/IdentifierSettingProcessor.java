@@ -77,13 +77,21 @@ public class IdentifierSettingProcessor implements Processor {
 			String query = "SELECT uuid FROM " + refTable + " WHERE " + refColumn + "=" + event.getPrimaryKeyId()
 			        + "?dataSource=" + Constants.OPENMRS_DATASOURCE_NAME;
 			List<Map> rows = DefaultFluentProducerTemplate.on(exchange.getContext()).to("sql:" + query).request(List.class);
-			event.setIdentifier(rows.get(0).get(WatcherConstants.FIELD_UUID).toString());
+			if (!rows.isEmpty()) {
+				event.setIdentifier(rows.get(0).get(WatcherConstants.FIELD_UUID).toString());
+			} else {
+				logger.warn("Failed to find row in parent table: " + refTable);
+			}
 		}
 		
 		//TODO Should we run a select to fetch the uuid from the DB as the final option?
 		
 		if (StringUtils.isBlank(event.getIdentifier())) {
-			throw new EIPException("Failed to determine identifier for the entity associated with the event: " + event);
+			if (isSubclassTable(event.getTableName()) && event.getOperation().equals("d")) {
+				logger.info("Can't determine the identifier for a deleted subclass row with no parent row");
+			} else {
+				throw new EIPException("Failed to determine identifier for the entity associated with the event: " + event);
+			}
 		}
 	}
 	
