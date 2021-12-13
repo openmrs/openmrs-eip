@@ -21,8 +21,8 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	@NotNull
-	@Column(name = "model_class_name", nullable = false, updatable = false)
-	private String modelClassName;
+	@Column(name = "table_name", nullable = false, updatable = false)
+	private String tableName;
 	
 	@NotNull
 	@Column(nullable = false, updatable = false)
@@ -30,7 +30,7 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	
 	@NotNull
 	@Column(nullable = false, unique = true, updatable = false, length = 38)
-	private String uuid;
+	private String requestUuid;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -38,25 +38,30 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	@Access(AccessType.FIELD)
 	private Resolution resolution;
 	
-	@Column(name = "date_changed")
-	private Date dateChanged;
+	@Column(name = "resolution_date")
+	@Access(AccessType.FIELD)
+	private Date resolutionDate;
+	
+	@Column(name = "date_sent")
+	@Access(AccessType.FIELD)
+	private Date dateSent;
 	
 	/**
-	 * Gets the modelClassName
+	 * Gets the tableName
 	 *
-	 * @return the modelClassName
+	 * @return the tableName
 	 */
-	public String getModelClassName() {
-		return modelClassName;
+	public String getTableName() {
+		return tableName;
 	}
 	
 	/**
-	 * Sets the modelClassName
+	 * Sets the tableName
 	 *
-	 * @param modelClassName the modelClassName to set
+	 * @param tableName the tableName to set
 	 */
-	public void setModelClassName(String modelClassName) {
-		this.modelClassName = modelClassName;
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
 	}
 	
 	/**
@@ -78,21 +83,21 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the uuid
+	 * Gets the requestUuid
 	 *
-	 * @return the uuid
+	 * @return the requestUuid
 	 */
-	public String getUuid() {
-		return uuid;
+	public String getRequestUuid() {
+		return requestUuid;
 	}
 	
 	/**
-	 * Sets the uuid
+	 * Sets the requestUuid
 	 *
-	 * @param uuid the uuid to set
+	 * @param requestUuid the requestUuid to set
 	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setRequestUuid(String requestUuid) {
+		this.requestUuid = requestUuid;
 	}
 	
 	/**
@@ -105,31 +110,52 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the dateChanged
+	 * Gets the dateSent
 	 *
-	 * @return the dateChanged
+	 * @return the dateSent
 	 */
-	public Date getDateChanged() {
-		return dateChanged;
+	public Date getDateSent() {
+		return dateSent;
 	}
 	
 	/**
-	 * Sets the dateChanged
+	 * Gets the dateResolved
 	 *
-	 * @param dateChanged the dateChanged to set
+	 * @return the dateResolved
 	 */
-	public void setDateChanged(Date dateChanged) {
-		this.dateChanged = dateChanged;
+	public Date getResolutionDate() {
+		return resolutionDate;
 	}
 	
 	/**
-	 * Sets the resolution to the specified resolution and updates date changed
-	 * 
+	 * Sets the resolution to FOUND and updates resolutionDate
+	 */
+	public void markAsFound() {
+		updateResolution(Resolution.FOUND);
+	}
+	
+	/**
+	 * Sets the resolution to NOT_FOUND and updates resolutionDate
+	 */
+	public void markAsNotFound() {
+		updateResolution(Resolution.NOT_FOUND);
+	}
+	
+	/**
+	 * Sets the dateSent to current date and time
+	 */
+	protected void updateDateSent() {
+		this.dateSent = new Date();
+	}
+	
+	/**
+	 * Sets the resolution to the specified resolution and updates resolutionDate
+	 *
 	 * @param resolution the resolution to set to
 	 */
-	public void updateResolution(Resolution resolution) {
+	private void updateResolution(Resolution resolution) {
 		this.resolution = resolution;
-		setDateChanged(new Date());
+		this.resolutionDate = new Date();
 	}
 	
 }

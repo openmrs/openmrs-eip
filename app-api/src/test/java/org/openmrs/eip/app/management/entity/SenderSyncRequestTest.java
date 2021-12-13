@@ -1,22 +1,23 @@
 package org.openmrs.eip.app.management.entity;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SenderSyncRequest;
 import org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus;
 
 public class SenderSyncRequestTest {
 	
 	@Test
-	public void updateStatus_shouldUpdateTheStatusAndSetDateChanged() {
+	public void markAsSent_shouldSetStatusToSentAndSetDateSent() {
 		SenderSyncRequest request = new SenderSyncRequest();
 		Assert.assertNull(request.getStatus());
-		Assert.assertNull(request.getDateChanged());
+		Assert.assertNull(request.getDateSent());
 		
-		request.updateStatus(SenderRequestStatus.PROCESSED);
+		request.markAsSent();
 		
-		Assert.assertEquals(SenderRequestStatus.PROCESSED, request.getStatus());
-		Assert.assertNotNull(request.getDateChanged());
+		assertEquals(SenderRequestStatus.SENT, request.getStatus());
+		Assert.assertNotNull(request.getDateSent());
 	}
 	
 }

@@ -23,19 +23,14 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	
 	public static final long serialVersionUID = 1;
 	
+	//TODO Support more statuses e.g. PROCESSED, ERROR, PROCESSED_WITH_CONFLICT
 	public enum ReceiverRequestStatus {
 		
 		NEW,
 		
 		SENT,
 		
-		RECEIVED,
-		
-		PROCESSED,
-		
-		ERROR,
-		
-		CONFLICT
+		RECEIVED
 		
 	}
 	
@@ -49,6 +44,10 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
 	private SiteInfo site;
+	
+	@Column(name = "date_received")
+	@Access(AccessType.FIELD)
+	private Date dateReceived;
 	
 	/**
 	 * Gets the status
@@ -78,19 +77,43 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
-	 * Sets the status to the specified status and updates date changed
-	 * 
-	 * @param status the status to set to
+	 * Gets the dateReceived
+	 *
+	 * @return the dateReceived
 	 */
-	public void updateStatus(ReceiverRequestStatus status) {
-		this.status = status;
-		setDateChanged(new Date());
+	public Date getDateReceived() {
+		return dateReceived;
+	}
+	
+	/**
+	 * Marks this request as sent and sets dateSent to current date time
+	 */
+	public void markAsSent() {
+		this.status = ReceiverRequestStatus.SENT;
+		updateDateSent();
+	}
+	
+	/**
+	 * Marks this request as received and sets dateReceived to current date time
+	 */
+	public void markAsReceived() {
+		this.status = ReceiverRequestStatus.RECEIVED;
+		this.dateReceived = new Date();
+	}
+	
+	/**
+	 * Creates and returns a {@link SyncRequestModel} object associated to this receiver request
+	 * 
+	 * @return SyncRequest object
+	 */
+	public SyncRequestModel buildRequest() {
+		return new SyncRequestModel(getTableName(), getIdentifier(), getRequestUuid());
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "{modelClassName=" + getModelClassName() + ", identifier=" + getIdentifier()
-		        + ", status=" + status + ", site=" + getSite() + "}";
+		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + ", status="
+		        + status + ", site=" + getSite() + ", requestUuid=" + getRequestUuid() + ", requestUuid=" + status + "}";
 	}
 	
 }

@@ -1,7 +1,5 @@
 package org.openmrs.eip.app.management.entity;
 
-import java.util.Date;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -21,13 +19,12 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	
 	public static final long serialVersionUID = 1;
 	
+	//TODO Support more statuses e.g. PROCESSING, ERROR
 	public enum SenderRequestStatus {
 		
 		NEW,
 		
-		PROCESSED,
-		
-		ERROR
+		SENT
 		
 	}
 	
@@ -47,18 +44,17 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
-	 * Sets the status to the specified status and updates date changed
-	 *
-	 * @param status the status to set to
+	 * Marks this request as sent and sets dateSent to current date time
 	 */
-	public void updateStatus(SenderRequestStatus status) {
-		this.status = status;
-		setDateChanged(new Date());
+	public void markAsSent() {
+		this.status = SenderRequestStatus.SENT;
+		updateDateSent();
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "{modelClassName=" + getModelClassName() + ", identifier=" + getIdentifier()
-		        + "status=" + status + "}";
+		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + "status="
+		        + status + ", requestUuid=" + getRequestUuid() + ", requestUuid=" + status + "}";
 	}
+	
 }
