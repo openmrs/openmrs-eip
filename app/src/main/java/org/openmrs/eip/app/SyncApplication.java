@@ -145,10 +145,10 @@ public class SyncApplication {
 	}
 	
 	@Bean("activeMqConnFactory")
-	@Profile(SyncProfiles.RECEIVER)
 	public ConnectionFactory getConnectionFactory(Environment env) {
 		ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory();
-		cf.setBrokerURL(env.getProperty("spring.artemis.brokerUrl"));
+		String url = "tcp://" + env.getProperty("spring.artemis.host") + ":" + env.getProperty("spring.artemis.port");
+		cf.setBrokerURL(url);
 		cf.setUserName(env.getProperty("spring.artemis.user"));
 		cf.setPassword(env.getProperty("spring.artemis.password"));
 		cf.setClientID(env.getProperty("activemq.clientId"));

@@ -1,0 +1,60 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="receiver-request-processor" errorHandlerRef="deadLetterChannelBuilder">
+        <!-- TODO Make the delay configurable -->
+        <from uri="scheduler:retry?initialDelay=15000&amp;delay=1800000" />
+
+        <log message="Fetching next 1000 sync requests" loggingLevel="DEBUG" />
+
+        <toD uri="jpa:ReceiverSyncRequest?query=SELECT r FROM ReceiverSyncRequest r WHERE r.status = 'NEW' ORDER BY r.dateCreated ASC, r.id ASC&amp;maximumResults=1000" />
+
+        <choice>
+            <when>
+                <simple>${body.size()} > 0</simple>
+                <log message="Fetched ${body.size()} sync requests" />
+
+                <split parallelProcessing="false">
+                    <simple>${body}</simple>
+                    <setProperty name="syncRequest">
+                        <simple>${body}</simple>
+                    </setProperty>
+
+                    <log message="Preparing sync request -> ${exchangeProperty.syncRequest}" />
+
+                    <!-- Verify that syncRequest.tableName is a synced table -->
+
+                    <setBody>
+                        <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${exchangeProperty.syncRequest.buildModel()})" />
+                    </setBody>
+
+                    <log message="Sending sync request -> ${body}" />
+
+                    <toD uri="activemq:openmrs.sync.request.${exchangeProperty.syncRequest.site.identifier}" />
+
+                    <log message="Request sent! Updating request status to sent" />
+
+                    <script>
+                        <spel>
+                            #{getProperty('syncRequest').markAsSent()}
+                        </spel>
+                    </script>
+                    <setBody>
+                        <simple>${exchangeProperty.syncRequest}</simple>
+                    </setBody>
+
+                    <log message="Saving updates for sync request" loggingLevel="DEBUG" />
+
+                    <to uri="jpa:ReceiverSyncRequest" />
+
+                    <log message="Successfully saved updates for sync request" loggingLevel="DEBUG" />
+
+                    <log message="Successfully sent and updated sync request " />
+                </split>
+            </when>
+            <otherwise>
+                <log message="No sync requests found" loggingLevel="DEBUG" />
+            </otherwise>
+        </choice>
+    </route>
+
+</routes>

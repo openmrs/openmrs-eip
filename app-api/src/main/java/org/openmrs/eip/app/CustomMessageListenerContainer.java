@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
  * 1. A message is successfully synced to the receiver OpenMRS database
  * 2. If a message is saved to the receiver retry queue.
  * 3. If a message is saved to the receiver conflict queue.
+ * 4. If a sync request is saved to the sender_sync_request table
  * </pre>
  */
 public class CustomMessageListenerContainer extends DefaultJmsMessageListenerContainer {
@@ -38,7 +39,7 @@ public class CustomMessageListenerContainer extends DefaultJmsMessageListenerCon
 	protected void messageReceived(Object invoker, Session session) {
 		commit = false;
 		if (log.isDebugEnabled()) {
-			log.debug("DB sync message received, disabled framework message acknowledgement");
+			log.debug("Sync message received, disabled framework message acknowledgement");
 		}
 		
 		super.messageReceived(invoker, session);

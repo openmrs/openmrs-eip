@@ -32,7 +32,7 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
-	private SenderRequestStatus status;
+	private SenderRequestStatus status = SenderRequestStatus.NEW;
 	
 	/**
 	 * Gets the status
