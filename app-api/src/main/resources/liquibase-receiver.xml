@@ -378,7 +378,9 @@
             </column>
             <column name="site_id" type="BIGINT" />
             <column name="status" type="VARCHAR(50)" defaultValue="NEW" />
-            <column name="resolution" type="VARCHAR(50)" defaultValue="PENDING" />
+            <column name="found" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
             <column name="request_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
@@ -387,7 +389,6 @@
             </column>
             <column name="date_received" type="DATETIME" />
             <column name="date_sent" type="DATETIME" />
-            <column name="resolution_date" type="DATETIME" />
         </createTable>
 
         <addForeignKeyConstraint constraintName="receiver_sync_request_site_fk"

@@ -44,17 +44,23 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
-	 * Marks this request as sent and sets dateSent to current date time
+	 * Marks this request as sent, sets dateSent to current date time and updates the request to specify
+	 * if the entity was found or not by the sender in its database
+	 * 
+	 * @param wasFound specifies if the entity was found by the sender in its database
 	 */
-	public void markAsSent() {
+	public void markAsSent(boolean wasFound) {
 		this.status = SenderRequestStatus.SENT;
 		updateDateSent();
+		if (wasFound) {
+			markAsFound();
+		}
 	}
 	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + "status="
-		        + status + ", requestUuid=" + getRequestUuid() + ", requestUuid=" + status + "}";
+		        + status + ", requestUuid=" + getRequestUuid() + "}";
 	}
 	
 }

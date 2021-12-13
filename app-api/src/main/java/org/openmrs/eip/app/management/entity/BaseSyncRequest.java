@@ -5,8 +5,6 @@ import java.util.Date;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
@@ -15,10 +13,6 @@ import javax.validation.constraints.NotNull;
  */
 @MappedSuperclass
 public abstract class BaseSyncRequest extends AbstractEntity {
-	
-	public enum Resolution {
-		PENDING, FOUND, NOT_FOUND
-	}
 	
 	@NotNull
 	@Column(name = "table_name", nullable = false, updatable = false)
@@ -29,18 +23,13 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	private String identifier;
 	
 	@NotNull
-	@Column(nullable = false, unique = true, updatable = false, length = 38)
+	@Column(name = "request_uuid", nullable = false, unique = true, updatable = false, length = 38)
 	private String requestUuid;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 1)
 	@Access(AccessType.FIELD)
-	private Resolution resolution;
-	
-	@Column(name = "resolution_date")
-	@Access(AccessType.FIELD)
-	private Date resolutionDate;
+	private boolean found;
 	
 	@Column(name = "date_sent")
 	@Access(AccessType.FIELD)
@@ -101,12 +90,12 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the resolution
+	 * Gets found
 	 *
-	 * @return the resolution
+	 * @return found
 	 */
-	public Resolution getResolution() {
-		return resolution;
+	public boolean getFound() {
+		return found;
 	}
 	
 	/**
@@ -119,26 +108,10 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the dateResolved
-	 *
-	 * @return the dateResolved
+	 * Sets the found to true
 	 */
-	public Date getResolutionDate() {
-		return resolutionDate;
-	}
-	
-	/**
-	 * Sets the resolution to FOUND and updates resolutionDate
-	 */
-	public void markAsFound() {
-		updateResolution(Resolution.FOUND);
-	}
-	
-	/**
-	 * Sets the resolution to NOT_FOUND and updates resolutionDate
-	 */
-	public void markAsNotFound() {
-		updateResolution(Resolution.NOT_FOUND);
+	protected void markAsFound() {
+		this.found = true;
 	}
 	
 	/**
@@ -146,16 +119,6 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	 */
 	protected void updateDateSent() {
 		this.dateSent = new Date();
-	}
-	
-	/**
-	 * Sets the resolution to the specified resolution and updates resolutionDate
-	 *
-	 * @param resolution the resolution to set to
-	 */
-	private void updateResolution(Resolution resolution) {
-		this.resolution = resolution;
-		this.resolutionDate = new Date();
 	}
 	
 }

@@ -211,12 +211,13 @@
             <column name="request_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="resolution" type="VARCHAR(50)" defaultValue="PENDING" />
+            <column name="found" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
             <column name="date_sent" type="DATETIME" />
-            <column name="resolution_date" type="DATETIME" />
         </createTable>
     </changeSet>
 

@@ -21,19 +21,35 @@ public class ReceiverSyncRequestTest {
 	}
 	
 	@Test
-	public void markAsReceived_shouldSetStatusToReceivedAndSetDateReceived() {
+	public void markAsReceived_shouldSetStatusToReceivedAndSetDateReceivedAndSetFoundToTrue() {
 		ReceiverSyncRequest request = new ReceiverSyncRequest();
 		Assert.assertNull(request.getStatus());
 		Assert.assertNull(request.getDateReceived());
+		Assert.assertFalse(request.getFound());
 		
-		request.markAsReceived();
+		request.markAsReceived(true);
 		
 		assertEquals(ReceiverRequestStatus.RECEIVED, request.getStatus());
 		Assert.assertNotNull(request.getDateReceived());
+		Assert.assertTrue(request.getFound());
 	}
 	
 	@Test
-	public void buildRequest_shouldCreateASyncRequestObjectFromTheReceiverRequest() {
+	public void markAsReceived_shouldSetStatusToReceivedAndSetDateReceivedAndSetFoundToFalse() {
+		ReceiverSyncRequest request = new ReceiverSyncRequest();
+		Assert.assertNull(request.getStatus());
+		Assert.assertNull(request.getDateReceived());
+		Assert.assertFalse(request.getFound());
+		
+		request.markAsReceived(false);
+		
+		assertEquals(ReceiverRequestStatus.RECEIVED, request.getStatus());
+		Assert.assertNotNull(request.getDateReceived());
+		Assert.assertFalse(request.getFound());
+	}
+	
+	@Test
+	public void buildModel_shouldCreateASyncRequestObjectFromTheReceiverRequest() {
 		final String table = "person";
 		final String identifier = "12345";
 		final String requestUuid = "f7f5b2d2abc1952a22274e269c47e992";
@@ -42,7 +58,7 @@ public class ReceiverSyncRequestTest {
 		request.setIdentifier(identifier);
 		request.setRequestUuid(requestUuid);
 		
-		SyncRequestModel model = request.buildRequest();
+		SyncRequestModel model = request.buildModel();
 		
 		assertEquals(table, model.getTableName());
 		assertEquals(identifier, model.getIdentifier());

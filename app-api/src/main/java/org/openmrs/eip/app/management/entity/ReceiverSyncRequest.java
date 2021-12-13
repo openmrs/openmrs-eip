@@ -94,11 +94,17 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
-	 * Marks this request as received and sets dateReceived to current date time
+	 * Marks this request as received, sets dateReceived to current date time and updates the request to
+	 * specify if the entity was found or not by the sender in its database
+	 * 
+	 * @param wasFound specifies if the entity was found by the sender in its database
 	 */
-	public void markAsReceived() {
+	public void markAsReceived(boolean wasFound) {
 		this.status = ReceiverRequestStatus.RECEIVED;
 		this.dateReceived = new Date();
+		if (wasFound) {
+			markAsFound();
+		}
 	}
 	
 	/**
@@ -106,14 +112,14 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	 * 
 	 * @return SyncRequest object
 	 */
-	public SyncRequestModel buildRequest() {
+	public SyncRequestModel buildModel() {
 		return new SyncRequestModel(getTableName(), getIdentifier(), getRequestUuid());
 	}
 	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + ", status="
-		        + status + ", site=" + getSite() + ", requestUuid=" + getRequestUuid() + ", requestUuid=" + status + "}";
+		        + status + ", site=" + getSite() + ", requestUuid=" + getRequestUuid() + "}";
 	}
 	
 }
