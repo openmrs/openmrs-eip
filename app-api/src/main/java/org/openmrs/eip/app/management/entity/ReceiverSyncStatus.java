@@ -2,19 +2,21 @@ package org.openmrs.eip.app.management.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "receiver_sync_status")
-public class ReceiverSyncStatus extends AbstractEntity {
-	
+public class ReceiverSyncStatus extends AbstractEntity {	
 	public static final long serialVersionUID = 1;
 	
-	//TODO This should be mapped as a @OneToOne association when we build a UI
-	@Column(name = "site_info_id", nullable = false, updatable = false, unique = true)
-	private Long siteInfoId;
+	@OneToOne(cascade = CascadeType.ALL, optional = false)
+	@JoinColumn(name = "site_info_id", nullable = false, updatable = false, unique = true)
+	private SiteInfo siteInfo;
 	
 	@Column(name = "last_sync_date", nullable = false)
 	private Date lastSyncDate;
@@ -23,27 +25,17 @@ public class ReceiverSyncStatus extends AbstractEntity {
 		
 	}
 	
-	public ReceiverSyncStatus(Long siteInfoId, Date lastSyncDate) {
-		this.siteInfoId = siteInfoId;
+	public ReceiverSyncStatus(SiteInfo siteInfo, Date lastSyncDate) {
+		this.siteInfo= siteInfo;
 		this.lastSyncDate = lastSyncDate;
 	}
 	
-	/**
-	 * Gets the siteInfoId
-	 *
-	 * @return the siteInfoId
-	 */
-	public Long getSiteInfoId() {
-		return siteInfoId;
+	public SiteInfo getSiteInfo() {
+		return siteInfo;
 	}
 	
-	/**
-	 * Sets the siteInfoId
-	 *
-	 * @param siteInfoId the siteInfoId to set
-	 */
-	public void setSiteInfoId(Long siteInfoId) {
-		this.siteInfoId = siteInfoId;
+	public void setSiteInfo(SiteInfo siteInfo) {
+		this.siteInfo = siteInfo;
 	}
 	
 	/**
@@ -64,8 +56,7 @@ public class ReceiverSyncStatus extends AbstractEntity {
 		this.lastSyncDate = lastSyncDate;
 	}
 	
-	@Override
 	public String toString() {
-		return "ReceiverSyncStatus {siteInfoId=" + siteInfoId + ", lastSyncDate=" + lastSyncDate + "}";
+		return "ReceiverSyncStatus {site=" + this.siteInfo + ", lastSyncDate=" + lastSyncDate + "}";
 	}
 }

@@ -47,14 +47,14 @@ public class SyncStatusProcessor implements Processor {
 			//TODO Find a smart way to minimise the calls so that we don't update the status on every message
 			exchange.setProperty(statusParamsProp, Collections.singletonMap("siteInfoId", siteInfo.getId()));
 			final String statusQuery = "jpa:" + statusClass + " ?query=SELECT s FROM " + statusClass
-			        + " s WHERE s.siteInfoId = " + siteInfo.getId();
+			        + " s WHERE s.siteInfo.id = " + siteInfo.getId();
 			
 			List<ReceiverSyncStatus> statuses = on(exchange.getContext()).to(statusQuery).request(List.class);
 			
 			ReceiverSyncStatus status;
 			final Date date = new Date();
 			if (statuses.size() == 0) {
-				status = new ReceiverSyncStatus(siteInfo.getId(), date);
+				status = new ReceiverSyncStatus(siteInfo, date);
 				status.setDateCreated(date);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Inserting initial sync status for " + siteInfo + " as of " + status.getLastSyncDate());
@@ -76,7 +76,5 @@ public class SyncStatusProcessor implements Processor {
 		catch (Throwable t) {
 			logger.error("Failed to update sync status for: " + siteInfo, t);
 		}
-		
 	}
-	
 }
