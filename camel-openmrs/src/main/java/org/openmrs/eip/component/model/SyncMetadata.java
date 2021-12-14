@@ -14,6 +14,8 @@ public class SyncMetadata {
 	
 	private LocalDateTime dateSent;
 	
+	private String requestUuid;
+	
 	/**
 	 * Gets the sourceIdentifier
 	 *
@@ -68,10 +70,28 @@ public class SyncMetadata {
 		this.dateSent = dateSent;
 	}
 	
+	/**
+	 * Gets the requestUuid
+	 *
+	 * @return the requestUuid
+	 */
+	public String getRequestUuid() {
+		return requestUuid;
+	}
+	
+	/**
+	 * Sets the requestUuid
+	 *
+	 * @param requestUuid the requestUuid to set
+	 */
+	public void setRequestUuid(String requestUuid) {
+		this.requestUuid = requestUuid;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation
-		        + ", dateSent=" + dateSent + "}";
+		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + "}";
 	}
 	
 }

@@ -9,30 +9,30 @@ import org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStat
 public class SenderSyncRequestTest {
 	
 	@Test
-	public void markAsSent_shouldSetStatusToSentAndSetDateSentAndSetFoundToTrue() {
+	public void markAsProcessed_shouldSetStatusToProcessedAndSetDateSentAndSetFoundToTrue() {
 		SenderSyncRequest request = new SenderSyncRequest();
-		Assert.assertNull(request.getStatus());
-		Assert.assertNull(request.getDateSent());
+		Assert.assertEquals(SenderRequestStatus.NEW, request.getStatus());
+		Assert.assertNull(request.getDateProcessed());
 		Assert.assertFalse(request.getFound());
 		
-		request.markAsSent(true);
+		request.markAsProcessed(true);
 		
-		assertEquals(SenderRequestStatus.SENT, request.getStatus());
-		Assert.assertNotNull(request.getDateSent());
+		assertEquals(SenderRequestStatus.PROCESSED, request.getStatus());
+		Assert.assertNotNull(request.getDateProcessed());
 		Assert.assertTrue(request.getFound());
 	}
 	
 	@Test
-	public void markAsSent_shouldSetStatusToSentAndSetDateSentAndSetFoundToFalse() {
+	public void markAsProcessed_shouldSetStatusToProcessedAndSetDateSentAndSetFoundToFalse() {
 		SenderSyncRequest request = new SenderSyncRequest();
-		Assert.assertNull(request.getStatus());
-		Assert.assertNull(request.getDateSent());
+		Assert.assertEquals(SenderRequestStatus.NEW, request.getStatus());
+		Assert.assertNull(request.getDateProcessed());
 		Assert.assertFalse(request.getFound());
 		
-		request.markAsSent(false);
+		request.markAsProcessed(false);
 		
-		assertEquals(SenderRequestStatus.SENT, request.getStatus());
-		Assert.assertNotNull(request.getDateSent());
+		assertEquals(SenderRequestStatus.PROCESSED, request.getStatus());
+		Assert.assertNotNull(request.getDateProcessed());
 		Assert.assertFalse(request.getFound());
 	}
 	

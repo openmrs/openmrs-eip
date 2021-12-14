@@ -217,8 +217,38 @@
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
-            <column name="date_sent" type="DATETIME" />
+            <column name="date_processed" type="DATETIME" />
         </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211214-1600">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="request_uuid" tableName="debezium_event_queue" />
+            </not>
+        </preConditions>
+        <comment>Add request_uuid column to debezium_event_queue table</comment>
+
+        <addColumn tableName="debezium_event_queue">
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints unique="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211214-1601">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="request_uuid" tableName="sender_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add request_uuid column to sender_retry_queue table</comment>
+
+        <addColumn tableName="sender_retry_queue">
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints unique="true" />
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

@@ -1,7 +1,5 @@
 package org.openmrs.eip.app.management.entity;
 
-import java.util.Date;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -30,10 +28,6 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	@Column(nullable = false, length = 1)
 	@Access(AccessType.FIELD)
 	private boolean found;
-	
-	@Column(name = "date_sent")
-	@Access(AccessType.FIELD)
-	private Date dateSent;
 	
 	/**
 	 * Gets the tableName
@@ -99,26 +93,10 @@ public abstract class BaseSyncRequest extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the dateSent
-	 *
-	 * @return the dateSent
-	 */
-	public Date getDateSent() {
-		return dateSent;
-	}
-	
-	/**
 	 * Sets the found to true
 	 */
 	protected void markAsFound() {
 		this.found = true;
-	}
-	
-	/**
-	 * Sets the dateSent to current date and time
-	 */
-	protected void updateDateSent() {
-		this.dateSent = new Date();
 	}
 	
 }

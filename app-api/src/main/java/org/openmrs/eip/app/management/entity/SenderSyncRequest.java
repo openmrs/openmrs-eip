@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.util.Date;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -19,12 +21,12 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	
 	public static final long serialVersionUID = 1;
 	
-	//TODO Support more statuses e.g. PROCESSING, PROCESSED, ERROR, SENT
+	//TODO Support more statuses e.g. PROCESSING, ERROR, SENT
 	public enum SenderRequestStatus {
 		
 		NEW,
 		
-		SENT
+		PROCESSED
 		
 	}
 	
@@ -33,6 +35,10 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
 	private SenderRequestStatus status = SenderRequestStatus.NEW;
+	
+	@Column(name = "date_processed")
+	@Access(AccessType.FIELD)
+	private Date dateProcessed;
 	
 	/**
 	 * Gets the status
@@ -44,14 +50,23 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
-	 * Marks this request as sent, sets dateSent to current date time and updates the request to specify
-	 * if the entity was found or not by the sender in its database
+	 * Gets the dateProcessed
+	 *
+	 * @return the dateProcessed
+	 */
+	public Date getDateProcessed() {
+		return dateProcessed;
+	}
+	
+	/**
+	 * Marks this request as processed, sets dateProcessed to current date time and updates the request
+	 * to specify if the entity was found or not by the sender in its database
 	 * 
 	 * @param wasFound specifies if the entity was found by the sender in its database
 	 */
-	public void markAsSent(boolean wasFound) {
-		this.status = SenderRequestStatus.SENT;
-		updateDateSent();
+	public void markAsProcessed(boolean wasFound) {
+		this.status = SenderRequestStatus.PROCESSED;
+		this.dateProcessed = new Date();
 		if (wasFound) {
 			markAsFound();
 		}

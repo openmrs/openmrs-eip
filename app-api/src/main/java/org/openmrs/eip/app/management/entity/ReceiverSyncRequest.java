@@ -45,6 +45,10 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
 	private SiteInfo site;
 	
+	@Column(name = "date_sent")
+	@Access(AccessType.FIELD)
+	private Date dateSent;
+	
 	@Column(name = "date_received")
 	@Access(AccessType.FIELD)
 	private Date dateReceived;
@@ -77,6 +81,15 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	}
 	
 	/**
+	 * Gets the dateSent
+	 *
+	 * @return the dateSent
+	 */
+	public Date getDateSent() {
+		return dateSent;
+	}
+	
+	/**
 	 * Gets the dateReceived
 	 *
 	 * @return the dateReceived
@@ -90,7 +103,7 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	 */
 	public void markAsSent() {
 		this.status = ReceiverRequestStatus.SENT;
-		updateDateSent();
+		this.dateSent = new Date();
 	}
 	
 	/**
