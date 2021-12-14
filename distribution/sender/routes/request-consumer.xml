@@ -1,0 +1,45 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="request-consumer" errorHandlerRef="shutdownErrorHandler">
+        <from uri="activemq:openmrs.sync.request.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&amp;acknowledgementModeName=CLIENT_ACKNOWLEDGE&amp;messageListenerContainerFactory=customMessageListenerContainerFactory&amp;asyncStartListener=true" />
+
+        <log message="Received sync request message -> ${body}" />
+
+        <setProperty name="requestTableName">
+            <jsonpath>$.tableName</jsonpath>
+        </setProperty>
+        <setProperty name="requestIdentifier">
+            <jsonpath>$.identifier</jsonpath>
+        </setProperty>
+        <setProperty name="requestUuid">
+            <jsonpath>$.requestUuid</jsonpath>
+        </setProperty>
+        <setProperty name="requestToSave">
+            <spel>
+                #{new org.openmrs.eip.app.management.entity.SenderSyncRequest()}
+            </spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('requestToSave').setTableName(getProperty('requestTableName'))}
+                #{getProperty('requestToSave').setIdentifier(getProperty('requestIdentifier'))}
+                #{getProperty('requestToSave').setRequestUuid(getProperty('requestUuid'))}
+                #{getProperty('requestToSave').setDateCreated(new java.util.Date())}
+            </spel>
+        </script>
+        <setBody>
+            <simple>${exchangeProperty.requestToSave}</simple>
+        </setBody>
+
+        <log loggingLevel="DEBUG" message="Saving sync request -> ${body}" />
+
+        <to uri="jpa:SenderSyncRequest" />
+
+        <log message="Successfully saved sync request" />
+
+        <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
+
+        <script>
+            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+        </script>
+    </route>
+</routes>

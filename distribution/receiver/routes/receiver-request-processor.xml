@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="receiver-request-processor" errorHandlerRef="deadLetterChannelBuilder">
+    <route id="receiver-request-processor" errorHandlerRef="shutdownErrorHandler">
         <!-- TODO Make the delay configurable -->
         <from uri="scheduler:retry?initialDelay=15000&amp;delay=1800000" />
 

@@ -19,7 +19,7 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	
 	public static final long serialVersionUID = 1;
 	
-	//TODO Support more statuses e.g. PROCESSING, ERROR
+	//TODO Support more statuses e.g. PROCESSING, PROCESSED, ERROR, SENT
 	public enum SenderRequestStatus {
 		
 		NEW,
@@ -59,7 +59,7 @@ public class SenderSyncRequest extends BaseSyncRequest {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + "status="
+		return getClass().getSimpleName() + "{tableName=" + getTableName() + ", identifier=" + getIdentifier() + ", status="
 		        + status + ", requestUuid=" + getRequestUuid() + "}";
 	}
 	
