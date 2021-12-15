@@ -97,7 +97,7 @@
                     <when>
                         <simple>${exchangeProperty.sync-model.metadata.operation} == 'r' &amp;&amp; ${exchangeProperty.sync-model.model} == null</simple>
 
-                        <log message="Ignoring sync message because entity was not found for request with uuid: ${exchangeProperty.sync-model.metadata.requestUuid}" />
+                        <log message="Ignoring sync message because entity was not found in the remote DB for request with uuid: ${exchangeProperty.sync-model.metadata.requestUuid}" />
                     </when>
                     <otherwise>
                         <log message="Entity: ${exchangeProperty.sync-model.tableToSyncModelClass}, identifier=${exchangeProperty.sync-model.model.uuid}" />
