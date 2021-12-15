@@ -27,56 +27,59 @@
 
                     <log loggingLevel="DEBUG" message="Found SyncEntityRepository for entity class mapped to table ${exchangeProperty.syncRequest.tableName} -> ${exchangeProperty.entityRepo}" />
 
-                    <log message="Looking up primary key for the entity" />
+                    <log message="Looking up the requested entity" />
 
                     <setProperty name="requestedEntity">
                         <spel>#{getProperty('entityRepo').findByUuid(getProperty('syncRequest').identifier)}</spel>
                     </setProperty>
 
+                    <log message="Requested entity -> ${exchangeProperty.requestedEntity}" />
+
                     <choice>
                         <when>
-                            <simple>${exchangeProperty.requestedEntity} == null</simple>
-                            <log message="No entity found with identifier: ${exchangeProperty.syncRequest.identifier}" />
-                            <script>
-                                <spel>
-                                    #{getProperty('syncRequest').markAsProcessed(false)}
-                                </spel>
-                            </script>
+                            <simple>${exchangeProperty.requestedEntity} != null</simple>
+                            <setProperty name="reqEntityPrimaryKeyId">
+                                <simple>${exchangeProperty.requestedEntity.id}</simple>
+                            </setProperty>
                         </when>
                         <otherwise>
-                            <log message="Found requested entity -> ${exchangeProperty.requestedEntity}" />
-
-                            <setProperty name="debeziumEvent">
-                                <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
+                            <setProperty name="reqEntityPrimaryKeyId">
+                                <simple>-1</simple>
                             </setProperty>
-                            <script>
-                                <spel>
-                                    #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.component.entity.Event())}
-                                    #{getProperty('debeziumEvent').event.setPrimaryKeyId(getProperty('requestedEntity').id)}
-                                    #{getProperty('debeziumEvent').event.setTableName(getProperty('syncRequest').tableName)}
-                                    #{getProperty('debeziumEvent').event.setIdentifier(getProperty('syncRequest').identifier)}
-                                    #{getProperty('debeziumEvent').event.setOperation('r')}
-                                    #{getProperty('debeziumEvent').event.setRequestUuid(getProperty('syncRequest').requestUuid)}
-                                    #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
-                                </spel>
-                            </script>
-                            <setBody>
-                                <simple>${exchangeProperty.debeziumEvent}</simple>
-                            </setBody>
-
-                            <log loggingLevel="DEBUG" message="Saving generated event to the event queue: ${exchangeProperty.debeziumEvent}" />
-
-                            <to uri="jpa:DebeziumEvent" />
-
-                            <log message="Successfully saved the generated event to the event queue" />
-
-                            <script>
-                                <spel>
-                                    #{getProperty('syncRequest').markAsProcessed(true)}
-                                </spel>
-                            </script>
                         </otherwise>
                     </choice>
+
+                    <setProperty name="debeziumEvent">
+                        <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
+                    </setProperty>
+                    <script>
+                        <spel>
+                            #{getProperty('debeziumEvent').setEvent(new org.openmrs.eip.component.entity.Event())}
+                            #{getProperty('debeziumEvent').event.setPrimaryKeyId(getProperty('reqEntityPrimaryKeyId'))}
+                            #{getProperty('debeziumEvent').event.setTableName(getProperty('syncRequest').tableName)}
+                            #{getProperty('debeziumEvent').event.setIdentifier(getProperty('syncRequest').identifier)}
+                            #{getProperty('debeziumEvent').event.setOperation('r')}
+                            #{getProperty('debeziumEvent').event.setRequestUuid(getProperty('syncRequest').requestUuid)}
+                            #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
+                        </spel>
+                    </script>
+                    <setBody>
+                        <simple>${exchangeProperty.debeziumEvent}</simple>
+                    </setBody>
+
+                    <log loggingLevel="DEBUG" message="Saving generated event to the event queue: ${exchangeProperty.debeziumEvent}" />
+
+                    <to uri="jpa:DebeziumEvent" />
+
+                    <log message="Successfully saved the generated event to the event queue" />
+
+                    <log message="Updating request status to processed" />
+
+                    <script>
+                        <spel>
+                            #{getProperty('syncRequest').markAsProcessed(getProperty('requestedEntity') != null)}
+                        </spel>
+                    </script>
                     <setBody>
                         <simple>${exchangeProperty.syncRequest}</simple>
                     </setBody>

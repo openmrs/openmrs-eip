@@ -31,35 +31,6 @@
             <method beanType="org.openmrs.eip.component.utils.Utils" method="getModelClassesInHierarchy(${exchangeProperty.model-class})" />
         </setProperty>
 
-        <!-- If this is sync message sent as a response to a sync request, update the request status to RECEIVED -->
-        <when>
-            <simple>${exchangeProperty.sync-model.metadata.operation} == 'r'</simple>
-
-            <log message="Received response for sync request with uuid: ${exchangeProperty.sync-model.metadata.requestUuid}" />
-
-            <log loggingLevel="DEBUG" message="Looking up the sync request" />
-
-            <toD uri="jpa:ReceiverSyncRequest?query=SELECT r FROM ReceiverSyncRequest r WHERE r.requestUuid = '${exchangeProperty.sync-model.metadata.requestUuid}'" />
-
-            <setBody>
-                <simple>${body[0]}</simple>
-            </setBody>
-
-            <log message="Updating status to received for request: ${body}" />
-
-            <script>
-                <spel>
-                    #{body.markAsReceived(true)}
-                </spel>
-            </script>
-            
-            <log message="Saving updates for sync request" loggingLevel="DEBUG" />
-
-            <to uri="jpa:ReceiverSyncRequest" />
-
-            <log message="Successfully saved updates for sync request" loggingLevel="DEBUG" />
-        </when>
-
         <toD uri="jpa:ReceiverRetryQueueItem?query=SELECT i from ReceiverRetryQueueItem i WHERE i.modelClassName IN (${exchangeProperty.model-classes}) AND i.identifier='${exchangeProperty.entity-id}'" />
 
         <setProperty name="retry-count">

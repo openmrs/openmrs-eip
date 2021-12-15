@@ -47,7 +47,22 @@
 
         <choice>
             <when>
-                <simple>${body} != null</simple>
+                <simple>${body} != null || ${exchangeProperty.event.operation} == 'r'</simple>
+                <when>
+                    <simple>${body} == null</simple>
+
+                    <log message="Entity not found for request with uuid: ${exchangeProperty.event.requestUuid}" />
+                    
+                    <setBody>
+                        <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
+                    </setBody>
+                    <script>
+                        <spel>
+                            #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
+                        </spel>
+                    </script>
+                </when>
+                
                 <script>
                     <spel>
                         #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
