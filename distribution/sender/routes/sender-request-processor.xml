@@ -39,7 +39,7 @@
                             <log message="No entity found with identifier: ${exchangeProperty.syncRequest.identifier}" />
                             <script>
                                 <spel>
-                                    #{getProperty('syncRequest').markAsSent(false)}
+                                    #{getProperty('syncRequest').markAsProcessed(false)}
                                 </spel>
                             </script>
                         </when>
@@ -56,6 +56,7 @@
                                     #{getProperty('debeziumEvent').event.setTableName(getProperty('syncRequest').tableName)}
                                     #{getProperty('debeziumEvent').event.setIdentifier(getProperty('syncRequest').identifier)}
                                     #{getProperty('debeziumEvent').event.setOperation('r')}
+                                    #{getProperty('debeziumEvent').event.setRequestUuid(getProperty('syncRequest').requestUuid)}
                                     #{getProperty('debeziumEvent').setDateCreated(new java.util.Date())}
                                 </spel>
                             </script>
@@ -63,15 +64,15 @@
                                 <simple>${exchangeProperty.debeziumEvent}</simple>
                             </setBody>
 
-                            <log message="Saving generated event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
+                            <log loggingLevel="DEBUG" message="Saving generated event to the event queue: ${exchangeProperty.debeziumEvent}" />
 
                             <to uri="jpa:DebeziumEvent" />
 
-                            <log message="Generated event saved to event queue" />
+                            <log message="Successfully saved the generated event to the event queue" />
 
                             <script>
                                 <spel>
-                                    #{getProperty('syncRequest').markAsSent(true)}
+                                    #{getProperty('syncRequest').markAsProcessed(true)}
                                 </spel>
                             </script>
                         </otherwise>
@@ -80,15 +81,15 @@
                         <simple>${exchangeProperty.syncRequest}</simple>
                     </setBody>
 
-                    <log message="Saving updates for sync request" loggingLevel="DEBUG" />
+                    <log loggingLevel="DEBUG" message="Saving updates for the sync request" />
 
                     <to uri="jpa:SenderSyncRequest" />
 
-                    <log message="Successfully processed and updated sync request " />
+                    <log message="Successfully processed and updated the sync request " />
                 </split>
             </when>
             <otherwise>
-                <log message="No sync requests found" loggingLevel="DEBUG" />
+                <log loggingLevel="DEBUG" message="No sync requests found" />
             </otherwise>
         </choice>
     </route>

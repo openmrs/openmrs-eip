@@ -53,6 +53,7 @@
                         #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
                         #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
                         #{body.metadata.setOperation(getProperty('event').operation)}
+                        #{body.metadata.setRequestUuid(getProperty('event').requestUuid)}
                     </spel>
                 </script>
                 <setBody>
