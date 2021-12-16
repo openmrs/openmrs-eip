@@ -21,7 +21,10 @@
 
                     <log message="Preparing sync request -> ${exchangeProperty.syncRequest}" />
 
-                    <!-- Verify that syncRequest.tableName is a synced table -->
+                    <!-- This will fail if the table is invalid i.e. not one of the synced tables -->
+                    <script>
+                        <method beanType="org.openmrs.eip.component.service.TableToSyncEnum" method="getTableToSyncEnum(${exchangeProperty.syncRequest.tableName})" />
+                    </script>
 
                     <setBody>
                         <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${exchangeProperty.syncRequest.buildModel()})" />
