@@ -12,7 +12,8 @@
 7. [Logging](#logging)
 8. [Management Database](#management-database)
 9. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-10. [Developer Guide](#developer-guide)
+10. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
+11. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
@@ -223,6 +224,23 @@ the retry queue should run, please refer to the [configuration](#configuration) 
 
 The DB sync receiver application uses a table named `receiver_retry_queue` to store failed incoming DB sync messages, 
 please refer to the [configuration](#configuration) section.
+
+# Requesting An Entity To Be Synced
+The application has a mechanism that allows the receiver to request for an entity to be synced from a specific remote 
+site to central, this is done by inserting a row in the `receiver_sync_request` table with the following columns that 
+you need to set,
+
+**table_name:** The name of the database table containing the entity  
+**identifier:** The unique identifier of the entity typically the entity uuid  
+**site_id:** Foreign key value for the database id of the source remote site i.e. the id value of the site in the `site_info` table  
+**date_created:** The insertion datetime  
+**request_uuid:** The unique UUID of the sync request (Used to track the request when in the remote site once sent)
+
+A sync request has a status field which defaults to `NEW` on insertion, every 30 minutes the receiver polls the 
+`receiver_sync_request` table for rows with the `NEW` status and submits them to their respective target remote site
+queues in the artemis instance, there will be a queue name for each remote site where the name is of the format
+`activemq:openmrs.sync.request.{SITE_IDENTIFIER}` where `{SITE_IDENTIFIER}` is the value of the identifier column of the 
+site row in the site_info table.
 
 # Developer Guide
 ## Build
