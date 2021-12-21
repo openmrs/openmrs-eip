@@ -80,7 +80,7 @@ public class IdentifierSettingProcessor implements Processor {
 			if (!rows.isEmpty()) {
 				event.setIdentifier(rows.get(0).get(WatcherConstants.FIELD_UUID).toString());
 			} else {
-				logger.warn("Failed to find row in parent table: " + refTable);
+				logger.info("Failed to find row in parent table: " + refTable);
 			}
 		}
 		
