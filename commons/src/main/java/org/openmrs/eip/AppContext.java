@@ -36,7 +36,7 @@ public class AppContext implements ApplicationContextAware {
 	 * @param key the unique
 	 * @return the value associated to the key
 	 */
-	public static Object retrieve(String key) {
+	public static Object get(String key) {
 		return EIP_CONTEXT.get(key);
 	}
 	
@@ -44,7 +44,7 @@ public class AppContext implements ApplicationContextAware {
 	 * Adds the specified value to the EIP cache if none already exists for the same key otherwise
 	 * updates the existing value
 	 */
-	public static void cache(String key, Object value) {
+	public static void add(String key, Object value) {
 		EIP_CONTEXT.put(key, value);
 	}
 	
