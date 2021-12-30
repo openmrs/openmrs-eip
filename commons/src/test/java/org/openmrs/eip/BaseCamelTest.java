@@ -82,7 +82,7 @@ public abstract class BaseCamelTest {
 		List<LoggingEvent> list = app.list;
 		for (LoggingEvent e : list) {
 			if (e.getLevel().equals(level) && e.getMessage().equalsIgnoreCase(message)) {
-				log.trace("Log event satisfied -> [" + level + "] " + message);
+				log.info("Log event satisfied -> [" + level + "] " + message);
 				return;
 			}
 		}

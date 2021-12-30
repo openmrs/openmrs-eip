@@ -43,9 +43,22 @@ public class AppContext implements ApplicationContextAware {
 	/**
 	 * Adds the specified value to the EIP cache if none already exists for the same key otherwise
 	 * updates the existing value
+	 * 
+	 * @param key the unique
+	 * @param value the value to set
+	 * @return the previous value associated with key, or null if there was no mapping for the key
 	 */
-	public static void add(String key, Object value) {
-		EIP_CONTEXT.put(key, value);
+	public static Object add(String key, Object value) {
+		return EIP_CONTEXT.put(key, value);
+	}
+	
+	/**
+	 * Removes the value for specified key from the EIP cache
+	 * 
+	 * @return the previous value associated with key, or null if there was no mapping for key.
+	 */
+	public static Object remove(String key) {
+		return EIP_CONTEXT.remove(key);
 	}
 	
 }
