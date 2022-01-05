@@ -83,25 +83,29 @@ In this guide we recommend [ArtemisMQ](https://activemq.apache.org/components/ar
 JMS server and all our documentation and properties file templates assume ArtemisMQ however, you should be able to use
 any of your choice as long as it is supported by spring boot and apache camel's [jms](https://camel.apache.org/components/latest/jms-component.html)
 or [activemq](https://camel.apache.org/components/latest/activemq-component.html) components but you would have to make
-more changes to the sender and receiver application properties jms settings, please see
+more changes to the sender and receiver application properties jms settings, see
 [How to install ArtemisMQ](https://activemq.apache.org/components/artemis/documentation/latest/using-server.html)
 
 Remember to keep note of the ArtemisMQ broker port and URL to the console application, you can peek at what's going on
 inside your JMS server using the console application.
 
+#### Configuration
+- In the `broker.xml` file for artemis, set `max-disk-usage` to 100, for more details see 
+  [artemis configuration reference](https://activemq.apache.org/components/artemis/documentation/latest/configuration-index.html)
+
 **Key things to note**
 - It's VERY important to understand how JMS servers work, key concepts especially when it comes to topics vs queues
-  subscription and message durability before picking one over the other. We recommend using topics therefore our
-  sender and receiver application properties file templates have topic settings with durable subscriptions as we will
-  later see when configuring our sender and receiver applications.
-- In case you're using a topic like we recommend, after installing ArtemisMQ and creating your broker instance,
-  your **MUST** connect the receiver sync application first with a durable topic subscription before any sender sync
-  application connects and publishes any message. Otherwise, any message pushed by a sender to the topic before you do 
-  so won't be delivered to the receiver.
+  subscription and message durability before picking one over the other.
+- In case you're using a topic, after installing ArtemisMQ and creating your broker instance, your **MUST** connect the 
+  receiver sync application first with a durable topic subscription before any sender sync application connects and 
+  publishes any message. Otherwise, any message pushed by a sender to the topic before you do so won't be delivered to 
+  the receiver.
 - With topics, it also implies that whenever you want to onboard a new sender application to sync data from a new site
   that wishes to join the party to push data to the receiver and it's using a different JMS instance or topic name,
   then the receiver **MUST** always connect first so that a durable subscription is created for it before the new sender
   application can start pushing sync data. Technically this applies whenever you switch to a new JMS broker instance.
+- In case you're using queues, you MUST set auto-delete-queues under address settings to false, for more details see 
+  [address model config](https://activemq.apache.org/components/artemis/documentation/latest/address-model.html)
   
 ### Building OpenMRS EIP
 From the terminal, navigate to your working directory, clone and build the project to generate the executable artifacts 
