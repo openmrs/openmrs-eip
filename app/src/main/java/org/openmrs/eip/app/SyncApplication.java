@@ -151,9 +151,9 @@ public class SyncApplication {
 		cf.setBrokerURL(url);
 		cf.setUserName(env.getProperty("spring.artemis.user"));
 		cf.setPassword(env.getProperty("spring.artemis.password"));
-		final String clientIdProp = "activemq.clientId";
-		if (StringUtils.isNotBlank(env.getProperty(clientIdProp))) {
-			cf.setClientID(env.getProperty(clientIdProp));
+		final String clientId = env.getProperty("activemq.clientId");
+		if (StringUtils.isNotBlank(clientId)) {
+			cf.setClientID(clientId);
 		}
 		
 		RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
