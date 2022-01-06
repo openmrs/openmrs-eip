@@ -60,6 +60,14 @@ public class DebeziumMessageProcessor implements Processor {
 			beforeStruct.schema().fields().forEach(field -> beforeState.put(field.name(), beforeStruct.get(field)));
 			event.setPreviousState(beforeState);
 		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Entity previous state: " + event.getPreviousState());
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Entity new state: " + event.getCurrentState());
+		}
 	}
 	
 }
