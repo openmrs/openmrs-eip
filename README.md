@@ -38,6 +38,9 @@ The application was initially built against the 2.3.x branch should be compatibl
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
 # Architecture
+![#](distribution/docs/dbsync.jpg)
+
+Note that in the diagram above we have 2 remote OpenMRS instances but they can be multiple.
 
 ### Modules
 Below is the high level breakdown of what is contained in each module.
