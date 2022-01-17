@@ -42,6 +42,12 @@ between it and it's ancestor, master should be compatible with the latest releas
 
 Note that in the diagram above we have 2 remote OpenMRS instances but they can be multiple.
 
+### Sender Architecture
+![#](distribution/docs/sender/sender.jpeg)
+
+### Receiver Architecture
+![#](distribution/docs/receiver/receiver.jpeg)
+
 ### Modules
 Below is the high level breakdown of what is contained in each module.
 #### camel-openmrs
