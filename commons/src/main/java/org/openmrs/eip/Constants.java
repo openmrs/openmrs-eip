@@ -13,7 +13,9 @@ public class Constants {
 	public static final String MGT_DATASOURCE_NAME = "mngtDataSource";
 	
 	public static final String HTTP_HEADER_AUTH = "Authorization";
-
-    public static final String PROP_WATCHED_TABLES = "eip.watchedTables";
+	
+	public static final String PROP_WATCHED_TABLES = "eip.watchedTables";
+	
+	public static final String MGT_TX_MGR_NAME = "mngtTransactionManager";
 	
 }

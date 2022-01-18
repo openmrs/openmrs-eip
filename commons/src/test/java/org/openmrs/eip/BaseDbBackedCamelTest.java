@@ -41,7 +41,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	private static final PathMatchingResourcePatternResolver RESOURCE_RESOLVER = new PathMatchingResourcePatternResolver();
 	
 	@Autowired
-	@Qualifier("mngtDataSource")
+	@Qualifier(Constants.MGT_DATASOURCE_NAME)
 	protected DataSource mngtDataSource;
 	
 	@Autowired

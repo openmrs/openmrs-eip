@@ -14,6 +14,18 @@
             </setProperty>
         </when>
 
+        <setProperty name="dbEventDestinations">
+            <spel>#{new java.util.HashSet()}</spel>
+        </setProperty>
+        <split>
+            <simple>{{db-event.destinations}}</simple>
+            <script>
+                <spel>#{getProperty('dbEventDestinations').add(body.trim())}</spel>
+            </script>
+        </split>
+
+        <log loggingLevel="DEBUG" message="All DB Event destinations -> ${exchangeProperty.dbEventDestinations}" />
+
         <split parallelProcessing="false">
             <simple>${exchangeProperty.db-event-destinations}</simple>
             <setProperty name="db-event-dest">
@@ -24,7 +36,7 @@
                 so that events that happened later don't overwrite those that happened before them
 
                 Note that this ONLY applies to new events and not retries, we don't explicitly check for this because
-                the header check for CamelDebeziumOperation and route-retry-count-map will be empty anyways
+                the route-retry-count-map will be empty anyways
             -->
             <when>
                 <simple>${exchangeProperty.event.operation} != 'c' &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
@@ -33,6 +45,57 @@
                     <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
                 </setProperty>
                 <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
+            </when>
+
+            <!--
+                For an order make sure we don't process one where previousOrder or previousOrder is not null to preserve data integrity,
+                Note that this ONLY applies to new events and not retries
+            -->
+            <when>
+                <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
+                <when>
+                    <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
+                    <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
+                </when>
+                
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.event.operation} == 'd' &amp;&amp; ${exchangeProperty.event.previousState} != null</simple>
+                        <setProperty name="previousId">
+                            <spel>#{getProperty('event').previousState.get('previous_order'))}</spel>
+                        </setProperty>
+                    </when>
+                    <when>
+                        <simple>${exchangeProperty.event.currentState} != null</simple>
+                        <setProperty name="previousOrderId">
+                            <spel>#{getProperty('event').currentState.get('previous_order')}</spel>
+                        </setProperty>
+                    </when>
+                </choice>
+
+                <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
+
+                <when>
+                    <simple>${exchangeProperty.previousOrderId} != null</simple>
+                    <log message="Has previous entity with id -> ${exchangeProperty.previousOrderId}, checking if previous order has no retry items" />
+
+                    <setProperty name="tableNames">
+                        <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+                        <method beanType="org.openmrs.eip.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
+                    </setProperty>
+
+                    <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.tableNames}) AND r.event.primaryKeyId='${exchangeProperty.previousOrderId}' AND r.route='${exchangeProperty.db-event-dest}'" />
+
+                    <when>
+                        <simple>${body.size()} > 0</simple>
+                        <log message="Moving order event to the failure queue because its previous order has ${body.size()} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
+
+                        <setProperty name="retryEventMsg">
+                            <simple>Cannot process the order event because its previous order has ${body.size()} event(s) in the retry queue</simple>
+                        </setProperty>
+                        <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retryEventMsg}" />
+                    </when>
+                </when>
             </when>
 
             <log message="Publishing to destination: ${exchangeProperty.db-event-dest}" loggingLevel="DEBUG" />
