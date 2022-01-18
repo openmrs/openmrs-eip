@@ -18,7 +18,7 @@
     2. [Tests](#tests)
 
 # Introduction
-This project aims at providing a low-level OpenMRS synchronization module based on [Debezium](https://debezium.io) and
+This project aims at providing a low-level OpenMRS synchronization mechanism based on [Debezium](https://debezium.io) and
 [Apache Camel](https://camel.apache.org/manual/latest/faq/what-is-camel.html).
 Data is directly pulled from a source OpenMRS MySQL database and wired onto camel routes in an effort to integrate
 OpenMRS with other systems without any use of the OpenMRS Java API or data model. The project comes with 2 built-in end
@@ -38,7 +38,7 @@ The application was initially built against the 2.3.x branch should be compatibl
 between it and it's ancestor, master should be compatible with the latest released OpenMRS version.
 
 # Architecture
-![#](distribution/docs/dbsync.jpg)
+![#](distribution/docs/dbsync.jpeg)
 
 Note that in the diagram above we have 2 remote OpenMRS instances but they can be multiple.
 
