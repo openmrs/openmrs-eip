@@ -44,7 +44,7 @@
                 <setProperty name="retry-event-message">
                     <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
                 </setProperty>
-                <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retry-event-message}" />
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="${exchangeProperty.retry-event-message}" />
             </when>
 
             <!--
@@ -55,7 +55,7 @@
                 <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
                 <when>
                     <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
-                    <throwException exceptionType="java.lang.Exception" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
+                    <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
                 </when>
                 
                 <choice>
@@ -93,7 +93,7 @@
                         <setProperty name="retryEventMsg">
                             <simple>Cannot process the order event because its previous order has ${body.size()} event(s) in the retry queue</simple>
                         </setProperty>
-                        <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.retryEventMsg}" />
+                        <throwException exceptionType="org.openmrs.eip.EIPException" message="${exchangeProperty.retryEventMsg}" />
                     </when>
                 </when>
             </when>

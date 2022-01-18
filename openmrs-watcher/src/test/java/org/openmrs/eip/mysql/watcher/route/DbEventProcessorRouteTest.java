@@ -9,7 +9,6 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.Constants;
@@ -68,8 +67,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		mockEventListenerEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, ERR_MSG);
 		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
-		assertMessageLogged(Level.DEBUG, "Publishing to destination: " + ROUTE_URI_LISTENER);
-		Assert.assertEquals(EX_MSG, getErrorMessage(exchange));
 	}
 	
 	@Test
@@ -83,7 +80,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		producerTemplate.send(ROUTE_URI, exchange);
 		
 		mockEventListenerEndpoint.assertIsSatisfied();
-        assertMessageLogged(Level.DEBUG, "Publishing to destination: " + ROUTE_URI_LISTENER);
+		assertMessageLogged(Level.DEBUG, "Publishing to destination: " + ROUTE_URI_LISTENER);
 		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
 	}
 	
