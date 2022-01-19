@@ -68,6 +68,51 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
+	public void shouldNotProcessATestOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
+	    throws Exception {
+		Event event = createEvent("test_order", "2", ORDER_UUID, "c");
+		event.setCurrentState(Collections.singletonMap(PREV_COLUMN, PREV_ORDER_ID));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
+	@Test
+	public void shouldNotProcessADrugOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
+	    throws Exception {
+		Event event = createEvent("drug_order", "2", ORDER_UUID, "c");
+		event.setCurrentState(Collections.singletonMap(PREV_COLUMN, PREV_ORDER_ID));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
+	@Test
+	public void shouldNotProcessADeletedOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
+	    throws Exception {
+		Event event = createEvent("orders", "2", ORDER_UUID, "d");
+		event.setPreviousState(Collections.singletonMap(PREV_COLUMN, PREV_ORDER_ID));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
+	@Test
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForAnotherRoute()
 	    throws Exception {
 		Event event = createEvent("orders", "5", ORDER_UUID, "c");

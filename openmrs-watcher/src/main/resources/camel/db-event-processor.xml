@@ -48,11 +48,11 @@
             </when>
 
             <!--
-                For an order make sure we don't process one where previousOrder or previousOrder is not null to preserve data integrity,
-                Note that this ONLY applies to new events and not retries
+                For an order make sure we don't process one where previousOrder or previousOrder is not null and is in
+                the retry queue to preserve data integrity, Note that this ONLY applies to new events and not retries
             -->
             <when>
-                <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
+                <simple>${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.event.tableName} == 'test_order' || ${exchangeProperty.event.tableName} == 'drug_order'</simple>
                 <when>
                     <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
                     <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
@@ -61,8 +61,8 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.event.operation} == 'd' &amp;&amp; ${exchangeProperty.event.previousState} != null</simple>
-                        <setProperty name="previousId">
-                            <spel>#{getProperty('event').previousState.get('previous_order'))}</spel>
+                        <setProperty name="previousOrderId">
+                            <spel>#{getProperty('event').previousState.get('previous_order')}</spel>
                         </setProperty>
                     </when>
                     <when>
