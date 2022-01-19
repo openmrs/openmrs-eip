@@ -42,8 +42,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	private static final String ERR_MSG = "Moving order event to the failure queue because its previous order has 1 event(s) in the retry queue for route: "
 	        + ROUTE_URI_LISTENER;
 	
-	private static final String EX_MSG = "Cannot process the order event because its previous order has 1 event(s) in the retry queue";
-	
 	private static final String END_ROUTE_MSG = "Done processing db event";
 	
 	@EndpointInject(ROUTE_URI_LISTENER)

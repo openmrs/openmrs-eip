@@ -22,7 +22,7 @@ public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 			propSource.getSource().put("openmrs.db.port", BaseDbBackedCamelTest.mysqlPort);
 			propSource.getSource().put("openmrs.db.host", "localhost");
 			propSource.getSource().put("openmrs.db.name", mysqlContainer.getDatabaseName());
-			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl", mysqlContainer.getJdbcUrl());
+			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl", mysqlContainer.getJdbcUrl() + "?useSSL=false");
 			propSource.getSource().put("spring.openmrs-datasource.driverClassName", Driver.class.getName());
 			propSource.getSource().put("spring.openmrs-datasource.username", "root");
 			propSource.getSource().put("spring.openmrs-datasource.password", mysqlContainer.getPassword());
