@@ -127,4 +127,20 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
 	}
 	
+	@Test
+	public void shouldProcessARetryItemForAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
+	    throws Exception {
+		Event event = createEvent("orders", "2", ORDER_UUID, "c");
+		event.setCurrentState(Collections.singletonMap(PREV_COLUMN, PREV_ORDER_ID));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty("retry-item-id", 5);
+		exchange.setProperty(PROP_EVENT, event);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.DEBUG, "Publishing to destination: " + ROUTE_URI_LISTENER);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
 }

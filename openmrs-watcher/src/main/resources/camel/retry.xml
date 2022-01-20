@@ -43,7 +43,9 @@
                     <setProperty name="retry-item">
                         <simple>${body[0]}</simple>
                     </setProperty>
+
                     <log message="Updating attempt count for retry item" />
+                    
                     <script>
                         <spel>
                             #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}

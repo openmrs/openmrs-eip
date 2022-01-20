@@ -52,48 +52,51 @@
                 the retry queue to preserve data integrity, Note that this ONLY applies to new events and not retries
             -->
             <when>
-                <simple>${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.event.tableName} == 'test_order' || ${exchangeProperty.event.tableName} == 'drug_order'</simple>
+                <simple>${exchangeProperty.retry-item-id} == null</simple>
                 <when>
-                    <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
-                    <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
-                </when>
-                
-                <choice>
+                    <simple>${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.event.tableName} == 'test_order' || ${exchangeProperty.event.tableName} == 'drug_order'</simple>
                     <when>
-                        <simple>${exchangeProperty.event.operation} == 'd' &amp;&amp; ${exchangeProperty.event.previousState} != null</simple>
-                        <setProperty name="previousOrderId">
-                            <spel>#{getProperty('event').previousState.get('previous_order')}</spel>
-                        </setProperty>
+                        <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
+                        <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
                     </when>
-                    <when>
-                        <simple>${exchangeProperty.event.currentState} != null</simple>
-                        <setProperty name="previousOrderId">
-                            <spel>#{getProperty('event').currentState.get('previous_order')}</spel>
-                        </setProperty>
-                    </when>
-                </choice>
 
-                <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.event.operation} == 'd' &amp;&amp; ${exchangeProperty.event.previousState} != null</simple>
+                            <setProperty name="previousOrderId">
+                                <spel>#{getProperty('event').previousState.get('previous_order')}</spel>
+                            </setProperty>
+                        </when>
+                        <when>
+                            <simple>${exchangeProperty.event.currentState} != null</simple>
+                            <setProperty name="previousOrderId">
+                                <spel>#{getProperty('event').currentState.get('previous_order')}</spel>
+                            </setProperty>
+                        </when>
+                    </choice>
 
-                <when>
-                    <simple>${exchangeProperty.previousOrderId} != null</simple>
-                    <log message="Has previous entity with id -> ${exchangeProperty.previousOrderId}, checking if previous order has no retry items" />
-
-                    <setProperty name="tableNames">
-                        <!-- We need to look up failed events for rows in both the parent and subclass tables -->
-                        <method beanType="org.openmrs.eip.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
-                    </setProperty>
-
-                    <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.tableNames}) AND r.event.primaryKeyId='${exchangeProperty.previousOrderId}' AND r.route='${exchangeProperty.db-event-dest}'" />
+                    <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
 
                     <when>
-                        <simple>${body.size()} > 0</simple>
-                        <log message="Moving order event to the failure queue because its previous order has ${body.size()} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
+                        <simple>${exchangeProperty.previousOrderId} != null</simple>
+                        <log message="Has previous entity with id -> ${exchangeProperty.previousOrderId}, checking if previous order has no retry items" />
 
-                        <setProperty name="retryEventMsg">
-                            <simple>Cannot process the order event because its previous order has ${body.size()} event(s) in the retry queue</simple>
+                        <setProperty name="tableNames">
+                            <!-- We need to look up failed events for rows in both the parent and subclass tables -->
+                            <method beanType="org.openmrs.eip.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
                         </setProperty>
-                        <throwException exceptionType="org.openmrs.eip.EIPException" message="${exchangeProperty.retryEventMsg}" />
+
+                        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.tableNames}) AND r.event.primaryKeyId='${exchangeProperty.previousOrderId}' AND r.route='${exchangeProperty.db-event-dest}'" />
+
+                        <when>
+                            <simple>${body.size()} > 0</simple>
+                            <log message="Moving order event to the failure queue because its previous order has ${body.size()} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
+
+                            <setProperty name="retryEventMsg">
+                                <simple>Cannot process the order event because its previous order has ${body.size()} event(s) in the retry queue</simple>
+                            </setProperty>
+                            <throwException exceptionType="org.openmrs.eip.EIPException" message="${exchangeProperty.retryEventMsg}" />
+                        </when>
                     </when>
                 </when>
             </when>
