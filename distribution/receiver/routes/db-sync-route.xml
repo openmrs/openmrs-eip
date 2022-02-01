@@ -30,60 +30,130 @@
                 <doTry>
                     <to uri="openmrs:load" />
 
+                    <setProperty name="isDeletedEntity">
+                        <simple>${body.metadata.operation}</simple>
+                    </setProperty>
+
                     <choice>
                         <when>
                             <simple>${body.tableToSyncModelClass.name} == 'org.openmrs.eip.component.model.PersonNameModel'</simple>
-                            <setProperty name="rebuild-search-index">
-                                <constant>true</constant>
+                            <setProperty name="nameUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
                             </setProperty>
-                            <setProperty name="resource">
-                                <constant>person</constant>
+                            <setProperty name="resourceBody">
+                                <simple>
+                                    {"resource": "person", "subResource": "name", "uuid": "${exchangeProperty.nameUuid}"}
+                                </simple>
                             </setProperty>
-                            <setProperty name="sub-resource">
-                                <constant>name</constant>
-                            </setProperty>
+
                             <when>
-                                <simple>${body.metadata.operation} != 'd'</simple>
-                                <setProperty name="sub-resource-uuid">
-                                    <simple>${body.model.uuid}</simple>
+                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <setProperty name="resourceBody">
+                                    <simple>
+                                        {"resource": "person", "subResource": "name"}
+                                    </simple>
                                 </setProperty>
                             </when>
+
+                            <setBody>
+                                <simple>
+                                    ${exchangeProperty.resourceBody}
+                                </simple>
+                            </setBody>
+
+                            <to uri="direct:receiver-update-search-index" />
                         </when>
                         <when>
                             <simple>${body.tableToSyncModelClass.name} == 'org.openmrs.eip.component.model.PatientIdentifierModel'</simple>
-                            <setProperty name="rebuild-search-index">
-                                <constant>true</constant>
+                            <setProperty name="idUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
                             </setProperty>
-                            <setProperty name="resource">
-                                <constant>patient</constant>
-                            </setProperty>
-                            <setProperty name="sub-resource">
-                                <constant>identifier</constant>
-                            </setProperty>
+                            <setBody>
+                                <simple>
+                                    {"resource": "patient", "subResource": "identifier", "uuid": "${exchangeProperty.idUuid}"}
+                                </simple>
+                            </setBody>
+
                             <when>
-                                <simple>${body.metadata.operation} != 'd'</simple>
-                                <setProperty name="sub-resource-uuid">
-                                    <simple>${body.model.uuid}</simple>
-                                </setProperty>
+                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <setBody>
+                                    <simple>
+                                        {"resource": "patient", "subResource": "identifier"}
+                                    </simple>
+                                </setBody>
                             </when>
+
+                            <to uri="direct:receiver-update-search-index" />
                         </when>
                         <when>
                             <simple>${body.tableToSyncModelClass.name} == 'org.openmrs.eip.component.model.PersonAttributeModel'</simple>
-                            <setProperty name="rebuild-search-index">
-                                <constant>true</constant>
+                            <setProperty name="attribUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
                             </setProperty>
-                            <setProperty name="resource">
-                                <constant>person</constant>
+                            <setProperty name="resourceBody">
+                                <simple>
+                                    {"resource": "person", "subResource": "attribute", "uuid": "${exchangeProperty.attribUuid}"}
+                                </simple>
                             </setProperty>
-                            <setProperty name="sub-resource">
-                                <constant>attribute</constant>
-                            </setProperty>
+
                             <when>
-                                <simple>${body.metadata.operation} != 'd'</simple>
-                                <setProperty name="sub-resource-uuid">
-                                    <simple>${body.model.uuid}</simple>
+                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <setProperty name="resourceBody">
+                                    <simple>
+                                        {"resource": "person", "subResource": "attribute"}
+                                    </simple>
                                 </setProperty>
                             </when>
+
+                            <setBody>
+                                <simple>
+                                    ${exchangeProperty.resourceBody}
+                                </simple>
+                            </setBody>
+
+                            <to uri="direct:receiver-update-search-index" />
+                        </when>
+                        <when>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PersonModel' || ${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PatientModel'</simple>
+                            <setProperty name="personUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
+                            </setProperty>
+
+                            <toD uri="sql:SELECT n.uuid FROM person p, person_name n WHERE p.person_id = n.person_id AND p.uuid = '${exchangeProperty.personUuid}'?dataSource=openmrsDataSource" />
+
+                            <when>
+                                <simple>${body.size()} > 0</simple>
+                                <log loggingLevel="DEBUG" message="Updating search index for person names with uuids: ${body}" />
+                            </when>
+
+                            <split parallelProcessing="false" stopOnException="true">
+                                <simple>${body}</simple>
+                                <setBody>
+                                    <simple>
+                                        {"resource": "person", "subResource": "name", "uuid": "${body.get('uuid')}"}
+                                    </simple>
+                                </setBody>
+
+                                <to uri="direct:receiver-update-search-index" />
+                            </split>
+
+                            <toD uri="sql:SELECT i.uuid FROM person p, patient_identifier i WHERE p.person_id = i.patient_id AND p.uuid = '${exchangeProperty.personUuid}'?dataSource=openmrsDataSource" />
+
+                            <when>
+                                <simple>${body.size()} > 0</simple>
+                                <log loggingLevel="DEBUG" message="Updating search index for patient identifiers with uuids: ${body}" />
+                            </when>
+
+                            <split parallelProcessing="false" stopOnException="true">
+                                <simple>${body}</simple>
+                                <setBody>
+                                    <simple>
+                                        {"resource": "patient", "subResource": "identifier", "uuid": "${body.get('uuid')}"}
+                                    </simple>
+                                </setBody>
+
+                                <to uri="direct:receiver-update-search-index" />
+                            </split>
                         </when>
                     </choice>
 
