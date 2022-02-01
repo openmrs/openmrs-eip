@@ -30,7 +30,7 @@
                 <doTry>
                     <to uri="openmrs:load" />
 
-                    <setProperty name="isDeletedEntity">
+                    <setProperty name="dbOperation">
                         <simple>${body.metadata.operation}</simple>
                     </setProperty>
 
@@ -47,7 +47,7 @@
                             </setProperty>
 
                             <when>
-                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <simple>${exchangeProperty.dbOperation} == 'd'</simple>
                                 <setProperty name="resourceBody">
                                     <simple>
                                         {"resource": "person", "subResource": "name"}
@@ -75,7 +75,7 @@
                             </setBody>
 
                             <when>
-                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <simple>${exchangeProperty.dbOperation} == 'd'</simple>
                                 <setBody>
                                     <simple>
                                         {"resource": "patient", "subResource": "identifier"}
@@ -97,7 +97,7 @@
                             </setProperty>
 
                             <when>
-                                <simple>${exchangeProperty.isDeletedEntity} == 'd'</simple>
+                                <simple>${exchangeProperty.dbOperation} == 'd'</simple>
                                 <setProperty name="resourceBody">
                                     <simple>
                                         {"resource": "person", "subResource": "attribute"}
