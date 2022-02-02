@@ -61,6 +61,14 @@
                                 </simple>
                             </setBody>
 
+                            <to uri="direct:receiver-clear-db-cache" />
+
+                            <setBody>
+                                <simple>
+                                    ${exchangeProperty.resourceBody}
+                                </simple>
+                            </setBody>
+
                             <to uri="direct:receiver-update-search-index" />
                         </when>
                         <when>
@@ -111,6 +119,14 @@
                                 </simple>
                             </setBody>
 
+                            <to uri="direct:receiver-clear-db-cache" />
+
+                            <setBody>
+                                <simple>
+                                    ${exchangeProperty.resourceBody}
+                                </simple>
+                            </setBody>
+
                             <to uri="direct:receiver-update-search-index" />
                         </when>
                         <when>
@@ -118,6 +134,22 @@
                             <setProperty name="personUuid">
                                 <jsonpath>$.model.uuid</jsonpath>
                             </setProperty>
+                            <setBody>
+                                <simple>
+                                    {"resource": "person", "uuid": "${exchangeProperty.personUuid}"}
+                                </simple>
+                            </setBody>
+
+                            <when>
+                                <simple>${exchangeProperty.dbOperation} == 'd'</simple>
+                                <setBody>
+                                    <simple>
+                                        {"resource": "person"}
+                                    </simple>
+                                </setBody>
+                            </when>
+
+                            <to uri="direct:receiver-clear-db-cache" />
 
                             <toD uri="sql:SELECT n.uuid FROM person p, person_name n WHERE p.person_id = n.person_id AND p.uuid = '${exchangeProperty.personUuid}'?dataSource=openmrsDataSource" />
 
@@ -154,6 +186,43 @@
 
                                 <to uri="direct:receiver-update-search-index" />
                             </split>
+                        </when>
+                        <when>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.PersonAddressModel'</simple>
+                            <setProperty name="addressUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
+                            </setProperty>
+                            <setBody>
+                                <simple>
+                                    {"resource": "person", "subResource": "address", "uuid": "${exchangeProperty.addressUuid}"}
+                                </simple>
+                            </setBody>
+
+                            <when>
+                                <simple>${exchangeProperty.dbOperation} == 'd'</simple>
+                                <setBody>
+                                    <simple>
+                                        {"resource": "person", "subResource": "address"}
+                                    </simple>
+                                </setBody>
+                            </when>
+
+                            <to uri="direct:receiver-clear-db-cache" />
+                        </when>
+                        <when>
+                            <simple>${body.tableToSyncModelClass} == 'org.openmrs.eip.component.model.UserModel'</simple>
+                            <setProperty name="userUuid">
+                                <jsonpath>$.model.uuid</jsonpath>
+                            </setProperty>
+                            <setBody>
+                                <simple>
+                                    {"resource": "user", "uuid": "${exchangeProperty.userUuid}"}
+                                </simple>
+                            </setBody>
+
+                            <!-- We don't delete users, so we don't have to clear the cache for all users as we do for other cached entities-->
+
+                            <to uri="direct:receiver-clear-db-cache" />
                         </when>
                     </choice>
 
