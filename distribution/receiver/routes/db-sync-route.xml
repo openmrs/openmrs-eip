@@ -226,39 +226,6 @@
                         </when>
                     </choice>
 
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.rebuild-search-index} == true</simple>
-                            <setHeader name="Content-Type">
-                                <constant>application/json</constant>
-                            </setHeader>
-                            <choice>
-                                <when>
-                                    <simple>${exchangeProperty.sub-resource-uuid} == null</simple>
-                                    <setBody>
-                                        <simple>
-                                            {"resource": "${exchangeProperty.resource}", "subResource": "${exchangeProperty.sub-resource}"}
-                                        </simple>
-                                    </setBody>
-                                </when>
-                                <otherwise>
-                                    <setBody>
-                                        <simple>
-                                            {"resource": "${exchangeProperty.resource}", "subResource": "${exchangeProperty.sub-resource}", "uuid": "${exchangeProperty.sub-resource-uuid}"}
-                                        </simple>
-                                    </setBody>
-                                </otherwise>
-                            </choice>
-
-                            <log message="Rebuilding search Index..." />
-
-                            <setHeader name="CamelHttpMethod">
-                                <constant>POST</constant>
-                            </setHeader>
-                            <to uri="{{openmrs.baseUrl}}/ws/rest/v1/searchindexupdate?authMethod=Basic&amp;authUsername={{openmrs.username}}&amp;authPassword={{openmrs.password}}" />
-                        </when>
-                    </choice>
-
                     <doCatch>
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
                         <setProperty name="conflict-item">
