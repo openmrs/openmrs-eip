@@ -425,9 +425,6 @@
         <createIndex indexName="person_hash_identifier" tableName="person_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="person_hash" tableName="person_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1802">
@@ -456,9 +453,6 @@
 
         <createIndex indexName="patient_hash_identifier" tableName="patient_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="patient_hash" tableName="patient_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -489,9 +483,6 @@
         <createIndex indexName="visit_hash_identifier" tableName="visit_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="visit_hash" tableName="visit_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1804">
@@ -520,9 +511,6 @@
 
         <createIndex indexName="encounter_hash_identifier" tableName="encounter_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="encounter_hash" tableName="encounter_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -553,9 +541,6 @@
         <createIndex indexName="obs_hash_identifier" tableName="obs_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="obs_hash" tableName="obs_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1806">
@@ -584,9 +569,6 @@
 
         <createIndex indexName="person_attribute_hash_identifier" tableName="person_attribute_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="person_attribute_hash" tableName="person_attribute_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -617,9 +599,6 @@
         <createIndex indexName="patient_program_hash_identifier" tableName="patient_program_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="patient_program_hash" tableName="patient_program_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1808">
@@ -648,9 +627,6 @@
 
         <createIndex indexName="patient_state_hash_identifier" tableName="patient_state_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="patient_state_hash" tableName="patient_state_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -681,9 +657,6 @@
         <createIndex indexName="visit_attribute_hash_identifier" tableName="visit_attribute_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="visit_attribute_hash" tableName="visit_attribute_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1810">
@@ -712,9 +685,6 @@
 
         <createIndex indexName="encounter_diagnosis_hash_identifier" tableName="encounter_diagnosis_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="encounter_diagnosis_hash" tableName="encounter_diagnosis_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -745,9 +715,6 @@
         <createIndex indexName="condition_hash_identifier" tableName="condition_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="condition_hash" tableName="condition_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1812">
@@ -776,9 +743,6 @@
 
         <createIndex indexName="person_name_hash_identifier" tableName="person_name_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="person_name_hash" tableName="person_name_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -809,9 +773,6 @@
         <createIndex indexName="allergy_hash_identifier" tableName="allergy_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="allergy_hash" tableName="allergy_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1814">
@@ -840,9 +801,6 @@
 
         <createIndex indexName="person_address_hash_identifier" tableName="person_address_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="person_address_hash" tableName="person_address_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -873,9 +831,6 @@
         <createIndex indexName="patient_identifier_hash_identifier" tableName="patient_identifier_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="patient_identifier_hash" tableName="patient_identifier_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1816">
@@ -904,9 +859,6 @@
 
         <createIndex indexName="orders_hash_identifier" tableName="orders_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="orders_hash" tableName="orders_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -937,9 +889,6 @@
         <createIndex indexName="drug_order_hash_identifier" tableName="drug_order_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="drug_order_hash" tableName="drug_order_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1818">
@@ -968,9 +917,6 @@
 
         <createIndex indexName="test_order_hash_identifier" tableName="test_order_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="test_order_hash" tableName="test_order_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -1001,9 +947,6 @@
         <createIndex indexName="relationship_hash_identifier" tableName="relationship_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="relationship_hash" tableName="relationship_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1820">
@@ -1032,9 +975,6 @@
 
         <createIndex indexName="encounter_provider_hash_identifier" tableName="encounter_provider_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="encounter_provider_hash" tableName="encounter_provider_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -1065,9 +1005,6 @@
         <createIndex indexName="order_group_hash_identifier" tableName="order_group_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="order_group_hash" tableName="order_group_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1822">
@@ -1096,9 +1033,6 @@
 
         <createIndex indexName="patient_program_attribute_hash_identifier" tableName="patient_program_attribute_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="patient_program_attribute_hash" tableName="patient_program_attribute_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
@@ -1129,9 +1063,6 @@
         <createIndex indexName="users_hash_identifier" tableName="users_hash" unique="false">
             <column name="identifier" />
         </createIndex>
-        <createIndex indexName="users_hash" tableName="users_hash" unique="false">
-            <column name="hash" />
-        </createIndex>
     </changeSet>
 
     <changeSet author="wluyima" id="20211007-1824">
@@ -1160,9 +1091,6 @@
 
         <createIndex indexName="provider_hash_identifier" tableName="provider_hash" unique="false">
             <column name="identifier" />
-        </createIndex>
-        <createIndex indexName="provider_hash" tableName="provider_hash" unique="false">
-            <column name="hash" />
         </createIndex>
     </changeSet>
 
