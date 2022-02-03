@@ -20,7 +20,6 @@ import org.openmrs.eip.component.entity.Location;
 import org.openmrs.eip.component.entity.LocationAttribute;
 import org.openmrs.eip.component.entity.Observation;
 import org.openmrs.eip.component.entity.Order;
-import org.openmrs.eip.component.entity.OrderFrequency;
 import org.openmrs.eip.component.entity.Patient;
 import org.openmrs.eip.component.entity.PatientIdentifier;
 import org.openmrs.eip.component.entity.PatientProgram;
@@ -80,7 +79,6 @@ import org.openmrs.eip.component.model.GaacMemberModel;
 import org.openmrs.eip.component.model.GaacModel;
 import org.openmrs.eip.component.model.LocationModel;
 import org.openmrs.eip.component.model.ObservationModel;
-import org.openmrs.eip.component.model.OrderFrequencyModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -148,8 +146,6 @@ public enum TableToSyncEnum {
 	USERS(User.class, UserModel.class, UserHash.class),
 	
 	RELATIONSHIP(Relationship.class, RelationshipModel.class, RelationshipHash.class),
-	
-	ORDER_FREQUENCY(OrderFrequency.class, OrderFrequencyModel.class, null),
 	
 	PROVIDER(Provider.class, ProviderModel.class, ProviderHash.class),
 	

@@ -23,7 +23,6 @@ public class AppUtils {
 		IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
 		IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
-		IGNORE_TABLES.add(TableToSyncEnum.ORDER_FREQUENCY);
 	}
 	
 	private static Map<String, String> classAndSimpleNameMap = null;
