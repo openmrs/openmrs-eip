@@ -104,8 +104,6 @@ public enum TableToSyncEnum {
 	GAAC_MEMBER(GaacMember.class, GaacMemberModel.class),
 	GAAC_FAMILY(GaacFamily.class, GaacFamilyModel.class),
 	GAAC_FAMILY_MEMBER(GaacFamilyMember.class, GaacFamilyMemberModel.class);
-	      
-    //ICRC_ERP_WORK_ORDER_STATE(ErpWorkOrderState.class, ErpWorkOrderStateModel.class);
 
     private Class<? extends BaseEntity> entityClass;
 

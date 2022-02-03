@@ -1166,4 +1166,120 @@
         </createIndex>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220203-1420">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_hash table</comment>
+
+        <createTable tableName="gaac_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+
+        <createIndex indexName="gaac_hash_identifier" tableName="gaac_hash" unique="false">
+            <column name="identifier" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1421">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_member_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_member_hash table</comment>
+
+        <createTable tableName="gaac_member_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+
+        <createIndex indexName="gaac_member_hash_identifier" tableName="gaac_member_hash" unique="false">
+            <column name="identifier" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1422">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_family_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_family_hash table</comment>
+
+        <createTable tableName="gaac_family_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+
+        <createIndex indexName="gaac_family_hash_identifier" tableName="gaac_family_hash" unique="false">
+            <column name="identifier" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1423">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_family_member_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_family_member_hash table</comment>
+
+        <createTable tableName="gaac_family_member_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+
+        <createIndex indexName="gaac_family_member_hash_identifier" tableName="gaac_family_member_hash" unique="false">
+            <column name="identifier" />
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
