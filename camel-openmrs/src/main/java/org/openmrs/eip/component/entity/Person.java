@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javax.persistence.AttributeOverride;
@@ -41,7 +42,7 @@ public class Person extends BaseChangeableDataEntity {
 	private boolean dead;
 	
 	@Column(name = "death_date")
-	private LocalDate deathDate;
+	private LocalDateTime deathDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "cause_of_death")

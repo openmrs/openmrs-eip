@@ -41,6 +41,8 @@
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
         <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
+        <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
+        <powerMockVersion>2.0.9</powerMockVersion>
 
         <!-- UI properties -->
         <projectLocale>en</projectLocale>
@@ -110,6 +112,21 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commonsBeanUtilsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powerMockVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito2</artifactId>
+                <version>${powerMockVersion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -152,6 +169,14 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito2</artifactId>
         </dependency>
     </dependencies>
 
