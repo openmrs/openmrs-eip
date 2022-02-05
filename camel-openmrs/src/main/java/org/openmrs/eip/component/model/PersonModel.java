@@ -1,7 +1,6 @@
 package org.openmrs.eip.component.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,7 +19,7 @@ public class PersonModel extends BaseChangeableDataModel {
 	
 	private boolean dead;
 	
-	private LocalDateTime deathDate;
+	private LocalDate deathDate;
 	
 	private String causeOfDeathUuid;
 	
@@ -107,7 +106,7 @@ public class PersonModel extends BaseChangeableDataModel {
 	 *
 	 * @return the deathDate
 	 */
-	public LocalDateTime getDeathDate() {
+	public LocalDate getDeathDate() {
 		return deathDate;
 	}
 	
@@ -116,7 +115,7 @@ public class PersonModel extends BaseChangeableDataModel {
 	 *
 	 * @param deathDate the deathDate to set
 	 */
-	public void setDeathDate(LocalDateTime deathDate) {
+	public void setDeathDate(LocalDate deathDate) {
 		this.deathDate = deathDate;
 	}
 	

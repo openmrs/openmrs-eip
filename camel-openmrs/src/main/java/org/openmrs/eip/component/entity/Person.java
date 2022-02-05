@@ -42,7 +42,7 @@ public class Person extends BaseChangeableDataEntity {
 	private boolean dead;
 	
 	@Column(name = "death_date")
-	private LocalDateTime deathDate;
+	private LocalDate deathDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "cause_of_death")
