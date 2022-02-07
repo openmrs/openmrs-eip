@@ -13,4 +13,10 @@ public class Constants {
 	
 	public static final String HASH_DELETED = "DELETED";
 	
+	public static final String VALUE_SITE_SEPARATOR = "|";
+	
+	public static final String DEFAULT_RETIRE_REASON = "Retired because it was deleted in the site of origin";
+	
+	public static final String PROP_OPENMRS_USER = "openmrs.username";
+	
 }
