@@ -1,6 +1,7 @@
 package org.openmrs.eip.component;
 
 import org.openmrs.eip.component.entity.BaseEntity;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 public class SyncContext implements ApplicationContextAware {
 	
 	private static ApplicationContext appContext;
+	
+	private static UserLight user;
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -51,6 +54,24 @@ public class SyncContext implements ApplicationContextAware {
 		}
 		
 		return (SyncEntityRepository) appContext.getBean(beanNames[0]);
+	}
+	
+	/**
+	 * Gets the user
+	 *
+	 * @return the user
+	 */
+	public static UserLight getUser() {
+		return user;
+	}
+	
+	/**
+	 * Sets the user
+	 *
+	 * @param user the user to set
+	 */
+	public static void setUser(UserLight user) {
+		SyncContext.user = user;
 	}
 	
 }

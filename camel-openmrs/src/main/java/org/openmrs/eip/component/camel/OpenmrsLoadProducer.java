@@ -110,7 +110,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				existing.setRetired(true);
 				existing.setRetiredByUuid(UserLight.class.getName() + "(" + SyncContext.getUser().getUuid() + ")");
 				existing.setDateRetired(LocalDateTime.now());
-				existing.setRetiredReason(Constants.DEFAULT_RETIRE_REASON);
+				existing.setRetireReason(Constants.DEFAULT_RETIRE_REASON);
 				modelToSave = existing;
 			}
 			
@@ -163,7 +163,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				} else if (dbModel instanceof BaseMetadataModel) {
 					BaseMetadataModel metadataModel = (BaseMetadataModel) dbModel;
 					isEtyInDbPlaceHolder = metadataModel.isRetired()
-					        && DEFAULT_VOID_REASON.equals(metadataModel.getRetiredReason());
+					        && DEFAULT_VOID_REASON.equals(metadataModel.getRetireReason());
 				}
 				
 				boolean isNewHashInstance = false;
