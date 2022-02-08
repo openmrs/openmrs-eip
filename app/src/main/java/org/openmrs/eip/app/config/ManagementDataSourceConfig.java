@@ -1,5 +1,14 @@
 package org.openmrs.eip.app.config;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
+import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,18 +17,12 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-import java.sql.Driver;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
@@ -51,14 +54,21 @@ public class ManagementDataSourceConfig {
 	@Bean(name = "mngtEntityManager")
 	@DependsOn("customPropSource")
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-	                                                            @Qualifier("mngtDataSource") final DataSource dataSource) {
+	                                                            @Qualifier("mngtDataSource") final DataSource dataSource,
+	                                                            Environment env) {
 		
 		Map<String, String> props = new HashMap();
 		props.put("hibernate.dialect", hibernateDialect);
 		props.put("hibernate.hbm2ddl.auto", "none");
+		List<String> entityPackages = new ArrayList();
+		entityPackages.add("org.openmrs.eip.app.management.entity");
+		if (SyncProfiles.SENDER.equalsIgnoreCase(env.getActiveProfiles()[0])) {
+			entityPackages.add("org.apache.camel.processor.idempotent.jpa");
+		} else {
+			entityPackages.add("org.openmrs.eip.component.management.hash.entity");
+		}
 		
-		return builder.dataSource(dataSource)
-		        .packages("org.openmrs.eip.app.management.entity", "org.apache.camel.processor.idempotent.jpa")
+		return builder.dataSource(dataSource).packages(entityPackages.toArray(new String[entityPackages.size()]))
 		        .persistenceUnit("mngt").properties(props).build();
 	}
 	
