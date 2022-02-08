@@ -137,7 +137,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 					//This will typically happen if we inserted the hash but something went wrong before or during
 					//insert of the entity and the event comes back as a retry item
 					log.info("Found existing hash for a new entity, this could be a retry item to insert a new entity "
-					        + "where the hash was created but the insert previously failed");
+					        + "where the hash was created but the insert previously failed or a previously deleted entity at another site");
 					storedHash.setDateChanged(LocalDateTime.now());
 					
 					if (log.isDebugEnabled()) {

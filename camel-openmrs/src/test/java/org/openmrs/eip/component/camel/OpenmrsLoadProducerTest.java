@@ -335,7 +335,7 @@ public class OpenmrsLoadProducerTest {
 		    storedHash);
 		verify(mockLogger).info(
 		    "Found existing hash for a new entity, this could be a retry item to insert a new entity where the hash was "
-		            + "created but the insert previously failed");
+		            + "created but the insert previously failed or a previously deleted entity at another site");
 		verify(mockLogger).debug("Updating hash for the incoming entity state");
 		assertEquals(expectedNewHash, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
