@@ -8,6 +8,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.test.spring.CamelSpringRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.openmrs.eip.component.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,6 @@ public abstract class BaseDbDrivenTest {
 	
 	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.7.31");
 	
-	protected static Integer MYSQL_PORT;
-	
 	@Autowired
 	protected ApplicationContext applicationContext;
 	
@@ -50,7 +49,7 @@ public abstract class BaseDbDrivenTest {
 	protected CamelContext camelContext;
 	
 	@Autowired
-	@Qualifier("openmrsDataSource")
+	@Qualifier(Constants.OPENMRS_DATASOURCE_NAME)
 	protected DataSource openmrsDataSource;
 	
 	@BeforeClass
@@ -58,7 +57,6 @@ public abstract class BaseDbDrivenTest {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
 		Startables.deepStart(Stream.of(mysqlContainer)).join();
-		MYSQL_PORT = mysqlContainer.getMappedPort(3306);
 	}
 	
 }

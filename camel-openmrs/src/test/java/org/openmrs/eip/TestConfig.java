@@ -23,7 +23,7 @@ public class TestConfig {
 	
 	@Bean(Constants.OPENMRS_DATASOURCE_NAME)
 	public DataSource getDataSource() {
-		return DataSourceBuilder.create().url(BaseDbDrivenTest.mysqlContainer.getJdbcUrl())
+		return DataSourceBuilder.create().url(BaseDbDrivenTest.mysqlContainer.getJdbcUrl() + "?useSSL=false")
 		        .username(BaseDbDrivenTest.mysqlContainer.getUsername())
 		        .password(BaseDbDrivenTest.mysqlContainer.getPassword()).build();
 	}
