@@ -26,6 +26,7 @@ import org.openmrs.eip.component.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	
@@ -167,14 +168,24 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 				
 				boolean isNewHashInstance = false;
+				boolean isExistingEntityWithNoHash = false;
 				if (storedHash == null) {
+					isExistingEntityWithNoHash = !isEtyInDbPlaceHolder;
 					if (!isEtyInDbPlaceHolder) {
-						//TODO Don't fail if hashes of the db and incoming payloads match
-						throw new EIPException("Failed to find the existing hash for an existing entity");
+						String ignore = SyncContext.getBean(Environment.class)
+						        .getProperty(Constants.PROP_IGNORE_MISSING_HASH);
+						if (!"true".equals(ignore)) {
+							//TODO Don't fail if hashes of the db and incoming payloads match
+							throw new EIPException("Failed to find the existing hash for an existing entity");
+						}
 					}
 					
 					if (log.isDebugEnabled()) {
-						log.debug("Inserting new hash for existing placeholder entity");
+						if (isEtyInDbPlaceHolder) {
+							log.debug("Inserting new hash for existing placeholder entity");
+						} else {
+							log.debug("Inserting new hash for existing entity with missing hash");
+						}
 					}
 					
 					try {
@@ -190,7 +201,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 				
 				String newHash = HashUtils.computeHash(syncModel.getModel());
-				if (!isEtyInDbPlaceHolder) {
+				if (!isExistingEntityWithNoHash && !isEtyInDbPlaceHolder) {
 					String dbEntityHash = HashUtils.computeHash(dbModel);
 					if (!dbEntityHash.equals(storedHash.getHash())) {
 						if (dbEntityHash.equals(newHash)) {
@@ -205,7 +216,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 					}
 				} else {
 					if (log.isDebugEnabled()) {
-						log.debug("Ignoring placeholder entity when checking for conflicts");
+						if (isEtyInDbPlaceHolder) {
+							log.debug("Ignoring placeholder entity when checking for conflicts");
+						} else if (isExistingEntityWithNoHash) {
+							log.debug("Ignoring existing entity with missing hash when checking for conflicts");
+						}
 					}
 				}
 				
@@ -217,13 +232,21 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 				
 				if (log.isDebugEnabled()) {
-					log.debug("Updating hash for the incoming entity state");
+					if (isNewHashInstance) {
+						log.debug("Saving new hash for the entity");
+					} else {
+						log.debug("Updating hash for the incoming entity state");
+					}
 				}
 				
 				producerTemplate.sendBody("jpa:" + hashClass.getSimpleName(), storedHash);
 				
 				if (log.isDebugEnabled()) {
-					log.debug("Successfully updated the hash for the incoming entity state");
+					if (isNewHashInstance) {
+						log.debug("Successfully saved new hash for the entity");
+					} else {
+						log.debug("Successfully updated the hash for the incoming entity state");
+					}
 				}
 			}
 		}

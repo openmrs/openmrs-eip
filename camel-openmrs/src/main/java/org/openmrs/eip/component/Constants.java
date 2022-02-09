@@ -19,6 +19,8 @@ public class Constants {
 	
 	public static final String PROP_OPENMRS_USER = "openmrs.username";
 	
+	public static final String PROP_IGNORE_MISSING_HASH = "receiver.ignore.missing.hash.for.existing.entity";
+	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
 	
 }

@@ -24,6 +24,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -41,6 +42,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SyncContext.class, HashUtils.class })
@@ -65,6 +67,9 @@ public class OpenmrsLoadProducerTest {
 	@Mock
 	private Logger mockLogger;
 	
+	@Mock
+	private Environment mockEnv;
+	
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 	
@@ -76,6 +81,7 @@ public class OpenmrsLoadProducerTest {
 		exchange = new DefaultExchange(new DefaultCamelContext());
 		producer = new OpenmrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
+		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 		Whitebox.setInternalState(OpenmrsLoadProducer.class, Logger.class, mockLogger);
 	}
 	
@@ -114,7 +120,7 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldUpdateAnExistingEntity() throws Exception {
+	public void process_shouldUpdateAnExistingEntity() {
 		// Given
 		PersonModel model = new PersonModel();
 		model.setUuid("uuid");
@@ -309,7 +315,7 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldUpdateTheHashIfItAlreadyExistsForANewEntity() throws Exception {
+	public void process_shouldUpdateTheHashIfItAlreadyExistsForANewEntity() {
 		PersonModel model = new PersonModel();
 		model.setUuid("uuid");
 		SyncMetadata metadata = new SyncMetadata();
@@ -344,7 +350,7 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldFailIfNoHashIsFoundForAnExistingEntity() {
+	public void process_shouldFailIfNoHashIsFoundForAnExistingEntityAndIgnoreIsNotSetToTrue() {
 		// Given
 		PersonModel model = new PersonModel();
 		model.setUuid("uuid");
@@ -359,6 +365,46 @@ public class OpenmrsLoadProducerTest {
 		expectedException.expectMessage(equalTo("Failed to find the existing hash for an existing entity"));
 		
 		producer.process(exchange);
+	}
+	
+	@Test
+	public void process_shouldInsertANewHashIfNoneIsFoundForAnExistingEntityAndIgnoreIsSetToTrue() throws Exception {
+		// Given
+		PersonModel model = new PersonModel();
+		model.setUuid("uuid");
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setOperation("u");
+		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
+		exchange.getIn().setBody(syncModel);
+		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
+		PersonModel dbModel = new PersonModel();
+		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
+		PersonHash personHash = new PersonHash();
+		assertNull(personHash.getIdentifier());
+		assertNull(personHash.getHash());
+		assertNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		final String expectedHash = "testing";
+		when(HashUtils.computeHash(model)).thenReturn(expectedHash);
+		when(HashUtils.instantiateHashEntity(PersonHash.class)).thenReturn(personHash);
+		when(mockLogger.isDebugEnabled()).thenReturn(true);
+		when(mockEnv.getProperty(Constants.PROP_IGNORE_MISSING_HASH)).thenReturn("true");
+		
+		// When
+		producer.process(exchange);
+		
+		// Then
+		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
+		    personHash);
+		verify(mockLogger).debug("Inserting new hash for existing entity with missing hash");
+		verify(mockLogger).debug("Ignoring existing entity with missing hash when checking for conflicts");
+		verify(mockLogger).debug("Saving new hash for the entity");
+		verify(mockLogger).debug("Successfully saved new hash for the entity");
+		assertEquals(model.getUuid(), personHash.getIdentifier());
+		assertEquals(expectedHash, personHash.getHash());
+		assertNotNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		verify(serviceFacade).saveModel(TableToSyncEnum.PERSON, model);
 	}
 	
 	@Test
@@ -390,6 +436,8 @@ public class OpenmrsLoadProducerTest {
 		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
 		    personHash);
 		verify(mockLogger).debug("Inserting new hash for existing placeholder entity");
+		verify(mockLogger).debug("Saving new hash for the entity");
+		verify(mockLogger).debug("Successfully saved new hash for the entity");
 		assertEquals(model.getUuid(), personHash.getIdentifier());
 		assertEquals(expectedHash, personHash.getHash());
 		assertNotNull(personHash.getDateCreated());
