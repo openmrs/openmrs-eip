@@ -7,4 +7,4 @@ VALUES (1, 1, 'user-1', 1, '2020-06-21 00:00:00', 0, '1a3b12d1-5c4f-415f-871b-b9
 set FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO provider (identifier,creator,date_created,retired,uuid)
-VALUES ('nurse', 1, now(), 0, '2b3b12d1-5c4f-415f-871b-b98a22137606');
+VALUES ('nurse', 1, '2020-06-21 00:00:00', 0, '2b3b12d1-5c4f-415f-871b-b98a22137606');

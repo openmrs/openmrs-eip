@@ -113,14 +113,16 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			BaseModel modelToSave = syncModel.getModel();
 			String siteId = syncModel.getMetadata().getSourceIdentifier();
 			if (!isDeleteOperation) {
-				if (isUser) {
-					UserModel userModel = (UserModel) modelToSave;
-					userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
-					userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
-				} else if (isProvider) {
-					ProviderModel providerModel = (ProviderModel) syncModel.getModel();
-					if (StringUtils.isNotBlank(providerModel.getIdentifier())) {
-						providerModel.setIdentifier(providerModel.getIdentifier() + VALUE_SITE_SEPARATOR + siteId);
+				if (dbModel == null) {
+					if (isUser) {
+						UserModel userModel = (UserModel) modelToSave;
+						userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
+						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+					} else if (isProvider) {
+						ProviderModel providerModel = (ProviderModel) syncModel.getModel();
+						if (StringUtils.isNotBlank(providerModel.getIdentifier())) {
+							providerModel.setIdentifier(providerModel.getIdentifier() + VALUE_SITE_SEPARATOR + siteId);
+						}
 					}
 				}
 			} else {

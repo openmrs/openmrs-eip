@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.AfterClass;
@@ -42,7 +41,11 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = "classpath:test_data.sql")
 public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
-	private String creator = UserLight.class.getName() + "(1a3b12d1-5c4f-415f-871b-b98a22137605)";
+	private static final String PROVIDER_UUID = "2b3b12d1-5c4f-415f-871b-b98a22137606";
+	
+	private static final String USER_UUID = "1a3b12d1-5c4f-415f-871b-b98a22137605";
+	
+	private String creator = UserLight.class.getName() + "(" + USER_UUID + ")";
 	
 	private Exchange exchange;
 	
@@ -53,9 +56,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@Autowired
 	private AbstractEntityService<Provider, ProviderModel> providerService;
-	
-	@Autowired
-	private ProducerTemplate producerTemplate;
 	
 	@Before
 	public void init() {
@@ -69,8 +69,10 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void process_shouldPreProcessUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
+	public void process_shouldPreProcessUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteIdIfTheyDoNotExistInReceiverDatabase() {
 		final String userUuid = "user-uuid";
+		UserModel existingUser = userService.getModel(userUuid);
+		assertNull(existingUser);
 		final String username = "jdoe@eip.org";
 		final String systemId = "123";
 		final String siteId = "some-site-uuid";
@@ -95,7 +97,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void process_shouldPreProcessProviderToUpdateIdentifierPropertyToIncludeTheSendingSiteId() {
+	public void process_shouldPreProcessProviderToUpdateIdentifierPropertyToIncludeTheSendingSiteIdIfTheyDoNotExistInReceiverDatabase() {
 		final String providerUuid = "provider-uuid";
 		final String identifier = "12345";
 		final String siteId = "some-site-uuid";
@@ -140,8 +142,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@Test
 	public void process_shouldPreProcessDeletedAUserAndMarkThemAsRetired() {
-		final String userUuid = "1a3b12d1-5c4f-415f-871b-b98a22137605";
-		UserModel existingUser = userService.getModel(userUuid);
+		UserModel existingUser = userService.getModel(USER_UUID);
 		assertNotNull(existingUser);
 		assertFalse(existingUser.isRetired());
 		assertNull(existingUser.getRetiredByUuid());
@@ -149,7 +150,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		assertNull(existingUser.getDateRetired());
 		final String siteId = "some-site-uuid";
 		UserModel model = new UserModel();
-		model.setUuid(userUuid);
+		model.setUuid(USER_UUID);
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		metadata.setOperation("d");
@@ -162,12 +163,12 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		UserHash existingHash = new UserHash();
 		existingHash.setHash(HashUtils.computeHash(existingUser));
 		final String query = QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, UserHash.class.getSimpleName())
-		        .replace(PLACEHOLDER_UUID, userUuid);
+		        .replace(PLACEHOLDER_UUID, USER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
 		producer.process(exchange);
 		
-		existingUser = userService.getModel(userUuid);
+		existingUser = userService.getModel(USER_UUID);
 		assertNotNull(existingUser);
 		assertTrue(existingUser.isRetired());
 		assertEquals(UserLight.class.getName() + "(" + appUserUuid + ")", existingUser.getRetiredByUuid());
@@ -177,8 +178,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@Test
 	public void process_shouldPreProcessDeletedAProviderAndMarkThemAsRetired() {
-		final String providerUuid = "2b3b12d1-5c4f-415f-871b-b98a22137606";
-		ProviderModel existingProvider = providerService.getModel(providerUuid);
+		ProviderModel existingProvider = providerService.getModel(PROVIDER_UUID);
 		assertNotNull(existingProvider);
 		assertFalse(existingProvider.isRetired());
 		assertNull(existingProvider.getRetiredByUuid());
@@ -186,7 +186,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		assertNull(existingProvider.getDateRetired());
 		final String siteId = "some-site-uuid";
 		ProviderModel model = new ProviderModel();
-		model.setUuid(providerUuid);
+		model.setUuid(PROVIDER_UUID);
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		metadata.setOperation("d");
@@ -199,12 +199,12 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		ProviderHash existingHash = new ProviderHash();
 		existingHash.setHash(HashUtils.computeHash(existingProvider));
 		final String query = QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, ProviderHash.class.getSimpleName())
-		        .replace(PLACEHOLDER_UUID, providerUuid);
+		        .replace(PLACEHOLDER_UUID, PROVIDER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
 		producer.process(exchange);
 		
-		existingProvider = providerService.getModel(providerUuid);
+		existingProvider = providerService.getModel(PROVIDER_UUID);
 		assertNotNull(existingProvider);
 		assertTrue(existingProvider.isRetired());
 		assertEquals(UserLight.class.getName() + "(" + appUserUuid + ")", existingProvider.getRetiredByUuid());
@@ -242,6 +242,62 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		producer.process(exchange);
 		
 		assertNull(providerService.getModel(providerUuid));
+	}
+	
+	@Test
+	public void process_shouldNotPreProcessUserToIncludeTheSendingSiteIdIfTheyExistInReceiverDatabase() {
+		UserModel existingUser = userService.getModel(USER_UUID);
+		assertNotNull(existingUser);
+		final String username = "jdoe@eip.org";
+		final String systemId = "123";
+		final String siteId = "some-site-uuid";
+		UserModel model = new UserModel();
+		model.setUuid(USER_UUID);
+		model.setUsername(username);
+		model.setSystemId(systemId);
+		model.setCreatorUuid(creator);
+		model.setDateCreated(LocalDateTime.now());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
+		exchange.getIn().setBody(syncModel);
+		final String query = Constants.QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, UserHash.class.getSimpleName())
+		        .replace(PLACEHOLDER_UUID, USER_UUID);
+		UserHash hash = new UserHash();
+		hash.setHash(HashUtils.computeHash(existingUser));
+		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(hash));
+		
+		producer.process(exchange);
+		
+		UserModel savedUser = userService.getModel(USER_UUID);
+		assertEquals(username, savedUser.getUsername());
+		assertEquals(systemId, savedUser.getSystemId());
+	}
+	
+	@Test
+	public void process_shouldNotPreProcessProviderToIncludeTheSendingSiteIdIfTheyExistInReceiverDatabase() {
+		ProviderModel existingProvider = providerService.getModel(PROVIDER_UUID);
+		assertNotNull(existingProvider);
+		final String identifier = "12345";
+		final String siteId = "some-site-uuid";
+		ProviderModel model = new ProviderModel();
+		model.setUuid(PROVIDER_UUID);
+		model.setIdentifier(identifier);
+		model.setCreatorUuid(creator);
+		model.setDateCreated(LocalDateTime.now());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
+		exchange.getIn().setBody(syncModel);
+		final String query = Constants.QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, ProviderHash.class.getSimpleName())
+		        .replace(PLACEHOLDER_UUID, PROVIDER_UUID);
+		ProviderHash hash = new ProviderHash();
+		hash.setHash(HashUtils.computeHash(existingProvider));
+		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(hash));
+		
+		producer.process(exchange);
+		
+		assertEquals(identifier, providerService.getModel(PROVIDER_UUID).getIdentifier());
 	}
 	
 }

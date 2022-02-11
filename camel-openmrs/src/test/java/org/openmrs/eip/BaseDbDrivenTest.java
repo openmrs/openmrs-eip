@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import javax.sql.DataSource;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.spring.CamelSpringRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -51,6 +52,9 @@ public abstract class BaseDbDrivenTest {
 	@Autowired
 	@Qualifier(Constants.OPENMRS_DATASOURCE_NAME)
 	protected DataSource openmrsDataSource;
+
+    @Autowired
+    protected ProducerTemplate producerTemplate;
 	
 	@BeforeClass
 	public static void startContainers() {
