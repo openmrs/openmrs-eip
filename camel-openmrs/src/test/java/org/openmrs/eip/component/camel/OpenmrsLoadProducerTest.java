@@ -184,7 +184,7 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldFailIfNoStoredHashIsFoundForAnExistingDeletedEntity() {
+	public void process_shouldInsertANewHashIfNoStoredHashIsFoundForAnExistingEntityGettingDeleted() throws Exception {
 		final String personUuid = "some-uuid";
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
@@ -197,14 +197,32 @@ public class OpenmrsLoadProducerTest {
 		exchange.getIn().setBody(syncModel);
 		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, personUuid)).thenReturn(model);
-		expectedException.expect(EIPException.class);
-		expectedException.expectMessage(equalTo("Failed to find the existing hash for the deleted entity"));
+		PersonHash personHash = new PersonHash();
+		assertNull(personHash.getIdentifier());
+		assertNull(personHash.getHash());
+		assertNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		when(HashUtils.instantiateHashEntity(PersonHash.class)).thenReturn(personHash);
+		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		producer.process(exchange);
+		
+		// Then
+		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
+		    personHash);
+		verify(mockLogger).info("Inserting new hash for the deleted entity with no existing hash");
+		verify(mockLogger).debug("Saving new hash for the deleted entity");
+		verify(mockLogger).debug("Successfully saved the new hash for the deleted entity");
+		assertEquals(model.getUuid(), personHash.getIdentifier());
+		assertEquals(HASH_DELETED, personHash.getHash());
+		assertNotNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 	}
 	
-	@Test(expected = ConflictsFoundException.class)
-	public void process_ShouldFailIfTheExistingEntityFromTheDbForADeletedEntityHasADifferentHashFromTheStoredOne() {
+	@Test
+	public void process_ShouldPassIfTheExistingEntityFromTheDbForADeletedEntityHasADifferentHashFromTheStoredOne()
+	    throws Exception {
 		final String personUuid = "some-uuid";
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
@@ -223,8 +241,14 @@ public class OpenmrsLoadProducerTest {
 		assertNull(storedHash.getDateChanged());
 		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class), any(ProducerTemplate.class))).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn("different-hash");
+		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		producer.process(exchange);
+		verify(mockLogger).debug("Updating hash for the deleted entity");
+		verify(mockLogger).debug("Successfully updated the hash for the deleted entity");
+		assertEquals(HASH_DELETED, storedHash.getHash());
+		assertNotNull(storedHash.getDateChanged());
+		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 	}
 	
 	@Test

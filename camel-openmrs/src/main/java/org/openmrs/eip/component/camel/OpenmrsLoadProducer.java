@@ -1,5 +1,7 @@
 package org.openmrs.eip.component.camel;
 
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
+import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 
@@ -54,15 +56,22 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
 		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
 		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
+			boolean isNewHash = false;
 			if (dbModel != null) {
 				if (storedHash == null) {
-					//TODO Don't fail if hashes of the db and incoming payloads match
-					throw new EIPException("Failed to find the existing hash for the deleted entity");
-				}
-				
-				String dbModelHash = HashUtils.computeHash(dbModel);
-				if (!dbModelHash.equals(storedHash.getHash())) {
-					throw new ConflictsFoundException();
+					isNewHash = true;
+					
+					log.info("Inserting new hash for the deleted entity with no existing hash");
+					
+					try {
+						storedHash = HashUtils.instantiateHashEntity(hashClass);
+					}
+					catch (Exception e) {
+						throw new EIPException("Failed to create an instance of " + hashClass, e);
+					}
+					
+					storedHash.setIdentifier(syncModel.getModel().getUuid());
+					storedHash.setDateCreated(LocalDateTime.now());
 				}
 			}
 			
@@ -77,16 +86,26 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 				
 				storedHash.setHash(Constants.HASH_DELETED);
-				storedHash.setDateChanged(LocalDateTime.now());
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Updating hash for the deleted entity");
+				if (!isNewHash) {
+					storedHash.setDateChanged(LocalDateTime.now());
 				}
 				
-				producerTemplate.sendBody("jpa:" + hashClass.getSimpleName(), storedHash);
+				if (log.isDebugEnabled()) {
+					if (isNewHash) {
+						log.debug("Saving new hash for the deleted entity");
+					} else {
+						log.debug("Updating hash for the deleted entity");
+					}
+				}
+				
+				producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
 				
 				if (log.isDebugEnabled()) {
-					log.debug("Successfully updated the hash for the deleted entity");
+					if (isNewHash) {
+						log.debug("Successfully saved the new hash for the deleted entity");
+					} else {
+						log.debug("Successfully updated the hash for the deleted entity");
+					}
 				}
 			}
 			
@@ -239,7 +258,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 					}
 				}
 				
-				producerTemplate.sendBody("jpa:" + hashClass.getSimpleName(), storedHash);
+				producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
 				
 				if (log.isDebugEnabled()) {
 					if (isNewHashInstance) {
