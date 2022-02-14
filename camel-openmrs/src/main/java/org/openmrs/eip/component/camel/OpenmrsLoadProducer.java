@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.camel;
 
+import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
@@ -45,6 +46,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 		
 		boolean isUser = syncModel.getModel() instanceof UserModel;
+		if (isUser && DAEMON_USER_UUID.equals(syncModel.getModel().getUuid())) {
+			log.info("Skipping syncing of daemon user");
+			return;
+		}
+		
 		boolean isProvider = syncModel.getModel() instanceof ProviderModel;
 		boolean isDeleteOperation = "d".equals(syncModel.getMetadata().getOperation());
 		boolean delete = isDeleteOperation && !isUser && !isProvider;

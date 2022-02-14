@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 import static org.openmrs.eip.component.Constants.QUERY_GET_HASH;
@@ -71,8 +72,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	@Test
 	public void process_shouldPreProcessAdminUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
 		final String userUuid = "user-uuid";
-		UserModel existingUser = userService.getModel(userUuid);
-		assertNull(existingUser);
+		assertNull(userService.getModel(userUuid));
 		final String username = "admin";
 		final String systemId = "123";
 		final String siteId = "some-site-uuid";
@@ -86,7 +86,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		exchange.getIn().setBody(syncModel);
-		assertNull(userService.getModel(userUuid));
 		
 		producer.process(exchange);
 		
@@ -99,8 +98,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	@Test
 	public void process_shouldNotPreProcessNonAdminUserUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
 		final String userUuid = "user-uuid";
-		UserModel existingUser = userService.getModel(userUuid);
-		assertNull(existingUser);
+		assertNull(userService.getModel(userUuid));
 		final String username = "test";
 		final String systemId = "123";
 		final String siteId = "some-site-uuid";
@@ -114,7 +112,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		exchange.getIn().setBody(syncModel);
-		assertNull(userService.getModel(userUuid));
 		
 		producer.process(exchange);
 		
@@ -226,6 +223,28 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		producer.process(exchange);
 		
 		assertNull(providerService.getModel(providerUuid));
+	}
+	
+	@Test
+	public void process_shouldNotSyncDaemonUser() {
+		assertNull(userService.getModel(DAEMON_USER_UUID));
+		final String username = "test";
+		final String systemId = "123";
+		final String siteId = "some-site-uuid";
+		UserModel model = new UserModel();
+		model.setUuid(DAEMON_USER_UUID);
+		model.setUsername(username);
+		model.setSystemId(systemId);
+		model.setCreatorUuid(creator);
+		model.setDateCreated(LocalDateTime.now());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
+		exchange.getIn().setBody(syncModel);
+		
+		producer.process(exchange);
+		
+		assertNull(userService.getModel(DAEMON_USER_UUID));
 	}
 	
 }
