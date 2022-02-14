@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.UserLight;
@@ -113,16 +112,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			BaseModel modelToSave = syncModel.getModel();
 			String siteId = syncModel.getMetadata().getSourceIdentifier();
 			if (!isDeleteOperation) {
-				if (dbModel == null) {
-					if (isUser) {
-						UserModel userModel = (UserModel) modelToSave;
+				if (isUser) {
+					UserModel userModel = (UserModel) modelToSave;
+					if ("admin".equals(userModel.getUsername())) {
 						userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
-					} else if (isProvider) {
-						ProviderModel providerModel = (ProviderModel) syncModel.getModel();
-						if (StringUtils.isNotBlank(providerModel.getIdentifier())) {
-							providerModel.setIdentifier(providerModel.getIdentifier() + VALUE_SITE_SEPARATOR + siteId);
-						}
 					}
 				}
 			} else {

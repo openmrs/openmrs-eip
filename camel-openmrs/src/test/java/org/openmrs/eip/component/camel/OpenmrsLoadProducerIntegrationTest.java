@@ -69,11 +69,11 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void process_shouldPreProcessUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteIdIfTheyDoNotExistInReceiverDatabase() {
+	public void process_shouldPreProcessAdminUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
 		final String userUuid = "user-uuid";
 		UserModel existingUser = userService.getModel(userUuid);
 		assertNull(existingUser);
-		final String username = "jdoe@eip.org";
+		final String username = "admin";
 		final String systemId = "123";
 		final String siteId = "some-site-uuid";
 		UserModel model = new UserModel();
@@ -97,47 +97,31 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void process_shouldPreProcessProviderToUpdateIdentifierPropertyToIncludeTheSendingSiteIdIfTheyDoNotExistInReceiverDatabase() {
-		final String providerUuid = "provider-uuid";
-		final String identifier = "12345";
+	public void process_shouldNotPreProcessNonAdminUserUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
+		final String userUuid = "user-uuid";
+		UserModel existingUser = userService.getModel(userUuid);
+		assertNull(existingUser);
+		final String username = "test";
+		final String systemId = "123";
 		final String siteId = "some-site-uuid";
-		ProviderModel model = new ProviderModel();
-		model.setUuid(providerUuid);
-		model.setIdentifier(identifier);
+		UserModel model = new UserModel();
+		model.setUuid(userUuid);
+		model.setUsername(username);
+		model.setSystemId(systemId);
 		model.setCreatorUuid(creator);
 		model.setDateCreated(LocalDateTime.now());
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		exchange.getIn().setBody(syncModel);
-		assertNull(providerService.getModel(providerUuid));
+		assertNull(userService.getModel(userUuid));
 		
 		producer.process(exchange);
 		
-		ProviderModel savedProvider = providerService.getModel(providerUuid);
-		assertNotNull(savedProvider);
-		assertEquals(identifier + VALUE_SITE_SEPARATOR + siteId, savedProvider.getIdentifier());
-	}
-	
-	@Test
-	public void process_shouldNotPreProcessProviderToUpdateIdentifierPropertyIfNotSet() {
-		final String providerUuid = "provider-uuid";
-		final String siteId = "some-site-uuid";
-		ProviderModel model = new ProviderModel();
-		model.setUuid(providerUuid);
-		model.setCreatorUuid(creator);
-		model.setDateCreated(LocalDateTime.now());
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setSourceIdentifier(siteId);
-		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
-		assertNull(providerService.getModel(providerUuid));
-		
-		producer.process(exchange);
-		
-		ProviderModel savedProvider = providerService.getModel(providerUuid);
-		assertNotNull(savedProvider);
-		assertNull(savedProvider.getIdentifier());
+		UserModel savedUser = userService.getModel(userUuid);
+		assertNotNull(savedUser);
+		assertEquals(username, savedUser.getUsername());
+		assertEquals(systemId, savedUser.getSystemId());
 	}
 	
 	@Test
@@ -242,62 +226,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		producer.process(exchange);
 		
 		assertNull(providerService.getModel(providerUuid));
-	}
-	
-	@Test
-	public void process_shouldNotPreProcessUserToIncludeTheSendingSiteIdIfTheyExistInReceiverDatabase() {
-		UserModel existingUser = userService.getModel(USER_UUID);
-		assertNotNull(existingUser);
-		final String username = "jdoe@eip.org";
-		final String systemId = "123";
-		final String siteId = "some-site-uuid";
-		UserModel model = new UserModel();
-		model.setUuid(USER_UUID);
-		model.setUsername(username);
-		model.setSystemId(systemId);
-		model.setCreatorUuid(creator);
-		model.setDateCreated(LocalDateTime.now());
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setSourceIdentifier(siteId);
-		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
-		final String query = Constants.QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, UserHash.class.getSimpleName())
-		        .replace(PLACEHOLDER_UUID, USER_UUID);
-		UserHash hash = new UserHash();
-		hash.setHash(HashUtils.computeHash(existingUser));
-		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(hash));
-		
-		producer.process(exchange);
-		
-		UserModel savedUser = userService.getModel(USER_UUID);
-		assertEquals(username, savedUser.getUsername());
-		assertEquals(systemId, savedUser.getSystemId());
-	}
-	
-	@Test
-	public void process_shouldNotPreProcessProviderToIncludeTheSendingSiteIdIfTheyExistInReceiverDatabase() {
-		ProviderModel existingProvider = providerService.getModel(PROVIDER_UUID);
-		assertNotNull(existingProvider);
-		final String identifier = "12345";
-		final String siteId = "some-site-uuid";
-		ProviderModel model = new ProviderModel();
-		model.setUuid(PROVIDER_UUID);
-		model.setIdentifier(identifier);
-		model.setCreatorUuid(creator);
-		model.setDateCreated(LocalDateTime.now());
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setSourceIdentifier(siteId);
-		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
-		final String query = Constants.QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, ProviderHash.class.getSimpleName())
-		        .replace(PLACEHOLDER_UUID, PROVIDER_UUID);
-		ProviderHash hash = new ProviderHash();
-		hash.setHash(HashUtils.computeHash(existingProvider));
-		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(hash));
-		
-		producer.process(exchange);
-		
-		assertEquals(identifier, providerService.getModel(PROVIDER_UUID).getIdentifier());
 	}
 	
 }
