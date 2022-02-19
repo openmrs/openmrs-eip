@@ -1,6 +1,9 @@
 package org.openmrs.eip.mysql.watcher.route;
 
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
+
 import org.openmrs.eip.BaseDbBackedCamelTest;
+import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.test.context.TestPropertySource;
  * database, .
  */
 @Import(WatcherConfig.class)
+@TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + TestConstants.URI_TEST_ERROR_HANDLER)
 @TestPropertySource("classpath:watcher-application-test.properties")
 public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	
