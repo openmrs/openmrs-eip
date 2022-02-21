@@ -7,4 +7,6 @@ VALUES
 (5, 'orders', '1', 'c', 'mock:event-listener', 1, 'java.lang.Exception', null, 0, '2020-02-27 00:00:00'),
 (6, 'orders', '2', 'c', 'direct:db-sync', 1, 'java.lang.Exception', null, 0, '2020-02-27 00:00:00'),
 (7, 'orders', '101', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
-(8, 'orders', '103', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00');
+(8, 'orders', '103', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
+(9, 'test_order', '105', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
+(10, 'drug_order', '107', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00');
