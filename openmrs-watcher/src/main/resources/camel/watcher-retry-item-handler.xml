@@ -1,0 +1,58 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="watcher-retry-item-handler" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:watcher-retry-item-handler" />
+
+        <log loggingLevel="DEBUG" message="Start: ${routeId}" />
+
+        <setProperty name="retry-item-id">
+            <simple>${body}</simple>
+        </setProperty>
+        
+        <log message="Loading event retry item with id: ${body}" />
+
+        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${body}" />
+
+        <setProperty name="retry-item">
+            <simple>${body[0]}</simple>
+        </setProperty>
+
+        <log message="Updating attempt count for retry item" />
+
+        <script>
+            <spel>
+                #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+            </spel>
+        </script>
+
+        <when>
+            <simple>${exchangeProperty.event-destinations.contains(${exchangeProperty.retry-item.route.trim()})} == false</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.retry-item.route.trim()}" />
+        </when>
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})} == true</simple>
+                <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="Skipped because the entity had older failed event(s) in the queue" />
+            </when>
+            <otherwise>
+                <log message="Re-processing: ${exchangeProperty.retry-item}" />
+                <setProperty name="event">
+                    <simple>${exchangeProperty.retry-item.event}</simple>
+                </setProperty>
+                <setProperty name="db-event-destinations">
+                    <simple>${exchangeProperty.retry-item.route}</simple>
+                </setProperty>
+                <setBody>
+                    <simple>${exchangeProperty.event}</simple>
+                </setBody>
+
+                <to uri="{{watcher.uri.event.processor}}" />
+            </otherwise>
+        </choice>
+
+        <log loggingLevel="DEBUG" message="End: ${routeId}" />
+    </route>
+
+</routes>
