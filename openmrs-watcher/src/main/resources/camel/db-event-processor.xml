@@ -60,35 +60,16 @@
                         <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
                     </when>
 
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
-                            <choice>
-                                <when>
-                                    <simple>${exchangeProperty.event.operation} == 'd' &amp;&amp; ${exchangeProperty.event.previousState} != null</simple>
-                                    <setProperty name="previousOrderId">
-                                        <spel>#{getProperty('event').previousState.get('previous_order')}</spel>
-                                    </setProperty>
-                                </when>
-                                <when>
-                                    <simple>${exchangeProperty.event.currentState} != null</simple>
-                                    <setProperty name="previousOrderId">
-                                        <spel>#{getProperty('event').currentState.get('previous_order')}</spel>
-                                    </setProperty>
-                                </when>
-                            </choice>
-                        </when>
-                        <otherwise>
-                            <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.event.primaryKeyId}?dataSource=openmrsDataSource" />
+                    <!-- TODO After https://issues.openmrs.org/browse/EIP-89 is done, for a deleted orders event get the
+                        previousOrderId from the previousState  -->
+                    <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.event.primaryKeyId}?dataSource=openmrsDataSource" />
 
-                            <when>
-                                <simple>${body.size()} == 1</simple>
-                                <setProperty name="previousOrderId">
-                                    <simple>${body[0].get('previous_order_id')}</simple>
-                                </setProperty>
-                            </when>
-                        </otherwise>
-                    </choice>
+                    <when>
+                        <simple>${body.size()} == 1</simple>
+                        <setProperty name="previousOrderId">
+                            <simple>${body[0].get('previous_order_id')}</simple>
+                        </setProperty>
+                    </when>
 
                     <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
 

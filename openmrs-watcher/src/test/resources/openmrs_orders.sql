@@ -1,5 +1,7 @@
 INSERT INTO orders (order_id, previous_order_id, uuid)
-VALUES (101, null, 'a0783853-608f-49f2-af6a-65c54ff54000'),
+VALUES (1, null, 'i0783853-608f-49f2-af6a-65c54ff54000'),
+       (2, 1, 'j0783853-608f-49f2-af6a-65c54ff54000'),
+       (101, null, 'a0783853-608f-49f2-af6a-65c54ff54000'),
        (102, 101, 'b0783853-608f-49f2-af6a-65c54ff54000'),
        (103, null, 'c0783853-608f-49f2-af6a-65c54ff54000'),
        (104, 103, 'd0783853-608f-49f2-af6a-65c54ff54000'),

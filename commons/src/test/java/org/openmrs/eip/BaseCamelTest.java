@@ -129,7 +129,7 @@ public abstract class BaseCamelTest {
 	}
 	
 	protected String getErrorMessage(Exchange e) {
-		return e.getProperty("error", EIPException.class).getMessage();
+		return e.getProperty("error", Exception.class).getMessage();
 	}
 	
 }

@@ -2,7 +2,6 @@ package org.openmrs.eip.mysql.watcher.route;
 
 import static java.util.Collections.singletonMap;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
-import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -11,7 +10,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.Constants;
-import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.TestOpenmrsDataSourceConfig;
 import org.springframework.context.annotation.Import;
@@ -37,11 +35,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	private static final String ORDER_UUID = "order_uuid";
 	
-	private static final String PREV_COLUMN = "previous_order";
-	
 	private static final String ORDER_ID_COLUMN = "order_id";
-	
-	private static final Integer PREV_ORDER_ID = 1;
 	
 	private static final String ERR_MSG = "Moving order event to the failure queue because its previous order has 1 event(s) in the retry queue for route: "
 	        + ROUTE_URI_LISTENER;
@@ -60,7 +54,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	public void shouldNotProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
 	    throws Exception {
 		Event event = createEvent("orders", "2", ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(PREV_COLUMN, PREV_ORDER_ID));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -77,7 +70,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 106;
 		Event event = createEvent("orders", orderId.toString(), ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(PREV_COLUMN, 105));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -94,7 +86,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 108;
 		Event event = createEvent("orders", orderId.toString(), ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(PREV_COLUMN, 107));
+		//event.setCurrentState(singletonMap(PREV_COLUMN, 107));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -111,7 +103,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 102;
 		Event event = createEvent("test_order", orderId.toString(), ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(ORDER_ID_COLUMN, orderId));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -128,7 +119,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 106;
 		Event event = createEvent("test_order", orderId.toString(), ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(ORDER_ID_COLUMN, orderId));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -145,7 +135,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 104;
 		Event event = createEvent("drug_order", orderId.toString(), ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(ORDER_ID_COLUMN, orderId));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -178,7 +167,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	public void shouldNotProcessADeletedOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
 	    throws Exception {
 		Event event = createEvent("orders", "2", ORDER_UUID, "d");
-		event.setPreviousState(singletonMap(PREV_COLUMN, PREV_ORDER_ID));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
@@ -194,7 +182,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForAnotherRoute()
 	    throws Exception {
 		Event event = createEvent("orders", "5", ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(PREV_COLUMN, "2"));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(1);
@@ -211,7 +198,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	public void shouldProcessARetryItemForAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheRoute()
 	    throws Exception {
 		Event event = createEvent("orders", "2", ORDER_UUID, "c");
-		event.setCurrentState(singletonMap(PREV_COLUMN, PREV_ORDER_ID));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty("retry-item-id", 5);
 		exchange.setProperty(PROP_EVENT, event);
