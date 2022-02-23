@@ -86,7 +86,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	    throws Exception {
 		final Integer orderId = 108;
 		Event event = createEvent("orders", orderId.toString(), ORDER_UUID, "c");
-		//event.setCurrentState(singletonMap(PREV_COLUMN, 107));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(0);
