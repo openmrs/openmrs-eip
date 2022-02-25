@@ -52,7 +52,7 @@
                 the retry queue to preserve data integrity, Note that this ONLY applies to new events and not retries
             -->
             <when>
-                <simple>${exchangeProperty.retry-item-id} == null</simple>
+                <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${properties:ignore.previous.order.in.error.queue:false} != true</simple>
                 <when>
                     <simple>${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.event.tableName} == 'test_order' || ${exchangeProperty.event.tableName} == 'drug_order'</simple>
                     <when>
@@ -86,7 +86,7 @@
 
                         <when>
                             <simple>${body.size()} > 0</simple>
-                            <log message="Moving order event to the failure queue because its previous order has ${body.size()} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
+                            <log message="Moving order event to the failure queue because its previous order has ${body.size()} event(s) in the retry queue for destination: ${exchangeProperty.db-event-dest}" />
 
                             <setProperty name="retryEventMsg">
                                 <simple>Cannot process the order event because its previous order has ${body.size()} event(s) in the retry queue</simple>

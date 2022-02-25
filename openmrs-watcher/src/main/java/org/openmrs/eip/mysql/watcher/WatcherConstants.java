@@ -36,4 +36,6 @@ public class WatcherConstants {
 	
 	public static final String PROP_SOURCE_NAME = "watcherPropSource";
 	
+	public static final String PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE = "ignore.previous.order.in.error.queue";
+	
 }

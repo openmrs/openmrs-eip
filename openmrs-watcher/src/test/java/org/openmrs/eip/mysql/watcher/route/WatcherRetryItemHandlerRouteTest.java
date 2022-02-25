@@ -4,11 +4,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.Constants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.Constants.MGT_TX_MGR_NAME;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_EVENT_PROCESSOR;
-
-import java.util.Date;
+import static org.openmrs.eip.mysql.watcher.WatcherTestUtils.addRetryItem;
+import static org.springframework.test.context.support.TestPropertySourceUtils.addInlinedPropertiesToEnvironment;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -17,9 +19,9 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.Constants;
-import org.openmrs.eip.EIPException;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.TestOpenmrsDataSourceConfig;
+import org.openmrs.eip.mysql.watcher.WatcherTestUtils;
 import org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
@@ -56,15 +58,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	@Before
 	public void setup() {
 		mockEventProcessorEndpoint.reset();
-	}
-	
-	private SenderRetryQueueItem addRetryItem(String entityTable, String entityId, String entityUuid, String route) {
-		SenderRetryQueueItem r = new SenderRetryQueueItem();
-		r.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
-		r.setRoute(route);
-		r.setExceptionType(EIPException.class.getName());
-		r.setDateCreated(new Date());
-		return (SenderRetryQueueItem) producerTemplate.requestBody("jpa:" + SenderRetryQueueItem.class.getSimpleName(), r);
+		addInlinedPropertiesToEnvironment(env, PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE + "=");
 	}
 	
 	@Test
@@ -96,11 +90,15 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldFailIfAnOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheRoute() throws Exception {
+	public void shouldFailIfAnOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
+	    throws Exception {
 		final String tableName = "orders";
-		SenderRetryQueueItem retry = addRetryItem(tableName, "102", null, MOCK_LISTENER);
+		final Integer orderId = 102;
+		final Integer previousOrderId = 101;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#101#" + MOCK_LISTENER));
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + previousOrderId + "#" + MOCK_LISTENER));
 		exchange.getIn().setBody(retry.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(0);
 		
@@ -111,12 +109,15 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldFailIfATestOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheRoute()
+	public void shouldFailIfATestOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
 	    throws Exception {
 		final String tableName = "test_order";
-		SenderRetryQueueItem retry = addRetryItem(tableName, "102", null, MOCK_LISTENER);
+		final Integer orderId = 102;
+		final Integer previousOrderId = 101;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#101#" + MOCK_LISTENER));
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + previousOrderId + "#" + MOCK_LISTENER));
 		exchange.getIn().setBody(retry.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(0);
 		
@@ -127,12 +128,15 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldFailIfADrugOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheRoute()
+	public void shouldFailIfADrugOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
 	    throws Exception {
 		final String tableName = "drug_order";
-		SenderRetryQueueItem retry = addRetryItem(tableName, "102", null, MOCK_LISTENER);
+		final Integer orderId = 102;
+		final Integer previousOrderId = 101;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#101#" + MOCK_LISTENER));
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + previousOrderId + "#" + MOCK_LISTENER));
 		exchange.getIn().setBody(retry.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(0);
 		
@@ -143,12 +147,15 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsAmongFailedRetriesButForAnotherRoute()
+	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsAmongFailedRetriesButForAnotherDestination()
 	    throws Exception {
 		final String tableName = "orders";
-		SenderRetryQueueItem retry = addRetryItem(tableName, "102", null, MOCK_LISTENER);
+		final Integer orderId = 102;
+		final Integer previousOrderId = 101;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#101#mock:other"));
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + previousOrderId + "#mock:other"));
 		exchange.getIn().setBody(retry.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		
@@ -158,7 +165,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
-	public void shouldFailIfAnEntityHasAnEventAmongFailedRetriesForTheRoute() throws Exception {
+	public void shouldFailIfAnEntityHasAnEventAmongFailedRetriesForTheDestination() throws Exception {
 		final String tableName = "person";
 		final String personId = "1";
 		SenderRetryQueueItem retry = addRetryItem(tableName, personId, null, MOCK_LISTENER);
@@ -171,12 +178,12 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Skipping retry item with id: " + retry.getId() + " for " + tableName + "#"
-		        + personId + " because it still has older failed event(s) in the queue for route: " + MOCK_LISTENER);
+		        + personId + " because it still has older failed event(s) in the queue for destination: " + MOCK_LISTENER);
 		assertEquals("Skipped because the entity had older failed event(s) in the queue", getErrorMessage(exchange));
 	}
 	
 	@Test
-	public void shouldFailIfTheEntityRouteIsNotAmongTheRegisteredDestinations() throws Exception {
+	public void shouldFailIfTheEntityDestinationIsNotAmongTheRegisteredDestinations() throws Exception {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty("event-destinations", emptyList());
 		exchange.getIn().setBody(3);
@@ -185,16 +192,36 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 		producerTemplate.send(ROUTE_URI, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		assertEquals("No listener route found with name direct:invalid-dest", getErrorMessage(exchange));
+		assertEquals("No listener destination found with name direct:invalid-dest", getErrorMessage(exchange));
 	}
 	
 	@Test
-	public void shouldProcessAnEntityThatHasAnEventAmongFailedRetriesButForAnotherRoute() throws Exception {
+	public void shouldProcessAnEntityThatHasAnEventAmongFailedRetriesButForAnotherDestination() throws Exception {
 		final String tableName = "person";
 		final String personId = "1";
 		SenderRetryQueueItem retry = addRetryItem(tableName, personId, null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + personId + "#mock:other"));
+		exchange.getIn().setBody(retry.getId());
+		mockEventProcessorEndpoint.expectedMessageCount(1);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventProcessorEndpoint.assertIsSatisfied();
+	}
+	
+	@Test
+	public void shouldPassIfAnOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestinationAndTheCheckIsDisabled()
+	    throws Exception {
+		final String tableName = "orders";
+		final Integer orderId = 102;
+		final Integer previousOrderId = 101;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		assertTrue(WatcherTestUtils.hasRetryItem(tableName, previousOrderId.toString(), MOCK_LISTENER));
+		addInlinedPropertiesToEnvironment(env, PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE + "=true");
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#101#" + MOCK_LISTENER));
 		exchange.getIn().setBody(retry.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		

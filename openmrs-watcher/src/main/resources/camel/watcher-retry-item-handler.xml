@@ -27,39 +27,44 @@
 
         <when>
             <simple>${exchangeProperty.event-destinations.contains(${exchangeProperty.retry-item.route.trim()})} == false</simple>
-            <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.retry-item.route.trim()}" />
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener destination found with name ${exchangeProperty.retry-item.route.trim()}" />
         </when>
 
         <choice>
             <when>
                 <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})} == true</simple>
-                <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
+                <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue for destination: ${exchangeProperty.retry-item.route}" />
                 <throwException exceptionType="org.openmrs.eip.EIPException" message="Skipped because the entity had older failed event(s) in the queue" />
             </when>
             <otherwise>
                 <!-- For an order make sure we don't process one where previousOrder or previousOrder is not null and is in
                     the route-failed-entities to preserve data integrity -->
                 <when>
-                    <simple>${exchangeProperty.retry-item.event.tableName} == 'orders' || ${exchangeProperty.retry-item.event.tableName} == 'test_order' || ${exchangeProperty.retry-item.event.tableName} == 'drug_order'</simple>
-                    <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.retry-item.event.primaryKeyId}?dataSource=openmrsDataSource" />
-
+                    <simple>${properties:ignore.previous.order.in.error.queue:false} != true</simple>
                     <when>
-                        <simple>${body.size()} == 1</simple>
-                        <setProperty name="previousOrderId">
-                            <simple>${body[0].get('previous_order_id')}</simple>
-                        </setProperty>
-                    </when>
-
-                    <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
-
-                    <when>
-                        <simple>${exchangeProperty.previousOrderId} != null</simple>
-                        <log message="Has previous entity with id -> ${exchangeProperty.previousOrderId}, checking if previous order has older failed event(s) in the queue for route:" />
+                        <simple>${exchangeProperty.retry-item.event.tableName} == 'orders' || ${exchangeProperty.retry-item.event.tableName} == 'test_order' || ${exchangeProperty.retry-item.event.tableName} == 'drug_order'</simple>
+                        <!-- TODO After https://issues.openmrs.org/browse/EIP-89 is done, for a deleted orders event get the
+                            previousOrderId from the previousState  -->
+                        <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.retry-item.event.primaryKeyId}?dataSource=openmrsDataSource" />
 
                         <when>
-                            <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.previousOrderId}#${exchangeProperty.retry-item.route})} == true</simple>
-                            <log message="Moving order event to the failure queue because its previous order still has older failed event(s) in the queue for route: ${exchangeProperty.retry-item.route}" />
-                            <throwException exceptionType="org.openmrs.eip.EIPException" message="Skipped because its previous order had older failed event(s) in the queue" />
+                            <simple>${body.size()} == 1</simple>
+                            <setProperty name="previousOrderId">
+                                <simple>${body[0].get('previous_order_id')}</simple>
+                            </setProperty>
+                        </when>
+
+                        <log loggingLevel="DEBUG" message="Previous order id -> ${exchangeProperty.previousOrderId}" />
+
+                        <when>
+                            <simple>${exchangeProperty.previousOrderId} != null</simple>
+                            <log message="Has previous entity with id -> ${exchangeProperty.previousOrderId}, checking if previous order has older failed event(s) in the queue for destination:" />
+
+                            <when>
+                                <simple>${exchangeProperty.route-failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.previousOrderId}#${exchangeProperty.retry-item.route})} == true</simple>
+                                <log message="Moving order event to the failure queue because its previous order still has older failed event(s) in the queue for destination: ${exchangeProperty.retry-item.route}" />
+                                <throwException exceptionType="org.openmrs.eip.EIPException" message="Skipped because its previous order had older failed event(s) in the queue" />
+                            </when>
                         </when>
                     </when>
                 </when>
