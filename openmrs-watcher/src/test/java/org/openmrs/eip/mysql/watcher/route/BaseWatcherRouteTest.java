@@ -5,6 +5,7 @@ import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HAND
 import org.openmrs.eip.BaseDbBackedCamelTest;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.mysql.watcher.Event;
+import org.openmrs.eip.mysql.watcher.WatcherTestUtils;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -26,13 +27,7 @@ public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	protected ConfigurableEnvironment env;
 	
 	protected Event createEvent(String table, String pkId, String identifier, String operation) {
-		Event event = new Event();
-		event.setTableName(table);
-		event.setPrimaryKeyId(pkId);
-		event.setIdentifier(identifier);
-		event.setOperation(operation);
-		event.setSnapshot(false);
-		return event;
+		return WatcherTestUtils.createEvent(table, pkId, identifier, operation);
 	}
 	
 }
