@@ -36,6 +36,12 @@
         <powerMockVersion>2.0.9</powerMockVersion>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:openmrs/openmrs-eip</connection>
+        <developerConnection>scm:git:git@github.com:openmrs/openmrs-eip</developerConnection>
+        <url>https://github.com/openmrs/openmrs-eip</url>
+    </scm>
+
     <dependencyManagement>
         <dependencies>
             <!-- camel BOM -->
