@@ -6,7 +6,7 @@
     <groupId>org.openmrs.eip</groupId>
     <artifactId>example-app</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.x</version>
 
     <name>OpenMRS EIP Example App</name>
     <description>Example application to demonstrate usage of the openmrs-watcher</description>
