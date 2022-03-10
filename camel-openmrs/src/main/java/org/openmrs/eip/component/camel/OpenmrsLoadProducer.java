@@ -5,6 +5,7 @@ import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
+import static org.springframework.data.domain.ExampleMatcher.matchingAll;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -22,6 +24,7 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
@@ -29,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Example;
 
 public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	
@@ -123,6 +127,29 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 					if ("admin".equals(userModel.getUsername())) {
 						userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+					} else {
+						if (dbModel == null) {
+							UserRepository userRepo = SyncContext.getBean(UserRepository.class);
+							if (userModel.getUsername() != null) {
+								User exampleUser = new User();
+								exampleUser.setUsername(userModel.getUsername());
+								Example<User> example = Example.of(exampleUser, matchingAll().withIgnoreCase());
+								if (userRepo.count(example) > 0) {
+									log.info("Found a user in the receiver DB with a duplicate username, appending site id "
+									        + "to this user's username to make it unique");
+									userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
+								}
+							}
+							
+							User exampleUser = new User();
+							exampleUser.setSystemId(userModel.getSystemId());
+							Example<User> example = Example.of(exampleUser, matchingAll().withIgnoreCase());
+							if (userRepo.count(example) > 0) {
+								log.info("Found a user in the receiver DB with a duplicate systemId, appending site id "
+								        + "to this user's systemId to make it unique");
+								userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+							}
+						}
 					}
 				}
 			} else {

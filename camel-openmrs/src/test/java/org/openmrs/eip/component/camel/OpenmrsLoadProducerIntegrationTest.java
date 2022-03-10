@@ -34,9 +34,12 @@ import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.service.AbstractEntityService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:test_data.sql")
@@ -57,6 +60,9 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@Autowired
 	private AbstractEntityService<Provider, ProviderModel> providerService;
+	
+	@Autowired
+	private UserRepository userRepo;
 	
 	@Before
 	public void init() {
@@ -119,6 +125,74 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		assertNotNull(savedUser);
 		assertEquals(username, savedUser.getUsername());
 		assertEquals(systemId, savedUser.getSystemId());
+	}
+	
+	@Test
+	public void process_shouldPreProcessANonExistingUserWithADuplicateUserNameToIncludeTheSendingSiteIdInTheUsername() {
+		final String userUuid = "user-uuid";
+		final String username = "user1";
+		final String systemId = "system-id";
+		assertNull(userService.getModel(userUuid));
+		User exampleUser = new User();
+		exampleUser.setUsername(username);
+		Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		assertTrue(userRepo.findOne(example).isPresent());
+		exampleUser = new User();
+		exampleUser.setSystemId(systemId);
+		example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		assertFalse(userRepo.findOne(example).isPresent());
+		final String siteId = "some-site-uuid";
+		UserModel model = new UserModel();
+		model.setUuid(userUuid);
+		model.setUsername(username);
+		model.setSystemId(systemId);
+		model.setCreatorUuid(creator);
+		model.setDateCreated(LocalDateTime.now());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
+		exchange.getIn().setBody(syncModel);
+		
+		producer.process(exchange);
+		
+		UserModel savedUser = userService.getModel(userUuid);
+		assertNotNull(savedUser);
+		assertEquals(systemId, savedUser.getSystemId());
+		assertEquals(username + VALUE_SITE_SEPARATOR + siteId, savedUser.getUsername());
+	}
+	
+	@Test
+	public void process_shouldPreProcessANonExistingUserWithADuplicateUserNameToIncludeTheSendingSiteIdInTheSystemId() {
+		final String userUuid = "user-uuid";
+		final String username = "user-name";
+		final String systemId = "user-1";
+		assertNull(userService.getModel(userUuid));
+		User exampleUser = new User();
+		exampleUser.setUsername(username);
+		Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		assertFalse(userRepo.findOne(example).isPresent());
+		exampleUser = new User();
+		exampleUser.setSystemId(systemId);
+		example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		assertTrue(userRepo.findOne(example).isPresent());
+		final String siteId = "some-site-uuid";
+		UserModel model = new UserModel();
+		model.setUuid(userUuid);
+		model.setUsername(username);
+		model.setSystemId(systemId);
+		model.setCreatorUuid(creator);
+		model.setDateCreated(LocalDateTime.now());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
+		exchange.getIn().setBody(syncModel);
+		
+		producer.process(exchange);
+		
+		UserModel savedUser = userService.getModel(userUuid);
+		assertNotNull(savedUser);
+		assertEquals(username, savedUser.getUsername());
+		assertEquals(systemId + VALUE_SITE_SEPARATOR + siteId, savedUser.getSystemId());
 	}
 	
 	@Test
