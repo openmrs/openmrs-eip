@@ -1,0 +1,40 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <!-- TODO(luis.pinto): which errorHandler to use? -->
+    <route id="sync-response-consumer" errorHandlerRef="shutdownErrorHandler">
+        <from uri="activemq:openmrs.sync.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&amp;acknowledgementModeName=CLIENT_ACKNOWLEDGE&amp;messageListenerContainerFactory=customMessageListenerContainerFactory&amp;asyncStartListener=true" />
+
+        <log message="Received sync response message -> ${body}" />
+
+        <setProperty name="messageUuid">
+            <jsonpath>${body}</jsonpath>
+            <!-- <jsonpath>$.messageUuid</jsonpath> -->
+        </setProperty>
+        
+        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.messageUuid='${exchangeProperty.messageUuid}'" />
+        
+        <choice>
+            <when>
+                <simple>${body.size()} > 0</simple>
+                <log message="Fetched ${body.size()} Sender sync messages with uuid ${exchangeProperty.messageUuid}" />
+
+                <log loggingLevel="DEBUG" message="Sender sync message(s) found -> ${body}" />
+                
+                <log message="Removing Sender sync message(s) with uuid ${exchangeProperty.messageUuid}" />
+
+                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = ${exchangeProperty.messageUuid}" />
+
+                <log loggingLevel="DEBUG" message="Successfully removed Sender sync message(s) with uuid ${exchangeProperty.messageUuid}" />
+            </when>
+            <otherwise>
+                <log loggingLevel="INFO" message="No Sender sync message was found with uuid ${exchangeProperty.messageUuid}" />
+            </otherwise>
+        </choice>
+        
+        <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
+
+        <script>
+            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
+        </script>
+        
+    </route>
+</routes>
