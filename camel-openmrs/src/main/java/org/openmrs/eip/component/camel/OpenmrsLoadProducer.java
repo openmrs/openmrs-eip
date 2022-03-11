@@ -5,7 +5,7 @@ import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
-import static org.springframework.data.domain.ExampleMatcher.matchingAll;
+import static org.springframework.data.domain.ExampleMatcher.matching;
 
 import java.time.LocalDateTime;
 
@@ -133,17 +133,17 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 							if (userModel.getUsername() != null) {
 								User exampleUser = new User();
 								exampleUser.setUsername(userModel.getUsername());
-								Example<User> example = Example.of(exampleUser, matchingAll().withIgnoreCase());
+								Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
 								if (userRepo.count(example) > 0) {
-									log.info("Found a user in the receiver DB with a duplicate username, appending site id "
-									        + "to this user's username to make it unique");
+									log.info("Found a user in the receiver DB with a duplicate username, appending "
+									        + "site id to this user's username to make it unique");
 									userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 								}
 							}
 							
 							User exampleUser = new User();
 							exampleUser.setSystemId(userModel.getSystemId());
-							Example<User> example = Example.of(exampleUser, matchingAll().withIgnoreCase());
+							Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
 							if (userRepo.count(example) > 0) {
 								log.info("Found a user in the receiver DB with a duplicate systemId, appending site id "
 								        + "to this user's systemId to make it unique");

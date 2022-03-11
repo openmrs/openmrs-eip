@@ -135,11 +135,11 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		assertNull(userService.getModel(userUuid));
 		User exampleUser = new User();
 		exampleUser.setUsername(username);
-		Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
 		assertTrue(userRepo.findOne(example).isPresent());
 		exampleUser = new User();
 		exampleUser.setSystemId(systemId);
-		example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
 		assertFalse(userRepo.findOne(example).isPresent());
 		final String siteId = "some-site-uuid";
 		UserModel model = new UserModel();
@@ -165,15 +165,15 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	public void process_shouldPreProcessANonExistingUserWithADuplicateUserNameToIncludeTheSendingSiteIdInTheSystemId() {
 		final String userUuid = "user-uuid";
 		final String username = "user-name";
-		final String systemId = "user-1";
+		final String systemId = "userSystemId1";
 		assertNull(userService.getModel(userUuid));
 		User exampleUser = new User();
 		exampleUser.setUsername(username);
-		Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
 		assertFalse(userRepo.findOne(example).isPresent());
 		exampleUser = new User();
 		exampleUser.setSystemId(systemId);
-		example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
+		example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
 		assertTrue(userRepo.findOne(example).isPresent());
 		final String siteId = "some-site-uuid";
 		UserModel model = new UserModel();
