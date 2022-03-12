@@ -1,20 +1,29 @@
 package org.openmrs.eip.web.receiver;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
+import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.web.contoller.BaseRestController;
+import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
+import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.openmrs.eip.component.service.facade.EntityServiceFacade;
+import org.openmrs.eip.component.utils.HashUtils;
 import org.openmrs.eip.web.RestConstants;
+import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,6 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConflictController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConflictController.class);
+	
+	@Autowired
+	private EntityServiceFacade entityServiceFacade;
 	
 	@Override
 	public Class<?> getClazz() {
@@ -70,7 +82,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@PatchMapping("/{id}")
-	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Integer id) {
+	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Integer id) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Updating conflict with id: " + id);
 		}
@@ -79,7 +91,22 @@ public class ConflictController extends BaseRestController {
 		ConflictQueueItem conflict = (ConflictQueueItem) doGet(id);
 		conflict.setResolved(Boolean.valueOf(payload.get("resolved").toString()));
 		
-		return on(camelContext).withBody(conflict).to("jpa:" + getName()).request();
+		conflict = producerTemplate.requestBody("jpa:" + getName(), conflict, ConflictQueueItem.class);
+		
+		log.info("Updating entity hash to match the current state in the receiver database");
+		
+		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
+		BaseModel dbModel = entityServiceFacade.getModel(tableToSyncEnum, conflict.getIdentifier());
+		BaseHashEntity storedHash = HashUtils.getStoredHash(conflict.getIdentifier(), tableToSyncEnum.getHashClass(),
+		    producerTemplate);
+		storedHash.setHash(HashUtils.computeHash(dbModel));
+		storedHash.setDateChanged(LocalDateTime.now());
+		producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, tableToSyncEnum.getHashClass().getSimpleName()),
+		    storedHash);
+		
+		log.info("Successfully saved new hash for the entity");
+		
+		return conflict;
 	}
 	
 	@DeleteMapping("/{id}")
