@@ -269,7 +269,10 @@
             <column name="identifier" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="message_uuid" type="VARCHAR(32)">
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="sent" type="BOOLEAN">
@@ -282,6 +285,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
+
     </changeSet>
 
 </databaseChangeLog>
