@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.Constants;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.OauthToken;
 import org.openmrs.eip.Utils;
@@ -75,7 +74,7 @@ public class OauthProcessorTest {
 		processor.process(exchange);
 		
 		verifyNoInteractions(mockProducerTemplate);
-		assertEquals(HTTP_AUTH_SCHEME + " " + testToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+		assertEquals(HTTP_AUTH_SCHEME + " " + testToken, exchange.getIn().getBody());
 	}
 	
 	@Test
@@ -101,7 +100,7 @@ public class OauthProcessorTest {
 		assertEquals(expectedToken, cachedOauthToken.getAccessToken());
 		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
-		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getBody());
 	}
 	
 	@Test
@@ -131,7 +130,7 @@ public class OauthProcessorTest {
 		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
 		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
-		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getHeader(Constants.HTTP_HEADER_AUTH));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getBody());
 	}
 	
 	@Test

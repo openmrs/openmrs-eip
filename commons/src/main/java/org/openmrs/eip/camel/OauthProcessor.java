@@ -1,7 +1,5 @@
 package org.openmrs.eip.camel;
 
-import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -81,7 +79,7 @@ public class OauthProcessor implements Processor {
 				//TODO verify if token is still valid, e.g. in the event the IDP was restarted or if token is revoked
 			}
 			
-			exchange.getIn().setHeader(HTTP_HEADER_AUTH, HTTP_AUTH_SCHEME + " " + oauthToken.getAccessToken());
+			exchange.getIn().setBody(HTTP_AUTH_SCHEME + " " + oauthToken.getAccessToken());
 		}
 	}
 	
