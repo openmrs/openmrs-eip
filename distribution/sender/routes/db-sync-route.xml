@@ -36,6 +36,10 @@
             <when>
                 <simple>${exchangeProperty.isValid}</simple>
                 
+                <setProperty name="messageUuid">
+                    <spel>#{getProperty('event').requestUuid != null ? getProperty('event').requestUuid : T(java.util.UUID).randomUUID().toString()}</spel>
+                </setProperty>
+                
                 <setBody>
                     <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
                 </setBody>
@@ -44,9 +48,9 @@
                         #{body.setTableName(getProperty('event').tableName)}
                         #{body.setIdentifier(getProperty('event').identifier)}
                         #{body.setOperation(getProperty('event').operation)}
-                        #{body.setMessageUuid(getProperty('event').requestUuid)}
                         #{body.setSnapshot(getProperty('event').snapshot)}
                         #{body.setDateCreated(new java.util.Date())}
+                        #{body.setMessageUuid(getProperty('messageUuid'))}
                     </spel>
                 </script>
                 
