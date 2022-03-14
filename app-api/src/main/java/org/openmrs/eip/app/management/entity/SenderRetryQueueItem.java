@@ -20,6 +20,7 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
     @AttributeOverride(name = "tableName", column = @Column(name = "table_name", nullable = false, updatable = false, length = 100))
     @AttributeOverride(name = "operation", column = @Column(nullable = false, updatable = false, length = 1))
     @AttributeOverride(name = "snapshot", column = @Column(nullable = false, updatable = false))
+    @AttributeOverride(name = "requestUuid", column = @Column(name = "request_uuid", unique = true, updatable = false, length = 38))
     private Event event;
 
     //the destination where this event couldn't be processed, typically a uri
