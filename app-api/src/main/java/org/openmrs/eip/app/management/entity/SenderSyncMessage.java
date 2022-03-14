@@ -1,8 +1,12 @@
 package org.openmrs.eip.app.management.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+@Entity
+@Table(name = "sender_sync_message")
 public class SenderSyncMessage extends AbstractEntity {
 
     private static final long serialVersionUID = 1L;
