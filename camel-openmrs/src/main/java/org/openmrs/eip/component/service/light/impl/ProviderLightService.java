@@ -1,5 +1,6 @@
  package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ProviderLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class ProviderLightService extends AbstractLightService<ProviderLight> {
     protected ProviderLight createPlaceholderEntity(final String uuid) {
         ProviderLight provider = new ProviderLight();
         provider.setDateCreated(DEFAULT_DATE);
-        provider.setCreator(DEFAULT_USER_ID);
+        provider.setCreator(SyncContext.getUser().getId());
         return provider;
     }
 }

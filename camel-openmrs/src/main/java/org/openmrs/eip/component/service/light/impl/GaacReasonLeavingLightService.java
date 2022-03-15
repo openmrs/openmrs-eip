@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.GaacReasonLeavingTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class GaacReasonLeavingLightService extends AbstractLightService<GaacReas
     protected GaacReasonLeavingTypeLight createPlaceholderEntity(final String uuid) {
     	GaacReasonLeavingTypeLight reasonLeaving = new GaacReasonLeavingTypeLight();
         reasonLeaving.setName(DEFAULT_STRING);
-        reasonLeaving.setCreator(DEFAULT_USER_ID);
+        reasonLeaving.setCreator(SyncContext.getUser().getId());
         reasonLeaving.setDateCreated(DEFAULT_DATE);
         return reasonLeaving;
     }

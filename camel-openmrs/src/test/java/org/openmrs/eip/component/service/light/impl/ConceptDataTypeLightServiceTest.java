@@ -1,10 +1,13 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptDatatypeLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
@@ -19,11 +22,21 @@ public class ConceptDataTypeLightServiceTest {
 
     private ConceptDatatypeLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new ConceptDatatypeLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -41,7 +54,7 @@ public class ConceptDataTypeLightServiceTest {
     private ConceptDatatypeLight getExpectedConceptDatatype() {
         ConceptDatatypeLight conceptDatatype = new ConceptDatatypeLight();
         conceptDatatype.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        conceptDatatype.setCreator(1L);
+        conceptDatatype.setCreator(USER_ID);
         conceptDatatype.setName("[Default]");
         return conceptDatatype;
     }

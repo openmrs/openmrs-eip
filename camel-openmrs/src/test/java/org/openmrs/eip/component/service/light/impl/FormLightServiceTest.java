@@ -1,10 +1,13 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.FormLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
@@ -19,11 +22,21 @@ public class FormLightServiceTest {
 
     private FormLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new FormLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -41,7 +54,7 @@ public class FormLightServiceTest {
     private FormLight getExpectedForm() {
         FormLight form = new FormLight();
         form.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        form.setCreator(1L);
+        form.setCreator(USER_ID);
         form.setName("[Default]");
         form.setVersion("[Default]");
         return form;

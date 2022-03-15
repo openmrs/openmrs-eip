@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.VisitLight;
 import org.openmrs.eip.component.entity.light.VisitTypeLight;
@@ -29,7 +30,7 @@ public class VisitLightService extends AbstractLightService<VisitLight> {
         visit.setPatient(patientService.getOrInitPlaceholderEntity());
         visit.setDateStarted(DEFAULT_DATE);
         visit.setVisitType(visitTypeService.getOrInitPlaceholderEntity());
-        visit.setCreator(DEFAULT_USER_ID);
+        visit.setCreator(SyncContext.getUser().getId());
         visit.setDateCreated(DEFAULT_DATE);
         return visit;
     }

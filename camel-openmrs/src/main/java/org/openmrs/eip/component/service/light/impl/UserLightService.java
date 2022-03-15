@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -15,7 +16,7 @@ public class UserLightService extends AbstractLightService<UserLight> {
     @Override
     protected UserLight createPlaceholderEntity(final String uuid) {
         UserLight user = new UserLight();
-        user.setCreator(DEFAULT_USER_ID);
+        user.setCreator(SyncContext.getUser().getId());
         user.setDateCreated(DEFAULT_DATE);
         user.setSystemId("admin");
         user.setPersonId(1L);

@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.VisitTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class VisitTypeLightService extends AbstractLightService<VisitTypeLight> 
     protected VisitTypeLight createPlaceholderEntity(final String uuid) {
         VisitTypeLight visitType = new VisitTypeLight();
         visitType.setName(DEFAULT_STRING);
-        visitType.setCreator(DEFAULT_USER_ID);
+        visitType.setCreator(SyncContext.getUser().getId());
         visitType.setDateCreated(DEFAULT_DATE);
         return visitType;
     }

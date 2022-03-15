@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowStateLight;
@@ -27,7 +28,7 @@ public class ProgramWorkflowStateLightService extends AbstractLightService<Progr
     protected ProgramWorkflowStateLight createPlaceholderEntity(final String uuid) {
         ProgramWorkflowStateLight workflowState = new ProgramWorkflowStateLight();
         workflowState.setDateCreated(DEFAULT_DATE);
-        workflowState.setCreator(DEFAULT_USER_ID);
+        workflowState.setCreator(SyncContext.getUser().getId());
         workflowState.setConcept(conceptService.getOrInitPlaceholderEntity());
         workflowState.setProgramWorkflow(programWorkflowService.getOrInitPlaceholderEntity());
 

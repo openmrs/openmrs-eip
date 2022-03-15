@@ -4,6 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.After;
 import org.junit.Test;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.Person;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.model.PersonModel;
@@ -19,8 +20,17 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
     @Autowired
     private SyncEntityRepository<Person> repository;
 
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
+    }
+
     @Test
     public void load() {
+        UserLight user = new UserLight();
+        user.setId(1L);
+        SyncContext.setUser(user);
+        
         // Given
         Exchange exchange = new DefaultExchange(camelContext);
         assertEquals(1, repository.findAll().size());

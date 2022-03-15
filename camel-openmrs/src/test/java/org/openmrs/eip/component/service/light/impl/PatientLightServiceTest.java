@@ -1,10 +1,13 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PatientLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
@@ -19,11 +22,21 @@ public class PatientLightServiceTest {
 
     private PatientLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new PatientLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -40,8 +53,8 @@ public class PatientLightServiceTest {
 
     private PatientLight getExpectedLocation() {
         PatientLight patient = new PatientLight();
-        patient.setCreator(1L);
-        patient.setPatientCreator(1L);
+        patient.setCreator(USER_ID);
+        patient.setPatientCreator(USER_ID);
         patient.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         patient.setPatientDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         patient.setAllergyStatus("[Default]");

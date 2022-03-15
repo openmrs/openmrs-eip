@@ -1,12 +1,15 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.EncounterTypeLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.LightService;
 
@@ -29,11 +32,21 @@ public class EncounterLightServiceTest {
 
     private EncounterLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new EncounterLightService(repository, patientService, encounterTypeService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -53,7 +66,7 @@ public class EncounterLightServiceTest {
     private EncounterLight getExpectedEncounter() {
         EncounterLight encounter = new EncounterLight();
         encounter.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        encounter.setCreator(1L);
+        encounter.setCreator(USER_ID);
         encounter.setEncounterType(getEncounterType());
         encounter.setEncounterDatetime(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         encounter.setPatient(getPatient());

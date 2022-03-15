@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.CareSettingLight;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.EncounterLight;
@@ -47,7 +48,7 @@ public class OrderLightService extends AbstractLightService<OrderLight> {
     protected OrderLight createPlaceholderEntity(final String uuid) {
         OrderLight order = new OrderLight();
         order.setDateCreated(DEFAULT_DATE);
-        order.setCreator(DEFAULT_USER_ID);
+        order.setCreator(SyncContext.getUser().getId());
         order.setOrderType(orderTypeService.getOrInitPlaceholderEntity());
         order.setConcept(conceptService.getOrInitPlaceholderEntity());
         order.setOrderer(providerService.getOrInitPlaceholderEntity());

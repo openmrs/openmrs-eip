@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.GaacAffinityTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class GaacAffinityTypeLightService extends AbstractLightService<GaacAffin
     protected GaacAffinityTypeLight createPlaceholderEntity(final String uuid) {
     	GaacAffinityTypeLight type = new GaacAffinityTypeLight();
         type.setName(DEFAULT_STRING);
-        type.setCreator(DEFAULT_USER_ID);
+        type.setCreator(SyncContext.getUser().getId());
         type.setDateCreated(DEFAULT_DATE);
         return type;
     }

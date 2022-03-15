@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.EncounterTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -27,7 +28,7 @@ public class EncounterLightService extends AbstractLightService<EncounterLight> 
     protected EncounterLight createPlaceholderEntity(final String uuid) {
         EncounterLight encounter = new EncounterLight();
         encounter.setDateCreated(DEFAULT_DATE);
-        encounter.setCreator(DEFAULT_USER_ID);
+        encounter.setCreator(SyncContext.getUser().getId());
         encounter.setEncounterType(encounterTypeService.getOrInitPlaceholderEntity());
         encounter.setEncounterDatetime(DEFAULT_DATE);
         encounter.setPatient(patientService.getOrInitPlaceholderEntity());

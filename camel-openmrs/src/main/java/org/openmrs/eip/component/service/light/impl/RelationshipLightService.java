@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PersonLight;
 import org.openmrs.eip.component.entity.light.RelationshipLight;
 import org.openmrs.eip.component.entity.light.RelationshipTypeLight;
@@ -24,7 +25,7 @@ public class RelationshipLightService extends AbstractLightService<RelationshipL
     protected RelationshipLight createPlaceholderEntity(final String uuid) {
     	RelationshipLight relationship = new RelationshipLight();
         relationship.setDateCreated(DEFAULT_DATE);
-        relationship.setCreator(DEFAULT_USER_ID);
+        relationship.setCreator(SyncContext.getUser().getId());
         relationship.setPersona(personService.getOrInitPlaceholderEntity());
         relationship.setPersonb(personService.getOrInitPlaceholderEntity());
         relationship.setRelationshipType(relationshipService.getOrInitPlaceholderEntity());

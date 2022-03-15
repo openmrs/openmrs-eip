@@ -1,12 +1,15 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ObservationLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.LightService;
 
@@ -29,11 +32,21 @@ public class ObservationLightServiceTest {
 
     private ObservationLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new ObservationLightService(repository, personService, conceptService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -53,7 +66,7 @@ public class ObservationLightServiceTest {
     private ObservationLight getExpectedObservation() {
         ObservationLight observation = new ObservationLight();
         observation.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        observation.setCreator(1L);
+        observation.setCreator(USER_ID);
         observation.setObsDatetime(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         observation.setConcept(getConcept());
         observation.setPerson(getPerson());

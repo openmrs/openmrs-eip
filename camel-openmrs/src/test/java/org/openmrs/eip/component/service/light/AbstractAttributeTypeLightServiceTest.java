@@ -4,7 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.MockedAttributeTypeLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 
 import java.time.LocalDateTime;
@@ -19,11 +21,16 @@ public class AbstractAttributeTypeLightServiceTest {
 
     private MockedAttributeTypeLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new MockedAttributeTypeLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
     }
 
     @Test
@@ -42,7 +49,7 @@ public class AbstractAttributeTypeLightServiceTest {
         MockedAttributeTypeLight attributeType = new MockedAttributeTypeLight(null, null);
         attributeType.setName("[Default]");
         attributeType.setMinOccurs(0);
-        attributeType.setCreator(1L);
+        attributeType.setCreator(USER_ID);
         attributeType.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         return attributeType;
     }

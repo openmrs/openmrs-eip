@@ -1,10 +1,13 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PatientLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.entity.light.VisitLight;
 import org.openmrs.eip.component.entity.light.VisitTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -29,11 +32,21 @@ public class VisitLightServiceTest {
 
     private VisitLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new VisitLightService(repository, patientService, visitTypeService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -53,7 +66,7 @@ public class VisitLightServiceTest {
     private VisitLight getExpectedVisit() {
         VisitLight visit = new VisitLight();
         visit.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        visit.setCreator(1L);
+        visit.setCreator(USER_ID);
         visit.setDateStarted(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         visit.setPatient(getPatient());
         visit.setVisitType(getVisitType());

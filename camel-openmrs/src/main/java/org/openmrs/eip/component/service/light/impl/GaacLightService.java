@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.GaacLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -15,7 +16,7 @@ public class GaacLightService extends AbstractLightService<GaacLight> {
     protected GaacLight createPlaceholderEntity(final String uuid) {
     	GaacLight gaac = new GaacLight();
         gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(DEFAULT_USER_ID);
+        gaac.setCreator(SyncContext.getUser().getId());
         gaac.setName(DEFAULT_STRING);
         gaac.setStartDate(DEFAULT_DATE);
         return gaac;

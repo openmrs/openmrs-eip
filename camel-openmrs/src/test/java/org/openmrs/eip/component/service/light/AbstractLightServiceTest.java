@@ -1,6 +1,9 @@
 package org.openmrs.eip.component.service.light;
 
+import org.junit.After;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.MockedLightEntity;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +26,21 @@ public class AbstractLightServiceTest {
 
     private static final String UUID = "uuid";
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new MockedLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setUser(null);
     }
 
     @Test
@@ -107,7 +120,7 @@ public class AbstractLightServiceTest {
         mockedLightEntity.setVoided(true);
         mockedLightEntity.setVoidReason(AbstractLightService.DEFAULT_VOID_REASON);
         mockedLightEntity.setDateVoided(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        mockedLightEntity.setVoidedBy(1L);
+        mockedLightEntity.setVoidedBy(USER_ID);
         return mockedLightEntity;
     }
 }
