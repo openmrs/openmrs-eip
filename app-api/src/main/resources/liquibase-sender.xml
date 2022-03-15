@@ -257,7 +257,7 @@
                 <tableExists tableName="sender_sync_message" />
             </not>
         </preConditions>
-        <comment>Adding sender_sync_request table</comment>
+        <comment>Adding sender_sync_message table</comment>
 
         <createTable tableName="sender_sync_message">
             <column autoIncrement="true" name="id" type="BIGINT">
