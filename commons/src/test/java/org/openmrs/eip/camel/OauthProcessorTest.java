@@ -147,4 +147,15 @@ public class OauthProcessorTest {
 		assertThrows("Unsupported oauth token type: " + type, EIPException.class, () -> processor.process(exchange));
 	}
 	
+	@Test
+	public void process_shouldSetBodyToNullIfOauthIsDisabled() throws Exception {
+		setInternalState(processor, "isOauthEnabled", false);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		exchange.getIn().setBody("Testing");
+		
+		processor.process(exchange);
+		
+		assertNull(exchange.getIn().getBody());
+	}
+	
 }

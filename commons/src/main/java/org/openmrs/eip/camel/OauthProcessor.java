@@ -49,6 +49,9 @@ public class OauthProcessor implements Processor {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Oauth is not enabled, skip fetching token");
 			}
+			
+			exchange.getIn().setBody(null);
+			
 			return;
 		}
 		

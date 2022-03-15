@@ -1,0 +1,91 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets an entity from OpenMRS that matches the specified criteria
+
+        @exchangePropertyIn resourceName (String) - The name of the resource
+        @exchangePropertyIn resourceId (String) - The identifier of the resource, this is usually a uuid
+        @exchangePropertyIn subResourceName (String) - (Optional) The sub resource name in case of a sub resource
+        @exchangePropertyIn subResourceId (String) - (Optional) The sub resource id in case of a sub resource
+        @exchangePropertyIn isSubResource (boolean) - (Optional) Specifies if the entity is a resource or sub resource
+
+        @bodyOut (Map) - The entity resource if a match is found otherwise null
+    -->
+
+	<route id="get-entity-by-uuid-from-openmrs">
+		<from uri="direct:get-entity-by-uuid-from-openmrs" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <process ref="oauthProcessor" />
+
+        <choice>
+            <when>
+                <simple>${body} == null</simple>
+                <setBody>
+                    <simple>{{openmrs.username}}:{{openmrs.password}}</simple>
+                </setBody>
+                <marshal>
+                    <base64 lineSeparator="" />
+                </marshal>
+                <setHeader name="Authorization">
+                    <simple>Basic ${body}</simple>
+                </setHeader>
+            </when>
+            <otherwise>
+                <setHeader name="Authorization">
+                    <simple>${body}</simple>
+                </setHeader>
+            </otherwise>
+        </choice>
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.isSubResource} == true</simple>
+                <setProperty name="resourceUrl">
+                    <simple>{{openmrs.baseUrl}}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}/${exchangeProperty.subResourceName}/${exchangeProperty.subResourceId}</simple>
+                </setProperty>
+            </when>
+            <otherwise>
+                <setProperty name="resourceUrl">
+                    <simple>{{openmrs.baseUrl}}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}</simple>
+                </setProperty>
+            </otherwise>
+        </choice>
+
+        <when>
+            <simple>${exchangeProperty.resourceRepresentation} != null</simple>
+            <setHeader name="CamelHttpRawQuery">
+                <simple>v=${exchangeProperty.resourceRepresentation}</simple>
+            </setHeader>
+        </when>
+
+        <setHeader name="CamelHttpMethod">
+            <simple>GET</simple>
+        </setHeader>
+		<setBody>
+			<simple>${null}</simple>
+		</setBody>
+
+		<toD uri="${exchangeProperty.resourceUrl}?throwExceptionOnFailure=false" />
+
+        <choice>
+            <when>
+                <simple>${headers.CamelHttpResponseCode} == 404</simple>
+                <log message="Resource Not Found -> Response Status Code: ${headers.CamelHttpResponseCode}, Response Body: ${body}" />
+
+                <setBody>
+                    <simple>${null}</simple>
+                </setBody>
+            </when>
+            <otherwise>
+                <when>
+                    <simple>${headers.CamelHttpResponseCode} != 200</simple>
+                    <throwException exceptionType="org.openmrs.eip.EIPException" message="An error occurred while fetching the resource from OpenMRS" />
+                </when>
+            </otherwise>
+        </choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+</routes>
