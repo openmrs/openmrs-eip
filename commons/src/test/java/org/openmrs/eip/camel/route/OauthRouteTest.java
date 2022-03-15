@@ -28,7 +28,9 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = "oauth.client.secret=" + CLIENT_SECRET)
 @TestPropertySource(properties = "oauth.client.scope=" + CLIENT_SCOPE)
 @TestPropertySource(properties = "spring.liquibase.enabled=false")
+@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/oauth.xml")
 @TestPropertySource(properties = "logging.level.org.apache.camel.reifier.RouteReifier=WARN")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OauthRouteTest extends BaseCamelTest {
 	
 	private static final String URI = "direct:oauth";
@@ -54,7 +56,6 @@ public class OauthRouteTest extends BaseCamelTest {
 	}
 	
 	@Test
-	@DirtiesContext
 	public void shouldFetchTheAuthToken() throws Exception {
 		advise("oauth", new AdviceWithRouteBuilder() {
 			

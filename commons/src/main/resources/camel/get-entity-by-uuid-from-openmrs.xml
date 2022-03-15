@@ -1,7 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     <!--
-        Gets an entity from OpenMRS that matches the specified criteria
+        Gets an entity from OpenMRS that matches the specified criteria, the routes comes with built-in oauth support
+        if oauth is enabled.
 
         @exchangePropertyIn resourceName (String) - The name of the resource
         @exchangePropertyIn resourceId (String) - The identifier of the resource, this is usually a uuid
@@ -9,13 +10,13 @@
         @exchangePropertyIn subResourceId (String) - (Optional) The sub resource id in case of a sub resource
         @exchangePropertyIn isSubResource (boolean) - (Optional) Specifies if the entity is a resource or sub resource
 
-        @bodyOut (Map) - The entity resource if a match is found otherwise null
+        @bodyOut (Map) - The entity if a match is found otherwise null
     -->
 
 	<route id="get-entity-by-uuid-from-openmrs">
 		<from uri="direct:get-entity-by-uuid-from-openmrs" />
 
-		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+		<log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
 
         <process ref="oauthProcessor" />
 
@@ -86,6 +87,6 @@
             </otherwise>
         </choice>
 
-		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
 	</route>
 </routes>
