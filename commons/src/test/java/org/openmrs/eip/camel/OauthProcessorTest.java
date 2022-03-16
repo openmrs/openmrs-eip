@@ -57,7 +57,7 @@ public class OauthProcessorTest {
 	
 	@Test
 	public void process_shouldSkipSettingTheOauthHeaderIfDisabled() throws Exception {
-		processor.process(null);
+		processor.process(new DefaultExchange(mockCamelContext));
 		
 		verifyNoInteractions(mockProducerTemplate);
 	}
