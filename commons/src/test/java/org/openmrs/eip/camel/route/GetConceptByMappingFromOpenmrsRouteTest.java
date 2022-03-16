@@ -3,8 +3,8 @@ package org.openmrs.eip.camel.route;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.openmrs.eip.Constants.EX_PROP_CODE;
-import static org.openmrs.eip.Constants.EX_PROP_SOURCE;
+import static org.openmrs.eip.Constants.EX_PROP_CONCEPT_CODE;
+import static org.openmrs.eip.Constants.EX_PROP_CONCEPT_SOURCE;
 import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
 import static org.openmrs.eip.Constants.ROUTE_ID_GET_CONCEPT_BY_MAPPING;
 import static org.openmrs.eip.Constants.URI_GET_CONCEPT_BY_MAPPING;
@@ -74,8 +74,8 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 		final Map expectedConcept = singletonMap("uuid", "some-concept-uuid");
 		AppContext.add(MAP_KEY, singletonMap(source + ":" + code, expectedConcept));
 		final Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_SOURCE, source);
-		exchange.setProperty(EX_PROP_CODE, code);
+		exchange.setProperty(EX_PROP_CONCEPT_SOURCE, source);
+		exchange.setProperty(EX_PROP_CONCEPT_CODE, code);
 		mockHttpEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_GET_CONCEPT_BY_MAPPING, exchange);
@@ -92,8 +92,8 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 		final Map expectedConcept = singletonMap("uuid", expectedConceptUuid);
 		AppContext.add(MAP_KEY, new HashMap());
 		final Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_SOURCE, source);
-		exchange.setProperty(EX_PROP_CODE, code);
+		exchange.setProperty(EX_PROP_CONCEPT_SOURCE, source);
+		exchange.setProperty(EX_PROP_CONCEPT_CODE, code);
 		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.whenAnyExchangeReceived(e -> {
 			e.getIn().setBody("{\"results\":[{\"uuid\":\"" + expectedConceptUuid + "\"}]}");
@@ -117,8 +117,8 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 		final String expectedConceptUuid = "some-concept-uuid";
 		final Map expectedConcept = singletonMap("uuid", expectedConceptUuid);
 		final Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_SOURCE, source);
-		exchange.setProperty(EX_PROP_CODE, code);
+		exchange.setProperty(EX_PROP_CONCEPT_SOURCE, source);
+		exchange.setProperty(EX_PROP_CONCEPT_CODE, code);
 		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.whenAnyExchangeReceived(e -> {
 			e.getIn().setBody("{\"results\":[{\"uuid\":\"" + expectedConceptUuid + "\"}]}");

@@ -30,9 +30,9 @@ public class Constants {
 	
 	public static final String EX_PROP_IS_SUB_RESOURCE = "isSubResource";
 	
-	public static final String EX_PROP_SOURCE = "conceptSource";
+	public static final String EX_PROP_CONCEPT_SOURCE = "conceptSource";
 	
-	public static final String EX_PROP_CODE = "conceptCode";
+	public static final String EX_PROP_CONCEPT_CODE = "conceptCode";
 	
 	public static final String ROUTE_ID_GET_CONCEPT_BY_MAPPING = "get-concept-by-mapping-from-openmrs";
 	
