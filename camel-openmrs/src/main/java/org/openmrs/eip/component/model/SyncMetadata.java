@@ -3,21 +3,21 @@ package org.openmrs.eip.component.model;
 import java.time.LocalDateTime;
 
 /**
- * Encapsulates descriptive data about a sync payload i.e. the unique ID of the
- * site sending the. payload and the date it was sent.
+ * Encapsulates descriptive data about a sync payload i.e. the unique ID of the site sending the.
+ * payload and the date it was sent.
  */
 public class SyncMetadata {
-
+	
 	private String sourceIdentifier;
-
+	
 	private String operation;
-
+	
 	private LocalDateTime dateSent;
-
+	
 	private String requestUuid;
-
+	
 	private String messageUuid;
-
+	
 	/**
 	 * Gets the sourceIdentifier
 	 *
@@ -26,7 +26,7 @@ public class SyncMetadata {
 	public String getSourceIdentifier() {
 		return sourceIdentifier;
 	}
-
+	
 	/**
 	 * Sets the sourceIdentifier
 	 *
@@ -35,7 +35,7 @@ public class SyncMetadata {
 	public void setSourceIdentifier(String sourceIdentifier) {
 		this.sourceIdentifier = sourceIdentifier;
 	}
-
+	
 	/**
 	 * Gets the operation
 	 *
@@ -44,7 +44,7 @@ public class SyncMetadata {
 	public String getOperation() {
 		return operation;
 	}
-
+	
 	/**
 	 * Sets the operation
 	 *
@@ -53,7 +53,7 @@ public class SyncMetadata {
 	public void setOperation(String operation) {
 		this.operation = operation;
 	}
-
+	
 	/**
 	 * Gets the dateSent
 	 *
@@ -62,7 +62,7 @@ public class SyncMetadata {
 	public LocalDateTime getDateSent() {
 		return dateSent;
 	}
-
+	
 	/**
 	 * Sets the dateSent
 	 *
@@ -71,7 +71,7 @@ public class SyncMetadata {
 	public void setDateSent(LocalDateTime dateSent) {
 		this.dateSent = dateSent;
 	}
-
+	
 	/**
 	 * Gets the requestUuid
 	 *
@@ -80,7 +80,7 @@ public class SyncMetadata {
 	public String getRequestUuid() {
 		return requestUuid;
 	}
-
+	
 	/**
 	 * Sets the requestUuid
 	 *
@@ -89,19 +89,19 @@ public class SyncMetadata {
 	public void setRequestUuid(String requestUuid) {
 		this.requestUuid = requestUuid;
 	}
-
+	
 	public String getMessageUuid() {
 		return messageUuid;
 	}
-
+	
 	public void setMessageUuid(String messageUuid) {
 		this.messageUuid = messageUuid;
 	}
-
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation
-				+ ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", messageUuid=" + messageUuid + "}";
+		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", messageUuid=" + messageUuid + "}";
 	}
-
+	
 }
