@@ -1,6 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <!-- TODO(luis.pinto): which errorHandler to use? -->
     <route id="active-mq-publisher" errorHandlerRef="outBoundErrorHandler">
     
         <!-- TODO(luis.pinto) Make the delay configurable -->
@@ -123,9 +122,7 @@
 
                     <to uri="jpa:SenderSyncMessage" />
 
-                    <log message="Successfully saved updates for sender sync message" loggingLevel="DEBUG" />
-
-                    <log message="Successfully sent and updated sender sync message" />
+                    <log message="Successfully updated sender sync message to sent" />
                     
                 </split>
             </when>
