@@ -1,0 +1,105 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets a concepts which contains a concept map entry whose code is equal to the specified value of the
+        conceptCode exchange property and whose concept source has either a name or hl7Code that is equal to the
+        specified value of the conceptSource exchange property. Note that the route maintains a cache of all previously
+        found concepts for better performance.
+
+        @exchangePropertyIn conceptSource (String) - The name or hl7Code of the concept source to check
+        @exchangePropertyIn conceptCode (String) - The code associated with the concept
+
+        @bodyOut (Map) - The concept resource if a match is found otherwise null
+    -->
+
+	<route id="get-concept-by-mapping-from-openmrs">
+		<from uri="direct:get-concept-by-mapping-from-openmrs" />
+
+		<log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="sourceAndCodeToConceptMapKey">
+            <simple>${routeId}-sourceAndCodeToConceptMapKey</simple>
+        </setProperty>
+
+        <setProperty name="sourceAndCodeToConceptMap">
+            <method beanType="org.openmrs.eip.AppContext" method="get(${exchangeProperty.sourceAndCodeToConceptMapKey})" />
+        </setProperty>
+
+        <when>
+            <simple>${exchangeProperty.sourceAndCodeToConceptMap} == null</simple>
+
+            <log message="Initializing source and code to concept resource map" />
+
+            <setProperty name="sourceAndCodeToConceptMap">
+                <spel>#{new java.util.HashMap()}</spel>
+            </setProperty>
+
+            <script>
+                <spel>
+                    #{T(org.openmrs.eip.AppContext).add(getProperty('sourceAndCodeToConceptMapKey'), getProperty('sourceAndCodeToConceptMap'))}
+                </spel>
+            </script>
+        </when>
+
+        <setProperty name="conceptSourceAndCode">
+            <simple>${exchangeProperty.conceptSource}:${exchangeProperty.conceptCode}</simple>
+        </setProperty>
+
+        <setProperty name="conceptResource">
+            <spel>#{getProperty('sourceAndCodeToConceptMap').get(getProperty('conceptSourceAndCode'))}</spel>
+        </setProperty>
+
+        <when>
+            <simple>${exchangeProperty.conceptResource} == null</simple>
+            <log message="Fetching concept by mapping from OpenMRS with code: ${exchangeProperty.conceptCode} in source: ${exchangeProperty.conceptSource} " />
+
+            <setBody>
+                <simple>{{openmrs.username}}:{{openmrs.password}}</simple>
+            </setBody>
+            <marshal>
+                <base64 lineSeparator="" />
+            </marshal>
+            <setHeader name="Authorization">
+                <simple>Basic ${body}</simple>
+            </setHeader>
+            <setHeader name="CamelHttpMethod">
+                <simple>GET</simple>
+            </setHeader>
+            <setHeader name="CamelHttpRawQuery">
+                <simple>source=${exchangeProperty.conceptSource}&amp;code=${exchangeProperty.conceptCode}</simple>
+            </setHeader>
+
+            <toD uri="{{openmrs.baseUrl}}/ws/rest/v1/concept" />
+
+            <setProperty name="conceptResults">
+                <jsonpath>$</jsonpath>
+            </setProperty>
+
+            <choice>
+                <when>
+                    <simple>${exchangeProperty.conceptResults.get('results').size()} == 1</simple>
+                    <setProperty name="conceptResource">
+                        <simple>${exchangeProperty.conceptResults.get('results').get(0)}</simple>
+                    </setProperty>
+                    <script>
+                        <spel>
+                            #{getProperty('sourceAndCodeToConceptMap').put(getProperty('conceptSourceAndCode'), getProperty('conceptResource'))}
+                        </spel>
+                    </script>
+                </when>
+                <otherwise>
+                    <setProperty name="conceptResource">
+                        <simple>${null}</simple>
+                    </setProperty>
+                </otherwise>
+
+            </choice>
+        </when>
+
+        <setBody>
+            <simple>${exchangeProperty.conceptResource}</simple>
+        </setBody>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+</routes>

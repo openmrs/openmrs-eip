@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
@@ -62,6 +63,9 @@ public abstract class BaseCamelTest {
 	protected ProducerTemplate producerTemplate;
 	
 	private LoggerContext loggerContext;
+	
+	@Autowired
+	protected ConfigurableEnvironment env;
 	
 	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
 		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);

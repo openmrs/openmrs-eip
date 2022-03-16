@@ -18,4 +18,12 @@ public class Constants {
 	
 	public static final String MGT_TX_MGR_NAME = "mngtTransactionManager";
 	
+	public static final String EX_PROP_SOURCE = "conceptSource";
+	
+	public static final String EX_PROP_CODE = "conceptCode";
+	
+	public static final String ROUTE_ID_GET_CONCEPT_BY_MAPPING = "get-concept-by-mapping-from-openmrs";
+	
+	public static final String URI_GET_CONCEPT_BY_MAPPING = "direct:" + ROUTE_ID_GET_CONCEPT_BY_MAPPING;
+	
 }

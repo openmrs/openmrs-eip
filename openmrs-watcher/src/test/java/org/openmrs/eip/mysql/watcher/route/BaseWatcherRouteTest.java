@@ -7,9 +7,7 @@ import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.WatcherTestUtils;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.TestPropertySource;
 
 /**
@@ -22,9 +20,6 @@ import org.springframework.test.context.TestPropertySource;
 public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	
 	protected static final String PROP_RETRY_MAP = "route-retry-count-map";
-	
-	@Autowired
-	protected ConfigurableEnvironment env;
 	
 	protected Event createEvent(String table, String pkId, String identifier, String operation) {
 		return WatcherTestUtils.createEvent(table, pkId, identifier, operation);
