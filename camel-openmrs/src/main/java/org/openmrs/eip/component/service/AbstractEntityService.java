@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.service;
 
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
+import static org.openmrs.eip.component.utils.ModelUtils.decomposeUuid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,12 +20,13 @@ import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
+import org.openmrs.eip.component.mapper.operations.DecomposedUuid;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.impl.AbstractSubclassEntityService;
-import org.openmrs.eip.component.service.light.AbstractLightService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +94,35 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 			}
 		}
 		
+		boolean hasSelfReference = false;
+		if (etyInDb == null && model instanceof UserModel) {
+			UserModel userModel = ((UserModel) model);
+			//The creator of the first admin account created in an OpenMRS database is a reference back to itself.
+			//It's also possible to have a user record where voided_by and changed_by are references back to itself.
+			//When we're creating it for the first time, it means a placeholder row has already been created, load 
+			//the placeholder and update it with this entity's payload otherwise we duplicate it including it's uuid 
+			Optional<DecomposedUuid> creatorUuid = decomposeUuid(userModel.getCreatorUuid());
+			if (creatorUuid.isPresent() && creatorUuid.get().getUuid().equals(userModel.getUuid())) {
+				hasSelfReference = true;
+			} else if (userModel.getRetiredByUuid() != null) {
+				Optional<DecomposedUuid> retireByUuid = decomposeUuid(userModel.getRetiredByUuid());
+				if (retireByUuid.isPresent() && retireByUuid.get().getUuid().equals(userModel.getUuid())) {
+					hasSelfReference = true;
+				}
+			} else if (userModel.getChangedByUuid() != null) {
+				Optional<DecomposedUuid> changedByUuid = decomposeUuid(userModel.getChangedByUuid());
+				if (changedByUuid.isPresent() && changedByUuid.get().getUuid().equals(userModel.getUuid())) {
+					hasSelfReference = true;
+				}
+			}
+			
+			if (hasSelfReference) {
+				log.info("The user entity being synced has a self reference");
+				
+				etyInDb = repository.findByUuid(model.getUuid());
+			}
+		}
+		
 		M modelToReturn;
 		boolean isEtyInDbPlaceHolder = false;
 		if (etyInDb != null && etyInDb instanceof BaseDataEntity) {
@@ -102,10 +133,14 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 		if (etyInDb == null) {
 			modelToReturn = saveEntity(ety);
 			log.info(getMsg(ety, model.getUuid(), " inserted"));
-		} else if (isEtyInDbPlaceHolder || !etyInDb.wasModifiedAfter(ety)) {
+		} else if (isEtyInDbPlaceHolder || hasSelfReference || !etyInDb.wasModifiedAfter(ety)) {
 			ety.setId(etyInDb.getId());
 			modelToReturn = saveEntity(ety);
-			log.info(getMsg(ety, model.getUuid(), " updated"));
+			if (hasSelfReference) {
+				log.info(getMsg(ety, model.getUuid(), " inserted"));
+			} else {
+				log.info(getMsg(ety, model.getUuid(), " updated"));
+			}
 		} else {
 			throw new ConflictsFoundException();
 		}
