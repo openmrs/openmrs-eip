@@ -51,17 +51,31 @@
 
         <when>
             <simple>${exchangeProperty.conceptResource} == null</simple>
+
+            <process ref="oauthProcessor" />
+
+            <choice>
+                <when>
+                    <simple>${body} == null</simple>
+                    <setBody>
+                        <simple>${properties:openmrs.username:''}:${properties:openmrs.password:''}</simple>
+                    </setBody>
+                    <marshal>
+                        <base64 lineSeparator="" />
+                    </marshal>
+                    <setHeader name="Authorization">
+                        <simple>Basic ${body}</simple>
+                    </setHeader>
+                </when>
+                <otherwise>
+                    <setHeader name="Authorization">
+                        <simple>${body}</simple>
+                    </setHeader>
+                </otherwise>
+            </choice>
+
             <log message="Fetching concept by mapping from OpenMRS with code: ${exchangeProperty.conceptCode} in source: ${exchangeProperty.conceptSource} " />
 
-            <setBody>
-                <simple>${properties:openmrs.username:''}:${properties:openmrs.password:''}</simple>
-            </setBody>
-            <marshal>
-                <base64 lineSeparator="" />
-            </marshal>
-            <setHeader name="Authorization">
-                <simple>Basic ${body}</simple>
-            </setHeader>
             <setHeader name="CamelHttpMethod">
                 <simple>GET</simple>
             </setHeader>
