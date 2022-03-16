@@ -34,7 +34,11 @@ public class Constants {
 	
 	public static final String EX_PROP_CONCEPT_CODE = "conceptCode";
 	
+	public static final String ROUTE_ID_GET_ENTITY_BY_ID = "get-entity-by-uuid-from-openmrs";
+	
 	public static final String ROUTE_ID_GET_CONCEPT_BY_MAPPING = "get-concept-by-mapping-from-openmrs";
+	
+	public static final String URI_GET_ENTITY_BY_ID = "direct:" + ROUTE_ID_GET_ENTITY_BY_ID;
 	
 	public static final String URI_GET_CONCEPT_BY_MAPPING = "direct:" + ROUTE_ID_GET_CONCEPT_BY_MAPPING;
 	

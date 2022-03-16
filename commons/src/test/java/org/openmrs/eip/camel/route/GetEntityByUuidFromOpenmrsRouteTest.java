@@ -3,6 +3,8 @@ package org.openmrs.eip.camel.route;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
+import static org.openmrs.eip.Constants.ROUTE_ID_GET_ENTITY_BY_ID;
+import static org.openmrs.eip.Constants.URI_GET_ENTITY_BY_ID;
 
 import java.util.Base64;
 
@@ -28,16 +30,11 @@ import ch.qos.logback.classic.Level;
 @TestPropertySource(properties = "openmrs.baseUrl=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_URL)
 @TestPropertySource(properties = "openmrs.username=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_USER)
 @TestPropertySource(properties = "openmrs.password=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_PASS)
-@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/"
-        + GetEntityByUuidFromOpenmrsRouteTest.ROUTE_ID + ".xml")
-@TestPropertySource(properties = "logging.level." + GetEntityByUuidFromOpenmrsRouteTest.ROUTE_ID + "=DEBUG")
+@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/" + ROUTE_ID_GET_ENTITY_BY_ID + ".xml")
+@TestPropertySource(properties = "logging.level." + ROUTE_ID_GET_ENTITY_BY_ID + "=DEBUG")
 @TestPropertySource(properties = "logging.level.org.apache.camel.reifier.RouteReifier=WARN")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
-	
-	protected static final String ROUTE_ID = "get-entity-by-uuid-from-openmrs";
-	
-	private static final String URI = "direct:" + ROUTE_ID;
 	
 	protected static final String OPENMRS_URL = "http://test.com";
 	
@@ -68,7 +65,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		mockHttpEndpoint.reset();
 		mockProcessor.reset();
 		
-		advise(ROUTE_ID, new AdviceWithRouteBuilder() {
+		advise(ROUTE_ID_GET_ENTITY_BY_ID, new AdviceWithRouteBuilder() {
 			
 			@Override
 			public void configure() {
@@ -105,7 +102,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setBody(expectedResponse);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertEquals(expectedResponse, exchange.getIn().getBody());
 	}
@@ -135,7 +132,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setBody(expectedResponse);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertEquals(expectedResponse, exchange.getIn().getBody());
 	}
@@ -161,7 +158,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setBody(expectedResponse);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertEquals(expectedResponse, exchange.getIn().getBody());
 	}
@@ -189,7 +186,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setBody(expectedResponse);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertEquals(expectedResponse, exchange.getIn().getBody());
 	}
@@ -212,7 +209,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setBody(errorMsg);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertNull(exchange.getIn().getBody());
 		assertMessageLogged(Level.INFO, "Resource Not Found -> Response Status Code: 404, Response Body: " + errorMsg);
@@ -234,7 +231,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 			e.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 301);
 		});
 		
-		producerTemplate.send(URI, exchange);
+		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
 		assertEquals("An error occurred while fetching the resource from OpenMRS", getErrorMessage(exchange));
 	}
