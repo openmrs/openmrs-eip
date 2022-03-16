@@ -21,7 +21,7 @@
                 
                 <log message="Removing Sender sync message(s) with uuid ${exchangeProperty.messageUuid}" />
 
-                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = ${exchangeProperty.messageUuid}" />
+                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = '${exchangeProperty.messageUuid}'" />
 
                 <log loggingLevel="DEBUG" message="Successfully removed Sender sync message(s) with uuid ${exchangeProperty.messageUuid}" />
             </when>
