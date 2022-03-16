@@ -54,7 +54,7 @@
             <log message="Fetching concept by mapping from OpenMRS with code: ${exchangeProperty.conceptCode} in source: ${exchangeProperty.conceptSource} " />
 
             <setBody>
-                <simple>{{openmrs.username}}:{{openmrs.password}}</simple>
+                <simple>${properties:openmrs.username:''}:${properties:openmrs.password:''}</simple>
             </setBody>
             <marshal>
                 <base64 lineSeparator="" />
@@ -69,7 +69,7 @@
                 <simple>source=${exchangeProperty.conceptSource}&amp;code=${exchangeProperty.conceptCode}</simple>
             </setHeader>
 
-            <toD uri="{{openmrs.baseUrl}}/ws/rest/v1/concept" />
+            <toD uri="${properties:openmrs.baseUrl:''}/ws/rest/v1/concept" />
 
             <setProperty name="conceptResults">
                 <jsonpath>$</jsonpath>

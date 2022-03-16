@@ -18,6 +18,18 @@ public class Constants {
 	
 	public static final String MGT_TX_MGR_NAME = "mngtTransactionManager";
 	
+	public static final String EX_PROP_RESOURCE_NAME = "resourceName";
+	
+	public static final String EX_PROP_RESOURCE_ID = "resourceId";
+	
+	public static final String EX_PROP_SUB_RESOURCE_NAME = "subResourceName";
+	
+	public static final String EX_PROP_SUB_RESOURCE_ID = "subResourceId";
+	
+	public static final String EX_PROP_RESOURCE_REP = "resourceRepresentation";
+	
+	public static final String EX_PROP_IS_SUB_RESOURCE = "isSubResource";
+	
 	public static final String EX_PROP_SOURCE = "conceptSource";
 	
 	public static final String EX_PROP_CODE = "conceptCode";

@@ -24,7 +24,7 @@
             <when>
                 <simple>${body} == null</simple>
                 <setBody>
-                    <simple>{{openmrs.username}}:{{openmrs.password}}</simple>
+                    <simple>${properties:openmrs.username:''}:${properties:openmrs.password:''}</simple>
                 </setBody>
                 <marshal>
                     <base64 lineSeparator="" />
@@ -44,12 +44,12 @@
             <when>
                 <simple>${exchangeProperty.isSubResource} == true</simple>
                 <setProperty name="resourceUrl">
-                    <simple>{{openmrs.baseUrl}}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}/${exchangeProperty.subResourceName}/${exchangeProperty.subResourceId}</simple>
+                    <simple>${properties:openmrs.baseUrl:''}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}/${exchangeProperty.subResourceName}/${exchangeProperty.subResourceId}</simple>
                 </setProperty>
             </when>
             <otherwise>
                 <setProperty name="resourceUrl">
-                    <simple>{{openmrs.baseUrl}}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}</simple>
+                    <simple>${properties:openmrs.baseUrl:''}/ws/rest/v1/${exchangeProperty.resourceName}/${exchangeProperty.resourceId}</simple>
                 </setProperty>
             </otherwise>
         </choice>
