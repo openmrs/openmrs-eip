@@ -146,7 +146,7 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 	}
 	
 	@Test
-	public void shouldUserTheOauthHeaderToAuthenticateIfItExists() throws Exception {
+	public void shouldUseTheOauthHeaderToAuthenticateIfItExists() throws Exception {
 		final String source = "CIEL";
 		final String code = "12345";
 		final String expectedConceptUuid = "some-concept-uuid";

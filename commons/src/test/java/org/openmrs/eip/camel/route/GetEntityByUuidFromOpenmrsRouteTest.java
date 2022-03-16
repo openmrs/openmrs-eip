@@ -90,6 +90,8 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		exchange.setProperty(EX_PROP_RES_ID, RES_ID);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID;
 		final String auth = "Basic " + Base64.getEncoder().encodeToString((OPENMRS_USER + ":" + OPENMRS_PASS).getBytes());
+		mockProcessor.expectedMessageCount(1);
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, auth);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
@@ -121,6 +123,8 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		exchange.setProperty(exPropSubResId, subResId);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID + "/" + subResName + "/" + subResId;
 		final String auth = "Basic " + Base64.getEncoder().encodeToString((OPENMRS_USER + ":" + OPENMRS_PASS).getBytes());
+		mockProcessor.expectedMessageCount(1);
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, auth);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
@@ -146,6 +150,8 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		exchange.setProperty(EX_PROP_RES_REP, rep);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID;
 		final String auth = "Basic " + Base64.getEncoder().encodeToString((OPENMRS_USER + ":" + OPENMRS_PASS).getBytes());
+		mockProcessor.expectedMessageCount(1);
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, auth);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
@@ -164,17 +170,19 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 	}
 	
 	@Test
-	public void shouldUserTheOauthHeaderToAuthenticateIfItExists() {
+	public void shouldUseTheOauthHeaderToAuthenticateIfItExists() {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_RES_NAME, RES_NAME);
 		exchange.setProperty(EX_PROP_RES_ID, RES_ID);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID;
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
+		mockProcessor.expectedMessageCount(1);
 		final String oauthHeader = "Bearer oauth-token";
 		mockProcessor.whenAnyExchangeReceived(e -> {
 			e.getIn().setBody(oauthHeader);
 		});
 		
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, oauthHeader);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
 		mockHttpEndpoint.expectedHeaderReceived(EX_PROP_RES_REP, null);
@@ -198,6 +206,8 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		exchange.setProperty(EX_PROP_RES_ID, RES_ID);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID;
 		final String auth = "Basic " + Base64.getEncoder().encodeToString((OPENMRS_USER + ":" + OPENMRS_PASS).getBytes());
+		mockProcessor.expectedMessageCount(1);
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, auth);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
@@ -222,6 +232,8 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		exchange.setProperty(EX_PROP_RES_ID, RES_ID);
 		final String url = OPENMRS_URL + "/ws/rest/v1/" + RES_NAME + "/" + RES_ID;
 		final String auth = "Basic " + Base64.getEncoder().encodeToString((OPENMRS_USER + ":" + OPENMRS_PASS).getBytes());
+		mockProcessor.expectedMessageCount(1);
+		mockHttpEndpoint.expectedMessageCount(1);
 		mockHttpEndpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 		mockHttpEndpoint.expectedHeaderReceived(HTTP_HEADER_AUTH, auth);
 		mockHttpEndpoint.expectedPropertyReceived(EX_PROP_RES_URL, url);
