@@ -17,7 +17,7 @@ public class EncounterTypeLightService extends AbstractLightService<EncounterTyp
     protected EncounterTypeLight createPlaceholderEntity(final String uuid) {
         EncounterTypeLight encounterType = new EncounterTypeLight();
         encounterType.setName(DEFAULT_STRING + " - " + uuid);
-        encounterType.setCreator(SyncContext.getUser().getId());
+        encounterType.setCreator(SyncContext.getAppUser().getId());
         encounterType.setDateCreated(DEFAULT_DATE);
         return encounterType;
     }

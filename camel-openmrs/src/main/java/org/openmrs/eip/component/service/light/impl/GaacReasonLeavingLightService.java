@@ -17,7 +17,7 @@ public class GaacReasonLeavingLightService extends AbstractLightService<GaacReas
     protected GaacReasonLeavingTypeLight createPlaceholderEntity(final String uuid) {
     	GaacReasonLeavingTypeLight reasonLeaving = new GaacReasonLeavingTypeLight();
         reasonLeaving.setName(DEFAULT_STRING);
-        reasonLeaving.setCreator(SyncContext.getUser().getId());
+        reasonLeaving.setCreator(SyncContext.getAppUser().getId());
         reasonLeaving.setDateCreated(DEFAULT_DATE);
         return reasonLeaving;
     }

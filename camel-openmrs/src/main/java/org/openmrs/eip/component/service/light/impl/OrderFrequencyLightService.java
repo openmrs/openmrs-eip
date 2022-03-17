@@ -22,7 +22,7 @@ public class OrderFrequencyLightService extends AbstractLightService<OrderFreque
     @Override
     protected OrderFrequencyLight createPlaceholderEntity(final String uuid) {
         OrderFrequencyLight orderFrequency = new OrderFrequencyLight();
-        orderFrequency.setCreator(SyncContext.getUser().getId());
+        orderFrequency.setCreator(SyncContext.getAppUser().getId());
         orderFrequency.setDateCreated(DEFAULT_DATE);
         orderFrequency.setConcept(conceptService.getOrInitPlaceholderEntity());
 

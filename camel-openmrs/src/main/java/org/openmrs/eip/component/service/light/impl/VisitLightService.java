@@ -30,7 +30,7 @@ public class VisitLightService extends AbstractLightService<VisitLight> {
         visit.setPatient(patientService.getOrInitPlaceholderEntity());
         visit.setDateStarted(DEFAULT_DATE);
         visit.setVisitType(visitTypeService.getOrInitPlaceholderEntity());
-        visit.setCreator(SyncContext.getUser().getId());
+        visit.setCreator(SyncContext.getAppUser().getId());
         visit.setDateCreated(DEFAULT_DATE);
         return visit;
     }

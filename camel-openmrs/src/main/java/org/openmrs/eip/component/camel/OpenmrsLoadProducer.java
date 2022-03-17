@@ -157,7 +157,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				log.info("Entity was deleted in remote site, marking it as retired");
 				BaseMetadataModel existing = entityServiceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
 				existing.setRetired(true);
-				existing.setRetiredByUuid(UserLight.class.getName() + "(" + SyncContext.getUser().getUuid() + ")");
+				existing.setRetiredByUuid(UserLight.class.getName() + "(" + SyncContext.getAppUser().getUuid() + ")");
 				existing.setDateRetired(LocalDateTime.now());
 				existing.setRetireReason(Constants.DEFAULT_RETIRE_REASON);
 				modelToSave = existing;

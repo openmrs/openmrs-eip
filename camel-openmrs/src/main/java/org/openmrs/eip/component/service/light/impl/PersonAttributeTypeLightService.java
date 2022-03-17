@@ -17,7 +17,7 @@ public class PersonAttributeTypeLightService extends AbstractLightService<Person
     protected PersonAttributeTypeLight createPlaceholderEntity(final String uuid) {
         PersonAttributeTypeLight personAttributeType = new PersonAttributeTypeLight();
         personAttributeType.setDateCreated(DEFAULT_DATE);
-        personAttributeType.setCreator(SyncContext.getUser().getId());
+        personAttributeType.setCreator(SyncContext.getAppUser().getId());
         personAttributeType.setName(DEFAULT_STRING);
         return personAttributeType;
     }

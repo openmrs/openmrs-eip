@@ -28,7 +28,7 @@ public class ProgramWorkflowStateLightService extends AbstractLightService<Progr
     protected ProgramWorkflowStateLight createPlaceholderEntity(final String uuid) {
         ProgramWorkflowStateLight workflowState = new ProgramWorkflowStateLight();
         workflowState.setDateCreated(DEFAULT_DATE);
-        workflowState.setCreator(SyncContext.getUser().getId());
+        workflowState.setCreator(SyncContext.getAppUser().getId());
         workflowState.setConcept(conceptService.getOrInitPlaceholderEntity());
         workflowState.setProgramWorkflow(programWorkflowService.getOrInitPlaceholderEntity());
 

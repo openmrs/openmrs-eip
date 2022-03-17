@@ -17,7 +17,7 @@ public class ProviderManagementProviderLightRoleService extends AbstractLightSer
     protected ProviderManagementProviderRoleLight createPlaceholderEntity(final String uuid) {
     	ProviderManagementProviderRoleLight type = new ProviderManagementProviderRoleLight();
         type.setName(DEFAULT_STRING);
-        type.setCreator(SyncContext.getUser().getId());
+        type.setCreator(SyncContext.getAppUser().getId());
         type.setDateCreated(DEFAULT_DATE);
         return type;
     }

@@ -16,7 +16,7 @@ public class GaacLightService extends AbstractLightService<GaacLight> {
     protected GaacLight createPlaceholderEntity(final String uuid) {
     	GaacLight gaac = new GaacLight();
         gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(SyncContext.getUser().getId());
+        gaac.setCreator(SyncContext.getAppUser().getId());
         gaac.setName(DEFAULT_STRING);
         gaac.setStartDate(DEFAULT_DATE);
         return gaac;

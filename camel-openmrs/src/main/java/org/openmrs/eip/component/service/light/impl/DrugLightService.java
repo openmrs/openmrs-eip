@@ -23,7 +23,7 @@ public class DrugLightService extends AbstractLightService<DrugLight> {
     protected DrugLight createPlaceholderEntity(final String uuid) {
         DrugLight drug = new DrugLight();
         drug.setDateCreated(DEFAULT_DATE);
-        drug.setCreator(SyncContext.getUser().getId());
+        drug.setCreator(SyncContext.getAppUser().getId());
         drug.setConcept(conceptService.getOrInitPlaceholderEntity());
         return drug;
     }

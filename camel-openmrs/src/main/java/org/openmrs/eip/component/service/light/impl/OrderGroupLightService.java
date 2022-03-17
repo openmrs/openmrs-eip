@@ -28,7 +28,7 @@ public class OrderGroupLightService extends AbstractLightService<OrderGroupLight
 	protected OrderGroupLight createPlaceholderEntity(final String uuid) {
 		OrderGroupLight orderGroup = new OrderGroupLight();
 		orderGroup.setDateCreated(DEFAULT_DATE);
-		orderGroup.setCreator(SyncContext.getUser().getId());
+		orderGroup.setCreator(SyncContext.getAppUser().getId());
 		orderGroup.setPatient(patientService.getOrInitPlaceholderEntity());
 		orderGroup.setEncounter(encounterService.getOrInitPlaceholderEntity());
 		

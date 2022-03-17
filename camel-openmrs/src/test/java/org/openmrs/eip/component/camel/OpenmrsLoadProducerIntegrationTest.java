@@ -80,7 +80,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@AfterClass
 	public static void afterClass() {
-		SyncContext.setUser(null);
+		SyncContext.setAppUser(null);
 		SyncContext.setAdminUser(null);
 	}
 	
@@ -197,7 +197,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		UserLight user = new UserLight();
 		final String appUserUuid = "test-user-uuid";
 		user.setUuid(appUserUuid);
-		SyncContext.setUser(user);
+		SyncContext.setAppUser(user);
 		UserHash existingHash = new UserHash();
 		existingHash.setHash(HashUtils.computeHash(existingUser));
 		final String query = QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, UserHash.class.getSimpleName())
@@ -233,7 +233,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		UserLight user = new UserLight();
 		final String appUserUuid = "test-user";
 		user.setUuid(appUserUuid);
-		SyncContext.setUser(user);
+		SyncContext.setAppUser(user);
 		ProviderHash existingHash = new ProviderHash();
 		existingHash.setHash(HashUtils.computeHash(existingProvider));
 		final String query = QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, ProviderHash.class.getSimpleName())

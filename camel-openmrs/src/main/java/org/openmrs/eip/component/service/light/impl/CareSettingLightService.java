@@ -17,7 +17,7 @@ public class CareSettingLightService extends AbstractLightService<CareSettingLig
     protected CareSettingLight createPlaceholderEntity(final String uuid) {
         CareSettingLight careSetting = new CareSettingLight();
         careSetting.setDateCreated(DEFAULT_DATE);
-        careSetting.setCreator(SyncContext.getUser().getId());
+        careSetting.setCreator(SyncContext.getAppUser().getId());
         careSetting.setCareSettingType(DEFAULT_STRING);
         careSetting.setName(DEFAULT_STRING);
         return careSetting;

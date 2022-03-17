@@ -17,7 +17,7 @@ public class VisitTypeLightService extends AbstractLightService<VisitTypeLight> 
     protected VisitTypeLight createPlaceholderEntity(final String uuid) {
         VisitTypeLight visitType = new VisitTypeLight();
         visitType.setName(DEFAULT_STRING);
-        visitType.setCreator(SyncContext.getUser().getId());
+        visitType.setCreator(SyncContext.getAppUser().getId());
         visitType.setDateCreated(DEFAULT_DATE);
         return visitType;
     }

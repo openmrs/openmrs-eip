@@ -23,7 +23,7 @@ public class ProgramLightService extends AbstractLightService<ProgramLight> {
     protected ProgramLight createPlaceholderEntity(final String uuid) {
         ProgramLight program = new ProgramLight();
         program.setDateCreated(DEFAULT_DATE);
-        program.setCreator(SyncContext.getUser().getId());
+        program.setCreator(SyncContext.getAppUser().getId());
         program.setName(DEFAULT_STRING);
         program.setConcept(conceptService.getOrInitPlaceholderEntity());
 

@@ -63,7 +63,7 @@ public class SyncContext implements ApplicationContextAware {
 	 *
 	 * @return the user
 	 */
-	public static UserLight getUser() {
+	public static UserLight getAppUser() {
 		return appUser;
 	}
 	
@@ -72,7 +72,7 @@ public class SyncContext implements ApplicationContextAware {
 	 *
 	 * @param user the user to set
 	 */
-	public static void setUser(UserLight user) {
+	public static void setAppUser(UserLight user) {
 		SyncContext.appUser = user;
 	}
 	
@@ -88,10 +88,10 @@ public class SyncContext implements ApplicationContextAware {
 	/**
 	 * Sets the admin user
 	 *
-	 * @param adminUser the admin user to set
+	 * @param user the admin user to set
 	 */
-	public static void setAdminUser(UserLight adminUser) {
-		SyncContext.adminUser = adminUser;
+	public static void setAdminUser(UserLight user) {
+		SyncContext.adminUser = user;
 	}
 	
 }

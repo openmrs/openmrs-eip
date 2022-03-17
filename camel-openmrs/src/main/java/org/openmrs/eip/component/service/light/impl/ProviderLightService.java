@@ -17,7 +17,7 @@ public class ProviderLightService extends AbstractLightService<ProviderLight> {
     protected ProviderLight createPlaceholderEntity(final String uuid) {
         ProviderLight provider = new ProviderLight();
         provider.setDateCreated(DEFAULT_DATE);
-        provider.setCreator(SyncContext.getUser().getId());
+        provider.setCreator(SyncContext.getAppUser().getId());
         return provider;
     }
 }

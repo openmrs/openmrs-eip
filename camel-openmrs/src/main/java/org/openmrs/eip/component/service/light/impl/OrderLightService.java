@@ -48,7 +48,7 @@ public class OrderLightService extends AbstractLightService<OrderLight> {
     protected OrderLight createPlaceholderEntity(final String uuid) {
         OrderLight order = new OrderLight();
         order.setDateCreated(DEFAULT_DATE);
-        order.setCreator(SyncContext.getUser().getId());
+        order.setCreator(SyncContext.getAppUser().getId());
         order.setOrderType(orderTypeService.getOrInitPlaceholderEntity());
         order.setConcept(conceptService.getOrInitPlaceholderEntity());
         order.setOrderer(providerService.getOrInitPlaceholderEntity());

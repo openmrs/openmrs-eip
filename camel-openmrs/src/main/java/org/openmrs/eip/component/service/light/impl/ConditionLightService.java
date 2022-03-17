@@ -23,7 +23,7 @@ public class ConditionLightService extends AbstractLightService<ConditionLight> 
     protected ConditionLight createPlaceholderEntity(final String uuid) {
         ConditionLight condition = new ConditionLight();
         condition.setDateCreated(DEFAULT_DATE);
-        condition.setCreator(SyncContext.getUser().getId());
+        condition.setCreator(SyncContext.getAppUser().getId());
         condition.setClinicalStatus(DEFAULT_STRING);
         condition.setPatient(patientService.getOrInitPlaceholderEntity());
         return condition;

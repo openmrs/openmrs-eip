@@ -23,7 +23,7 @@ public class GaacFamilyLightService extends AbstractLightService<GaacFamilyLight
         gaac.setCrumbled(0);
         gaac.setLocation(locationService.getOrInitPlaceholderEntity());
     	gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(SyncContext.getUser().getId());
+        gaac.setCreator(SyncContext.getAppUser().getId());
         gaac.setStartDate(DEFAULT_DATE);
         return gaac;
     }

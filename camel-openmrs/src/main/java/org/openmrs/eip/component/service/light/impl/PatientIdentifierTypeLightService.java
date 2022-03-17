@@ -17,7 +17,7 @@ public class PatientIdentifierTypeLightService extends AbstractLightService<Pati
     protected PatientIdentifierTypeLight createPlaceholderEntity(final String uuid) {
         PatientIdentifierTypeLight patientIdentifierType = new PatientIdentifierTypeLight();
         patientIdentifierType.setDateCreated(DEFAULT_DATE);
-        patientIdentifierType.setCreator(SyncContext.getUser().getId());
+        patientIdentifierType.setCreator(SyncContext.getAppUser().getId());
         patientIdentifierType.setName(DEFAULT_STRING);
         return patientIdentifierType;
     }

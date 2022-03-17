@@ -31,12 +31,12 @@ public class FormLightServiceTest {
         service = new FormLightService(repository);
         UserLight user = new UserLight();
         user.setId(USER_ID);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
     }
 
     @After
     public void tearDown() {
-        SyncContext.setUser(null);
+        SyncContext.setAppUser(null);
     }
 
     @Test

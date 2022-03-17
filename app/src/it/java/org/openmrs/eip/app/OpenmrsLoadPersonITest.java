@@ -22,14 +22,14 @@ public class OpenmrsLoadPersonITest extends OpenmrsLoadEndpointITest {
 
     @After
     public void tearDown() {
-        SyncContext.setUser(null);
+        SyncContext.setAppUser(null);
     }
 
     @Test
     public void load() {
         UserLight user = new UserLight();
         user.setId(1L);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
         
         // Given
         Exchange exchange = new DefaultExchange(camelContext);

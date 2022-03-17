@@ -60,7 +60,7 @@ public class CamelListener extends EventNotifierSupport {
 				SyncApplication.shutdown();
 			}
 			
-			SyncContext.setUser(userListRepo.findById(optional.get().getId()).get());
+			SyncContext.setAppUser(userListRepo.findById(optional.get().getId()).get());
 			
 			log.info("Loading OpenMRS admin user account");
 			exampleUser = new User();

@@ -17,7 +17,7 @@ public class OrderTypeLightService extends AbstractLightService<OrderTypeLight> 
     protected OrderTypeLight createPlaceholderEntity(final String uuid) {
         OrderTypeLight orderType = new OrderTypeLight();
         orderType.setDateCreated(DEFAULT_DATE);
-        orderType.setCreator(SyncContext.getUser().getId());
+        orderType.setCreator(SyncContext.getAppUser().getId());
         orderType.setName(DEFAULT_STRING);
         orderType.setJavaClassName(DEFAULT_STRING);
         return orderType;

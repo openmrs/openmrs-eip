@@ -16,7 +16,7 @@ public abstract class AbstractAttributeTypeLightService<E extends AttributeTypeL
 	protected E createPlaceholderEntity(final String uuid) {
 		E attributeEntity = createEntity();
 		attributeEntity.setDateCreated(DEFAULT_DATE);
-		attributeEntity.setCreator(SyncContext.getUser().getId());
+		attributeEntity.setCreator(SyncContext.getAppUser().getId());
 		attributeEntity.setName(DEFAULT_STRING);
 		return attributeEntity;
 	}

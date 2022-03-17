@@ -17,7 +17,7 @@ public class EncounterRoleLightService extends AbstractLightService<EncounterRol
     protected EncounterRoleLight createPlaceholderEntity(final String uuid) {
     	EncounterRoleLight role = new EncounterRoleLight();
         role.setName(DEFAULT_STRING);
-        role.setCreator(SyncContext.getUser().getId());
+        role.setCreator(SyncContext.getAppUser().getId());
         role.setDateCreated(DEFAULT_DATE);
         return role;
     }

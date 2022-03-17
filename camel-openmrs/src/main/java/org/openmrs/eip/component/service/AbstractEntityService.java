@@ -85,7 +85,7 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 				id = parent.getId();
 				PatientModel pModel = (PatientModel) model;
 				UserLight user = SyncContext.getBean(UserLightRepository.class).findByUuid(pModel.getPatientCreatorUuid());
-				Long creatorId = user != null ? user.getId() : SyncContext.getUser().getId();
+				Long creatorId = user != null ? user.getId() : SyncContext.getAppUser().getId();
 				
 				PatientServiceUtils.createPatient(id, pModel.getUuid(), pModel.isPatientVoided(), creatorId,
 				    pModel.getPatientDateCreated());

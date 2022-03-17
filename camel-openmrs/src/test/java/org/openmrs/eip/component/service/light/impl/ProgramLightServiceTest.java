@@ -37,12 +37,12 @@ public class ProgramLightServiceTest {
         service = new ProgramLightService(repository, conceptService);
         UserLight user = new UserLight();
         user.setId(USER_ID);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
     }
 
     @After
     public void tearDown() {
-        SyncContext.setUser(null);
+        SyncContext.setAppUser(null);
     }
 
     @Test

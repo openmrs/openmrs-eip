@@ -18,7 +18,7 @@ public class FormLightService extends AbstractLightService<FormLight> {
         FormLight form = new FormLight();
         form.setName(DEFAULT_STRING);
         form.setVersion(DEFAULT_STRING);
-        form.setCreator(SyncContext.getUser().getId());
+        form.setCreator(SyncContext.getAppUser().getId());
         form.setDateCreated(DEFAULT_DATE);
         return form;
     }

@@ -28,7 +28,7 @@ public class ObservationLightService extends AbstractLightService<ObservationLig
     protected ObservationLight createPlaceholderEntity(final String uuid) {
         ObservationLight observation = new ObservationLight();
         observation.setDateCreated(DEFAULT_DATE);
-        observation.setCreator(SyncContext.getUser().getId());
+        observation.setCreator(SyncContext.getAppUser().getId());
         observation.setObsDatetime(DEFAULT_DATE);
         observation.setPerson(personService.getOrInitPlaceholderEntity());
         observation.setConcept(conceptService.getOrInitPlaceholderEntity());

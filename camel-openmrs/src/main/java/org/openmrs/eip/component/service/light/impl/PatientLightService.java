@@ -17,8 +17,8 @@ public class PatientLightService extends AbstractLightService<PatientLight> {
     protected PatientLight createPlaceholderEntity(final String uuid) {
         PatientLight patient = new PatientLight();
         patient.setAllergyStatus(DEFAULT_STRING);
-        patient.setCreator(SyncContext.getUser().getId());
-        patient.setPatientCreator(SyncContext.getUser().getId());
+        patient.setCreator(SyncContext.getAppUser().getId());
+        patient.setPatientCreator(SyncContext.getAppUser().getId());
         patient.setDateCreated(DEFAULT_DATE);
         patient.setPatientDateCreated(DEFAULT_DATE);
         return patient;

@@ -85,7 +85,7 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 					log.info("No matching row in the patient table, inserting one");
 					id = person.getId();
 					PatientLight p = (PatientLight) entity;
-					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : SyncContext.getUser().getId();
+					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : SyncContext.getAppUser().getId();
 					
 					PatientServiceUtils.createPatient(id, uuid, p.isVoided(), creatorId, p.getPatientDateCreated());
 					
@@ -103,11 +103,11 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 		entity.setMuted(true);
 		entity.setMuteReason(DEFAULT_VOID_REASON);
 		entity.setDateMuted(DEFAULT_DATE);
-		entity.setMutedBy(SyncContext.getUser().getId());
+		entity.setMutedBy(SyncContext.getAppUser().getId());
 		if (entity instanceof PatientLight) {
 			PatientLight patientLight = (PatientLight) entity;
 			patientLight.setPatientVoided(true);
-			patientLight.setPatientVoidedBy(SyncContext.getUser().getId());
+			patientLight.setPatientVoidedBy(SyncContext.getAppUser().getId());
 			patientLight.setPatientDateVoided(DEFAULT_DATE);
 			patientLight.setPatientVoidReason(DEFAULT_VOID_REASON);
 		}

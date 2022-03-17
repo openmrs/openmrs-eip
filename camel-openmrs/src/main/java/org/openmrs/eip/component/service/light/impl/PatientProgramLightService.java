@@ -28,7 +28,7 @@ public class PatientProgramLightService extends AbstractLightService<PatientProg
     protected PatientProgramLight createPlaceholderEntity(final String uuid) {
         PatientProgramLight patientProgram = new PatientProgramLight();
         patientProgram.setDateCreated(DEFAULT_DATE);
-        patientProgram.setCreator(SyncContext.getUser().getId());
+        patientProgram.setCreator(SyncContext.getAppUser().getId());
         patientProgram.setPatient(patientService.getOrInitPlaceholderEntity());
         patientProgram.setProgram(programService.getOrInitPlaceholderEntity());
 

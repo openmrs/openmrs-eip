@@ -16,7 +16,7 @@ public class UserLightService extends AbstractLightService<UserLight> {
     @Override
     protected UserLight createPlaceholderEntity(final String uuid) {
         UserLight user = new UserLight();
-        user.setCreator(SyncContext.getUser().getId());
+        user.setCreator(SyncContext.getAppUser().getId());
         user.setDateCreated(DEFAULT_DATE);
         user.setSystemId("admin");
         user.setPersonId(1L);

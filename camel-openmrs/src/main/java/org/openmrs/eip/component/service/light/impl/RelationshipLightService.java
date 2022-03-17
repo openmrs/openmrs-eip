@@ -25,7 +25,7 @@ public class RelationshipLightService extends AbstractLightService<RelationshipL
     protected RelationshipLight createPlaceholderEntity(final String uuid) {
     	RelationshipLight relationship = new RelationshipLight();
         relationship.setDateCreated(DEFAULT_DATE);
-        relationship.setCreator(SyncContext.getUser().getId());
+        relationship.setCreator(SyncContext.getAppUser().getId());
         relationship.setPersona(personService.getOrInitPlaceholderEntity());
         relationship.setPersonb(personService.getOrInitPlaceholderEntity());
         relationship.setRelationshipType(relationshipService.getOrInitPlaceholderEntity());

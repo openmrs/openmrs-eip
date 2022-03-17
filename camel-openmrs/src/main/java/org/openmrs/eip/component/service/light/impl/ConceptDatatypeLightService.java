@@ -17,7 +17,7 @@ public class ConceptDatatypeLightService extends AbstractLightService<ConceptDat
     protected ConceptDatatypeLight createPlaceholderEntity(final String uuid) {
         ConceptDatatypeLight conceptDatatype = new ConceptDatatypeLight();
         conceptDatatype.setDateCreated(DEFAULT_DATE);
-        conceptDatatype.setCreator(SyncContext.getUser().getId());
+        conceptDatatype.setCreator(SyncContext.getAppUser().getId());
         conceptDatatype.setName(DEFAULT_STRING);
         return conceptDatatype;
     }

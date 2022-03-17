@@ -17,7 +17,7 @@ public class LocationLightService extends AbstractLightService<LocationLight> {
     protected LocationLight createPlaceholderEntity(final String uuid) {
         LocationLight location = new LocationLight();
         location.setName(DEFAULT_STRING);
-        location.setCreator(SyncContext.getUser().getId());
+        location.setCreator(SyncContext.getAppUser().getId());
         location.setDateCreated(DEFAULT_DATE);
         return location;
     }

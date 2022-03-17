@@ -31,12 +31,12 @@ public class PatientIdentifierTypeLightServiceTest {
         service = new PatientIdentifierTypeLightService(repository);
         UserLight user = new UserLight();
         user.setId(USER_ID);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
     }
 
     @After
     public void tearDown() {
-        SyncContext.setUser(null);
+        SyncContext.setAppUser(null);
     }
 
     @Test

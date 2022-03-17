@@ -43,12 +43,12 @@ public class AbstractEntityServiceIntegrationTest extends BaseDbDrivenTest {
 		userRepo = applicationContext.getBean(UserRepository.class);
 		UserLight user = new UserLight();
 		user.setId(1L);
-		SyncContext.setUser(user);
+		SyncContext.setAppUser(user);
 	}
 	
 	@AfterClass
 	public static void afterClass() {
-		SyncContext.setUser(null);
+		SyncContext.setAppUser(null);
 	}
 	
 	/**

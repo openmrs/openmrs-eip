@@ -17,7 +17,7 @@ public class ConceptNameLightService extends AbstractLightService<ConceptNameLig
     protected ConceptNameLight createPlaceholderEntity(final String uuid) {
         ConceptNameLight conceptName = new ConceptNameLight();
         conceptName.setDateCreated(DEFAULT_DATE);
-        conceptName.setCreator(SyncContext.getUser().getId());
+        conceptName.setCreator(SyncContext.getAppUser().getId());
         conceptName.setLocale("en");
         conceptName.setName(DEFAULT_STRING);
         return conceptName;

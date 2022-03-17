@@ -41,12 +41,12 @@ public class ObservationLightServiceTest {
         service = new ObservationLightService(repository, personService, conceptService);
         UserLight user = new UserLight();
         user.setId(USER_ID);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
     }
 
     @After
     public void tearDown() {
-        SyncContext.setUser(null);
+        SyncContext.setAppUser(null);
     }
 
     @Test

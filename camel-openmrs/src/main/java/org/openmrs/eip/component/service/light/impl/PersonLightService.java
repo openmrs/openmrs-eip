@@ -16,7 +16,7 @@ public class PersonLightService extends AbstractLightService<PersonLight> {
     @Override
     protected PersonLight createPlaceholderEntity(final String uuid) {
         PersonLight person = new PersonLight();
-        person.setCreator(SyncContext.getUser().getId());
+        person.setCreator(SyncContext.getAppUser().getId());
         person.setDateCreated(DEFAULT_DATE);
         return person;
     }

@@ -30,7 +30,7 @@ public class AbstractAttributeTypeLightServiceTest {
         service = new MockedAttributeTypeLightService(repository);
         UserLight user = new UserLight();
         user.setId(USER_ID);
-        SyncContext.setUser(user);
+        SyncContext.setAppUser(user);
     }
 
     @Test
