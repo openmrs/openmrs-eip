@@ -275,6 +275,9 @@
             <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints unique="true"/>
+            </column>
             <column name="sent" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>

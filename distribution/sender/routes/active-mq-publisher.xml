@@ -82,9 +82,7 @@
                             #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
                             #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
                             #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
-                            <!-- TODO(luis.pinto) - validate with JP/Wyclif: SenderSyncMessage only have messageUuid, that stores event request uuid. -->
-                            <!-- Should we use the same uuid to set the two metadata uuid here? -->
-                            #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').messageUuid)}
+                            #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
                             #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
                         </spel>
                     </script>

@@ -27,6 +27,9 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Column(name = "message_uuid", length = 38, nullable = false, unique = true, updatable = false)
 	private String messageUuid;
 	
+	@Column(name = "request_uuid", length = 38, unique = true, updatable = false)
+	private String requestUuid;
+	
 	@NotNull
 	@Column(length = 1, nullable = false)
 	private boolean sent;
@@ -67,6 +70,14 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.messageUuid = messageUuid;
 	}
 	
+	public String getRequestUuid() {
+		return requestUuid;
+	}
+	
+	public void setRequestUuid(String requestUuid) {
+		this.requestUuid = requestUuid;
+	}
+	
 	public boolean isSent() {
 		return sent;
 	}
@@ -86,7 +97,8 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Override
 	public String toString() {
 		return "SenderSyncMessage [tableName=" + tableName + ", identifier=" + identifier + ", operation=" + operation
-		        + ", messageUuid=" + messageUuid + ", sent=" + sent + ", snapshot=" + snapshot + "]";
+		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", sent=" + sent + ", snapshot="
+		        + snapshot + "]";
 	}
 	
 }
