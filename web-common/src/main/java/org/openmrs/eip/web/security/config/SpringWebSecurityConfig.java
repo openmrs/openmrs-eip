@@ -59,6 +59,7 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/styles.*.css").permitAll();
 		http.authorizeRequests().antMatchers("/*/styles.*.css").permitAll();
 		http.authorizeRequests().antMatchers("/css/login.*.css").permitAll();
+		http.httpBasic();
 		
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
 		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
