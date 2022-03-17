@@ -19,13 +19,9 @@
             <when>
                 <simple>${exchangeProperty.event.operation} != 'r'</simple>
                 
-                <log message="Verifying entity on DB..." loggingLevel="DEBUG" />
-                
                 <!-- TODO (luis.pinto): create an endpoint that count the entity and use here, avoiding fetching twice, here and later on active-mq-publisher route -->
                 <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
 
-                <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
-                
                 <setProperty name="isValid">
                     <simple>${body.size()} == 1</simple>
                 </setProperty>
