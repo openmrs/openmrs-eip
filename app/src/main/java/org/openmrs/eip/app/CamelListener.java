@@ -38,7 +38,7 @@ public class CamelListener extends EventNotifierSupport {
 	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
 	
 	private static ExecutorService executor;
-	
+
 	@Override
 	public void notify(CamelEvent event) {
 		
@@ -49,12 +49,30 @@ public class CamelListener extends EventNotifierSupport {
 				throw new EIPException("No value set for application property: " + Constants.PROP_OPENMRS_USER);
 			}
 			
+			UserLightRepository userListRepo = SyncContext.getBean(UserLightRepository.class);
+			UserRepository userRepo = SyncContext.getBean(UserRepository.class);
 			User exampleUser = new User();
 			exampleUser.setUsername(username);
-			Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
-			Optional<User> optional = SyncContext.getBean(UserRepository.class).findOne(example);
-			User user = optional.orElseThrow(() -> new EIPException("No user found with username: " + username));
-			SyncContext.setUser(SyncContext.getBean(UserLightRepository.class).findById(user.getId()).get());
+			Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+			Optional<User> optional = userRepo.findOne(example);
+			if (!optional.isPresent()) {
+				log.error("No user found with username: " + username);
+				SyncApplication.shutdown();
+			}
+			
+			SyncContext.setUser(userListRepo.findById(optional.get().getId()).get());
+			
+			log.info("Loading OpenMRS admin user account");
+			exampleUser = new User();
+			exampleUser.setUsername("admin");
+			example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+			optional = userRepo.findOne(example);
+			if (!optional.isPresent()) {
+				log.error("No admin user found");
+				SyncApplication.shutdown();
+			}
+			
+			SyncContext.setAdminUser(userListRepo.findById(optional.get().getId()).get());
 			
 			log.info("Starting sync message consumer threads, one per site");
 			

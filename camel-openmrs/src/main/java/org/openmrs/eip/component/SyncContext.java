@@ -19,7 +19,9 @@ public class SyncContext implements ApplicationContextAware {
 	
 	private static ApplicationContext appContext;
 	
-	private static UserLight user;
+	private static UserLight appUser;
+	
+	private static UserLight adminUser;
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -62,7 +64,7 @@ public class SyncContext implements ApplicationContextAware {
 	 * @return the user
 	 */
 	public static UserLight getUser() {
-		return user;
+		return appUser;
 	}
 	
 	/**
@@ -71,7 +73,25 @@ public class SyncContext implements ApplicationContextAware {
 	 * @param user the user to set
 	 */
 	public static void setUser(UserLight user) {
-		SyncContext.user = user;
+		SyncContext.appUser = user;
+	}
+	
+	/**
+	 * Gets the admin user
+	 *
+	 * @return the admin user
+	 */
+	public static UserLight getAdminUser() {
+		return adminUser;
+	}
+	
+	/**
+	 * Sets the admin user
+	 *
+	 * @param adminUser the admin user to set
+	 */
+	public static void setAdminUser(UserLight adminUser) {
+		SyncContext.adminUser = adminUser;
 	}
 	
 }

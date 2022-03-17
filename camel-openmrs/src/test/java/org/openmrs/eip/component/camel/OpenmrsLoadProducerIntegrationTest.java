@@ -20,6 +20,7 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.BaseDbDrivenTest;
@@ -64,6 +65,13 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	@Autowired
 	private UserRepository userRepo;
 	
+	@BeforeClass
+	public static void beforeClass() {
+		UserLight user = new UserLight();
+		user.setUuid("admin-uuid");
+		SyncContext.setAdminUser(user);
+	}
+	
 	@Before
 	public void init() {
 		exchange = new DefaultExchange(new DefaultCamelContext());
@@ -73,32 +81,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	@AfterClass
 	public static void afterClass() {
 		SyncContext.setUser(null);
-	}
-	
-	@Test
-	public void process_shouldPreProcessAdminUserToUpdateUsernameAndSystemIdPropertiesToIncludeTheSendingSiteId() {
-		final String userUuid = "user-uuid";
-		assertNull(userService.getModel(userUuid));
-		final String username = "admin";
-		final String systemId = "123";
-		final String siteId = "some-site-uuid";
-		UserModel model = new UserModel();
-		model.setUuid(userUuid);
-		model.setUsername(username);
-		model.setSystemId(systemId);
-		model.setCreatorUuid(creator);
-		model.setDateCreated(LocalDateTime.now());
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setSourceIdentifier(siteId);
-		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
-		
-		producer.process(exchange);
-		
-		UserModel savedUser = userService.getModel(userUuid);
-		assertNotNull(savedUser);
-		assertEquals(username + VALUE_SITE_SEPARATOR + siteId, savedUser.getUsername());
-		assertEquals(systemId + VALUE_SITE_SEPARATOR + siteId, savedUser.getSystemId());
+		SyncContext.setAdminUser(null);
 	}
 	
 	@Test

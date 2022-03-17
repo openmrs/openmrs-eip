@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.PersonHash;
@@ -33,6 +34,7 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
@@ -496,6 +498,22 @@ public class OpenmrsLoadProducerTest {
 		verify(mockLogger).debug("Updating hash for the incoming entity state");
 		assertEquals(expectedNewHash, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
+	}
+	
+	@Test
+	public void process_shouldNotSyncLocalAdminUser() {
+		final String adminUserUuid = "admin-user-uuid";
+		UserLight adminUser = new UserLight();
+		adminUser.setUuid(adminUserUuid);
+		when(SyncContext.getAdminUser()).thenReturn(adminUser);
+		UserModel model = new UserModel();
+		model.setUuid(adminUserUuid);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, null);
+		exchange.getIn().setBody(syncModel);
+		
+		producer.process(exchange);
+		
+		verify(mockLogger).info("Skipping syncing of a user with a uuid matching the local admin account");
 	}
 	
 }

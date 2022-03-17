@@ -55,6 +55,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			return;
 		}
 		
+		if (isUser && SyncContext.getAdminUser().getUuid().equals(syncModel.getModel().getUuid())) {
+			log.info("Skipping syncing of a user with a uuid matching the local admin account");
+			return;
+		}
+		
 		boolean isProvider = syncModel.getModel() instanceof ProviderModel;
 		boolean isDeleteOperation = "d".equals(syncModel.getMetadata().getOperation());
 		boolean delete = isDeleteOperation && !isUser && !isProvider;
@@ -124,31 +129,26 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			if (!isDeleteOperation) {
 				if (isUser) {
 					UserModel userModel = (UserModel) modelToSave;
-					if ("admin".equals(userModel.getUsername())) {
-						userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
-						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
-					} else {
-						if (dbModel == null) {
-							UserRepository userRepo = SyncContext.getBean(UserRepository.class);
-							if (userModel.getUsername() != null) {
-								User exampleUser = new User();
-								exampleUser.setUsername(userModel.getUsername());
-								Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
-								if (userRepo.count(example) > 0) {
-									log.info("Found a user in the receiver DB with a duplicate username, appending "
-									        + "site id to this user's username to make it unique");
-									userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
-								}
-							}
-							
+					if (dbModel == null) {
+						UserRepository userRepo = SyncContext.getBean(UserRepository.class);
+						if (userModel.getUsername() != null) {
 							User exampleUser = new User();
-							exampleUser.setSystemId(userModel.getSystemId());
+							exampleUser.setUsername(userModel.getUsername());
 							Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
 							if (userRepo.count(example) > 0) {
-								log.info("Found a user in the receiver DB with a duplicate systemId, appending site id "
-								        + "to this user's systemId to make it unique");
-								userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+								log.info("Found a user in the receiver DB with a duplicate username, appending "
+								        + "site id to this user's username to make it unique");
+								userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 							}
+						}
+						
+						User exampleUser = new User();
+						exampleUser.setSystemId(userModel.getSystemId());
+						Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
+						if (userRepo.count(example) > 0) {
+							log.info("Found a user in the receiver DB with a duplicate systemId, appending site id "
+							        + "to this user's systemId to make it unique");
+							userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
 						}
 					}
 				}
