@@ -136,8 +136,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 							exampleUser.setUsername(userModel.getUsername());
 							Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
 							if (userRepo.count(example) > 0) {
-								log.info("Found a user in the receiver DB with a duplicate username, appending "
-								        + "site id to this user's username to make it unique");
+								log.info(
+								    "Found a user in the receiver DB with a duplicate username: " + userModel.getUsername()
+								            + ", appending " + "site id to this user's username to make it unique");
 								userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 							}
 						}
@@ -146,8 +147,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 						exampleUser.setSystemId(userModel.getSystemId());
 						Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
 						if (userRepo.count(example) > 0) {
-							log.info("Found a user in the receiver DB with a duplicate systemId, appending site id "
-							        + "to this user's systemId to make it unique");
+							log.info("Found a user in the receiver DB with a duplicate systemId: " + userModel.getSystemId()
+							        + ", appending site id " + "to this user's systemId to make it unique");
 							userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
 						}
 					}
