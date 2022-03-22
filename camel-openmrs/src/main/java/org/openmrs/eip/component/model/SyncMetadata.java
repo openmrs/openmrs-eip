@@ -17,7 +17,7 @@ public class SyncMetadata {
 	
 	private String requestUuid;
 	
-	private Boolean snapshot;
+	private Boolean snapshot = false;
 	
 	/**
 	 * Gets the sourceIdentifier
@@ -99,7 +99,7 @@ public class SyncMetadata {
 	public Boolean getSnapshot() {
 		return snapshot;
 	}
-
+	
 	/**
 	 * Sets the snapshot
 	 *
@@ -108,7 +108,7 @@ public class SyncMetadata {
 	public void setSnapshot(Boolean snapshot) {
 		this.snapshot = snapshot;
 	}
-
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation

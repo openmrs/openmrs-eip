@@ -30,7 +30,7 @@ public class SyncMessage extends AbstractEntity {
 	private SiteInfo site;
 	
 	@Column(name = "is_snapshot", nullable = false, updatable = false)
-	private Boolean snapshot = Boolean.FALSE;
+	private Boolean snapshot = false;
 	
 	/**
 	 * Gets the identifier

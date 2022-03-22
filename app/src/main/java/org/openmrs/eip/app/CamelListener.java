@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStartedEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStoppingEvent;
@@ -38,7 +37,7 @@ public class CamelListener extends EventNotifierSupport {
 	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
 	
 	private static ExecutorService executor;
-
+	
 	@Override
 	public void notify(CamelEvent event) {
 		
@@ -78,11 +77,10 @@ public class CamelListener extends EventNotifierSupport {
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
 			executor = Executors.newFixedThreadPool(sites.size());
-			ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteMessageConsumer(site, producerTemplate));
+				executor.execute(new SiteMessageConsumer(site));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);

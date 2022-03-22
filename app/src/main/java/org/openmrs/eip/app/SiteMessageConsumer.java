@@ -10,6 +10,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private static final String PARAM_SITE = "site";
 	
-	private static final String ENTITY = SyncMessage.class.getSimpleName();
+	protected static final String ENTITY = SyncMessage.class.getSimpleName();
 	
 	//Order by dateCreated may be just in case the DB is migrated and id change
 	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
@@ -31,21 +32,18 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private SiteInfo site;
 	
-	private ProducerTemplate producerTemplate;
-	
 	private boolean errorEncountered = false;
 	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
-	 * @param producerTemplate {@link ProducerTemplate} object
 	 */
-	public SiteMessageConsumer(SiteInfo site, ProducerTemplate producerTemplate) {
+	public SiteMessageConsumer(SiteInfo site) {
 		this.site = site;
-		this.producerTemplate = producerTemplate;
 	}
 	
 	@Override
 	public void run() {
+		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
@@ -104,22 +102,8 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			Thread.currentThread().setName(site.getIdentifier() + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-"
-			        + msg.getIdentifier() + "-" + msg.getId());
-			
-			log.info("Submitting sync message to the processor");
-			
-			producerTemplate.sendBody("direct:message-processor", msg);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Removing sync message from the queue");
-			}
-			
-			producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
-			
-			log.info("Successfully removed the sync message from the queue");
+			ReceiverUtils.processMessage(msg);
 		}
-		
 	}
 	
 }
