@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 /**
  * Encapsulates descriptive data about a sync payload i.e. the unique ID of the site sending the.
- * payload and the date it was sent.
+ * payload, the date it was sent, snapshot and request uuid in case of a message sent in response to
+ * sync request.
  */
 public class SyncMetadata {
 	
@@ -15,6 +16,8 @@ public class SyncMetadata {
 	private LocalDateTime dateSent;
 	
 	private String requestUuid;
+	
+	private Boolean snapshot;
 	
 	/**
 	 * Gets the sourceIdentifier
@@ -88,10 +91,28 @@ public class SyncMetadata {
 		this.requestUuid = requestUuid;
 	}
 	
+	/**
+	 * Gets the snapshot
+	 *
+	 * @return the snapshot
+	 */
+	public Boolean getSnapshot() {
+		return snapshot;
+	}
+
+	/**
+	 * Sets the snapshot
+	 *
+	 * @param snapshot the snapshot to set
+	 */
+	public void setSnapshot(Boolean snapshot) {
+		this.snapshot = snapshot;
+	}
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation
-		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + "}";
+		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + "}";
 	}
 	
 }

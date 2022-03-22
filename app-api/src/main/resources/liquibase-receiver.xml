@@ -1098,4 +1098,19 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220321-1200">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="is_snapshot" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add is_snapshot column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
