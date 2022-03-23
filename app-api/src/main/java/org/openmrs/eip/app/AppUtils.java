@@ -47,23 +47,20 @@ public class AppUtils {
 	}
 	
 	private static Map<String, String> getClassAndSimpleNameMap() {
-		if (classAndSimpleNameMap == null) {
-			synchronized (AppUtils.class) {
-				if (classAndSimpleNameMap == null) {
-					log.info("Initializing class to simple name mappings...");
-					
-					classAndSimpleNameMap = new HashMap(TableToSyncEnum.values().length);
-					Arrays.stream(TableToSyncEnum.values()).forEach(e -> {
-						classAndSimpleNameMap.put(e.getModelClass().getName(),
-						    e.getEntityClass().getSimpleName().toLowerCase());
-					});
-					
-					if (log.isDebugEnabled()) {
-						log.debug("Class to simple name mappings: " + classAndSimpleNameMap);
-					}
-					
-					log.info("Successfully initialized class to simple name mappings");
+		synchronized (AppUtils.class) {
+			if (classAndSimpleNameMap == null) {
+				log.info("Initializing class to simple name mappings...");
+				
+				classAndSimpleNameMap = new HashMap(TableToSyncEnum.values().length);
+				Arrays.stream(TableToSyncEnum.values()).forEach(e -> {
+					classAndSimpleNameMap.put(e.getModelClass().getName(), e.getEntityClass().getSimpleName().toLowerCase());
+				});
+				
+				if (log.isDebugEnabled()) {
+					log.debug("Class to simple name mappings: " + classAndSimpleNameMap);
 				}
+				
+				log.info("Successfully initialized class to simple name mappings");
 			}
 		}
 		
