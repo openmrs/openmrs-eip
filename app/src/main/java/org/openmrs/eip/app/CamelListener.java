@@ -1,8 +1,8 @@
 package org.openmrs.eip.app;
 
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_POOL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.PROP_SYNC_THREAD_POOL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_SYNC_THREAD_SIZE;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.Collection;
@@ -43,7 +43,7 @@ public class CamelListener extends EventNotifierSupport {
 	
 	private static ExecutorService syncExecutor;
 	
-	@Value("${" + PROP_SYNC_THREAD_POOL_SIZE + ":" + DEFAULT_SYNC_THREAD_POOL_SIZE + "}")
+	@Value("${" + PROP_SYNC_THREAD_SIZE + ":" + DEFAULT_SYNC_THREAD_SIZE + "}")
 	private Integer parallelSyncMsgSize;
 	
 	@Override

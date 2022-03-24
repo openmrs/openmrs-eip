@@ -1,10 +1,15 @@
 package org.openmrs.eip.app;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.synchronizedList;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
+import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_SYNC_PROCESSOR;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.ProducerTemplate;
@@ -37,6 +42,8 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ExecutorService syncMsgExecutor;
 	
+	private ProducerTemplate producerTemplate;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param syncMsgExecutor ExecutorService object
@@ -48,7 +55,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	@Override
 	public void run() {
-		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
@@ -98,8 +105,10 @@ public class SiteMessageConsumer implements Runnable {
 		
 	}
 	
-	protected void processMessages(List<SyncMessage> syncMessages) {
+	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
+		
+		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(DEFAULT_SYNC_THREAD_SIZE));
 		
 		for (SyncMessage msg : syncMessages) {
 			if (ReceiverContext.isStopSignalReceived()) {
@@ -108,12 +117,84 @@ public class SiteMessageConsumer implements Runnable {
 			}
 			
 			if (msg.getSnapshot()) {
-				syncMsgExecutor.execute(() -> {
-					ReceiverUtils.processMessage(msg);
-				});
+				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+					final String originalThreadName = Thread.currentThread().getName();
+					try {
+						setThreadName(msg);
+						processMessage(msg);
+					}
+					finally {
+						Thread.currentThread().setName(originalThreadName);
+					}
+				}, syncMsgExecutor));
+			} else {
+				final String originalThreadName = Thread.currentThread().getName();
+				try {
+					setThreadName(msg);
+					if (syncThreadFutures.size() > 0) {
+						waitForFutures(syncThreadFutures);
+						syncThreadFutures.clear();
+					}
+					
+					processMessage(msg);
+				}
+				finally {
+					Thread.currentThread().setName(originalThreadName);
+				}
 			}
+			
 		}
 		
+		if (syncThreadFutures.size() > 0) {
+			waitForFutures(syncThreadFutures);
+		}
+	}
+	
+	/**
+	 * Processes the specified sync message
+	 *
+	 * @param msg the sync message to process
+	 */
+	public void processMessage(SyncMessage msg) {
+		
+		log.info("Submitting sync message to the processor");
+		
+		producerTemplate.sendBody(ROUTE_URI_SYNC_PROCESSOR, msg);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Removing sync message from the queue " + msg);
+		}
+		
+		producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msg.getId(), null);
+	}
+	
+	/**
+	 * Wait for all the Future instances in the specified list to terminate
+	 * 
+	 * @param futures the list of Futures instance to wait for
+	 * @throws Exception
+	 */
+	public void waitForFutures(List<CompletableFuture<Void>> futures) throws Exception {
+		if (log.isDebugEnabled()) {
+			log.debug("Waiting for " + futures.size() + " sync message processor thread(s) to terminate");
+		}
+		
+		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		
+		allFuture.get();
+		
+		if (log.isDebugEnabled()) {
+			log.debug(futures.size() + " sync message processor thread(s) have terminated");
+		}
+	}
+	
+	private void setThreadName(SyncMessage msg) {
+		Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getThreadName(msg));
+	}
+	
+	protected String getThreadName(SyncMessage msg) {
+		return msg.getSite().getIdentifier() + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-"
+		        + msg.getIdentifier() + "-" + msg.getId();
 	}
 	
 }
