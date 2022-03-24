@@ -5,6 +5,7 @@ import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.jpa.JpaConstants;
@@ -34,11 +35,15 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private boolean errorEncountered = false;
 	
+	private ExecutorService syncMsgExecutor;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
+	 * @param syncMsgExecutor ExecutorService object
 	 */
-	public SiteMessageConsumer(SiteInfo site) {
+	public SiteMessageConsumer(SiteInfo site, ExecutorService syncMsgExecutor) {
 		this.site = site;
+		this.syncMsgExecutor = syncMsgExecutor;
 	}
 	
 	@Override
@@ -93,7 +98,7 @@ public class SiteMessageConsumer implements Runnable {
 		
 	}
 	
-	private void processMessages(List<SyncMessage> syncMessages) {
+	protected void processMessages(List<SyncMessage> syncMessages) {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
 		for (SyncMessage msg : syncMessages) {
@@ -102,8 +107,13 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			ReceiverUtils.processMessage(msg);
+			if (msg.getSnapshot()) {
+				syncMsgExecutor.execute(() -> {
+					ReceiverUtils.processMessage(msg);
+				});
+			}
 		}
+		
 	}
 	
 }

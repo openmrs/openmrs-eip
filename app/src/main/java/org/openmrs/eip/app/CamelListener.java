@@ -1,6 +1,8 @@
 package org.openmrs.eip.app;
 
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_POOL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
+import static org.openmrs.eip.app.SyncConstants.PROP_SYNC_THREAD_POOL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.Collection;
@@ -24,6 +26,7 @@ import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
@@ -36,7 +39,12 @@ public class CamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
 	
-	private static ExecutorService executor;
+	private static ExecutorService siteExecutor;
+	
+	private static ExecutorService syncExecutor;
+	
+	@Value("${" + PROP_SYNC_THREAD_POOL_SIZE + ":" + DEFAULT_SYNC_THREAD_POOL_SIZE + "}")
+	private Integer parallelSyncMsgSize;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -76,11 +84,13 @@ public class CamelListener extends EventNotifierSupport {
 			log.info("Starting sync message consumer threads, one per site");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
-			executor = Executors.newFixedThreadPool(sites.size());
+			siteExecutor = Executors.newFixedThreadPool(sites.size());
+			syncExecutor = Executors.newFixedThreadPool(parallelSyncMsgSize);
+			
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteMessageConsumer(site));
+				siteExecutor.execute(new SiteMessageConsumer(site, syncExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
@@ -91,20 +101,37 @@ public class CamelListener extends EventNotifierSupport {
 			ReceiverContext.setStopSignal();
 			log.info("Shutting down executor for message consumer threads");
 			
-			if (executor != null) {
-				executor.shutdown();
+			if (siteExecutor != null) {
+				siteExecutor.shutdown();
 				
 				try {
 					int wait = WAIT_IN_SECONDS + 10;
 					log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
 					
-					executor.awaitTermination(wait, TimeUnit.SECONDS);
+					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
 					
 					log.info("The message consumer threads have successfully terminated, done shutting down the "
 					        + "executor for message consumer threads");
 				}
-				catch (InterruptedException e) {
+				catch (Exception e) {
 					log.error("An error occurred while waiting for message consumer threads to terminate");
+				}
+			}
+			
+			if (syncExecutor != null) {
+				syncExecutor.shutdown();
+				
+				try {
+					int wait = WAIT_IN_SECONDS + 10;
+					log.info("Waiting for " + wait + " seconds for sync threads to terminate");
+					
+					syncExecutor.awaitTermination(wait, TimeUnit.SECONDS);
+					
+					log.info("The sync threads have successfully terminated, done shutting down the "
+					        + "executor for sync threads");
+				}
+				catch (Exception e) {
+					log.error("An error occurred while waiting for sync threads to terminate");
 				}
 			}
 		}
