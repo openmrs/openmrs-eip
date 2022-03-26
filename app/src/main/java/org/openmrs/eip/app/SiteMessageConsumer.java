@@ -2,7 +2,6 @@ package org.openmrs.eip.app;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
 import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_SYNC_PROCESSOR;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
@@ -44,13 +43,17 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ProducerTemplate producerTemplate;
 	
+	private int threadCount;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param syncMsgExecutor ExecutorService object
+	 * @param threadCount the number of threads to use to sync messages in parallel
 	 */
-	public SiteMessageConsumer(SiteInfo site, ExecutorService syncMsgExecutor) {
+	public SiteMessageConsumer(SiteInfo site, ExecutorService syncMsgExecutor, int threadCount) {
 		this.site = site;
 		this.syncMsgExecutor = syncMsgExecutor;
+		this.threadCount = threadCount;
 	}
 	
 	@Override
@@ -108,7 +111,7 @@ public class SiteMessageConsumer implements Runnable {
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
-		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(DEFAULT_SYNC_THREAD_SIZE));
+		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
 		
 		for (SyncMessage msg : syncMessages) {
 			if (ReceiverContext.isStopSignalReceived()) {

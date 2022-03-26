@@ -90,7 +90,7 @@ public class CamelListener extends EventNotifierSupport {
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				siteExecutor.execute(new SiteMessageConsumer(site, syncExecutor));
+				siteExecutor.execute(new SiteMessageConsumer(site, syncExecutor, parallelSyncMsgSize));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
@@ -99,24 +99,7 @@ public class CamelListener extends EventNotifierSupport {
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			ReceiverContext.setStopSignal();
-			log.info("Shutting down executor for message consumer threads");
-			
-			if (siteExecutor != null) {
-				siteExecutor.shutdown();
-				
-				try {
-					int wait = WAIT_IN_SECONDS + 10;
-					log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
-					
-					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
-					
-					log.info("The message consumer threads have successfully terminated, done shutting down the "
-					        + "executor for message consumer threads");
-				}
-				catch (Exception e) {
-					log.error("An error occurred while waiting for message consumer threads to terminate");
-				}
-			}
+			log.info("Shutting down executor for sync message threads");
 			
 			if (syncExecutor != null) {
 				syncExecutor.shutdown();
@@ -132,6 +115,25 @@ public class CamelListener extends EventNotifierSupport {
 				}
 				catch (Exception e) {
 					log.error("An error occurred while waiting for sync threads to terminate");
+				}
+			}
+			
+			log.info("Shutting down executor for site message consumer threads");
+			
+			if (siteExecutor != null) {
+				siteExecutor.shutdown();
+				
+				try {
+					int wait = WAIT_IN_SECONDS + 10;
+					log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
+					
+					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
+					
+					log.info("The message consumer threads have successfully terminated, done shutting down the "
+					        + "executor for message consumer threads");
+				}
+				catch (Exception e) {
+					log.error("An error occurred while waiting for message consumer threads to terminate");
 				}
 			}
 		}

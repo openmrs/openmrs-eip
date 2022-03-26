@@ -80,7 +80,7 @@ public class JsonUtilsTest {
 		syncMetadata.put("sourceIdentifier", sourceId);
 		syncModel.put("metadata", syncMetadata);
 		SyncModel result = JsonUtils.unmarshal(new ObjectMapper().writeValueAsString(syncModel), SyncModel.class);
-		Assert.assertNull(result.getMetadata().getSnapshot());
+		Assert.assertFalse(result.getMetadata().getSnapshot());
 		assertEquals(sourceId, result.getMetadata().getSourceIdentifier());
 	}
 	
