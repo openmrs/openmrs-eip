@@ -2,15 +2,12 @@ package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_SIZE;
 import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_SYNC_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
@@ -32,8 +29,6 @@ import org.powermock.reflect.Whitebox;
 public class SiteMessageConsumerTest {
 	
 	private SiteMessageConsumer consumer;
-	
-	private ExecutorService executor;
 	
 	private SiteInfo siteInfo;
 	
@@ -58,11 +53,10 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
-	public void processMessages_shouldProcessAllSnapshotMessagesInParallel() throws Exception {
+	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForSlowThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
-		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, executor, size);
+		consumer = new SiteMessageConsumer(siteInfo, size);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -94,11 +88,44 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
+	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForFastThreads() throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 100;
+		consumer = new SiteMessageConsumer(siteInfo, size);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
 	public void processMessages_shouldProcessAllNonSnapshotMessagesInSerialInCurrentThread() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 10;
-		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, executor, size);
+		consumer = new SiteMessageConsumer(siteInfo, size);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = new ArrayList(size);
@@ -135,8 +162,7 @@ public class SiteMessageConsumerTest {
 	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
-		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, executor, size);
+		consumer = new SiteMessageConsumer(siteInfo, size);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -192,8 +218,7 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAMixOfMessagesWithAllSnapshotAtTheStartOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
-		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, executor, size);
+		consumer = new SiteMessageConsumer(siteInfo, size);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -260,8 +285,7 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAMixOfMessagesWithAllSnapshotAtTheEndOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
-		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, executor, size);
+		consumer = new SiteMessageConsumer(siteInfo, size);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
