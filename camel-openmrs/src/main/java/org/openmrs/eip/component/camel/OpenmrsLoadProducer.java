@@ -162,7 +162,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 						if (log.isDebugEnabled()) {
 							log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
 						}
-
+						
 						model.setValue(getId(type.getFormat(), model.getValue()).toString());
 					}
 				}
@@ -326,8 +326,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		if (entity == null) {
 			throw new EIPException("No entity of type " + openmrsClassName + " found with uuid " + uuid);
 		}
-
+		
 		return entity.getId();
 	}
-
+	
 }

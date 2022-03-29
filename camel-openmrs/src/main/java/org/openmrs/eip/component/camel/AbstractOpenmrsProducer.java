@@ -12,24 +12,24 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
 
 public abstract class AbstractOpenmrsProducer extends DefaultProducer {
-
+	
 	private static Logger log = LoggerFactory.getLogger(AbstractOpenmrsProducer.class);
-
-    private static final String LIGHT_ENTITY_PKG = LightEntity.class.getPackage().getName();
-
+	
+	private static final String LIGHT_ENTITY_PKG = LightEntity.class.getPackage().getName();
+	
 	protected static final String OPENMRS_ROOT_PGK = "org.openmrs";
-
+	
 	protected ApplicationContext applicationContext;
-
+	
 	protected ProducerParams params;
-
+	
 	public AbstractOpenmrsProducer(final OpenmrsEndpoint endpoint, final ApplicationContext applicationContext,
 	    final ProducerParams params) {
 		super(endpoint);
 		this.applicationContext = applicationContext;
 		this.params = params;
 	}
-
+	
 	/**
 	 * Gets the repository for the specified openmrs type
 	 *
@@ -39,11 +39,11 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	protected OpenmrsRepository<LightEntity> getEntityLightRepository(String openmrsType) {
 		String lightEntityTypeName = LIGHT_ENTITY_PKG + "." + openmrsType.substring(openmrsType.lastIndexOf(".") + 1)
 		        + "Light";
-
+		
 		if (log.isDebugEnabled()) {
 			log.debug("OpenMRS type: " + openmrsType + " is mapped to DB sync light entity type: " + lightEntityTypeName);
 		}
-
+		
 		Class<? extends LightEntity> lightEntityType;
 		try {
 			lightEntityType = (Class<? extends LightEntity>) Class.forName(lightEntityTypeName);
@@ -51,10 +51,10 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 		catch (ClassNotFoundException e) {
 			throw new EIPException("Failed to load light entity class: " + lightEntityTypeName, e);
 		}
-
+		
 		return getEntityLightRepository(lightEntityType);
 	}
-
+	
 	/**
 	 * Gets the repository for the specified light entity type
 	 *
@@ -63,7 +63,7 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	 */
 	private OpenmrsRepository<LightEntity> getEntityLightRepository(Class<? extends LightEntity> lightEntityType) {
 		ResolvableType resType = ResolvableType.forClassWithGenerics(OpenmrsRepository.class, lightEntityType);
-
+		
 		String[] beanNames = applicationContext.getBeanNamesForType(resType);
 		if (beanNames.length != 1) {
 			if (beanNames.length == 0) {
@@ -72,16 +72,16 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 				throw new EIPException("Found multiple light repositories for type " + lightEntityType);
 			}
 		}
-
+		
 		Object lightRepo = applicationContext.getBean(beanNames[0]);
-
+		
 		if (log.isDebugEnabled()) {
 			log.debug("Using light entity repo: " + lightRepo + " for light entity type: " + lightEntityType);
 		}
-
+		
 		return (OpenmrsRepository<LightEntity>) lightRepo;
 	}
-
+	
 	/**
 	 * Loads and returns a light entity matching the specified decomposed uuid
 	 *
@@ -93,5 +93,5 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 		DecomposedUuid decomposedUuid = ModelUtils.decomposeUuid(composedUuid).get();
 		return (T) getEntityLightRepository(decomposedUuid.getEntityType()).findByUuid(decomposedUuid.getUuid());
 	}
-
+	
 }
