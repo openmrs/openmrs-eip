@@ -5,37 +5,35 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.component.model.AttributeModel;
-import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.entity.PersonAttribute;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
+import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
-
-import static org.junit.Assert.assertEquals;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 
 public class PersonAttributeServiceTest {
 
-    @Mock
-    private SyncEntityRepository<PersonAttribute> repository;
+	@Mock
+	private SyncEntityRepository<PersonAttribute> repository;
 
-    @Mock
-    private EntityToModelMapper<PersonAttribute, AttributeModel> entityToModelMapper;
+	@Mock
+	private EntityToModelMapper<PersonAttribute, PersonAttributeModel> entityToModelMapper;
 
-    @Mock
-    private ModelToEntityMapper<AttributeModel, PersonAttribute> modelToEntityMapper;
+	@Mock
+	private ModelToEntityMapper<PersonAttributeModel, PersonAttribute> modelToEntityMapper;
 
-    private PersonAttributeService service;
+	private PersonAttributeService service;
 
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
 
-        service = new PersonAttributeService(repository, entityToModelMapper, modelToEntityMapper);
-    }
+		service = new PersonAttributeService(repository, entityToModelMapper, modelToEntityMapper);
+	}
 
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.PERSON_ATTRIBUTE, service.getTableToSync());
-    }
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.PERSON_ATTRIBUTE, service.getTableToSync());
+	}
 }

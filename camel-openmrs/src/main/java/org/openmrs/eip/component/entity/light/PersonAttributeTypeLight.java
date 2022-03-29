@@ -13,7 +13,11 @@ import javax.validation.constraints.NotNull;
 @AttributeOverride(name = "id", column = @Column(name = "person_attribute_type_id"))
 public class PersonAttributeTypeLight extends RetireableLightEntity {
 
-    @NotNull
-    @Column(name = "name")
-    private String name;
+	@NotNull
+	@Column(name = "name")
+	private String name;
+
+	@Column
+	private String format;
+
 }
