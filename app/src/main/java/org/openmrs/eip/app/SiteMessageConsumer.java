@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.jpa.JpaConstants;
@@ -45,13 +43,17 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private int threadCount;
 	
+	private ExecutorService msgExecutor;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param threadCount the number of threads to use to sync messages in parallel
+	 * @param msgExecutor {@link ExecutorService} instance to messages in parallel
 	 */
-	public SiteMessageConsumer(SiteInfo site, int threadCount) {
+	public SiteMessageConsumer(SiteInfo site, int threadCount, ExecutorService msgExecutor) {
 		this.site = site;
 		this.threadCount = threadCount;
+		this.msgExecutor = msgExecutor;
 	}
 	
 	@Override
@@ -108,72 +110,46 @@ public class SiteMessageConsumer implements Runnable {
 	
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
-		ExecutorService syncMsgExecutor = null;
+		
 		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
 		
-		try {
-			for (SyncMessage msg : syncMessages) {
-				if (ReceiverContext.isStopSignalReceived()) {
-					log.info("Sync message consumer for site: " + site + " has detected a stop signal");
-					break;
-				}
-				
-				if (msg.getSnapshot()) {
-					if (syncMsgExecutor == null) {
-						log.info("Creating executor for sync message threads");
-						syncMsgExecutor = Executors.newFixedThreadPool(threadCount);
-					}
-					
-					syncThreadFutures.add(CompletableFuture.runAsync(() -> {
-						final String originalThreadName = Thread.currentThread().getName();
-						try {
-							setThreadName(msg);
-							processMessage(msg);
-						}
-						finally {
-							Thread.currentThread().setName(originalThreadName);
-						}
-					}, syncMsgExecutor));
-				} else {
+		for (SyncMessage msg : syncMessages) {
+			if (ReceiverContext.isStopSignalReceived()) {
+				log.info("Sync message consumer for site: " + site + " has detected a stop signal");
+				break;
+			}
+			
+			if (msg.getSnapshot()) {
+				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
 						setThreadName(msg);
-						if (syncThreadFutures.size() > 0) {
-							waitForFutures(syncThreadFutures);
-							syncThreadFutures.clear();
-						}
-						
 						processMessage(msg);
 					}
 					finally {
 						Thread.currentThread().setName(originalThreadName);
 					}
+				}, msgExecutor));
+			} else {
+				final String originalThreadName = Thread.currentThread().getName();
+				try {
+					setThreadName(msg);
+					if (syncThreadFutures.size() > 0) {
+						waitForFutures(syncThreadFutures);
+						syncThreadFutures.clear();
+					}
+					
+					processMessage(msg);
 				}
-				
+				finally {
+					Thread.currentThread().setName(originalThreadName);
+				}
 			}
 			
-			if (syncThreadFutures.size() > 0) {
-				waitForFutures(syncThreadFutures);
-			}
 		}
-		finally {
-			if (syncMsgExecutor != null) {
-				log.info("Shutting down executor for sync message threads");
-				syncMsgExecutor.shutdown();
-				
-				try {
-					int wait = WAIT_IN_SECONDS + 10;
-					log.info("Waiting for " + wait + " seconds for sync threads to terminate");
-					
-					syncMsgExecutor.awaitTermination(wait, TimeUnit.SECONDS);
-					
-					log.info("The sync threads have successfully terminated, done shutting down the "
-					        + "executor for sync threads");
-				}
-				catch (Exception e) {
-					log.error("An error occurred while waiting for sync threads to terminate");
-				}
-			}
+		
+		if (syncThreadFutures.size() > 0) {
+			waitForFutures(syncThreadFutures);
 		}
 	}
 	

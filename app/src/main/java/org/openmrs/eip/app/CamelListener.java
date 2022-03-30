@@ -39,7 +39,9 @@ public class CamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
 	
-	private static ExecutorService executor;
+	private static ExecutorService siteExecutor;
+	
+	private static ExecutorService msgExecutor;
 	
 	@Value("${" + PROP_SYNC_THREAD_SIZE + ":" + DEFAULT_SYNC_THREAD_SIZE + "}")
 	private Integer parallelSyncMsgSize;
@@ -82,12 +84,13 @@ public class CamelListener extends EventNotifierSupport {
 			log.info("Starting sync message consumer threads, one per site");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
-			executor = Executors.newFixedThreadPool(sites.size());
+			siteExecutor = Executors.newFixedThreadPool(sites.size());
+			msgExecutor = Executors.newFixedThreadPool(parallelSyncMsgSize);
 			
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteMessageConsumer(site, parallelSyncMsgSize));
+				siteExecutor.execute(new SiteMessageConsumer(site, parallelSyncMsgSize, msgExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
@@ -96,16 +99,35 @@ public class CamelListener extends EventNotifierSupport {
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			ReceiverContext.setStopSignal();
-			log.info("Shutting down executor for site message consumer threads");
+			int wait = WAIT_IN_SECONDS + 10;
 			
-			if (executor != null) {
-				executor.shutdown();
+			if (msgExecutor != null) {
+				log.info("Shutting down executor for sync message threads");
+				
+				msgExecutor.shutdown();
 				
 				try {
-					int wait = WAIT_IN_SECONDS + 10;
+					log.info("Waiting for " + wait + " seconds for sync threads to terminate");
+					
+					msgExecutor.awaitTermination(wait, TimeUnit.SECONDS);
+					
+					log.info("The sync threads have successfully terminated, done shutting down the "
+					        + "executor for sync threads");
+				}
+				catch (Exception e) {
+					log.error("An error occurred while waiting for sync threads to terminate");
+				}
+			}
+			
+			if (siteExecutor != null) {
+				log.info("Shutting down executor for site message consumer threads");
+				
+				siteExecutor.shutdown();
+				
+				try {
 					log.info("Waiting for " + wait + " seconds for site message consumer threads to terminate");
 					
-					executor.awaitTermination(wait, TimeUnit.SECONDS);
+					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
 					
 					log.info("The message consumer threads have successfully terminated, done shutting down the "
 					        + "executor for site message consumer threads");

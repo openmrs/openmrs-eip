@@ -6,7 +6,7 @@ public class SyncConstants {
 	
 	public static final int WAIT_IN_SECONDS = 15;
 	
-	public static final int DEFAULT_SYNC_THREAD_SIZE = 50;
+	public static final int DEFAULT_SYNC_THREAD_SIZE = 10;
 	
 	public static final String PROP_SYNC_THREAD_SIZE = "sync.threads.size";
 

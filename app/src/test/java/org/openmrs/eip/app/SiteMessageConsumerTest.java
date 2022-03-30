@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
@@ -29,6 +31,8 @@ import org.powermock.reflect.Whitebox;
 public class SiteMessageConsumerTest {
 	
 	private SiteMessageConsumer consumer;
+	
+	private ExecutorService executor;
 	
 	private SiteInfo siteInfo;
 	
@@ -56,7 +60,8 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForSlowThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -91,7 +96,8 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForFastThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -125,7 +131,8 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAllNonSnapshotMessagesInSerialInCurrentThread() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 10;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = new ArrayList(size);
@@ -162,7 +169,8 @@ public class SiteMessageConsumerTest {
 	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -218,7 +226,8 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAMixOfMessagesWithAllSnapshotAtTheStartOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -285,7 +294,8 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAMixOfMessagesWithAllSnapshotAtTheEndOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
-		consumer = new SiteMessageConsumer(siteInfo, size);
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
