@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager", basePackages = {
@@ -33,22 +36,12 @@ public class ManagementDataSourceConfig {
 	@Value("${spring.mngt-datasource.dialect}")
 	private String hibernateDialect;
 	
-	@Value("${spring.mngt-datasource.jdbcUrl}")
-	private String url;
-	
-	@Value("${spring.mngt-datasource.username}")
-	private String username;
-	
-	@Value("${spring.mngt-datasource.password}")
-	private String password;
-	
-	@Value("${spring.mngt-datasource.driverClassName}")
-	private String driverClassName;
-	
 	@Bean(name = "mngtDataSource")
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
-	public DataSource dataSource() throws ClassNotFoundException {
-		return DataSourceBuilder.create().build();
+	public DataSource dataSource() {
+		HikariDataSource ds = ((HikariDataSource) DataSourceBuilder.create().build());
+		ds.setMaximumPoolSize(SyncConstants.DEFAULT_CONN_POOL_SIZE);
+		return ds;
 	}
 	
 	@Bean(name = "mngtEntityManager")

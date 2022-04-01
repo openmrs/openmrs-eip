@@ -44,7 +44,7 @@ public class CamelListener extends EventNotifierSupport {
 	private static ExecutorService msgExecutor;
 	
 	@Value("${" + PROP_SYNC_THREAD_SIZE + ":" + DEFAULT_SYNC_THREAD_SIZE + "}")
-	private Integer parallelSyncMsgSize;
+	private int parallelSyncMsgSize;
 	
 	@Override
 	public void notify(CamelEvent event) {
