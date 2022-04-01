@@ -40,6 +40,7 @@ public class ManagementDataSourceConfig {
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
 	public DataSource dataSource() {
 		HikariDataSource ds = ((HikariDataSource) DataSourceBuilder.create().build());
+		ds.setPoolName(SyncConstants.DEFAULT_MGT_POOL_NAME);
 		ds.setMaximumPoolSize(SyncConstants.DEFAULT_CONN_POOL_SIZE);
 		return ds;
 	}

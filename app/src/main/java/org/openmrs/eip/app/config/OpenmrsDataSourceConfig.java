@@ -40,6 +40,7 @@ public class OpenmrsDataSourceConfig {
 	@ConfigurationProperties(prefix = "spring.openmrs-datasource")
 	public DataSource dataSource() {
 		HikariDataSource ds = ((HikariDataSource) DataSourceBuilder.create().build());
+		ds.setPoolName(SyncConstants.DEFAULT_OPENMRS_POOL_NAME);
 		ds.setMaximumPoolSize(SyncConstants.DEFAULT_CONN_POOL_SIZE);
 		return ds;
 	}

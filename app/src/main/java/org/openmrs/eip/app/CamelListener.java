@@ -1,8 +1,10 @@
 package org.openmrs.eip.app;
 
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_SYNC_THREAD_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.PROP_SYNC_THREAD_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.Collection;
@@ -43,8 +45,11 @@ public class CamelListener extends EventNotifierSupport {
 	
 	private static ExecutorService msgExecutor;
 	
-	@Value("${" + PROP_SYNC_THREAD_SIZE + ":" + DEFAULT_SYNC_THREAD_SIZE + "}")
-	private int parallelSyncMsgSize;
+	@Value("${" + PROP_SITE_PARALLEL_SIZE + ":" + DEFAULT_SITE_PARALLEL_SIZE + "}")
+	private int parallelSiteSize;
+	
+	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
+	private int parallelMsgSize;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -84,13 +89,13 @@ public class CamelListener extends EventNotifierSupport {
 			log.info("Starting sync message consumer threads, one per site");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
-			siteExecutor = Executors.newFixedThreadPool(sites.size());
-			msgExecutor = Executors.newFixedThreadPool(parallelSyncMsgSize);
+			siteExecutor = Executors.newFixedThreadPool(parallelSiteSize);
+			msgExecutor = Executors.newFixedThreadPool(parallelMsgSize);
 			
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				siteExecutor.execute(new SiteMessageConsumer(site, parallelSyncMsgSize, msgExecutor));
+				siteExecutor.execute(new SiteMessageConsumer(site, parallelMsgSize, msgExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
