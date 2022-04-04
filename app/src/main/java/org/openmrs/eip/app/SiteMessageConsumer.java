@@ -111,6 +111,7 @@ public class SiteMessageConsumer implements Runnable {
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
+		List<String> typeAndIdentifier = synchronizedList(new ArrayList(threadCount));
 		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
 		
 		for (SyncMessage msg : syncMessages) {
@@ -119,7 +120,11 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			if (msg.getSnapshot()) {
+			final String typeAndId = msg.getModelClassName() + "#" + msg.getIdentifier();
+			//Only process snapshot events in parallel if they don't belong to the same entity to avoid false conflicts 
+			//and unique key constraint violations
+			if (msg.getSnapshot() && !typeAndIdentifier.contains(typeAndId)) {
+				typeAndIdentifier.add(typeAndId);
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
@@ -127,6 +132,8 @@ public class SiteMessageConsumer implements Runnable {
 						processMessage(msg);
 					}
 					finally {
+						//May be we should also remove the entity from typeAndIdentifier list but typically there is
+                        //going to be at most 2 snapshot events for the same entity i.e for tables with a hierarchy
 						Thread.currentThread().setName(originalThreadName);
 					}
 				}, msgExecutor));
