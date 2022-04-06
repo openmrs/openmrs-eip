@@ -20,7 +20,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.component.model.DrugOrderModel;
+import org.openmrs.eip.component.model.OrderModel;
+import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.TestOrderModel;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -359,7 +363,7 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSameEntityInSerial() throws Exception {
+	public void processMessages_shouldProcessSnapshotEventsInSerialForTheSameEntity() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 5;
 		executor = Executors.newFixedThreadPool(size);
@@ -372,6 +376,270 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, true);
 			m.setIdentifier("same-uuid");
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSamePatientInSerialIfPrecededByPersonEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? PersonModel.class.getName() : PatientModel.class.getName());
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSamePersonInSerialIfPrecededByPatientEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? PatientModel.class.getName() : PersonModel.class.getName());
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSameTestOrderInSerialIfPrecededByOrderEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? OrderModel.class.getName() : TestOrderModel.class.getName());
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByTestOrderEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? TestOrderModel.class.getName() : OrderModel.class.getName());
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSameDrugOrderInSerialIfPrecededByOrderEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? OrderModel.class.getName() : DrugOrderModel.class.getName());
+			messages.add(m);
+			Mockito.doAnswer(invocation -> {
+				SyncMessage arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(size, expectedResults.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		
+		SyncMessage firstMsg = messages.get(0);
+		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		
+		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		for (int i = 1; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
+			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+		}
+	}
+	
+	@Test
+	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByDrugOrderEvents()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 3;
+		executor = Executors.newFixedThreadPool(size);
+		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, true);
+			m.setIdentifier("same-uuid");
+			m.setModelClassName(i == 0 ? DrugOrderModel.class.getName() : OrderModel.class.getName());
 			messages.add(m);
 			Mockito.doAnswer(invocation -> {
 				SyncMessage arg = invocation.getArgument(1);

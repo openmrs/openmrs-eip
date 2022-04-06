@@ -16,6 +16,7 @@ import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,11 +121,13 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			final String typeAndId = msg.getModelClassName() + "#" + msg.getIdentifier();
 			//Only process snapshot events in parallel if they don't belong to the same entity to avoid false conflicts 
-			//and unique key constraint violations
-			if (msg.getSnapshot() && !typeAndIdentifier.contains(typeAndId)) {
-				typeAndIdentifier.add(typeAndId);
+			//and unique key constraint violations, this applies to subclasses
+			if (msg.getSnapshot() && !typeAndIdentifier.contains(msg.getModelClassName() + "#" + msg.getIdentifier())) {
+				for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
+					typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
+				}
+				
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
@@ -133,7 +136,7 @@ public class SiteMessageConsumer implements Runnable {
 					}
 					finally {
 						//May be we should also remove the entity from typeAndIdentifier list but typically there is
-                        //going to be at most 2 snapshot events for the same entity i.e for tables with a hierarchy
+						//going to be at most 2 snapshot events for the same entity i.e for tables with a hierarchy
 						Thread.currentThread().setName(originalThreadName);
 					}
 				}, msgExecutor));
