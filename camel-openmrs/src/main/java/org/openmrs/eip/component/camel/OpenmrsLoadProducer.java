@@ -14,8 +14,6 @@ import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.User;
-import org.openmrs.eip.component.entity.light.LightEntity;
-import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -23,7 +21,6 @@ import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
-import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
@@ -77,58 +74,6 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
 		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
 		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
-			boolean isNewHash = false;
-			if (dbModel != null) {
-				if (storedHash == null) {
-					isNewHash = true;
-					
-					log.info("Inserting new hash for the deleted entity with no existing hash");
-					
-					try {
-						storedHash = HashUtils.instantiateHashEntity(hashClass);
-					}
-					catch (Exception e) {
-						throw new EIPException("Failed to create an instance of " + hashClass, e);
-					}
-					
-					storedHash.setIdentifier(syncModel.getModel().getUuid());
-					storedHash.setDateCreated(LocalDateTime.now());
-				}
-			}
-			
-			entityServiceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
-			
-			if (dbModel != null || storedHash != null) {
-				if (dbModel == null) {
-					//This will typically happen if we deleted the entity but something went wrong before or during
-					//update of the hash and the event comes back as a retry item
-					log.info("Found existing hash for a missing entity, this could be a retry item to delete an entity "
-					        + "but the hash was never updated to the terminal value");
-				}
-				
-				storedHash.setHash(Constants.HASH_DELETED);
-				if (!isNewHash) {
-					storedHash.setDateChanged(LocalDateTime.now());
-				}
-				
-				if (log.isDebugEnabled()) {
-					if (isNewHash) {
-						log.debug("Saving new hash for the deleted entity");
-					} else {
-						log.debug("Updating hash for the deleted entity");
-					}
-				}
-				
-				producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
-				
-				if (log.isDebugEnabled()) {
-					if (isNewHash) {
-						log.debug("Successfully saved the new hash for the deleted entity");
-					} else {
-						log.debug("Successfully updated the hash for the deleted entity");
-					}
-				}
-			}
 			
 		} else {
 			BaseModel modelToSave = syncModel.getModel();
@@ -158,16 +103,6 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 							        + ", appending site id " + "to this user's systemId to make it unique");
 							userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
 						}
-					}
-				} else if (modelToSave instanceof PersonAttributeModel) {
-					PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
-					PersonAttributeTypeLight type = getLightEntity(model.getPersonAttributeTypeUuid());
-					if (type.getFormat() != null && type.getFormat().startsWith(OPENMRS_ROOT_PGK)) {
-						if (log.isDebugEnabled()) {
-							log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
-						}
-						
-						model.setValue(getId(type.getFormat(), model.getValue()).toString());
 					}
 				}
 			} else {
@@ -318,20 +253,62 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	/**
-	 * Gets the id of the entity matching the specified classname and uuid
-	 *
-	 * @param openmrsClassName the fully qualified OpenMRS java class name to match
-	 * @param uuid the uuid of the entity
-	 * @return the id of the entity
-	 */
-	private Long getId(String openmrsClassName, String uuid) {
-		LightEntity entity = getEntityLightRepository(openmrsClassName).findByUuid(uuid);
-		if (entity == null) {
-			throw new EIPException("No entity of type " + openmrsClassName + " found with uuid " + uuid);
+	private void processDelete(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                           EntityServiceFacade entityServiceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                           ProducerTemplate producerTemplate) {
+		
+		boolean isNewHash = false;
+		if (dbModel != null) {
+			if (storedHash == null) {
+				isNewHash = true;
+				
+				log.info("Inserting new hash for the deleted entity with no existing hash");
+				
+				try {
+					storedHash = HashUtils.instantiateHashEntity(hashClass);
+				}
+				catch (Exception e) {
+					throw new EIPException("Failed to create an instance of " + hashClass, e);
+				}
+				
+				storedHash.setIdentifier(syncModel.getModel().getUuid());
+				storedHash.setDateCreated(LocalDateTime.now());
+			}
 		}
 		
-		return entity.getId();
+		entityServiceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
+		
+		if (dbModel != null || storedHash != null) {
+			if (dbModel == null) {
+				//This will typically happen if we deleted the entity but something went wrong before or during
+				//update of the hash and the event comes back as a retry item
+				log.info("Found existing hash for a missing entity, this could be a retry item to delete an entity "
+				        + "but the hash was never updated to the terminal value");
+			}
+			
+			storedHash.setHash(Constants.HASH_DELETED);
+			if (!isNewHash) {
+				storedHash.setDateChanged(LocalDateTime.now());
+			}
+			
+			if (log.isDebugEnabled()) {
+				if (isNewHash) {
+					log.debug("Saving new hash for the deleted entity");
+				} else {
+					log.debug("Updating hash for the deleted entity");
+				}
+			}
+			
+			producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
+			
+			if (log.isDebugEnabled()) {
+				if (isNewHash) {
+					log.debug("Successfully saved the new hash for the deleted entity");
+				} else {
+					log.debug("Successfully updated the hash for the deleted entity");
+				}
+			}
+		}
 	}
 	
 }
