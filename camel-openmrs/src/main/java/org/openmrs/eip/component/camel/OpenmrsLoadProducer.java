@@ -127,95 +127,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		if (dbModel == null) {
 			
 		} else {
-			boolean isEtyInDbPlaceHolder = false;
-			if (dbModel instanceof BaseDataModel) {
-				BaseDataModel dataModel = (BaseDataModel) dbModel;
-				isEtyInDbPlaceHolder = dataModel.isVoided() && DEFAULT_VOID_REASON.equals(dataModel.getVoidReason());
-			} else if (dbModel instanceof BaseMetadataModel) {
-				BaseMetadataModel metadataModel = (BaseMetadataModel) dbModel;
-				isEtyInDbPlaceHolder = metadataModel.isRetired()
-				        && DEFAULT_VOID_REASON.equals(metadataModel.getRetireReason());
-			}
 			
-			boolean isNewHashInstance = false;
-			boolean isExistingEntityWithNoHash = false;
-			if (storedHash == null) {
-				isExistingEntityWithNoHash = !isEtyInDbPlaceHolder;
-				if (!isEtyInDbPlaceHolder) {
-					String ignore = SyncContext.getBean(Environment.class).getProperty(Constants.PROP_IGNORE_MISSING_HASH);
-					if (!"true".equals(ignore)) {
-						//TODO Don't fail if hashes of the db and incoming payloads match
-						throw new EIPException("Failed to find the existing hash for an existing entity");
-					}
-				}
-				
-				if (log.isDebugEnabled()) {
-					if (isEtyInDbPlaceHolder) {
-						log.debug("Inserting new hash for existing placeholder entity");
-					} else {
-						log.debug("Inserting new hash for existing entity with missing hash");
-					}
-				}
-				
-				try {
-					storedHash = HashUtils.instantiateHashEntity(hashClass);
-					isNewHashInstance = true;
-				}
-				catch (Exception e) {
-					throw new EIPException("Failed to create an instance of " + hashClass, e);
-				}
-				
-				storedHash.setIdentifier(syncModel.getModel().getUuid());
-				storedHash.setDateCreated(LocalDateTime.now());
-			}
-			
-			String newHash = HashUtils.computeHash(syncModel.getModel());
-			if (!isExistingEntityWithNoHash && !isEtyInDbPlaceHolder) {
-				String dbEntityHash = HashUtils.computeHash(dbModel);
-				if (!dbEntityHash.equals(storedHash.getHash())) {
-					if (dbEntityHash.equals(newHash)) {
-						//This will typically happen if we update the entity but something goes wrong before or during
-						//update of the hash and the event comes back as a retry item
-						log.info("Stored hash differs from that of the state in the DB, ignoring this because the incoming "
-						        + "and DB states match");
-					} else {
-						throw new ConflictsFoundException();
-					}
-				}
-			} else {
-				if (log.isDebugEnabled()) {
-					if (isEtyInDbPlaceHolder) {
-						log.debug("Ignoring placeholder entity when checking for conflicts");
-					} else if (isExistingEntityWithNoHash) {
-						log.debug("Ignoring existing entity with missing hash when checking for conflicts");
-					}
-				}
-			}
-			
-			serviceFacade.saveModel(tableToSyncEnum, modelToSave);
-			
-			storedHash.setHash(newHash);
-			if (!isNewHashInstance) {
-				storedHash.setDateChanged(LocalDateTime.now());
-			}
-			
-			if (log.isDebugEnabled()) {
-				if (isNewHashInstance) {
-					log.debug("Saving new hash for the entity");
-				} else {
-					log.debug("Updating hash for the incoming entity state");
-				}
-			}
-			
-			producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
-			
-			if (log.isDebugEnabled()) {
-				if (isNewHashInstance) {
-					log.debug("Successfully saved new hash for the entity");
-				} else {
-					log.debug("Successfully updated the hash for the incoming entity state");
-				}
-			}
 		}
 	}
 	
@@ -321,6 +233,100 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
+	}
+	
+	private void update(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                    ProducerTemplate producerTemplate, BaseModel modelToSave) {
+		
+		boolean isEtyInDbPlaceHolder = false;
+		if (dbModel instanceof BaseDataModel) {
+			BaseDataModel dataModel = (BaseDataModel) dbModel;
+			isEtyInDbPlaceHolder = dataModel.isVoided() && DEFAULT_VOID_REASON.equals(dataModel.getVoidReason());
+		} else if (dbModel instanceof BaseMetadataModel) {
+			BaseMetadataModel metadataModel = (BaseMetadataModel) dbModel;
+			isEtyInDbPlaceHolder = metadataModel.isRetired() && DEFAULT_VOID_REASON.equals(metadataModel.getRetireReason());
+		}
+		
+		boolean isNewHashInstance = false;
+		boolean isExistingEntityWithNoHash = false;
+		if (storedHash == null) {
+			isExistingEntityWithNoHash = !isEtyInDbPlaceHolder;
+			if (!isEtyInDbPlaceHolder) {
+				String ignore = SyncContext.getBean(Environment.class).getProperty(Constants.PROP_IGNORE_MISSING_HASH);
+				if (!"true".equals(ignore)) {
+					//TODO Don't fail if hashes of the db and incoming payloads match
+					throw new EIPException("Failed to find the existing hash for an existing entity");
+				}
+			}
+			
+			if (log.isDebugEnabled()) {
+				if (isEtyInDbPlaceHolder) {
+					log.debug("Inserting new hash for existing placeholder entity");
+				} else {
+					log.debug("Inserting new hash for existing entity with missing hash");
+				}
+			}
+			
+			try {
+				storedHash = HashUtils.instantiateHashEntity(hashClass);
+				isNewHashInstance = true;
+			}
+			catch (Exception e) {
+				throw new EIPException("Failed to create an instance of " + hashClass, e);
+			}
+			
+			storedHash.setIdentifier(syncModel.getModel().getUuid());
+			storedHash.setDateCreated(LocalDateTime.now());
+		}
+		
+		String newHash = HashUtils.computeHash(syncModel.getModel());
+		if (!isExistingEntityWithNoHash && !isEtyInDbPlaceHolder) {
+			String dbEntityHash = HashUtils.computeHash(dbModel);
+			if (!dbEntityHash.equals(storedHash.getHash())) {
+				if (dbEntityHash.equals(newHash)) {
+					//This will typically happen if we update the entity but something goes wrong before or during
+					//update of the hash and the event comes back as a retry item
+					log.info("Stored hash differs from that of the state in the DB, ignoring this because the incoming "
+					        + "and DB states match");
+				} else {
+					throw new ConflictsFoundException();
+				}
+			}
+		} else {
+			if (log.isDebugEnabled()) {
+				if (isEtyInDbPlaceHolder) {
+					log.debug("Ignoring placeholder entity when checking for conflicts");
+				} else if (isExistingEntityWithNoHash) {
+					log.debug("Ignoring existing entity with missing hash when checking for conflicts");
+				}
+			}
+		}
+		
+		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
+		
+		storedHash.setHash(newHash);
+		if (!isNewHashInstance) {
+			storedHash.setDateChanged(LocalDateTime.now());
+		}
+		
+		if (log.isDebugEnabled()) {
+			if (isNewHashInstance) {
+				log.debug("Saving new hash for the entity");
+			} else {
+				log.debug("Updating hash for the incoming entity state");
+			}
+		}
+		
+		producerTemplate.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
+		
+		if (log.isDebugEnabled()) {
+			if (isNewHashInstance) {
+				log.debug("Successfully saved new hash for the entity");
+			} else {
+				log.debug("Successfully updated the hash for the incoming entity state");
+			}
+		}
 	}
 	
 }
