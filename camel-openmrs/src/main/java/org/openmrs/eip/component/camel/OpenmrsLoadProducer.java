@@ -74,16 +74,16 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
 		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
 		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
-			processDelete(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
+			delete(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
 		} else {
-			processSave(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
+			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
 			    isDeleteOperation);
 		}
 	}
 	
-	private void processSave(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                         EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                         ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
+	private void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                  ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
 		
 		BaseModel modelToSave = syncModel.getModel();
 		String siteId = syncModel.getMetadata().getSourceIdentifier();
@@ -125,15 +125,15 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		if (dbModel == null) {
-			
+			insert(modelToSave, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
 		} else {
-			
+			update(modelToSave, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, dbModel);
 		}
 	}
 	
-	private void processDelete(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                           EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                           ProducerTemplate producerTemplate) {
+	private void delete(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                    ProducerTemplate producerTemplate) {
 		
 		boolean isNewHash = false;
 		if (dbModel != null) {
@@ -189,9 +189,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private void save(BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                  ProducerTemplate producerTemplate, BaseModel modelToSave) {
+	private void insert(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                    ProducerTemplate producerTemplate) {
 		
 		if (storedHash == null) {
 			if (log.isDebugEnabled()) {
@@ -235,9 +235,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 	}
 	
-	private void update(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	private void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
 	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate, BaseModel modelToSave) {
+	                    ProducerTemplate producerTemplate, BaseModel dbModel) {
 		
 		boolean isEtyInDbPlaceHolder = false;
 		if (dbModel instanceof BaseDataModel) {
