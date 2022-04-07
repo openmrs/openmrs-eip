@@ -49,7 +49,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	private void doProcess(Exchange exchange) {
-		EntityServiceFacade entityServiceFacade = (EntityServiceFacade) applicationContext.getBean("entityServiceFacade");
+		EntityServiceFacade serviceFacade = (EntityServiceFacade) applicationContext.getBean("entityServiceFacade");
 		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 		
@@ -69,19 +69,20 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		boolean delete = isDeleteOperation && !isUser && !isProvider;
 		Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(syncModel.getModel());
 		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		BaseModel dbModel = entityServiceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
+		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
 		BaseHashEntity storedHash = HashUtils.getStoredHash(syncModel.getModel().getUuid(), hashClass, producerTemplate);
 		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
 		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
 		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
-			
+			processDelete(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
 		} else {
-			
+			processSave(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
+			    isDeleteOperation);
 		}
 	}
 	
 	private void processSave(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                         EntityServiceFacade entityServiceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                         EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
 	                         ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
 		
 		BaseModel modelToSave = syncModel.getModel();
@@ -115,7 +116,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		} else {
 			//This is a user or provider entity that was deleted
 			log.info("Entity was deleted in remote site, marking it as retired");
-			BaseMetadataModel existing = entityServiceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
+			BaseMetadataModel existing = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
 			existing.setRetired(true);
 			existing.setRetiredByUuid(UserLight.class.getName() + "(" + SyncContext.getAppUser().getUuid() + ")");
 			existing.setDateRetired(LocalDateTime.now());
@@ -163,7 +164,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				log.debug("Successfully saved the hash for the incoming entity state");
 			}
 			
-			entityServiceFacade.saveModel(tableToSyncEnum, modelToSave);
+			serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 		} else {
 			boolean isEtyInDbPlaceHolder = false;
 			if (dbModel instanceof BaseDataModel) {
@@ -230,7 +231,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 			}
 			
-			entityServiceFacade.saveModel(tableToSyncEnum, modelToSave);
+			serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 			
 			storedHash.setHash(newHash);
 			if (!isNewHashInstance) {
@@ -258,7 +259,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	private void processDelete(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                           EntityServiceFacade entityServiceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                           EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
 	                           ProducerTemplate producerTemplate) {
 		
 		boolean isNewHash = false;
@@ -280,7 +281,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			}
 		}
 		
-		entityServiceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
+		serviceFacade.delete(tableToSyncEnum, syncModel.getModel().getUuid());
 		
 		if (dbModel != null || storedHash != null) {
 			if (dbModel == null) {
