@@ -47,7 +47,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	@Override
-	public void process(final Exchange exchange) {
+	public void process(Exchange exchange) {
+		doProcess(exchange);
+	}
+	
+	private void doProcess(Exchange exchange) {
 		EntityServiceFacade entityServiceFacade = (EntityServiceFacade) applicationContext.getBean("entityServiceFacade");
 		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
