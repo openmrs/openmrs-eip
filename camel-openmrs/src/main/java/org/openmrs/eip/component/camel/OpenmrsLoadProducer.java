@@ -74,7 +74,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
 		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
 		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
-			delete(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
+			delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum, producerTemplate);
 		} else {
 			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
 			    isDeleteOperation);
@@ -125,14 +125,14 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		if (dbModel == null) {
-			insert(modelToSave, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
+			insert(modelToSave, storedHash, hashClass, serviceFacade, tableToSyncEnum, producerTemplate);
 		} else {
-			update(modelToSave, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, dbModel);
+			update(modelToSave, storedHash, hashClass, serviceFacade, tableToSyncEnum, producerTemplate, dbModel);
 		}
 	}
 	
-	private void delete(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	private void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
 	                    ProducerTemplate producerTemplate) {
 		
 		boolean isNewHash = false;
@@ -190,7 +190,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	private void insert(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
 	                    ProducerTemplate producerTemplate) {
 		
 		if (storedHash == null) {
@@ -205,7 +205,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				throw new EIPException("Failed to create an instance of " + hashClass, e);
 			}
 			
-			storedHash.setIdentifier(syncModel.getModel().getUuid());
+			storedHash.setIdentifier(modelToSave.getUuid());
 			storedHash.setDateCreated(LocalDateTime.now());
 			
 			if (log.isDebugEnabled()) {
@@ -223,7 +223,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			}
 		}
 		
-		storedHash.setHash(HashUtils.computeHash(syncModel.getModel()));
+		storedHash.setHash(HashUtils.computeHash(modelToSave));
 		
 		producerTemplate.sendBody(Constants.QUERY_SAVE_HASH.replace(Constants.PLACEHOLDER_CLASS, hashClass.getSimpleName()),
 		    storedHash);
@@ -236,7 +236,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	private void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
 	                    ProducerTemplate producerTemplate, BaseModel dbModel) {
 		
 		boolean isEtyInDbPlaceHolder = false;
@@ -276,11 +276,11 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				throw new EIPException("Failed to create an instance of " + hashClass, e);
 			}
 			
-			storedHash.setIdentifier(syncModel.getModel().getUuid());
+			storedHash.setIdentifier(modelToSave.getUuid());
 			storedHash.setDateCreated(LocalDateTime.now());
 		}
 		
-		String newHash = HashUtils.computeHash(syncModel.getModel());
+		String newHash = HashUtils.computeHash(modelToSave);
 		if (!isExistingEntityWithNoHash && !isEtyInDbPlaceHolder) {
 			String dbEntityHash = HashUtils.computeHash(dbModel);
 			if (!dbEntityHash.equals(storedHash.getHash())) {
