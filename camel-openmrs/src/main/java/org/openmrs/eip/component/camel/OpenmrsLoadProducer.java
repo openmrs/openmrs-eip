@@ -125,46 +125,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		if (dbModel == null) {
-			if (storedHash == null) {
-				if (log.isDebugEnabled()) {
-					log.debug("Inserting new hash for the incoming entity state");
-				}
-				
-				try {
-					storedHash = HashUtils.instantiateHashEntity(hashClass);
-				}
-				catch (Exception e) {
-					throw new EIPException("Failed to create an instance of " + hashClass, e);
-				}
-				
-				storedHash.setIdentifier(syncModel.getModel().getUuid());
-				storedHash.setDateCreated(LocalDateTime.now());
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Saving hash for the incoming entity state");
-				}
-			} else {
-				//This will typically happen if we inserted the hash but something went wrong before or during
-				//insert of the entity and the event comes back as a retry item
-				log.info("Found existing hash for a new entity, this could be a retry item to insert a new entity "
-				        + "where the hash was created but the insert previously failed or a previously deleted entity at another site");
-				storedHash.setDateChanged(LocalDateTime.now());
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Updating hash for the incoming entity state");
-				}
-			}
 			
-			storedHash.setHash(HashUtils.computeHash(syncModel.getModel()));
-			
-			producerTemplate.sendBody(
-			    Constants.QUERY_SAVE_HASH.replace(Constants.PLACEHOLDER_CLASS, hashClass.getSimpleName()), storedHash);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully saved the hash for the incoming entity state");
-			}
-			
-			serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 		} else {
 			boolean isEtyInDbPlaceHolder = false;
 			if (dbModel instanceof BaseDataModel) {
@@ -314,6 +275,52 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 			}
 		}
+	}
+	
+	private void save(BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                  ProducerTemplate producerTemplate, BaseModel modelToSave) {
+		
+		if (storedHash == null) {
+			if (log.isDebugEnabled()) {
+				log.debug("Inserting new hash for the incoming entity state");
+			}
+			
+			try {
+				storedHash = HashUtils.instantiateHashEntity(hashClass);
+			}
+			catch (Exception e) {
+				throw new EIPException("Failed to create an instance of " + hashClass, e);
+			}
+			
+			storedHash.setIdentifier(syncModel.getModel().getUuid());
+			storedHash.setDateCreated(LocalDateTime.now());
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Saving hash for the incoming entity state");
+			}
+		} else {
+			//This will typically happen if we inserted the hash but something went wrong before or during
+			//insert of the entity and the event comes back as a retry item
+			log.info("Found existing hash for a new entity, this could be a retry item to insert a new entity "
+			        + "where the hash was created but the insert previously failed or a previously deleted entity at another site");
+			storedHash.setDateChanged(LocalDateTime.now());
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Updating hash for the incoming entity state");
+			}
+		}
+		
+		storedHash.setHash(HashUtils.computeHash(syncModel.getModel()));
+		
+		producerTemplate.sendBody(Constants.QUERY_SAVE_HASH.replace(Constants.PLACEHOLDER_CLASS, hashClass.getSimpleName()),
+		    storedHash);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved the hash for the incoming entity state");
+		}
+		
+		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 	}
 	
 }
