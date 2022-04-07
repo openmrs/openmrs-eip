@@ -136,4 +136,8 @@ public abstract class BaseCamelTest {
 		return e.getProperty("error", Exception.class).getMessage();
 	}
 	
+	protected Exception getException(Exchange e) {
+		return e.getProperty("error", Exception.class);
+	}
+	
 }
