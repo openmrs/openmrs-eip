@@ -49,8 +49,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	/**
-	 * Processes the sync message message specified on the exchange, thit method is marked as
-	 * synchronized because we want to avoid the following from happening,
+	 * Processes the sync message specified on the exchange, thit method is marked as synchronized
+	 * because we want to avoid the following from happening,
 	 * 
 	 * <pre>
 	 * 1. Duplicating a record when the same new record is being synced by 2 different sites in parallel
