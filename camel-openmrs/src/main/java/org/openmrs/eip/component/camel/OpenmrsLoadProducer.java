@@ -48,8 +48,17 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		doProcess(exchange);
 	}
 	
-	private void doProcess(Exchange exchange) {
-		EntityServiceFacade serviceFacade = (EntityServiceFacade) applicationContext.getBean("entityServiceFacade");
+	/**
+	 * Processes the sync message message specified on the exchange, thit method is marked as
+	 * synchronized because we want to avoid the following from happening,
+	 * 
+	 * <pre>
+	 * 1. Duplicating a record when the same new record is being synced by 2 different sites in parallel
+	 * 2. Duplicating records because they are referenced by multiple entities being processed in parallel
+	 * </pre>
+	 */
+	private synchronized static void doProcess(Exchange exchange) {
+		EntityServiceFacade serviceFacade = SyncContext.getBean(EntityServiceFacade.class);
 		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 		
@@ -81,9 +90,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                  ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
+	private static void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                         EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                         ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
 		
 		BaseModel modelToSave = syncModel.getModel();
 		String siteId = syncModel.getMetadata().getSourceIdentifier();
@@ -131,9 +140,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate) {
+	private static void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                           EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
+	                           ProducerTemplate producerTemplate) {
 		
 		boolean isNewHash = false;
 		if (dbModel != null) {
@@ -189,9 +198,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private void insert(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate) {
+	private static void insert(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                           EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
+	                           ProducerTemplate producerTemplate) {
 		
 		if (storedHash == null) {
 			if (log.isDebugEnabled()) {
@@ -235,9 +244,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 	}
 	
-	private void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate, BaseModel dbModel) {
+	private static void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                           EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
+	                           ProducerTemplate producerTemplate, BaseModel dbModel) {
 		
 		boolean isEtyInDbPlaceHolder = false;
 		if (dbModel instanceof BaseDataModel) {

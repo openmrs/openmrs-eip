@@ -82,6 +82,7 @@ public class OpenmrsLoadProducerTest {
 		PowerMockito.mockStatic(HashUtils.class);
 		exchange = new DefaultExchange(new DefaultCamelContext());
 		producer = new OpenmrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
+		when(SyncContext.getBean(EntityServiceFacade.class)).thenReturn(serviceFacade);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 		Whitebox.setInternalState(OpenmrsLoadProducer.class, Logger.class, mockLogger);
