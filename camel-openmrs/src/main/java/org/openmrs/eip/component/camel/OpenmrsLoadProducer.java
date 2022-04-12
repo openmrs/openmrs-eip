@@ -14,6 +14,8 @@ import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.User;
+import org.openmrs.eip.component.entity.light.LightEntity;
+import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -21,6 +23,7 @@ import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
@@ -120,6 +123,16 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 						        + ", appending site id " + "to this user's systemId to make it unique");
 						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
 					}
+				}
+			} else if (modelToSave instanceof PersonAttributeModel) {
+				PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
+				PersonAttributeTypeLight type = getLightEntity(model.getPersonAttributeTypeUuid());
+				if (type.getFormat() != null && type.getFormat().startsWith(OPENMRS_ROOT_PGK)) {
+					if (log.isDebugEnabled()) {
+						log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
+					}
+					
+					model.setValue(getId(type.getFormat(), model.getValue()).toString());
 				}
 			}
 		} else {
@@ -336,6 +349,22 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				log.debug("Successfully updated the hash for the incoming entity state");
 			}
 		}
+	}
+	
+	/**
+	 * Gets the id of the entity matching the specified classname and uuid
+	 *
+	 * @param openmrsClassName the fully qualified OpenMRS java class name to match
+	 * @param uuid the uuid of the entity
+	 * @return the id of the entity
+	 */
+	private static Long getId(String openmrsClassName, String uuid) {
+		LightEntity entity = getEntityLightRepository(openmrsClassName).findByUuid(uuid);
+		if (entity == null) {
+			throw new EIPException("No entity of type " + openmrsClassName + " found with uuid " + uuid);
+		}
+		
+		return entity.getId();
 	}
 	
 }

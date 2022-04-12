@@ -28,7 +28,7 @@ public class OpenmrsExtractProducer extends AbstractOpenmrsProducer {
 	
 	@Override
 	public void process(final Exchange exchange) {
-		FetchModelsRuleEngine ruleEngine = (FetchModelsRuleEngine) applicationContext.getBean("fetchModelsRuleEngine");
+		FetchModelsRuleEngine ruleEngine = (FetchModelsRuleEngine) appContext.getBean("fetchModelsRuleEngine");
 		
 		List<BaseModel> models = ruleEngine.process(params);
 		
