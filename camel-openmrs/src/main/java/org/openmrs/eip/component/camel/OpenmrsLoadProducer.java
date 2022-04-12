@@ -61,7 +61,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	 * </pre>
 	 */
 	private synchronized static void doProcess(Exchange exchange) {
-		EntityServiceFacade serviceFacade = SyncContext.getBean(EntityServiceFacade.class);
+		EntityServiceFacade serviceFacade = (EntityServiceFacade) appContext.getBean("entityServiceFacade");
 		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 		
