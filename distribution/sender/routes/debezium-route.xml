@@ -34,42 +34,51 @@
                     </spel>
                 </setProperty>
 
-                <choice>
-                    <when>
-                        <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+                <setProperty name="${routeId}-skipDbEvent">
+                    <spel>
+                        #{getProperty('isSubclassTable') == true &amp;&amp; getProperty('debeziumEvent').event.snapshot == true}
+                    </spel>
+                </setProperty>
+
+                <when>
+                    <simple>${exchangeProperty.${routeId}-skipDbEvent} == false</simple>
+                    <choice>
                         <when>
-                            <simple>${exchangeProperty.isSubclassTable} == false</simple>
-                            <choice>
-                                <when>
-                                    <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
-                                    <script>
-                                        <spel>
-                                            #{getProperty('debeziumEvent').event.setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}
-                                        </spel>
-                                    </script>
-                                </when>
-                                <otherwise>
-                                    <script>
-                                        <spel>#{getProperty('debeziumEvent').event.setIdentifier(body.get('uuid'))}</spel>
-                                    </script>
-                                </otherwise>
-                            </choice>
+                            <simple>${headers.CamelDebeziumOperation} == 'c' || ${headers.CamelDebeziumOperation} == 'u' || ${headers.CamelDebeziumOperation} == 'd'</simple>
+                            <when>
+                                <simple>${exchangeProperty.isSubclassTable} == false</simple>
+                                <choice>
+                                    <when>
+                                        <simple>${headers.CamelDebeziumOperation} == 'd'</simple>
+                                        <script>
+                                            <spel>
+                                                #{getProperty('debeziumEvent').event.setIdentifier(request.headers.CamelDebeziumBefore.get('uuid'))}
+                                            </spel>
+                                        </script>
+                                    </when>
+                                    <otherwise>
+                                        <script>
+                                            <spel>#{getProperty('debeziumEvent').event.setIdentifier(body.get('uuid'))}</spel>
+                                        </script>
+                                    </otherwise>
+                                </choice>
+                            </when>
+
+                            <setBody>
+                                <simple>${exchangeProperty.debeziumEvent}</simple>
+                            </setBody>
+
+                            <log message="Saving debezium event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
+
+                            <to uri="jpa:DebeziumEvent?usePersist=true" />
+
+                            <log message="Debezium event saved to event queue" />
                         </when>
-
-                        <setBody>
-                            <simple>${exchangeProperty.debeziumEvent}</simple>
-                        </setBody>
-
-                        <log message="Saving debezium event to event queue: ${exchangeProperty.debeziumEvent}" loggingLevel="DEBUG" />
-
-                        <to uri="jpa:DebeziumEvent?usePersist=true" />
-
-                        <log message="Debezium event saved to event queue" />
-                    </when>
-                    <otherwise>
-                        <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
-                    </otherwise>
-                </choice>
+                        <otherwise>
+                            <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Don't know how to handle DB event -> Operation=${headers.CamelDebeziumOperation}, Metadata=${headers.CamelDebeziumSourceMetadata}" />
+                        </otherwise>
+                    </choice>
+                </when>
             </when>
             <otherwise>
                 <log message="Deferring DB event because an error was encountered while processing a previous one" loggingLevel="DEBUG" />
