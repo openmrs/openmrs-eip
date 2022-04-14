@@ -36,7 +36,48 @@ public class DebeziumEventProcessor implements Processor {
 	private ExecutorService msgExecutor;
 	
 	public void process(Exchange exchange) throws Exception {
-
+		List<String> tableAndIdentifier = synchronizedList(new ArrayList(threadCount));
+		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
+		List<DebeziumEvent> events = exchange.getIn().getBody(List.class);
+		
+		for (DebeziumEvent debeziumEvent : events) {
+			final String key = debeziumEvent.getEvent().getTableName() + "#" + debeziumEvent.getEvent().getPrimaryKeyId();
+			if (debeziumEvent.getEvent().getSnapshot() && !tableAndIdentifier.contains(key)) {
+				tableAndIdentifier.add(key);
+				if (msgExecutor == null) {
+					msgExecutor = Executors.newFixedThreadPool(threadCount);
+				}
+				
+				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+					final String originalThreadName = Thread.currentThread().getName();
+					try {
+						setThreadName(debeziumEvent);
+						producerTemplate.sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, debeziumEvent);
+					}
+					finally {
+						Thread.currentThread().setName(originalThreadName);
+					}
+				}, msgExecutor));
+			} else {
+				final String originalThreadName = Thread.currentThread().getName();
+				try {
+					setThreadName(debeziumEvent);
+					if (syncThreadFutures.size() > 0) {
+						waitForFutures(syncThreadFutures);
+						syncThreadFutures.clear();
+					}
+					
+					producerTemplate.sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, debeziumEvent);
+				}
+				finally {
+					Thread.currentThread().setName(originalThreadName);
+				}
+			}
+		}
+		
+		if (syncThreadFutures.size() > 0) {
+			waitForFutures(syncThreadFutures);
+		}
 	}
 	
 	/**

@@ -22,4 +22,6 @@ public class SyncConstants {
 	
 	public static final String ROUTE_URI_SYNC_PROCESSOR = "direct:message-processor";
 	
+	public static final String ROUTE_URI_DBZM_EVNT_PROCESSOR = "direct:debezium-event-processor";
+	
 }
