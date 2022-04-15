@@ -40,7 +40,7 @@ public class DebeziumEventProcessor extends EventNotifierSupport implements Proc
 	
 	private ProducerTemplate producerTemplate;
 	
-	private ExecutorService msgExecutor;
+	private ExecutorService executor;
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -56,8 +56,8 @@ public class DebeziumEventProcessor extends EventNotifierSupport implements Proc
 			final String key = debeziumEvent.getEvent().getTableName() + "#" + debeziumEvent.getEvent().getPrimaryKeyId();
 			if (debeziumEvent.getEvent().getSnapshot() && !tableAndIdentifier.contains(key)) {
 				tableAndIdentifier.add(key);
-				if (msgExecutor == null) {
-					msgExecutor = Executors.newFixedThreadPool(threadCount);
+				if (executor == null) {
+					executor = Executors.newFixedThreadPool(threadCount);
 				}
 				
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
@@ -69,7 +69,7 @@ public class DebeziumEventProcessor extends EventNotifierSupport implements Proc
 					finally {
 						Thread.currentThread().setName(originalThreadName);
 					}
-				}, msgExecutor));
+				}, executor));
 			} else {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
@@ -95,15 +95,15 @@ public class DebeziumEventProcessor extends EventNotifierSupport implements Proc
 	@Override
 	public void notify(CamelEvent event) {
 		if (event instanceof CamelEvent.CamelContextStoppingEvent) {
-			if (msgExecutor != null) {
+			if (executor != null) {
 				log.info("Shutting down executor for db event processor threads");
 				
-				msgExecutor.shutdown();
+				executor.shutdown();
 				
 				try {
 					log.info("Waiting for " + WAIT_IN_SECONDS + " seconds for db event processor threads to terminate");
 					
-					msgExecutor.awaitTermination(WAIT_IN_SECONDS, TimeUnit.SECONDS);
+					executor.awaitTermination(WAIT_IN_SECONDS, TimeUnit.SECONDS);
 					
 					log.info("Done shutting down executor for db event processor threads");
 				}
