@@ -116,8 +116,7 @@ public class CamelListener extends EventNotifierSupport {
 					
 					msgExecutor.awaitTermination(wait, TimeUnit.SECONDS);
 					
-					log.info("The sync threads have successfully terminated, done shutting down the "
-					        + "executor for sync threads");
+					log.info("Done shutting down executor for site message consumer threads");
 				}
 				catch (Exception e) {
 					log.error("An error occurred while waiting for sync threads to terminate");
@@ -134,8 +133,7 @@ public class CamelListener extends EventNotifierSupport {
 					
 					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
 					
-					log.info("The message consumer threads have successfully terminated, done shutting down the "
-					        + "executor for site message consumer threads");
+					log.info("Done shutting down executor for site message consumer threads");
 				}
 				catch (Exception e) {
 					log.error("An error occurred while waiting for site message consumer threads to terminate");
