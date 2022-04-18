@@ -86,7 +86,7 @@ public class DebeziumEventProcessorTest {
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			Assert.assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class DebeziumEventProcessorTest {
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			Assert.assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	
@@ -160,7 +160,7 @@ public class DebeziumEventProcessorTest {
 			DebeziumEvent event = events.get(i);
 			String threadName = threadNames.get(i);
 			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), threadName.split(":")[1]);
+			assertEquals(processor.getThreadName(event), threadName.split(":")[2]);
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class DebeziumEventProcessorTest {
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			Assert.assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
 		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
@@ -219,7 +219,7 @@ public class DebeziumEventProcessorTest {
 			DebeziumEvent event = events.get(i);
 			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
 			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	
@@ -270,7 +270,7 @@ public class DebeziumEventProcessorTest {
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			Assert.assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
 		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
@@ -279,7 +279,7 @@ public class DebeziumEventProcessorTest {
 			DebeziumEvent event = events.get(i);
 			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
 			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
 		//Snapshots should all have been first synced before incremental events
@@ -339,7 +339,7 @@ public class DebeziumEventProcessorTest {
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			Assert.assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
 		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
@@ -348,7 +348,7 @@ public class DebeziumEventProcessorTest {
 			DebeziumEvent event = events.get(i);
 			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
 			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
 		//Incremental events should all have been first synced before snapshot
@@ -394,14 +394,14 @@ public class DebeziumEventProcessorTest {
 		
 		DebeziumEvent firstMsg = events.get(0);
 		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
-		assertEquals(processor.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
+		assertEquals(processor.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[2]);
 		
 		//All other events for the same row are only processed in serial after first snapshot events is encountered
 		for (int i = 1; i < size; i++) {
 			DebeziumEvent event = events.get(i);
 			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
 			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[1]);
+			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	

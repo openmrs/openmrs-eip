@@ -1,46 +1,25 @@
 package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_MSG_PARALLEL_SIZE;
-import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_DBZM_EVNT_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.spi.CamelEvent;
-import org.apache.camel.support.EventNotifierSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("debeziumEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class DebeziumEventProcessor extends EventNotifierSupport implements Processor {
-	
-	private static final Logger log = LoggerFactory.getLogger(DebeziumEventProcessor.class);
-	
-	public static final int WAIT_IN_SECONDS = 30;
-	
-	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
-	private int threadCount;
-	
-	private ProducerTemplate producerTemplate;
-	
-	private ExecutorService executor;
+public class DebeziumEventProcessor extends BaseEventProcessor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -93,49 +72,12 @@ public class DebeziumEventProcessor extends EventNotifierSupport implements Proc
 	}
 	
 	@Override
-	public void notify(CamelEvent event) {
-		if (event instanceof CamelEvent.CamelContextStoppingEvent) {
-			if (executor != null) {
-				log.info("Shutting down executor for db event processor threads");
-				
-				executor.shutdown();
-				
-				try {
-					log.info("Waiting for " + WAIT_IN_SECONDS + " seconds for db event processor threads to terminate");
-					
-					executor.awaitTermination(WAIT_IN_SECONDS, TimeUnit.SECONDS);
-					
-					log.info("Done shutting down executor for db event processor threads");
-				}
-				catch (Exception e) {
-					log.error("An error occurred while waiting for db event processor threads to terminate");
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Wait for all the Future instances in the specified list to terminate
-	 *
-	 * @param futures the list of Futures instance to wait for
-	 * @throws Exception
-	 */
-	public void waitForFutures(List<CompletableFuture<Void>> futures) throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("Waiting for " + futures.size() + " db event processor thread(s) to terminate");
-		}
-		
-		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
-		
-		allFuture.get();
-		
-		if (log.isDebugEnabled()) {
-			log.debug(futures.size() + " db event processor thread(s) have terminated");
-		}
+	public String getProcessorName() {
+		return "db event";
 	}
 	
 	private void setThreadName(DebeziumEvent event) {
-		Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getThreadName(event));
+		Thread.currentThread().setName(Thread.currentThread().getName() + ":db-event:" + getThreadName(event));
 	}
 	
 	protected String getThreadName(DebeziumEvent event) {
