@@ -73,9 +73,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 			if (snapshotStr.equalsIgnoreCase("last")) {
 				waitForFutures(futures);
 				futures.clear();
-				if (snapshotStr.equalsIgnoreCase("last")) {
-					log.info("Processed final snapshot change event");
-				}
+				
+				log.info("Processed final snapshot change event");
 				
 				CustomFileOffsetBackingStore.unpause();
 			}
@@ -84,11 +83,6 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 			final String originalThreadName = Thread.currentThread().getName();
 			try {
 				setThreadName(table, id);
-				if (futures.size() > 0) {
-					waitForFutures(futures);
-					futures.clear();
-				}
-				
 				producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
 			}
 			finally {
@@ -103,7 +97,11 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	}
 	
 	private void setThreadName(String table, String id) {
-		Thread.currentThread().setName(Thread.currentThread().getName() + ":change-event:" + table + "-" + id);
+		Thread.currentThread().setName(Thread.currentThread().getName() + ":change-event:" + getThreadName(table, id));
+	}
+	
+	protected String getThreadName(String table, String id) {
+		return table + "-" + id;
 	}
 	
 }
