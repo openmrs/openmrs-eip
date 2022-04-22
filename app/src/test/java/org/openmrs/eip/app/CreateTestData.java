@@ -10,7 +10,9 @@ import org.apache.commons.io.FileUtils;
 
 public class CreateTestData {
 	
-	private static final String fileName = "data.sql";
+	private static final String DATA_FILE_NAME = "data.sql";
+	
+	private static final String HASH_FILE_NAME = "hashes.sql";
 	
 	public static void main(String[] args) {
 		try {
@@ -22,7 +24,7 @@ public class CreateTestData {
 	}
 	
 	public static void addPatients() throws Exception {
-		FileUtils.writeLines(new File(fileName), Collections.emptyList(), false);
+		FileUtils.writeLines(new File(DATA_FILE_NAME), Collections.emptyList(), false);
 		final String ID_PH = "{i}";
 		final String G_PH = "{g}";
 		final String M_PH = "{m}";
@@ -65,14 +67,39 @@ public class CreateTestData {
 			rows.add(patient.replace(ID_PH, "" + i));
 			rows.add(id.replace(ID_PH, "" + i));
 			
-			if (i % 10000000 == 0) {
-				FileUtils.writeLines(new File(fileName), rows, true);
+			if (i % 10000 == 0) {
+				FileUtils.writeLines(new File(DATA_FILE_NAME), rows, true);
 				rows.clear();
 			}
 		}
 		
 		if (!rows.isEmpty())
-			FileUtils.writeLines(new File(fileName), rows, true);
+			FileUtils.writeLines(new File(DATA_FILE_NAME), rows, true);
+		
+		System.out.println("Done");
+	}
+	
+	public static void addHashes() throws Exception {
+		FileUtils.writeLines(new File(HASH_FILE_NAME), Collections.emptyList(), false);
+		final String ID_PH = "{i}";
+		final String query = "INSERT INTO patient_hash (identifier,hash,date_created) VALUES ('" + ID_PH
+		        + "', '484fbb51d42a5186c9bd09beb2ffdd2f', now());";
+		
+		int start = 2;
+		int count = 500000;
+		List<String> rows = new ArrayList(count);
+		for (int i = start; i < (count + start); i++) {
+			String personRow = query.replace(ID_PH, UUID.randomUUID().toString());
+			rows.add(personRow);
+			
+			if (i % 10000 == 0) {
+				FileUtils.writeLines(new File(HASH_FILE_NAME), rows, true);
+				rows.clear();
+			}
+		}
+		
+		if (!rows.isEmpty())
+			FileUtils.writeLines(new File(HASH_FILE_NAME), rows, true);
 		
 		System.out.println("Done");
 	}
