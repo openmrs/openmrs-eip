@@ -299,9 +299,12 @@
         </preConditions>
         <comment>Adding sync_response table</comment>
 
-        <createTable tableName="sender_sync_message">
+        <createTable tableName="sync_response">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
             </column>
             <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
