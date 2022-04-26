@@ -26,4 +26,6 @@ public class SyncConstants {
 	
 	public static final String ROUTE_URI_CHANGE_EVNT_PROCESSOR = "direct:change-event-processor";
 	
+	public final static String SAVEPOINT_FILE = "snapshot_savepoint.properties";
+	
 }
