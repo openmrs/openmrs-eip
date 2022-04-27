@@ -1,8 +1,6 @@
 package org.openmrs.eip.app;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -13,7 +11,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class SnapshotSavePointStore {
+final class SnapshotSavePointStore {
 	
 	private static final Logger log = LoggerFactory.getLogger(SnapshotSavePointStore.class);
 	
@@ -21,37 +19,38 @@ public final class SnapshotSavePointStore {
 	
 	private static Properties props;
 	
-	private static boolean hasChanges = false;
-	
-	public SnapshotSavePointStore() {
+	SnapshotSavePointStore() {
 		file = new File(SyncConstants.SAVEPOINT_FILE);
 		
 		log.info("Snapshot savepoint file -> " + file);
 		
 		props = new Properties();
-		load();
 	}
 	
-	private void load() {
-		log.info("Loading the snapshot savepoint");
+	void init() {
+		log.info("Initializing snapshot savepoint store");
 		
 		try {
 			if (file.exists()) {
-				props.load(new FileInputStream(file));
+				log.info("Loading the snapshot savepoint");
+
+				props.load(FileUtils.openInputStream(file));
+
+				log.info("Done loading snapshot savepoint");
 			}
 			
 			if (MapUtils.isEmpty(props)) {
 				log.info("No snapshot savepoint file found that was previously stored");
 			}
 			
-			log.info("Loaded snapshot savepoint");
+			log.info("Done initializing snapshot savepoint store");
 		}
 		catch (IOException e) {
 			throw new EIPException("Failed to read snapshot savepoint file", e);
 		}
 	}
 	
-	public Integer getSavedId(String tableName) {
+	Integer getSavedRowId(String tableName) {
 		String value = props.getProperty(tableName);
 		if (StringUtils.isBlank(value)) {
 			return null;
@@ -60,21 +59,15 @@ public final class SnapshotSavePointStore {
 		return Integer.valueOf(value);
 	}
 	
-	public void update(String tableName, String id) {
+	void update(String tableName, String id) {
 		props.put(tableName, id);
-		hasChanges = true;
 	}
 	
-	public boolean canSave() {
-		return hasChanges;
-	}
-	
-	public void save() {
+	void save() {
 		log.info("Saving the snapshot savepoint");
 		
 		try {
-			props.store(new FileOutputStream(file), null);
-			hasChanges = false;
+			props.store(FileUtils.openOutputStream(file), null);
 			
 			log.info("Successfully saved the snapshot savepoint");
 		}
@@ -83,11 +76,10 @@ public final class SnapshotSavePointStore {
 		}
 	}
 	
-	public void discard() {
-		log.info("Deleting the snapshot save point file");
+	void discard() {
+		log.info("Deleting the snapshot savepoint file");
 		
 		props.clear();
-		hasChanges = false;
 		
 		if (!file.exists()) {
 			log.info("No snapshot savepoint file found to delete");

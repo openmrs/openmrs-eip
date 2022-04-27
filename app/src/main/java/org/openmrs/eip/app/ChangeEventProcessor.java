@@ -29,6 +29,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	private List<CompletableFuture<Void>> futures;
 	
+	private SnapshotSavePointStore savePointStore;
+
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		if (producerTemplate == null) {
@@ -45,6 +47,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 		final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 		
 		if (snapshot) {
+			initSavePointStoreIfNecessary();
+
 			if (executor == null) {
 				executor = Executors.newFixedThreadPool(threadCount);
 			}
@@ -77,6 +81,11 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				log.info("Processed final snapshot change event");
 				
 				CustomFileOffsetBackingStore.unpause();
+
+				savePointStore.discard();
+				savePointStore = null;
+			} else {
+				updateSavePointStore(table, id);
 			}
 			
 		} else {
@@ -104,4 +113,18 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 		return table + "-" + id;
 	}
 	
+	protected void initSavePointStoreIfNecessary() {
+		if (savePointStore == null) {
+			savePointStore = new SnapshotSavePointStore();
+			savePointStore.init();
+		}
+	}
+
+	protected synchronized void updateSavePointStore(String tableName, String id) throws Exception {
+		savePointStore.update(tableName, id);
+		waitForFutures(futures);
+		futures.clear();
+		savePointStore.save();
+	}
+
 }

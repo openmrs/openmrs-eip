@@ -1,8 +1,6 @@
 package org.openmrs.eip.app;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -48,7 +46,6 @@ public class SnapshotSavePointStoreTest {
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		PowerMockito.mockStatic(FileUtils.class);
-		setInternalState(SnapshotSavePointStore.class, boolean.class, false);
 		store = new SnapshotSavePointStore();
 		setInternalState(SnapshotSavePointStore.class, File.class, mockFile);
 		setInternalState(SnapshotSavePointStore.class, Properties.class, mockProperties);
@@ -57,19 +54,19 @@ public class SnapshotSavePointStoreTest {
 	}
 	
 	@Test
-	public void load_shouldLoadTheStoreContentsFromTheFileIfItExists() throws Exception {
+	public void init_shouldLoadTheStoreContentsFromTheFileIfItExists() throws Exception {
 		when(mockFile.exists()).thenReturn(true);
 		
-		store.load();
+		store.init();
 		
 		verify(mockProperties).load(mockInputStream);
 	}
 	
 	@Test
-	public void load_shouldNotLoadTheStoreContentsIfTheFileDoesNotExist() throws Exception {
+	public void init_shouldNotLoadTheStoreContentsIfTheFileDoesNotExist() throws Exception {
 		when(mockFile.exists()).thenReturn(false);
 		
-		store.load();
+		store.init();
 		
 		verify(mockProperties, never()).load(any(InputStream.class));
 	}
@@ -105,50 +102,39 @@ public class SnapshotSavePointStoreTest {
 	
 	@Test
 	public void update_shouldSetTheRowIdForTheSpecifiedTable() {
-		assertFalse(store.canSave());
 		final String table = "patient";
 		final String id = "3";
 		
-		store.update(table, id, false);
+		store.update(table, id);
 		
 		verify(mockProperties).put(table, id);
-		assertTrue(store.canSave());
-		
 	}
 	
 	@Test
 	public void save_shouldWriteTheStoreContentsToTheFile() throws Exception {
-		setInternalState(SnapshotSavePointStore.class, boolean.class, true);
-		assertTrue(store.canSave());
-		
 		store.save();
 		
 		verify(mockProperties).store(mockOutputStream, null);
-		assertFalse(store.canSave());
 	}
 	
 	@Test
 	public void discard_shouldClearTheStoreInMemoryContents() throws Exception {
-		setInternalState(SnapshotSavePointStore.class, boolean.class, true);
-		assertTrue(store.canSave());
 		when(mockFile.exists()).thenReturn(false);
 		
 		store.discard();
 		
-		assertFalse(store.canSave());
+		verify(mockProperties).clear();
 		PowerMockito.verifyStatic(FileUtils.class, never());
 		FileUtils.forceDelete(mockFile);
 	}
 	
 	@Test
 	public void discard_shouldClearTheStoreInMemoryContentsAndDeleteTheFileIfItExists() throws Exception {
-		setInternalState(SnapshotSavePointStore.class, boolean.class, true);
-		assertTrue(store.canSave());
 		when(mockFile.exists()).thenReturn(true);
 		
 		store.discard();
 		
-		assertFalse(store.canSave());
+		verify(mockProperties).clear();
 		PowerMockito.verifyStatic(FileUtils.class);
 		FileUtils.forceDelete(mockFile);
 	}
