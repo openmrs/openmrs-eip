@@ -11,6 +11,8 @@ public class SyncConstants {
 	public static final int DEFAULT_MSG_PARALLEL_SIZE = 10;
 	
 	public static final int DEFAULT_CONN_POOL_SIZE = 50;
+
+	public static final int DEFAULT_BATCH_SIZE = 1000;
 	
 	public static final String DEFAULT_OPENMRS_POOL_NAME = "openmrs-ds-pool";
 	

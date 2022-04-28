@@ -1,12 +1,13 @@
 package org.openmrs.eip.app;
 
-import static java.util.Collections.synchronizedList;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
 import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_CHANGE_EVNT_PROCESSOR;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
@@ -29,7 +30,11 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	private List<CompletableFuture<Void>> futures;
 	
+	private Map<String, Integer> tableAndMaxRowIdsMap;
+
 	private SnapshotSavePointStore savePointStore;
+
+	private static Integer batchSize;
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -47,14 +52,25 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 		final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 		
 		if (snapshot) {
-			initSavePointStoreIfNecessary();
-
 			if (executor == null) {
 				executor = Executors.newFixedThreadPool(threadCount);
 			}
 			
 			if (futures == null) {
-				futures = synchronizedList(new ArrayList(threadCount));
+				futures = new Vector(DEFAULT_BATCH_SIZE);
+			}
+
+			if (tableAndMaxRowIdsMap == null) {
+				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
+			}
+
+			if (batchSize == null) {
+				batchSize = DEFAULT_BATCH_SIZE;
+			}
+
+			if (savePointStore == null) {
+				savePointStore = new SnapshotSavePointStore();
+				savePointStore.init();
 			}
 			
 			futures.add(CompletableFuture.runAsync(() -> {
@@ -67,25 +83,34 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				try {
 					setThreadName(table, id);
 					producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
+					//TODO Add support for PKs that are not integers
+					Integer currentRowId = Integer.valueOf(id);
+					Integer maxRowId = tableAndMaxRowIdsMap.get(table);
+					if (maxRowId == null || currentRowId > maxRowId) {
+						tableAndMaxRowIdsMap.put(table, currentRowId);
+					}
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
 				}
 			}, executor));
 			
-			//Only save offsets if it is the last snapshot item
-			if (snapshotStr.equalsIgnoreCase("last")) {
+			boolean isLast = snapshotStr.equalsIgnoreCase("last");
+			if (isLast || futures.size() == batchSize) {
 				waitForFutures(futures);
 				futures.clear();
 				
-				log.info("Processed final snapshot change event");
-				
-				CustomFileOffsetBackingStore.unpause();
+				if (isLast) {
+					//Only save offsets if it is the last snapshot item
+					log.info("Processed final snapshot change event");
 
-				savePointStore.discard();
-				savePointStore = null;
-			} else {
-				updateSavePointStore(table, id);
+					CustomFileOffsetBackingStore.unpause();
+
+					savePointStore.discard();
+					savePointStore = null;
+				} else {
+					savePointStore.update(tableAndMaxRowIdsMap);
+				}
 			}
 			
 		} else {
@@ -111,20 +136,6 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	protected String getThreadName(String table, String id) {
 		return table + "-" + id;
-	}
-	
-	protected void initSavePointStoreIfNecessary() {
-		if (savePointStore == null) {
-			savePointStore = new SnapshotSavePointStore();
-			savePointStore.init();
-		}
-	}
-
-	protected synchronized void updateSavePointStore(String tableName, String id) throws Exception {
-		savePointStore.update(tableName, id);
-		waitForFutures(futures);
-		futures.clear();
-		savePointStore.save();
 	}
 
 }

@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
@@ -101,19 +103,14 @@ public class SnapshotSavePointStoreTest {
 	}
 	
 	@Test
-	public void update_shouldSetTheRowIdForTheSpecifiedTable() {
+	public void update_shouldSetTheRowIdForTheSpecifiedTable() throws Exception {
 		final String table = "patient";
-		final String id = "3";
+		final Integer id = 3;
+		Map map = Collections.singletonMap(table, id);
 		
-		store.update(table, id);
+		store.update(map);
 		
-		verify(mockProperties).put(table, id);
-	}
-	
-	@Test
-	public void save_shouldWriteTheStoreContentsToTheFile() throws Exception {
-		store.save();
-		
+		verify(mockProperties).putAll(map);
 		verify(mockProperties).store(mockOutputStream, null);
 	}
 	

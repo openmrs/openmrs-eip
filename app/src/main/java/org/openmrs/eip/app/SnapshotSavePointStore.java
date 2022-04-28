@@ -2,6 +2,7 @@ package org.openmrs.eip.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections.MapUtils;
@@ -59,20 +60,18 @@ final class SnapshotSavePointStore {
 		return Integer.valueOf(value);
 	}
 	
-	void update(String tableName, String id) {
-		props.put(tableName, id);
-	}
-	
-	void save() {
-		log.info("Saving the snapshot savepoint");
+	void update(Map<String, Integer> tableIdMap) {
+		props.putAll(tableIdMap);
+
+		log.info("Writing the snapshot savepoint to disk");
 		
 		try {
 			props.store(FileUtils.openOutputStream(file), null);
 			
-			log.info("Successfully saved the snapshot savepoint");
+			log.info("Successfully written the snapshot savepoint to disk");
 		}
 		catch (IOException e) {
-			log.error("Failed to save the snapshot savepoint", e);
+			log.error("Failed to write the snapshot savepoint to disk", e);
 		}
 	}
 	

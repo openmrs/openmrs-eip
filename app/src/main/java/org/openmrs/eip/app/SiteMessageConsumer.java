@@ -127,8 +127,9 @@ public class SiteMessageConsumer implements Runnable {
 				for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
 					typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
 				}
-				
-				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+
+                //TODO Periodically wait and reset futures to save memory
+                syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
 						setThreadName(msg);

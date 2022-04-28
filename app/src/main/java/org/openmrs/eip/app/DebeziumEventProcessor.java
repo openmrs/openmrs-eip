@@ -38,7 +38,8 @@ public class DebeziumEventProcessor extends BaseEventProcessor {
 				if (executor == null) {
 					executor = Executors.newFixedThreadPool(threadCount);
 				}
-				
+
+				//TODO Periodically wait and reset futures to save memory
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
