@@ -74,6 +74,8 @@ public class AuditableEventFilter implements EventFilter {
 		modifiedColumns.addAll(newState.keySet());
 		modifiedColumns.remove(COLUMN_CHANGED_BY);
 		modifiedColumns.remove(COLUMN_DATE_CHANGED);
+		columns.remove(COLUMN_CHANGED_BY);
+		columns.remove(COLUMN_DATE_CHANGED);
 		
 		for (String column : columns) {
 			Object prevValue = prevState.get(column);

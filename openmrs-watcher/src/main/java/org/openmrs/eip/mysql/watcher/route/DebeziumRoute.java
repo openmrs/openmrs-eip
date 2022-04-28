@@ -1,4 +1,4 @@
-package org.openmrs.eip.mysql.watcher;
+package org.openmrs.eip.mysql.watcher.route;
 
 import static org.apache.camel.LoggingLevel.DEBUG;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DBZM_MSG_PROCESSOR;
@@ -7,6 +7,9 @@ import static org.openmrs.eip.mysql.watcher.WatcherConstants.ID_SETTING_PROCESSO
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
+import org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore;
+import org.openmrs.eip.mysql.watcher.DebeziumMessageProcessor;
+import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,6 +3,7 @@ package org.openmrs.eip.mysql.watcher;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
+import org.openmrs.eip.mysql.watcher.route.DebeziumRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
