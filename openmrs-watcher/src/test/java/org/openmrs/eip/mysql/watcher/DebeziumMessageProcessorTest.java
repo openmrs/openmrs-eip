@@ -36,7 +36,7 @@ import org.openmrs.eip.EIPException;
 @Ignore
 public class DebeziumMessageProcessorTest {
 	
-	private Processor processor = new DebeziumMessageProcessor();
+	private Processor processor = new DebeziumMessageProcessor(null);
 	
 	@Test
 	public void process_shouldCreateAnEventAndAddItAsAHeaderForAnUpdate() throws Exception {
