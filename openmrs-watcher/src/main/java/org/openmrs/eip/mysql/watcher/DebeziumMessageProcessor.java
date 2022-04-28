@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,9 +24,17 @@ public class DebeziumMessageProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DebeziumMessageProcessor.class);
 	
+	private Collection<EventFilter> filters;
+	
+	public DebeziumMessageProcessor(@Autowired Collection<EventFilter> filters) {
+		this.filters = filters;
+	}
+	
 	@Override
 	public void process(Exchange exchange) {
-		logger.info("Received debezium event");
+		if (logger.isTraceEnabled()) {
+			logger.trace("Received debezium event");
+		}
 		
 		Message message = exchange.getMessage();
 		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
@@ -45,13 +55,15 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		exchange.setProperty(WatcherConstants.PROP_EVENT, event);
 		
-		logger.info("Event details: " + event + ", Source Metadata: " + sourceMetadata);
-		
 		if (message.getBody() != null) {
 			Map<String, Object> currentState = new HashMap();
 			Struct bodyStruct = message.getBody(Struct.class);
 			bodyStruct.schema().fields().forEach(field -> currentState.put(field.name(), bodyStruct.get(field)));
 			event.setCurrentState(currentState);
+		}
+		
+		if (logger.isTraceEnabled()) {
+			logger.trace("Previous row state: " + event.getPreviousState());
 		}
 		
 		Struct beforeStruct = message.getHeader(DebeziumConstants.HEADER_BEFORE, Struct.class);
@@ -61,13 +73,22 @@ public class DebeziumMessageProcessor implements Processor {
 			event.setPreviousState(beforeState);
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("Entity previous state: " + event.getPreviousState());
+		if (logger.isTraceEnabled()) {
+			logger.debug("New row state: " + event.getCurrentState());
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("Entity new state: " + event.getCurrentState());
+		for (EventFilter filter : filters) {
+			if (!filter.accept(event, exchange)) {
+				exchange.setProperty(WatcherConstants.EX_PROP_SKIP, true);
+				if (logger.isTraceEnabled()) {
+					logger.trace("Predicate failed for event filter of type: " + filter.getClass().getName());
+				}
+				
+				break;
+			}
 		}
+		
+		logger.info("Event: " + event + ", Source Metadata: " + sourceMetadata);
 	}
 	
 }

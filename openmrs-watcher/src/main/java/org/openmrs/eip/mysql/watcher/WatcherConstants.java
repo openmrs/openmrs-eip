@@ -2,6 +2,8 @@ package org.openmrs.eip.mysql.watcher;
 
 public class WatcherConstants {
 	
+	public static final String PKG_NAME = WatcherConstants.class.getPackage().getName();
+	
 	public static final String DEBEZIUM_FIELD_TABLE = "table";
 	
 	public static final String DEBEZIUM_FIELD_SNAPSHOT = "snapshot";
@@ -37,5 +39,13 @@ public class WatcherConstants {
 	public static final String PROP_SOURCE_NAME = "watcherPropSource";
 	
 	public static final String PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE = "ignore.previous.order.in.error.queue";
+	
+	public static final String EVENT_AUT_COLUMNS_FILTER_BEAN_NAME = "auditableColumnsEventFilter";
+	
+	public static final String EX_PROP_SKIP = PKG_NAME + ".skip";
+	
+	public static final String COLUMN_CHANGED_BY = "changed_by";
+	
+	public static final String COLUMN_DATE_CHANGED = "date_changed";
 	
 }
