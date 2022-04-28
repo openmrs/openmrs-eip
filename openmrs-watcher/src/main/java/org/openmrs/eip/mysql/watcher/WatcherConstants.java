@@ -48,4 +48,6 @@ public class WatcherConstants {
 	
 	public static final String COLUMN_DATE_CHANGED = "date_changed";
 	
+	public static final String PROP_AUDIT_FILTER_TABLES = "filter.auditable.tables";
+	
 }
