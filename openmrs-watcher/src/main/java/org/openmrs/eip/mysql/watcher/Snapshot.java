@@ -1,22 +1,20 @@
 package org.openmrs.eip.mysql.watcher;
 
 /**
- * Enumeration for database operations used by debezium
+ * Enumeration for snapshot values used by debezium
  */
-public enum DatabaseOperation {
+public enum Snapshot {
 	
-	CREATE("c"),
+	TRUE("true"),
 	
-	READ("r"),
+	FALSE("false"),
 	
-	UPDATE("u"),
-	
-	DELETE("d");
+	LAST("last");
 	
 	//Raw value as represented by debezium
 	private String rawValue;
 	
-	DatabaseOperation(String rawValue) {
+	Snapshot(String rawValue) {
 		this.rawValue = rawValue;
 	}
 	

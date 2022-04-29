@@ -2,11 +2,23 @@ package org.openmrs.eip.mysql.watcher;
 
 import static org.openmrs.eip.Constants.OPENMRS_DATASOURCE_NAME;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.debezium.DebeziumConstants;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.DefaultExchange;
+import org.apache.camel.support.DefaultMessage;
+import org.apache.kafka.connect.data.ConnectSchema;
+import org.apache.kafka.connect.data.Field;
+import org.apache.kafka.connect.data.Schema.Type;
+import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.AppContext;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
@@ -54,6 +66,37 @@ public final class WatcherTestUtils {
 		event.setOperation(operation);
 		event.setSnapshot(false);
 		return event;
+	}
+	
+	public static Exchange createExchange(String table, Integer id, Snapshot snapshot) {
+		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+		Message message = new DefaultMessage(exchange);
+		exchange.setMessage(message);
+		final String idColumn = table + "_id";
+		Field idField = createField(idColumn, 0, Type.INT32);
+		Struct idStruct = createStruct(Collections.singletonList(idField));
+		idStruct.put(idColumn, id);
+		Map<String, Object> sourceMetadata = new HashMap();
+		sourceMetadata.put(WatcherConstants.DEBEZIUM_FIELD_TABLE, table);
+		sourceMetadata.put(WatcherConstants.DEBEZIUM_FIELD_SNAPSHOT, snapshot.getRawValue());
+		
+		message.setHeader(DebeziumConstants.HEADER_KEY, idStruct);
+		message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+		message.setHeader(DebeziumConstants.HEADER_OPERATION, "c");
+		
+		return exchange;
+	}
+	
+	public static Field createField(String name, int index, Type type) {
+		return new Field(name, index, new ConnectSchema(type));
+	}
+	
+	public static ConnectSchema createSchema(List<Field> fields) {
+		return new ConnectSchema(Type.STRUCT, false, null, null, null, null, null, fields, null, null);
+	}
+	
+	public static Struct createStruct(List<Field> fields) {
+		return new Struct(createSchema(fields));
 	}
 	
 }

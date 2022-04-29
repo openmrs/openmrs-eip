@@ -5,10 +5,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.EX_PROP_SKIP;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.FIELD_UUID;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +37,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.EIPException;
 
-@Ignore
 public class DebeziumMessageProcessorTest {
 	
-	private Processor processor = new DebeziumMessageProcessor(null);
+	private Processor processor = new DebeziumMessageProcessor(Collections.emptyList());
 	
 	@Test
+	@Ignore
 	public void process_shouldCreateAnEventAndAddItAsAHeaderForAnUpdate() throws Exception {
 		final Integer id = 2;
 		final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
@@ -108,6 +112,7 @@ public class DebeziumMessageProcessorTest {
 	}
 	
 	@Test
+	@Ignore
 	public void process_shouldCreateAnEventAndAddItAsAHeaderForAnInsert() throws Exception {
 		final Integer id = 2;
 		final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
@@ -163,6 +168,7 @@ public class DebeziumMessageProcessorTest {
 	}
 	
 	@Test
+	@Ignore
 	public void process_shouldCreateAnEventAndAddItAsAHeaderForADelete() throws Exception {
 		final Integer id = 2;
 		final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
@@ -380,6 +386,7 @@ public class DebeziumMessageProcessorTest {
 	}
 	
 	@Test
+	@Ignore
 	public void process_shouldSetIdentifierForASubclassTable() throws Exception {
 		final Integer id = 2;
 		CamelContext mockCamelContext = Mockito.mock(CamelContext.class);
@@ -411,6 +418,74 @@ public class DebeziumMessageProcessorTest {
 		processor.process(exchange);
 		
 		//assertEquals(uuid, event.getIdentifier());
+	}
+	
+	@Test
+	public void process_shouldNotSetSkipPropertyIfAllFiltersReturnTrue() throws Exception {
+		Exchange exchange = WatcherTestUtils.createExchange("visit", 1, Snapshot.FALSE);
+		EventFilter filter1 = Mockito.mock(EventFilter.class);
+		EventFilter filter2 = Mockito.mock(EventFilter.class);
+		Mockito.when(filter1.accept(any(Event.class), eq(exchange))).thenReturn(true);
+		Mockito.when(filter2.accept(any(Event.class), eq(exchange))).thenReturn(true);
+		processor = new DebeziumMessageProcessor(Arrays.asList(filter1, filter2));
+		
+		processor.process(exchange);
+		
+		assertNull(exchange.getProperty(EX_PROP_SKIP));
+		Mockito.verify(filter1).accept(any(Event.class), eq(exchange));
+		Mockito.verify(filter2).accept(any(Event.class), eq(exchange));
+	}
+	
+	@Test
+	public void process_shouldSetSkipPropertyToTrueIfFirstFilterReturnsFalse() throws Exception {
+		Exchange exchange = WatcherTestUtils.createExchange("visit", 1, Snapshot.FALSE);
+		EventFilter filter1 = Mockito.mock(EventFilter.class);
+		EventFilter filter2 = Mockito.mock(EventFilter.class);
+		Mockito.when(filter1.accept(any(Event.class), eq(exchange))).thenReturn(false);
+		processor = new DebeziumMessageProcessor(Arrays.asList(filter1, filter2));
+		
+		processor.process(exchange);
+		
+		assertTrue(exchange.getProperty(EX_PROP_SKIP, Boolean.class));
+		Mockito.verify(filter1).accept(any(Event.class), eq(exchange));
+		Mockito.verifyNoInteractions(filter2);
+	}
+	
+	@Test
+	public void process_shouldSetSkipPropertyToTrueIfAFilterInTheMiddleReturnsFalse() throws Exception {
+		Exchange exchange = WatcherTestUtils.createExchange("visit", 1, Snapshot.FALSE);
+		EventFilter filter1 = Mockito.mock(EventFilter.class);
+		EventFilter filter2 = Mockito.mock(EventFilter.class);
+		EventFilter filter3 = Mockito.mock(EventFilter.class);
+		Mockito.when(filter1.accept(any(Event.class), eq(exchange))).thenReturn(true);
+		Mockito.when(filter2.accept(any(Event.class), eq(exchange))).thenReturn(false);
+		processor = new DebeziumMessageProcessor(Arrays.asList(filter1, filter2, filter3));
+		
+		processor.process(exchange);
+		
+		assertTrue(exchange.getProperty(EX_PROP_SKIP, Boolean.class));
+		Mockito.verify(filter1).accept(any(Event.class), eq(exchange));
+		Mockito.verify(filter2).accept(any(Event.class), eq(exchange));
+		Mockito.verifyNoInteractions(filter3);
+	}
+	
+	@Test
+	public void process_shouldSetSkipPropertyToTrueIfTheLastFilterReturnsFalse() throws Exception {
+		Exchange exchange = WatcherTestUtils.createExchange("visit", 1, Snapshot.FALSE);
+		EventFilter filter1 = Mockito.mock(EventFilter.class);
+		EventFilter filter2 = Mockito.mock(EventFilter.class);
+		EventFilter filter3 = Mockito.mock(EventFilter.class);
+		Mockito.when(filter1.accept(any(Event.class), eq(exchange))).thenReturn(true);
+		Mockito.when(filter2.accept(any(Event.class), eq(exchange))).thenReturn(true);
+		Mockito.when(filter3.accept(any(Event.class), eq(exchange))).thenReturn(false);
+		processor = new DebeziumMessageProcessor(Arrays.asList(filter1, filter2, filter3));
+		
+		processor.process(exchange);
+		
+		assertTrue(exchange.getProperty(EX_PROP_SKIP, Boolean.class));
+		Mockito.verify(filter1).accept(any(Event.class), eq(exchange));
+		Mockito.verify(filter2).accept(any(Event.class), eq(exchange));
+		Mockito.verify(filter3).accept(any(Event.class), eq(exchange));
 	}
 	
 }
