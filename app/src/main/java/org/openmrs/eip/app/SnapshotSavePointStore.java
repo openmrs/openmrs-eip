@@ -12,7 +12,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class SnapshotSavePointStore {
+class SnapshotSavePointStore {
 	
 	private static final Logger log = LoggerFactory.getLogger(SnapshotSavePointStore.class);
 	
