@@ -3,13 +3,13 @@ package org.openmrs.eip.mysql.watcher.route;
 import static org.apache.camel.LoggingLevel.DEBUG;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DBZM_MSG_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.EX_PROP_SKIP;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.ID_SETTING_PROCESSOR;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore;
 import org.openmrs.eip.mysql.watcher.DebeziumMessageProcessor;
-import org.openmrs.eip.mysql.watcher.WatcherConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,38 +23,50 @@ public class DebeziumRoute extends RouteBuilder {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DebeziumRoute.class);
 	
-	public DebeziumRoute() {
+	protected static final String ROUTE_ID_EVENT_LISTENER = "debezium-event-listener";
+	
+	protected static final String URI_EVENT_LISTENER = "direct:" + ROUTE_ID_EVENT_LISTENER;
+	
+	private String fromUri;
+	
+	private String errorHandlerRef;
+	
+	public DebeziumRoute(String fromUri, String errorHandlerRef) {
+		this.fromUri = fromUri;
+		this.errorHandlerRef = errorHandlerRef;
 	}
 	
 	@Override
 	public void configure() {
 		logger.info("Starting debezium...");
 		
-		RouteDefinition routeDef = from(
-		    "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}&offsetStorageFileName={{debezium.offsetFilename}}&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}&offsetFlushIntervalMs=0&snapshotMode={{debezium.snapshotMode}}&snapshotFetchSize=1000&snapshotLockingMode={{debezium.snapshotLockingMode}}&includeSchemaChanges=false&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage={{"
-		            + WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS + "}}&databaseHistory={{"
-		            + WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS + "}}&offsetCommitTimeoutMs=15000")
-		                    .routeId(DEBEZIUM_ROUTE_ID);
+		RouteDefinition routeDef = from(fromUri).routeId(DEBEZIUM_ROUTE_ID);
 		
-		logger.info("Setting debezium route handler to: " + WatcherConstants.SHUTDOWN_HANDLER_REF);
+		logger.info("Setting debezium route handler to: " + errorHandlerRef);
 		
-		routeDef.setErrorHandlerRef(WatcherConstants.SHUTDOWN_HANDLER_REF);
+		routeDef.setErrorHandlerRef(errorHandlerRef);
 		
-		routeDef.choice()
+		routeDef.choice()//Start outer choice
 		        
 		        .when(exchange -> !CustomFileOffsetBackingStore.isDisabled())
+		        
+		        .choice()//Start inner choice
+		        
+		        .when(exchange -> !exchange.getProperty(EX_PROP_SKIP, false, Boolean.class))
 		        
 		        .process(DBZM_MSG_PROCESSOR)
 		        
 		        .process(ID_SETTING_PROCESSOR)
 		        
-		        .to("direct:debezium-event-listener")
+		        .to(URI_EVENT_LISTENER)
+		        
+		        .endChoice()//End inner choice
 		        
 		        .otherwise()
 		        
 		        .log(DEBUG, "Deferring DB event because an error was encountered while processing a previous one")
 		        
-		        .end();
+		        .end();//End outer choice
 	}
 	
 }
