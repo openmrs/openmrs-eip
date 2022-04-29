@@ -94,8 +94,38 @@ public class DebeziumRouteTest extends BaseWatcherRouteTest {
 	}
 	
 	@Test
+	public void shouldProcessTheEventIfSkipIsSetToNull() throws Exception {
+		mockDbzmEndpoint.expectedMessageCount(1);
+		mockIdSettingEndpoint.expectedMessageCount(1);
+		mockEventListenerEndpoint.expectedMessageCount(1);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_SKIP, null);
+		
+		producerTemplate.sendBody(URI, null);
+		
+		mockDbzmEndpoint.assertIsSatisfied();
+		mockIdSettingEndpoint.assertIsSatisfied();
+		mockEventListenerEndpoint.assertIsSatisfied();
+	}
+	
+	@Test
+	public void shouldProcessTheEventIfSkipIsSetToFalse() throws Exception {
+		mockDbzmEndpoint.expectedMessageCount(1);
+		mockIdSettingEndpoint.expectedMessageCount(1);
+		mockEventListenerEndpoint.expectedMessageCount(1);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_SKIP, false);
+		
+		producerTemplate.sendBody(URI, null);
+		
+		mockDbzmEndpoint.assertIsSatisfied();
+		mockIdSettingEndpoint.assertIsSatisfied();
+		mockEventListenerEndpoint.assertIsSatisfied();
+	}
+	
+	@Test
 	public void shouldNotProcessTheEventIfMarkedForSkipping() throws Exception {
-		mockDbzmEndpoint.expectedMessageCount(0);
+		mockDbzmEndpoint.expectedMessageCount(1);
 		mockIdSettingEndpoint.expectedMessageCount(0);
 		mockEventListenerEndpoint.expectedMessageCount(0);
 		Exchange exchange = new DefaultExchange(camelContext);

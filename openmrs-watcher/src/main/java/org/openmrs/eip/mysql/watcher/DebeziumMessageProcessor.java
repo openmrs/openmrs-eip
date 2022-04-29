@@ -28,6 +28,8 @@ public class DebeziumMessageProcessor implements Processor {
 	
 	public DebeziumMessageProcessor(@Autowired Collection<EventFilter> filters) {
 		this.filters = filters;
+		
+		logger.info("Event Filters -> " + this.filters);
 	}
 	
 	@Override
@@ -55,17 +57,6 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		exchange.setProperty(WatcherConstants.PROP_EVENT, event);
 		
-		if (message.getBody() != null) {
-			Map<String, Object> currentState = new HashMap();
-			Struct bodyStruct = message.getBody(Struct.class);
-			bodyStruct.schema().fields().forEach(field -> currentState.put(field.name(), bodyStruct.get(field)));
-			event.setCurrentState(currentState);
-		}
-		
-		if (logger.isTraceEnabled()) {
-			logger.trace("Previous row state: " + event.getPreviousState());
-		}
-		
 		Struct beforeStruct = message.getHeader(DebeziumConstants.HEADER_BEFORE, Struct.class);
 		if (beforeStruct != null) {
 			Map<String, Object> beforeState = new HashMap();
@@ -74,8 +65,21 @@ public class DebeziumMessageProcessor implements Processor {
 		}
 		
 		if (logger.isTraceEnabled()) {
+			logger.trace("Previous row state: " + event.getPreviousState());
+		}
+		
+		if (message.getBody() != null) {
+			Map<String, Object> currentState = new HashMap();
+			Struct bodyStruct = message.getBody(Struct.class);
+			bodyStruct.schema().fields().forEach(field -> currentState.put(field.name(), bodyStruct.get(field)));
+			event.setCurrentState(currentState);
+		}
+		
+		if (logger.isTraceEnabled()) {
 			logger.debug("New row state: " + event.getCurrentState());
 		}
+		
+		logger.info("Event: " + event + ", Source Metadata: " + sourceMetadata);
 		
 		for (EventFilter filter : filters) {
 			if (!filter.accept(event, exchange)) {
@@ -87,8 +91,6 @@ public class DebeziumMessageProcessor implements Processor {
 				break;
 			}
 		}
-		
-		logger.info("Event: " + event + ", Source Metadata: " + sourceMetadata);
 	}
 	
 }

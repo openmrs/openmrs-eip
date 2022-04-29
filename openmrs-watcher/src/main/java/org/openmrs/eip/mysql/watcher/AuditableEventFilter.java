@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_CHANGED_BY;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_DATE_CHANGED;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_AUDIT_FILTER_TABLES;
@@ -32,21 +33,23 @@ public class AuditableEventFilter implements EventFilter {
 	public AuditableEventFilter(@Value("${" + PROP_AUDIT_FILTER_TABLES + ":}") List<String> tables) {
 		this.tables = tables.stream().filter(t -> StringUtils.isNotBlank(t)).map(t -> t.trim().toLowerCase())
 		        .collect(Collectors.toSet());
+		
+		logger.info("Auditable tables to filter -> " + this.tables);
 	}
 	
 	@Override
 	public boolean accept(Event event, Exchange exchange) {
-		if (tables.isEmpty() || !tables.contains(event.getTableName().toLowerCase())) {
+		if (!"u".equals(event.getOperation())) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Skipping event for a non filtered table");
+				logger.trace("Accepting non update event");
 			}
 			
 			return true;
 		}
 		
-		if (!"u".equals(event.getOperation())) {
+		if (tables.isEmpty() || !tables.contains(event.getTableName().toLowerCase())) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Skipping non update event");
+				logger.trace("Accepting event for a non filtered table");
 			}
 			
 			return true;
@@ -87,10 +90,10 @@ public class AuditableEventFilter implements EventFilter {
 			
 			if (prevValue != null && newValue != null) {
 				//For simplicity only detect changes for columns of simple types
-				boolean isPrevValidValidType = prevValue.getClass().isPrimitive() || prevValue instanceof String;
-				boolean isNewValidValidType = newValue.getClass().isPrimitive() || prevValue instanceof String;
+				boolean isPrevValidType = isPrimitiveOrWrapper(prevValue.getClass()) || prevValue instanceof String;
+				boolean isNewValidType = isPrimitiveOrWrapper(newValue.getClass()) || prevValue instanceof String;
 				
-				if (prevValue.equals(newValue) && isPrevValidValidType && isNewValidValidType) {
+				if (prevValue.equals(newValue) && isPrevValidType && isNewValidType) {
 					modifiedColumns.remove(column);
 				}
 			}

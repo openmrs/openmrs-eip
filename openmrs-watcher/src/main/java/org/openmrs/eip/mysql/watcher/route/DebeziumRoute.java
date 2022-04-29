@@ -50,11 +50,11 @@ public class DebeziumRoute extends RouteBuilder {
 		        
 		        .when(exchange -> !CustomFileOffsetBackingStore.isDisabled())
 		        
+		        .process(DBZM_MSG_PROCESSOR)
+		        
 		        .choice()//Start inner choice
 		        
 		        .when(exchange -> !exchange.getProperty(EX_PROP_SKIP, false, Boolean.class))
-		        
-		        .process(DBZM_MSG_PROCESSOR)
 		        
 		        .process(ID_SETTING_PROCESSOR)
 		        

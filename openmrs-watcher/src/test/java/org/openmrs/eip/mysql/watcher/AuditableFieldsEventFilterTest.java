@@ -21,6 +21,10 @@ public class AuditableFieldsEventFilterTest {
 	
 	public static final String COLUMN_FIRST_NAME = "first_name";
 	
+	public static final String COLUMN_CREATOR = "creator";
+	
+	public static final String COLUMN_DATE_CREATED = "date_created";
+	
 	public static final String TABLE_PERSON = "person";
 	
 	private AuditableEventFilter filter = new AuditableEventFilter(Collections.singletonList(TABLE_PERSON));
@@ -74,35 +78,22 @@ public class AuditableFieldsEventFilterTest {
 	}
 	
 	@Test
-	public void accept_shouldReturnTrueIfTheRowHasModifiedColumnsOfAPrimitiveType() {
-		final int value = 2;
-		Map prevState = new HashMap();
-		prevState.put(COLUMN_FIRST_NAME, value);
-		prevState.put(COLUMN_CHANGED_BY, null);
-		prevState.put(COLUMN_DATE_CHANGED, null);
-		Map newState = new HashMap();
-		newState.put(COLUMN_FIRST_NAME, value);
-		newState.put(COLUMN_CHANGED_BY, null);
-		newState.put(COLUMN_DATE_CHANGED, null);
-		assertTrue(filter.accept(createEvent(prevState, newState), null));
-	}
-	
-	@Test
 	public void accept_shouldReturnTrueIfTheRowHasModifiedColumnsOfAPrimitiveWrapperType() {
-		final Integer value = Integer.valueOf(2);
+		final Integer oldValue = 2;
+		final Integer newValue = 3;
 		Map prevState = new HashMap();
-		prevState.put(COLUMN_FIRST_NAME, value);
+		prevState.put(COLUMN_FIRST_NAME, oldValue);
 		prevState.put(COLUMN_CHANGED_BY, null);
 		prevState.put(COLUMN_DATE_CHANGED, null);
 		Map newState = new HashMap();
-		newState.put(COLUMN_FIRST_NAME, value);
+		newState.put(COLUMN_FIRST_NAME, newValue);
 		newState.put(COLUMN_CHANGED_BY, null);
 		newState.put(COLUMN_DATE_CHANGED, null);
 		assertTrue(filter.accept(createEvent(prevState, newState), null));
 	}
 	
 	@Test
-	public void accept_shouldReturnTrueForACreateEventEvenIfTheRowHasNoModifiedColumns() {
+	public void accept_shouldReturnTrueForACreateEvent() {
 		final String firstName = "John";
 		Map newState = new HashMap();
 		newState.put(COLUMN_FIRST_NAME, firstName);
@@ -114,7 +105,7 @@ public class AuditableFieldsEventFilterTest {
 	}
 	
 	@Test
-	public void accept_shouldReturnTrueForADeleteEventEvenIfTheRowHasNoModifiedColumns() {
+	public void accept_shouldReturnTrueForADeleteEvent() {
 		final String firstName = "John";
 		Map prevState = new HashMap();
 		prevState.put(COLUMN_FIRST_NAME, firstName);
@@ -126,7 +117,7 @@ public class AuditableFieldsEventFilterTest {
 	}
 	
 	@Test
-	public void accept_shouldReturnTrueForAReadEventEvenIfTheRowHasNoModifiedColumns() {
+	public void accept_shouldReturnTrueForAReadEvent() {
 		final String firstName = "John";
 		Map newState = new HashMap();
 		newState.put(COLUMN_FIRST_NAME, firstName);
@@ -237,12 +228,18 @@ public class AuditableFieldsEventFilterTest {
 	@Test
 	public void accept_shouldReturnFalseIfOnlyTheAuditColumnsWereModified() {
 		final String firstName = "John";
+		final Integer creator = 1;
+		final Long dateCreated = System.currentTimeMillis();
 		Map prevState = new HashMap();
 		prevState.put(COLUMN_FIRST_NAME, firstName);
+		prevState.put(COLUMN_CREATOR, creator);
+		prevState.put(COLUMN_DATE_CREATED, dateCreated);
 		prevState.put(COLUMN_CHANGED_BY, 1);
 		prevState.put(COLUMN_DATE_CHANGED, "2022-01-01 00:00:00");
 		Map newState = new HashMap();
 		newState.put(COLUMN_FIRST_NAME, firstName);
+		newState.put(COLUMN_CREATOR, creator);
+		newState.put(COLUMN_DATE_CREATED, dateCreated);
 		newState.put(COLUMN_CHANGED_BY, 2);
 		newState.put(COLUMN_DATE_CHANGED, "2022-01-01 00:00:01");
 		assertFalse(filter.accept(createEvent(prevState, newState), null));
