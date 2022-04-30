@@ -18,6 +18,8 @@ class SnapshotSavePointStore {
 	
 	private static File file;
 	
+	private static Properties savedProps;
+	
 	private static Properties props;
 	
 	SnapshotSavePointStore() {
@@ -25,6 +27,7 @@ class SnapshotSavePointStore {
 		
 		log.info("Snapshot savepoint file -> " + file);
 		
+		savedProps = new Properties();
 		props = new Properties();
 	}
 	
@@ -33,18 +36,18 @@ class SnapshotSavePointStore {
 		
 		try {
 			if (file.exists()) {
-				log.info("Loading the snapshot savepoint");
-
-				props.load(FileUtils.openInputStream(file));
-
-				log.info("Done loading snapshot savepoint");
+				log.info("Loading saved snapshot savepoint");
+				
+				savedProps.load(FileUtils.openInputStream(file));
+				
+				log.info("Done loading saved snapshot savepoint");
 			}
 			
-			if (MapUtils.isEmpty(props)) {
-				log.info("No snapshot savepoint file found that was previously stored");
+			if (MapUtils.isEmpty(savedProps)) {
+				log.info("No saved snapshot savepoint file found");
 			}
 			
-			log.info("Done initializing snapshot savepoint store");
+			log.info("Done initializing saved snapshot savepoint store");
 		}
 		catch (IOException e) {
 			throw new EIPException("Failed to read snapshot savepoint file", e);
@@ -52,7 +55,7 @@ class SnapshotSavePointStore {
 	}
 	
 	Integer getSavedRowId(String tableName) {
-		String value = props.getProperty(tableName);
+		String value = savedProps.getProperty(tableName);
 		if (StringUtils.isBlank(value)) {
 			return null;
 		}
@@ -62,7 +65,7 @@ class SnapshotSavePointStore {
 	
 	void update(Map<String, Integer> tableIdMap) {
 		props.putAll(tableIdMap);
-
+		
 		log.info("Writing the snapshot savepoint to disk");
 		
 		try {
@@ -79,6 +82,7 @@ class SnapshotSavePointStore {
 		log.info("Deleting the snapshot savepoint file");
 		
 		props.clear();
+		savedProps.clear();
 		
 		if (!file.exists()) {
 			log.info("No snapshot savepoint file found to delete");

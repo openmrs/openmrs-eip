@@ -31,11 +31,11 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	private List<CompletableFuture<Void>> futures;
 	
 	private Map<String, Integer> tableAndMaxRowIdsMap;
-
-	private SnapshotSavePointStore savePointStore;
-
+	
+	private SnapshotSavePointStore savepointStore;
+	
 	private static Integer batchSize;
-
+	
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		if (producerTemplate == null) {
@@ -59,18 +59,28 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 			if (futures == null) {
 				futures = new Vector(DEFAULT_BATCH_SIZE);
 			}
-
+			
 			if (tableAndMaxRowIdsMap == null) {
 				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
 			}
-
+			
 			if (batchSize == null) {
 				batchSize = DEFAULT_BATCH_SIZE;
 			}
-
-			if (savePointStore == null) {
-				savePointStore = new SnapshotSavePointStore();
-				savePointStore.init();
+			
+			if (savepointStore == null) {
+				savepointStore = new SnapshotSavePointStore();
+				savepointStore.init();
+			}
+			
+			Integer currentRowId = Integer.valueOf(id);
+			Integer saveRowId = savepointStore.getSavedRowId(table);
+			if (saveRowId != null && saveRowId >= currentRowId) {
+				if (log.isDebugEnabled()) {
+					log.debug("Skipping previously processed row with id: " + currentRowId + " in " + table + " table");
+				}
+				
+				return;
 			}
 			
 			futures.add(CompletableFuture.runAsync(() -> {
@@ -84,7 +94,6 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 					setThreadName(table, id);
 					producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
 					//TODO Add support for PKs that are not integers
-					Integer currentRowId = Integer.valueOf(id);
 					Integer maxRowId = tableAndMaxRowIdsMap.get(table);
 					if (maxRowId == null || currentRowId > maxRowId) {
 						tableAndMaxRowIdsMap.put(table, currentRowId);
@@ -103,13 +112,13 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				if (isLast) {
 					//Only save offsets if it is the last snapshot item
 					log.info("Processed final snapshot change event");
-
+					
 					CustomFileOffsetBackingStore.unpause();
-
-					savePointStore.discard();
-					savePointStore = null;
+					
+					savepointStore.discard();
+					savepointStore = null;
 				} else {
-					savePointStore.update(tableAndMaxRowIdsMap);
+					savepointStore.update(tableAndMaxRowIdsMap);
 				}
 			}
 			
@@ -137,5 +146,5 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	protected String getThreadName(String table, String id) {
 		return table + "-" + id;
 	}
-
+	
 }

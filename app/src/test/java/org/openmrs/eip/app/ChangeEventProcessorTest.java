@@ -62,6 +62,7 @@ public class ChangeEventProcessorTest {
 		Whitebox.setInternalState(processor, "threadCount", threadCount);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
+		Mockito.when(mockStore.getSavedRowId(ArgumentMatchers.anyString())).thenReturn(null);
 		return processor;
 	}
 	
@@ -385,6 +386,54 @@ public class ChangeEventProcessorTest {
 			assertTrue(expectedResults.contains(TABLE_VISIT + id));
 			assertEquals(processor.getThreadName(TABLE_VISIT, id.toString()),
 			    expectedRowThreadNameMap.get(TABLE_VISIT + id).split(":")[2]);
+		}
+	}
+	
+	@Test
+	public void process_shouldNotProcessPreviouslyProcessedSnapshotEvent() throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 10;
+		final int maxRowId = 6;
+		List<Exchange> exchanges = new ArrayList(size);
+		List<Integer> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Integer, String> expectedIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			Exchange e = createExchange(i, i < size - 1 ? TRUE.toString() : "last", TABLE_PERSON);
+			exchanges.add(e);
+			Mockito.doAnswer(invocation -> {
+				Exchange arg = invocation.getArgument(1);
+				Integer id = getId(arg);
+				expectedResults.add(id);
+				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
+				assertTrue(CustomFileOffsetBackingStore.isPaused());
+				return null;
+			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+		}
+		
+		processor = createProcessor(size);
+		Mockito.when(mockStore.getSavedRowId(TABLE_PERSON)).thenReturn(maxRowId);
+		for (Exchange exchange : exchanges) {
+			processor.process(exchange);
+		}
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(3, expectedResults.size());
+		assertEquals(3, expectedIdThreadNameMap.size());
+		assertFalse(CustomFileOffsetBackingStore.isPaused());
+		Mockito.verify(mockStore).discard();
+		assertNull(Whitebox.getInternalState(processor, SnapshotSavePointStore.class));
+		
+		for (int i = 0; i < size; i++) {
+			Integer id = getId(exchanges.get(i));
+			if (i <= maxRowId) {
+				assertFalse(expectedResults.contains(id));
+				assertNull(expectedIdThreadNameMap.get(id));
+			} else {
+				assertTrue(expectedResults.contains(id));
+				assertEquals(processor.getThreadName(TABLE_PERSON, id.toString()),
+				    expectedIdThreadNameMap.get(id).split(":")[2]);
+			}
 		}
 	}
 	
