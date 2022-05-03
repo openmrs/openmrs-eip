@@ -65,14 +65,14 @@ then you set the logging level as below.
 logging.level.my-route=DEBUG
 ```
 
+For built-in routes and all classes in this project, you can globally set their log level by setting the value of the
+`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to
+[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
+
 # Metrics
 There is built-in support for metrics via spring's actuator, it is not enabled by default, custom applications can be 
 setup and configured to enable and expose endpoints for metrics. Please refer to the [custom application set up](docs/custom/README.md) 
 documentation for how to do this.
-
-For built-in routes and all classes in this project, you can globally set their log level by setting the value of the
-`openmrs.eip.log.level` property in the application.properties file. For all other classes please refer to
-[spring boot logging configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties-core)
 
 # Management Database
 The `openmrs-watcher` requires configuration of a management database where it stores useful data for proper functioning.
