@@ -1,5 +1,7 @@
 package org.openmrs.eip.app;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -64,7 +66,7 @@ class SnapshotSavePointStore {
 	}
 	
 	void update(Map<String, Integer> tableIdMap) {
-		props.putAll(tableIdMap);
+		props.putAll(tableIdMap.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 		
 		log.info("Writing the snapshot savepoint to disk");
 		
