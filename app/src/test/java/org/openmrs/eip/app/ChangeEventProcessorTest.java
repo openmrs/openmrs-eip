@@ -106,7 +106,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -147,7 +147,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -189,7 +189,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -245,7 +245,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(id);
 				threadNames.add(Thread.currentThread().getName());
 				assertFalse(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -290,7 +290,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(TABLE_ENC + id);
 				expectedRowThreadNameMap.put(TABLE_ENC + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -303,7 +303,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(TABLE_PERSON + id);
 				expectedRowThreadNameMap.put(TABLE_PERSON + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -316,7 +316,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(TABLE_VISIT + id);
 				expectedRowThreadNameMap.put(TABLE_VISIT + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		
@@ -407,7 +407,7 @@ public class ChangeEventProcessorTest {
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
-				return null;
+				return arg;
 			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
 		}
 		

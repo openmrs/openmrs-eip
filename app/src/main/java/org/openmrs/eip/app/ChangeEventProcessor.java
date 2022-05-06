@@ -17,6 +17,7 @@ import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -92,7 +93,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				
 				try {
 					setThreadName(table, id);
-					producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
+                    //producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
+					CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
 					//TODO Add support for PKs that are not integers
 					Integer maxRowId = tableAndMaxRowIdsMap.get(table);
 					if (maxRowId == null || currentRowId > maxRowId) {
@@ -126,7 +128,7 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 			final String originalThreadName = Thread.currentThread().getName();
 			try {
 				setThreadName(table, id);
-				producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
+				CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
 			}
 			finally {
 				Thread.currentThread().setName(originalThreadName);

@@ -20,7 +20,7 @@ public abstract class BaseEventProcessor extends EventNotifierSupport implements
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseEventProcessor.class);
 	
-	protected static final int WAIT_IN_SECONDS = 30;
+	protected static final int WAIT_IN_SECONDS = 120;
 	
 	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
 	protected int threadCount;
@@ -42,7 +42,7 @@ public abstract class BaseEventProcessor extends EventNotifierSupport implements
 		
 		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 		
-		allFuture.get();
+		allFuture.get(WAIT_IN_SECONDS - 30, TimeUnit.SECONDS);
 		
 		if (log.isDebugEnabled()) {
 			log.debug(futures.size() + " " + getProcessorName() + " processor thread(s) have terminated");
