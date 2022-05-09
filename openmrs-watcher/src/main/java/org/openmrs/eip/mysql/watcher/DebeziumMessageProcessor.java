@@ -57,6 +57,10 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		exchange.setProperty(WatcherConstants.PROP_EVENT, event);
 		
+		if (logger.isTraceEnabled()) {
+			logger.trace("Change event: " + event + ", Source Metadata: " + sourceMetadata);
+		}
+		
 		Struct beforeStruct = message.getHeader(DebeziumConstants.HEADER_BEFORE, Struct.class);
 		if (beforeStruct != null) {
 			Map<String, Object> beforeState = new HashMap();
@@ -76,20 +80,24 @@ public class DebeziumMessageProcessor implements Processor {
 		}
 		
 		if (logger.isTraceEnabled()) {
-			logger.debug("New row state: " + event.getCurrentState());
+			logger.trace("New row state: " + event.getCurrentState());
 		}
 		
-		logger.info("Event: " + event + ", Source Metadata: " + sourceMetadata);
-		
+		boolean skip = false;
 		for (EventFilter filter : filters) {
 			if (!filter.accept(event, exchange)) {
 				exchange.setProperty(WatcherConstants.EX_PROP_SKIP, true);
+				skip = true;
 				if (logger.isTraceEnabled()) {
 					logger.trace("Predicate failed for event filter of type: " + filter.getClass().getName());
 				}
 				
 				break;
 			}
+		}
+		
+		if (!skip) {
+			logger.info("Processing change event: " + event + ", Source Metadata: " + sourceMetadata);
 		}
 	}
 	
