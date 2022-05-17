@@ -46,6 +46,8 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ExecutorService msgExecutor;
 	
+	private int failureCount;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param threadCount the number of threads to use to sync messages in parallel
@@ -55,6 +57,7 @@ public class SiteMessageConsumer implements Runnable {
 		this.site = site;
 		this.threadCount = threadCount;
 		this.msgExecutor = msgExecutor;
+		failureCount = 0;
 	}
 	
 	@Override
@@ -83,7 +86,7 @@ public class SiteMessageConsumer implements Runnable {
 					}
 					catch (InterruptedException e) {
 						//ignore
-						log.info("Sync message consumer for site: " + site + " has been interrupted");
+						log.warn("Sync message consumer for site: " + site + " has been interrupted");
 					}
 					
 					continue;
@@ -93,19 +96,46 @@ public class SiteMessageConsumer implements Runnable {
 				
 			}
 			catch (Throwable t) {
-				//TODO After a certain failure count may be we should shutdown the application
-				//TODO Even better, add a retry mechanism for a number of times before giving up
 				if (!ReceiverContext.isStopSignalReceived()) {
-					log.error("Stopping message consumer thread for site: " + site + " because an error occurred", t);
+					log.error("Message consumer thread for site: " + site + " encountered an error", t);
 					
-					errorEncountered = true;
-					break;
+					failureCount++;
+					if (failureCount < 3) {
+						//TODO Make the wait times configurable
+						long wait;
+						if (failureCount == 1) {
+							wait = 300000;
+						} else {
+							wait = 900000;
+						}
+						
+						log.info("Pausing message consumer thread for site: " + site + " for " + (wait / 60000)
+						        + " minutes after an encountered error");
+						
+						try {
+							Thread.sleep(wait);
+						}
+						catch (InterruptedException e) {
+							log.warn("Sync message consumer for site: " + site + " has been interrupted");
+						}
+					} else {
+						log.error("Stopping message consumer thread for site: " + site);
+						
+						errorEncountered = true;
+						break;
+					}
 				}
 			}
 			
 		} while (!ReceiverContext.isStopSignalReceived() && !errorEncountered);
 		
 		log.info("Sync message consumer for site: " + site + " has stopped");
+		
+		if (errorEncountered) {
+			log.info("Shutting down after the sync message consumer for " + site + " encountered an error");
+			
+			SyncApplication.shutdown();
+		}
 		
 	}
 	
@@ -127,9 +157,9 @@ public class SiteMessageConsumer implements Runnable {
 				for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
 					typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
 				}
-
-                //TODO Periodically wait and reset futures to save memory
-                syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+				
+				//TODO Periodically wait and reset futures to save memory
+				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
 						setThreadName(msg);
