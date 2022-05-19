@@ -20,7 +20,7 @@ public abstract class BaseEventProcessor extends EventNotifierSupport implements
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseEventProcessor.class);
 	
-	protected static final int WAIT_IN_SECONDS = 180;
+	protected static final int WAIT_IN_SECONDS = 300;
 	
 	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
 	protected int threadCount;
