@@ -67,7 +67,7 @@
             
             <otherwise>
                 <!-- TODO Log to a special failures log file or DB -->
-                <log message="Unknowk message was received: ${body}" loggingLevel="ERROR" />
+                <log message="Unknown message was received: ${body}" loggingLevel="WARN" />
             </otherwise>
         </choice>
 

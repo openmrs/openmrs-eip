@@ -31,11 +31,11 @@ public class SenderSyncMessage extends AbstractEntity {
 	private String requestUuid;
 	
 	@NotNull
-	@Column(length = 1, nullable = false)
+	@Column(nullable = false)
 	private boolean sent;
 	
 	@NotNull
-	@Column(length = 1, nullable = false, updatable = false)
+	@Column(nullable = false, updatable = false)
 	private boolean snapshot;
 	
 	public String getTableName() {

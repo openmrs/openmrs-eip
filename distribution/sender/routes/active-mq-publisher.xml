@@ -2,12 +2,11 @@
 
     <route id="active-mq-publisher" errorHandlerRef="outBoundErrorHandler">
     
-        <!-- TODO(luis.pinto) Make the delay configurable -->
-        <from uri="scheduler:active_mq_publisher?initialDelay=15000&amp;delay=60000" />
+        <from uri="scheduler:active_mq_publisher?initialDelay={{active-mq-publisher.initial.delay}}&amp;delay={{active-mq-publisher.delay}}" />
 
-        <log message="Fetching next 1000 sender sync messages" loggingLevel="DEBUG" />
+        <log message="Fetching next {{active-mq-publisher.max.fetch.results}} sender sync messages" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.sent = false ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults=1000" />
+        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.sent = false ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults={{active-mq-publisher.max.fetch.results}}" />
 
         <choice>
             <when>
@@ -105,7 +104,7 @@
     
                     <toD uri="{{camel.output.endpoint}}" />
     
-                    <log message="Entity sent! Updating request status to sent." />
+                    <log message="Entity sent! Updating request status to sent." loggingLevel="DEBUG" />
                     
                     <script>
                         <spel>

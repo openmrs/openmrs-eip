@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "sync_response")
+@Table(name = "sender_sync_response")
 public class SyncResponse extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
@@ -23,27 +23,29 @@ public class SyncResponse extends AbstractEntity {
 	}
 	
 	@NotNull
-	@Column(name = "message_uuid", length = 38, nullable = false, unique = true, updatable = false)
+	@Column(name = "message_uuid", length = 38, nullable = false, updatable = false)
 	@Access(AccessType.FIELD)
 	private String messageUuid;
 	
 	@NotNull
-	@Column(name = "date_sent", precision = 3, nullable = false, updatable = false)
+	@Column(name = "date_sent", nullable = false, updatable = false)
 	@Access(AccessType.FIELD)
 	private Date dateSent;
 	
-	@Column(name = "date_processed", precision = 3)
+	@Column(name = "date_processed")
 	@Access(AccessType.FIELD)
 	private Date dateProcessed;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 10)
+	@Column(nullable = false, length = 20)
 	@Access(AccessType.FIELD)
 	private SyncResponseStatus status;
 	
+	public SyncResponse() {
+	}
+	
 	public SyncResponse(@NotNull String messageUuid, @NotNull Date dateSent) {
-		super();
 		this.messageUuid = messageUuid;
 		this.dateSent = dateSent;
 		this.status = SyncResponseStatus.NEW;
