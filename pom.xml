@@ -6,7 +6,7 @@
     <groupId>org.openmrs.eip</groupId>
     <artifactId>openmrs-eip</artifactId>
     <packaging>pom</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
 
     <modules>
         <module>app-api</module>
