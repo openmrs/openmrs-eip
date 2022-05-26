@@ -86,6 +86,7 @@
                                     #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
                                     #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
                                     #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
+                                    #{body.metadata.setSnapshot(getProperty('senderSyncMessage').snapshot)}
                                 </spel>
                             </script>
                             <setBody>
