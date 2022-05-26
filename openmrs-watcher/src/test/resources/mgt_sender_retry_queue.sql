@@ -9,4 +9,6 @@ VALUES
 (7, 'orders', '101', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
 (8, 'orders', '103', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
 (9, 'test_order', '105', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
-(10, 'drug_order', '107', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00');
+(10, 'drug_order', '107', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
+(11, 'orders', '111', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
+(12, 'referral_order', '113', 'c', 'mock:event-listener', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00');

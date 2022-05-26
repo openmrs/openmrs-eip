@@ -1,5 +1,9 @@
 package org.openmrs.eip;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
 	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
@@ -41,5 +45,21 @@ public class Constants {
 	public static final String URI_GET_ENTITY_BY_ID = "direct:" + ROUTE_ID_GET_ENTITY_BY_ID;
 	
 	public static final String URI_GET_CONCEPT_BY_MAPPING = "direct:" + ROUTE_ID_GET_CONCEPT_BY_MAPPING;
+	
+	public static final List<String> ORDER_SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order", "referral_order");
+	
+	public static final List<String> ORDER_TABLES;
+	
+	public static final List<String> SUBCLASS_TABLES;
+	
+	static {
+		ORDER_TABLES = new ArrayList();
+		ORDER_TABLES.add("orders");
+		ORDER_TABLES.addAll(ORDER_SUBCLASS_TABLES);
+		
+		SUBCLASS_TABLES = new ArrayList();
+		SUBCLASS_TABLES.add("patient");
+		SUBCLASS_TABLES.addAll(ORDER_SUBCLASS_TABLES);
+	}
 	
 }

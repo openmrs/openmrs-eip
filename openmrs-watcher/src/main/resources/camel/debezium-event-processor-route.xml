@@ -11,9 +11,6 @@
         <setProperty name="event">
             <simple>${body.event}</simple>
         </setProperty>
-        <setProperty name="is-subclass">
-            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
-        </setProperty>
 
         <setProperty name="route-retry-count-map">
             <spel>#{new java.util.HashMap()}</spel>

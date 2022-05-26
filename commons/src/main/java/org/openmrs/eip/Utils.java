@@ -33,9 +33,8 @@ public class Utils {
 		if ("person".equalsIgnoreCase(tableName) || "patient".equalsIgnoreCase(tableName)) {
 			tables.add("person".equalsIgnoreCase(tableName) ? "patient" : "person");
 		} else if ("orders".equalsIgnoreCase(tableName)) {
-			tables.add("test_order");
-			tables.add("drug_order");
-		} else if ("test_order".equalsIgnoreCase(tableName) || "drug_order".equalsIgnoreCase(tableName)) {
+			tables.addAll(Constants.ORDER_SUBCLASS_TABLES);
+		} else if (Constants.ORDER_SUBCLASS_TABLES.contains(tableName.toLowerCase())) {
 			tables.add("orders");
 		}
 		
@@ -68,6 +67,16 @@ public class Utils {
 	public static void shutdown() {
 		//Shutdown in a new thread to ensure other background shutdown threads complete too
 		new Thread(() -> System.exit(129)).start();
+	}
+	
+	/**
+	 * Checks if the specified table name is orders or an order subclass tables
+	 *
+	 * @param tableName the table name to check
+	 * @return true if the specified table name is orders or an order subclass tables otherwise false
+	 */
+	public static boolean isOrderTable(String tableName) {
+		return Constants.ORDER_TABLES.contains(tableName.toLowerCase());
 	}
 	
 }

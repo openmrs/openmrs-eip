@@ -48,4 +48,17 @@
                                  referencedTableName="orders" referencedColumnNames="order_id" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20220526-1103">
+        <comment>Adding referral_order table</comment>
+
+        <createTable tableName="referral_order">
+            <column name="order_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="referral_order_order_id_fk"
+                                 baseTableName="referral_order" baseColumnNames="order_id"
+                                 referencedTableName="orders" referencedColumnNames="order_id" />
+    </changeSet>
+
 </databaseChangeLog>

@@ -2,7 +2,6 @@ package org.openmrs.eip.mysql.watcher;
 
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +24,6 @@ import org.springframework.stereotype.Component;
 public class IdentifierSettingProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(IdentifierSettingProcessor.class);
-	
-	private static final List<String> SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order", "patient");
 	
 	@Override
 	public void process(Exchange exchange) {
@@ -96,7 +93,7 @@ public class IdentifierSettingProcessor implements Processor {
 	}
 	
 	private boolean isSubclassTable(String tableName) {
-		return SUBCLASS_TABLES.contains(tableName.toLowerCase());
+		return Constants.SUBCLASS_TABLES.contains(tableName.toLowerCase());
 	}
 	
 }

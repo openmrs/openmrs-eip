@@ -230,4 +230,23 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 		mockEventProcessorEndpoint.assertIsSatisfied();
 	}
 	
+	@Test
+	public void shouldFailIfAReferralOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
+	    throws Exception {
+		final String tableName = "referral_order";
+		final Integer orderId = 112;
+		final Integer previousOrderId = 111;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		SenderRetryQueueItem retry = addRetryItem(tableName, orderId.toString(), null, MOCK_LISTENER);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_FAILURES, singletonList(tableName + "#" + previousOrderId + "#" + MOCK_LISTENER));
+		exchange.getIn().setBody(retry.getId());
+		mockEventProcessorEndpoint.expectedMessageCount(0);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventProcessorEndpoint.assertIsSatisfied();
+		assertEquals(EX_MSG, getErrorMessage(exchange));
+	}
+	
 }

@@ -277,4 +277,63 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
 	}
 	
+	@Test
+	public void shouldNotProcessAnOrderThatHasAPreviousReferralOrderIfThePreviousReferralOrderIsInTheErrorQueueForTheDestination()
+	    throws Exception {
+		final Integer orderId = 114;
+		final Integer previousOrderId = 113;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		assertTrue(WatcherTestUtils.hasRetryItem("referral_order", previousOrderId.toString(), ROUTE_URI_LISTENER));
+		Event event = createEvent("orders", orderId.toString(), ORDER_UUID, "c");
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		mockEventListenerEndpoint.expectedMessageCount(0);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
+	@Test
+	public void shouldNotProcessAReferralOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
+	    throws Exception {
+		final Integer orderId = 112;
+		final Integer previousOrderId = 111;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		assertTrue(WatcherTestUtils.hasRetryItem("orders", previousOrderId.toString(), ROUTE_URI_LISTENER));
+		Event event = createEvent("referral_order", orderId.toString(), ORDER_UUID, "c");
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		mockEventListenerEndpoint.expectedMessageCount(0);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
+	@Test
+	public void shouldNotProcessAReferralOrderThatHasAPreviousReferralOrderIfThePreviousReferralOrderIsInTheErrorQueueForTheDestination()
+	    throws Exception {
+		final String tableName = "referral_order";
+		final Integer orderId = 114;
+		final Integer previousOrderId = 113;
+		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
+		assertTrue(WatcherTestUtils.hasRetryItem(tableName, previousOrderId.toString(), ROUTE_URI_LISTENER));
+		Event event = createEvent(tableName, orderId.toString(), ORDER_UUID, "c");
+		event.setCurrentState(singletonMap(ORDER_ID_COLUMN, orderId));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(PROP_EVENT, event);
+		mockEventListenerEndpoint.expectedMessageCount(0);
+		
+		producerTemplate.send(ROUTE_URI, exchange);
+		
+		mockEventListenerEndpoint.assertIsSatisfied();
+		assertMessageLogged(Level.INFO, ERR_MSG);
+		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
+	}
+	
 }

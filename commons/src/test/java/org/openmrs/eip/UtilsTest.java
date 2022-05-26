@@ -2,6 +2,7 @@ package org.openmrs.eip;
 
 import static java.util.Arrays.stream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -40,10 +41,11 @@ public class UtilsTest {
 		
 		tableName = "orders";
 		tables = Utils.getListOfTablesInHierarchy(tableName);
-		assertEquals(3, tables.size());
+		assertEquals(4, tables.size());
 		assertTrue(tables.contains(tableName));
 		assertTrue(tables.contains("test_order"));
 		assertTrue(tables.contains("drug_order"));
+		assertTrue(tables.contains("referral_order"));
 		
 		tableName = "test_order";
 		tables = Utils.getListOfTablesInHierarchy(tableName);
@@ -52,6 +54,12 @@ public class UtilsTest {
 		assertTrue(tables.contains("orders"));
 		
 		tableName = "drug_order";
+		tables = Utils.getListOfTablesInHierarchy(tableName);
+		assertEquals(2, tables.size());
+		assertTrue(tables.contains(tableName));
+		assertTrue(tables.contains("orders"));
+		
+		tableName = "REFERRAL_ORDER";
 		tables = Utils.getListOfTablesInHierarchy(tableName);
 		assertEquals(2, tables.size());
 		assertTrue(tables.contains(tableName));
@@ -79,10 +87,11 @@ public class UtilsTest {
 		
 		tableName = "orders";
 		tables = stream(Utils.getTablesInHierarchy(tableName).split(",")).collect(Collectors.toList());
-		assertEquals(3, tables.size());
+		assertEquals(4, tables.size());
 		assertTrue(tables.contains("'" + tableName + "'"));
 		assertTrue(tables.contains("'test_order'"));
 		assertTrue(tables.contains("'drug_order'"));
+		assertTrue(tables.contains("'referral_order'"));
 		
 		tableName = "test_order";
 		tables = stream(Utils.getTablesInHierarchy(tableName).split(",")).collect(Collectors.toList());
@@ -91,6 +100,12 @@ public class UtilsTest {
 		assertTrue(tables.contains("'orders'"));
 		
 		tableName = "drug_order";
+		tables = stream(Utils.getTablesInHierarchy(tableName).split(",")).collect(Collectors.toList());
+		assertEquals(2, tables.size());
+		assertTrue(tables.contains("'" + tableName + "'"));
+		assertTrue(tables.contains("'orders'"));
+		
+		tableName = "REFERRAL_ORDER";
 		tables = stream(Utils.getTablesInHierarchy(tableName).split(",")).collect(Collectors.toList());
 		assertEquals(2, tables.size());
 		assertTrue(tables.contains("'" + tableName + "'"));
@@ -108,6 +123,19 @@ public class UtilsTest {
 		assertTrue(watchedTables.contains("person"));
 		assertTrue(watchedTables.contains("patient"));
 		assertTrue(watchedTables.contains("visit"));
+	}
+	
+	@Test
+	public void isOrderTable_shouldReturnTrueForAnOrderSubclass() {
+		assertTrue(Utils.isOrderTable("orders"));
+		assertTrue(Utils.isOrderTable("drug_order"));
+		assertTrue(Utils.isOrderTable("test_order"));
+		assertTrue(Utils.isOrderTable("REFERRAL_ORDER"));
+	}
+	
+	@Test
+	public void isOrderTable_shouldReturnFalseANonOrderSubclass() {
+		assertFalse(Utils.isOrderTable("patient"));
 	}
 	
 }

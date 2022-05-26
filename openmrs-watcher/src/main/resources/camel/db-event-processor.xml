@@ -54,7 +54,7 @@
             <when>
                 <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${properties:ignore.previous.order.in.error.queue:false} != true</simple>
                 <when>
-                    <simple>${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.event.tableName} == 'test_order' || ${exchangeProperty.event.tableName} == 'drug_order'</simple>
+                    <spel>#{T(org.openmrs.eip.Utils).isOrderTable(getProperty('event').tableName)}</spel>
                     <when>
                         <simple>${exchangeProperty.dbEventDestinations.contains(${exchangeProperty.db-event-dest})} == false</simple>
                         <throwException exceptionType="org.openmrs.eip.EIPException" message="No listener route found with name ${exchangeProperty.db-event-dest}" />
