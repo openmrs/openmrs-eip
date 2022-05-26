@@ -1,63 +1,30 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-db-sync" errorHandlerRef="outBoundErrorHandler">
+    <route id="out-bound-db-sync" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
         <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />
         
-        <setProperty name="isValid">
-            <simple>false</simple>
-        </setProperty>
+        <setBody>
+            <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
+        </setBody>
+        <script>
+            <spel>
+                #{body.setTableName(getProperty('event').tableName)}
+                #{body.setIdentifier(getProperty('event').identifier)}
+                #{body.setOperation(getProperty('event').operation)}
+                #{body.setSnapshot(getProperty('event').snapshot)}
+                #{body.setDateCreated(new java.util.Date())}
+                #{body.setMessageUuid(T(java.util.UUID).randomUUID().toString())}
+                #{body.setRequestUuid(getProperty('event').requestUuid)}
+            </spel>
+        </script>
         
-        <choice>
-            <when>
-                <simple>${exchangeProperty.event.operation} == 'd'</simple>
-                <setProperty name="isValid">
-                    <simple>true</simple>
-                </setProperty>
-            </when>
-            <when>
-                <simple>${exchangeProperty.event.operation} != 'r'</simple>
-                
-                <!-- TODO (luis.pinto): create an endpoint that count the entity and use here, avoiding fetching twice, here and later on active-mq-publisher route -->
-                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
+        <log message="Saving sender sync message: ${body}" loggingLevel="DEBUG" />
 
-                <setProperty name="isValid">
-                    <simple>${body.size()} == 1</simple>
-                </setProperty>
-            </when>
-        </choice>
+        <to uri="jpa:SenderSyncMessage?usePersist=true" />
 
-        <choice>
-            <when>
-                <simple>${exchangeProperty.isValid}</simple>
-                
-                <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setTableName(getProperty('event').tableName)}
-                        #{body.setIdentifier(getProperty('event').identifier)}
-                        #{body.setOperation(getProperty('event').operation)}
-                        #{body.setSnapshot(getProperty('event').snapshot)}
-                        #{body.setDateCreated(new java.util.Date())}
-                        #{body.setMessageUuid(T(java.util.UUID).randomUUID().toString())}
-                        #{body.setRequestUuid(getProperty('event').requestUuid)}
-                    </spel>
-                </script>
-                
-                <log message="Saving sender sync message: ${body}" loggingLevel="DEBUG" />
-        
-                <to uri="jpa:SenderSyncMessage?usePersist=true" />
-        
-                <log message="Sender sync message saved" />
-            </when>
-            <otherwise>
-                <!-- TODO Log to a special failures log file or DB -->
-                <log message="No entity found in the database matching identifier: ${exchangeProperty.event.identifier}" loggingLevel="ERROR" />
-            </otherwise>
-        </choice>
+        <log message="Sender sync message saved" />
         
         <log message="End db-sync-route" loggingLevel="DEBUG" />
 

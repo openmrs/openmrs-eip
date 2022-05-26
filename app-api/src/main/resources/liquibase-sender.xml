@@ -275,18 +275,18 @@
             <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="request_uuid" type="VARCHAR(38)">
-                <constraints unique="true"/>
-            </column>
-            <column name="sent" type="BOOLEAN">
-                <constraints nullable="false" />
-            </column>
+            <column name="request_uuid" type="VARCHAR(38)" />
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_updated" type="DATETIME" />
+            <column name="error_message" type="VARCHAR(200)" />
         </createTable>
 
     </changeSet>

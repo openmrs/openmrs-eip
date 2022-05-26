@@ -1,7 +1,13 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.util.Date;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -10,6 +16,13 @@ import javax.validation.constraints.NotNull;
 public class SenderSyncMessage extends AbstractEntity {
 	
 	private static final long serialVersionUID = 1L;
+	
+	// TODO add ACKNOWLEDGED status, which will be set after successful processing of the receiver response
+	public enum SenderSyncMessageStatus {
+		NEW,
+		SENT,
+		ERROR
+	}
 	
 	@NotNull
 	@Column(name = "table_name", length = 100, nullable = false, updatable = false)
@@ -27,16 +40,26 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Column(name = "message_uuid", length = 38, nullable = false, unique = true, updatable = false)
 	private String messageUuid;
 	
-	@Column(name = "request_uuid", length = 38, unique = true, updatable = false)
+	@Column(name = "request_uuid", length = 38, updatable = false)
 	private String requestUuid;
-	
-	@NotNull
-	@Column(nullable = false)
-	private boolean sent;
 	
 	@NotNull
 	@Column(nullable = false, updatable = false)
 	private boolean snapshot;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
+	@Access(AccessType.FIELD)
+	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
+	
+	@Column(name = "date_updated")
+	@Access(AccessType.FIELD)
+	private Date dateUpdated;
+	
+	@Column(name = "error_message", length = 200)
+	@Access(AccessType.FIELD)
+	private String errorMessage;
 	
 	public String getTableName() {
 		return tableName;
@@ -78,14 +101,6 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.requestUuid = requestUuid;
 	}
 	
-	public boolean isSent() {
-		return sent;
-	}
-	
-	public void setSent(boolean sent) {
-		this.sent = sent;
-	}
-	
 	public boolean isSnapshot() {
 		return snapshot;
 	}
@@ -94,11 +109,34 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.snapshot = snapshot;
 	}
 	
+	public SenderSyncMessageStatus getStatus() {
+		return status;
+	}
+	
+	public Date getDateUpdated() {
+		return dateUpdated;
+	}
+	
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	
+	public void markAsSent() {
+		this.status = SenderSyncMessageStatus.SENT;
+		this.dateUpdated = new Date();
+	}
+	
+	public void markAsError(@NotNull String errorMessage) {
+		this.status = SenderSyncMessageStatus.ERROR;
+		this.dateUpdated = new Date();
+		this.errorMessage = errorMessage;
+	}
+	
 	@Override
 	public String toString() {
 		return "SenderSyncMessage [tableName=" + tableName + ", identifier=" + identifier + ", operation=" + operation
-		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", sent=" + sent + ", snapshot="
-		        + snapshot + "]";
+		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + ", status="
+		        + status + ", dateUpdated=" + dateUpdated + ", errorMessage=" + errorMessage + "]";
 	}
 	
 }
