@@ -23,24 +23,22 @@ public final class ReceiverContext {
 	private static boolean isStopping = false;
 	
 	private static Map<String, SiteInfo> getSiteNameAndInfoMap() {
-		if (siteNameAndInfoMap == null) {
-			synchronized (ReceiverContext.class) {
-				if (siteNameAndInfoMap == null) {
-					log.info("Loading sites...");
-					
-					ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-					String siteClass = SiteInfo.class.getSimpleName();
-					final String siteUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s";
-					List<SiteInfo> sites = producerTemplate.requestBody(siteUri, null, List.class);
-					siteNameAndInfoMap = new HashMap(sites.size());
-					sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
-					
-					if (log.isDebugEnabled()) {
-						log.debug("Loaded sites: " + sites);
-					}
-					
-					log.info("Successfully loaded " + sites.size() + " site(s)");
+		synchronized (ReceiverContext.class) {
+			if (siteNameAndInfoMap == null) {
+				log.info("Loading sites...");
+				
+				ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+				String siteClass = SiteInfo.class.getSimpleName();
+				final String siteUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s";
+				List<SiteInfo> sites = producerTemplate.requestBody(siteUri, null, List.class);
+				siteNameAndInfoMap = new HashMap(sites.size());
+				sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
+				
+				if (log.isDebugEnabled()) {
+					log.debug("Loaded sites: " + sites);
 				}
+				
+				log.info("Successfully loaded " + sites.size() + " site(s)");
 			}
 		}
 		

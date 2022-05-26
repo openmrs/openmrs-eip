@@ -15,15 +15,35 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	private static boolean disabled = false;
 	
-	public static void disable() {
+	private static boolean paused = false;
+	
+	public synchronized static void disable() {
 		disabled = true;
 		if (log.isDebugEnabled()) {
 			log.debug("Disabled saving of offsets");
 		}
 	}
 	
-	public static boolean isDisabled() {
+	public synchronized static boolean isDisabled() {
 		return disabled;
+	}
+	
+	public synchronized static boolean isPaused() {
+		return paused;
+	}
+	
+	public synchronized static void pause() {
+		paused = true;
+		if (log.isDebugEnabled()) {
+			log.debug("Pause saving of offsets");
+		}
+	}
+	
+	public synchronized static void unpause() {
+		paused = false;
+		if (log.isDebugEnabled()) {
+			log.debug("Removing pause on saving of offsets");
+		}
 	}
 	
 	/**
@@ -32,8 +52,15 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	@Override
 	protected void save() {
 		synchronized (CustomFileOffsetBackingStore.class) {
-			if (disabled) {
-				log.warn("Skipping saving of offset because an error was encountered while processing a source record");
+			if (disabled || paused) {
+				if (paused) {
+					if (log.isDebugEnabled()) {
+						log.debug("Skipping saving of offset because it is paused");
+					}
+				} else {
+					log.warn("Skipping saving of offset because an error was encountered while processing a source record");
+				}
+				
 				return;
 			}
 			
@@ -41,8 +68,12 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 				log.debug("Saving binlog offset");
 			}
 			
-			super.save();
+			doSave();
 		}
+	}
+	
+	protected void doSave() {
+		super.save();
 	}
 	
 }

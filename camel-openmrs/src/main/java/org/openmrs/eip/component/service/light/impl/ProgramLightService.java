@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ProgramLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -22,7 +23,7 @@ public class ProgramLightService extends AbstractLightService<ProgramLight> {
     protected ProgramLight createPlaceholderEntity(final String uuid) {
         ProgramLight program = new ProgramLight();
         program.setDateCreated(DEFAULT_DATE);
-        program.setCreator(DEFAULT_USER_ID);
+        program.setCreator(SyncContext.getAppUser().getId());
         program.setName(DEFAULT_STRING);
         program.setConcept(conceptService.getOrInitPlaceholderEntity());
 

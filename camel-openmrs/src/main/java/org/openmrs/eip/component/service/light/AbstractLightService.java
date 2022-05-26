@@ -24,8 +24,6 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 	
 	public static final LocalDateTime DEFAULT_DATE = LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0);
 	
-	public static final long DEFAULT_USER_ID = 1L;
-	
 	public static final String DEFAULT_VOID_REASON = "[placeholder]";
 	
 	protected OpenmrsRepository<E> repository;
@@ -87,7 +85,7 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 					log.info("No matching row in the patient table, inserting one");
 					id = person.getId();
 					PatientLight p = (PatientLight) entity;
-					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : DEFAULT_USER_ID;
+					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : SyncContext.getAppUser().getId();
 					
 					PatientServiceUtils.createPatient(id, uuid, p.isVoided(), creatorId, p.getPatientDateCreated());
 					
@@ -105,11 +103,11 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 		entity.setMuted(true);
 		entity.setMuteReason(DEFAULT_VOID_REASON);
 		entity.setDateMuted(DEFAULT_DATE);
-		entity.setMutedBy(DEFAULT_USER_ID);
+		entity.setMutedBy(SyncContext.getAppUser().getId());
 		if (entity instanceof PatientLight) {
 			PatientLight patientLight = (PatientLight) entity;
 			patientLight.setPatientVoided(true);
-			patientLight.setPatientVoidedBy(DEFAULT_USER_ID);
+			patientLight.setPatientVoidedBy(SyncContext.getAppUser().getId());
 			patientLight.setPatientDateVoided(DEFAULT_DATE);
 			patientLight.setPatientVoidReason(DEFAULT_VOID_REASON);
 		}

@@ -1,12 +1,15 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ProgramLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.LightService;
 
@@ -29,11 +32,21 @@ public class ProgramWorkflowLightServiceTest {
 
     private ProgramWorkflowLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new ProgramWorkflowLightService(repository, conceptService, programService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setAppUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setAppUser(null);
     }
 
     @Test
@@ -53,7 +66,7 @@ public class ProgramWorkflowLightServiceTest {
     private ProgramWorkflowLight getExpectedProgramWorkflow() {
         ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
         programWorkflow.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        programWorkflow.setCreator(1L);
+        programWorkflow.setCreator(USER_ID);
         programWorkflow.setConcept(getConcept());
         programWorkflow.setProgram(getProgram());
         return programWorkflow;

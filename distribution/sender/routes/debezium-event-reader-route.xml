@@ -12,18 +12,12 @@
                 <simple>${body.size()} > 0</simple>
                 <log message="Read ${body.size()} item(s) from the debezium event queue" />
 
-                <split parallelProcessing="false">
-                    <simple>${body}</simple>
-
-                    <log loggingLevel="DEBUG" message=":" />
-
-                    <to uri="direct:debezium-event-processor" />
-                </split>
+                <process ref="debeziumEventProcessor" />
             </when>
             <otherwise>
                 <log loggingLevel="DEBUG" message="No events found in the debezium event queue" />
             </otherwise>
         </choice>
-        
+
     </route>
 </routes>

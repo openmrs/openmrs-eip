@@ -29,6 +29,9 @@ public class SyncMessage extends AbstractEntity {
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
 	private SiteInfo site;
 	
+	@Column(name = "is_snapshot", nullable = false, updatable = false)
+	private Boolean snapshot = false;
+	
 	/**
 	 * Gets the identifier
 	 *
@@ -101,10 +104,28 @@ public class SyncMessage extends AbstractEntity {
 		this.site = site;
 	}
 	
+	/**
+	 * Gets the snapshot
+	 *
+	 * @return the snapshot
+	 */
+	public Boolean getSnapshot() {
+		return snapshot;
+	}
+	
+	/**
+	 * Sets the snapshot
+	 *
+	 * @param snapshot the snapshot to set
+	 */
+	public void setSnapshot(Boolean snapshot) {
+		this.snapshot = snapshot;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", site=" + site + "}";
+		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + "}";
 	}
 	
 }

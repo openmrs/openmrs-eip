@@ -114,6 +114,7 @@
                                 #{getProperty('messageToSave').setEntityPayload(getProperty('entity-payload'))}
                                 #{getProperty('messageToSave').setSite(T(org.openmrs.eip.app.ReceiverContext).getSiteInfo(getProperty('sync-model').metadata.sourceIdentifier))}
                                 #{getProperty('messageToSave').setDateCreated(new java.util.Date())}
+                                #{getProperty('messageToSave').setSnapshot(getProperty('sync-model').metadata.snapshot == true)}
                             </spel>
                         </script>
                         <setBody>

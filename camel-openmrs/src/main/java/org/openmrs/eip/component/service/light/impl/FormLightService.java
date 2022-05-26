@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.FormLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -17,7 +18,7 @@ public class FormLightService extends AbstractLightService<FormLight> {
         FormLight form = new FormLight();
         form.setName(DEFAULT_STRING);
         form.setVersion(DEFAULT_STRING);
-        form.setCreator(DEFAULT_USER_ID);
+        form.setCreator(SyncContext.getAppUser().getId());
         form.setDateCreated(DEFAULT_DATE);
         return form;
     }

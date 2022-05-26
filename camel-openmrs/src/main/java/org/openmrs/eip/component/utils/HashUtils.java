@@ -84,21 +84,19 @@ public class HashUtils {
 	 * @return a set of property names
 	 */
 	public static Set<String> getDatetimePropertyNames(Class<? extends BaseModel> modelClass) {
-		if (modelClassDatetimePropsMap == null) {
-			synchronized (HashUtils.class) {
-				if (modelClassDatetimePropsMap == null) {
-					modelClassDatetimePropsMap = new HashMap();
-					Arrays.stream(TableToSyncEnum.values()).forEach(e -> {
-						Set<String> datetimeProps = new HashSet();
-						Arrays.stream(PropertyUtils.getPropertyDescriptors(e.getModelClass())).forEach(d -> {
-							if (LocalDateTime.class.equals(d.getPropertyType())) {
-								datetimeProps.add(d.getName());
-							}
-						});
-						
-						modelClassDatetimePropsMap.put(e.getModelClass(), datetimeProps);
+		synchronized (HashUtils.class) {
+			if (modelClassDatetimePropsMap == null) {
+				modelClassDatetimePropsMap = new HashMap();
+				Arrays.stream(TableToSyncEnum.values()).forEach(e -> {
+					Set<String> datetimeProps = new HashSet();
+					Arrays.stream(PropertyUtils.getPropertyDescriptors(e.getModelClass())).forEach(d -> {
+						if (LocalDateTime.class.equals(d.getPropertyType())) {
+							datetimeProps.add(d.getName());
+						}
 					});
-				}
+					
+					modelClassDatetimePropsMap.put(e.getModelClass(), datetimeProps);
+				});
 			}
 		}
 		

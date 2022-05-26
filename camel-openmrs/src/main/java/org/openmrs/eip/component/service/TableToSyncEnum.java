@@ -210,4 +210,9 @@ public enum TableToSyncEnum {
 		        .map(TableToSyncEnum::getHashClass)
 		        .orElseThrow(() -> new EIPException("No hash class found corresponding to has class " + model.getClass()));
 	}
+	
+	public static TableToSyncEnum getTableToSyncEnumByModelClassName(String modelClassName) {
+		return Arrays.stream(values()).filter(e -> e.getModelClass().getName().equals(modelClassName)).findFirst()
+		        .orElseThrow(() -> new EIPException("No enum found for model class name " + modelClassName));
+	}
 }

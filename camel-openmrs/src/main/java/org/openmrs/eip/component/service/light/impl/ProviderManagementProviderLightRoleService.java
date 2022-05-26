@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ProviderManagementProviderRoleLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class ProviderManagementProviderLightRoleService extends AbstractLightSer
     protected ProviderManagementProviderRoleLight createPlaceholderEntity(final String uuid) {
     	ProviderManagementProviderRoleLight type = new ProviderManagementProviderRoleLight();
         type.setName(DEFAULT_STRING);
-        type.setCreator(DEFAULT_USER_ID);
+        type.setCreator(SyncContext.getAppUser().getId());
         type.setDateCreated(DEFAULT_DATE);
         return type;
     }

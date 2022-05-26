@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptClassLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class ConceptClassLightService extends AbstractLightService<ConceptClassL
     protected ConceptClassLight createPlaceholderEntity(final String uuid) {
         ConceptClassLight conceptClass = new ConceptClassLight();
         conceptClass.setDateCreated(DEFAULT_DATE);
-        conceptClass.setCreator(DEFAULT_USER_ID);
+        conceptClass.setCreator(SyncContext.getAppUser().getId());
         conceptClass.setName(DEFAULT_STRING);
         return conceptClass;
     }

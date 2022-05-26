@@ -1,5 +1,7 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.junit.Before;
@@ -19,11 +21,21 @@ public class UserLightServiceTest {
 
     private UserLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new UserLightService(repository);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setAppUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setAppUser(null);
     }
 
     @Test
@@ -40,7 +52,7 @@ public class UserLightServiceTest {
 
     private UserLight getExpectedUser() {
         UserLight user = new UserLight();
-        user.setCreator(1L);
+        user.setCreator(USER_ID);
         user.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
         user.setSystemId("admin");
         user.setPersonId(1L);

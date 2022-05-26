@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.DrugLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -22,7 +23,7 @@ public class DrugLightService extends AbstractLightService<DrugLight> {
     protected DrugLight createPlaceholderEntity(final String uuid) {
         DrugLight drug = new DrugLight();
         drug.setDateCreated(DEFAULT_DATE);
-        drug.setCreator(DEFAULT_USER_ID);
+        drug.setCreator(SyncContext.getAppUser().getId());
         drug.setConcept(conceptService.getOrInitPlaceholderEntity());
         return drug;
     }

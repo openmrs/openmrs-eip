@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.PersonHash;
@@ -33,6 +34,7 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
@@ -80,6 +82,7 @@ public class OpenmrsLoadProducerTest {
 		PowerMockito.mockStatic(HashUtils.class);
 		exchange = new DefaultExchange(new DefaultCamelContext());
 		producer = new OpenmrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
+		when(SyncContext.getBean(EntityServiceFacade.class)).thenReturn(serviceFacade);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 		Whitebox.setInternalState(OpenmrsLoadProducer.class, Logger.class, mockLogger);
@@ -184,7 +187,7 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldFailIfNoStoredHashIsFoundForAnExistingDeletedEntity() {
+	public void process_shouldInsertANewHashIfNoStoredHashIsFoundForAnExistingEntityGettingDeleted() throws Exception {
 		final String personUuid = "some-uuid";
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
@@ -197,14 +200,32 @@ public class OpenmrsLoadProducerTest {
 		exchange.getIn().setBody(syncModel);
 		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, personUuid)).thenReturn(model);
-		expectedException.expect(EIPException.class);
-		expectedException.expectMessage(equalTo("Failed to find the existing hash for the deleted entity"));
+		PersonHash personHash = new PersonHash();
+		assertNull(personHash.getIdentifier());
+		assertNull(personHash.getHash());
+		assertNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		when(HashUtils.instantiateHashEntity(PersonHash.class)).thenReturn(personHash);
+		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		producer.process(exchange);
+		
+		// Then
+		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
+		    personHash);
+		verify(mockLogger).info("Inserting new hash for the deleted entity with no existing hash");
+		verify(mockLogger).debug("Saving new hash for the deleted entity");
+		verify(mockLogger).debug("Successfully saved the new hash for the deleted entity");
+		assertEquals(model.getUuid(), personHash.getIdentifier());
+		assertEquals(HASH_DELETED, personHash.getHash());
+		assertNotNull(personHash.getDateCreated());
+		assertNull(personHash.getDateChanged());
+		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 	}
 	
-	@Test(expected = ConflictsFoundException.class)
-	public void process_ShouldFailIfTheExistingEntityFromTheDbForADeletedEntityHasADifferentHashFromTheStoredOne() {
+	@Test
+	public void process_ShouldPassIfTheExistingEntityFromTheDbForADeletedEntityHasADifferentHashFromTheStoredOne()
+	    throws Exception {
 		final String personUuid = "some-uuid";
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
@@ -223,8 +244,14 @@ public class OpenmrsLoadProducerTest {
 		assertNull(storedHash.getDateChanged());
 		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class), any(ProducerTemplate.class))).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn("different-hash");
+		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		producer.process(exchange);
+		verify(mockLogger).debug("Updating hash for the deleted entity");
+		verify(mockLogger).debug("Successfully updated the hash for the deleted entity");
+		assertEquals(HASH_DELETED, storedHash.getHash());
+		assertNotNull(storedHash.getDateChanged());
+		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 	}
 	
 	@Test
@@ -472,6 +499,22 @@ public class OpenmrsLoadProducerTest {
 		verify(mockLogger).debug("Updating hash for the incoming entity state");
 		assertEquals(expectedNewHash, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
+	}
+	
+	@Test
+	public void process_shouldNotSyncLocalAdminUser() {
+		final String adminUserUuid = "admin-user-uuid";
+		UserLight adminUser = new UserLight();
+		adminUser.setUuid(adminUserUuid);
+		when(SyncContext.getAdminUser()).thenReturn(adminUser);
+		UserModel model = new UserModel();
+		model.setUuid(adminUserUuid);
+		SyncModel syncModel = new SyncModel(model.getClass(), model, null);
+		exchange.getIn().setBody(syncModel);
+		
+		producer.process(exchange);
+		
+		verify(mockLogger).info("Skipping syncing of a user with a uuid matching the local admin account");
 	}
 	
 }

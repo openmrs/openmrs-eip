@@ -15,7 +15,7 @@
                 <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
                      before failed insert retries for the same entity.
 
-                     Using a synchronized list for thread safety in case we start supporting parallel processing
+                     Using a synchronized list for thread safety in case of parallel processing
                      otherwise it's likely the dev might unknowingly not change it at the time.
                  -->
                 <setProperty name="failed-entities">

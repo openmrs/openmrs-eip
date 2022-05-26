@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ObservationLight;
 import org.openmrs.eip.component.entity.light.PersonLight;
@@ -27,7 +28,7 @@ public class ObservationLightService extends AbstractLightService<ObservationLig
     protected ObservationLight createPlaceholderEntity(final String uuid) {
         ObservationLight observation = new ObservationLight();
         observation.setDateCreated(DEFAULT_DATE);
-        observation.setCreator(DEFAULT_USER_ID);
+        observation.setCreator(SyncContext.getAppUser().getId());
         observation.setObsDatetime(DEFAULT_DATE);
         observation.setPerson(personService.getOrInitPlaceholderEntity());
         observation.setConcept(conceptService.getOrInitPlaceholderEntity());

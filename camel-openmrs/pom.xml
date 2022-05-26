@@ -5,12 +5,10 @@
     <parent>
         <groupId>org.openmrs.eip</groupId>
         <artifactId>openmrs-eip</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
-    <groupId>org.openmrs.eip</groupId>
     <artifactId>camel-openmrs</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
 
     <name>OpenMRS EIP OpenMRS Camel API</name>
 

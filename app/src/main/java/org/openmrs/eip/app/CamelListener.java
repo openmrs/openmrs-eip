@@ -1,6 +1,10 @@
 package org.openmrs.eip.app;
 
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
+import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
 import java.util.Collection;
@@ -9,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStartedEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStoppingEvent;
@@ -25,6 +28,7 @@ import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
@@ -37,7 +41,15 @@ public class CamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
 	
-	private static ExecutorService executor;
+	private static ExecutorService siteExecutor;
+	
+	private static ExecutorService msgExecutor;
+	
+	@Value("${" + PROP_SITE_PARALLEL_SIZE + ":" + DEFAULT_SITE_PARALLEL_SIZE + "}")
+	private int parallelSiteSize;
+	
+	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
+	private int parallelMsgSize;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -49,22 +61,41 @@ public class CamelListener extends EventNotifierSupport {
 				throw new EIPException("No value set for application property: " + Constants.PROP_OPENMRS_USER);
 			}
 			
+			UserLightRepository userListRepo = SyncContext.getBean(UserLightRepository.class);
+			UserRepository userRepo = SyncContext.getBean(UserRepository.class);
 			User exampleUser = new User();
 			exampleUser.setUsername(username);
-			Example<User> example = Example.of(exampleUser, ExampleMatcher.matchingAll().withIgnoreCase());
-			Optional<User> optional = SyncContext.getBean(UserRepository.class).findOne(example);
-			User user = optional.orElseThrow(() -> new EIPException("No user found with username: " + username));
-			SyncContext.setUser(SyncContext.getBean(UserLightRepository.class).findById(user.getId()).get());
+			Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+			Optional<User> optional = userRepo.findOne(example);
+			if (!optional.isPresent()) {
+				log.error("No user found with username: " + username);
+				SyncApplication.shutdown();
+			}
+			
+			SyncContext.setAppUser(userListRepo.findById(optional.get().getId()).get());
+			
+			log.info("Loading OpenMRS admin user account");
+			exampleUser = new User();
+			exampleUser.setUsername("admin");
+			example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+			optional = userRepo.findOne(example);
+			if (!optional.isPresent()) {
+				log.error("No admin user found");
+				SyncApplication.shutdown();
+			}
+			
+			SyncContext.setAdminUser(userListRepo.findById(optional.get().getId()).get());
 			
 			log.info("Starting sync message consumer threads, one per site");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
-			executor = Executors.newFixedThreadPool(sites.size());
-			ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+			siteExecutor = Executors.newFixedThreadPool(parallelSiteSize);
+			msgExecutor = Executors.newFixedThreadPool(parallelMsgSize);
+			
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				executor.execute(new SiteMessageConsumer(site, producerTemplate));
+				siteExecutor.execute(new SiteMessageConsumer(site, parallelMsgSize, msgExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
@@ -73,22 +104,39 @@ public class CamelListener extends EventNotifierSupport {
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			ReceiverContext.setStopSignal();
-			log.info("Shutting down executor for message consumer threads");
+			int wait = WAIT_IN_SECONDS + 10;
 			
-			if (executor != null) {
-				executor.shutdown();
+			if (msgExecutor != null) {
+				log.info("Shutting down executor for sync message threads");
+				
+				msgExecutor.shutdown();
 				
 				try {
-					int wait = WAIT_IN_SECONDS + 10;
-					log.info("Waiting for " + wait + " seconds for message consumer threads to terminate");
+					log.info("Waiting for " + wait + " seconds for sync threads to terminate");
 					
-					executor.awaitTermination(wait, TimeUnit.SECONDS);
+					msgExecutor.awaitTermination(wait, TimeUnit.SECONDS);
 					
-					log.info("The message consumer threads have successfully terminated, done shutting down the "
-					        + "executor for message consumer threads");
+					log.info("Done shutting down executor for site message consumer threads");
 				}
-				catch (InterruptedException e) {
-					log.error("An error occurred while waiting for message consumer threads to terminate");
+				catch (Exception e) {
+					log.error("An error occurred while waiting for sync threads to terminate");
+				}
+			}
+			
+			if (siteExecutor != null) {
+				log.info("Shutting down executor for site message consumer threads");
+				
+				siteExecutor.shutdown();
+				
+				try {
+					log.info("Waiting for " + wait + " seconds for site message consumer threads to terminate");
+					
+					siteExecutor.awaitTermination(wait, TimeUnit.SECONDS);
+					
+					log.info("Done shutting down executor for site message consumer threads");
+				}
+				catch (Exception e) {
+					log.error("An error occurred while waiting for site message consumer threads to terminate");
 				}
 			}
 		}

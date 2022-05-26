@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseRestController {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseRestController.class);
+	
+	@Autowired
+	protected ProducerTemplate producerTemplate;
 	
 	@Autowired
 	protected CamelContext camelContext;
@@ -44,8 +48,8 @@ public abstract class BaseRestController {
 	}
 	
 	public Object doGet(Integer id) {
-		return on(camelContext).to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id)
-		        .request(getClazz());
+		return producerTemplate.requestBody(
+		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
 	public void doDelete(Integer id) {

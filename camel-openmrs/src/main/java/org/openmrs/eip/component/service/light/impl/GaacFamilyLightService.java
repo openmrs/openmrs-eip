@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.GaacFamilyLight;
 import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -22,7 +23,7 @@ public class GaacFamilyLightService extends AbstractLightService<GaacFamilyLight
         gaac.setCrumbled(0);
         gaac.setLocation(locationService.getOrInitPlaceholderEntity());
     	gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(DEFAULT_USER_ID);
+        gaac.setCreator(SyncContext.getAppUser().getId());
         gaac.setStartDate(DEFAULT_DATE);
         return gaac;
     }

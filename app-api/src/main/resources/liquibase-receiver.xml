@@ -1098,4 +1098,24 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220321-1200">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="is_snapshot" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add is_snapshot column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220518-1400">
+        <comment>Changing date_created and date_changed column datatypes to datetime for all tables used to store hashes</comment>
+        <customChange class="org.openmrs.eip.app.management.UpdateColumnDatatypeChangeSet" />
+    </changeSet>
+
 </databaseChangeLog>

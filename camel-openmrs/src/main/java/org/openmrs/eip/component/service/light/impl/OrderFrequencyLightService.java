@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.entity.light.OrderFrequencyLight;
@@ -21,7 +22,7 @@ public class OrderFrequencyLightService extends AbstractLightService<OrderFreque
     @Override
     protected OrderFrequencyLight createPlaceholderEntity(final String uuid) {
         OrderFrequencyLight orderFrequency = new OrderFrequencyLight();
-        orderFrequency.setCreator(DEFAULT_USER_ID);
+        orderFrequency.setCreator(SyncContext.getAppUser().getId());
         orderFrequency.setDateCreated(DEFAULT_DATE);
         orderFrequency.setConcept(conceptService.getOrInitPlaceholderEntity());
 

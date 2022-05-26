@@ -31,7 +31,7 @@ public class AbstractOpenmrsProducerTest {
         FakeOpenmrsProducer result = new FakeOpenmrsProducer(endpoint, applicationContext, params);
 
         // Then
-        assertNotNull(result.applicationContext);
+        assertNotNull(FakeOpenmrsProducer.appContext);
         assertNotNull(result.getEndpoint());
         assertEquals(params, result.params);
     }

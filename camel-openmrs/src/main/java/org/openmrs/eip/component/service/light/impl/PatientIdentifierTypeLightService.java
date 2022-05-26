@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PatientIdentifierTypeLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class PatientIdentifierTypeLightService extends AbstractLightService<Pati
     protected PatientIdentifierTypeLight createPlaceholderEntity(final String uuid) {
         PatientIdentifierTypeLight patientIdentifierType = new PatientIdentifierTypeLight();
         patientIdentifierType.setDateCreated(DEFAULT_DATE);
-        patientIdentifierType.setCreator(DEFAULT_USER_ID);
+        patientIdentifierType.setCreator(SyncContext.getAppUser().getId());
         patientIdentifierType.setName(DEFAULT_STRING);
         return patientIdentifierType;
     }

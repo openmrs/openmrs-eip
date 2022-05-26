@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class PersonAttributeTypeLightService extends AbstractLightService<Person
     protected PersonAttributeTypeLight createPlaceholderEntity(final String uuid) {
         PersonAttributeTypeLight personAttributeType = new PersonAttributeTypeLight();
         personAttributeType.setDateCreated(DEFAULT_DATE);
-        personAttributeType.setCreator(DEFAULT_USER_ID);
+        personAttributeType.setCreator(SyncContext.getAppUser().getId());
         personAttributeType.setName(DEFAULT_STRING);
         return personAttributeType;
     }

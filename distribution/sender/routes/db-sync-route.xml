@@ -24,7 +24,7 @@
 
         <to uri="jpa:SenderSyncMessage?usePersist=true" />
 
-        <log message="Sender sync message saved" />
+        <log message="Sender sync message saved" loggingLevel="DEBUG" />
         
         <log message="End db-sync-route" loggingLevel="DEBUG" />
 

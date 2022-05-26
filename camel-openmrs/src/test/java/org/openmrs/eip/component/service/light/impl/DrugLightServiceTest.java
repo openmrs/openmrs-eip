@@ -1,11 +1,14 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.DrugLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.LightService;
 
@@ -25,11 +28,21 @@ public class DrugLightServiceTest {
 
     private DrugLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
 
         service = new DrugLightService(repository, conceptService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setAppUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setAppUser(null);
     }
 
     @Test
@@ -48,7 +61,7 @@ public class DrugLightServiceTest {
     private DrugLight getExpectedDrug() {
         DrugLight drug = new DrugLight();
         drug.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        drug.setCreator(1L);
+        drug.setCreator(USER_ID);
         drug.setConcept(getConcept());
         return drug;
     }

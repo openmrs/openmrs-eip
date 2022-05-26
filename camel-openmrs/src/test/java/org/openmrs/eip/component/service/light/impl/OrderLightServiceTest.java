@@ -1,9 +1,11 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.CareSettingLight;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.EncounterLight;
@@ -11,6 +13,7 @@ import org.openmrs.eip.component.entity.light.OrderLight;
 import org.openmrs.eip.component.entity.light.OrderTypeLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.ProviderLight;
+import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.LightService;
 
@@ -46,6 +49,8 @@ public class OrderLightServiceTest {
 
     private OrderLightService service;
 
+    private static final Long USER_ID = 6L;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -57,6 +62,14 @@ public class OrderLightServiceTest {
                 encounterService,
                 patientService,
                 careSettingService);
+        UserLight user = new UserLight();
+        user.setId(USER_ID);
+        SyncContext.setAppUser(user);
+    }
+
+    @After
+    public void tearDown() {
+        SyncContext.setAppUser(null);
     }
 
     @Test
@@ -80,7 +93,7 @@ public class OrderLightServiceTest {
     private OrderLight getExpectedOrder() {
         OrderLight order = new OrderLight();
         order.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        order.setCreator(1L);
+        order.setCreator(USER_ID);
         order.setOrderType(getOrderType());
         order.setConcept(getConcept());
         order.setOrderer(getOrderer());

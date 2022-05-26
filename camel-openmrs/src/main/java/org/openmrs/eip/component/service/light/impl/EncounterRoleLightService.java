@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.service.light.impl;
 
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.EncounterRoleLight;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.openmrs.eip.component.service.light.AbstractLightService;
@@ -16,7 +17,7 @@ public class EncounterRoleLightService extends AbstractLightService<EncounterRol
     protected EncounterRoleLight createPlaceholderEntity(final String uuid) {
     	EncounterRoleLight role = new EncounterRoleLight();
         role.setName(DEFAULT_STRING);
-        role.setCreator(DEFAULT_USER_ID);
+        role.setCreator(SyncContext.getAppUser().getId());
         role.setDateCreated(DEFAULT_DATE);
         return role;
     }
