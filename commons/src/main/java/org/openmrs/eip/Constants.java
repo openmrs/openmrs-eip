@@ -2,6 +2,7 @@ package org.openmrs.eip;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Constants {
@@ -53,13 +54,15 @@ public class Constants {
 	public static final List<String> SUBCLASS_TABLES;
 	
 	static {
-		ORDER_TABLES = new ArrayList();
-		ORDER_TABLES.add("orders");
-		ORDER_TABLES.addAll(ORDER_SUBCLASS_TABLES);
+		List<String> orderTables = new ArrayList();
+		orderTables.add("orders");
+		orderTables.addAll(ORDER_SUBCLASS_TABLES);
+		ORDER_TABLES = Collections.unmodifiableList(orderTables);
 		
-		SUBCLASS_TABLES = new ArrayList();
-		SUBCLASS_TABLES.add("patient");
-		SUBCLASS_TABLES.addAll(ORDER_SUBCLASS_TABLES);
+		List<String> subclassTables = new ArrayList();
+		subclassTables.add("patient");
+		subclassTables.addAll(ORDER_SUBCLASS_TABLES);
+		SUBCLASS_TABLES = Collections.unmodifiableList(subclassTables);
 	}
 	
 }
