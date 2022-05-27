@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
@@ -30,9 +31,9 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	private List<CompletableFuture<Void>> futures;
 	
-	//private Map<String, Integer> tableAndMaxRowIdsMap;
+	private Map<String, Integer> tableAndMaxRowIdsMap;
 	
-	//private SnapshotSavePointStore savepointStore;
+	private SnapshotSavePointStore savepointStore;
 	
 	private static Integer batchSize;
 	
@@ -60,12 +61,12 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				futures = new Vector(DEFAULT_BATCH_SIZE);
 			}
 			
-			if (batchSize == null) {
-				batchSize = DEFAULT_BATCH_SIZE;
+			if (tableAndMaxRowIdsMap == null) {
+				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
 			}
 			
-			/*if (tableAndMaxRowIdsMap == null) {
-				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
+			if (batchSize == null) {
+				batchSize = DEFAULT_BATCH_SIZE;
 			}
 			
 			if (savepointStore == null) {
@@ -81,7 +82,7 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				}
 				
 				return;
-			}*/
+			}
 			
 			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
@@ -92,13 +93,13 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				
 				try {
 					setThreadName(table, id);
-					//producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
+                    //producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
 					CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
 					//TODO Add support for PKs that are not integers
-					/*Integer maxRowId = tableAndMaxRowIdsMap.get(table);
+					Integer maxRowId = tableAndMaxRowIdsMap.get(table);
 					if (maxRowId == null || currentRowId > maxRowId) {
 						tableAndMaxRowIdsMap.put(table, currentRowId);
-					}*/
+					}
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
@@ -116,11 +117,11 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 					
 					CustomFileOffsetBackingStore.unpause();
 					
-					//savepointStore.discard();
-					//savepointStore = null;
-				} /* else {
-				  savepointStore.update(tableAndMaxRowIdsMap);
-				  }*/
+					savepointStore.discard();
+					savepointStore = null;
+				} else {
+					savepointStore.update(tableAndMaxRowIdsMap);
+				}
 			}
 			
 		} else {
