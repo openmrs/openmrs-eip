@@ -53,10 +53,15 @@
                 </setProperty>
 
                 <setBody>
-                    <spel>
-                        #{new org.openmrs.eip.app.management.entity.SyncResponse(getProperty('messageUuid'), getProperty('dateSent'))}
-                    </spel>
+                    <spel>#{new org.openmrs.eip.app.management.entity.SyncResponse()}</spel>
                 </setBody>
+                <script>
+                    <spel>
+                        #{body.setDateCreated(new java.util.Date())}
+                        #{body.setMessageUuid(getProperty('messageUuid'))}
+                        #{body.setDateSent(getProperty('dateSent'))}
+                    </spel>
+                </script>
         
                 <log loggingLevel="DEBUG" message="Saving sync response -> ${body}" />
         

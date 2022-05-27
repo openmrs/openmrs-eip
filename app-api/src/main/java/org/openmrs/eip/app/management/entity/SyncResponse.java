@@ -40,24 +40,22 @@ public class SyncResponse extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	@Access(AccessType.FIELD)
-	private SyncResponseStatus status;
-	
-	public SyncResponse() {
-	}
-	
-	public SyncResponse(@NotNull String messageUuid, @NotNull Date dateSent) {
-		this.messageUuid = messageUuid;
-		this.dateSent = dateSent;
-		this.status = SyncResponseStatus.NEW;
-		super.setDateCreated(new Date());
-	}
+	private SyncResponseStatus status = SyncResponseStatus.NEW;
 	
 	public String getMessageUuid() {
 		return messageUuid;
 	}
 	
+	public void setMessageUuid(String messageUuid) {
+		this.messageUuid = messageUuid;
+	}
+	
 	public Date getDateSent() {
 		return dateSent;
+	}
+	
+	public void setDateSent(Date dateSent) {
+		this.dateSent = dateSent;
 	}
 	
 	public Date getDateProcessed() {
