@@ -93,13 +93,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				
 				try {
 					setThreadName(table, id);
-                    //producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
 					CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
-					//TODO Add support for PKs that are not integers
-					Integer maxRowId = tableAndMaxRowIdsMap.get(table);
-					if (maxRowId == null || currentRowId > maxRowId) {
-						tableAndMaxRowIdsMap.put(table, currentRowId);
-					}
+					updateTableAndMaxRowIdsMap(table, currentRowId);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
@@ -147,6 +142,14 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	protected String getThreadName(String table, String id) {
 		return table + "-" + id;
+	}
+	
+	private synchronized void updateTableAndMaxRowIdsMap(String table, Integer currentRowId) {
+		//TODO Add support for PKs that are not integers
+		Integer maxRowId = tableAndMaxRowIdsMap.get(table);
+		if (maxRowId == null || currentRowId > maxRowId) {
+			tableAndMaxRowIdsMap.put(table, currentRowId);
+		}
 	}
 	
 }
