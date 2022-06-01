@@ -7,7 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_CHANGE_EVNT_PROCESSOR;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.app.sender.ChangeEventHandler;
 import org.powermock.reflect.Whitebox;
 
 public class ChangeEventProcessorTest {
@@ -50,6 +52,9 @@ public class ChangeEventProcessorTest {
 	@Mock
 	private SnapshotSavePointStore mockStore;
 	
+	@Mock
+	private ChangeEventHandler handler;
+	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -58,7 +63,7 @@ public class ChangeEventProcessorTest {
 	}
 	
 	private ChangeEventProcessor createProcessor(int threadCount) {
-		processor = new ChangeEventProcessor();
+		processor = new ChangeEventProcessor(handler);
 		Whitebox.setInternalState(processor, "threadCount", threadCount);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
@@ -101,13 +106,13 @@ public class ChangeEventProcessorTest {
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
 				Thread.sleep(500);
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(size);
@@ -142,13 +147,13 @@ public class ChangeEventProcessorTest {
 			Exchange e = createExchange(i, i < size - 1 ? TRUE.toString() : "last", TABLE_PERSON);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(size);
@@ -184,13 +189,13 @@ public class ChangeEventProcessorTest {
 			Exchange e = createExchange(i, i < size - 1 ? TRUE.toString() : "last", TABLE_PERSON);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(1);
@@ -240,13 +245,13 @@ public class ChangeEventProcessorTest {
 			Exchange e = createExchange(i, Boolean.FALSE.toString(), TABLE_PERSON);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				threadNames.add(Thread.currentThread().getName());
 				assertFalse(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(false), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(size);
@@ -285,39 +290,39 @@ public class ChangeEventProcessorTest {
 			Exchange e = createExchange(i, TRUE.toString(), TABLE_ENC);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(TABLE_ENC + id);
 				expectedRowThreadNameMap.put(TABLE_ENC + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_ENC), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		for (int i = 0; i < personTableRowCount; i++) {
 			Exchange e = createExchange(i, TRUE.toString(), TABLE_PERSON);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(TABLE_PERSON + id);
 				expectedRowThreadNameMap.put(TABLE_PERSON + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		for (int i = 0; i < visitTableRowCount; i++) {
 			Exchange e = createExchange(i, i < visitTableRowCount - 1 ? TRUE.toString() : "last", TABLE_VISIT);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(TABLE_VISIT + id);
 				expectedRowThreadNameMap.put(TABLE_VISIT + id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_VISIT), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(1);
@@ -402,13 +407,13 @@ public class ChangeEventProcessorTest {
 			Exchange e = createExchange(i, i < size - 1 ? TRUE.toString() : "last", TABLE_PERSON);
 			exchanges.add(e);
 			Mockito.doAnswer(invocation -> {
-				Exchange arg = invocation.getArgument(1);
+				Exchange arg = invocation.getArgument(4);
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				expectedIdThreadNameMap.put(id, Thread.currentThread().getName());
 				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
-			}).when(mockProducerTemplate).send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, e);
+			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
 		processor = createProcessor(size);

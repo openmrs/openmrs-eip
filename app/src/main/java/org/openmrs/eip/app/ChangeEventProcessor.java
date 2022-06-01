@@ -1,7 +1,6 @@
 package org.openmrs.eip.app;
 
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_CHANGE_EVNT_PROCESSOR;
 
 import java.util.List;
 import java.util.Map;
@@ -12,14 +11,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
-import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.app.sender.ChangeEventHandler;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -37,12 +35,14 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	private static Integer batchSize;
 	
+	private ChangeEventHandler handler;
+	
+	public ChangeEventProcessor(@Autowired ChangeEventHandler handler) {
+		this.handler = handler;
+	}
+	
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		if (producerTemplate == null) {
-			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		}
-		
 		Message message = exchange.getMessage();
 		Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
 		//TODO Take care of situation where a table has a composite PK because fields length will be > 1
@@ -93,7 +93,7 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				
 				try {
 					setThreadName(table, id);
-					CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
+					handler.handle(table, id, true, sourceMetadata, exchange);
 					updateTableAndMaxRowIdsMap(table, currentRowId);
 				}
 				finally {
@@ -123,7 +123,7 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 			final String originalThreadName = Thread.currentThread().getName();
 			try {
 				setThreadName(table, id);
-				CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
+				handler.handle(table, id, false, sourceMetadata, exchange);
 			}
 			finally {
 				Thread.currentThread().setName(originalThreadName);
