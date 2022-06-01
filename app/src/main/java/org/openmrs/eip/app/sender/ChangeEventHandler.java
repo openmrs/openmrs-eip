@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component("changeEventHandler")
 public class ChangeEventHandler {
 	
-	protected static final Logger log = LoggerFactory.getLogger(ChangeEventHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(ChangeEventHandler.class);
 	
 	private DebeziumEventRepository repository;
 	
@@ -46,11 +46,6 @@ public class ChangeEventHandler {
 	public void handle(String tableName, String id, boolean snapshot, Map<String, Object> metadata, Exchange exchange)
 	    throws EIPException {
 		
-		Message message = exchange.getMessage();
-		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
-		
-		log.info("Received DB change event: Operation=" + op + ", Metadata=" + metadata);
-		
 		if (CustomFileOffsetBackingStore.isDisabled()) {
 			if (log.isDebugEnabled()) {
 				log.debug("Deferring DB event because an error was encountered while processing a previous one");
@@ -59,19 +54,28 @@ public class ChangeEventHandler {
 			return;
 		}
 		
-		boolean isSubclassTable = Utils.isSubclassTable(tableName);
-		if (isSubclassTable && snapshot) {
-			//We only need to process the row from the parent table during initial loading
-			return;
-		}
+		Message message = exchange.getMessage();
+		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
+		
+		log.info("Received DB change event: Operation=" + op + ", Metadata=" + metadata);
 		
 		if (!op.equals("c") && !op.equals("u") && !op.equals("d")) {
 			throw new EIPException("Don't know how to handle DB event with operation: " + op);
 		}
 		
+		boolean isSubclassTable = Utils.isSubclassTable(tableName);
+		if (isSubclassTable && snapshot) {
+			//We only need to process the row from the parent table during initial loading
+			if (log.isTraceEnabled()) {
+				log.trace("Skipping " + tableName + " snapshot event");
+			}
+			
+			return;
+		}
+		
 		Event event = new Event();
-		event.setPrimaryKeyId(id);
 		event.setTableName(tableName);
+		event.setPrimaryKeyId(id);
 		event.setOperation(op);
 		event.setSnapshot(snapshot);
 		if (!isSubclassTable) {
