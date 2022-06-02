@@ -57,16 +57,16 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				executor = Executors.newFixedThreadPool(threadCount);
 			}
 			
+			if (batchSize == null) {
+				batchSize = DEFAULT_BATCH_SIZE;
+			}
+			
 			if (futures == null) {
-				futures = new Vector(DEFAULT_BATCH_SIZE);
+				futures = new Vector(batchSize);
 			}
 			
 			if (tableAndMaxRowIdsMap == null) {
-				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
-			}
-			
-			if (batchSize == null) {
-				batchSize = DEFAULT_BATCH_SIZE;
+				tableAndMaxRowIdsMap = new ConcurrentHashMap(batchSize);
 			}
 			
 			if (savepointStore == null) {

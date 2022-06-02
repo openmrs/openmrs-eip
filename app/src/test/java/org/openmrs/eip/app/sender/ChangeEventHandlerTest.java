@@ -3,6 +3,7 @@ package org.openmrs.eip.app.sender;
 import static java.util.Collections.singletonList;
 import static org.apache.kafka.connect.data.Schema.Type.STRUCT;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -119,7 +120,7 @@ public class ChangeEventHandlerTest {
 		
 		handler.handle(tableName, id, true, null, exchange);
 		
-		verify(mockRepository).save(ArgumentMatchers.argThat(dbzmEvent -> {
+		verify(mockRepository).save(argThat(dbzmEvent -> {
 			try {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
@@ -152,7 +153,7 @@ public class ChangeEventHandlerTest {
 		
 		handler.handle(tableName, id, false, null, exchange);
 		
-		verify(mockRepository).save(ArgumentMatchers.argThat(dbzmEvent -> {
+		verify(mockRepository).save(argThat(dbzmEvent -> {
 			try {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
@@ -185,7 +186,7 @@ public class ChangeEventHandlerTest {
 		
 		handler.handle(tableName, id, false, null, exchange);
 		
-		verify(mockRepository).save(ArgumentMatchers.argThat(dbzmEvent -> {
+		verify(mockRepository).save(argThat(dbzmEvent -> {
 			try {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
@@ -218,13 +219,38 @@ public class ChangeEventHandlerTest {
 		
 		handler.handle(tableName, id, false, null, exchange);
 		
-		verify(mockRepository).save(ArgumentMatchers.argThat(dbzmEvent -> {
+		verify(mockRepository).save(argThat(dbzmEvent -> {
 			try {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
 				        && uuid.equals(dbzmEvent.getEvent().getIdentifier())
 				        && op.equals(dbzmEvent.getEvent().getOperation()) && !dbzmEvent.getEvent().getSnapshot()
 				        && dbzmEvent.getDateCreated() != null;
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}));
+	}
+	
+	@Test
+	public void handle_shouldNotSetIdentifierForASubclassTableEVent() {
+		final String tableName = "patient";
+		final String id = "1";
+		final String op = "c";
+		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+		Message message = new DefaultMessage(exchange);
+		message.setHeader(DebeziumConstants.HEADER_OPERATION, op);
+		exchange.setMessage(message);
+		
+		handler.handle(tableName, id, false, null, exchange);
+		
+		verify(mockRepository).save(argThat(dbzmEvent -> {
+			try {
+				return tableName.equals(dbzmEvent.getEvent().getTableName())
+				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
+				        && op.equals(dbzmEvent.getEvent().getOperation()) && !dbzmEvent.getEvent().getSnapshot()
+				        && dbzmEvent.getEvent().getIdentifier() == null && dbzmEvent.getDateCreated() != null;
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
