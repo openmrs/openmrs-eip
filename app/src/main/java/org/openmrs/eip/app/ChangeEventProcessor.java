@@ -1,24 +1,23 @@
 package org.openmrs.eip.app;
 
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_CHANGE_EVNT_PROCESSOR;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
-import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.app.sender.ChangeEventHandler;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -30,18 +29,20 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	private List<CompletableFuture<Void>> futures;
 	
-	//private Map<String, Integer> tableAndMaxRowIdsMap;
+	private Map<String, Integer> tableAndMaxRowIdsMap;
 	
-	//private SnapshotSavePointStore savepointStore;
+	private SnapshotSavePointStore savepointStore;
 	
 	private static Integer batchSize;
 	
+	private ChangeEventHandler handler;
+	
+	public ChangeEventProcessor(@Autowired ChangeEventHandler handler) {
+		this.handler = handler;
+	}
+	
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		if (producerTemplate == null) {
-			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		}
-		
 		Message message = exchange.getMessage();
 		Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
 		//TODO Take care of situation where a table has a composite PK because fields length will be > 1
@@ -56,16 +57,16 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				executor = Executors.newFixedThreadPool(threadCount);
 			}
 			
-			if (futures == null) {
-				futures = new Vector(DEFAULT_BATCH_SIZE);
-			}
-			
 			if (batchSize == null) {
 				batchSize = DEFAULT_BATCH_SIZE;
 			}
 			
-			/*if (tableAndMaxRowIdsMap == null) {
-				tableAndMaxRowIdsMap = new ConcurrentHashMap(DEFAULT_BATCH_SIZE);
+			if (futures == null) {
+				futures = new Vector(batchSize);
+			}
+			
+			if (tableAndMaxRowIdsMap == null) {
+				tableAndMaxRowIdsMap = new ConcurrentHashMap(batchSize);
 			}
 			
 			if (savepointStore == null) {
@@ -81,7 +82,7 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				}
 				
 				return;
-			}*/
+			}
 			
 			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
@@ -92,13 +93,8 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 				
 				try {
 					setThreadName(table, id);
-					//producerTemplate.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange);
-					CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
-					//TODO Add support for PKs that are not integers
-					/*Integer maxRowId = tableAndMaxRowIdsMap.get(table);
-					if (maxRowId == null || currentRowId > maxRowId) {
-						tableAndMaxRowIdsMap.put(table, currentRowId);
-					}*/
+					handler.handle(table, id, true, sourceMetadata, exchange);
+					updateTableAndMaxRowIdsMap(table, currentRowId);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
@@ -116,18 +112,18 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 					
 					CustomFileOffsetBackingStore.unpause();
 					
-					//savepointStore.discard();
-					//savepointStore = null;
-				} /* else {
-				  savepointStore.update(tableAndMaxRowIdsMap);
-				  }*/
+					savepointStore.discard();
+					savepointStore = null;
+				} else {
+					savepointStore.update(tableAndMaxRowIdsMap);
+				}
 			}
 			
 		} else {
 			final String originalThreadName = Thread.currentThread().getName();
 			try {
 				setThreadName(table, id);
-				CamelUtils.send(ROUTE_URI_CHANGE_EVNT_PROCESSOR, exchange, producerTemplate);
+				handler.handle(table, id, false, sourceMetadata, exchange);
 			}
 			finally {
 				Thread.currentThread().setName(originalThreadName);
@@ -146,6 +142,14 @@ public class ChangeEventProcessor extends BaseEventProcessor {
 	
 	protected String getThreadName(String table, String id) {
 		return table + "-" + id;
+	}
+	
+	private synchronized void updateTableAndMaxRowIdsMap(String table, Integer currentRowId) {
+		//TODO Add support for PKs that are not integers
+		Integer maxRowId = tableAndMaxRowIdsMap.get(table);
+		if (maxRowId == null || currentRowId > maxRowId) {
+			tableAndMaxRowIdsMap.put(table, currentRowId);
+		}
 	}
 	
 }

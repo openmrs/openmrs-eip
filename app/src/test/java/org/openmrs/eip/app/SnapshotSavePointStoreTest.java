@@ -39,9 +39,6 @@ public class SnapshotSavePointStoreTest {
 	private FileOutputStream mockOutputStream;
 	
 	@Mock
-	private Properties mockSavedProperties;
-	
-	@Mock
 	private Properties mockProperties;
 	
 	private SnapshotSavePointStore store;
@@ -52,7 +49,6 @@ public class SnapshotSavePointStoreTest {
 		PowerMockito.mockStatic(FileUtils.class);
 		store = new SnapshotSavePointStore();
 		setInternalState(SnapshotSavePointStore.class, File.class, mockFile);
-		setInternalState(SnapshotSavePointStore.class, "savedProps", mockSavedProperties);
 		setInternalState(SnapshotSavePointStore.class, "props", mockProperties);
 		when(FileUtils.openInputStream(mockFile)).thenReturn(mockInputStream);
 		when(FileUtils.openOutputStream(mockFile)).thenReturn(mockOutputStream);
@@ -64,7 +60,7 @@ public class SnapshotSavePointStoreTest {
 		
 		store.init();
 		
-		verify(mockSavedProperties).load(mockInputStream);
+		verify(mockProperties).load(mockInputStream);
 	}
 	
 	@Test
@@ -80,28 +76,28 @@ public class SnapshotSavePointStoreTest {
 	public void getSavedRowId_shouldReturnTheSavedRowIdForTheSpecifiedTable() {
 		final String table = "person";
 		final Integer expected = 2;
-		when(mockSavedProperties.getProperty(table)).thenReturn(expected.toString());
+		when(mockProperties.getProperty(table)).thenReturn(expected.toString());
 		Assert.assertEquals(expected, store.getSavedRowId(table));
 	}
 	
 	@Test
 	public void getSavedRowId_shouldReturnNullIfNoMatchIsFound() {
 		final String table = "person";
-		when(mockSavedProperties.getProperty(table)).thenReturn(null);
+		when(mockProperties.getProperty(table)).thenReturn(null);
 		assertNull(store.getSavedRowId(table));
 	}
 	
 	@Test
 	public void getSavedRowId_shouldReturnNullIfTheValueIsBlank() {
 		final String table = "person";
-		when(mockSavedProperties.getProperty(table)).thenReturn("");
+		when(mockProperties.getProperty(table)).thenReturn("");
 		assertNull(store.getSavedRowId(table));
 	}
 	
 	@Test
 	public void getSavedRowId_shouldReturnNullIfTheValueIsWhitespace() {
 		final String table = "person";
-		when(mockSavedProperties.getProperty(table)).thenReturn(" ");
+		when(mockProperties.getProperty(table)).thenReturn(" ");
 		assertNull(store.getSavedRowId(table));
 	}
 	
@@ -122,7 +118,6 @@ public class SnapshotSavePointStoreTest {
 		
 		store.discard();
 		
-		verify(mockSavedProperties).clear();
 		verify(mockProperties).clear();
 		PowerMockito.verifyStatic(FileUtils.class, never());
 		FileUtils.forceDelete(mockFile);
