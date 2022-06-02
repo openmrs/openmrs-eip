@@ -1,11 +1,11 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="sync-response-processor" errorHandlerRef="shutdownErrorHandler">
-        <!-- TODO(luis.pinto) Make the delay configurable -->
-        <from uri="scheduler:sync_response_processor?initialDelay=15000&amp;delay=60000" />
 
-        <log message="Fetching next 1000 sync responses" loggingLevel="DEBUG" />
+        <from uri="scheduler:sync_response_processor?initialDelay={{sync-response-processor.initial.delay}}&amp;delay={{sync-response-processor.delay}}" />
 
-        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r WHERE r.status = 'NEW' ORDER BY r.dateSent, r.id ASC&amp;maximumResults=1000" />
+        <log message="Fetching next {{sync-response-processor.max.fetch.results}} sync responses" loggingLevel="DEBUG" />
+
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r WHERE r.status = 'NEW' ORDER BY r.dateSent, r.id ASC&amp;maximumResults={{sync-response-processor.max.fetch.results}}" />
 
         <choice>
             <when>
