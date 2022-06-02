@@ -53,7 +53,7 @@
                 </setProperty>
 
                 <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.SyncResponse()}</spel>
+                    <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncResponse()}</spel>
                 </setBody>
                 <script>
                     <spel>
@@ -65,7 +65,7 @@
         
                 <log loggingLevel="DEBUG" message="Saving sync response -> ${body}" />
         
-                <to uri="jpa:SyncResponse" />
+                <to uri="jpa:SenderSyncResponse" />
         
                 <log message="Successfully saved sync response" />
             </when>

@@ -5,7 +5,7 @@
 
         <log message="Fetching next 1000 sync responses" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SyncResponse?query=SELECT r FROM SyncResponse r WHERE r.status = 'NEW' ORDER BY r.dateSent, r.id ASC&amp;maximumResults=1000" />
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r WHERE r.status = 'NEW' ORDER BY r.dateSent, r.id ASC&amp;maximumResults=1000" />
 
         <choice>
             <when>
@@ -52,7 +52,7 @@
                         <simple>${exchangeProperty.syncResponse}</simple>
                     </setBody>
 
-                    <to uri="jpa:SyncResponse" />
+                    <to uri="jpa:SenderSyncResponse" />
 
                     <log message="Successfully processed sync response" loggingLevel="DEBUG" />
                 </split>

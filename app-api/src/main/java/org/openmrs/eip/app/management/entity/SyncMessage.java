@@ -32,6 +32,9 @@ public class SyncMessage extends AbstractEntity {
 	@Column(name = "is_snapshot", nullable = false, updatable = false)
 	private Boolean snapshot = false;
 	
+	@Column(name = "message_uuid", length = 38, updatable = false)
+	private String messageUuid;
+	
 	/**
 	 * Gets the identifier
 	 *
@@ -122,10 +125,18 @@ public class SyncMessage extends AbstractEntity {
 		this.snapshot = snapshot;
 	}
 	
+	public String getMessageUuid() {
+		return messageUuid;
+	}
+	
+	public void setMessageUuid(String messageUuid) {
+		this.messageUuid = messageUuid;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + "}";
+		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + "}";
 	}
 	
 }

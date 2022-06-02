@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sender_sync_response")
-public class SyncResponse extends AbstractEntity {
+public class SenderSyncResponse extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
 	

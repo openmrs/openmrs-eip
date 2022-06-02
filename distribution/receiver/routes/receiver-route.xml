@@ -91,12 +91,18 @@
                     <to uri="jpa:ReceiverSyncRequest" />
 
                     <log message="Successfully saved updates for sync request" loggingLevel="DEBUG" />
+                    
+                    <setProperty name="receiverSyncRequest">
+                        <simple>${body}</simple>
+                    </setProperty>
                 </when>
 
                 <choice>
                     <when>
                         <simple>${exchangeProperty.sync-model.metadata.operation} == 'r' &amp;&amp; ${exchangeProperty.sync-model.model} == null</simple>
-
+                        
+                        <to uri="bean:receiverMessageUtils?method=sendSyncResponse(${exchangeProperty.receiverSyncRequest}, ${exchangeProperty.sync-model.metadata.messageUuid})" />
+                        
                         <log message="Ignoring sync message because entity was not found in the remote DB for request with uuid: ${exchangeProperty.sync-model.metadata.requestUuid}" />
                     </when>
                     <otherwise>
