@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
