@@ -27,5 +27,9 @@ public class SyncConstants {
 	public static final String ROUTE_URI_DBZM_EVNT_PROCESSOR = "direct:debezium-event-processor";
 	
 	public final static String SAVEPOINT_FILE = "snapshot_savepoint.properties";
+
+    public final static String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
+
+    public final static String MGT_DATASOURCE_NAME = "mngtDataSource";
 	
 }
