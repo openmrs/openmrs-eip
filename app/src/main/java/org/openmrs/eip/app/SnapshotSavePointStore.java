@@ -73,7 +73,7 @@ class SnapshotSavePointStore {
 			log.info("Successfully written the snapshot savepoint to disk");
 		}
 		catch (IOException e) {
-			log.error("Failed to write the snapshot savepoint to disk", e);
+			throw new EIPException("Failed to write the snapshot savepoint to disk", e);
 		}
 	}
 	
@@ -93,7 +93,7 @@ class SnapshotSavePointStore {
 			log.info("Successfully deleted the snapshot savepoint file");
 		}
 		catch (IOException e) {
-			log.error("Failed to delete the snapshot savepoint file", e);
+			throw new EIPException("Failed to delete the snapshot savepoint file", e);
 		}
 	}
 	
