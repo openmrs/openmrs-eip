@@ -29,7 +29,8 @@ public class ChangeEventHandler {
 	
 	private DebeziumEventRepository repository;
 	
-	public ChangeEventHandler(@Autowired DebeziumEventRepository repository) {
+	@Autowired
+	public ChangeEventHandler(DebeziumEventRepository repository) {
 		this.repository = repository;
 	}
 	

@@ -133,8 +133,8 @@ public class SiteMessageConsumer implements Runnable {
 		
 		if (errorEncountered) {
 			log.info("Shutting down after the sync message consumer for " + site + " encountered an error");
-			
-			SyncApplication.shutdown();
+
+            AppUtils.shutdown();
 		}
 		
 	}

@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 public class AppUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(AppUtils.class);
+
+    private static boolean shuttingDown = false;
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
 	
@@ -90,5 +92,28 @@ public class AppUtils {
 	public static boolean isSubclassTable(String tableName) {
 		return SUBCLASS_TABLES.contains(tableName.toUpperCase());
 	}
+
+    /**
+     * Checks if the application is shutting down
+     */
+    public static boolean isShuttingDown() {
+        return shuttingDown;
+    }
+
+    /**
+     * Shuts down the application
+     */
+    public synchronized static void shutdown() {
+        if (isShuttingDown()) {
+            return;
+        }
+
+        shuttingDown = true;
+
+        log.info("Shutting down the application...");
+
+        //Shutdown in a new thread to ensure other background shutdown threads complete too
+        new Thread(() -> System.exit(129)).start();
+    }
 	
 }
