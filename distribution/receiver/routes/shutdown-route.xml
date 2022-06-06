@@ -2,16 +2,19 @@
     <route id="shutdown-route">
         <from uri="direct:shutdown-route" />
 
-        <!-- TODO Send a notification to the configured emails -->
-
         <choice>
             <when>
                 <method beanType="org.openmrs.eip.app.ReceiverContext" method="isStopSignalReceived()" />
-                <log message="The application is already shutting down" />
+                <log loggingLevel="DEBUG" message="The application is already shutting down" />
+            </when>
+            <when>
+                <method beanType="org.openmrs.eip.app.SyncApplication" method="isShuttingDown()" />
+                <log loggingLevel="DEBUG" message="The application is already shutting down" />
             </when>
             <otherwise>
-                <log loggingLevel="ERROR" message="An error occurred, cause: ${exception.message}" />
-                <log message="Shutting down the application..." />
+                <!-- TODO Send a notification to the configured emails -->
+
+                <log loggingLevel="ERROR" message="An error occurred, ${exception.printStackTrace()}" />
 
                 <script>
                     <method beanType="org.openmrs.eip.app.SyncApplication" method="shutdown()" />

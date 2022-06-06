@@ -1,5 +1,10 @@
 package org.openmrs.eip.component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Constants {
 	
 	public static final String PLACEHOLDER_CLASS = "[class]";
@@ -22,9 +27,19 @@ public class Constants {
 	public static final String PROP_IGNORE_MISSING_HASH = "receiver.ignore.missing.hash.for.existing.entity";
 	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
-
-    public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";
-
-    public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
 	
+	public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";
+  
+  public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
+	
+	public static final List<String> ORDER_SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order");
+	
+	public static final List<String> SUBCLASS_TABLES;
+	
+	static {
+		List<String> subclassTables = new ArrayList();
+		subclassTables.add("patient");
+		subclassTables.addAll(ORDER_SUBCLASS_TABLES);
+		SUBCLASS_TABLES = Collections.unmodifiableList(subclassTables);
+	}
 }

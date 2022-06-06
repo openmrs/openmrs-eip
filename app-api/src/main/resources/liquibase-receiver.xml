@@ -1131,4 +1131,19 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220526-1500">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_disabled" tableName="site_info" />
+            </not>
+        </preConditions>
+        <comment>Add sync_disabled column to site_info table</comment>
+
+        <addColumn tableName="site_info">
+            <column name="sync_disabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

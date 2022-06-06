@@ -29,8 +29,9 @@ public final class ReceiverContext {
 				
 				ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 				String siteClass = SiteInfo.class.getSimpleName();
-				final String siteUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s";
-				List<SiteInfo> sites = producerTemplate.requestBody(siteUri, null, List.class);
+				final String siteQueryUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass
+				        + " s WHERE s.disabled = false";
+				List<SiteInfo> sites = producerTemplate.requestBody(siteQueryUri, null, List.class);
 				siteNameAndInfoMap = new HashMap(sites.size());
 				sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
 				

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -79,6 +80,16 @@ public final class Utils {
 	public static String getModelClassesInHierarchy(String modelClass) {
 		List<String> classes = getListOfModelClassHierarchy(modelClass);
 		return String.join(",", classes.stream().map(clazz -> "'" + clazz + "'").collect(Collectors.toList()));
+	}
+	
+	/**
+	 * Checks if the specified table is for a subclass entity
+	 * 
+	 * @param tableName the table name to check
+	 * @return true for a subclass table otherwise false
+	 */
+	public static boolean isSubclassTable(String tableName) {
+		return Constants.SUBCLASS_TABLES.contains(tableName.toLowerCase());
 	}
 	
 }

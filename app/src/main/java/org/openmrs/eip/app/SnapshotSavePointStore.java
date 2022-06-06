@@ -20,8 +20,6 @@ class SnapshotSavePointStore {
 	
 	private static File file;
 	
-	private static Properties savedProps;
-	
 	private static Properties props;
 	
 	SnapshotSavePointStore() {
@@ -29,7 +27,6 @@ class SnapshotSavePointStore {
 		
 		log.info("Snapshot savepoint file -> " + file);
 		
-		savedProps = new Properties();
 		props = new Properties();
 	}
 	
@@ -40,12 +37,12 @@ class SnapshotSavePointStore {
 			if (file.exists()) {
 				log.info("Loading saved snapshot savepoint");
 				
-				savedProps.load(FileUtils.openInputStream(file));
+				props.load(FileUtils.openInputStream(file));
 				
 				log.info("Done loading saved snapshot savepoint");
 			}
 			
-			if (MapUtils.isEmpty(savedProps)) {
+			if (MapUtils.isEmpty(props)) {
 				log.info("No saved snapshot savepoint file found");
 			}
 			
@@ -57,7 +54,7 @@ class SnapshotSavePointStore {
 	}
 	
 	Integer getSavedRowId(String tableName) {
-		String value = savedProps.getProperty(tableName);
+		String value = props.getProperty(tableName);
 		if (StringUtils.isBlank(value)) {
 			return null;
 		}
@@ -76,7 +73,7 @@ class SnapshotSavePointStore {
 			log.info("Successfully written the snapshot savepoint to disk");
 		}
 		catch (IOException e) {
-			log.error("Failed to write the snapshot savepoint to disk", e);
+			throw new EIPException("Failed to write the snapshot savepoint to disk", e);
 		}
 	}
 	
@@ -84,7 +81,6 @@ class SnapshotSavePointStore {
 		log.info("Deleting the snapshot savepoint file");
 		
 		props.clear();
-		savedProps.clear();
 		
 		if (!file.exists()) {
 			log.info("No snapshot savepoint file found to delete");
@@ -97,7 +93,7 @@ class SnapshotSavePointStore {
 			log.info("Successfully deleted the snapshot savepoint file");
 		}
 		catch (IOException e) {
-			log.error("Failed to delete the snapshot savepoint file", e);
+			throw new EIPException("Failed to delete the snapshot savepoint file", e);
 		}
 	}
 	

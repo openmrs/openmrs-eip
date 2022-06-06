@@ -2,6 +2,7 @@ package org.openmrs.eip.component.utils;
 
 import static java.util.Arrays.stream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -171,6 +172,19 @@ public class UtilsTest {
 		assertEquals(2, classes.size());
 		assertTrue(classes.contains("'" + className + "'"));
 		assertTrue(classes.contains("'" + OrderModel.class.getName() + "'"));
+	}
+	
+	@Test
+	public void isSubclassTable_shouldReturnTrueForASubclassTable() {
+		assertTrue(Utils.isSubclassTable("patient"));
+		assertTrue(Utils.isSubclassTable("drug_order"));
+		assertTrue(Utils.isSubclassTable("test_order"));
+	}
+	
+	@Test
+	public void isSubclassTable_shouldReturnFalseForANonSubclassTable() {
+		assertFalse(Utils.isSubclassTable("person"));
+		assertFalse(Utils.isSubclassTable("orders"));
 	}
 	
 }
