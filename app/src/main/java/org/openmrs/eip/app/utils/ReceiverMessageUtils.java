@@ -1,7 +1,7 @@
 package org.openmrs.eip.app.utils;
 
 import java.text.MessageFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +11,7 @@ import org.openmrs.eip.app.management.entity.SenderSyncResponseModel;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,14 +63,15 @@ public class ReceiverMessageUtils {
 		}
 		
 		SenderSyncResponseModel syncResponse = new SenderSyncResponseModel();
-		syncResponse.setDateSent(new Date());
+		syncResponse.setDateSent(LocalDateTime.now());
 		syncResponse.setMessageUuid(messageUuid);
 		
 		String endpoint = getCamelOutputEndpoint(siteIdentifier);
+		String payload = JsonUtils.marshall(syncResponse);
 		
-		log.info("Sending Sync Response. Payload: {}; Endpoint: {}", syncResponse, endpoint);
+		log.info("Sending Sync Response. Payload: {}; Endpoint: {}", payload, endpoint);
 		
-		producerTemplate.sendBody(endpoint, syncResponse);
+		producerTemplate.sendBody(endpoint, payload);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Sync Response sent.");

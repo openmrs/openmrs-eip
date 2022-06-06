@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.management.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -9,6 +9,6 @@ public class SenderSyncResponseModel {
 	
 	private String messageUuid;
 	
-	private Date dateSent;
+	private LocalDateTime dateSent;
 	
 }

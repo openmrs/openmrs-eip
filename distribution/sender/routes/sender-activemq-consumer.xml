@@ -5,10 +5,10 @@
         <log message="Received message -> ${body}" />
         
         <setProperty name="requestUuid">
-            <jsonpath>$.requestUuid</jsonpath>
+            <jsonpath suppressExceptions="true">$.requestUuid</jsonpath>
         </setProperty>
         <setProperty name="messageUuid">
-            <jsonpath>$.messageUuid</jsonpath>
+            <jsonpath suppressExceptions="true">$.messageUuid</jsonpath>
         </setProperty>
         
         <choice>
@@ -48,17 +48,25 @@
             <when>
                 <simple>${exchangeProperty.messageUuid} != null</simple>
                 
-                <setProperty name="dateSent">
-                    <jsonpath>$.dateSent</jsonpath>
+                <setProperty name="senderSyncResponseModelClass">
+                    <spel>#{T(org.openmrs.eip.app.management.entity.SenderSyncResponseModel)}</spel>
                 </setProperty>
-
+                
+                <setProperty name="senderSyncResponseModel">
+                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshal(${body}, ${exchangeProperty.senderSyncResponseModelClass})" />
+                </setProperty>
+                
+                <setProperty name="dateSent">
+                    <method beanType="org.openmrs.eip.component.utils.DateUtils" method="localDateTimeToDate(${exchangeProperty.senderSyncResponseModel.dateSent})" />
+                </setProperty>
+                
                 <setBody>
                     <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncResponse()}</spel>
                 </setBody>
                 <script>
                     <spel>
                         #{body.setDateCreated(new java.util.Date())}
-                        #{body.setMessageUuid(getProperty('messageUuid'))}
+                        #{body.setMessageUuid(getProperty('senderSyncResponseModel').messageUuid)}
                         #{body.setDateSent(getProperty('dateSent'))}
                     </spel>
                 </script>
