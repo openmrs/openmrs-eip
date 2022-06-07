@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
 import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.openmrs.eip.app.SyncConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;

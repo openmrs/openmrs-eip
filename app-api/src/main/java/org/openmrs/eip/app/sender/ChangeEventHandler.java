@@ -10,12 +10,14 @@ import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
  * debezium_event_queue table in the management DB.
  */
 @Component("changeEventHandler")
+@Profile(SyncProfiles.SENDER)
 public class ChangeEventHandler {
 	
 	private static final Logger log = LoggerFactory.getLogger(ChangeEventHandler.class);

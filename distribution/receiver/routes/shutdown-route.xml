@@ -17,7 +17,7 @@
                 <log loggingLevel="ERROR" message="An error occurred, ${exception.printStackTrace()}" />
 
                 <script>
-                    <method beanType="org.openmrs.eip.app.SyncApplication" method="shutdown()" />
+                    <method beanType="org.openmrs.eip.app.AppUtils" method="shutdown()" />
                 </script>
             </otherwise>
         </choice>

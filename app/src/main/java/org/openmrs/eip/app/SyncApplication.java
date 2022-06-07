@@ -21,6 +21,9 @@ import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.processor.idempotent.jpa.JpaMessageIdRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openmrs.eip.app.config.JpaCamelConf;
+import org.openmrs.eip.app.config.ManagementDataSourceConfig;
+import org.openmrs.eip.app.config.OpenmrsDataSourceConfig;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -40,6 +44,7 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import liquibase.integration.spring.SpringLiquibase;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
+@Import({ ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class })
 public class SyncApplication {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncApplication.class);

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -25,7 +25,6 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -41,7 +40,7 @@ import ch.qos.logback.core.read.ListAppender;
  * Base class for camel route tests and processors
  */
 @RunWith(CamelSpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = TestConfig.class)
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
@@ -49,7 +48,6 @@ import ch.qos.logback.core.read.ListAppender;
 @TestPropertySource(properties = "camel.component.direct.block=false")
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
-@DirtiesContext
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
