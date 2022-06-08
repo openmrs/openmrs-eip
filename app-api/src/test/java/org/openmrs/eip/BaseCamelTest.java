@@ -25,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -48,6 +49,7 @@ import ch.qos.logback.core.read.ListAppender;
 @TestPropertySource(properties = "camel.component.direct.block=false")
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
+@ActiveProfiles("test")
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);

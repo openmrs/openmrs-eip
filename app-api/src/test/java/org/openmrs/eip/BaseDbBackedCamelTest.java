@@ -31,6 +31,7 @@ import org.testcontainers.lifecycle.Startables;
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
+@TestPropertySource(properties = "spring.openmrs-datasource.dialect=org.hibernate.dialect.MySQL5Dialect")
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.7.31");
@@ -54,7 +55,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
 		mysqlContainer.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
-		
+
 		Resource[] scripts = RESOURCE_RESOLVER.getResources("classpath*:" + SCRIPT_DIR + "*.sql");
 		
 		for (Resource script : scripts) {

@@ -31,5 +31,7 @@ public class SyncConstants {
     public final static String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
 
     public final static String MGT_DATASOURCE_NAME = "mngtDataSource";
+
+    public final static String CUSTOM_PROP_SOURCE_BEAN_NAME = "customPropSource";
 	
 }
