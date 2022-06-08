@@ -3,8 +3,6 @@ package org.openmrs.eip;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.camel.Exchange;
@@ -45,7 +43,7 @@ import ch.qos.logback.core.read.ListAppender;
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
-//@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
+@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
 @TestPropertySource(properties = "camel.component.direct.block=false")
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
@@ -74,7 +72,7 @@ public abstract class BaseCamelTest {
 	
 	@Before
 	public void beforeBaseCamelTest() throws Exception {
-		//loadXmlRoutesInDirectory("camel-common", "test-error-handler.xml");
+		loadXmlRoutes("test-error-handler.xml");
 		if (loggerContext == null) {
 			loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		}
@@ -108,29 +106,6 @@ public abstract class BaseCamelTest {
 			        .loadRoutesDefinition(camelContext, in);
 			camelContext.addRouteDefinitions(rd.getRoutes());
 		}
-	}
-	
-	/**
-	 * Loads and registers the routes defined in files with the specified names from the camel directory
-	 * on the classpath.
-	 * 
-	 * @param filenames the names of the files to load
-	 * @throws Exception
-	 */
-	protected void loadXmlRoutesInCamelDirectory(String... filenames) throws Exception {
-		loadXmlRoutes(Arrays.stream(filenames).map(f -> Paths.get("camel", f).toString()).toArray(String[]::new));
-	}
-	
-	/**
-	 * Loads and registers the routes defined in files with the specified names from the specified
-	 * directory on the classpath.
-	 *
-	 * @param directory the name of the directory containing the routes
-	 * @param filenames the names of the files to load
-	 * @throws Exception
-	 */
-	protected void loadXmlRoutesInDirectory(String directory, String... filenames) throws Exception {
-		loadXmlRoutes(Arrays.stream(filenames).map(f -> Paths.get(directory, f).toString()).toArray(String[]::new));
 	}
 	
 	protected String getErrorMessage(Exchange e) {
