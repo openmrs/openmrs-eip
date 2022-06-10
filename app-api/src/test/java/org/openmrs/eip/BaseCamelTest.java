@@ -2,7 +2,9 @@ package org.openmrs.eip;
 
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.camel.Exchange;
@@ -72,7 +74,7 @@ public abstract class BaseCamelTest {
 	
 	@Before
 	public void beforeBaseCamelTest() throws Exception {
-		loadXmlRoutes("test-error-handler.xml");
+		loadClasspathXmlRoutes("test-error-handler.xml");
 		if (loggerContext == null) {
 			loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		}
@@ -99,13 +101,29 @@ public abstract class BaseCamelTest {
 	 * @param filenames the names of the files to load
 	 * @throws Exception
 	 */
-	private void loadXmlRoutes(String... filenames) throws Exception {
+	private void loadClasspathXmlRoutes(String... filenames) throws Exception {
 		for (String file : filenames) {
-			InputStream in = getClass().getClassLoader().getResourceAsStream(file);
-			RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
-			        .loadRoutesDefinition(camelContext, in);
-			camelContext.addRouteDefinitions(rd.getRoutes());
+			loadRoute(getClass().getClassLoader().getResourceAsStream(file));
 		}
+	}
+	
+	/**
+	 * Loads and registers the routes defined in the specified directory with the specified names.
+	 * 
+	 * @param appDir the name of the application directory
+	 * @param filenames the names of the files to load
+	 * @throws Exception
+	 */
+	protected void loadXmlRoutes(String appDir, String... filenames) throws Exception {
+		for (String file : filenames) {
+			loadRoute(new FileInputStream(Paths.get("distribution", appDir, "routes", file).toFile()));
+		}
+	}
+	
+	private void loadRoute(InputStream in) throws Exception {
+		RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
+		        .loadRoutesDefinition(camelContext, in);
+		camelContext.addRouteDefinitions(rd.getRoutes());
 	}
 	
 	protected String getErrorMessage(Exchange e) {
