@@ -85,6 +85,7 @@ public class SyncApplication {
 	}
 	
 	@Bean("outBoundErrorHandler")
+	@Profile(SyncProfiles.SENDER)
 	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
 		builder.setUseOriginalMessage(true);
@@ -92,6 +93,7 @@ public class SyncApplication {
 	}
 	
 	@Bean("inBoundErrorHandler")
+	@Profile(SyncProfiles.RECEIVER)
 	public DeadLetterChannelBuilder getInBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:inbound-error-handler");
 		builder.setUseOriginalMessage(true);
@@ -115,10 +117,10 @@ public class SyncApplication {
 		Map<String, Object> props = Collections.singletonMap("message.destination", "inbound-db-sync");
 		PropertySource customPropSource = new MapPropertySource("receiverPropSource", props);
 		env.getPropertySources().addLast(customPropSource);
-
+		
 		return customPropSource;
 	}
-
+	
 	@Bean("customPropSource")
 	@Profile(SyncProfiles.SENDER)
 	public PropertySource getSenderPropertySource(ConfigurableEnvironment env) {
