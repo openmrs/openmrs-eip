@@ -11,7 +11,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
@@ -40,8 +39,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.jms.connection.CachingConnectionFactory;
-
-import liquibase.integration.spring.SpringLiquibase;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 @Import({ ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class })
@@ -140,19 +137,6 @@ public class SyncApplication {
 		env.getPropertySources().addLast(customPropSource);
 		
 		return customPropSource;
-	}
-	
-	@Bean(name = "liquibase")
-	public SpringLiquibase getSpringLiquibaseForMgtDB(@Qualifier("mngtDataSource") DataSource dataSource, Environment env) {
-		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setContexts(env.getActiveProfiles()[0]);
-		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:liquibase-master.xml");
-		liquibase.setDatabaseChangeLogTable("LIQUIBASECHANGELOG");
-		liquibase.setDatabaseChangeLogLockTable("LIQUIBASECHANGELOGLOCK");
-		liquibase.setShouldRun(true);
-		
-		return liquibase;
 	}
 	
 	@Bean("activeMqConnFactory")
