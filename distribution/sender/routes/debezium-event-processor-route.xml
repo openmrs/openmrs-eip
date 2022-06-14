@@ -12,7 +12,7 @@
             <simple>${body.event}</simple>
         </setProperty>
         <setProperty name="is-subclass">
-            <spel>#{getProperty('event').tableName == 'test_order' || getProperty('event').tableName == 'drug_order' || getProperty('event').tableName == 'patient'}</spel>
+            <method beanType="org.openmrs.eip.component.utils.Utils" method="isSubclassTable(${exchangeProperty.event.tableName})" />
         </setProperty>
 
         <setProperty name="route-retry-count-map">
