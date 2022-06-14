@@ -2,7 +2,7 @@ package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_DBZM_EVNT_PROCESSOR;
+import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -107,7 +107,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -143,7 +143,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				threadNames.add(Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -195,7 +195,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -241,7 +241,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		List<Integer> nonSnapshotMsgIndices = new ArrayList();
@@ -254,7 +254,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -311,7 +311,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
@@ -323,7 +323,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -380,7 +380,7 @@ public class DebeziumEventProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());

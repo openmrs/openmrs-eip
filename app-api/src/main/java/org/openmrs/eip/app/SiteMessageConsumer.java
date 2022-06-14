@@ -3,8 +3,8 @@ package org.openmrs.eip.app;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_SYNC_PROCESSOR;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,8 +133,8 @@ public class SiteMessageConsumer implements Runnable {
 		
 		if (errorEncountered) {
 			log.info("Shutting down after the sync message consumer for " + site + " encountered an error");
-
-            AppUtils.shutdown();
+			
+			AppUtils.shutdown();
 		}
 		
 	}
@@ -203,7 +203,7 @@ public class SiteMessageConsumer implements Runnable {
 		
 		log.info("Submitting sync message to the processor");
 		
-		producerTemplate.sendBody(ROUTE_URI_SYNC_PROCESSOR, msg);
+		producerTemplate.sendBody(URI_MSG_PROCESSOR, msg);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Removing sync message from the queue " + msg);

@@ -3,5 +3,4 @@ VALUES  (1, 'person', '1', 'c', 'direct:db-sync', 1, 'java.lang.Exception', 'Tes
         (2, 'person', '1', 'u', 'direct:db-sync', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
         (3, 'patient', '1', 'u', 'direct:db-sync', 1, 'java.lang.Exception', 'Testing', 0, '2020-02-27 00:00:00'),
         (4, 'person', '2', 'c', 'direct:invalid-dest', 1, 'java.lang.Exception', '', 0, '2020-02-27 00:00:00'),
-        (5, 'person', '1', 'c', 'direct:senaite', 1, 'java.lang.Exception', null, 0, '2020-02-27 00:00:00'),
-        (6, 'orders', '1', 'c', 'mock:event-listener', 1, 'java.lang.Exception', null, 0, '2020-02-27 00:00:00');
+        (5, 'person', '1', 'c', 'direct:senaite', 1, 'java.lang.Exception', null, 0, '2020-02-27 00:00:00');
