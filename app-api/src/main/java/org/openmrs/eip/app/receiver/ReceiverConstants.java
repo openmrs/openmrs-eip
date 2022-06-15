@@ -10,4 +10,6 @@ public class ReceiverConstants {
 	
 	public static final String URI_INBOUND_DB_SYNC = "direct:" + ROUTE_ID_INBOUND_DB_SYNC;
 	
+	public static final String ERROR_HANDLER_REF = "inBoundErrorHandler";
+	
 }

@@ -16,4 +16,6 @@ public class SenderConstants {
 	
 	public static final String URI_DBZM_EVENT_PROCESSOR = "direct:" + ROUTE_ID_DBZM_EVENT_PROCESSOR;
 	
+	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
+	
 }

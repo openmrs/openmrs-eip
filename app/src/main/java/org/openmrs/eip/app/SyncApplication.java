@@ -16,9 +16,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.app.config.JpaCamelConf;
 import org.openmrs.eip.app.config.ManagementDataSourceConfig;
 import org.openmrs.eip.app.config.OpenmrsDataSourceConfig;
-import org.openmrs.eip.app.receiver.ReceiverConfig;
-import org.openmrs.eip.app.sender.SenderConfig;
-import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +23,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
-@Import({ ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class, SenderConfig.class,
-        ReceiverConfig.class })
+@Import({ ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class })
 public class SyncApplication {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncApplication.class);
@@ -68,22 +63,6 @@ public class SyncApplication {
 	@Bean
 	public DeadLetterChannelBuilder deadLetterChannelBuilder() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
-		builder.setUseOriginalMessage(true);
-		return builder;
-	}
-	
-	@Bean("outBoundErrorHandler")
-	@Profile(SyncProfiles.SENDER)
-	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:outbound-error-handler");
-		builder.setUseOriginalMessage(true);
-		return builder;
-	}
-	
-	@Bean("inBoundErrorHandler")
-	@Profile(SyncProfiles.RECEIVER)
-	public DeadLetterChannelBuilder getInBoundErrorHandler() {
-		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:inbound-error-handler");
 		builder.setUseOriginalMessage(true);
 		return builder;
 	}
