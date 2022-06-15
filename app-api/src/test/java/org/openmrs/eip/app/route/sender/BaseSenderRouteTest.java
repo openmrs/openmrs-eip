@@ -6,10 +6,8 @@ import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.entity.Event;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 @Import(SenderTestConfig.class)
-@TestPropertySource(properties = "db-event.destinations=")
 @ActiveProfiles(SyncProfiles.SENDER)
 public abstract class BaseSenderRouteTest extends BaseRouteTest {
 	
