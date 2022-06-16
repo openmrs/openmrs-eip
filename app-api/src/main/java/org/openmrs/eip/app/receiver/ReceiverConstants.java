@@ -12,4 +12,12 @@ public class ReceiverConstants {
 	
 	public static final String ERROR_HANDLER_REF = "inBoundErrorHandler";
 	
+	public static final String EX_PROP_PAYLOAD = "entity-payload";
+	
+	public static final String EX_PROP_MODEL_CLASS = "model-class";
+	
+	public static final String EX_PROP_ENTITY_ID = "entity-id";
+	
+	public static final String EX_PROP_SITE = "site";
+	
 }
