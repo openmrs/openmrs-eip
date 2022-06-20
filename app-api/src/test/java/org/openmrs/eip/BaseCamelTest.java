@@ -1,8 +1,11 @@
 package org.openmrs.eip;
 
+import static java.io.File.separator;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.test.spring.CamelSpringRunner;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -52,6 +56,10 @@ import ch.qos.logback.core.read.ListAppender;
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
+	
+	protected static final String FOLDER_DIST = "distribution";
+	
+	protected static final String FOLDER_ROUTES = "routes";
 	
 	@Autowired
 	protected ApplicationContext applicationContext;
@@ -114,8 +122,15 @@ public abstract class BaseCamelTest {
 	 * @throws Exception
 	 */
 	protected void loadXmlRoutes(String appDir, String... filenames) throws Exception {
-		for (String file : filenames) {
-			loadRoute(new FileInputStream(Paths.get("distribution", appDir, "routes", file).toFile()));
+		for (String filename : filenames) {
+			try {
+				loadRoute(new FileInputStream(Paths.get(FOLDER_DIST, appDir, FOLDER_ROUTES, filename).toFile()));
+			}
+			catch (FileNotFoundException e) {
+				//We are in a submodule directory, go one directory up to the parent project directory
+				String subPath = FOLDER_DIST + separator + appDir + separator + FOLDER_ROUTES + separator + filename;
+				loadRoute(new FileInputStream(new File(SystemUtils.getUserDir().getParentFile(), subPath)));
+			}
 		}
 	}
 	
