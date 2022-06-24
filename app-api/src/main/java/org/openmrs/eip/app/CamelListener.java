@@ -18,6 +18,7 @@ import org.apache.camel.spi.CamelEvent.CamelContextStartedEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStoppingEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
@@ -69,7 +70,7 @@ public class CamelListener extends EventNotifierSupport {
 			Optional<User> optional = userRepo.findOne(example);
 			if (!optional.isPresent()) {
 				log.error("No user found with username: " + username);
-				SyncApplication.shutdown();
+				AppUtils.shutdown();
 			}
 			
 			SyncContext.setAppUser(userListRepo.findById(optional.get().getId()).get());
@@ -81,7 +82,7 @@ public class CamelListener extends EventNotifierSupport {
 			optional = userRepo.findOne(example);
 			if (!optional.isPresent()) {
 				log.error("No admin user found");
-				SyncApplication.shutdown();
+                AppUtils.shutdown();
 			}
 			
 			SyncContext.setAdminUser(userListRepo.findById(optional.get().getId()).get());

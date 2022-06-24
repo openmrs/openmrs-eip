@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="test-error-handler">
+        <from uri="direct:test-error-handler" />
+
+        <setProperty name="error">
+            <simple>${exception}</simple>
+        </setProperty>
+
+    </route>
+</routes>

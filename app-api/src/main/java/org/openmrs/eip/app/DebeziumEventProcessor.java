@@ -1,7 +1,7 @@
 package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_DBZM_EVNT_PROCESSOR;
+import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +38,13 @@ public class DebeziumEventProcessor extends BaseEventProcessor {
 				if (executor == null) {
 					executor = Executors.newFixedThreadPool(threadCount);
 				}
-
+				
 				//TODO Periodically wait and reset futures to save memory
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
 					final String originalThreadName = Thread.currentThread().getName();
 					try {
 						setThreadName(debeziumEvent);
-						producerTemplate.sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, debeziumEvent);
+						producerTemplate.sendBody(URI_DBZM_EVENT_PROCESSOR, debeziumEvent);
 					}
 					finally {
 						Thread.currentThread().setName(originalThreadName);
@@ -59,7 +59,7 @@ public class DebeziumEventProcessor extends BaseEventProcessor {
 						syncThreadFutures.clear();
 					}
 					
-					producerTemplate.sendBody(ROUTE_URI_DBZM_EVNT_PROCESSOR, debeziumEvent);
+					producerTemplate.sendBody(URI_DBZM_EVENT_PROCESSOR, debeziumEvent);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);

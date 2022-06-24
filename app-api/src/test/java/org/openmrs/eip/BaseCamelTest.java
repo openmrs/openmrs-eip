@@ -1,10 +1,13 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
+import static java.io.File.separator;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.camel.Exchange;
@@ -14,6 +17,7 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.test.spring.CamelSpringRunner;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -25,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -41,18 +44,22 @@ import ch.qos.logback.core.read.ListAppender;
  * Base class for camel route tests and processors
  */
 @RunWith(CamelSpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = TestConfig.class)
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
-//@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
+@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
 @TestPropertySource(properties = "camel.component.direct.block=false")
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
-@DirtiesContext
+@TestPropertySource(properties = "spring.liquibase.enabled=false")
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
+	
+	protected static final String FOLDER_DIST = "distribution";
+	
+	protected static final String FOLDER_ROUTES = "routes";
 	
 	@Autowired
 	protected ApplicationContext applicationContext;
@@ -74,7 +81,7 @@ public abstract class BaseCamelTest {
 	
 	@Before
 	public void beforeBaseCamelTest() throws Exception {
-		//loadXmlRoutesInDirectory("camel-common", "test-error-handler.xml");
+		loadClasspathXmlRoutes("test-error-handler.xml");
 		if (loggerContext == null) {
 			loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		}
@@ -101,36 +108,36 @@ public abstract class BaseCamelTest {
 	 * @param filenames the names of the files to load
 	 * @throws Exception
 	 */
-	private void loadXmlRoutes(String... filenames) throws Exception {
+	private void loadClasspathXmlRoutes(String... filenames) throws Exception {
 		for (String file : filenames) {
-			InputStream in = getClass().getClassLoader().getResourceAsStream(file);
-			RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
-			        .loadRoutesDefinition(camelContext, in);
-			camelContext.addRouteDefinitions(rd.getRoutes());
+			loadRoute(getClass().getClassLoader().getResourceAsStream(file));
 		}
 	}
 	
 	/**
-	 * Loads and registers the routes defined in files with the specified names from the camel directory
-	 * on the classpath.
+	 * Loads and registers the routes defined in the specified directory with the specified names.
 	 * 
+	 * @param appDir the name of the application directory
 	 * @param filenames the names of the files to load
 	 * @throws Exception
 	 */
-	protected void loadXmlRoutesInCamelDirectory(String... filenames) throws Exception {
-		loadXmlRoutes(Arrays.stream(filenames).map(f -> Paths.get("camel", f).toString()).toArray(String[]::new));
+	protected void loadXmlRoutes(String appDir, String... filenames) throws Exception {
+		for (String filename : filenames) {
+			try {
+				loadRoute(new FileInputStream(Paths.get(FOLDER_DIST, appDir, FOLDER_ROUTES, filename).toFile()));
+			}
+			catch (FileNotFoundException e) {
+				//We are in a submodule directory, go one directory up to the parent project directory
+				String subPath = FOLDER_DIST + separator + appDir + separator + FOLDER_ROUTES + separator + filename;
+				loadRoute(new FileInputStream(new File(SystemUtils.getUserDir().getParentFile(), subPath)));
+			}
+		}
 	}
 	
-	/**
-	 * Loads and registers the routes defined in files with the specified names from the specified
-	 * directory on the classpath.
-	 *
-	 * @param directory the name of the directory containing the routes
-	 * @param filenames the names of the files to load
-	 * @throws Exception
-	 */
-	protected void loadXmlRoutesInDirectory(String directory, String... filenames) throws Exception {
-		loadXmlRoutes(Arrays.stream(filenames).map(f -> Paths.get(directory, f).toString()).toArray(String[]::new));
+	private void loadRoute(InputStream in) throws Exception {
+		RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
+		        .loadRoutesDefinition(camelContext, in);
+		camelContext.addRouteDefinitions(rd.getRoutes());
 	}
 	
 	protected String getErrorMessage(Exchange e) {

@@ -1,7 +1,8 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
-import static org.openmrs.eip.app.BaseDbBackedCamelTest.mysqlContainer;
+import static org.openmrs.eip.BaseDbBackedCamelTest.mysqlContainer;
 
+import org.openmrs.eip.app.SyncConstants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.env.MapPropertySource;
@@ -9,15 +10,15 @@ import org.springframework.core.env.MapPropertySource;
 import com.mysql.jdbc.Driver;
 
 /**
- * Test BeanPostProcessor that injects the OpenMRS datasource properties values after the
- * {@link org.testcontainers.containers.MySQLContainer} has been started and available. This is
- * necessary primarily for setting the MySQL port and the jdbc url.
+ * Test BeanPostProcessor that sets the dead letter uri for tests and injects the OpenMRS datasource
+ * properties values after the {@link org.testcontainers.containers.MySQLContainer} has been started
+ * and available. This is necessary primarily for setting the MySQL port and the jdbc url.
  */
 public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 	
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		if (SyncConstants.OPENMRS_DATASOURCE_NAME.equals(beanName)) {
+		if (SyncConstants.CUSTOM_PROP_SOURCE_BEAN_NAME.equals(beanName)) {
 			MapPropertySource propSource = (MapPropertySource) bean;
 			propSource.getSource().put("openmrs.db.port", BaseDbBackedCamelTest.mysqlPort);
 			propSource.getSource().put("openmrs.db.host", "localhost");

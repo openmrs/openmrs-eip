@@ -2,7 +2,7 @@ package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
-import static org.openmrs.eip.app.SyncConstants.ROUTE_URI_SYNC_PROCESSOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +90,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -123,7 +123,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -156,7 +156,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				threadNames.add(Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -205,7 +205,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -248,7 +248,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		List<Integer> nonSnapshotMsgIndices = new ArrayList();
@@ -261,7 +261,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -315,7 +315,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
@@ -327,7 +327,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -380,7 +380,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -422,7 +422,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -464,7 +464,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -506,7 +506,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -548,7 +548,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -590,7 +590,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);
@@ -632,7 +632,7 @@ public class SiteMessageConsumerTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(ROUTE_URI_SYNC_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
 		}
 		
 		consumer.processMessages(messages);

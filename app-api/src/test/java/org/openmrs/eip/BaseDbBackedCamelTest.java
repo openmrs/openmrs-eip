@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
 import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.openmrs.eip.app.SyncConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
@@ -30,6 +31,7 @@ import org.testcontainers.lifecycle.Startables;
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
+@TestPropertySource(properties = "spring.openmrs-datasource.dialect=org.hibernate.dialect.MySQL5Dialect")
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.7.31");
@@ -53,7 +55,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
 		mysqlContainer.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
-		
+
 		Resource[] scripts = RESOURCE_RESOLVER.getResources("classpath*:" + SCRIPT_DIR + "*.sql");
 		
 		for (Resource script : scripts) {

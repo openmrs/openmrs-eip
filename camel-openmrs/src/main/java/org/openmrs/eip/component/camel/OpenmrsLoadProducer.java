@@ -8,6 +8,7 @@ import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAU
 import static org.springframework.data.domain.ExampleMatcher.matching;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -102,26 +103,48 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		if (!isDeleteOperation) {
 			if (isUser) {
 				UserModel userModel = (UserModel) modelToSave;
-				if (dbModel == null) {
-					UserRepository userRepo = SyncContext.getBean(UserRepository.class);
-					if (userModel.getUsername() != null) {
-						User exampleUser = new User();
-						exampleUser.setUsername(userModel.getUsername());
-						Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
-						if (userRepo.count(example) > 0) {
-							log.info("Found a user in the receiver DB with a duplicate username: " + userModel.getUsername()
-							        + ", appending " + "site id to this user's username to make it unique");
+				UserRepository userRepo = SyncContext.getBean(UserRepository.class);
+				if (userModel.getUsername() != null) {
+					User exampleUser = new User();
+					exampleUser.setUsername(userModel.getUsername());
+					Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
+					List<User> duplicates = userRepo.findAll(example);
+					if (duplicates.size() > 0) {
+						boolean duplicateUsername = false;
+						if (duplicates.size() > 1) {
+							duplicateUsername = true;
+						} else if (!userModel.getUuid().equalsIgnoreCase(duplicates.get(0).getUuid())) {
+							duplicateUsername = true;
+						}
+						
+						if (duplicateUsername) {
+							log.info(
+							    "Found another user in the receiver DB with a duplicate username: " + userModel.getUsername()
+							            + ", appending " + "site id to this user's username to make it unique");
 							userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
 						}
 					}
-					
+				}
+				
+				if (userModel.getSystemId() != null) {
 					User exampleUser = new User();
 					exampleUser.setSystemId(userModel.getSystemId());
 					Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
-					if (userRepo.count(example) > 0) {
-						log.info("Found a user in the receiver DB with a duplicate systemId: " + userModel.getSystemId()
-						        + ", appending site id " + "to this user's systemId to make it unique");
-						userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+					List<User> duplicates = userRepo.findAll(example);
+					if (duplicates.size() > 0) {
+						boolean duplicateSystemId = false;
+						if (duplicates.size() > 1) {
+							duplicateSystemId = true;
+						} else if (!userModel.getUuid().equalsIgnoreCase(duplicates.get(0).getUuid())) {
+							duplicateSystemId = true;
+						}
+						
+						if (duplicateSystemId) {
+							log.info(
+							    "Found another user in the receiver DB with a duplicate systemId: " + userModel.getSystemId()
+							            + ", appending site id " + "to this user's systemId to make it unique");
+							userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
+						}
 					}
 				}
 			} else if (modelToSave instanceof PersonAttributeModel) {

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.openmrs.eip.app.SyncConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
