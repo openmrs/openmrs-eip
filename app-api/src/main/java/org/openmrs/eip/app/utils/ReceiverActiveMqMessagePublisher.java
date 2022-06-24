@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.RECEIVER)
-public class ReceiverMessageUtils {
+public class ReceiverActiveMqMessagePublisher {
 	
-	private static final Logger log = LoggerFactory.getLogger(ReceiverMessageUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(ReceiverActiveMqMessagePublisher.class);
 	
 	@Value("${" + Constants.PROP_CAMEL_OUTPUT_ENDPOINT + "}")
 	private String endpointConfig;

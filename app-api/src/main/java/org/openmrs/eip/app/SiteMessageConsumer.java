@@ -15,7 +15,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.utils.ReceiverMessageUtils;
+import org.openmrs.eip.app.utils.ReceiverActiveMqMessagePublisher;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private int failureCount;
 	
-	private ReceiverMessageUtils messageUtils;
+	private ReceiverActiveMqMessagePublisher messagePublisher;
 	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
@@ -66,7 +66,7 @@ public class SiteMessageConsumer implements Runnable {
 	@Override
 	public void run() {
 		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		messageUtils = SyncContext.getBean(ReceiverMessageUtils.class);
+		messagePublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
 		
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
@@ -204,7 +204,7 @@ public class SiteMessageConsumer implements Runnable {
 	 * @param msg the sync message to process
 	 */
 	public void processMessage(SyncMessage msg) {
-		messageUtils.sendSyncResponse(msg);
+		messagePublisher.sendSyncResponse(msg);
 		
 		log.info("Submitting sync message to the processor");
 		

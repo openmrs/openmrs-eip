@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.utils.ReceiverMessageUtils;
+import org.openmrs.eip.app.utils.ReceiverActiveMqMessagePublisher;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -52,14 +52,14 @@ public class SiteMessageConsumerTest {
 	}
 	
 	private void initExecutorAndConsumer(final int size) {
-		ReceiverMessageUtils messageUtils = new ReceiverMessageUtils();
-		Whitebox.setInternalState(messageUtils, "endpointConfig", "queue.name.prefix.{0}");
-		Whitebox.setInternalState(messageUtils, ProducerTemplate.class, mockProducerTemplate);
+		ReceiverActiveMqMessagePublisher messagePublisher = new ReceiverActiveMqMessagePublisher();
+		Whitebox.setInternalState(messagePublisher, "endpointConfig", "queue.name.prefix.{0}");
+		Whitebox.setInternalState(messagePublisher, ProducerTemplate.class, mockProducerTemplate);
 		
 		executor = Executors.newFixedThreadPool(size);
 		consumer = new SiteMessageConsumer(siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
-		Whitebox.setInternalState(consumer, ReceiverMessageUtils.class, messageUtils);
+		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, messagePublisher);
 	}
 	
 	private SyncMessage createMessage(int index, boolean snapshot) {
