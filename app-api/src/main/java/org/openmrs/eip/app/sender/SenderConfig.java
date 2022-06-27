@@ -48,7 +48,7 @@ public class SenderConfig {
 	
 	@Bean(SenderConstants.ERROR_HANDLER_REF)
 	@DependsOn(CUSTOM_PROP_SOURCE_BEAN_NAME)
-	public DeadLetterChannelBuilder getInBoundErrorHandler() {
+	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
 		builder.setUseOriginalMessage(true);
 		return builder;

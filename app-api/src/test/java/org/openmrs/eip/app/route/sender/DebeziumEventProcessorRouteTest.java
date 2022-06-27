@@ -3,13 +3,14 @@ package org.openmrs.eip.app.route.sender;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.route.sender.DebeziumEventProcessorRouteTest.DEST_DB_SYNC;
 import static org.openmrs.eip.app.route.sender.DebeziumEventProcessorRouteTest.DEST_SENAITE;
+import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_IS_SUBCLASS;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_ROUTE_RETRY_COUNT_MAP;
+import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DBSYNC;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DBZM_EVENT_PROCESSOR;
-import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DB_EVENT_PROCESSOR_ROUTE;
+import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DB_EVENT_PROCESSOR;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_PROCESSOR;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_DB_EVENT_PROCESSOR;
 
@@ -32,14 +33,12 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 @Sql(scripts = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 @TestPropertySource(properties = "logging.level.debezium-event-processor=DEBUG")
-@TestPropertySource(properties = "db-event.destinations=" + DEST_DB_SYNC + ", " + DEST_SENAITE)
+@TestPropertySource(properties = "db-event.destinations=" + ROUTE_ID_DBSYNC + ", " + DEST_SENAITE)
 public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	
-	protected static final String DEST_DB_SYNC = "direct:db-sync";
+	protected static final String DEST_SENAITE = "senaite";
 	
-	protected static final String DEST_SENAITE = "direct:senaite";
-	
-	@EndpointInject("mock:" + ROUTE_ID_DB_EVENT_PROCESSOR_ROUTE)
+	@EndpointInject("mock:" + ROUTE_ID_DB_EVENT_PROCESSOR)
 	private MockEndpoint mockEventProcessorEndpoint;
 	
 	@Override
@@ -64,7 +63,7 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	public void shouldFailIfARetryItemForTheEntityIsForAnInvalidRoute() throws Exception {
 		final String table = "person";
 		final String id = "2";
-		final String destination = "direct:invalid-dest";
+		final String destination = "invalid-dest";
 		assertTrue(SenderTestUtils.hasRetryItem(table, id, destination));
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(createDebeziumEvent(table, id, null, "u"));
@@ -80,16 +79,17 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	public void shouldProcessAnEventForAnEntityWithNoRetryItems() throws Exception {
 		final String table = "person";
 		final String id = "3";
-		assertFalse(SenderTestUtils.hasRetryItem(table, id, DEST_DB_SYNC));
+		assertFalse(SenderTestUtils.hasRetryItem(table, id, ROUTE_ID_DBSYNC));
 		Exchange exchange = new DefaultExchange(camelContext);
 		DebeziumEvent debeziumEvent = createDebeziumEvent(table, id, null, "u");
 		exchange.getIn().setBody(debeziumEvent);
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(debeziumEvent.getEvent());
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_EVENT, debeziumEvent.getEvent());
+		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_DBZM_EVENT, debeziumEvent);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_IS_SUBCLASS, false);
 		Map<String, Integer> routRetryCountMap = new HashMap();
-		routRetryCountMap.put(DEST_DB_SYNC, 0);
+		routRetryCountMap.put(ROUTE_ID_DBSYNC, 0);
 		routRetryCountMap.put(DEST_SENAITE, 0);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_ROUTE_RETRY_COUNT_MAP, routRetryCountMap);
 		
@@ -102,16 +102,17 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	public void shouldProcessAnEventForAnEntityWithRetryItems() throws Exception {
 		final String table = "person";
 		final String id = "1";
-		assertTrue(SenderTestUtils.hasRetryItem(table, id, DEST_DB_SYNC));
+		assertTrue(SenderTestUtils.hasRetryItem(table, id, ROUTE_ID_DBSYNC));
 		Exchange exchange = new DefaultExchange(camelContext);
 		DebeziumEvent debeziumEvent = createDebeziumEvent(table, id, null, "u");
 		exchange.getIn().setBody(debeziumEvent);
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(debeziumEvent.getEvent());
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_EVENT, debeziumEvent.getEvent());
+		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_DBZM_EVENT, debeziumEvent);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_IS_SUBCLASS, false);
 		Map<String, Integer> routRetryCountMap = new HashMap();
-		routRetryCountMap.put(DEST_DB_SYNC, 3);
+		routRetryCountMap.put(ROUTE_ID_DBSYNC, 3);
 		routRetryCountMap.put(DEST_SENAITE, 1);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_ROUTE_RETRY_COUNT_MAP, routRetryCountMap);
 		
@@ -124,16 +125,17 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	public void shouldProcessAnEventForASubclassEntity() throws Exception {
 		final String table = "patient";
 		final String id = "1";
-		assertTrue(SenderTestUtils.hasRetryItem(table, id, DEST_DB_SYNC));
+		assertTrue(SenderTestUtils.hasRetryItem(table, id, ROUTE_ID_DBSYNC));
 		Exchange exchange = new DefaultExchange(camelContext);
 		DebeziumEvent debeziumEvent = createDebeziumEvent(table, id, null, "u");
 		exchange.getIn().setBody(debeziumEvent);
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(debeziumEvent.getEvent());
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_EVENT, debeziumEvent.getEvent());
+		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_DBZM_EVENT, debeziumEvent);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_IS_SUBCLASS, true);
 		Map<String, Integer> routRetryCountMap = new HashMap();
-		routRetryCountMap.put(DEST_DB_SYNC, 3);
+		routRetryCountMap.put(ROUTE_ID_DBSYNC, 3);
 		routRetryCountMap.put(DEST_SENAITE, 1);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_ROUTE_RETRY_COUNT_MAP, routRetryCountMap);
 		
