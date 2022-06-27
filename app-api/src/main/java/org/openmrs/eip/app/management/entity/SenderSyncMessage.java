@@ -53,9 +53,9 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Access(AccessType.FIELD)
 	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
 	
-	@Column(name = "date_updated")
+	@Column(name = "date_changed")
 	@Access(AccessType.FIELD)
-	private Date dateUpdated;
+	private Date dateChanged;
 	
 	@Column(name = "error_message", length = 200)
 	@Access(AccessType.FIELD)
@@ -113,8 +113,8 @@ public class SenderSyncMessage extends AbstractEntity {
 		return status;
 	}
 	
-	public Date getDateUpdated() {
-		return dateUpdated;
+	public Date getDateChanged() {
+		return dateChanged;
 	}
 	
 	public String getErrorMessage() {
@@ -123,12 +123,12 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	public void markAsSent() {
 		this.status = SenderSyncMessageStatus.SENT;
-		this.dateUpdated = new Date();
+		this.dateChanged = new Date();
 	}
 	
 	public void markAsError(@NotNull String errorMessage) {
 		this.status = SenderSyncMessageStatus.ERROR;
-		this.dateUpdated = new Date();
+		this.dateChanged = new Date();
 		this.errorMessage = errorMessage;
 	}
 	
@@ -136,7 +136,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	public String toString() {
 		return "SenderSyncMessage [tableName=" + tableName + ", identifier=" + identifier + ", operation=" + operation
 		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + ", status="
-		        + status + ", dateUpdated=" + dateUpdated + ", errorMessage=" + errorMessage + "]";
+		        + status + ", dateChanged=" + dateChanged + ", errorMessage=" + errorMessage + "]";
 	}
 	
 }
