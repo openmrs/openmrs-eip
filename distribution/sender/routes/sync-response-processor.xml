@@ -5,7 +5,7 @@
 
         <log message="Fetching next {{sync-response-processor.max.fetch.results}} sync responses" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r WHERE r.status = 'NEW' ORDER BY r.dateSent, r.id ASC&amp;maximumResults={{sync-response-processor.max.fetch.results}}" />
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateSent, r.id ASC&amp;maximumResults={{sync-response-processor.max.fetch.results}}" />
 
         <choice>
             <when>
@@ -41,24 +41,16 @@
                         </otherwise>
                     </choice>
                     
-                    <log message="Updating sync response status to processed" />
-
-                    <script>
-                        <spel>
-                            #{getProperty('syncResponse').markAsProcessed()}
-                        </spel>
-                    </script>
-                    <setBody>
-                        <simple>${exchangeProperty.syncResponse}</simple>
-                    </setBody>
-
-                    <to uri="jpa:SenderSyncResponse" />
-
-                    <log message="Successfully processed sync response" loggingLevel="DEBUG" />
+                    <log message="Removing processed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" loggingLevel="DEBUG" />
+                    
+                    <toD uri="jpa:SenderSyncResponse?query=DELETE FROM SenderSyncResponse WHERE id = ${exchangeProperty.syncResponse.id}" />
+                    
+                    <log message="Successfully removed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" loggingLevel="DEBUG" />
+                    
                 </split>
             </when>
             <otherwise>
-                <log message="No sync responses was found" loggingLevel="DEBUG" />
+                <log message="No sender sync responses was found" loggingLevel="DEBUG" />
             </otherwise>
         </choice>
         

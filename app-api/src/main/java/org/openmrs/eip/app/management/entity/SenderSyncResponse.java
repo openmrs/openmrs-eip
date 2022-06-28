@@ -6,8 +6,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -16,11 +14,6 @@ import javax.validation.constraints.NotNull;
 public class SenderSyncResponse extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
-	
-	public enum SyncResponseStatus {
-		NEW,
-		PROCESSED
-	}
 	
 	@NotNull
 	@Column(name = "message_uuid", length = 38, nullable = false, updatable = false)
@@ -31,16 +24,6 @@ public class SenderSyncResponse extends AbstractEntity {
 	@Column(name = "date_sent", nullable = false, updatable = false)
 	@Access(AccessType.FIELD)
 	private Date dateSent;
-	
-	@Column(name = "date_processed")
-	@Access(AccessType.FIELD)
-	private Date dateProcessed;
-	
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
-	@Access(AccessType.FIELD)
-	private SyncResponseStatus status = SyncResponseStatus.NEW;
 	
 	public String getMessageUuid() {
 		return messageUuid;
@@ -58,23 +41,9 @@ public class SenderSyncResponse extends AbstractEntity {
 		this.dateSent = dateSent;
 	}
 	
-	public Date getDateProcessed() {
-		return dateProcessed;
-	}
-	
-	public SyncResponseStatus getStatus() {
-		return status;
-	}
-	
-	public void markAsProcessed() {
-		this.status = SyncResponseStatus.PROCESSED;
-		this.dateProcessed = new Date();
-	}
-	
 	@Override
 	public String toString() {
-		return "SyncResponse [messageUuid=" + messageUuid + ", dateSent=" + dateSent + ", dateProcessed=" + dateProcessed
-		        + ", status=" + status + "]";
+		return "SyncResponse [messageUuid=" + messageUuid + ", dateSent=" + dateSent + "]";
 	}
 	
 }

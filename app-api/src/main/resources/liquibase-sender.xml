@@ -311,10 +311,6 @@
             <column name="date_sent" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_processed" type="TIMESTAMP(3)"/>
-            <column name="status" type="VARCHAR(20)">
-                <constraints nullable="false" />
-            </column>
         </createTable>
 
     </changeSet>
