@@ -53,7 +53,7 @@ public class ReceiverActiveMqMessagePublisher {
 	private <E extends AbstractEntity> void sendSyncResponse(E sourceEntity, String siteIdentifier, String messageUuid) {
 		if (StringUtils.isBlank(messageUuid)) {
 			if (log.isDebugEnabled()) {
-				log.debug("No correspondent messageUuid was found. Skipping sending sync response for: {}", sourceEntity);
+				log.debug("No correspondent messageUuid is present. Skipping sending sync response for: {}", sourceEntity);
 			}
 			return;
 		}
@@ -66,16 +66,15 @@ public class ReceiverActiveMqMessagePublisher {
 		syncResponse.setDateSent(LocalDateTime.now());
 		syncResponse.setMessageUuid(messageUuid);
 		
-		String endpoint = getCamelOutputEndpoint(siteIdentifier);
 		String payload = JsonUtils.marshall(syncResponse);
 		
-		log.info("Sending Sync Response. Payload: {}; Endpoint: {}", payload, endpoint);
-		
-		producerTemplate.sendBody(endpoint, payload);
-		
 		if (log.isDebugEnabled()) {
-			log.debug("Sync Response sent.");
+			log.debug("Sending Sync Response. Payload: {}", payload);
 		}
+		
+		producerTemplate.sendBody(getCamelOutputEndpoint(siteIdentifier), payload);
+		
+		log.info("Sync response sent for message with uuid: {}", messageUuid);
 	}
 	
 	/**
