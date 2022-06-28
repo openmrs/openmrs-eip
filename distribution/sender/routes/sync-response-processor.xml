@@ -3,9 +3,9 @@
 
         <from uri="scheduler:sync_response_processor?initialDelay={{sync-response-processor.initial.delay}}&amp;delay={{sync-response-processor.delay}}" />
 
-        <log message="Fetching next {{sync-response-processor.max.fetch.results}} sync responses" loggingLevel="DEBUG" />
+        <log message="Fetching next 500 sync responses" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateSent, r.id ASC&amp;maximumResults={{sync-response-processor.max.fetch.results}}" />
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateSent, r.id ASC&amp;maximumResults=500" />
 
         <choice>
             <when>

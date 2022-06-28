@@ -4,9 +4,9 @@
     
         <from uri="scheduler:active_mq_publisher?initialDelay={{active-mq-publisher.initial.delay}}&amp;delay={{active-mq-publisher.delay}}" />
 
-        <log message="Fetching next {{active-mq-publisher.max.fetch.results}} sender sync messages" loggingLevel="DEBUG" />
+        <log message="Fetching next 500 sender sync messages" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.status = 'NEW' ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults={{active-mq-publisher.max.fetch.results}}" />
+        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.status = 'NEW' ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults=500" />
 
         <choice>
             <when>
