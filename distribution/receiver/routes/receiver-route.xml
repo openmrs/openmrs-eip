@@ -77,6 +77,10 @@
                     <setBody>
                         <simple>${body[0]}</simple>
                     </setBody>
+                    
+                    <setProperty name="receiverSyncRequest">
+                        <simple>${body}</simple>
+                    </setProperty>
 
                     <log message="Updating status to received for request: ${body}" />
 
@@ -91,10 +95,6 @@
                     <to uri="jpa:ReceiverSyncRequest" />
 
                     <log message="Successfully saved updates for sync request" loggingLevel="DEBUG" />
-                    
-                    <setProperty name="receiverSyncRequest">
-                        <simple>${body}</simple>
-                    </setProperty>
                 </when>
 
                 <choice>

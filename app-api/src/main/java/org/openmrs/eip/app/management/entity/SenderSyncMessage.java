@@ -17,11 +17,9 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	private static final long serialVersionUID = 1L;
 	
-	// TODO add ACKNOWLEDGED status, which will be set after successful processing of the receiver response
 	public enum SenderSyncMessageStatus {
 		NEW,
-		SENT,
-		ERROR
+		SENT
 	}
 	
 	@NotNull
@@ -56,10 +54,6 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Column(name = "date_changed")
 	@Access(AccessType.FIELD)
 	private Date dateChanged;
-	
-	@Column(name = "error_message", length = 200)
-	@Access(AccessType.FIELD)
-	private String errorMessage;
 	
 	public String getTableName() {
 		return tableName;
@@ -117,26 +111,16 @@ public class SenderSyncMessage extends AbstractEntity {
 		return dateChanged;
 	}
 	
-	public String getErrorMessage() {
-		return errorMessage;
-	}
-	
 	public void markAsSent() {
 		this.status = SenderSyncMessageStatus.SENT;
 		this.dateChanged = new Date();
-	}
-	
-	public void markAsError(@NotNull String errorMessage) {
-		this.status = SenderSyncMessageStatus.ERROR;
-		this.dateChanged = new Date();
-		this.errorMessage = errorMessage;
 	}
 	
 	@Override
 	public String toString() {
 		return "SenderSyncMessage [tableName=" + tableName + ", identifier=" + identifier + ", operation=" + operation
 		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + ", status="
-		        + status + ", dateChanged=" + dateChanged + ", errorMessage=" + errorMessage + "]";
+		        + status + ", dateChanged=" + dateChanged + "]";
 	}
 	
 }
