@@ -63,7 +63,7 @@
             
                     <choice>
                         <when>
-                            <simple>${body} != null || ${exchangeProperty.event.operation} == 'r'</simple>
+                            <simple>${body} != null || ${exchangeProperty.senderSyncMessage.operation} == 'r'</simple>
                             <when>
                                 <simple>${body} == null</simple>
     
