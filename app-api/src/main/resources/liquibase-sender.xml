@@ -282,7 +282,7 @@
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
-            <column name="status" type="VARCHAR(20)">
+            <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>
             <column name="date_changed" type="DATETIME(3)" />

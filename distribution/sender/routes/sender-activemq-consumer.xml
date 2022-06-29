@@ -48,16 +48,16 @@
             <when>
                 <simple>${exchangeProperty.messageUuid} != null</simple>
                 
-                <setProperty name="senderSyncResponseModelClass">
-                    <spel>#{T(org.openmrs.eip.app.management.entity.SenderSyncResponseModel)}</spel>
+                <setProperty name="syncResponseModelClass">
+                    <spel>#{T(org.openmrs.eip.app.management.entity.SyncResponseModel)}</spel>
                 </setProperty>
                 
-                <setProperty name="senderSyncResponseModel">
-                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshal(${body}, ${exchangeProperty.senderSyncResponseModelClass})" />
+                <setProperty name="syncResponseModel">
+                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshal(${body}, ${exchangeProperty.syncResponseModelClass})" />
                 </setProperty>
                 
                 <setProperty name="dateSent">
-                    <method beanType="org.openmrs.eip.component.utils.DateUtils" method="localDateTimeToDate(${exchangeProperty.senderSyncResponseModel.dateSent})" />
+                    <method beanType="org.openmrs.eip.component.utils.DateUtils" method="localDateTimeToDate(${exchangeProperty.syncResponseModel.dateSent})" />
                 </setProperty>
                 
                 <setBody>
@@ -66,7 +66,7 @@
                 <script>
                     <spel>
                         #{body.setDateCreated(new java.util.Date())}
-                        #{body.setMessageUuid(getProperty('senderSyncResponseModel').messageUuid)}
+                        #{body.setMessageUuid(getProperty('syncResponseModel').messageUuid)}
                         #{body.setDateSent(getProperty('dateSent'))}
                     </spel>
                 </script>

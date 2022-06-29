@@ -2,8 +2,6 @@ package org.openmrs.eip.app.management.entity;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -17,12 +15,10 @@ public class SenderSyncResponse extends AbstractEntity {
 	
 	@NotNull
 	@Column(name = "message_uuid", length = 38, nullable = false, updatable = false)
-	@Access(AccessType.FIELD)
 	private String messageUuid;
 	
 	@NotNull
 	@Column(name = "date_sent", nullable = false, updatable = false)
-	@Access(AccessType.FIELD)
 	private Date dateSent;
 	
 	public String getMessageUuid() {

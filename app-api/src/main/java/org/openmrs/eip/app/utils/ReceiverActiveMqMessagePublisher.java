@@ -7,7 +7,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
-import org.openmrs.eip.app.management.entity.SenderSyncResponseModel;
+import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncProfiles;
@@ -32,7 +32,7 @@ public class ReceiverActiveMqMessagePublisher {
 	private ProducerTemplate producerTemplate;
 	
 	/**
-	 * Sends a <code>SenderSyncResponseModel</code> back to the Sender.
+	 * Sends a <code>SyncResponseModel</code> back to the Sender.
 	 * 
 	 * @param message The <code>SenderSyncMessage</code> to acknowledge.
 	 */
@@ -41,7 +41,7 @@ public class ReceiverActiveMqMessagePublisher {
 	}
 	
 	/**
-	 * Sends a <code>SenderSyncResponseModel</code> back to the Sender.
+	 * Sends a <code>SyncResponseModel</code> back to the Sender.
 	 * 
 	 * @param syncRequest The <code>ReceiverSyncRequest</code> to acknowledge.
 	 * @param messageUuid The Message UUID
@@ -62,7 +62,7 @@ public class ReceiverActiveMqMessagePublisher {
 			log.debug("Preparing sync response for: {}", sourceEntity);
 		}
 		
-		SenderSyncResponseModel syncResponse = new SenderSyncResponseModel();
+		SyncResponseModel syncResponse = new SyncResponseModel();
 		syncResponse.setDateSent(LocalDateTime.now());
 		syncResponse.setMessageUuid(messageUuid);
 		
