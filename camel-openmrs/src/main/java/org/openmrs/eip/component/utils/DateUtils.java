@@ -1,10 +1,8 @@
 package org.openmrs.eip.component.utils;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,10 +50,6 @@ public final class DateUtils {
 		}
 		
 		return latestDateFromColl2 == null || latestDateFromColl1.isAfter(latestDateFromColl2);
-	}
-	
-	public static Date localDateTimeToDate(LocalDateTime dateToConvert) {
-		return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
 	}
 	
 }

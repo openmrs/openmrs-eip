@@ -56,10 +56,6 @@
                     <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshal(${body}, ${exchangeProperty.syncResponseModelClass})" />
                 </setProperty>
                 
-                <setProperty name="dateSent">
-                    <method beanType="org.openmrs.eip.component.utils.DateUtils" method="localDateTimeToDate(${exchangeProperty.syncResponseModel.dateSent})" />
-                </setProperty>
-                
                 <setBody>
                     <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncResponse()}</spel>
                 </setBody>
@@ -67,7 +63,7 @@
                     <spel>
                         #{body.setDateCreated(new java.util.Date())}
                         #{body.setMessageUuid(getProperty('syncResponseModel').messageUuid)}
-                        #{body.setDateSent(getProperty('dateSent'))}
+                        #{body.setDateSent(getProperty('syncResponseModel').dateSent)}
                     </spel>
                 </script>
         

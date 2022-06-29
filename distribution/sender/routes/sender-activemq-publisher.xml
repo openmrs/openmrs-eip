@@ -13,7 +13,7 @@
                 <simple>${body.size()} > 0</simple>
                 <log message="Fetched ${body.size()} sender sync messages" />
 
-                <split parallelProcessing="false">
+                <split parallelProcessing="false" stopOnException="true">
                     <simple>${body}</simple>
                     <setProperty name="senderSyncMessage">
                         <simple>${body}</simple>
@@ -128,7 +128,7 @@
                         </when>
                         
                         <otherwise>
-                            <log message="No entity found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
+                            <log message="Requested entity not found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" loggingLevel="INFO" />
                             <log message="Removing sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
                             
                             <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE id = ${exchangeProperty.senderSyncMessage.id}" />

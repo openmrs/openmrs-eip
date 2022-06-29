@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.management.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +19,7 @@ public class SenderSyncResponse extends AbstractEntity {
 	
 	@NotNull
 	@Column(name = "date_sent", nullable = false, updatable = false)
-	private Date dateSent;
+	private LocalDateTime dateSent;
 	
 	public String getMessageUuid() {
 		return messageUuid;
@@ -29,11 +29,11 @@ public class SenderSyncResponse extends AbstractEntity {
 		this.messageUuid = messageUuid;
 	}
 	
-	public Date getDateSent() {
+	public LocalDateTime getDateSent() {
 		return dateSent;
 	}
 	
-	public void setDateSent(Date dateSent) {
+	public void setDateSent(LocalDateTime dateSent) {
 		this.dateSent = dateSent;
 	}
 	
