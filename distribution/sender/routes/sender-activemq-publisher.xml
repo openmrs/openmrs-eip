@@ -128,7 +128,7 @@
                         </when>
                         
                         <otherwise>
-                            <log message="Requested entity not found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" loggingLevel="INFO" />
+                            <log message="No entity found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" />
                             <log message="Removing sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
                             
                             <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE id = ${exchangeProperty.senderSyncMessage.id}" />
