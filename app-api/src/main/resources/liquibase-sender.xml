@@ -308,7 +308,7 @@
             <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_sent" type="TIMESTAMP(3)">
+            <column name="date_sent_by_receiver" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
         </createTable>

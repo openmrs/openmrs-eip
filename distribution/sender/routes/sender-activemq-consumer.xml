@@ -63,7 +63,7 @@
                     <spel>
                         #{body.setDateCreated(new java.util.Date())}
                         #{body.setMessageUuid(getProperty('syncResponseModel').messageUuid)}
-                        #{body.setDateSent(getProperty('syncResponseModel').dateSent)}
+                        #{body.setDateSentByReceiver(getProperty('syncResponseModel').dateSentByReceiver)}
                     </spel>
                 </script>
         

@@ -9,6 +9,6 @@ public class SyncResponseModel {
 	
 	private String messageUuid;
 	
-	private LocalDateTime dateSent;
+	private LocalDateTime dateSentByReceiver;
 	
 }

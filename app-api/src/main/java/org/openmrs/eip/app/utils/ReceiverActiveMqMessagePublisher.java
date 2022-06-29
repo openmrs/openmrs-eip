@@ -63,7 +63,7 @@ public class ReceiverActiveMqMessagePublisher {
 		}
 		
 		SyncResponseModel syncResponse = new SyncResponseModel();
-		syncResponse.setDateSent(LocalDateTime.now());
+		syncResponse.setDateSentByReceiver(LocalDateTime.now());
 		syncResponse.setMessageUuid(messageUuid);
 		
 		String payload = JsonUtils.marshall(syncResponse);
