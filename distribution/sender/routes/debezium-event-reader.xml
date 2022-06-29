@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="debezium-event-reader" errorHandlerRef="shutdownErrorHandler">
-        <from uri="scheduler:debezium-reader?initialDelay={{debezium-event-reader.initial.delay}}&amp;delay={{debezium-event-reader.repeat.interval}}" />
+        <from uri="direct:debezium-event-reader" />
 
         <log loggingLevel="DEBUG" message="Fetching next 1000 events in the debezium event queue" />
 

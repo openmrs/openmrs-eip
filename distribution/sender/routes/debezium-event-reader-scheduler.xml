@@ -1,0 +1,8 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="debezium-event-reader-scheduler" errorHandlerRef="shutdownErrorHandler">
+        <from uri="scheduler:debezium-event-reader?initialDelay={{debezium-event-reader.initial.delay}}&amp;delay={{debezium-event-reader.repeat.interval}}" />
+
+        <to uri="direct:debezium-event-reader" />
+
+    </route>
+</routes>
