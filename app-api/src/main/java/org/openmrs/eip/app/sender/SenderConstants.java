@@ -26,6 +26,10 @@ public class SenderConstants {
 	
 	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;
 	
+	public static final String ROUTE_ID_DBZM_EVENT_READER = "debezium-event-reader";
+	
+	public static final String URI_DBZM_EVENT_READER = "direct:" + ROUTE_ID_DBZM_EVENT_READER;
+	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
 }
