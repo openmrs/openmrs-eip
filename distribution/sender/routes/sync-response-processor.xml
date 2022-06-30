@@ -26,7 +26,7 @@
                     <choice>
                         <when>
                             <simple>${body.size()} > 0</simple>
-                            <log message="Fetched ${body.size()} Sender sync messages with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                            <log message="Fetched ${body.size()} sender sync message(s) matching message uuid ${exchangeProperty.syncResponse.messageUuid}" />
             
                             <log loggingLevel="DEBUG" message="Sender sync message(s) found -> ${body}" />
                             
