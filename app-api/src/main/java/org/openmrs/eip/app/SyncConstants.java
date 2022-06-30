@@ -34,4 +34,6 @@ public class SyncConstants {
 	
 	public final static String MGT_TX_MGR = "mngtTransactionManager";
 	
+	public final static String EX_PROP_APP_ID = "org.openmrs.eip.app-appId";
+	
 }

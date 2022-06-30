@@ -12,9 +12,13 @@
                 <log loggingLevel="DEBUG" message="The application is already shutting down" />
             </when>
             <otherwise>
-                <!-- TODO Send a notification to the configured emails -->
-
                 <log loggingLevel="ERROR" message="An error occurred, ${exception.printStackTrace()}" />
+                
+                <setProperty name="org.openmrs.eip.app-appId">
+                    <simple>{{db-sync.receiverId}}</simple>
+                </setProperty>
+
+                <process ref="shutdownNotificationProcessor" />
 
                 <script>
                     <method beanType="org.openmrs.eip.app.AppUtils" method="shutdown()" />
