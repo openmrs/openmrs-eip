@@ -1117,6 +1117,19 @@
         <comment>Changing date_created and date_changed column datatypes to datetime for all tables used to store hashes</comment>
         <customChange class="org.openmrs.eip.app.management.UpdateColumnDatatypeChangeSet" />
     </changeSet>
+    
+    <changeSet author="lccpinto" id="20220601-1140">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="message_uuid" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add message_uuid column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="message_uuid" type="VARCHAR(38)" />
+        </addColumn>
+    </changeSet>
 
     <changeSet author="wluyima" id="20220526-1500">
         <preConditions onFail="MARK_RAN">

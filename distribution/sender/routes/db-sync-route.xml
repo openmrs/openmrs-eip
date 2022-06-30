@@ -1,104 +1,31 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
-    <route id="out-bound-db-sync" errorHandlerRef="outBoundErrorHandler">
+    <route id="out-bound-db-sync" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
         <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />
+        
+        <setBody>
+            <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
+        </setBody>
+        <script>
+            <spel>
+                #{body.setTableName(getProperty('event').tableName)}
+                #{body.setIdentifier(getProperty('event').identifier)}
+                #{body.setOperation(getProperty('event').operation)}
+                #{body.setSnapshot(getProperty('event').snapshot)}
+                #{body.setDateCreated(new java.util.Date())}
+                #{body.setMessageUuid(T(java.util.UUID).randomUUID().toString())}
+                #{body.setRequestUuid(getProperty('event').requestUuid)}
+            </spel>
+        </script>
+        
+        <log message="Saving sender sync message: ${body}" loggingLevel="DEBUG" />
 
-        <choice>
-            <when>
-                <simple>${exchangeProperty.event.operation} == 'd'</simple>
-                <setBody>
-                    <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('event').tableName).modelClass)}
-                        #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
-                        #{body.model.setUuid(getProperty('event').identifier)}
-                        #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                    </spel>
-                </script>
+        <to uri="jpa:SenderSyncMessage?usePersist=true" />
 
-                <log message="Deleted entity payload -> ${body}" />
-            </when>
-            <otherwise>
-                <log message="Loading entity from DB..." loggingLevel="DEBUG" />
-
-                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.event.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.event.identifier}" />
-
-                <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
-
-                <choice>
-                    <when>
-                        <simple>${body.size()} == 1</simple>
-                        <setBody>
-                            <jsonpath>$[0]</jsonpath>
-                        </setBody>
-                    </when>
-                    <otherwise>
-                        <setBody>
-                            <simple>${null}</simple>
-                        </setBody>
-                    </otherwise>
-                </choice>
-            </otherwise>
-        </choice>
-
-        <choice>
-            <when>
-                <simple>${body} != null || ${exchangeProperty.event.operation} == 'r'</simple>
-                <when>
-                    <simple>${body} == null</simple>
-
-                    <log message="Entity not found for request with uuid: ${exchangeProperty.event.requestUuid}" />
-                    
-                    <setBody>
-                        <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                    </setBody>
-                    <script>
-                        <spel>
-                            #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                        </spel>
-                    </script>
-                </when>
-                
-                <script>
-                    <spel>
-                        #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                        #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
-                        #{body.metadata.setOperation(getProperty('event').operation)}
-                        #{body.metadata.setRequestUuid(getProperty('event').requestUuid)}
-                        #{body.metadata.setSnapshot(getProperty('event').snapshot)}
-                    </spel>
-                </script>
-                <setBody>
-                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
-                </setBody>
-
-                <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
-
-                <when>
-                    <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
-                    <log message="Encrypting entity payload.." />
-                    
-                    <process ref="pgpEncryptService" />
-
-                    <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
-                </when>
-                
-                <log message="Sending entity to sync destination: {{camel.output.endpoint}}" />
-
-                <toD uri="{{camel.output.endpoint}}" />
-
-                <log loggingLevel="DEBUG" message="Entity sent!" />
-            </when>
-            <otherwise>
-                <!-- TODO Log to a special failures log file or DB -->
-                <log message="No entity found in the database matching identifier: ${exchangeProperty.event.identifier}" loggingLevel="ERROR" />
-            </otherwise>
-        </choice>
-
+        <log message="Sender sync message saved" loggingLevel="DEBUG" />
+        
         <log message="End db-sync-route" loggingLevel="DEBUG" />
 
     </route>

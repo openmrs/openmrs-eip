@@ -77,6 +77,10 @@
                     <setBody>
                         <simple>${body[0]}</simple>
                     </setBody>
+                    
+                    <setProperty name="receiverSyncRequest">
+                        <simple>${body}</simple>
+                    </setProperty>
 
                     <log message="Updating status to received for request: ${body}" />
 
@@ -96,7 +100,9 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.sync-model.metadata.operation} == 'r' &amp;&amp; ${exchangeProperty.sync-model.model} == null</simple>
-
+                        
+                        <to uri="bean:receiverActiveMqMessagePublisher?method=sendSyncResponse(${exchangeProperty.receiverSyncRequest}, ${exchangeProperty.sync-model.metadata.messageUuid})" />
+                        
                         <log message="Ignoring sync message because entity was not found in the remote DB for request with uuid: ${exchangeProperty.sync-model.metadata.requestUuid}" />
                     </when>
                     <otherwise>
@@ -115,6 +121,7 @@
                                 #{getProperty('messageToSave').setSite(T(org.openmrs.eip.app.ReceiverContext).getSiteInfo(getProperty('sync-model').metadata.sourceIdentifier))}
                                 #{getProperty('messageToSave').setDateCreated(new java.util.Date())}
                                 #{getProperty('messageToSave').setSnapshot(getProperty('sync-model').metadata.snapshot == true)}
+                                #{getProperty('messageToSave').setMessageUuid(getProperty('sync-model').metadata.messageUuid)}
                             </spel>
                         </script>
                         <setBody>

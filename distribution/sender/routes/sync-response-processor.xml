@@ -1,0 +1,58 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="sync-response-processor" errorHandlerRef="shutdownErrorHandler">
+
+        <from uri="scheduler:sync_response_processor?initialDelay={{sync-response-processor.initial.delay}}&amp;delay={{sync-response-processor.delay}}" />
+
+        <log message="Fetching next 500 sync responses" loggingLevel="DEBUG" />
+
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateSentByReceiver, r.id ASC&amp;maximumResults=500" />
+
+        <choice>
+            <when>
+                <simple>${body.size()} > 0</simple>
+                <log message="Fetched ${body.size()} sender sync responses" />
+                
+                <split parallelProcessing="false">
+                    <simple>${body}</simple>
+                    
+                    <setProperty name="syncResponse">
+                        <simple>${body}</simple>
+                    </setProperty>
+
+                    <log message="Processing sender sync response -> ${exchangeProperty.syncResponse}" />
+                    
+                    <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.messageUuid='${exchangeProperty.syncResponse.messageUuid}'" />
+                    
+                    <choice>
+                        <when>
+                            <simple>${body.size()} > 0</simple>
+                            <log message="Fetched ${body.size()} Sender sync messages with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+            
+                            <log loggingLevel="DEBUG" message="Sender sync message(s) found -> ${body}" />
+                            
+                            <log loggingLevel="DEBUG" message="Removing Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+            
+                            <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = '${exchangeProperty.syncResponse.messageUuid}'" />
+            
+                            <log loggingLevel="INFO" message="Successfully removed Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                        </when>
+                        <otherwise>
+                            <log loggingLevel="INFO" message="No Sender sync message was found with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                        </otherwise>
+                    </choice>
+                    
+                    <log message="Removing processed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" loggingLevel="DEBUG" />
+                    
+                    <toD uri="jpa:SenderSyncResponse?query=DELETE FROM SenderSyncResponse WHERE id = ${exchangeProperty.syncResponse.id}" />
+                    
+                    <log message="Successfully removed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" loggingLevel="DEBUG" />
+                    
+                </split>
+            </when>
+            <otherwise>
+                <log message="No sender sync responses was found" loggingLevel="DEBUG" />
+            </otherwise>
+        </choice>
+        
+    </route>
+</routes>

@@ -17,6 +17,8 @@ public class SyncMetadata {
 	
 	private String requestUuid;
 	
+	private String messageUuid;
+	
 	private Boolean snapshot = false;
 	
 	/**
@@ -91,6 +93,14 @@ public class SyncMetadata {
 		this.requestUuid = requestUuid;
 	}
 	
+	public String getMessageUuid() {
+		return messageUuid;
+	}
+	
+	public void setMessageUuid(String messageUuid) {
+		this.messageUuid = messageUuid;
+	}
+  
 	/**
 	 * Gets the snapshot
 	 *
@@ -112,7 +122,7 @@ public class SyncMetadata {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation
-		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + "}";
+		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", messageUuid=" + messageUuid + ", snapshot=" + snapshot + "}";
 	}
 	
 }

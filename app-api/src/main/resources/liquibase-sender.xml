@@ -250,5 +250,69 @@
             </column>
         </addColumn>
     </changeSet>
+    
+    <changeSet author="lpinto" id="20220210-1050">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_message" />
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_message table</comment>
 
+        <createTable tableName="sender_sync_message">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)" />
+            <column name="date_created" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="snapshot" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="DATETIME(3)" />
+        </createTable>
+
+    </changeSet>
+    
+    <changeSet author="lpinto" id="20220323-1545">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_response" />
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_response table</comment>
+
+        <createTable tableName="sender_sync_response">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_sent_by_receiver" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+    </changeSet>
+    
 </databaseChangeLog>
