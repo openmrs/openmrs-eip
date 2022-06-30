@@ -7,9 +7,9 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
-import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.component.Constants;
+import org.openmrs.eip.app.management.entity.SyncResponseModel;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class ReceiverActiveMqMessagePublisher {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverActiveMqMessagePublisher.class);
 	
-	@Value("${" + Constants.PROP_CAMEL_OUTPUT_ENDPOINT + "}")
+	@Value("${" + ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT + "}")
 	private String endpointConfig;
 	
 	@Autowired

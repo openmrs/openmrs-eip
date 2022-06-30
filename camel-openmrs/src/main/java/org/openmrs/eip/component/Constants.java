@@ -32,8 +32,6 @@ public class Constants {
 	
 	public static final String PROP_URI_ERROR_HANDLER = "uri.error.handler";
 	
-	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
-	
 	public static final List<String> ORDER_SUBCLASS_TABLES = Arrays.asList("test_order", "drug_order");
 	
 	public static final List<String> SUBCLASS_TABLES;
