@@ -39,19 +39,19 @@ public class ShutdownNotificationProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		log.info("Sending failure notification email with the log file attached");
+		log.info("Sending shutdown notification email with the log file attached");
 		
 		try {
 			String siteName = exchange.getProperty(SyncConstants.EX_PROP_APP_ID, String.class);
 			AttachmentMessage in = exchange.getMessage(AttachmentMessage.class);
-			in.setHeader("subject", "DB sync application at " + siteName + " site has stopped");
+			in.setHeader("subject", "DB sync application at " + siteName + " site has shutdown");
 			in.setHeader("to", recipients);
 			in.setHeader("from", user);
 			in.setHeader("mail.smtp.auth", true);
 			in.setHeader("mail.smtp.starttls.enable", true);
 			
 			in.setBody("The Db sync application at " + siteName
-			        + " site has stopped due to an exception, please see attached log file");
+			        + " site has stopped after encountering an error, please see attached log file");
 			
 			File file = new File(logFilePath);
 			
@@ -61,10 +61,15 @@ public class ShutdownNotificationProcessor implements Processor {
 			
 			CamelUtils.send("smtps://" + host + ":" + port + "?username=" + user + "&password=" + pass, exchange);
 			
-			log.info("Successfully sent failure notification email");
+			log.info("Successfully sent shutdown notification email");
 		}
 		catch (Throwable t) {
 			log.error("An error occurred while sending shutdown email notification", t);
+		}
+		finally {
+			//Swallow any exception encountered when sending the email so that shutdown continues 
+			//otherwise we end up in the dead letter channel error handler hence skipping shutdown
+			exchange.setException(null);
 		}
 	}
 	
