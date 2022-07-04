@@ -299,9 +299,8 @@ periodically read entries in the MySQL binlog, it constructs an [Event](../../ca
 fields with key fields being the source table name, the unique identifier of the affected row usually a uuid, the
 operation that triggered the event(c, u, d) which stand for Create, Update or Delete respectively. The debezium route
 sends the event to an intermediate event processor route which has some extra logic in it which in turn sends the event
-to all configured endpoints with the DB event message set as the body. In theory, you can register as many endpoints as
-the systems that need to be notified of changes from the OpenMRS DB, the sender's application.properties file has a
-named **db-event.destinations** which takes a comma separated list of camel endpoints to which the db event will be sent.
+to the outbound DB sync route.
+
 There is a built-in sender DB sync route that is registered as a listener for DB events, its job is to transform each
 message by loading the entity by its uuid, serialize it into a custom format and then publishes the payload to a
 configured sync destination, if you're using ActiveMQ to sync between the sender and receiver which is our recommended

@@ -8,11 +8,7 @@ public class SenderConstants {
 	
 	public static final String EX_PROP_IS_SUBCLASS = "is-subclass";
 	
-	public static final String EX_PROP_ROUTE_RETRY_COUNT_MAP = "route-retry-count-map";
-	
 	public static final String EX_PROP_RETRY_ITEM_ID = "retry-item-id";
-	
-	public static final String EX_PROP_DESTINATIONS = "db-event-destinations";
 	
 	public static final String ROUTE_ID_DB_EVENT_PROCESSOR = "db-event-processor";
 	

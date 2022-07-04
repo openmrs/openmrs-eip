@@ -7,14 +7,14 @@
 
         <when>
             <simple>${exchangeProperty.retry-item-id} != null</simple>
-            <log message="Entities with failed retries in current poll run: ${exchangeProperty.route-failed-entities.size()}" loggingLevel="DEBUG" />
+            <log message="Entities with failed retries in current poll run: ${exchangeProperty.failed-entities.size()}" loggingLevel="DEBUG" />
             <setBody>
                 <method beanType="org.openmrs.eip.component.utils.Utils" method="getListOfTablesInHierarchy(${exchangeProperty.retry-item.event.tableName})" />
             </setBody>
-            <split parallelProcessing="false" >
+            <split parallelProcessing="false" stopOnException="true">
                 <simple>${body}</simple>
                 <script>
-                    <simple>${exchangeProperty.route-failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId}#${exchangeProperty.retry-item.route})}</simple>
+                    <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId}})}</simple>
                 </script>
             </split>
         </when>
@@ -67,7 +67,6 @@
                 </setProperty>
                 <script>
                     <spel>
-                        #{getProperty('retry-item').setRoute(getProperty('db-event-dest'))}
                         #{getProperty('retry-item').setEvent(getProperty('event'))}
                         #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                         #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
@@ -78,44 +77,11 @@
                     <simple>${exchangeProperty.retry-item}</simple>
                 </setBody>
 
-                <choice>
-                    <when>
-                        <simple>${exchangeProperty.retry-item.route} != null</simple>
-                        <log message="Saving failed DB event to retry queue" loggingLevel="DEBUG" />
+                <log loggingLevel="DEBUG" message="Saving failed DB event to retry queue" />
 
-                        <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
+                <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
-                        <log message="Successfully saved DB event to retry queue" loggingLevel="DEBUG" />
-                    </when>
-                    <otherwise>
-                        <log message="Adding failed DB event for each registered route" />
-                        <split parallelProcessing="false">
-                            <simple>{{db-event.destinations}}</simple>
-                            <setProperty name="retry-item-dest">
-                                <simple>${body.trim()}</simple>
-                            </setProperty>
-                            <setBody>
-                                <spel>
-                                    #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
-                                </spel>
-                            </setBody>
-                            <script>
-                                <spel>
-                                    #{body.setRoute(getProperty('retry-item-dest'))}
-                                    #{body.setEvent(getProperty('event'))}
-                                    #{body.setExceptionType(getProperty('exceptionType'))}
-                                    #{body.setMessage(getProperty('error-msg'))}
-                                    #{body.setDateCreated(new java.util.Date())}
-                                </spel>
-                            </script>
-                            <log message="Saving failed DB event to retry queue for route: ${exchangeProperty.retry-item-dest}" loggingLevel="DEBUG" />
-
-                            <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
-
-                            <log message="Successfully saved DB event to retry queue" loggingLevel="DEBUG" />
-                        </split>
-                    </otherwise>
-                </choice>
+                <log loggingLevel="DEBUG" message="Successfully saved DB event to retry queue" />
 
                 <when>
                     <simple>${exchangeProperty.dbzmEvent} != null</simple>

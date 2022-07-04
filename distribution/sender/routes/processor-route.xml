@@ -46,58 +46,30 @@
             </when>
         </when>
 
+        <setBody>
+            <simple>${exchangeProperty.event}</simple>
+        </setBody>
+
+        <toD uri="direct:out-bound-db-sync" />
+
+        <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because inside a split exceptions are swallowed  -->
         <when>
-            <simple>${exchangeProperty.db-event-destinations} == null</simple>
-            <setProperty name="db-event-destinations">
-                <simple>{{db-event.destinations}}</simple>
-            </setProperty>
+            <simple>${exchangeProperty.retry-item-id} != null</simple>
+            <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+
+            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+
+            <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
         </when>
 
-        <split parallelProcessing="false" stopOnException="true">
-            <simple>${exchangeProperty.db-event-destinations}</simple>
-            <setProperty name="db-event-dest">
-                <simple>${body.trim()}</simple>
-            </setProperty>
+        <when>
+            <simple>${exchangeProperty.dbzmEvent} != null</simple>
+            <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
 
-            <!-- Ensure there is no retry items in the queue for this route for the entity so that events that happened
-                later don't overwrite those that happened before them, this ONLY applies to new events and not retries.
-            -->
-            <when>
-                <simple>${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} > 0</simple>
-                <log message="Moving the event to the failure queue because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue for route: ${exchangeProperty.db-event-dest}" />
-                <setProperty name="retry-event-message">
-                    <simple>Cannot process the event because the entity has ${exchangeProperty.route-retry-count-map.get(${exchangeProperty.db-event-dest})} event(s) in the retry queue</simple>
-                </setProperty>
-                <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="${exchangeProperty.retry-event-message}" />
-            </when>
+            <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
 
-            <log message="Publishing to destination: ${exchangeProperty.db-event-dest}" loggingLevel="DEBUG" />
-
-            <setBody>
-                <simple>${exchangeProperty.event}</simple>
-            </setBody>
-
-            <toD uri="direct:${exchangeProperty.db-event-dest}" />
-
-            <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because inside a split exceptions are swallowed  -->
-            <when>
-                <simple>${exchangeProperty.retry-item-id} != null</simple>
-                <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-
-                <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
-                
-                <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-            </when>
-
-            <when>
-                <simple>${exchangeProperty.dbzmEvent} != null</simple>
-                <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
-
-                <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
-
-                <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
-            </when>
-        </split>
+            <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+        </when>
 
         <log message="Done processing db event" loggingLevel="DEBUG" />
     </route>

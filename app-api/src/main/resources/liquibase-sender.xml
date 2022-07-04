@@ -314,5 +314,14 @@
         </createTable>
 
     </changeSet>
+
+    <changeSet author="wluyima" id="20220704-1400">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="destination" tableName="sender_retry_queue" />
+        </preConditions>
+        <comment>Dropping sender_retry_queue.destination column</comment>
+
+        <dropColumn tableName="sender_retry_queue" columnName="destination" />
+    </changeSet>
     
 </databaseChangeLog>

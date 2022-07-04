@@ -23,10 +23,6 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
 	@AttributeOverride(name = "requestUuid", column = @Column(name = "request_uuid", unique = true, updatable = false, length = 38))
 	private Event event;
 	
-	//the destination where this event couldn't be processed, typically a uri
-	@Column(name = "destination", nullable = false, updatable = false, length = 50)
-	private String route;
-	
 	/**
 	 * Gets the event
 	 *
@@ -45,28 +41,9 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
 		this.event = event;
 	}
 	
-	/**
-	 * Gets the route
-	 *
-	 * @return the route
-	 */
-	public String getRoute() {
-		return route;
-	}
-	
-	/**
-	 * Sets the route
-	 *
-	 * @param route the route to set
-	 */
-	public void setRoute(String route) {
-		this.route = route;
-	}
-	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " {route=" + getRoute() + ", attemptCount=" + getAttemptCount() + ", " + event
-		        + "}";
+		return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + "}";
 	}
 	
 }
