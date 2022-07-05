@@ -15,12 +15,12 @@
             <method beanType="org.openmrs.eip.component.utils.Utils" method="isSubclassTable(${exchangeProperty.event.tableName})" />
         </setProperty>
 
-        <setProperty name="table-names">
+        <setProperty name="debezium-event-processor-tableNames">
             <!-- We need to look up failed events for rows in both the parent and subclass tables -->
             <method beanType="org.openmrs.eip.component.utils.Utils" method="getTablesInHierarchy(${exchangeProperty.event.tableName})" />
         </setProperty>
 
-        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.table-names}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
+        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r from SenderRetryQueueItem r WHERE r.event.tableName IN (${exchangeProperty.debezium-event-processor-tableNames}) AND r.event.primaryKeyId='${exchangeProperty.event.primaryKeyId}'" />
 
         <when>
             <simple>${body.size()} > 0</simple>

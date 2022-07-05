@@ -14,7 +14,7 @@
             <split parallelProcessing="false" stopOnException="true">
                 <simple>${body}</simple>
                 <script>
-                    <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId}})}</simple>
+                    <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
                 </script>
             </split>
         </when>

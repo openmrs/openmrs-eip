@@ -18,7 +18,7 @@
                     <setBody>
                         <method beanType="org.openmrs.eip.component.utils.Utils" method="getListOfModelClassHierarchy(${exchangeProperty.retry-item.modelClassName})" />
                     </setBody>
-                    <split parallelProcessing="false" >
+                    <split parallelProcessing="false" stopOnException="true">
                         <simple>${body}</simple>
                         <script>
                             <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.identifier})}</simple>
