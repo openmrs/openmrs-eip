@@ -1,7 +1,9 @@
 package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntity;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_IS_SUBCLASS;
@@ -21,10 +23,12 @@ import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.utils.Utils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
+@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 @Sql(scripts = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 @TestPropertySource(properties = "logging.level.debezium-event-processor=DEBUG")
 public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
@@ -52,21 +56,22 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldProcessAnEventForAnEntityWithNoRetryItems() throws Exception {
-		final String table = "person";
-		final String id = "3";
-		assertFalse(SenderTestUtils.hasRetryItem(table, id));
 		Exchange exchange = new DefaultExchange(camelContext);
-		DebeziumEvent debeziumEvent = createDebeziumEvent(table, id, null, "u");
+		final Long debeziumEventId = 1L;
+		DebeziumEvent debeziumEvent = getEntity(DebeziumEvent.class, debeziumEventId);
+		Event event = debeziumEvent.getEvent();
+		assertFalse(SenderTestUtils.hasRetryItem(event.getTableName(), event.getPrimaryKeyId()));
 		exchange.getIn().setBody(debeziumEvent);
 		mockEventProcessorEndpoint.expectedMessageCount(1);
-		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(debeziumEvent.getEvent());
-		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_EVENT, debeziumEvent.getEvent());
+		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(event);
+		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_EVENT, event);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_DBZM_EVENT, debeziumEvent);
 		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_IS_SUBCLASS, false);
 		
 		producerTemplate.send(URI_DBZM_EVENT_PROCESSOR, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
+		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 	@Test
@@ -88,11 +93,12 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldProcessAnEventForASubclassEntity() throws Exception {
-		final String table = "patient";
-		final String id = "9";
-		assertFalse(SenderTestUtils.hasRetryItem(table, id));
+		final Long debeziumEventId = 2L;
+		DebeziumEvent debeziumEvent = getEntity(DebeziumEvent.class, debeziumEventId);
+		Event event = debeziumEvent.getEvent();
+		assertTrue(Utils.isSubclassTable(event.getTableName()));
+		assertFalse(SenderTestUtils.hasRetryItem(event.getTableName(), event.getPrimaryKeyId()));
 		Exchange exchange = new DefaultExchange(camelContext);
-		DebeziumEvent debeziumEvent = createDebeziumEvent(table, id, null, "u");
 		exchange.getIn().setBody(debeziumEvent);
 		mockEventProcessorEndpoint.expectedMessageCount(1);
 		mockEventProcessorEndpoint.expectedBodyReceived().body(Event.class).isEqualTo(debeziumEvent.getEvent());
@@ -103,6 +109,7 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DBZM_EVENT_PROCESSOR, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
+		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 }

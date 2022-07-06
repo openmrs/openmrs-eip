@@ -71,7 +71,6 @@ public class ProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DB_EVENT_PROCESSOR, exchange);
 		
 		mockDbSyncEndpoint.assertIsSatisfied();
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 	@Test
@@ -90,7 +89,6 @@ public class ProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DB_EVENT_PROCESSOR, exchange);
 		
 		mockDbSyncEndpoint.assertIsSatisfied();
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 	@Test
@@ -112,7 +110,6 @@ public class ProcessorRouteTest extends BaseSenderRouteTest {
 		
 		mockDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("abfd940e-32dc-491f-8038-a8f3afe3e35b", event.getIdentifier());
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 	@Test
@@ -131,7 +128,6 @@ public class ProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DB_EVENT_PROCESSOR, exchange);
 		
 		mockDbSyncEndpoint.assertIsSatisfied();
-		assertNull(getEntity(SenderRetryQueueItem.class, retryItemId));
 	}
 	
 }
