@@ -53,6 +53,12 @@ import ch.qos.logback.core.read.ListAppender;
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
 @TestPropertySource(properties = "spring.liquibase.enabled=false")
+@TestPropertySource(properties = "shutdown.notice.email.attachment.log.file=")
+@TestPropertySource(properties = "smtp.host.name=")
+@TestPropertySource(properties = "smtp.host.port=")
+@TestPropertySource(properties = "smtp.auth.user=")
+@TestPropertySource(properties = "smtp.auth.pass=")
+@TestPropertySource(properties = "shutdown.notice.email.recipients=")
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
