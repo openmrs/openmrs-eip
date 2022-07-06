@@ -57,6 +57,12 @@
                             </setBody>
 
                             <to uri="direct:db-event-processor" />
+
+                            <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+
+                            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+
+                            <log message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
                         </otherwise>
                     </choice>
                 </split>

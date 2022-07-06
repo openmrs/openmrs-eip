@@ -52,25 +52,6 @@
 
         <toD uri="direct:out-bound-db-sync" />
 
-        <!-- TODO Move deleting of item from queue to the retry-route, reason it is here is because inside a split exceptions are swallowed  -->
-        <when>
-            <simple>${exchangeProperty.retry-item-id} != null</simple>
-            <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-
-            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
-
-            <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-        </when>
-
-        <when>
-            <simple>${exchangeProperty.dbzmEvent} != null</simple>
-            <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
-
-            <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
-
-            <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
-        </when>
-
         <log message="Done processing db event" loggingLevel="DEBUG" />
     </route>
 
