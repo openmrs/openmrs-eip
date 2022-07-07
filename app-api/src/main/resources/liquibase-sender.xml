@@ -302,13 +302,13 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
             <column name="message_uuid" type="VARCHAR(38)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_sent_by_receiver" type="TIMESTAMP(3)">
+            <column name="date_sent_by_receiver" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -322,6 +322,15 @@
         <comment>Dropping sender_retry_queue.destination column</comment>
 
         <dropColumn tableName="sender_retry_queue" columnName="destination" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220707-1500">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="debezium_event_queue" columnName="date_created" />
+        </preConditions>
+        <comment>Changing datatype of debezium_event_queue.date_created column to datetime(3)</comment>
+
+        <modifyDataType tableName="debezium_event_queue" columnName="date_created" newDataType="DATETIME(3)" />
     </changeSet>
     
 </databaseChangeLog>

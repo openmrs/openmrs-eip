@@ -1146,4 +1146,13 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220707-1501">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="receiver_sync_msg" columnName="date_created" />
+        </preConditions>
+        <comment>Changing datatype of receiver_sync_msg.date_created column to datetime(3)</comment>
+
+        <modifyDataType tableName="receiver_sync_msg" columnName="date_created" newDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
