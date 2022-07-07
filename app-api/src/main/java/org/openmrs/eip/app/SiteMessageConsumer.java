@@ -35,7 +35,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	//Order by dateCreated may be just in case the DB is migrated and id change
 	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY m.id ASC &maximumResults=" + MAX_COUNT;
+	        + PARAM_SITE + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
 	
 	private SiteInfo site;
 	
