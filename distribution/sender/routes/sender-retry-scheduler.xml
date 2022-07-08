@@ -1,0 +1,9 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="sender-retry-scheduler" errorHandlerRef="shutdownErrorHandler">
+        <from uri="scheduler:sender-retry?initialDelay={{db-event.retry.initial.delay}}&amp;delay={{db-event.retry.interval}}" />
+
+        <to uri="direct:sender-retry" />
+    </route>
+
+</routes>
