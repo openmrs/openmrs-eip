@@ -65,6 +65,7 @@ public class debeziumEventReaderTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldLoadDebeziumEventsSortedByDateCreatedAndCallTheEventProcessor() throws Exception {
 		List<DebeziumEvent> events = repo.findAll();
+		assertEquals(2, events.size());
 		Assert.assertTrue(events.get(0).getDateCreated().getTime() > (events.get(1).getDateCreated().getTime()));
 		mockEventProcessor.expectedBodyReceived().body(List.class).isEqualTo(events);
 		DefaultExchange exchange = new DefaultExchange(camelContext);
@@ -72,7 +73,7 @@ public class debeziumEventReaderTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DBZM_EVENT_READER, exchange);
 		
 		mockEventProcessor.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Read " + repo.findAll().size() + " item(s) from the debezium event queue");
+		assertMessageLogged(Level.INFO, "Read " + events.size() + " item(s) from the debezium event queue");
 		assertEquals(2, exchange.getIn().getBody(List.class).size());
 		assertEquals(2, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(0)).getId().intValue());
 		assertEquals(1, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(1)).getId().intValue());

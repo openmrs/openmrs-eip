@@ -30,4 +30,10 @@ public final class SenderTestUtils {
 		return null;
 	}
 	
+	public static <T extends AbstractEntity> List<T> getEntities(Class<T> clazz) {
+		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
+		final String classname = clazz.getSimpleName();
+		return t.requestBody("jpa:" + classname + "?query=SELECT i FROM " + classname + " i", null, List.class);
+	}
+	
 }
