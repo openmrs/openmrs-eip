@@ -3,7 +3,7 @@
     <route id="out-bound-db-sync" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:out-bound-db-sync" />
 
-        <log message="Start db-sync-route: ${body}" loggingLevel="DEBUG" />
+        <log loggingLevel="DEBUG" message="Start ${routeId}: ${body}" />
         
         <setBody>
             <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
@@ -20,13 +20,13 @@
             </spel>
         </script>
         
-        <log message="Saving sender sync message: ${body}" loggingLevel="DEBUG" />
+        <log loggingLevel="DEBUG" message="Saving sync message to the outbound queue -> ${body}" />
 
         <to uri="jpa:SenderSyncMessage?usePersist=true" />
 
-        <log message="Sender sync message saved" loggingLevel="DEBUG" />
+        <log message="Sync message saved to the outbound queue" />
         
-        <log message="End db-sync-route" loggingLevel="DEBUG" />
+        <log loggingLevel="DEBUG" message="End ${routeId}" />
 
     </route>
 

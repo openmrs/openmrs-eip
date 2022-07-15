@@ -50,7 +50,7 @@
             <simple>${exchangeProperty.event}</simple>
         </setBody>
 
-        <toD uri="direct:out-bound-db-sync" />
+        <to uri="direct:out-bound-db-sync" />
 
         <log message="Done processing db event" loggingLevel="DEBUG" />
     </route>
