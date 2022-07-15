@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="sender-activemq-consumer" errorHandlerRef="shutdownErrorHandler">
-        <from uri="activemq:openmrs.sync.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&amp;acknowledgementModeName=CLIENT_ACKNOWLEDGE&amp;messageListenerContainerFactory=customMessageListenerContainerFactory&amp;asyncStartListener=true" />
+        <from uri="{{db-sync.sender.activemq.in}}" />
 
         <log message="Received message -> ${body}" />
         

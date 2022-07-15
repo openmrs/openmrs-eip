@@ -120,11 +120,11 @@
                     <simple>${exchangeProperty.retry-item}</simple>
                 </setBody>
 
-                <log message="Saving updates for retry item" loggingLevel="DEBUG" />
+                <log message="Saving updates for the retry item" loggingLevel="DEBUG" />
 
                 <to uri="jpa:SenderRetryQueueItem" />
 
-                <log message="Successfully updated retry item" loggingLevel="DEBUG" />
+                <log message="Successfully saved updates for the retry item" />
             </otherwise>
         </choice>
         

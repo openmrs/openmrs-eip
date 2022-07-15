@@ -38,6 +38,7 @@ public class SenderConfig {
 		
 		Map<String, Object> props = new HashMap();
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
+		props.put(SenderConstants.PROP_ACTIVEMQ_IN_ENDPOINT, SenderConstants.ACTIVEMQ_IN_ENDPOINT);
 		props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
 		props.put(PROP_URI_ERROR_HANDLER, "direct:outbound-error-handler");
 		PropertySource customPropSource = new MapPropertySource("senderPropSource", props);
