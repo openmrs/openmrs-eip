@@ -25,7 +25,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import ch.qos.logback.classic.Level;
 
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_DBZM_EVENT_READER + "=DEBUG")
-public class debeziumEventReaderTest extends BaseSenderRouteTest {
+public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 	
 	@EndpointInject("mock:" + ROUTE_ID_DBZM_EVENT_READER)
 	private MockEndpoint mockEventProcessor;
