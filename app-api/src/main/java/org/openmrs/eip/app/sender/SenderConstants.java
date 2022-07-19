@@ -5,6 +5,8 @@ public class SenderConstants {
 	public static final String ACTIVEMQ_IN_ENDPOINT = "activemq:openmrs.sync.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&acknowledgementModeName=CLIENT_ACKNOWLEDGE&messageListenerContainerFactory=customMessageListenerContainerFactory&asyncStartListener=true";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "db-sync.sender.activemq.in";
+
+    public static final String PROP_SENDER_ID = "db-sync.senderId";
 	
 	public static final String EX_PROP_EVENT = "event";
 	
@@ -32,7 +34,7 @@ public class SenderConstants {
 	
 	public static final String ROUTE_ID_DBZM_EVENT_READER = "debezium-event-reader";
 	
-	public static final String URI_DBZM_EVENT_READER = "direct:" + ROUTE_ID_DBZM_EVENT_READER;
+	public static final String URI_DBZM_EVENT_READER = "direct:debezium-event-reader";
 	
 	public static final String ROUTE_ID_RETRY = "sender-retry";
 	
@@ -43,6 +45,10 @@ public class SenderConstants {
 	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
 	
 	public static final String ROUTE_ID_ACTIVEMQ_CONSUMER = "sender-activemq-consumer";
+	
+	public static final String ROUTE_ID_ACTIVEMQ_PUBLISHER = "sender-activemq-publisher";
+	
+	public static final String URI_ACTIVEMQ_PUBLISHER = "direct:" + ROUTE_ID_ACTIVEMQ_PUBLISHER;
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	

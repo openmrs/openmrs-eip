@@ -11,7 +11,7 @@
         <choice>
             <when>
                 <simple>${body.size()} > 0</simple>
-                <log message="Fetched ${body.size()} sender sync messages" />
+                <log message="Fetched ${body.size()} sender sync message(s)" />
 
                 <split parallelProcessing="false" stopOnException="true">
                     <simple>${body}</simple>
@@ -96,7 +96,7 @@
                             <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
     
                             <when>
-                                <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
+                                <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
                                 <log message="Encrypting entity payload.." />
             
                                 <process ref="pgpEncryptService" />

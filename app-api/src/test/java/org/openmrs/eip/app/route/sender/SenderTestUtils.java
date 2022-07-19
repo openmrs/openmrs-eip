@@ -36,4 +36,9 @@ public final class SenderTestUtils {
 		return t.requestBody("jpa:" + classname + "?query=SELECT i FROM " + classname + " i", null, List.class);
 	}
 	
+	public static <T extends AbstractEntity> void saveEntity(T entity) {
+		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
+		t.sendBody("jpa:" + entity.getClass().getSimpleName() + "?usePersist=true", entity);
+	}
+	
 }
