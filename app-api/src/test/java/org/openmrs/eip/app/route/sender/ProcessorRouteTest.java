@@ -94,7 +94,7 @@ public class ProcessorRouteTest extends BaseSenderRouteTest {
 	@Test
 	public void shouldProcessForARowForASubclassEntityAndSetTheUuidIfMissing() throws Exception {
 		Exchange exchange = new DefaultExchange(camelContext);
-		final Long debeziumEventId = 2L;
+		final Long debeziumEventId = 3L;
 		DebeziumEvent debeziumEvent = getEntity(DebeziumEvent.class, debeziumEventId);
 		assertNotNull(debeziumEvent);
 		Event event = debeziumEvent.getEvent();

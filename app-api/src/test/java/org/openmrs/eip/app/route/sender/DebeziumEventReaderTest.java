@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DBZM_EVENT_READER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_READER;
 
@@ -11,7 +12,6 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
@@ -64,9 +64,11 @@ public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 	@Test
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldLoadDebeziumEventsSortedByDateCreatedAndCallTheEventProcessor() throws Exception {
+		final int eventCount = 3;
 		List<DebeziumEvent> events = repo.findAll();
-		assertEquals(2, events.size());
-		Assert.assertTrue(events.get(0).getDateCreated().getTime() > (events.get(1).getDateCreated().getTime()));
+		assertEquals(eventCount, events.size());
+		assertTrue(events.get(0).getDateCreated().getTime() > (events.get(2).getDateCreated().getTime()));
+		assertTrue(events.get(1).getDateCreated().getTime() > (events.get(2).getDateCreated().getTime()));
 		mockEventProcessor.expectedBodyReceived().body(List.class).isEqualTo(events);
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		
@@ -74,9 +76,10 @@ public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 		
 		mockEventProcessor.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Read " + events.size() + " item(s) from the debezium event queue");
-		assertEquals(2, exchange.getIn().getBody(List.class).size());
-		assertEquals(2, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(0)).getId().intValue());
+		assertEquals(eventCount, exchange.getIn().getBody(List.class).size());
+		assertEquals(3, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(0)).getId().intValue());
 		assertEquals(1, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(1)).getId().intValue());
+		assertEquals(2, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(2)).getId().intValue());
 	}
 	
 }

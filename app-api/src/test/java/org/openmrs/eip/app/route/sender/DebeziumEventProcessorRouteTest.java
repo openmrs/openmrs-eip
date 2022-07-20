@@ -93,7 +93,7 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldProcessAnEventForASubclassEntity() throws Exception {
-		final Long debeziumEventId = 2L;
+		final Long debeziumEventId = 3L;
 		DebeziumEvent debeziumEvent = getEntity(DebeziumEvent.class, debeziumEventId);
 		Event event = debeziumEvent.getEvent();
 		assertTrue(Utils.isSubclassTable(event.getTableName()));
