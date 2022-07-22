@@ -72,7 +72,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldLoadSyncMessagesSortedByDateCreatedAndSendThemToSyncQueue() throws Exception {
+	public void shouldDoNothingIfNoSyncMessagesAreFound() throws Exception {
 		mockActiveMqEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
