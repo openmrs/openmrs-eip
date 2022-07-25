@@ -1,0 +1,9 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="sync-response-processor-scheduler" errorHandlerRef="shutdownErrorHandler">
+
+        <from uri="scheduler:sync_response_processor?initialDelay={{sync-response-processor.initial.delay}}&amp;delay={{sync-response-processor.delay}}" />
+
+        <to uri="direct:sync-response-processor" />
+        
+    </route>
+</routes>
