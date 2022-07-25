@@ -5,12 +5,12 @@
 
         <log message="Fetching next 500 sync responses" loggingLevel="DEBUG" />
 
-        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateSentByReceiver, r.id ASC&amp;maximumResults=500" />
+        <toD uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateCreated, r.id ASC&amp;maximumResults=500" />
 
         <choice>
             <when>
                 <simple>${body.size()} > 0</simple>
-                <log message="Fetched ${body.size()} sender sync responses" />
+                <log message="Fetched ${body.size()} sender sync response(s)" />
                 
                 <split parallelProcessing="false">
                     <simple>${body}</simple>

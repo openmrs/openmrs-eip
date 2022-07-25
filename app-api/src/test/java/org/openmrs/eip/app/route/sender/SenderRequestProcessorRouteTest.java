@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus.NEW;
 import static org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus.PROCESSED;
 import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntities;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderSyncRequest;
 import org.springframework.test.context.TestPropertySource;
@@ -35,13 +36,13 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	}
 	
 	private SenderSyncRequest createSyncRequest(String table, String identifier, String requestUuid) {
-		SenderSyncRequest msg = new SenderSyncRequest();
-		msg.setTableName(table);
-		msg.setIdentifier(identifier);
-		msg.setRequestUuid(requestUuid);
-		msg.setDateCreated(new Date());
-		SenderTestUtils.saveEntity(msg);
-		return msg;
+		SenderSyncRequest request = new SenderSyncRequest();
+        request.setTableName(table);
+        request.setIdentifier(identifier);
+        request.setRequestUuid(requestUuid);
+        request.setDateCreated(new Date());
+		SenderTestUtils.saveEntity(request);
+		return request;
 	}
 	
 	@Test
@@ -52,7 +53,7 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	@Sql(scripts = "classpath:mgt_sender_sync_request.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	@Sql(scripts = "classpath:mgt_sender_sync_request.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldLoadAndProcessAllNewSyncRequestsSortedByDateCreated() {
 		final int messageCount = 3;
 		List<SenderSyncRequest> requests = getEntities(SenderSyncRequest.class).stream().filter(m -> m.getStatus() == NEW)

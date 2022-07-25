@@ -53,6 +53,10 @@ public class SenderConstants {
     public static final String ROUTE_ID_REQUEST_PROCESSOR = "sender-request-processor";
 
     public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
+
+    public static final String ROUTE_ID_RESPONSE_PROCESSOR = "sync-response-processor";
+
+	public static final String URI_RESPONSE_PROCESSOR = "direct:" + ROUTE_ID_RESPONSE_PROCESSOR;
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
