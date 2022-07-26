@@ -2,22 +2,34 @@
     <route id="debezium-event-reader" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:debezium-event-reader" />
 
-        <log loggingLevel="DEBUG" message="Fetching next 1000 events in the debezium event queue" />
+        <setProperty name="${routeId}-endLoop">
+            <simple>false</simple>
+        </setProperty>
 
-        <!-- Order by dateCreated may be just in case the DB is migrated and ids change -->
-        <toD uri="jpa:DebeziumEvent?query=SELECT e FROM DebeziumEvent e ORDER BY e.dateCreated ASC, e.id ASC&amp;maximumResults=1000" />
+        <loop doWhile="true">
+            <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
 
-        <choice>
-            <when>
-                <simple>${body.size()} > 0</simple>
-                <log message="Read ${body.size()} item(s) from the debezium event queue" />
+            <log loggingLevel="DEBUG" message="Fetching next 1000 events in the debezium event queue" />
 
-                <process ref="debeziumEventProcessor" />
-            </when>
-            <otherwise>
-                <log loggingLevel="DEBUG" message="No events found in the debezium event queue" />
-            </otherwise>
-        </choice>
+            <!-- Order by dateCreated may be just in case the DB is migrated and ids change -->
+            <to uri="jpa:DebeziumEvent?query=SELECT e FROM DebeziumEvent e ORDER BY e.dateCreated ASC, e.id ASC&amp;maximumResults=1000" />
+
+            <choice>
+                <when>
+                    <simple>${body.size()} > 0</simple>
+                    <log message="Read ${body.size()} item(s) from the debezium event queue" />
+
+                    <process ref="debeziumEventProcessor" />
+                </when>
+                <otherwise>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+
+                    <log loggingLevel="DEBUG" message="No events found in the debezium event queue" />
+                </otherwise>
+            </choice>
+        </loop>
 
     </route>
 </routes>

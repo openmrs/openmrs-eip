@@ -3,74 +3,86 @@
     <route id="sender-retry" errorHandlerRef="outBoundErrorHandler">
         <from uri="direct:sender-retry" />
 
-        <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
+        <setProperty name="${routeId}-endLoop">
+            <simple>false</simple>
+        </setProperty>
 
-        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r.id FROM SenderRetryQueueItem r ORDER BY r.dateCreated ASC, r.id ASC" />
+        <loop doWhile="true">
+            <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
 
-        <choice>
-            <when>
-                <simple>${body.size()} > 0</simple>
-                <log message="Event count in the retry queue: ${body.size()}" />
+            <log message="Fetching events in the retry queue" loggingLevel="DEBUG" />
 
-                <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
-                     before failed insert retries for the same entity for the same route.
+            <to uri="jpa:SenderRetryQueueItem?query=SELECT r.id FROM SenderRetryQueueItem r ORDER BY r.dateCreated ASC, r.id ASC" />
 
-                     Using a synchronized list for thread safety in case we start supporting parallel processing
-                     otherwise it's likely the dev might unknowingly not change it at the time.
-                 -->
-                <setProperty name="failed-entities">
-                    <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
-                </setProperty>
+            <choice>
+                <when>
+                    <simple>${body.size()} > 0</simple>
+                    <log message="Event count in the retry queue: ${body.size()}" />
 
-                <split parallelProcessing="false">
-                    <simple>${body}</simple>
-                    <setProperty name="retry-item-id">
+                    <!-- We need to track entities with failed retry items so that we maintain ordering to avoid syncing deletes
+                         before failed insert retries for the same entity for the same route.
+
+                         Using a synchronized list for thread safety in case we start supporting parallel processing
+                         otherwise it's likely the dev might unknowingly not change it at the time.
+                     -->
+                    <setProperty name="failed-entities">
+                        <spel>#{T(java.util.Collections).synchronizedSet(new java.util.HashSet())}</spel>
+                    </setProperty>
+
+                    <split parallelProcessing="false">
                         <simple>${body}</simple>
+                        <setProperty name="retry-item-id">
+                            <simple>${body}</simple>
+                        </setProperty>
+                        <log message="Loading event retry item with id: ${body}" />
+
+                        <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${body}" />
+
+                        <setProperty name="retry-item">
+                            <simple>${body[0]}</simple>
+                        </setProperty>
+                        <log message="Updating attempt count for retry item" />
+                        <script>
+                            <spel>
+                                #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
+                            </spel>
+                        </script>
+
+                        <choice>
+                            <when>
+                                <simple>${exchangeProperty.failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})} == true</simple>
+                                <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue" />
+                                <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Skipped because the entity had older failed event(s) in the queue" />
+                            </when>
+                            <otherwise>
+                                <log message="Re-processing: ${exchangeProperty.retry-item}" />
+                                <setProperty name="event">
+                                    <simple>${exchangeProperty.retry-item.event}</simple>
+                                </setProperty>
+                                <setBody>
+                                    <simple>${exchangeProperty.event}</simple>
+                                </setBody>
+
+                                <to uri="direct:db-event-processor" />
+
+                                <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+
+                                <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+
+                                <log message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                            </otherwise>
+                        </choice>
+                    </split>
+                </when>
+                <otherwise>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
                     </setProperty>
-                    <log message="Loading event retry item with id: ${body}" />
 
-                    <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${body}" />
-
-                    <setProperty name="retry-item">
-                        <simple>${body[0]}</simple>
-                    </setProperty>
-                    <log message="Updating attempt count for retry item" />
-                    <script>
-                        <spel>
-                            #{getProperty('retry-item').setAttemptCount(getProperty('retry-item').getAttemptCount() + 1)}
-                        </spel>
-                    </script>
-
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.failed-entities.contains(${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId})} == true</simple>
-                            <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.event.tableName}#${exchangeProperty.retry-item.event.primaryKeyId} because it still has older failed event(s) in the queue" />
-                            <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Skipped because the entity had older failed event(s) in the queue" />
-                        </when>
-                        <otherwise>
-                            <log message="Re-processing: ${exchangeProperty.retry-item}" />
-                            <setProperty name="event">
-                                <simple>${exchangeProperty.retry-item.event}</simple>
-                            </setProperty>
-                            <setBody>
-                                <simple>${exchangeProperty.event}</simple>
-                            </setBody>
-
-                            <to uri="direct:db-event-processor" />
-
-                            <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-
-                            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
-
-                            <log message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-                        </otherwise>
-                    </choice>
-                </split>
-            </when>
-            <otherwise>
-                <log message="No events found in the retry queue" loggingLevel="DEBUG" />
-            </otherwise>
-        </choice>
+                    <log loggingLevel="DEBUG" message="No events found in the retry queue" />
+                </otherwise>
+            </choice>
+        </loop>
     </route>
 
 </routes>

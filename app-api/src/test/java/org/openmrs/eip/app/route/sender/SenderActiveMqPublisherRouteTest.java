@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
@@ -43,6 +42,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	public static final String URI_ACTIVEMQ_SYNC = "mock:activemq.openmrs.sync";
 	
 	public static final String SENDER_ID = "test-sender-id";
+	
+	private static final String EX_PROP_SYNC_MSG = "senderSyncMessage";
 	
 	@EndpointInject(URI_ACTIVEMQ_SYNC)
 	private MockEndpoint mockActiveMqEndpoint;
@@ -78,7 +79,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.DEBUG, "No sender sync messages found");
+		assertMessageLogged(Level.DEBUG, "No sync messages found");
 	}
 	
 	@Test
@@ -92,16 +93,19 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertTrue(msgs.get(0).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
 		assertTrue(msgs.get(1).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
 		mockActiveMqEndpoint.expectedMessageCount(messageCount);
+		List<SenderSyncMessage> syncMessages = new ArrayList();
+		mockActiveMqEndpoint
+		        .whenAnyExchangeReceived(e -> syncMessages.add(e.getProperty(EX_PROP_SYNC_MSG, SenderSyncMessage.class)));
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		
 		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched " + msgs.size() + " sender sync message(s)");
-		assertEquals(messageCount, exchange.getIn().getBody(List.class).size());
-		assertEquals(3, ((SenderSyncMessage) exchange.getIn().getBody(List.class).get(0)).getId().intValue());
-		assertEquals(1, ((SenderSyncMessage) exchange.getIn().getBody(List.class).get(1)).getId().intValue());
-		assertEquals(2, ((SenderSyncMessage) exchange.getIn().getBody(List.class).get(2)).getId().intValue());
+		assertEquals(messageCount, syncMessages.size());
+		assertEquals(3, syncMessages.get(0).getId().intValue());
+		assertEquals(1, syncMessages.get(1).getId().intValue());
+		assertEquals(2, syncMessages.get(2).getId().intValue());
 		assertEquals(0,
 		    SenderTestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
 	}

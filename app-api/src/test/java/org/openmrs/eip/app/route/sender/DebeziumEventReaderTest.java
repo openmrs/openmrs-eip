@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DBZM_EVENT_READER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_READER;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.EndpointInject;
@@ -70,16 +71,21 @@ public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 		assertTrue(events.get(0).getDateCreated().getTime() > (events.get(2).getDateCreated().getTime()));
 		assertTrue(events.get(1).getDateCreated().getTime() > (events.get(2).getDateCreated().getTime()));
 		mockEventProcessor.expectedBodyReceived().body(List.class).isEqualTo(events);
+		List<DebeziumEvent> processedEvents = new ArrayList();
+		mockEventProcessor.whenAnyExchangeReceived(e -> {
+			processedEvents.addAll(e.getIn().getBody(List.class));
+			repo.deleteAll();
+		});
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		
 		producerTemplate.send(URI_DBZM_EVENT_READER, exchange);
 		
 		mockEventProcessor.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Read " + events.size() + " item(s) from the debezium event queue");
-		assertEquals(eventCount, exchange.getIn().getBody(List.class).size());
-		assertEquals(3, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(0)).getId().intValue());
-		assertEquals(1, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(1)).getId().intValue());
-		assertEquals(2, ((DebeziumEvent) exchange.getIn().getBody(List.class).get(2)).getId().intValue());
+		assertEquals(eventCount, processedEvents.size());
+		assertEquals(3, processedEvents.get(0).getId().intValue());
+		assertEquals(1, processedEvents.get(1).getId().intValue());
+		assertEquals(2, processedEvents.get(2).getId().intValue());
 	}
 	
 }

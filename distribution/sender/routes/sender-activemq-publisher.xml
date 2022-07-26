@@ -4,143 +4,155 @@
     
         <from uri="direct:sender-activemq-publisher" />
 
-        <log message="Fetching next 500 sender sync messages" loggingLevel="DEBUG" />
+        <setProperty name="${routeId}-endLoop">
+            <simple>false</simple>
+        </setProperty>
 
-        <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.status = 'NEW' ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults=500" />
+        <loop doWhile="true">
+            <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
 
-        <choice>
-            <when>
-                <simple>${body.size()} > 0</simple>
-                <log message="Fetched ${body.size()} sender sync message(s)" />
+            <log message="Fetching next 500 sender sync messages" loggingLevel="DEBUG" />
 
-                <split parallelProcessing="false" stopOnException="true">
-                    <simple>${body}</simple>
-                    <setProperty name="senderSyncMessage">
+            <to uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.status = 'NEW' ORDER BY m.dateCreated ASC, m.id ASC&amp;maximumResults=500" />
+
+            <choice>
+                <when>
+                    <simple>${body.size()} > 0</simple>
+                    <log message="Fetched ${body.size()} sender sync message(s)" />
+
+                    <split parallelProcessing="false" stopOnException="true">
                         <simple>${body}</simple>
-                    </setProperty>
+                        <setProperty name="senderSyncMessage">
+                            <simple>${body}</simple>
+                        </setProperty>
 
-                    <log message="Preparing sender sync message -> ${exchangeProperty.senderSyncMessage}" />
-                    
-                    <choice>
-                        <when>
-                            <simple>${exchangeProperty.senderSyncMessage.operation} == 'd'</simple>
-                            <setBody>
-                                <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                            </setBody>
-                            <script>
-                                <spel>
-                                    #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('senderSyncMessage').tableName).modelClass)}
-                                    #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
-                                    #{body.model.setUuid(getProperty('senderSyncMessage').identifier)}
-                                    #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                                </spel>
-                            </script>
-            
-                            <log message="Deleted entity payload -> ${body}" />
-                        </when>
-                        <otherwise>
-                            <log message="Loading entity from DB with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
-            
-                            <toD uri="openmrs:extract?tableToSync=${exchangeProperty.senderSyncMessage.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.senderSyncMessage.identifier}" />
-            
-                            <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
-            
-                            <choice>
-                                <when>
-                                    <simple>${body.size()} == 1</simple>
-                                    <setBody>
-                                        <jsonpath>$[0]</jsonpath>
-                                    </setBody>
-                                </when>
-                                <otherwise>
-                                    <setBody>
-                                        <simple>${null}</simple>
-                                    </setBody>
-                                </otherwise>
-                            </choice>
-                        </otherwise>
-                    </choice>
-            
-                    <choice>
-                        <when>
-                            <simple>${body} != null || ${exchangeProperty.senderSyncMessage.operation} == 'r'</simple>
+                        <log message="Preparing sender sync message -> ${exchangeProperty.senderSyncMessage}" />
+
+                        <choice>
                             <when>
-                                <simple>${body} == null</simple>
-    
-                                <log message="Entity not found for request with uuid: ${exchangeProperty.senderSyncMessage.requestUuid}" />
-            
+                                <simple>${exchangeProperty.senderSyncMessage.operation} == 'd'</simple>
                                 <setBody>
                                     <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
                                 </setBody>
                                 <script>
                                     <spel>
+                                        #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('senderSyncMessage').tableName).modelClass)}
+                                        #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
+                                        #{body.model.setUuid(getProperty('senderSyncMessage').identifier)}
                                         #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
                                     </spel>
                                 </script>
+
+                                <log message="Deleted entity payload -> ${body}" />
                             </when>
-            
-                            <script>
-                                <spel>
-                                    #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                                    #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
-                                    #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
-                                    #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
-                                    #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
-                                    #{body.metadata.setSnapshot(getProperty('senderSyncMessage').snapshot)}
-                                </spel>
-                            </script>
-                            <setBody>
-                                <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
-                            </setBody>
-            
-                            <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
-    
+                            <otherwise>
+                                <log message="Loading entity from DB with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
+
+                                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.senderSyncMessage.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.senderSyncMessage.identifier}" />
+
+                                <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
+
+                                <choice>
+                                    <when>
+                                        <simple>${body.size()} == 1</simple>
+                                        <setBody>
+                                            <jsonpath>$[0]</jsonpath>
+                                        </setBody>
+                                    </when>
+                                    <otherwise>
+                                        <setBody>
+                                            <simple>${null}</simple>
+                                        </setBody>
+                                    </otherwise>
+                                </choice>
+                            </otherwise>
+                        </choice>
+
+                        <choice>
                             <when>
-                                <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
-                                <log message="Encrypting entity payload.." />
-            
-                                <process ref="pgpEncryptService" />
-            
-                                <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
+                                <simple>${body} != null || ${exchangeProperty.senderSyncMessage.operation} == 'r'</simple>
+                                <when>
+                                    <simple>${body} == null</simple>
+
+                                    <log message="Entity not found for request with uuid: ${exchangeProperty.senderSyncMessage.requestUuid}" />
+
+                                    <setBody>
+                                        <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
+                                    </setBody>
+                                    <script>
+                                        <spel>
+                                            #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
+                                        </spel>
+                                    </script>
+                                </when>
+
+                                <script>
+                                    <spel>
+                                        #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
+                                        #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
+                                        #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
+                                        #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
+                                        #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
+                                        #{body.metadata.setSnapshot(getProperty('senderSyncMessage').snapshot)}
+                                    </spel>
+                                </script>
+                                <setBody>
+                                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
+                                </setBody>
+
+                                <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
+
+                                <when>
+                                    <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
+                                    <log message="Encrypting entity payload.." />
+
+                                    <process ref="pgpEncryptService" />
+
+                                    <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
+                                </when>
+
+                                <log message="Sending entity to sync destination: {{camel.output.endpoint}}" />
+
+                                <toD uri="{{camel.output.endpoint}}" />
+
+                                <log message="Entity sent!" loggingLevel="DEBUG" />
+
+                                <script>
+                                    <spel>
+                                        #{getProperty('senderSyncMessage').markAsSent()}
+                                    </spel>
+                                </script>
+
+                                <setBody>
+                                    <simple>${exchangeProperty.senderSyncMessage}</simple>
+                                </setBody>
+
+                                <log message="Updating sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" loggingLevel="DEBUG" />
+
+                                <to uri="jpa:SenderSyncMessage" />
+
+                                <log message="Successfully updated sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" />
                             </when>
-    
-                            <log message="Sending entity to sync destination: {{camel.output.endpoint}}" />
-            
-                            <toD uri="{{camel.output.endpoint}}" />
-            
-                            <log message="Entity sent!" loggingLevel="DEBUG" />
-                    
-                            <script>
-                                <spel>
-                                    #{getProperty('senderSyncMessage').markAsSent()}
-                                </spel>
-                            </script>
-                            
-                            <setBody>
-                                <simple>${exchangeProperty.senderSyncMessage}</simple>
-                            </setBody>
-                            
-                            <log message="Updating sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" loggingLevel="DEBUG" />
-                            
-                            <to uri="jpa:SenderSyncMessage" />
-            
-                            <log message="Successfully updated sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" />
-                        </when>
-                        
-                        <otherwise>
-                            <log message="No entity found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" />
-                            <log message="Removing sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
-                            
-                            <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE id = ${exchangeProperty.senderSyncMessage.id}" />
-                            
-                            <log loggingLevel="DEBUG" message="Successfully removed sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" />
-                        </otherwise>
-                    </choice>
-                </split>
-            </when>
-            <otherwise>
-                <log message="No sender sync messages found" loggingLevel="DEBUG" />
-            </otherwise>
-        </choice>
+
+                            <otherwise>
+                                <log message="No entity found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" />
+                                <log message="Removing sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
+
+                                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE id = ${exchangeProperty.senderSyncMessage.id}" />
+
+                                <log loggingLevel="DEBUG" message="Successfully removed sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" />
+                            </otherwise>
+                        </choice>
+                    </split>
+                </when>
+                <otherwise>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+
+                    <log loggingLevel="DEBUG" message="No sync messages found" />
+                </otherwise>
+            </choice>
+        </loop>
     </route>
 </routes>
