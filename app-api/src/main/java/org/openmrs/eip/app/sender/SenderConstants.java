@@ -19,6 +19,8 @@ public class SenderConstants {
 	public static final String EX_PROP_RETRY_ITEM = "retry-item";
 	
 	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
+
+    public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
 	
 	public static final String ROUTE_ID_DB_EVENT_PROCESSOR = "db-event-processor";
 	
@@ -57,6 +59,10 @@ public class SenderConstants {
     public static final String ROUTE_ID_RESPONSE_PROCESSOR = "sync-response-processor";
 
 	public static final String URI_RESPONSE_PROCESSOR = "direct:" + ROUTE_ID_RESPONSE_PROCESSOR;
+
+    public static final String ROUTE_ID_SHUTDOWN = "shutdown-route";
+
+	public static final String URI_SHUTDOWN = "direct:" + ROUTE_ID_SHUTDOWN;
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
