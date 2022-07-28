@@ -22,6 +22,7 @@ import org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStat
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.app.management.entity.SyncRequestModel;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
@@ -55,11 +56,11 @@ public class SenderActiveMqConsumerRouteTest extends BaseSenderRouteTest {
 		requestData.setIdentifier(uuid);
 		requestData.setRequestUuid(requestUuid);
 		exchange.getIn().setBody(JsonUtils.marshall(requestData));
-		assertEquals(0, SenderTestUtils.getEntities(SenderSyncRequest.class).size());
+		assertEquals(0, TestUtils.getEntities(SenderSyncRequest.class).size());
 		
 		producerTemplate.send(URI, exchange);
 		
-		List<SenderSyncRequest> requests = SenderTestUtils.getEntities(SenderSyncRequest.class);
+		List<SenderSyncRequest> requests = TestUtils.getEntities(SenderSyncRequest.class);
 		assertEquals(1, requests.size());
 		SenderSyncRequest savedRequest = requests.get(0);
 		assertEquals(table, savedRequest.getTableName());
@@ -81,11 +82,11 @@ public class SenderActiveMqConsumerRouteTest extends BaseSenderRouteTest {
 		responseData.setMessageUuid(messageUuid);
 		responseData.setDateSentByReceiver(dateSent);
 		exchange.getIn().setBody(JsonUtils.marshall(responseData));
-		assertEquals(0, SenderTestUtils.getEntities(SenderSyncResponse.class).size());
+		assertEquals(0, TestUtils.getEntities(SenderSyncResponse.class).size());
 		
 		producerTemplate.send(URI, exchange);
 		
-		List<SenderSyncResponse> responses = SenderTestUtils.getEntities(SenderSyncResponse.class);
+		List<SenderSyncResponse> responses = TestUtils.getEntities(SenderSyncResponse.class);
 		assertEquals(1, responses.size());
 		SenderSyncResponse savedResponse = responses.get(0);
 		assertEquals(messageUuid, savedResponse.getMessageUuid());

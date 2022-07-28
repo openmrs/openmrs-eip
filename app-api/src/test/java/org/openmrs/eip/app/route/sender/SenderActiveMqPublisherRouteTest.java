@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.test.context.TestPropertySource;
@@ -68,7 +69,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		msg.setSnapshot(false);
 		msg.setDateCreated(new Date());
 		msg.setRequestUuid(requestUuid);
-		SenderTestUtils.saveEntity(msg);
+		TestUtils.saveEntity(msg);
 		return msg;
 	}
 	
@@ -87,7 +88,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldLoadAndProcessAllNewSyncMessagesSortedByDateCreated() throws Exception {
 		final int messageCount = 3;
-		List<SenderSyncMessage> msgs = SenderTestUtils.getEntities(SenderSyncMessage.class).stream()
+		List<SenderSyncMessage> msgs = TestUtils.getEntities(SenderSyncMessage.class).stream()
 		        .filter(m -> m.getStatus() == NEW).collect(Collectors.toList());
 		assertEquals(messageCount, msgs.size());
 		assertTrue(msgs.get(0).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
@@ -106,8 +107,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(3, syncMessages.get(0).getId().intValue());
 		assertEquals(1, syncMessages.get(1).getId().intValue());
 		assertEquals(2, syncMessages.get(2).getId().intValue());
-		assertEquals(0,
-		    SenderTestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
+		assertEquals(0, TestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
 	}
 	
 	@Test
@@ -116,9 +116,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
 		final String op = "d";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
@@ -127,8 +127,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
 		
 		String syncMsg = syncMessages.get(0);
@@ -149,9 +149,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String msgUuid = "msg-uuid";
 		final String op = "c";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
@@ -160,8 +160,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
 		
 		String syncMsg = syncMessages.get(0);
@@ -182,9 +182,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String msgUuid = "msg-uuid";
 		final String op = "u";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
@@ -193,8 +193,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
 		
 		String syncMsg = syncMessages.get(0);
@@ -212,16 +212,16 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	public void shouldProcessAnInsertOrUpdateEventAndTheEntityIsNotFound() throws Exception {
 		final String table = "patient";
 		final String uuid = "person-uuid";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, "msg-uuid", "u", null);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		assertMessageLogged(Level.INFO,
 		    "No entity found in the database matching identifier " + uuid + " in table " + table);
 	}
@@ -234,9 +234,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		final String msgUuid = "msg-uuid";
 		final String requestUuid = "request-uuid";
 		final String op = "r";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, requestUuid);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
@@ -245,8 +245,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
 		
 		String syncMsg = syncMessages.get(0);
@@ -267,9 +267,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		final String msgUuid = "msg-uuid";
 		final String requestUuid = "request-uuid";
 		final String op = "r";
-		assertTrue(SenderTestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, requestUuid);
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
@@ -278,8 +278,8 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
-		assertEquals(1, SenderTestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
+		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
+		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
 		
 		String syncMsg = syncMessages.get(0);

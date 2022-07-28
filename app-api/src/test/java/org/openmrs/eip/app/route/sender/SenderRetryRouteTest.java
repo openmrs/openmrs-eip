@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.springframework.test.context.TestPropertySource;
@@ -72,7 +73,7 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldLoadAllRetryItemsSortedByDateCreatedAndCallTheEventProcessorForEach() throws Exception {
 		final int retryCount = 4;
-		List<SenderRetryQueueItem> retries = SenderTestUtils.getEntities(SenderRetryQueueItem.class);
+		List<SenderRetryQueueItem> retries = TestUtils.getEntities(SenderRetryQueueItem.class);
 		for (SenderRetryQueueItem retry : retries) {
 			assertEquals(1, retry.getAttemptCount().intValue());
 		}
@@ -105,14 +106,14 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 		for (SenderRetryQueueItem retry : receivedRetryItems) {
 			assertEquals(2, retry.getAttemptCount().intValue());
 		}
-		Assert.assertTrue(SenderTestUtils.getEntities(SenderRetryQueueItem.class).isEmpty());
+		Assert.assertTrue(TestUtils.getEntities(SenderRetryQueueItem.class).isEmpty());
 		Assert.assertTrue(exchange.getProperty(EX_PROP_FAILED_ENTITIES, List.class).isEmpty());
 	}
 	
 	@Test
 	@Sql(scripts = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldFailIfAnEntityAlreadyHasAFailedRetryItemInTheCurrentIteration() throws Exception {
-		List<SenderRetryQueueItem> retries = SenderTestUtils.getEntities(SenderRetryQueueItem.class);
+		List<SenderRetryQueueItem> retries = TestUtils.getEntities(SenderRetryQueueItem.class);
 		assertEquals(4, retries.size());
 		List<Exchange> failedExchanges = new ArrayList();
 		advise(ROUTE_ID_RETRY, new AdviceWithRouteBuilder() {
@@ -139,7 +140,7 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, SenderRetryQueueItem.class).getAttemptCount().intValue());
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, SenderRetryQueueItem.class).getAttemptCount().intValue());
 		}
-		retries = SenderTestUtils.getEntities(SenderRetryQueueItem.class);
+		retries = TestUtils.getEntities(SenderRetryQueueItem.class);
 		assertEquals(2, retries.size());
 		assertEquals(2, retries.get(0).getId().longValue());
 		assertEquals(3, retries.get(1).getId().longValue());

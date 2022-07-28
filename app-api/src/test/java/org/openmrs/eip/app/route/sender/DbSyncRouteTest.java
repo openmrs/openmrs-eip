@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
 import org.springframework.test.context.TestPropertySource;
 
@@ -24,7 +25,7 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldCreateAndSaveTheSenderSyncMessageForTheEvent() {
-		final int count = SenderTestUtils.getEntities(SenderSyncMessage.class).size();
+		final int count = TestUtils.getEntities(SenderSyncMessage.class).size();
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		final String table = "visit";
 		final String uuid = "some-uuid";
@@ -38,7 +39,7 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 		
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
-		List<SenderSyncMessage> syncMsgs = SenderTestUtils.getEntities(SenderSyncMessage.class);
+		List<SenderSyncMessage> syncMsgs = TestUtils.getEntities(SenderSyncMessage.class);
 		assertEquals(count + 1, syncMsgs.size());
 		SenderSyncMessage msg = syncMsgs.get(syncMsgs.size() - 1);
 		assertEquals(table, msg.getTableName());

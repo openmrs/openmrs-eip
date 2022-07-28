@@ -3,7 +3,7 @@ package org.openmrs.eip.app.route.sender;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntity;
+import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_IS_SUBCLASS;

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntity;
+import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_FAILED_ENTITIES;
@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.springframework.test.context.TestPropertySource;
@@ -72,7 +73,7 @@ public class SenderErrorHandlerRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
 		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
-		List<SenderRetryQueueItem> errorItems = SenderTestUtils.getEntities(SenderRetryQueueItem.class).stream()
+		List<SenderRetryQueueItem> errorItems = TestUtils.getEntities(SenderRetryQueueItem.class).stream()
 		        .filter(r -> r.getEvent().getTableName().equals(event.getTableName())
 		                && r.getEvent().getPrimaryKeyId().equals(event.getPrimaryKeyId()))
 		        .collect(Collectors.toList());
@@ -103,7 +104,7 @@ public class SenderErrorHandlerRouteTest extends BaseSenderRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		List<SenderRetryQueueItem> errorItems = SenderTestUtils.getEntities(SenderRetryQueueItem.class).stream()
+		List<SenderRetryQueueItem> errorItems = TestUtils.getEntities(SenderRetryQueueItem.class).stream()
 		        .filter(r -> r.getEvent().getTableName().equals(event.getTableName())
 		                && r.getEvent().getPrimaryKeyId().equals(event.getPrimaryKeyId()))
 		        .collect(Collectors.toList());
@@ -123,14 +124,14 @@ public class SenderErrorHandlerRouteTest extends BaseSenderRouteTest {
 		SenderRetryQueueItem retryItem = getEntity(SenderRetryQueueItem.class, retryItemId);
 		assertNull(retryItem.getDateChanged());
 		assertEquals(Exception.class.getName(), retryItem.getExceptionType());
-		final int errorItemCount = SenderTestUtils.getEntities(SenderRetryQueueItem.class).size();
+		final int errorItemCount = TestUtils.getEntities(SenderRetryQueueItem.class).size();
 		exchange.setProperty(EX_PROP_RETRY_ITEM_ID, retryItemId);
 		exchange.setProperty(EX_PROP_RETRY_ITEM, retryItem);
 		exchange.setProperty(EX_PROP_FAILED_ENTITIES, new HashSet());
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		assertEquals(errorItemCount, SenderTestUtils.getEntities(SenderRetryQueueItem.class).size());
+		assertEquals(errorItemCount, TestUtils.getEntities(SenderRetryQueueItem.class).size());
 		retryItem = getEntity(SenderRetryQueueItem.class, retryItemId);
 		assertNotNull(retryItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), retryItem.getExceptionType());
@@ -156,7 +157,7 @@ public class SenderErrorHandlerRouteTest extends BaseSenderRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		List<SenderRetryQueueItem> errorItems = SenderTestUtils.getEntities(SenderRetryQueueItem.class).stream()
+		List<SenderRetryQueueItem> errorItems = TestUtils.getEntities(SenderRetryQueueItem.class).stream()
 		        .filter(r -> r.getEvent().getTableName().equals(event.getTableName())
 		                && r.getEvent().getPrimaryKeyId().equals(event.getPrimaryKeyId()))
 		        .collect(Collectors.toList());
@@ -190,13 +191,13 @@ public class SenderErrorHandlerRouteTest extends BaseSenderRouteTest {
 		SenderRetryQueueItem retryItem = getEntity(SenderRetryQueueItem.class, retryItemId);
 		assertNull(retryItem.getDateChanged());
 		assertEquals(Exception.class.getName(), retryItem.getExceptionType());
-		final int errorItemCount = SenderTestUtils.getEntities(SenderRetryQueueItem.class).size();
+		final int errorItemCount = TestUtils.getEntities(SenderRetryQueueItem.class).size();
 		exchange.setProperty(EX_PROP_RETRY_ITEM_ID, retryItemId);
 		exchange.setProperty(EX_PROP_FAILED_ENTITIES, new HashSet());
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		assertEquals(errorItemCount, SenderTestUtils.getEntities(SenderRetryQueueItem.class).size());
+		assertEquals(errorItemCount, TestUtils.getEntities(SenderRetryQueueItem.class).size());
 		retryItem = getEntity(SenderRetryQueueItem.class, retryItemId);
 		assertNotNull(retryItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), retryItem.getExceptionType());

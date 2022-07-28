@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntities;
+import static org.openmrs.eip.app.route.TestUtils.getEntities;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_RESPONSE_PROCESSOR;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_RESPONSE_PROCESSOR;
 
@@ -23,6 +23,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
+import org.openmrs.eip.app.route.TestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -49,7 +50,7 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 		response.setMessageUuid(messageUuid);
 		response.setDateSentByReceiver(LocalDateTime.now());
 		response.setDateCreated(new Date());
-		SenderTestUtils.saveEntity(response);
+		TestUtils.saveEntity(response);
 		return response;
 	}
 	
@@ -102,15 +103,15 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_sender_sync_response.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldProcessAResponseForASyncMessageWithAMessageUuidMatches() {
 		final String msgUuid = "26beb8bd-287c-47f2-9786-a7b98c933c04";
-		SenderSyncMessage msg = SenderTestUtils.getEntity(SenderSyncMessage.class, 2L);
+		SenderSyncMessage msg = TestUtils.getEntity(SenderSyncMessage.class, 2L);
 		assertEquals(msgUuid, msg.getMessageUuid());
-		SenderSyncResponse response = SenderTestUtils.getEntity(SenderSyncResponse.class, 2L);
+		SenderSyncResponse response = TestUtils.getEntity(SenderSyncResponse.class, 2L);
 		assertEquals(msgUuid, response.getMessageUuid());
 		
 		producerTemplate.send(URI_RESPONSE_PROCESSOR, new DefaultExchange(camelContext));
 		
-		assertNull(SenderTestUtils.getEntity(SenderSyncMessage.class, msg.getId()));
-		assertNull(SenderTestUtils.getEntity(SenderSyncResponse.class, response.getId()));
+		assertNull(TestUtils.getEntity(SenderSyncMessage.class, msg.getId()));
+		assertNull(TestUtils.getEntity(SenderSyncResponse.class, response.getId()));
 	}
 	
 	@Test

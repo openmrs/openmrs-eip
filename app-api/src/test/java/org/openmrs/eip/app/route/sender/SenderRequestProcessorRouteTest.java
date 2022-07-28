@@ -8,8 +8,8 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus.NEW;
 import static org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus.PROCESSED;
-import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntities;
-import static org.openmrs.eip.app.route.sender.SenderTestUtils.getEntity;
+import static org.openmrs.eip.app.route.TestUtils.getEntities;
+import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_REQUEST_PROCESSOR;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_REQUEST_PROCESSOR;
 
@@ -25,6 +25,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderSyncRequest;
+import org.openmrs.eip.app.route.TestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -52,7 +53,7 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 		request.setIdentifier(identifier);
 		request.setRequestUuid(requestUuid);
 		request.setDateCreated(new Date());
-		SenderTestUtils.saveEntity(request);
+		TestUtils.saveEntity(request);
 		return request;
 	}
 	
