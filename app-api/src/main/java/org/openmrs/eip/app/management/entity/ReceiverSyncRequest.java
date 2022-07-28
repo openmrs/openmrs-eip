@@ -38,7 +38,7 @@ public class ReceiverSyncRequest extends BaseSyncRequest {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
-	private ReceiverRequestStatus status;
+	private ReceiverRequestStatus status = ReceiverRequestStatus.NEW;
 	
 	@NotNull
 	@ManyToOne(optional = false)

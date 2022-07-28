@@ -11,7 +11,7 @@
         <choice>
             <when>
                 <simple>${body.size()} > 0</simple>
-                <log message="Fetched ${body.size()} sync requests" />
+                <log message="Fetched ${body.size()} sync request(s)" />
 
                 <split parallelProcessing="false">
                     <simple>${body}</simple>

@@ -21,4 +21,8 @@ public class ReceiverConstants {
 	public static final String EX_PROP_SITE = "site";
 	
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
+	
+	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
+	
+	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
 }
