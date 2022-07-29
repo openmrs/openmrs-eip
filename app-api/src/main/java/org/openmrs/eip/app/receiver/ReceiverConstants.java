@@ -1,6 +1,8 @@
 package org.openmrs.eip.app.receiver;
 
 public class ReceiverConstants {
+
+    public static final String APP_PROP_MSG_DESTINATION = "message.destination";
 	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
@@ -19,10 +21,20 @@ public class ReceiverConstants {
 	public static final String EX_PROP_ENTITY_ID = "entity-id";
 	
 	public static final String EX_PROP_SITE = "site";
+
+    public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
+
+    public static final String EX_PROP_RETRY_ITEM_ID = "retry-item-id";
+
+    public static final String EX_PROP_RETRY_ITEM = "retry-item";
 	
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
 	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	
 	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
+	
+	public static final String ROUTE_ID_RETRY = "receiver-retry";
+	
+	public static final String URI_RETRY = "direct:" + ROUTE_ID_RETRY;
 }

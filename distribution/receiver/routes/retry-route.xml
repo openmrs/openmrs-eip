@@ -53,7 +53,7 @@
                         <when>
                             <simple>${exchangeProperty.failed-entities.contains(${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier})} == true</simple>
                             <log message="Skipping retry item with id: ${exchangeProperty.retry-item-id} for ${exchangeProperty.retry-item.modelClassName}#${exchangeProperty.retry-item.identifier} because it still has older failed event(s) in the queue" />
-                            <throwException exceptionType="java.lang.Exception" message="Skipped because the entity had older failed message(s) in the queue" />
+                            <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Skipped because the entity had older failed message(s) in the queue" />
                         </when>
                         <otherwise>
                             <log message="Re-processing: ${exchangeProperty.retry-item}" />
