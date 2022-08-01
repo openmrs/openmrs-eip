@@ -1,6 +1,10 @@
 package org.openmrs.eip.app.route.sender;
 
+import static java.util.Collections.synchronizedSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.route.TestUtils.getEntities;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_RETRY_ITEM;
@@ -12,8 +16,12 @@ import static org.openmrs.eip.app.sender.SenderConstants.URI_RETRY;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -27,6 +35,7 @@ import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.app.sender.SenderConstants;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.springframework.test.context.TestPropertySource;
@@ -144,6 +153,46 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 		assertEquals(2, retries.size());
 		assertEquals(2, retries.get(0).getId().longValue());
 		assertEquals(3, retries.get(1).getId().longValue());
+	}
+	
+	@Test
+	public void shouldProcessARetryItem() throws Exception {
+		final String table = "person";
+		final String uuid = "1";
+		assertTrue(getEntities(SenderRetryQueueItem.class).isEmpty());
+		Event event = new Event();
+		event.setTableName(table);
+		event.setPrimaryKeyId(uuid);
+		event.setSnapshot(false);
+		event.setOperation("u");
+		SenderRetryQueueItem retry = new SenderRetryQueueItem();
+		retry.setEvent(event);
+		retry.setDateCreated(new Date());
+		retry.setAttemptCount(1);
+		retry.setExceptionType(EIPException.class.getName());
+		TestUtils.saveEntity(retry);
+		assertEquals(1, getEntities(SenderRetryQueueItem.class).size());
+		mockEventProcessorEndpoint.expectedMessageCount(1);
+		mockEventProcessorEndpoint.expectedPropertyReceived(SenderConstants.EX_PROP_RETRY_ITEM_ID, retry.getId());
+		mockEventProcessorEndpoint.expectedPropertyReceived(EX_PROP_RETRY_ITEM, retry);
+		mockEventProcessorEndpoint.expectedPropertyReceived(SenderConstants.EX_PROP_FAILED_ENTITIES,
+		    synchronizedSet(new HashSet()));
+		final AtomicInteger attemptCountHolder = new AtomicInteger();
+		AtomicReference<Event> eventHolder = new AtomicReference();
+		AtomicReference<Event> bodyHolder = new AtomicReference();
+		mockEventProcessorEndpoint.whenAnyExchangeReceived(e -> {
+			attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, SenderRetryQueueItem.class).getAttemptCount());
+			eventHolder.set(e.getProperty(EX_PROP_EVENT, Event.class));
+			bodyHolder.set(e.getIn().getBody(Event.class));
+		});
+		
+		producerTemplate.send(SenderConstants.URI_RETRY, new DefaultExchange(camelContext));
+		
+		mockEventProcessorEndpoint.assertIsSatisfied();
+		assertTrue(getEntities(SenderRetryQueueItem.class).isEmpty());
+		assertEquals(2, attemptCountHolder.get());
+		assertNotNull(eventHolder.get());
+		assertNotNull(bodyHolder.get());
 	}
 	
 }

@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;
@@ -148,7 +147,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_RETRY, exchange);
 		
 		mockMsgProcessorEndpoint.assertIsSatisfied();
-		Assert.assertEquals(2, failedExchanges.size());
+		assertEquals(2, failedExchanges.size());
 		for (Exchange e : failedExchanges) {
 			assertEquals("Skipped because the entity had older failed message(s) in the queue", getErrorMessage(e));
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount().intValue());
@@ -161,9 +160,9 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldProcessAMessage() throws Exception {
+	public void shouldProcessARetryItem() throws Exception {
 		final String uuid = "person-uuid";
-		assertTrue(getEntities(ReceiverSyncRequest.class).isEmpty());
+		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
