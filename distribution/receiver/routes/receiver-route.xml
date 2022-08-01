@@ -5,7 +5,7 @@
         <log message="Received sync message" />
 
         <when>
-            <simple>{{openmrs.eip.dbsync.encryption.enabled}} == true</simple>
+            <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
             <!--
                 TODO If we can't decrypt the message, put it in some error queue that blocks all future incoming
                 messages

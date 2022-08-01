@@ -3,7 +3,7 @@ package org.openmrs.eip.app.route.receiver;
 import static java.util.Collections.synchronizedSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.APP_PROP_MSG_DESTINATION;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_MSG_DESTINATION;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
@@ -44,7 +44,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 import ch.qos.logback.classic.Level;
 
-@TestPropertySource(properties = APP_PROP_MSG_DESTINATION + "=" + ROUTE_ID_DESTINATION)
+@TestPropertySource(properties = PROP_MSG_DESTINATION + "=" + ROUTE_ID_DESTINATION)
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_RETRY + "=DEBUG")
 public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	
