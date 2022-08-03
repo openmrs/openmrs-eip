@@ -18,6 +18,12 @@
 				<receiver-conflicts></receiver-conflicts>
 			</ng-template>
 		</li>
+		<li ngbNavItem="statuses">
+			<a ngbNavLink i18n="@@site-statuses">Site Statuses</a>
+			<ng-template ngbNavContent>
+				<site-statuses></site-statuses>
+			</ng-template>
+		</li>
 	</ul>
 	<div class="container mw-100 bg-white">
 		<div [ngbNavOutlet]="nav" class="mt-2 mb-3 tab-content-container"></div>

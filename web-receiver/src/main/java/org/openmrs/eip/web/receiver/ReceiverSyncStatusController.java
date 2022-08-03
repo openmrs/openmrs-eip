@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/syncstatus")
+@RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/status")
 public class ReceiverSyncStatusController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverSyncStatusController.class);
@@ -25,7 +25,7 @@ public class ReceiverSyncStatusController extends BaseRestController {
 	@GetMapping
 	public Map<String, Object> getAll() {
 		if (log.isDebugEnabled()) {
-			log.debug("Fetching receiver sync status items");
+			log.debug("Fetching sync status items");
 		}
 		
 		return doGetAll();
