@@ -11,7 +11,7 @@ import {DbEventService} from "./db-event.service";
 	selector: 'db-events',
 	templateUrl: './db-event.component.html'
 })
-export class EbEventComponent extends BaseListingComponent implements OnInit {
+export class DbEventComponent extends BaseListingComponent implements OnInit {
 
 	count?: number;
 
