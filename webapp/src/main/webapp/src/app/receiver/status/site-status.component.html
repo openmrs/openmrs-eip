@@ -10,7 +10,7 @@
 	</thead>
 	<tbody>
 	<tr *ngFor="let e of statuses">
-		<td>{{e.siteInfo?.id}}</td>
+		<td>{{e.siteInfo?.name}}</td>
 		<td>{{e.siteInfo?.identifier}}</td>
 		<td>{{e.lastSyncDate | date:'yyyy-MM-dd HH:mm:ss.SSS'}}</td>
 	</tr>

@@ -64,8 +64,9 @@ body {
 .ui-tabs-vertical .nav-link {
 	color: $colorLightSilver;
 	background-color: $colorSecondary;
-	border-bottom-left-radius: 4px;
-	border-top-left-radius: 4px;
+	border-bottom-left-radius: 6px;
+	border-top-left-radius: 6px;
+	border: 1px solid white !important;
 	width: 180px !important;
 }
 
