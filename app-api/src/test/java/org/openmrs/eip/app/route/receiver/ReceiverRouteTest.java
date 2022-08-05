@@ -112,6 +112,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);
 		
@@ -144,6 +145,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		exchange.getIn()
 		        .setBody(TypeEnum.FILE.getOpeningTag() + syncMetadata + "#" + fileContents + TypeEnum.FILE.getClosingTag());
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, true);
 		mockComplexObsSyncEndpoint.expectedPropertyReceived(EX_PROP_METADATA, syncMetadata);
 		mockComplexObsSyncEndpoint.expectedBodiesReceived(fileContents);
 		
@@ -183,6 +185,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);
 		
@@ -215,6 +218,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
 		mockActiveMqResponseEndpoint.expectedMessageCount(1);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);
