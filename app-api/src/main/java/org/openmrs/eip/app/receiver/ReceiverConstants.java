@@ -58,4 +58,8 @@ public class ReceiverConstants {
 	
 	public static final String URI_UPDATE_SEARCH_INDEX = "direct:" + ROUTE_ID_UPDATE_SEARCH_INDEX;
 	
+	public static final String ROUTE_ID_CLEAR_CACHE = "receiver-clear-db-cache";
+	
+	public static final String URI_CLEAR_CACHE = "direct:" + ROUTE_ID_CLEAR_CACHE;
+	
 }
