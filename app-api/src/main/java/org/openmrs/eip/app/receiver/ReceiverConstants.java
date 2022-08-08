@@ -62,4 +62,8 @@ public class ReceiverConstants {
 	
 	public static final String URI_CLEAR_CACHE = "direct:" + ROUTE_ID_CLEAR_CACHE;
 	
+	public static final String ROUTE_ID_DBSYNC = "inbound-db-sync";
+	
+	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;
+	
 }

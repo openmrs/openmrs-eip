@@ -20,7 +20,7 @@
                 <setProperty name="err-message">
                     <simple>Cannot process the message because the entity has ${body.size()} message(s) in the DB sync conflict queue</simple>
                 </setProperty>
-                <throwException exceptionType="java.lang.Exception" message="${exchangeProperty.err-message}" />
+                <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="${exchangeProperty.err-message}" />
             </when>
             <otherwise>
                 <setBody>
