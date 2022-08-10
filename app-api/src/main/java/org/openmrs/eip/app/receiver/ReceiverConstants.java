@@ -66,4 +66,8 @@ public class ReceiverConstants {
 	
 	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;
 	
+	public static final String ROUTE_ID_ERROR_HANDLER = "inbound-error-handler";
+	
+	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
+	
 }
