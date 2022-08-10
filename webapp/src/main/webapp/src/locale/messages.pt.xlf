@@ -323,7 +323,7 @@
 		<unit id="site-statuses">
 			<segment>
 				<source>Site Statuses</source>
-				<target>TODO</target>
+				<target>Estado dos Sites</target>
 			</segment>
 		</unit>
 		<unit id="common-name">
