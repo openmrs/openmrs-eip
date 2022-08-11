@@ -11,7 +11,7 @@ public class ReceiverSyncRequestTest {
 	@Test
 	public void markAsSent_shouldSetStatusToSentAndSetDateSent() {
 		ReceiverSyncRequest request = new ReceiverSyncRequest();
-		Assert.assertNull(request.getStatus());
+		Assert.assertEquals(ReceiverRequestStatus.NEW, request.getStatus());
 		Assert.assertNull(request.getDateSent());
 		
 		request.markAsSent();
@@ -23,7 +23,7 @@ public class ReceiverSyncRequestTest {
 	@Test
 	public void markAsReceived_shouldSetStatusToReceivedAndSetDateReceivedAndSetFoundToTrue() {
 		ReceiverSyncRequest request = new ReceiverSyncRequest();
-		Assert.assertNull(request.getStatus());
+		Assert.assertEquals(ReceiverRequestStatus.NEW, request.getStatus());
 		Assert.assertNull(request.getDateReceived());
 		Assert.assertFalse(request.getFound());
 		
@@ -37,7 +37,7 @@ public class ReceiverSyncRequestTest {
 	@Test
 	public void markAsReceived_shouldSetStatusToReceivedAndSetDateReceivedAndSetFoundToFalse() {
 		ReceiverSyncRequest request = new ReceiverSyncRequest();
-		Assert.assertNull(request.getStatus());
+		Assert.assertEquals(ReceiverRequestStatus.NEW, request.getStatus());
 		Assert.assertNull(request.getDateReceived());
 		Assert.assertFalse(request.getFound());
 		
