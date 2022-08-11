@@ -324,18 +324,18 @@
 			<segment>
 				<source>Site Statuses</source>
 				<target>Estado dos Sites</target>
-			</segment>
+			</segment>	
 		</unit>
 		<unit id="common-name">
 			<segment>
 				<source>Name</source>
-				<target>TODO</target>
+				<target>Nome</target>
 			</segment>
 		</unit>
 		<unit id="last-sync-date">
 			<segment>
 				<source>Last Sync Date</source>
-				<target>TODO</target>
+				<target>Data da Ultima Sincronizacao</target>
 			</segment>
 		</unit>
 	</file>
