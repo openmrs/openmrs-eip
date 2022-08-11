@@ -1,11 +1,9 @@
-package org.openmrs.eip.app.route.sender;
+package org.openmrs.eip.app.route.receiver;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.EX_APP_ID;
 import static org.openmrs.eip.app.SyncConstants.ROUTE_ID_SHUTDOWN;
 import static org.openmrs.eip.app.SyncConstants.URI_SHUTDOWN;
-import static org.openmrs.eip.app.route.sender.ShutdownRouteTest.TEST_SENDER_ID;
+import static org.openmrs.eip.app.route.receiver.ShutdownRouteTest.TEST_RECEIVER_ID;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import org.apache.camel.EndpointInject;
@@ -17,15 +15,18 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.CustomFileOffsetBackingStore;
-import org.openmrs.eip.app.sender.SenderConstants;
+import org.openmrs.eip.app.ReceiverContext;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(properties = SenderConstants.PROP_SENDER_ID + "=" + TEST_SENDER_ID)
+import ch.qos.logback.classic.Level;
+
+@TestPropertySource(properties = ReceiverConstants.PROP_RECEIVER_ID + "=" + TEST_RECEIVER_ID)
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_SHUTDOWN + "=DEBUG")
-public class ShutdownRouteTest extends BaseSenderRouteTest {
+public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	
-	protected static final String TEST_SENDER_ID = "test";
+	protected static final String TEST_RECEIVER_ID = "test";
 	
 	@EndpointInject("mock:email")
 	private MockEndpoint mockEmailNoticeProcessor;
@@ -40,7 +41,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
-		setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
+		setInternalState(ReceiverContext.class, "isStopping", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
@@ -57,29 +58,39 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldDisableTheDebeziumBackingStoreCallEmailProcessorAndShutdownTheApplication() throws Exception {
-		assertFalse(CustomFileOffsetBackingStore.isDisabled());
-		mockEmailNoticeProcessor.expectedMessageCount(1);
-		mockShutdownBean.expectedMessageCount(1);
-		mockEmailNoticeProcessor.expectedPropertyReceived(EX_APP_ID, TEST_SENDER_ID);
-		
-		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
-		
-		assertTrue(CustomFileOffsetBackingStore.isDisabled());
-		mockEmailNoticeProcessor.assertIsSatisfied();
-		mockShutdownBean.assertIsSatisfied();
-	}
-	
-	@Test
-	public void shouldDisableTheDebeziumBackingStoreAndSkipCallingEmailProcessorAndShutdown() throws Exception {
-		setInternalState(AppUtils.class, "shuttingDown", true);
-		assertFalse(CustomFileOffsetBackingStore.isDisabled());
+	public void shouldSkipIfTheReceiverIsHasAlreadyReceivedAShutdownNotice() throws Exception {
+		Whitebox.setInternalState(ReceiverContext.class, "isStopping", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
 		
-		assertTrue(CustomFileOffsetBackingStore.isDisabled());
+		mockEmailNoticeProcessor.assertIsSatisfied();
+		mockShutdownBean.assertIsSatisfied();
+		assertMessageLogged(Level.DEBUG, "The application is already shutting down after a previous shutdown notice");
+	}
+	
+	@Test
+	public void shouldSkipProcessingIfTheReceiverIsAlreadyShuttingDown() throws Exception {
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
+		mockEmailNoticeProcessor.expectedMessageCount(0);
+		mockShutdownBean.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
+		
+		mockEmailNoticeProcessor.assertIsSatisfied();
+		mockShutdownBean.assertIsSatisfied();
+		assertMessageLogged(Level.DEBUG, "The application is already shutting down");
+	}
+	
+	@Test
+	public void shouldCallEmailProcessorAndShutdownTheApplication() throws Exception {
+		mockEmailNoticeProcessor.expectedMessageCount(1);
+		mockShutdownBean.expectedMessageCount(1);
+		mockEmailNoticeProcessor.expectedPropertyReceived(EX_APP_ID, TEST_RECEIVER_ID);
+		
+		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
+		
 		mockEmailNoticeProcessor.assertIsSatisfied();
 		mockShutdownBean.assertIsSatisfied();
 	}

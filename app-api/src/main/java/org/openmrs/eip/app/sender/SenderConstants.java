@@ -5,8 +5,8 @@ public class SenderConstants {
 	public static final String ACTIVEMQ_IN_ENDPOINT = "activemq:openmrs.sync.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&acknowledgementModeName=CLIENT_ACKNOWLEDGE&messageListenerContainerFactory=customMessageListenerContainerFactory&asyncStartListener=true";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "db-sync.sender.activemq.in";
-
-    public static final String PROP_SENDER_ID = "db-sync.senderId";
+	
+	public static final String PROP_SENDER_ID = "db-sync.senderId";
 	
 	public static final String EX_PROP_EVENT = "event";
 	
@@ -19,8 +19,6 @@ public class SenderConstants {
 	public static final String EX_PROP_RETRY_ITEM = "retry-item";
 	
 	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
-
-    public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
 	
 	public static final String ROUTE_ID_DB_EVENT_PROCESSOR = "db-event-processor";
 	
@@ -51,18 +49,14 @@ public class SenderConstants {
 	public static final String ROUTE_ID_ACTIVEMQ_PUBLISHER = "sender-activemq-publisher";
 	
 	public static final String URI_ACTIVEMQ_PUBLISHER = "direct:" + ROUTE_ID_ACTIVEMQ_PUBLISHER;
-
-    public static final String ROUTE_ID_REQUEST_PROCESSOR = "sender-request-processor";
-
-    public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
-
-    public static final String ROUTE_ID_RESPONSE_PROCESSOR = "sync-response-processor";
-
+	
+	public static final String ROUTE_ID_REQUEST_PROCESSOR = "sender-request-processor";
+	
+	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
+	
+	public static final String ROUTE_ID_RESPONSE_PROCESSOR = "sync-response-processor";
+	
 	public static final String URI_RESPONSE_PROCESSOR = "direct:" + ROUTE_ID_RESPONSE_PROCESSOR;
-
-    public static final String ROUTE_ID_SHUTDOWN = "shutdown-route";
-
-	public static final String URI_SHUTDOWN = "direct:" + ROUTE_ID_SHUTDOWN;
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	

@@ -8,6 +8,8 @@ public class ReceiverConstants {
 	
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
 	
+	public static final String PROP_RECEIVER_ID = "db-sync.receiverId";
+
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
 	public static final String URI_MSG_PROCESSOR = "direct:" + ROUTE_ID_MSG_PROCESSOR;
