@@ -2,6 +2,10 @@ package org.openmrs.eip.app;
 
 public class SyncConstants {
 	
+	public static final String FOLDER_DIST = "distribution";
+	
+	public static final String FOLDER_ROUTES = "routes";
+	
 	public static final int MAX_COUNT = 200;
 	
 	public static final int WAIT_IN_SECONDS = 60;
@@ -21,8 +25,8 @@ public class SyncConstants {
 	public static final String PROP_SITE_PARALLEL_SIZE = "sites.sync.parallel.size";
 	
 	public static final String PROP_MSG_PARALLEL_SIZE = "events.sync.parallel.size";
-
-    public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
+	
+	public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
 	
 	public final static String SAVEPOINT_FILE = "snapshot_savepoint.properties";
 	
@@ -37,9 +41,9 @@ public class SyncConstants {
 	public final static String MGT_TX_MGR = "mngtTransactionManager";
 	
 	public final static String EX_PROP_APP_ID = "org.openmrs.eip.app-appId";
-
-    public static final String ROUTE_ID_SHUTDOWN = "shutdown-route";
-
-    public static final String URI_SHUTDOWN = "direct:" + ROUTE_ID_SHUTDOWN;
+	
+	public static final String ROUTE_ID_SHUTDOWN = "shutdown-route";
+	
+	public static final String URI_SHUTDOWN = "direct:" + ROUTE_ID_SHUTDOWN;
 	
 }
