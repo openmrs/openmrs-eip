@@ -1,6 +1,8 @@
 package org.openmrs.eip;
 
 import static java.io.File.separator;
+import static org.openmrs.eip.app.SyncConstants.FOLDER_DIST;
+import static org.openmrs.eip.app.SyncConstants.FOLDER_ROUTES;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 import java.io.File;
@@ -62,11 +64,7 @@ import ch.qos.logback.core.read.ListAppender;
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
-	
-	protected static final String FOLDER_DIST = "distribution";
-	
-	protected static final String FOLDER_ROUTES = "routes";
-	
+
 	@Autowired
 	protected ApplicationContext applicationContext;
 	
