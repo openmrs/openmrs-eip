@@ -42,13 +42,4 @@ public class ReceiverErrorController extends BaseRestController {
 		return doGet(id);
 	}
 	
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable("id") Integer id) {
-		if (log.isDebugEnabled()) {
-			log.debug("Deleting receiver retry item with id: " + id);
-		}
-		
-		doDelete(id);
-	}
-	
 }

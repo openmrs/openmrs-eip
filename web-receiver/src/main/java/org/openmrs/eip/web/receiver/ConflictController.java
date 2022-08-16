@@ -24,7 +24,6 @@ import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,15 +106,6 @@ public class ConflictController extends BaseRestController {
 		log.info("Successfully saved new hash for the entity");
 		
 		return conflict;
-	}
-	
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable("id") Integer id) {
-		if (log.isDebugEnabled()) {
-			log.debug("Deleting conflict with id: " + id);
-		}
-		
-		doDelete(id);
 	}
 	
 }

@@ -3,11 +3,10 @@ package org.openmrs.eip.web.sender;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
-import org.openmrs.eip.web.contoller.BaseRestController;
 import org.openmrs.eip.web.RestConstants;
+import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,15 +39,6 @@ public class SenderErrorController extends BaseRestController {
 		}
 		
 		return doGet(id);
-	}
-	
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable("id") Integer id) {
-		if (log.isDebugEnabled()) {
-			log.debug("Deleting sender retry item with id: " + id);
-		}
-		
-		doDelete(id);
 	}
 	
 }

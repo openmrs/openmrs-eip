@@ -52,10 +52,6 @@ public abstract class BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
-	public void doDelete(Integer id) {
-		on(camelContext).to("jpa:" + getName() + "?query=DELETE FROM " + getName() + " WHERE id = " + id).request();
-	}
-	
 	public String getName() {
 		return getClazz().getSimpleName();
 	}
