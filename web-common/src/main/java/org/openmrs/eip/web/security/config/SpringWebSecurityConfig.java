@@ -8,6 +8,7 @@ import static org.openmrs.eip.web.RestConstants.PATH_LOGIN;
 import static org.openmrs.eip.web.security.SecurityConstants.ROLE_AUTHENTICATED;
 import static org.openmrs.eip.web.security.SecurityConstants.USERS_FILE;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -75,7 +77,15 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 			log.debug("Loading and setting up user info...");
 		}
 		
-		Properties users = PropertiesLoaderUtils.loadProperties(new FileSystemResourceLoader().getResource(USERS_FILE));
+		Properties users;
+		try {
+			users = PropertiesLoaderUtils.loadProperties(new FileSystemResourceLoader().getResource(USERS_FILE));
+		}
+		catch (FileNotFoundException e) {
+			//Useful in tests
+			users = PropertiesLoaderUtils.loadProperties(new ClassPathResource(USERS_FILE));
+		}
+		
 		InMemoryUserDetailsManagerConfigurer configurer = auth.inMemoryAuthentication();
 		for (Map.Entry<Object, Object> entry : users.entrySet()) {
 			String encodedPass = passwordEncoder.encode(entry.getValue().toString());

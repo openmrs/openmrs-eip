@@ -21,6 +21,13 @@
             <artifactId>web-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openmrs.eip</groupId>
+            <artifactId>app-api</artifactId>
+            <type>test-jar</type>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
