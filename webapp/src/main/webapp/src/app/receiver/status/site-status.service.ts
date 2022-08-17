@@ -11,7 +11,7 @@ const RESOURCE_NAME = 'receiver/status';
 })
 export class SiteStatusService extends BaseService<SiteStatus> {
 
-	getEventCountAndItems(): Observable<SiteStatusCountAndItems> {
+	getStatusCountAndItems(): Observable<SiteStatusCountAndItems> {
 		return this.getCountAndItems(RESOURCE_NAME);
 	}
 

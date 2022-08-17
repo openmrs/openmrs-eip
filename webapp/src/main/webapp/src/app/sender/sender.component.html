@@ -18,6 +18,12 @@
 				<db-events></db-events>
 			</ng-template>
 		</li>
+		<li ngbNavItem="syncMsgs">
+			<a ngbNavLink i18n="@@common-sync-msgs">Sync Messages</a>
+			<ng-template ngbNavContent>
+				<sender-sync-messages></sender-sync-messages>
+			</ng-template>
+		</li>
 	</ul>
 	<div class="container mw-100 bg-white">
 		<div [ngbNavOutlet]="nav" class="mt-2 mb-3 tab-content-container"></div>

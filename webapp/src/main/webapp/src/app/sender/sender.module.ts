@@ -8,6 +8,8 @@ import {TableStatsComponent} from "./stats/table-stats.component";
 import {SenderDashboardComponent} from "./dashboard/sender-dashboard.component";
 import {DbEventComponent} from "./event/db-event.component";
 import {dbEventReducer} from "./event/state/db-event.reducer";
+import {SenderSyncMessagesComponent} from './sync/sender-sync-messages.component';
+import {senderSyncMessageReducer} from "./sync/state/sender-sync-message.reducer";
 
 
 @NgModule({
@@ -16,12 +18,14 @@ import {dbEventReducer} from "./event/state/db-event.reducer";
 		SenderErrorComponent,
 		SenderDashboardComponent,
 		TableStatsComponent,
-		DbEventComponent
+		DbEventComponent,
+		SenderSyncMessagesComponent
 	],
 	imports: [
 		SharedModule,
 		StoreModule.forFeature('senderErrorQueue', senderErrorReducer),
-		StoreModule.forFeature('eventQueue', dbEventReducer)
+		StoreModule.forFeature('eventQueue', dbEventReducer),
+		StoreModule.forFeature('syncQueue', senderSyncMessageReducer)
 	], exports: [SenderComponent]
 })
 

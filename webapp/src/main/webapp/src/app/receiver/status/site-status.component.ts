@@ -40,7 +40,7 @@ export class SiteStatusComponent extends BaseListingComponent implements OnInit 
 	}
 
 	loadStatuses(): void {
-		this.service.getEventCountAndItems().subscribe(countAndItems => {
+		this.service.getStatusCountAndItems().subscribe(countAndItems => {
 			this.store.dispatch(new SiteStatusesLoaded(countAndItems));
 		});
 	}

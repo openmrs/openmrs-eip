@@ -324,7 +324,7 @@
 			<segment>
 				<source>Site Statuses</source>
 				<target>Estado dos Sites</target>
-			</segment>	
+			</segment>
 		</unit>
 		<unit id="common-name">
 			<segment>
@@ -336,6 +336,24 @@
 			<segment>
 				<source>Last Sync Date</source>
 				<target>Data da Ultima Sincronizacao</target>
+			</segment>
+		</unit>
+		<unit id="common-sync-msgs">
+			<segment>
+				<source>Sync Messages</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-message-id">
+			<segment>
+				<source>Message Id</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-request-id">
+			<segment>
+				<source>Request Id</source>
+				<target></target>
 			</segment>
 		</unit>
 	</file>
