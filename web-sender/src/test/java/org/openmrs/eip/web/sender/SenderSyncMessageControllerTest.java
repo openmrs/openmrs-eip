@@ -24,8 +24,12 @@ public class SenderSyncMessageControllerTest extends BaseSenderTest {
 	public void shouldGetAllSyncMessages() {
 		Map result = controller.getAll();
 		assertEquals(2, result.size());
-		assertEquals(4, result.get("count"));
-		assertEquals(4, ((List) result.get("items")).size());
+		assertEquals(3, result.get("count"));
+		List<SenderSyncMessage> messages = (List) result.get("items");
+		assertEquals(3, messages.size());
+		assertEquals(1, messages.get(0).getId().longValue());
+		assertEquals(2, messages.get(1).getId().longValue());
+		assertEquals(3, messages.get(2).getId().longValue());
 	}
 	
 	@Test
