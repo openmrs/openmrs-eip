@@ -22,11 +22,20 @@
 			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
 			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
-		<td class="text-left">
-			<span class="text-infos" [hidden]="m.status != 'NEW'" i18n="@@common-waiting">Waiting To Be Sent</span>
-			<span class="text-infos" [hidden]="m.status != 'SENT'" i18n="@@common-sent">Sent</span>
+		<td>
+			<i class="bi-envelope-dash text-warning ui-cursor-pointer" [hidden]="m.status != 'NEW'" [ngbTooltip]="statusWaitingTemplate" [openDelay]="1000"></i>
+			<i class="bi-envelope-check-fill text-success ui-cursor-pointer" [hidden]="m.status != 'SENT'" [ngbTooltip]="statusSentTemplate" [openDelay]="1000"></i>
 		</td>
 		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 	</tr>
 	</tbody>
 </table>
+
+<!-- Templates -->
+<ng-template #statusWaitingTemplate>
+	<span i18n="@@common-waiting">Waiting To Be Sent</span>
+</ng-template>
+
+<ng-template #statusSentTemplate>
+	<span i18n="@@common-sent">Sent</span>
+</ng-template>

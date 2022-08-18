@@ -27,7 +27,7 @@
 		"@ngrx/store-devtools": "^11.0.1",
 		"angular-datatables": "^11.1.2",
 		"bootstrap": "^4.5.0",
-		"bootstrap-icons": "^1.4.1",
+		"bootstrap-icons": "^1.9.1",
 		"datatables.net": "^1.10.20",
 		"datatables.net-dt": "^1.10.20",
 		"jquery": "^3.4.1",
