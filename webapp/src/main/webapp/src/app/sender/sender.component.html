@@ -6,12 +6,6 @@
 				<sender-dashboard></sender-dashboard>
 			</ng-template>
 		</li>
-		<li ngbNavItem="errors">
-			<a ngbNavLink i18n="@@common-errors" class="border-top border-bottom">Errors</a>
-			<ng-template ngbNavContent>
-				<sender-errors></sender-errors>
-			</ng-template>
-		</li>
 		<li ngbNavItem="pending">
 			<a ngbNavLink i18n="@@sender-pending">Pending</a>
 			<ng-template ngbNavContent>
@@ -22,6 +16,12 @@
 			<a ngbNavLink i18n="@@common-sync-msgs">Sync Messages</a>
 			<ng-template ngbNavContent>
 				<sender-sync-messages></sender-sync-messages>
+			</ng-template>
+		</li>
+		<li ngbNavItem="errors">
+			<a ngbNavLink i18n="@@common-errors" class="border-top border-bottom">Errors</a>
+			<ng-template ngbNavContent>
+				<sender-errors></sender-errors>
 			</ng-template>
 		</li>
 	</ul>

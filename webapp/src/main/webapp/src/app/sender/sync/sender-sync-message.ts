@@ -12,4 +12,6 @@ export class SenderSyncMessage extends BaseEntity {
 
 	requestUuid?: string;
 
+	status?: string;
+
 }

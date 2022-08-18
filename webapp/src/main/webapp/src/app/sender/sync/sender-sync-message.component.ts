@@ -9,9 +9,9 @@ import {SenderSyncMessagesLoaded} from "./state/sender-sync-message.actions";
 
 @Component({
 	selector: 'sender-sync-messages',
-	templateUrl: './sender-sync-messages.component.html'
+	templateUrl: './sender-sync-message.component.html'
 })
-export class SenderSyncMessagesComponent extends BaseListingComponent implements OnInit {
+export class SenderSyncMessageComponent extends BaseListingComponent implements OnInit {
 
 	count?: number;
 
