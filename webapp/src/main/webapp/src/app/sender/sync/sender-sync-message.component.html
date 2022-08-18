@@ -7,7 +7,7 @@
 		<th i18n="@@common-identifier">Identifier</th>
 		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@common-operation">Operation</th>
-		<th i18n="@@common-request-id">Request Id</th>
+		<th i18n="@@common-status">Status</th>
 		<th i18n="@@common-dateAdded">Date Added</th>
 	</tr>
 	</thead>
@@ -20,9 +20,13 @@
 			<span class="text-success" [hidden]="m.operation != 'c'" i18n="@@common-insert">Insert</span>
 			<span [hidden]="m.operation != 'u'" i18n="@@common-update">Update</span>
 			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
-		<td>{{m.requestUuid}}</td>
-		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss.SSS'}}</td>
+		<td class="text-left">
+			<span class="text-infos" [hidden]="m.status != 'NEW'" i18n="@@common-waiting">Waiting To Be Sent</span>
+			<span class="text-infos" [hidden]="m.status != 'SENT'" i18n="@@common-sent">Sent</span>
+		</td>
+		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 	</tr>
 	</tbody>
 </table>

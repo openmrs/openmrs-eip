@@ -356,5 +356,29 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-status">
+			<segment>
+				<source>Status</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-request">
+			<segment>
+				<source>Request</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-sent">
+			<segment>
+				<source>Sent</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-waiting-to-sent">
+			<segment>
+				<source>Waiting To Be Sent</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

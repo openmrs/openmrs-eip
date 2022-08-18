@@ -17,7 +17,8 @@ export abstract class BaseListingComponent implements OnDestroy {
 
 	init(): void {
 		this.dtOptions = {
-			pagingType: 'full_numbers'
+			pagingType: 'full_numbers',
+			ordering: false
 		};
 	}
 

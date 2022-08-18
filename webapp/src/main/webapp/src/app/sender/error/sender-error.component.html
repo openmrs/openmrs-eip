@@ -15,7 +15,12 @@
 	<tr *ngFor="let e of errors" class="ui-row-highlight" ngbTooltip="{{e.message}}" [openDelay]="2000">
 		<td>{{e.event?.tableName}}</td>
 		<td>{{e.event?.identifier}}</td>
-		<td>{{e.event?.operation}}</td>
+		<td>
+			<span class="text-success" [hidden]="e.event?.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="e.event?.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="e.event?.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-info" [hidden]="e.event?.operation != 'r'" i18n="@@common-request">Request</span>
+		</td>
 		<td>{{e.attemptCount}}</td>
 		<td>{{e.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 		<td>
