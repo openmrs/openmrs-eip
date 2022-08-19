@@ -169,12 +169,6 @@
 				<target>Resumo rápido</target>
 			</segment>
 		</unit>
-		<unit id="common-total-error-count">
-			<segment>
-				<source>Total Count Of Event Errors</source>
-				<target>Total de Eventos com Erro</target>
-			</segment>
-		</unit>
 		<unit id="common-activemq-related-errors">
 			<segment>
 				<source>ActiveMQ Related Event Errors</source>
@@ -266,10 +260,10 @@
 				<target>Confirma</target>
 			</segment>
 		</unit>
-		<unit id="sender-pending">
+		<unit id="sender-db-events">
 			<segment>
-				<source>Pending</source>
-				<target>Pendentes</target>
+				<source>Database Events</source>
+				<target></target>
 			</segment>
 		</unit>
 		<unit id="common-databaseId">
@@ -296,16 +290,10 @@
 				<target>Remocoes</target>
 			</segment>
 		</unit>
-		<unit id="sender-pending-events">
+		<unit id="sender-unprocessed-events">
 			<segment>
-				<source>Pending Events</source>
-				<target>Eventos Pendentes</target>
-			</segment>
-		</unit>
-		<unit id="common-total-pending-count">
-			<segment>
-				<source>Total Count Of Pending Events</source>
-				<target>Total de Eventos Pendentes</target>
+				<source>Unprocessed Database Events</source>
+				<target></target>
 			</segment>
 		</unit>
 		<unit id="common-no-pending-msg">
