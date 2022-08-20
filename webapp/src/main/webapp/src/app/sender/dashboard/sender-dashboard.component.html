@@ -79,10 +79,12 @@
 							<table class="text-dark">
 								<tr *ngFor="let e of dashboard?.entries.syncMessages['statusItemCountMap'] | keyvalue">
 									<td>
-										<span class="text-warning" [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
-										<span class="text-success" [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
+										<span [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
+										<span [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
 									</td>
-									<td class="pl-2"><span class="badge border border-secondary">{{e.value}}</span></td>
+									<td class="pl-2">
+										<span [ngClass]="e.key == 'SENT' ? 'badge badge-success' : 'badge badge-warning'">{{e.value}}</span>
+									</td>
 								</tr>
 							</table>
 						</div>
