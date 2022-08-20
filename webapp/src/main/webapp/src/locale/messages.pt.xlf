@@ -296,10 +296,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-no-pending-msg">
+		<unit id="common-no-events-msg">
 			<segment>
-				<source>No pending events, everything looks good!</source>
-				<target>Nao ha eventos pendentes! Tudo parece bem!</target>
+				<source>No events, everything looks good!</source>
 			</segment>
 		</unit>
 		<unit id="common-sender-site">
@@ -328,7 +327,7 @@
 		</unit>
 		<unit id="common-sync-msgs">
 			<segment>
-				<source>Sync Messages</source>
+				<source>Sync Items</source>
 				<target></target>
 			</segment>
 		</unit>
@@ -365,6 +364,18 @@
 		<unit id="common-waiting-to-sent">
 			<segment>
 				<source>Waiting To Be Sent</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-no-sync-msg">
+			<segment>
+				<source>No items, everything looks good!</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-requests">
+			<segment>
+				<source>Requests</source>
 				<target></target>
 			</segment>
 		</unit>
