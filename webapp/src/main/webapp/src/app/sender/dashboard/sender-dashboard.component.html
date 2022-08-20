@@ -151,8 +151,21 @@
 							<table-stats [tableStatsMap]="dashboard?.entries.syncMessages['tableStatsMap']"></table-stats>
 						</div>
 					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
+						<div class="ml-2 mr-2">
+							<table class="text-dark">
+								<tr *ngFor="let e of dashboard?.entries.syncMessages['statusItemCountMap'] | keyvalue">
+									<td>
+										<span class="text-warning" [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
+										<span class="text-success" [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
+									</td>
+									<td class="pl-2"><span class="badge border border-secondary">{{e.value}}</span></td>
+								</tr>
+							</table>
+						</div>
+					</li>
 				</ul>
-
 			</div>
 		</div>
 	</div>

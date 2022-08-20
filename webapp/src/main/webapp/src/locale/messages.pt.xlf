@@ -379,5 +379,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-status-breakdown">
+			<segment>
+				<source>Status Breakdown</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

@@ -57,6 +57,7 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		final AtomicInteger totalEventCount = new AtomicInteger();
 		final AtomicInteger totalSyncMsgCount = new AtomicInteger();
 		final Map<String, Map> syncMsgsTableStatsMap = new ConcurrentHashMap();
+		final Map statusItemCountMap = new ConcurrentHashMap();
 		
 		AppUtils.getTablesToSync().parallelStream().forEach(table -> {
 			Arrays.stream(SyncOperation.values()).parallel().forEach(op -> {
@@ -121,7 +122,7 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 			        + "?query=SELECT exceptionType, count(*) FROM " + ERROR_ENTITY_NAME + " GROUP BY exceptionType")
 			        .request(List.class);
 			
-			items.parallelStream().forEach(values -> {
+			items.forEach(values -> {
 				final String exception = values[0].toString();
 				final Integer count = Integer.valueOf(values[1].toString());
 				exceptionCountMap.put(exception, count);
@@ -148,6 +149,16 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 			});
 		}
 		
+		if (totalSyncMsgCount.get() > 0) {
+			List<Object[]> items = on(camelContext).to(
+			    "jpa:" + SYNC_ENTITY_NAME + "?query=SELECT status, count(*) FROM " + SYNC_ENTITY_NAME + " GROUP BY status")
+			        .request(List.class);
+			
+			items.forEach(values -> {
+				statusItemCountMap.put(values[0], values[1]);
+			});
+		}
+		
 		Dashboard dashboard = new Dashboard();
 		Map<String, Object> errors = new ConcurrentHashMap();
 		errors.put("totalCount", totalErrorCount);
@@ -165,6 +176,7 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		Map<String, Object> syncMessages = new ConcurrentHashMap();
 		syncMessages.put("totalCount", totalSyncMsgCount);
 		syncMessages.put("tableStatsMap", syncMsgsTableStatsMap);
+		syncMessages.put("statusItemCountMap", statusItemCountMap);
 		dashboard.add("syncMessages", syncMessages);
 		
 		return dashboard;
