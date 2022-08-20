@@ -2,6 +2,99 @@
 	<div class="row">
 		<div class="col-6">
 			<div class="card">
+				<div class="card-header text-center">
+					<span class="h5" i18n="@@sender-unprocessed-events">Unprocessed Database Events</span>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@common-no-events-msg">No events, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
+						<div class="ml-3 mr-3">
+							<table class="text-dark">
+								<tr>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-count">Total Count</span>
+									</td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.pendingEvents['totalCount']}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
+						<div class="ml-3 mr-3">
+							<table-stats [tableStatsMap]="dashboard?.entries.pendingEvents['tableStatsMap']"></table-stats>
+						</div>
+					</li>
+				</ul>
+
+			</div>
+		</div>
+
+		<div class="col-6">
+			<div class="card">
+				<div class="card-header text-center">
+					<span class="h5" i18n="@@common-sync-msgs">Sync Items</span>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@common-no-sync-msg">No items, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
+						<div class="ml-3 mr-3">
+							<table class="text-dark">
+								<tr>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-count">Total Count</span>
+									</td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.syncMessages['totalCount']}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
+						<div class="ml-3 mr-3">
+							<table-stats [tableStatsMap]="dashboard?.entries.syncMessages['tableStatsMap']"></table-stats>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
+						<div class="ml-2 mr-2">
+							<table class="text-dark">
+								<tr *ngFor="let e of dashboard?.entries.syncMessages['statusItemCountMap'] | keyvalue">
+									<td>
+										<span class="text-warning" [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
+										<span class="text-success" [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
+									</td>
+									<td class="pl-2"><span class="badge border border-secondary">{{e.value}}</span></td>
+								</tr>
+							</table>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-4">
+		<div class="col-12">
+			<div class="card">
 				<div class="card-header text-danger text-center">
 					<span class="h5" i18n="@@common-error-queue">Event Error Queue</span>
 				</div>
@@ -71,99 +164,6 @@
 								</div>
 							</li>
 						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
-
-		<div class="col-6">
-			<div class="card">
-				<div class="card-header text-center">
-					<span class="h5" i18n="@@sender-unprocessed-events">Unprocessed Database Events</span>
-				</div>
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
-						<span i18n="@@common-loading">Loading</span>...
-					</li>
-					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] > 0">
-						<i class="bi-check-circle-fill text-success"></i>&nbsp;
-						<span i18n="@@common-no-events-msg">No events, everything looks good!</span>
-					</li>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] == 0">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
-						<div class="ml-3 mr-3">
-							<table class="text-dark">
-								<tr>
-									<td class="ui-no-wrap">
-										<span i18n="@@common-total-count">Total Count</span>
-									</td>
-									<td class="pl-2">
-										<span class="badge border border-secondary">{{dashboard?.entries.pendingEvents['totalCount']}}</span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</li>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.pendingEvents['totalCount'] == 0">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
-						<div class="ml-3 mr-3">
-							<table-stats [tableStatsMap]="dashboard?.entries.pendingEvents['tableStatsMap']"></table-stats>
-						</div>
-					</li>
-				</ul>
-
-			</div>
-		</div>
-	</div>
-
-	<div class="row mt-4">
-		<div class="col-6">
-			<div class="card">
-				<div class="card-header text-center">
-					<span class="h5" i18n="@@common-sync-msgs">Sync Items</span>
-				</div>
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
-						<span i18n="@@common-loading">Loading</span>...
-					</li>
-					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] > 0">
-						<i class="bi-check-circle-fill text-success"></i>&nbsp;
-						<span i18n="@@common-no-sync-msg">No items, everything looks good!</span>
-					</li>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
-						<div class="ml-3 mr-3">
-							<table class="text-dark">
-								<tr>
-									<td class="ui-no-wrap">
-										<span i18n="@@common-total-count">Total Count</span>
-									</td>
-									<td class="pl-2">
-										<span class="badge border border-secondary">{{dashboard?.entries.syncMessages['totalCount']}}</span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</li>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-db-table-breakdown">Database Table Breakdown</div>
-						<div class="ml-3 mr-3">
-							<table-stats [tableStatsMap]="dashboard?.entries.syncMessages['tableStatsMap']"></table-stats>
-						</div>
-					</li>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
-						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
-						<div class="ml-2 mr-2">
-							<table class="text-dark">
-								<tr *ngFor="let e of dashboard?.entries.syncMessages['statusItemCountMap'] | keyvalue">
-									<td>
-										<span class="text-warning" [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
-										<span class="text-success" [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
-									</td>
-									<td class="pl-2"><span class="badge border border-secondary">{{e.value}}</span></td>
-								</tr>
-							</table>
-						</div>
 					</li>
 				</ul>
 			</div>
