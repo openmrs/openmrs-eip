@@ -1,21 +1,23 @@
 import {Component, OnInit} from "@angular/core";
 import {DashboardService} from "./dashboard.service";
 import {Dashboard} from "./dashboard";
+import {Subscription, timer} from 'rxjs';
 
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit {
 
 	dashboard?: Dashboard;
-	interval?: number;
+
+	reloadTimer?: Subscription;
+
 
 	constructor(private service: DashboardService) {
 	}
 
 	ngOnInit(): void {
-		this.loadDashboard();
-		this.interval = setInterval(() => {
+		this.reloadTimer = timer(100, 60000).subscribe(() => {
 			this.loadDashboard();
-		}, 60000);
+		});
 	}
 
 	loadDashboard(): void {
@@ -25,9 +27,7 @@ export abstract class DashboardComponent implements OnInit {
 	}
 
 	ngOnDestroy(): void {
-		if (this.interval) {
-			clearInterval(this.interval);
-		}
+		this.reloadTimer?.unsubscribe();
 	}
 
 }
