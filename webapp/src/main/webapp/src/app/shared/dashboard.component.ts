@@ -15,7 +15,7 @@ export abstract class DashboardComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.reloadTimer = timer(100, 60000).subscribe(() => {
+		this.reloadTimer = timer(100, 30000).subscribe(() => {
 			this.loadDashboard();
 		});
 	}

@@ -14,7 +14,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 		if (errorResponse.status === 401) {
 			window.location.href = "/login";
 		} else {
-			alert('An error occurred');
+			console.error('An http error occurred with status: ' + errorResponse.status);
 		}
 
 		return throwError(errorResponse)

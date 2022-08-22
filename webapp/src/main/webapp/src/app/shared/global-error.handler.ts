@@ -1,11 +1,11 @@
 import {ErrorHandler} from "@angular/core";
-import {throwError} from "rxjs";
 
 export class GlobalErrorHandler implements ErrorHandler {
 
 	handleError(error: any) {
-		alert('An unexpected error occurred');
-		throw throwError(error);
+		document.open();
+		document.write('<h1 style="color:#ff0000">An unexpected error occurred</h1>');
+		document.close();
 	}
 
 }

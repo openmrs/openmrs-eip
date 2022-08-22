@@ -91,7 +91,7 @@
 				<target>Remover da fila</target>
 			</segment>
 		</unit>
-		<unit id="receiver-error-deleted">
+		<unit id="common-deleted">
 			<segment>
 				<source>Deleted Entity</source>
 				<target>Remover Entidade</target>
