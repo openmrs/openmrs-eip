@@ -28,6 +28,13 @@
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openmrs.eip</groupId>
+            <artifactId>web-common</artifactId>
+            <type>test-jar</type>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
