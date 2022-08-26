@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Generates a {@link DebeziumEvent} instance for the associated change event and saved it to the
+ * Generates a {@link DebeziumEvent} instance for the associated change event and saves it to the
  * debezium_event_queue table in the management DB.
  */
 @Component("changeEventHandler")

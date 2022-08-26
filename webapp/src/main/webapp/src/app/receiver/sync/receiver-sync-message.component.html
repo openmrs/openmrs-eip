@@ -1,0 +1,66 @@
+<h5>
+	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
+</h5>
+<div class="ui-bar-spacer"></div>
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-entity">Entity</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-message-id">Message Id</th>
+		<th i18n="@@common-sender-site">Sender Site</th>
+		<th i18n="@@common-dateAdded">Date Added</th>
+		<th i18n="@@common-action">Action</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let m of syncMessages" class="ui-row-highlight" ngbTooltip="{{m.message}}" [openDelay]="2000">
+		<td>{{m.modelClassName | modelClass}}</td>
+		<td>{{m.identifier}}</td>
+		<td>{{m.messageUuid}}</td>
+		<td>{{m.site?.name}}</td>
+		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+		<td>
+			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewMessage(m)"></i>
+		</td>
+	</tr>
+	</tbody>
+</table>
+
+<ng-template #viewDetailsTemplate>
+	<span i18n="@@common-view-details">View Details</span>
+</ng-template>
+
+<ng-template #detailsTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-details">Details</h4>
+		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<div *ngIf="parsedEntityPayLoad.metadata.operation === 'd'" class="text-danger font-italic">
+			*<span i18n="@@common-deleted">Deleted Entity</span>
+		</div>
+		<table border="1" width="100%" class="ui-display-table">
+			<tbody>
+			<tr *ngIf="parsedEntityPayLoad.metadata.operation !== 'd'">
+				<th class="text-right align-text-top ui-no-wrap mw-50" i18n="@@common-payload">Payload</th>
+				<td class="text-left ui-table-container">
+					<table border="1" width="100%" class="table-striped ui-display-table">
+						<tbody>
+						<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
+							<th class="text-right align-text-top">{{entry.key}}</th>
+							<td class="text-left">{{entry.value}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
+	</div>
+</ng-template>

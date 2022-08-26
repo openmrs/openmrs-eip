@@ -8,13 +8,15 @@ import {receiverErrorReducer} from "./error/state/error.reducer";
 import {ReceiverComponent} from './receiver.component';
 import {SiteStatusComponent} from "./status/site-status.component";
 import {siteStatusReducer} from "./status/state/site-status.reducer";
+import {ReceiverSyncMessageComponent} from './sync/receiver-sync-message.component';
 
 @NgModule({
 	declarations: [
 		ReceiverComponent,
 		ReceiverErrorComponent,
 		ConflictComponent,
-		SiteStatusComponent
+		SiteStatusComponent,
+		ReceiverSyncMessageComponent
 	],
 	imports: [
 		SharedModule,

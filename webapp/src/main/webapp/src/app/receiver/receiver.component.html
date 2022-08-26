@@ -6,8 +6,14 @@
 				<span class="font-italic">Running in Receiver Mode</span>
 			</ng-template>
 		</li>
+		<li ngbNavItem="syncMsgs">
+			<a ngbNavLink i18n="@@common-sync-msgs">Sync Items</a>
+			<ng-template ngbNavContent>
+				<receiver-sync-messages></receiver-sync-messages>
+			</ng-template>
+		</li>
 		<li ngbNavItem="errors">
-			<a ngbNavLink i18n="@@common-errors" class="border-top border-bottom">Errors</a>
+			<a ngbNavLink i18n="@@common-errors">Errors</a>
 			<ng-template ngbNavContent>
 				<receiver-errors></receiver-errors>
 			</ng-template>
