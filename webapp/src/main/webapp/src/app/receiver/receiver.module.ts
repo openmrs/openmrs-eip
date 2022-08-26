@@ -9,6 +9,7 @@ import {ReceiverComponent} from './receiver.component';
 import {SiteStatusComponent} from "./status/site-status.component";
 import {siteStatusReducer} from "./status/state/site-status.reducer";
 import {ReceiverSyncMessageComponent} from './sync/receiver-sync-message.component';
+import {syncMessageReducer} from "./sync/state/sync-message.reducer";
 
 @NgModule({
 	declarations: [
@@ -22,7 +23,8 @@ import {ReceiverSyncMessageComponent} from './sync/receiver-sync-message.compone
 		SharedModule,
 		StoreModule.forFeature('conflictQueue', conflictReducer),
 		StoreModule.forFeature('receiverErrorQueue', receiverErrorReducer),
-		StoreModule.forFeature('siteStatuses', siteStatusReducer)
+		StoreModule.forFeature('siteStatuses', siteStatusReducer),
+		StoreModule.forFeature('syncMsgQueue', syncMessageReducer)
 	], exports: [ReceiverComponent]
 })
 

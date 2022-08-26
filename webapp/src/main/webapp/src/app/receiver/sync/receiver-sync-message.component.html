@@ -14,14 +14,14 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let m of syncMessages" class="ui-row-highlight" ngbTooltip="{{m.message}}" [openDelay]="2000">
+	<tr *ngFor="let m of syncMessages" class="ui-row-highlight">
 		<td>{{m.modelClassName | modelClass}}</td>
 		<td>{{m.identifier}}</td>
 		<td>{{m.messageUuid}}</td>
 		<td>{{m.site?.name}}</td>
 		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 		<td>
-			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewMessage(m)"></i>
+			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSyncMessage(m)"></i>
 		</td>
 	</tr>
 	</tbody>
@@ -42,20 +42,11 @@
 		<div *ngIf="parsedEntityPayLoad.metadata.operation === 'd'" class="text-danger font-italic">
 			*<span i18n="@@common-deleted">Deleted Entity</span>
 		</div>
-		<table border="1" width="100%" class="ui-display-table">
+		<table *ngIf="parsedEntityPayLoad.metadata.operation !== 'd'" border="1" width="100%" class="table-striped ui-display-table">
 			<tbody>
-			<tr *ngIf="parsedEntityPayLoad.metadata.operation !== 'd'">
-				<th class="text-right align-text-top ui-no-wrap mw-50" i18n="@@common-payload">Payload</th>
-				<td class="text-left ui-table-container">
-					<table border="1" width="100%" class="table-striped ui-display-table">
-						<tbody>
-						<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
-							<th class="text-right align-text-top">{{entry.key}}</th>
-							<td class="text-left">{{entry.value}}</td>
-						</tr>
-						</tbody>
-					</table>
-				</td>
+			<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
+				<th class="text-right align-text-top">{{entry.key}}</th>
+				<td class="text-left">{{entry.value}}</td>
 			</tr>
 			</tbody>
 		</table>

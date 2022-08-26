@@ -46,7 +46,7 @@
 	<div class="modal-body">
 		<table border="1" width="100%" class="table-striped ui-display-table">
 			<tbody>
-				<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue" class="ui-display-table">
+				<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
 					<th class="text-right align-text-top">{{entry.key}}</th>
 					<td class="text-left">{{entry.value}}</td>
 				</tr>
