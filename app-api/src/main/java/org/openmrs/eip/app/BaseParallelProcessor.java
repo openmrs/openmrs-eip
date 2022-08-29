@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-public abstract class BaseEventProcessor extends EventNotifierSupport implements Processor {
+public abstract class BaseParallelProcessor extends EventNotifierSupport implements Processor {
 	
-	private static final Logger log = LoggerFactory.getLogger(BaseEventProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseParallelProcessor.class);
 	
 	protected static final int WAIT_IN_SECONDS = 300;
 	

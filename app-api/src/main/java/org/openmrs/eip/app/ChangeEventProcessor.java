@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component("changeEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class ChangeEventProcessor extends BaseEventProcessor {
+public class ChangeEventProcessor extends BaseParallelProcessor {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
 	

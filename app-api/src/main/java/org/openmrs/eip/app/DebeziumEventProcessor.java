@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component("debeziumEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class DebeziumEventProcessor extends BaseEventProcessor {
+public class DebeziumEventProcessor extends BaseParallelProcessor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
