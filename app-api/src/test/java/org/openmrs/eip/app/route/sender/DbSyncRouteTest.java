@@ -45,7 +45,7 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 		assertEquals(table, msg.getTableName());
 		assertEquals(uuid, msg.getIdentifier());
 		assertEquals(op, msg.getOperation());
-		assertEquals(snapshot, msg.isSnapshot());
+		assertEquals(snapshot, msg.getSnapshot());
 		assertEquals(requestUuid, msg.getRequestUuid());
 		assertNotNull(msg.getDateCreated());
 		assertNotNull(msg.getMessageUuid());

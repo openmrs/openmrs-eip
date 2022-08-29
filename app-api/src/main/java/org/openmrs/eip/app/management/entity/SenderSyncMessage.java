@@ -95,7 +95,7 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.requestUuid = requestUuid;
 	}
 	
-	public boolean isSnapshot() {
+	public boolean getSnapshot() {
 		return snapshot;
 	}
 	
