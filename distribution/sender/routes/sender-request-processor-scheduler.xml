@@ -2,7 +2,7 @@
 
     <route id="sender-request-processor-scheduler" errorHandlerRef="shutdownErrorHandler">
         <!-- TODO Make the delay configurable -->
-        <from uri="scheduler:retry?initialDelay=15000&amp;delay=1800000" />
+        <from uri="scheduler:sender-request-processor?initialDelay=15000&amp;delay=1800000" />
 
         <to uri="direct:sender-request-processor" />
     </route>

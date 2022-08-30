@@ -1,9 +1,0 @@
-<routes xmlns="http://camel.apache.org/schema/spring">
-
-    <route id="sender-activemq-publisher-scheduler" errorHandlerRef="shutdownErrorHandler">
-    
-        <from uri="scheduler:active_mq_publisher?initialDelay={{active-mq-publisher.initial.delay}}&amp;delay={{active-mq-publisher.delay}}" />
-
-        <to uri="direct:sender-activemq-publisher" />
-    </route>
-</routes>
