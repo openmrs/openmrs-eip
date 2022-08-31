@@ -34,8 +34,8 @@ public class SenderSyncResponseProcessorTest {
 	}
 	
 	@Test
-	public void isSnapshot_returnTrue() {
-		Assert.assertTrue(processor.isSnapshot(null));
+	public void processInParallel_shouldAlwaysReturnTrue() {
+		Assert.assertTrue(processor.processInParallel(null));
 	}
 	
 	@Test

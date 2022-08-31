@@ -32,7 +32,7 @@ public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends
 		
 		for (T item : items) {
 			final String key = getItemKey(item);
-			if (isSnapshot(item) && !uniqueKeys.contains(key)) {
+			if (processInParallel(item) && !uniqueKeys.contains(key)) {
 				uniqueKeys.add(key);
 				if (executor == null) {
 					executor = Executors.newFixedThreadPool(threadCount);
@@ -84,12 +84,12 @@ public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends
 	public abstract String getItemKey(T item);
 	
 	/**
-	 * Checks if the item is for a snapshot event or not
+	 * Checks if the item if the item should be processed in parallel or not
 	 * 
 	 * @param item the queue item
-	 * @return true for a snapshot otherwise false
+	 * @return true to process in parallel otherwise false
 	 */
-	public abstract boolean isSnapshot(T item);
+	public abstract boolean processInParallel(T item);
 	
 	/**
 	 * Gets the logical queue name

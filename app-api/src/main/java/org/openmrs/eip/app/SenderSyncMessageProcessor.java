@@ -26,7 +26,7 @@ public class SenderSyncMessageProcessor extends BaseSenderQueueProcessor<SenderS
 	}
 	
 	@Override
-	public boolean isSnapshot(SenderSyncMessage item) {
+	public boolean processInParallel(SenderSyncMessage item) {
 		return item.getSnapshot();
 	}
 	

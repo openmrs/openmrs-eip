@@ -32,7 +32,7 @@ public class DebeziumEventProcessor extends BaseSenderQueueProcessor<DebeziumEve
 	}
 	
 	@Override
-	public boolean isSnapshot(DebeziumEvent item) {
+	public boolean processInParallel(DebeziumEvent item) {
 		return item.getEvent().getSnapshot();
 	}
 	

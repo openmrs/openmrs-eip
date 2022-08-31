@@ -26,7 +26,7 @@ public class SenderSyncResponseProcessor extends BaseSenderQueueProcessor<Sender
 	}
 	
 	@Override
-	public boolean isSnapshot(SenderSyncResponse item) {
+	public boolean processInParallel(SenderSyncResponse item) {
 		return true;
 	}
 	
