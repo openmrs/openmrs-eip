@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

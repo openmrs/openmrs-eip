@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
@@ -13,9 +13,9 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.jpa.JpaConstants;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.utils.ReceiverActiveMqMessagePublisher;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;

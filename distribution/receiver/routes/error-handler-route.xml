@@ -7,7 +7,7 @@
 
         <choice>
             <when>
-                <method beanType="org.openmrs.eip.app.ReceiverContext" method="isStopSignalReceived()" />
+                <method beanType="org.openmrs.eip.app.receiver.ReceiverContext" method="isStopSignalReceived()" />
                 <log message="Ignoring the error because the application is shutting down" />
             </when>
             <otherwise>

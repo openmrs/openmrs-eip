@@ -1,7 +1,6 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import org.openmrs.eip.BaseDbBackedCamelTest;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;

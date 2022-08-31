@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -29,7 +29,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.ReceiverContext;
+import org.openmrs.eip.app.receiver.ReceiverContext;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.route.TestUtils;

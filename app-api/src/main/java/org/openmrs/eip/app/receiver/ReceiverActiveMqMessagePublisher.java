@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.utils;
+package org.openmrs.eip.app.receiver;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -9,7 +9,6 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;

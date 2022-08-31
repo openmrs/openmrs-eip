@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.utils.ReceiverActiveMqMessagePublisher;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -176,7 +175,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessAMixOfSnapshotAndNonSnapshotMessagesAndMaintainTheIndicesOfNonSnapshots()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		initExecutorAndConsumer(size);
@@ -404,7 +403,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSamePatientInSerialIfPrecededByPersonEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
@@ -446,7 +445,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSamePersonInSerialIfPrecededByPatientEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
@@ -488,7 +487,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSameTestOrderInSerialIfPrecededByOrderEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
@@ -530,7 +529,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByTestOrderEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
@@ -572,7 +571,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSameDrugOrderInSerialIfPrecededByOrderEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
@@ -614,7 +613,7 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByDrugOrderEvents()
-	        throws Exception {
+	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);

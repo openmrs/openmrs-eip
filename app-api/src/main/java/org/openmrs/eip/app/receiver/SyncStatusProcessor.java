@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 
@@ -10,14 +10,17 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
 import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("syncStatusProcessor")
+@Profile(SyncProfiles.RECEIVER)
 public class SyncStatusProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SyncStatusProcessor.class);

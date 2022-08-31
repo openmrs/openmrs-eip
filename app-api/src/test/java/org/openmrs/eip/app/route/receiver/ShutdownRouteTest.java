@@ -15,7 +15,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.ReceiverContext;
+import org.openmrs.eip.app.receiver.ReceiverContext;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;

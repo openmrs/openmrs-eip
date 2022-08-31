@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.utils;
+package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,7 +11,6 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.BaseReceiverTest;
 import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;

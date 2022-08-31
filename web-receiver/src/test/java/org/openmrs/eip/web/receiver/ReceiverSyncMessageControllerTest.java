@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.openmrs.eip.app.BaseReceiverTest;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
