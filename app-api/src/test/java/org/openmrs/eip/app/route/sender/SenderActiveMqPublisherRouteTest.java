@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus.NEW;
 import static org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus.SENT;
 import static org.openmrs.eip.app.route.sender.SenderActiveMqPublisherRouteTest.SENDER_ID;
 import static org.openmrs.eip.app.route.sender.SenderActiveMqPublisherRouteTest.URI_ACTIVEMQ_SYNC;
@@ -15,21 +14,19 @@ import static org.openmrs.eip.app.sender.SenderConstants.URI_ACTIVEMQ_PUBLISHER;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.camel.EndpointInject;
+import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -43,8 +40,6 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	public static final String URI_ACTIVEMQ_SYNC = "mock:activemq.openmrs.sync";
 	
 	public static final String SENDER_ID = "test-sender-id";
-	
-	private static final String EX_PROP_SYNC_MSG = "senderSyncMessage";
 	
 	@EndpointInject(URI_ACTIVEMQ_SYNC)
 	private MockEndpoint mockActiveMqEndpoint;
@@ -74,43 +69,6 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldDoNothingIfNoSyncMessagesAreFound() throws Exception {
-		mockActiveMqEndpoint.expectedMessageCount(0);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.DEBUG, "No sync messages found");
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
-	public void shouldLoadAndProcessAllNewSyncMessagesSortedByDateCreated() throws Exception {
-		final int messageCount = 3;
-		List<SenderSyncMessage> msgs = TestUtils.getEntities(SenderSyncMessage.class).stream()
-		        .filter(m -> m.getStatus() == NEW).collect(Collectors.toList());
-		assertEquals(messageCount, msgs.size());
-		assertTrue(msgs.get(0).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
-		assertTrue(msgs.get(1).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
-		mockActiveMqEndpoint.expectedMessageCount(messageCount);
-		List<SenderSyncMessage> syncMessages = new ArrayList();
-		mockActiveMqEndpoint
-		        .whenAnyExchangeReceived(e -> syncMessages.add(e.getProperty(EX_PROP_SYNC_MSG, SenderSyncMessage.class)));
-		DefaultExchange exchange = new DefaultExchange(camelContext);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched " + msgs.size() + " sender sync message(s)");
-		assertEquals(messageCount, syncMessages.size());
-		assertEquals(3, syncMessages.get(0).getId().intValue());
-		assertEquals(1, syncMessages.get(1).getId().intValue());
-		assertEquals(2, syncMessages.get(2).getId().intValue());
-		assertEquals(0, TestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
-	}
-	
-	@Test
 	public void shouldProcessADeleteEvent() throws Exception {
 		final String table = "person";
 		final String uuid = "person-uuid";
@@ -122,11 +80,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
@@ -155,11 +114,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
@@ -188,11 +148,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
@@ -216,11 +177,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		SenderSyncMessage msg = createSyncMessage(table, uuid, "msg-uuid", "u", null);
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(0);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		assertMessageLogged(Level.INFO,
 		    "No entity found in the database matching identifier " + uuid + " in table " + table);
@@ -240,11 +202,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());
@@ -273,11 +236,12 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(msg);
 		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, new DefaultExchange(camelContext));
+		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
 		
 		mockActiveMqEndpoint.assertIsSatisfied();
-		assertMessageLogged(Level.INFO, "Fetched 1 sender sync message(s)");
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
 		assertEquals(1, syncMessages.size());

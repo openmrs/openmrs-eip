@@ -85,6 +85,7 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 		assertEquals(3, processedEvents.get(0).getId().intValue());
 		assertEquals(1, processedEvents.get(1).getId().intValue());
 		assertEquals(2, processedEvents.get(2).getId().intValue());
+		assertEquals(0, TestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
 	}
 	
 }
