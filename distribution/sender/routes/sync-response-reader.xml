@@ -1,0 +1,35 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="sync-response-reader" errorHandlerRef="shutdownErrorHandler">
+
+        <from uri="direct:sync-response-reader" />
+
+        <setProperty name="${routeId}-endLoop">
+            <simple>false</simple>
+        </setProperty>
+
+        <loop doWhile="true">
+            <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
+
+            <log loggingLevel="DEBUG" message="Fetching next 500 sync responses" />
+
+            <to uri="jpa:SenderSyncResponse?query=SELECT r FROM SenderSyncResponse r ORDER BY r.dateCreated, r.id ASC&amp;maximumResults=500" />
+
+            <choice>
+                <when>
+                    <simple>${body.size()} > 0</simple>
+                    <log message="Fetched ${body.size()} sender sync response(s)" />
+
+                    <process ref="senderSyncResponseProcessor" />
+                </when>
+                <otherwise>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+
+                    <log loggingLevel="DEBUG" message="No sync responses was found" />
+                </otherwise>
+            </choice>
+        </loop>
+
+    </route>
+</routes>
