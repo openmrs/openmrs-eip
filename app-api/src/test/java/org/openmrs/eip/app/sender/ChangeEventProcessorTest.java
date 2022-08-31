@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.singletonList;
@@ -33,7 +33,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.app.sender.ChangeEventHandler;
+import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.powermock.reflect.Whitebox;
 
 public class ChangeEventProcessorTest {

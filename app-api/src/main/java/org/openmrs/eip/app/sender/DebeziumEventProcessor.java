@@ -1,8 +1,7 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
-import org.openmrs.eip.app.sender.SenderConstants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

@@ -1,11 +1,10 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
-import org.openmrs.eip.app.sender.SenderConstants;
 import org.openmrs.eip.component.entity.Event;
 
 public class DebeziumEventProcessorTest {

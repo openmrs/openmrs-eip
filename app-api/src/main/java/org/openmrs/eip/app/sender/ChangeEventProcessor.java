@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
 
@@ -13,7 +13,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
-import org.openmrs.eip.app.sender.ChangeEventHandler;
+import org.openmrs.eip.app.BaseParallelProcessor;
+import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

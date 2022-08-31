@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static java.util.Collections.synchronizedList;
 
@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.app.BaseParallelProcessor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncContext;
 

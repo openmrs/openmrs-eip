@@ -1,4 +1,4 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;

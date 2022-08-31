@@ -1,11 +1,10 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
-import org.openmrs.eip.app.sender.SenderConstants;
 
 public class SenderSyncMessageProcessorTest {
 	

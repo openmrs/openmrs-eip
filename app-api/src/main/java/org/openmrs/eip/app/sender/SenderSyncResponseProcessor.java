@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.sender;
 
-import org.openmrs.eip.app.BaseSenderQueueProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
