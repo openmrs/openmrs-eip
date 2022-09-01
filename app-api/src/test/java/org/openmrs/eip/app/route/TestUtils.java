@@ -31,6 +31,11 @@ public final class TestUtils {
 		t.sendBody("jpa:" + entity.getClass().getSimpleName() + "?usePersist=true", entity);
 	}
 	
+	public static <T extends AbstractEntity> void updateEntity(T entity) {
+		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
+		t.sendBody("jpa:" + entity.getClass().getSimpleName(), entity);
+	}
+	
 	public static <T extends AbstractEntity> void deleteAll(Class<T> clazz) {
 		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
 		final String classname = clazz.getSimpleName();

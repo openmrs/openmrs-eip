@@ -70,21 +70,23 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 		assertTrue(msgs.get(0).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
 		assertTrue(msgs.get(1).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
 		mockProcessor.expectedBodyReceived().body(List.class).isEqualTo(msgs);
-		List<SenderSyncMessage> processedEvents = new ArrayList();
+		List<SenderSyncMessage> processedMsgs = new ArrayList();
 		mockProcessor.whenAnyExchangeReceived(e -> {
-			processedEvents.addAll(e.getIn().getBody(List.class));
-			TestUtils.deleteAll(SenderSyncMessage.class);
+			processedMsgs.addAll(e.getIn().getBody(List.class));
+			processedMsgs.forEach(m -> {
+				m.markAsSent();
+				TestUtils.updateEntity(m);
+			});
 		});
-		DefaultExchange exchange = new DefaultExchange(camelContext);
 		
-		producerTemplate.send(URI_SYNC_MSG_READER, exchange);
+		producerTemplate.send(URI_SYNC_MSG_READER, new DefaultExchange(camelContext));
 		
 		mockProcessor.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched " + msgs.size() + " sender sync message(s)");
-		assertEquals(msgCount, processedEvents.size());
-		assertEquals(3, processedEvents.get(0).getId().intValue());
-		assertEquals(1, processedEvents.get(1).getId().intValue());
-		assertEquals(2, processedEvents.get(2).getId().intValue());
+		assertEquals(msgCount, processedMsgs.size());
+		assertEquals(3, processedMsgs.get(0).getId().intValue());
+		assertEquals(1, processedMsgs.get(1).getId().intValue());
+		assertEquals(2, processedMsgs.get(2).getId().intValue());
 		assertEquals(0, TestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
 	}
 	

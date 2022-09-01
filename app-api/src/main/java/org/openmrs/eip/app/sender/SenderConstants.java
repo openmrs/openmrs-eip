@@ -62,6 +62,10 @@ public class SenderConstants {
 	
 	public static final String URI_RESPONSE_PROCESSOR = "direct:" + ROUTE_ID_RESPONSE_PROCESSOR;
 	
+	public static final String ROUTE_ID_RESPONSE_READER = "sync-response-reader";
+	
+	public static final String URI_RESPONSE_READER = "direct:" + ROUTE_ID_RESPONSE_READER;
+	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
 }

@@ -22,6 +22,7 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderSyncRequest;
@@ -42,6 +43,11 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	@EndpointInject(TEST_LISTENER)
 	private MockEndpoint mockListener;
 	
+	@Before
+	public void setup() throws Exception {
+		mockListener.reset();
+	}
+	
 	@Override
 	public String getTestRouteFilename() {
 		return ROUTE_ID_REQUEST_PROCESSOR;
@@ -58,9 +64,12 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldDoNothingIfNoSyncRequestsAreFound() {
+	public void shouldDoNothingIfNoSyncRequestsAreFound() throws Exception {
+		mockListener.expectedMessageCount(0);
+		
 		producerTemplate.send(URI_REQUEST_PROCESSOR, new DefaultExchange(camelContext));
 		
+		mockListener.assertIsSatisfied();
 		assertMessageLogged(Level.DEBUG, "No sync requests found");
 	}
 	
