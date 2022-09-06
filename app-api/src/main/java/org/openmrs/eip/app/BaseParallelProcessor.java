@@ -6,6 +6,7 @@ import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.Processor;
@@ -27,7 +28,7 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 	
 	protected ProducerTemplate producerTemplate;
 	
-	protected ExecutorService executor;
+	protected static ExecutorService executor;
 	
 	/**
 	 * Wait for all the Future instances in the specified list to terminate
@@ -51,11 +52,15 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 	
 	@Override
 	public void notify(CamelEvent event) {
-		if (event instanceof CamelEvent.CamelContextStoppingEvent) {
+		if (event instanceof CamelEvent.CamelContextStartedEvent) {
+			if (executor == null) {
+				executor = Executors.newFixedThreadPool(threadCount);
+			}
+		} else if (event instanceof CamelEvent.CamelContextStoppingEvent) {
 			if (executor != null) {
 				log.info("Shutting down executor for " + getProcessorName() + " processor threads");
 				
-				executor.shutdown();
+				executor.shutdownNow();
 				
 				try {
 					log.info("Waiting for " + WAIT_IN_SECONDS + " seconds for " + getProcessorName()
@@ -67,7 +72,7 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 				}
 				catch (Exception e) {
 					log.error(
-					    "An error occurred while waiting for " + getProcessorName() + " processor threads to terminate");
+					    "An error occurred while waiting for " + getProcessorName() + " processor threads to terminate", e);
 				}
 			}
 		}

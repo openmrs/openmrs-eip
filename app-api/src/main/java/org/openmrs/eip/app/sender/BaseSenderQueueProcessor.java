@@ -5,7 +5,6 @@ import static java.util.Collections.synchronizedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -35,9 +34,6 @@ public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends
 			final String key = getItemKey(item);
 			if (processInParallel(item) && !uniqueKeys.contains(key)) {
 				uniqueKeys.add(key);
-				if (executor == null) {
-					executor = Executors.newFixedThreadPool(threadCount);
-				}
 				
 				//TODO Periodically wait and reset futures to save memory
 				syncThreadFutures.add(CompletableFuture.runAsync(() -> {

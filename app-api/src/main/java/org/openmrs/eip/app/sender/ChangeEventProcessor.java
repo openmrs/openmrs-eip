@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -54,9 +53,6 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 		final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 		
 		if (snapshot) {
-			if (executor == null) {
-				executor = Executors.newFixedThreadPool(threadCount);
-			}
 			
 			if (batchSize == null) {
 				batchSize = DEFAULT_BATCH_SIZE;
@@ -105,6 +101,33 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			boolean isLast = snapshotStr.equalsIgnoreCase("last");
 			if (isLast || futures.size() == batchSize) {
 				waitForFutures(futures);
+				//If the executor is already shutdown, there could be tasks for some DB events that were never processed
+				//Which leaves unprocessed rows when initial loading is resumed, so we can't persist the savepoint
+				if (executor.isShutdown()) {
+					log.warn("Executor is already shutdown, can't persist snapshot save point");
+					return;
+				}
+				
+				for (CompletableFuture f : futures) {
+					boolean stop = false;
+					if (!f.isDone()) {
+						stop = true;
+						log.warn("Detected DB event processor threads that were not yet done");
+					} else if (f.isCancelled()) {
+						stop = true;
+						log.warn("Detected DB event processor threads that were cancelled");
+					} else if (f.isCompletedExceptionally()) {
+						stop = true;
+						log.warn("Detected DB event processor threads that encountered exceptions");
+					}
+					
+					if (stop) {
+						log.warn(
+						    "Can't persist snapshot save point because some DB event processor threads didn't terminate properly");
+						return;
+					}
+				}
+				
 				futures.clear();
 				
 				if (isLast) {
@@ -119,7 +142,6 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 					savepointStore.update(tableAndMaxRowIdsMap);
 				}
 			}
-			
 		} else {
 			final String originalThreadName = Thread.currentThread().getName();
 			try {
