@@ -53,6 +53,10 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 		final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 		
 		if (snapshot) {
+			//Block saving offsets until all rows in the snapshot are processed
+			if (!CustomFileOffsetBackingStore.isPaused()) {
+				CustomFileOffsetBackingStore.pause();
+			}
 			
 			if (batchSize == null) {
 				batchSize = DEFAULT_BATCH_SIZE;
@@ -83,11 +87,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			
 			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
-				//Block saving offsets
-				if (!CustomFileOffsetBackingStore.isPaused()) {
-					CustomFileOffsetBackingStore.pause();
-				}
-				
+
 				try {
 					setThreadName(table, id);
 					handler.handle(table, id, true, sourceMetadata, exchange);
