@@ -8,17 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseParallelProcessor;
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
 import org.powermock.reflect.Whitebox;
@@ -29,6 +36,23 @@ public class BaseSenderQueueProcessorTest {
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
+	
+	private static ExecutorService executor;
+	
+	@BeforeClass
+	public static void beforeClass() {
+		if (Whitebox.getInternalState(BaseParallelProcessor.class, "executor") == null) {
+			executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_MSG_PARALLEL_SIZE);
+			Whitebox.setInternalState(BaseParallelProcessor.class, "executor", executor);
+		}
+	}
+	
+	@AfterClass
+	public static void afterClass() {
+		if (executor != null) {
+			executor.shutdownNow();
+		}
+	}
 	
 	@Before
 	public void setup() {
@@ -404,6 +428,26 @@ public class BaseSenderQueueProcessorTest {
 			assertEquals(originalThreadName, threadName.split(":")[0]);
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
+	}
+	
+	@Test
+	public void process_shouldNotProcessEventsWhenTheApplicationContextIsStopping() throws Exception {
+		AppUtils.setAppContextStopping();
+		final int size = 2;
+		List<DebeziumEvent> events = new ArrayList(size);
+		
+		for (int i = 0; i < size; i++) {
+			DebeziumEvent m = createDebeziumEvent(i, true);
+			events.add(m);
+		}
+		
+		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+		exchange.getIn().setBody(events);
+		DebeziumEventProcessor processor = createProcessor(size);
+		
+		processor.process(exchange);
+		
+		Mockito.verifyNoInteractions(mockProducerTemplate);
 	}
 	
 }

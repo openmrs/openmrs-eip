@@ -8,9 +8,12 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseParallelProcessor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for sender processors that operate on items in a DB sync related queue and forward
@@ -19,6 +22,8 @@ import org.openmrs.eip.component.SyncContext;
  * @param <T>
  */
 public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor {
+	
+	private static final Logger log = LoggerFactory.getLogger(BaseSenderQueueProcessor.class);
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -31,6 +36,14 @@ public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends
 		List<T> items = exchange.getIn().getBody(List.class);
 		
 		for (T item : items) {
+			if (AppUtils.isAppContextStopping()) {
+				if (log.isDebugEnabled()) {
+					log.debug("Stopping item processing because application context is stopping");
+				}
+				
+				break;
+			}
+			
 			final String key = getItemKey(item);
 			if (processInParallel(item) && !uniqueKeys.contains(key)) {
 				uniqueKeys.add(key);
