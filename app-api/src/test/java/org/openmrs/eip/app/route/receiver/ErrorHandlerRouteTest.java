@@ -29,7 +29,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.receiver.ReceiverContext;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.route.TestUtils;
@@ -56,7 +56,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
-		Whitebox.setInternalState(ReceiverContext.class, "isStopping", false);
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 		
 		advise(ROUTE_ID_ERROR_HANDLER, new AdviceWithRouteBuilder() {
 			
@@ -70,7 +70,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	
 	@Test
 	public void shouldSkipMessageIfTheReceiverIsAlreadyStopping() {
-		Whitebox.setInternalState(ReceiverContext.class, "isStopping", true);
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		final int errorCount = TestUtils.getEntities(ReceiverRetryQueueItem.class).size();
 		
 		producerTemplate.send(URI_ERROR_HANDLER, new DefaultExchange(camelContext));

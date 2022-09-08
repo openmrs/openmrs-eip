@@ -100,7 +100,7 @@ public class SiteMessageConsumer implements Runnable {
 				
 			}
 			catch (Throwable t) {
-				if (!ReceiverContext.isStopSignalReceived()) {
+				if (!AppUtils.isAppContextStopping()) {
 					log.error("Message consumer thread for site: " + site + " encountered an error", t);
 					
 					failureCount++;
@@ -131,7 +131,7 @@ public class SiteMessageConsumer implements Runnable {
 				}
 			}
 			
-		} while (!ReceiverContext.isStopSignalReceived() && !errorEncountered);
+		} while (!AppUtils.isAppContextStopping() && !errorEncountered);
 		
 		log.info("Sync message consumer for site: " + site + " has stopped");
 		
@@ -150,7 +150,7 @@ public class SiteMessageConsumer implements Runnable {
 		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
 		
 		for (SyncMessage msg : syncMessages) {
-			if (ReceiverContext.isStopSignalReceived()) {
+			if (AppUtils.isAppContextStopping()) {
 				log.info("Sync message consumer for site: " + site + " has detected a stop signal");
 				break;
 			}

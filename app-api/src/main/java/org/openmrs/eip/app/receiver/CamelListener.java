@@ -104,7 +104,6 @@ public class CamelListener extends EventNotifierSupport {
 			});
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
-			ReceiverContext.setStopSignal();
 			int wait = WAIT_IN_SECONDS + 10;
 			
 			if (msgExecutor != null) {

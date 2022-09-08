@@ -15,7 +15,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.receiver.ReceiverContext;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
@@ -41,7 +40,7 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
-		setInternalState(ReceiverContext.class, "isStopping", false);
+		setInternalState(AppUtils.class, "appContextStopping", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
@@ -59,7 +58,7 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	
 	@Test
 	public void shouldSkipIfTheReceiverIsHasAlreadyReceivedAShutdownNotice() throws Exception {
-		Whitebox.setInternalState(ReceiverContext.class, "isStopping", true);
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);
 		

@@ -4,7 +4,7 @@
 
         <choice>
             <when>
-                <method beanType="org.openmrs.eip.app.receiver.ReceiverContext" method="isStopSignalReceived()" />
+                <method beanType="org.openmrs.eip.app.AppUtils" method="isAppContextStopping()" />
                 <log loggingLevel="DEBUG" message="The application is already shutting down after a previous shutdown notice" />
             </when>
             <when>
