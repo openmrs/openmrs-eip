@@ -17,9 +17,11 @@ import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -40,6 +42,8 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockProcessor.reset();
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		
 		advise(ROUTE_ID_SYNC_MSG_READER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -88,6 +92,17 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 		assertEquals(1, processedMsgs.get(1).getId().intValue());
 		assertEquals(2, processedMsgs.get(2).getId().intValue());
 		assertEquals(0, TestUtils.getEntities(SenderSyncMessage.class).stream().filter(m -> m.getStatus() == NEW).count());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	public void shouldNotReadAnyMessagesIfTheApplicationIsStopping() throws Exception {
+		AppUtils.setAppContextStopping();
+		mockProcessor.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_SYNC_MSG_READER, new DefaultExchange(camelContext));
+		
+		mockProcessor.assertIsSatisfied();
 	}
 	
 }

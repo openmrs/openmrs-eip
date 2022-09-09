@@ -15,9 +15,11 @@ import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
+import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -42,6 +44,7 @@ public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockEventProcessor.reset();
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 		advise(ROUTE_ID_DBZM_EVENT_READER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -86,6 +89,17 @@ public class DebeziumEventReaderTest extends BaseSenderRouteTest {
 		assertEquals(3, processedEvents.get(0).getId().intValue());
 		assertEquals(1, processedEvents.get(1).getId().intValue());
 		assertEquals(2, processedEvents.get(2).getId().intValue());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	public void shouldNotReadAnyEventsIfTheApplicationIsStopping() throws Exception {
+		AppUtils.setAppContextStopping();
+		mockEventProcessor.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_DBZM_EVENT_READER, new DefaultExchange(camelContext));
+		
+		mockEventProcessor.assertIsSatisfied();
 	}
 	
 }

@@ -19,9 +19,11 @@ import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.app.route.TestUtils;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -42,6 +44,7 @@ public class SyncResponseReaderRouteTest extends BaseSenderRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockProcessor.reset();
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 		advise(ROUTE_ID_RESPONSE_READER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -80,15 +83,26 @@ public class SyncResponseReaderRouteTest extends BaseSenderRouteTest {
 		});
 		
 		producerTemplate.send(URI_RESPONSE_READER, new DefaultExchange(camelContext));
-
-        assertMessageLogged(Level.INFO, "Fetched " + responses.size() + " sender sync response(s)");
-        assertEquals(messageCount, processedResponses.size());
-        assertEquals(3, processedResponses.get(0).getId().intValue());
-        assertEquals(4, processedResponses.get(1).getId().intValue());
-        assertEquals(1, processedResponses.get(2).getId().intValue());
-        assertEquals(2, processedResponses.get(3).getId().intValue());
-        assertTrue(getEntities(SenderSyncResponse.class).isEmpty());
-        assertTrue(getEntities(SenderSyncMessage.class).isEmpty());
+		
+		assertMessageLogged(Level.INFO, "Fetched " + responses.size() + " sender sync response(s)");
+		assertEquals(messageCount, processedResponses.size());
+		assertEquals(3, processedResponses.get(0).getId().intValue());
+		assertEquals(4, processedResponses.get(1).getId().intValue());
+		assertEquals(1, processedResponses.get(2).getId().intValue());
+		assertEquals(2, processedResponses.get(3).getId().intValue());
+		assertTrue(getEntities(SenderSyncResponse.class).isEmpty());
+		assertTrue(getEntities(SenderSyncMessage.class).isEmpty());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_sender_sync_response.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldNotReadAnyResponsesIfTheApplicationIsStopping() throws Exception {
+		AppUtils.setAppContextStopping();
+		mockProcessor.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_RESPONSE_READER, new DefaultExchange(camelContext));
+		
+		mockProcessor.assertIsSatisfied();
 	}
 	
 }

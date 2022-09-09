@@ -57,6 +57,7 @@ public class BaseSenderQueueProcessorTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 	}
 	
 	private DebeziumEventProcessor createProcessor(int threadCount) {

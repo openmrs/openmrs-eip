@@ -24,9 +24,11 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderSyncRequest;
 import org.openmrs.eip.app.route.TestUtils;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -36,16 +38,23 @@ import ch.qos.logback.classic.Level;
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_REQUEST_PROCESSOR + "=DEBUG")
 public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	
-	private static final String TEST_LISTENER = "mock:listener";
+	private static final String TEST_SAVE_EVENT = "mock:DebeziumEvent";
+	
+	private static final String TEST_UPDATE_REQUEST = "mock:SenderSyncRequest";
 	
 	private static final String EX_PROP_SYNC_REQ = "syncRequest";
 	
-	@EndpointInject(TEST_LISTENER)
-	private MockEndpoint mockListener;
+	@EndpointInject(TEST_SAVE_EVENT)
+	private MockEndpoint mockSaveEventListener;
+	
+	@EndpointInject(TEST_UPDATE_REQUEST)
+	private MockEndpoint mockUpdateReqListener;
 	
 	@Before
 	public void setup() throws Exception {
-		mockListener.reset();
+		mockSaveEventListener.reset();
+		mockUpdateReqListener.reset();
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 	}
 	
 	@Override
@@ -65,11 +74,23 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldDoNothingIfNoSyncRequestsAreFound() throws Exception {
-		mockListener.expectedMessageCount(0);
+		advise(ROUTE_ID_REQUEST_PROCESSOR, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByToUri("jpa:DebeziumEvent").after().to(mockSaveEventListener);
+				weaveByToUri("jpa:SenderSyncRequest").after().to(mockUpdateReqListener);
+			}
+			
+		});
+		
+		mockSaveEventListener.expectedMessageCount(0);
+		mockUpdateReqListener.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_REQUEST_PROCESSOR, new DefaultExchange(camelContext));
 		
-		mockListener.assertIsSatisfied();
+		mockSaveEventListener.assertIsSatisfied();
+		mockUpdateReqListener.assertIsSatisfied();
 		assertMessageLogged(Level.DEBUG, "No sync requests found");
 	}
 	
@@ -86,19 +107,21 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 			
 			@Override
 			public void configure() {
-				weaveByToUri("jpa:SenderSyncRequest").after().to(TEST_LISTENER);
+				weaveByToUri("jpa:DebeziumEvent").after().to(mockSaveEventListener);
+				weaveByToUri("jpa:SenderSyncRequest").after().to(mockUpdateReqListener);
 			}
 			
 		});
 		
 		List<SenderSyncRequest> processedRequests = new ArrayList();
-		mockListener.whenAnyExchangeReceived(e -> {
+		mockSaveEventListener.whenAnyExchangeReceived(e -> {
 			processedRequests.add(e.getProperty(EX_PROP_SYNC_REQ, SenderSyncRequest.class));
 		});
-		DefaultExchange exchange = new DefaultExchange(camelContext);
 		
-		producerTemplate.send(URI_REQUEST_PROCESSOR, exchange);
+		producerTemplate.send(URI_REQUEST_PROCESSOR, new DefaultExchange(camelContext));
 		
+		mockSaveEventListener.assertIsSatisfied();
+		mockUpdateReqListener.assertIsSatisfied();
 		assertMessageLogged(Level.INFO, "Fetched " + requests.size() + " sync request(s)");
 		assertEquals(messageCount, processedRequests.size());
 		assertEquals(3, processedRequests.get(0).getId().intValue());
@@ -158,6 +181,29 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 		assertEquals("r", event.getEvent().getOperation());
 		assertFalse(event.getEvent().getSnapshot());
 		assertNotNull(event.getDateCreated());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_sender_sync_request.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldNotReadAnyRequestsIfTheApplicationIsStopping() throws Exception {
+		advise(ROUTE_ID_REQUEST_PROCESSOR, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByToUri("jpa:DebeziumEvent").after().to(mockSaveEventListener);
+				weaveByToUri("jpa:SenderSyncRequest").after().to(mockUpdateReqListener);
+			}
+			
+		});
+		
+		AppUtils.setAppContextStopping();
+		mockSaveEventListener.expectedMessageCount(0);
+		mockUpdateReqListener.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_REQUEST_PROCESSOR, new DefaultExchange(camelContext));
+		
+		mockSaveEventListener.assertIsSatisfied();
+		mockUpdateReqListener.assertIsSatisfied();
 	}
 	
 }
