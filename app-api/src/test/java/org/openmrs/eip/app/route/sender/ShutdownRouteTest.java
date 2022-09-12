@@ -8,6 +8,7 @@ import static org.openmrs.eip.app.SyncConstants.URI_SHUTDOWN;
 import static org.openmrs.eip.app.route.sender.ShutdownRouteTest.TEST_SENDER_ID;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
+import ch.qos.logback.classic.Level;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.app.sender.SenderConstants;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = SenderConstants.PROP_SENDER_ID + "=" + TEST_SENDER_ID)
@@ -42,6 +44,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	public void setup() throws Exception {
 		setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
+        setInternalState(AppUtils.class, "appContextStopping", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
 		
@@ -83,5 +86,18 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 		mockEmailNoticeProcessor.assertIsSatisfied();
 		mockShutdownBean.assertIsSatisfied();
 	}
+
+    @Test
+    public void shouldSkipIfTheApplicationContextIsStopping() throws Exception {
+        Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+        mockEmailNoticeProcessor.expectedMessageCount(0);
+        mockShutdownBean.expectedMessageCount(0);
+
+        producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
+
+        mockEmailNoticeProcessor.assertIsSatisfied();
+        mockShutdownBean.assertIsSatisfied();
+        assertMessageLogged(Level.DEBUG, "The application context is stopping");
+    }
 	
 }

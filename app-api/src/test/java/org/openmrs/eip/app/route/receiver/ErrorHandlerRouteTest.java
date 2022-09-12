@@ -69,13 +69,13 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldSkipMessageIfTheReceiverIsAlreadyStopping() {
+	public void shouldSkipIfTheApplicationContextIsStopping() {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		final int errorCount = TestUtils.getEntities(ReceiverRetryQueueItem.class).size();
 		
 		producerTemplate.send(URI_ERROR_HANDLER, new DefaultExchange(camelContext));
 		
-		assertMessageLogged(Level.INFO, "Ignoring the error because the application is shutting down");
+		assertMessageLogged(Level.INFO, "Ignoring the error because the application context is stopping");
 		assertEquals(errorCount, TestUtils.getEntities(ReceiverRetryQueueItem.class).size());
 	}
 	

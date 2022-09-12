@@ -5,126 +5,134 @@
     <route id="outbound-error-handler" errorHandlerRef="shutdownErrorHandler">
         <from uri="direct:outbound-error-handler" />
 
-        <when>
-            <simple>${exchangeProperty.dbzmEvent} == null &amp;&amp; ${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.retry-item} == null</simple>
-            <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Not enough details to handle the exception" />
-        </when>
-
-        <when>
-            <simple>${exchangeProperty.retry-item-id} != null</simple>
-            <log message="Entities with failed retries in current poll run: ${exchangeProperty.failed-entities.size()}" loggingLevel="DEBUG" />
-            <setBody>
-                <method beanType="org.openmrs.eip.component.utils.Utils" method="getListOfTablesInHierarchy(${exchangeProperty.retry-item.event.tableName})" />
-            </setBody>
-            <split parallelProcessing="false" stopOnException="true">
-                <simple>${body}</simple>
-                <script>
-                    <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
-                </script>
-            </split>
-        </when>
-
-        <setProperty name="exceptionType">
-            <simple>${exception.class.name}</simple>
-        </setProperty>
-        <setProperty name="error-msg">
-            <simple>${exception.message}</simple>
-        </setProperty>
-
-        <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="WARN" />
-
-        <setProperty name="rootCause">
-            <method beanType="org.apache.commons.lang3.exception.ExceptionUtils" method="getRootCause(${exception})" />
-        </setProperty>
-        
-        <when>
-            <simple>${exception.cause} != null &amp;&amp; ${exchangeProperty.rootCause} != null</simple>
-            <setProperty name="exceptionType">
-                <simple>${exchangeProperty.rootCause.class.name}</simple>
-            </setProperty>
-
-            <when>
-                <simple>${exchangeProperty.rootCause.message} != null</simple>
-                <setProperty name="error-msg">
-                    <simple>${exchangeProperty.rootCause.message}</simple>
-                </setProperty>
-
-                <log message="Cause: ${exchangeProperty.rootCause.message}" loggingLevel="WARN" />
-            </when>
-        </when>
-
-        <when>
-            <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
-            <setProperty name="error-msg">
-                <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
-            </setProperty>
-        </when>
-
         <choice>
             <when>
-                <!-- This is a failure when processing a new debezium event -->
-                <simple>${exchangeProperty.dbzmEvent} != null</simple>
-                <log message="Adding new item to retry queue" />
-                <setProperty name="retry-item">
-                    <spel>
-                        #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
-                    </spel>
-                </setProperty>
-                <script>
-                    <spel>
-                        #{getProperty('retry-item').setEvent(getProperty('event'))}
-                        #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
-                        #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
-                        #{getProperty('retry-item').setDateCreated(new java.util.Date())}
-                    </spel>
-                </script>
-                <setBody>
-                    <simple>${exchangeProperty.retry-item}</simple>
-                </setBody>
-
-                <log loggingLevel="DEBUG" message="Saving failed DB event to retry queue" />
-
-                <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
-
-                <log loggingLevel="DEBUG" message="Successfully saved DB event to retry queue" />
-
-                <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
-
-                <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
-
-                <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue since it has been moved to the error queue" />
+                <method beanType="org.openmrs.eip.app.AppUtils" method="isAppContextStopping()" />
+                <log message="Ignoring the error because the application context is stopping" />
             </when>
             <otherwise>
-                <!-- This is a failure when re-processing a previously failed event -->
-                <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
                 <when>
-                    <simple>${exchangeProperty.retry-item} == null</simple>
-                    <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
+                    <simple>${exchangeProperty.dbzmEvent} == null &amp;&amp; ${exchangeProperty.retry-item-id} == null &amp;&amp; ${exchangeProperty.retry-item} == null</simple>
+                    <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Not enough details to handle the exception" />
+                </when>
 
-                    <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
+                <when>
+                    <simple>${exchangeProperty.retry-item-id} != null</simple>
+                    <log message="Entities with failed retries in current poll run: ${exchangeProperty.failed-entities.size()}" loggingLevel="DEBUG" />
+                    <setBody>
+                        <method beanType="org.openmrs.eip.component.utils.Utils" method="getListOfTablesInHierarchy(${exchangeProperty.retry-item.event.tableName})" />
+                    </setBody>
+                    <split parallelProcessing="false" stopOnException="true">
+                        <simple>${body}</simple>
+                        <script>
+                            <simple>${exchangeProperty.failed-entities.add(${body}#${exchangeProperty.retry-item.event.primaryKeyId})}</simple>
+                        </script>
+                    </split>
+                </when>
 
-                    <log message="Loaded: ${body}" loggingLevel="DEBUG" />
-                    <setProperty name="retry-item">
-                        <simple>${body[0]}</simple>
+                <setProperty name="exceptionType">
+                    <simple>${exception.class.name}</simple>
+                </setProperty>
+                <setProperty name="error-msg">
+                    <simple>${exception.message}</simple>
+                </setProperty>
+
+                <log message="Error: ${exchangeProperty.error-msg}" loggingLevel="WARN" />
+
+                <setProperty name="rootCause">
+                    <method beanType="org.apache.commons.lang3.exception.ExceptionUtils" method="getRootCause(${exception})" />
+                </setProperty>
+
+                <when>
+                    <simple>${exception.cause} != null &amp;&amp; ${exchangeProperty.rootCause} != null</simple>
+                    <setProperty name="exceptionType">
+                        <simple>${exchangeProperty.rootCause.class.name}</simple>
+                    </setProperty>
+
+                    <when>
+                        <simple>${exchangeProperty.rootCause.message} != null</simple>
+                        <setProperty name="error-msg">
+                            <simple>${exchangeProperty.rootCause.message}</simple>
+                        </setProperty>
+
+                        <log message="Cause: ${exchangeProperty.rootCause.message}" loggingLevel="WARN" />
+                    </when>
+                </when>
+
+                <when>
+                    <simple>${exchangeProperty.error-msg.length()} > 1024</simple>
+                    <setProperty name="error-msg">
+                        <simple>${exchangeProperty.error-msg.substring(0, 1024)}</simple>
                     </setProperty>
                 </when>
 
-                <script>
-                    <spel>
-                        #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
-                        #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
-                        #{getProperty('retry-item').setDateChanged(new java.util.Date())}
-                    </spel>
-                </script>
-                <setBody>
-                    <simple>${exchangeProperty.retry-item}</simple>
-                </setBody>
+                <choice>
+                    <when>
+                        <!-- This is a failure when processing a new debezium event -->
+                        <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                        <log message="Adding new item to retry queue" />
+                        <setProperty name="retry-item">
+                            <spel>
+                                #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
+                            </spel>
+                        </setProperty>
+                        <script>
+                            <spel>
+                                #{getProperty('retry-item').setEvent(getProperty('event'))}
+                                #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
+                                #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
+                                #{getProperty('retry-item').setDateCreated(new java.util.Date())}
+                            </spel>
+                        </script>
+                        <setBody>
+                            <simple>${exchangeProperty.retry-item}</simple>
+                        </setBody>
 
-                <log message="Saving updates for the retry item" loggingLevel="DEBUG" />
+                        <log loggingLevel="DEBUG" message="Saving failed DB event to retry queue" />
 
-                <to uri="jpa:SenderRetryQueueItem" />
+                        <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
 
-                <log message="Successfully saved updates for the retry item" />
+                        <log loggingLevel="DEBUG" message="Successfully saved DB event to retry queue" />
+
+                        <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
+
+                        <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+
+                        <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue since it has been moved to the error queue" />
+                    </when>
+                    <otherwise>
+                        <!-- This is a failure when re-processing a previously failed event -->
+                        <!-- TODO track ids of entities for events so that we don't process future failed events for the same entity -->
+                        <when>
+                            <simple>${exchangeProperty.retry-item} == null</simple>
+                            <log message="Loading retry item with id: ${exchangeProperty.retry-item-id}" loggingLevel="DEBUG" />
+
+                            <toD uri="jpa:SenderRetryQueueItem?query=SELECT r FROM SenderRetryQueueItem r WHERE r.id = ${exchangeProperty.retry-item-id}" />
+
+                            <log message="Loaded: ${body}" loggingLevel="DEBUG" />
+                            <setProperty name="retry-item">
+                                <simple>${body[0]}</simple>
+                            </setProperty>
+                        </when>
+
+                        <script>
+                            <spel>
+                                #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
+                                #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
+                                #{getProperty('retry-item').setDateChanged(new java.util.Date())}
+                            </spel>
+                        </script>
+                        <setBody>
+                            <simple>${exchangeProperty.retry-item}</simple>
+                        </setBody>
+
+                        <log message="Saving updates for the retry item" loggingLevel="DEBUG" />
+
+                        <to uri="jpa:SenderRetryQueueItem" />
+
+                        <log message="Successfully saved updates for the retry item" />
+                    </otherwise>
+                </choice>
             </otherwise>
         </choice>
         

@@ -26,15 +26,18 @@ import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
+import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
+import ch.qos.logback.classic.Level;
 import io.debezium.DebeziumException;
 
 @Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -49,6 +52,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 		advise(ROUTE_ID_ERROR_HANDLER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -203,6 +207,17 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 		assertNotNull(retryItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), retryItem.getExceptionType());
 		assertEquals(newErrorMsg, retryItem.getMessage());
+	}
+	
+	@Test
+	public void shouldSkipIfTheApplicationContextIsStopping() {
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+		final int errorCount = TestUtils.getEntities(SenderRetryQueueItem.class).size();
+		
+		producerTemplate.send(URI_ERROR_HANDLER, new DefaultExchange(camelContext));
+		
+		assertMessageLogged(Level.INFO, "Ignoring the error because the application context is stopping");
+		assertEquals(errorCount, TestUtils.getEntities(SenderRetryQueueItem.class).size());
 	}
 	
 }

@@ -57,7 +57,7 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldSkipIfTheReceiverIsHasAlreadyReceivedAShutdownNotice() throws Exception {
+	public void shouldSkipIfTheApplicationContextIsStopping() throws Exception {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);
@@ -66,7 +66,7 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 		
 		mockEmailNoticeProcessor.assertIsSatisfied();
 		mockShutdownBean.assertIsSatisfied();
-		assertMessageLogged(Level.DEBUG, "The application is already shutting down after a previous shutdown notice");
+		assertMessageLogged(Level.DEBUG, "The application context is stopping");
 	}
 	
 	@Test

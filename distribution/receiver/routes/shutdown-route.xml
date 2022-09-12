@@ -5,7 +5,7 @@
         <choice>
             <when>
                 <method beanType="org.openmrs.eip.app.AppUtils" method="isAppContextStopping()" />
-                <log loggingLevel="DEBUG" message="The application is already shutting down after a previous shutdown notice" />
+                <log loggingLevel="DEBUG" message="The application context is stopping" />
             </when>
             <when>
                 <method beanType="org.openmrs.eip.app.AppUtils" method="isShuttingDown()" />
