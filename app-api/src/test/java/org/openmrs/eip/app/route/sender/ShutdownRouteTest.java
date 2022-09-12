@@ -97,7 +97,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 
         mockEmailNoticeProcessor.assertIsSatisfied();
         mockShutdownBean.assertIsSatisfied();
-        assertMessageLogged(Level.DEBUG, "The application context is stopping");
+        assertMessageLogged(Level.DEBUG, "The application context is already stopping");
     }
 	
 }
