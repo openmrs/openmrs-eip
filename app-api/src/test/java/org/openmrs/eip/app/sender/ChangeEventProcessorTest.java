@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -55,6 +57,8 @@ public class ChangeEventProcessorTest {
 	@Mock
 	private ChangeEventHandler handler;
 	
+	private ExecutorService executor;
+	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -65,6 +69,8 @@ public class ChangeEventProcessorTest {
 	private ChangeEventProcessor createProcessor(int threadCount) {
 		processor = new ChangeEventProcessor(handler);
 		Whitebox.setInternalState(processor, "threadCount", threadCount);
+		executor = Executors.newFixedThreadPool(threadCount);
+		Whitebox.setInternalState(ChangeEventProcessor.class, "executor", executor);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
 		Mockito.when(mockStore.getSavedRowId(ArgumentMatchers.anyString())).thenReturn(null);
