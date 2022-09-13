@@ -1,7 +1,7 @@
 package org.openmrs.eip.app;
 
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_MSG_PARALLEL_SIZE;
-import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
+import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +23,7 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 	
 	protected static final int WAIT_IN_SECONDS = 300;
 	
-	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
+	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
 	protected int threadCount;
 	
 	protected ProducerTemplate producerTemplate;

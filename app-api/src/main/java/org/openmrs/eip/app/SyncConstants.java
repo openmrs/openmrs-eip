@@ -12,7 +12,7 @@ public class SyncConstants {
 	
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
 	
-	public static final int DEFAULT_MSG_PARALLEL_SIZE = 10;
+	public static final int DEFAULT_THREAD_NUMBER = 10;
 	
 	public static final int DEFAULT_CONN_POOL_SIZE = 50;
 	
@@ -24,7 +24,7 @@ public class SyncConstants {
 	
 	public static final String PROP_SITE_PARALLEL_SIZE = "sites.sync.parallel.size";
 	
-	public static final String PROP_MSG_PARALLEL_SIZE = "events.sync.parallel.size";
+	public static final String PROP_THREAD_NUMBER = "parallel.processing.thread.number";
 	
 	public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
 	

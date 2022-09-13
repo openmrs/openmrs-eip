@@ -42,7 +42,7 @@ public class BaseSenderQueueProcessorTest {
 	@BeforeClass
 	public static void beforeClass() {
 		if (Whitebox.getInternalState(BaseParallelProcessor.class, "executor") == null) {
-			executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_MSG_PARALLEL_SIZE);
+			executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
 			Whitebox.setInternalState(BaseParallelProcessor.class, "executor", executor);
 		}
 	}

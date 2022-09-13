@@ -1,9 +1,9 @@
 package org.openmrs.eip.app.receiver;
 
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.PROP_MSG_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 
@@ -38,9 +38,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.RECEIVER)
-public class CamelListener extends EventNotifierSupport {
+public class ReceiverCamelListener extends EventNotifierSupport {
 	
-	protected static final Logger log = LoggerFactory.getLogger(CamelListener.class);
+	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
 	private static ExecutorService siteExecutor;
 	
@@ -49,8 +49,8 @@ public class CamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_SITE_PARALLEL_SIZE + ":" + DEFAULT_SITE_PARALLEL_SIZE + "}")
 	private int parallelSiteSize;
 	
-	@Value("${" + PROP_MSG_PARALLEL_SIZE + ":" + DEFAULT_MSG_PARALLEL_SIZE + "}")
-	private int parallelMsgSize;
+	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
+	private int threadCount;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -91,12 +91,12 @@ public class CamelListener extends EventNotifierSupport {
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites();
 			siteExecutor = Executors.newFixedThreadPool(parallelSiteSize);
-			msgExecutor = Executors.newFixedThreadPool(parallelMsgSize);
+			msgExecutor = Executors.newFixedThreadPool(threadCount);
 			
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				siteExecutor.execute(new SiteMessageConsumer(site, parallelMsgSize, msgExecutor));
+				siteExecutor.execute(new SiteMessageConsumer(site, threadCount, msgExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
