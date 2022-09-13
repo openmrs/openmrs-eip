@@ -50,14 +50,6 @@ public class ChangeEventHandler {
 	public void handle(String tableName, String id, boolean snapshot, Map<String, Object> metadata, Exchange exchange)
 	    throws EIPException {
 		
-		if (CustomFileOffsetBackingStore.isDisabled()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Deferring DB event because an error was encountered while processing a previous one");
-			}
-			
-			return;
-		}
-		
 		Message message = exchange.getMessage();
 		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
 		

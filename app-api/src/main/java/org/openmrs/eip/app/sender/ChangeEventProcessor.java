@@ -43,6 +43,16 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
+		if (CustomFileOffsetBackingStore.isDisabled()) {
+			if (log.isDebugEnabled()) {
+				log.debug("Deferring DB event because an error was encountered while processing a previous one");
+			}
+			
+			return;
+		}
+		
+		CustomFileOffsetBackingStore.disable();
+		
 		Message message = exchange.getMessage();
 		Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
 		//TODO Take care of situation where a table has a composite PK because fields length will be > 1
@@ -147,6 +157,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			try {
 				setThreadName(table, id);
 				handler.handle(table, id, false, sourceMetadata, exchange);
+				CustomFileOffsetBackingStore.enable();
 			}
 			finally {
 				Thread.currentThread().setName(originalThreadName);

@@ -17,6 +17,13 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	private static boolean paused = false;
 	
+	public synchronized static void enable() {
+		disabled = false;
+		if (log.isDebugEnabled()) {
+			log.debug("Enabled saving of offsets");
+		}
+	}
+	
 	public synchronized static void disable() {
 		disabled = true;
 		if (log.isDebugEnabled()) {
