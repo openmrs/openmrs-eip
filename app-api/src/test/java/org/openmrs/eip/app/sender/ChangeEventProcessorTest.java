@@ -63,6 +63,8 @@ public class ChangeEventProcessorTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", (Integer) null);
+		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "paused", false);
+		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		Mockito.reset(mockStore);
 	}
 	
@@ -255,7 +257,8 @@ public class ChangeEventProcessorTest {
 				Integer id = getId(arg);
 				expectedResults.add(id);
 				threadNames.add(Thread.currentThread().getName());
-				assertFalse(CustomFileOffsetBackingStore.isPaused());
+				assertFalse(CustomFileOffsetBackingStore.isDisabled());
+				assertTrue(CustomFileOffsetBackingStore.isPaused());
 				return arg;
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(false), anyMap(), eq(e));
 		}

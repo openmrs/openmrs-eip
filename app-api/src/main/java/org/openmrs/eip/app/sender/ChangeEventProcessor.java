@@ -51,7 +51,11 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			return;
 		}
 		
-		CustomFileOffsetBackingStore.disable();
+		//In case if initial loading, block saving offsets until all rows in the snapshot are processed
+		//In case of incremental, block saving until we have successfully save the event to the event queue in the DB
+		if (!CustomFileOffsetBackingStore.isPaused()) {
+			CustomFileOffsetBackingStore.pause();
+		}
 		
 		Message message = exchange.getMessage();
 		Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
@@ -63,11 +67,6 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 		final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 		
 		if (snapshot) {
-			//Block saving offsets until all rows in the snapshot are processed
-			if (!CustomFileOffsetBackingStore.isPaused()) {
-				CustomFileOffsetBackingStore.pause();
-			}
-			
 			if (batchSize == null) {
 				batchSize = DEFAULT_BATCH_SIZE;
 			}
@@ -97,7 +96,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			
 			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
-
+				
 				try {
 					setThreadName(table, id);
 					handler.handle(table, id, true, sourceMetadata, exchange);
@@ -157,7 +156,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			try {
 				setThreadName(table, id);
 				handler.handle(table, id, false, sourceMetadata, exchange);
-				CustomFileOffsetBackingStore.enable();
+				CustomFileOffsetBackingStore.unpause();
 			}
 			finally {
 				Thread.currentThread().setName(originalThreadName);
