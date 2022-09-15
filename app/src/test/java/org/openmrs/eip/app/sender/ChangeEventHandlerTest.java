@@ -63,17 +63,6 @@ public class ChangeEventHandlerTest {
 	}
 	
 	@Test
-	public void handle_shouldSkipTheEventIfTheOffSetBackingStoreIsDisabled() {
-		when(CustomFileOffsetBackingStore.isDisabled()).thenReturn(true);
-		when(mockLogger.isDebugEnabled()).thenReturn(true);
-		
-		handler.handle(null, null, true, null, null);
-		
-		verify(mockLogger).debug("Deferring DB event because an error was encountered while processing a previous one");
-		verifyNoInteractions(mockRepository);
-	}
-	
-	@Test
 	public void handle_shouldFailForAnUnknownDatabaseOperation() {
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 		Message message = new DefaultMessage(exchange);
