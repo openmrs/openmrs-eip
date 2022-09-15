@@ -69,90 +69,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 			final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 			
 			if (snapshot) {
-				if (batchSize == null) {
-					batchSize = DEFAULT_BATCH_SIZE;
-				}
-				
-				if (futures == null) {
-					futures = new Vector(batchSize);
-				}
-				
-				if (tableAndMaxRowIdsMap == null) {
-					tableAndMaxRowIdsMap = new ConcurrentHashMap(batchSize);
-				}
-				
-				if (savepointStore == null) {
-					savepointStore = new SnapshotSavePointStore();
-					savepointStore.init();
-				}
-				
-				Integer currentRowId = Integer.valueOf(id);
-				Integer saveRowId = savepointStore.getSavedRowId(table);
-				if (saveRowId != null && saveRowId >= currentRowId) {
-					if (log.isDebugEnabled()) {
-						log.debug("Skipping previously processed row with id: " + currentRowId + " in " + table + " table");
-					}
-					
-					return;
-				}
-				
-				futures.add(CompletableFuture.runAsync(() -> {
-					final String originalThreadName = Thread.currentThread().getName();
-					
-					try {
-						setThreadName(table, id);
-						handler.handle(table, id, true, sourceMetadata, exchange);
-						updateTableAndMaxRowIdsMap(table, currentRowId);
-					}
-					finally {
-						Thread.currentThread().setName(originalThreadName);
-					}
-				}, executor));
-				
-				boolean isLast = snapshotStr.equalsIgnoreCase("last");
-				if (isLast || futures.size() == batchSize) {
-					waitForFutures(futures);
-					//If the executor is already shutdown, there could be tasks for some DB events that were never processed
-					//Which leaves unprocessed rows when initial loading is resumed, so we can't persist the savepoint
-					if (executor.isShutdown()) {
-						log.warn("Executor is already shutdown, can't persist snapshot save point");
-						return;
-					}
-					
-					for (CompletableFuture f : futures) {
-						boolean stop = false;
-						if (!f.isDone()) {
-							stop = true;
-							log.warn("Detected DB event processor threads that were not yet done");
-						} else if (f.isCancelled()) {
-							stop = true;
-							log.warn("Detected DB event processor threads that were cancelled");
-						} else if (f.isCompletedExceptionally()) {
-							stop = true;
-							log.warn("Detected DB event processor threads that encountered exceptions");
-						}
-						
-						if (stop) {
-							log.warn(
-							    "Can't persist snapshot save point because some DB event processor threads didn't terminate properly");
-							return;
-						}
-					}
-					
-					futures.clear();
-					
-					if (isLast) {
-						//Only save offsets if it is the last snapshot item
-						log.info("Processed final snapshot change event");
-						
-						CustomFileOffsetBackingStore.unpause();
-						
-						savepointStore.discard();
-						savepointStore = null;
-					} else {
-						savepointStore.update(tableAndMaxRowIdsMap);
-					}
-				}
+				processSnapshotEvent(exchange, sourceMetadata, id, table, snapshotStr);
 			} else {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
@@ -178,6 +95,95 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 	@Override
 	public String getProcessorName() {
 		return "change event";
+	}
+	
+	private void processSnapshotEvent(Exchange exchange, Map<String, Object> sourceMetadata, String id, String table,
+	                                  String snapshotStr)
+	    throws Exception {
+		if (batchSize == null) {
+			batchSize = DEFAULT_BATCH_SIZE;
+		}
+		
+		if (futures == null) {
+			futures = new Vector(batchSize);
+		}
+		
+		if (tableAndMaxRowIdsMap == null) {
+			tableAndMaxRowIdsMap = new ConcurrentHashMap(batchSize);
+		}
+		
+		if (savepointStore == null) {
+			savepointStore = new SnapshotSavePointStore();
+			savepointStore.init();
+		}
+		
+		Integer currentRowId = Integer.valueOf(id);
+		Integer saveRowId = savepointStore.getSavedRowId(table);
+		if (saveRowId != null && saveRowId >= currentRowId) {
+			if (log.isDebugEnabled()) {
+				log.debug("Skipping previously processed row with id: " + currentRowId + " in " + table + " table");
+			}
+			
+			return;
+		}
+		
+		futures.add(CompletableFuture.runAsync(() -> {
+			final String originalThreadName = Thread.currentThread().getName();
+			
+			try {
+				setThreadName(table, id);
+				handler.handle(table, id, true, sourceMetadata, exchange);
+				updateTableAndMaxRowIdsMap(table, currentRowId);
+			}
+			finally {
+				Thread.currentThread().setName(originalThreadName);
+			}
+		}, executor));
+		
+		boolean isLast = snapshotStr.equalsIgnoreCase("last");
+		if (isLast || futures.size() == batchSize) {
+			waitForFutures(futures);
+			//If the executor is already shutdown, there could be tasks for some DB events that were never processed
+			//Which leaves unprocessed rows when initial loading is resumed, so we can't persist the savepoint
+			if (executor.isShutdown()) {
+				log.warn("Executor is already shutdown, can't persist snapshot save point");
+				return;
+			}
+			
+			for (CompletableFuture f : futures) {
+				boolean stop = false;
+				if (!f.isDone()) {
+					stop = true;
+					log.warn("Detected DB event processor threads that were not yet done");
+				} else if (f.isCancelled()) {
+					stop = true;
+					log.warn("Detected DB event processor threads that were cancelled");
+				} else if (f.isCompletedExceptionally()) {
+					stop = true;
+					log.warn("Detected DB event processor threads that encountered exceptions");
+				}
+				
+				if (stop) {
+					log.warn(
+					    "Can't persist snapshot save point because some DB event processor threads didn't terminate properly");
+					return;
+				}
+			}
+			
+			futures.clear();
+			
+			if (isLast) {
+				//Only save offsets if it is the last snapshot item
+				log.info("Processed final snapshot change event");
+				
+				CustomFileOffsetBackingStore.unpause();
+				
+				savepointStore.discard();
+				savepointStore = null;
+			} else {
+				savepointStore.update(tableAndMaxRowIdsMap);
+			}
+		}
 	}
 	
 	private void setThreadName(String table, String id) {
