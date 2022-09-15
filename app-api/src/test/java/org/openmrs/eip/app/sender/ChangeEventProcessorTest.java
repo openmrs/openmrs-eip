@@ -456,6 +456,7 @@ public class ChangeEventProcessorTest {
 	
 	@Test
 	public void process_shouldDisableTheOffsetStoreAndRethrowWhenAnExceptionIsEncountered() throws Exception {
+		assertFalse(CustomFileOffsetBackingStore.isDisabled());
 		Exchange e = createExchange(0, FALSE.toString(), TABLE_PERSON);
 		Mockito.doThrow(new NumberFormatException()).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(0)), eq(false),
 		    anyMap(), eq(e));
@@ -464,6 +465,7 @@ public class ChangeEventProcessorTest {
 			processor.process(e);
 		});
 		
+		assertTrue(CustomFileOffsetBackingStore.isDisabled());
 		assertEquals("Failed to process DB event", thrown.getMessage());
 	}
 	
