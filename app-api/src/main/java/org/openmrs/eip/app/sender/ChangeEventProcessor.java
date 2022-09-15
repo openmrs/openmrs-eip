@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.sender;
 
+import static org.apache.camel.component.debezium.DebeziumConstants.HEADER_SOURCE_METADATA;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
 
 import java.util.List;
@@ -59,12 +60,12 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 				CustomFileOffsetBackingStore.pause();
 			}
 			
-			Message message = exchange.getMessage();
-			Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
+			final Message message = exchange.getMessage();
+			final Struct primaryKeyStruct = message.getHeader(DebeziumConstants.HEADER_KEY, Struct.class);
 			//TODO Take care of situation where a table has a composite PK because fields length will be > 1
-			String id = primaryKeyStruct.get(primaryKeyStruct.schema().fields().get(0)).toString();
-			Map<String, Object> sourceMetadata = message.getHeader(DebeziumConstants.HEADER_SOURCE_METADATA, Map.class);
-			String table = sourceMetadata.get("table").toString();
+			final String id = primaryKeyStruct.get(primaryKeyStruct.schema().fields().get(0)).toString();
+			final Map<String, Object> sourceMetadata = message.getHeader(HEADER_SOURCE_METADATA, Map.class);
+			final String table = sourceMetadata.get("table").toString();
 			final String snapshotStr = sourceMetadata.getOrDefault("snapshot", "").toString();
 			final boolean snapshot = !"false".equalsIgnoreCase(snapshotStr);
 			
