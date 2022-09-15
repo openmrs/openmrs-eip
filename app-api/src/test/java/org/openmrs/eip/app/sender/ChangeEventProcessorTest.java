@@ -1,11 +1,13 @@
 package org.openmrs.eip.app.sender;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
+import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
 
 public class ChangeEventProcessorTest {
@@ -449,6 +452,19 @@ public class ChangeEventProcessorTest {
 				    expectedIdThreadNameMap.get(id).split(":")[2]);
 			}
 		}
+	}
+	
+	@Test
+	public void process_shouldDisableTheOffsetStoreAndRethrowWhenAnExceptionIsEncountered() throws Exception {
+		Exchange e = createExchange(0, FALSE.toString(), TABLE_PERSON);
+		Mockito.doThrow(new NumberFormatException()).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(0)), eq(false),
+		    anyMap(), eq(e));
+		processor = createProcessor(1);
+		Exception thrown = assertThrows(EIPException.class, () -> {
+			processor.process(e);
+		});
+		
+		assertEquals("Failed to process DB event", thrown.getMessage());
 	}
 	
 }
