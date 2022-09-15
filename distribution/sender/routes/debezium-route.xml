@@ -2,8 +2,6 @@
     <route id="debezium" errorHandlerRef="shutdownErrorHandler">
         <from uri="debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}&amp;databaseServerName={{debezium.db.serverName}}&amp;databaseHostname={{openmrs.db.host}}&amp;databasePort={{openmrs.db.port}}&amp;databaseUser={{debezium.db.user}}&amp;databasePassword={{debezium.db.password}}&amp;databaseWhitelist={{openmrs.db.name}}&amp;offsetStorageFileName={{debezium.offsetFilename}}&amp;databaseHistoryFileFilename={{debezium.historyFilename}}&amp;tableWhitelist={{debezium.tablesToSync}}&amp;offsetFlushIntervalMs=0&amp;snapshotMode={{debezium.snapshotMode}}&amp;snapshotFetchSize=1000&amp;snapshotLockingMode=minimal&amp;includeSchemaChanges=false&amp;maxBatchSize={{debezium.reader.maxBatchSize}}&amp;offsetStorage=org.openmrs.eip.app.CustomFileOffsetBackingStore&amp;offsetCommitTimeoutMs=15000" />
 
-        <log loggingLevel="DEBUG" message=":" />
-        
         <process ref="changeEventProcessor" />
 
         <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
