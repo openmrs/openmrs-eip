@@ -92,6 +92,10 @@
                         <to uri="jpa:ReceiverRetryQueueItem?usePersist=true" />
 
                         <log message="Successfully saved retry item" loggingLevel="DEBUG" />
+
+                        <setProperty name="org.openmrs.eip.app.receiver.SiteMessageConsumer-deleteSyncMsg">
+                            <simple>true</simple>
+                        </setProperty>
                     </when>
                     <otherwise>
                         <!-- This is a failure when re-processing a previously failed message -->
