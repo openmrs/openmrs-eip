@@ -2,6 +2,8 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -31,7 +36,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ReceiverContext.class })
+@PrepareForTest({ ReceiverContext.class, CamelUtils.class })
 public class SiteMessageConsumerTest {
 	
 	private SiteMessageConsumer consumer;
@@ -43,11 +48,16 @@ public class SiteMessageConsumerTest {
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
+	@Mock
+	private ExtendedCamelContext mockCamelContext;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverContext.class);
+		PowerMockito.mockStatic(CamelUtils.class);
 		siteInfo = new SiteInfo();
 		siteInfo.setIdentifier("testSite");
+		Mockito.when(mockProducerTemplate.getCamelContext()).thenReturn(mockCamelContext);
 	}
 	
 	private void initExecutorAndConsumer(final int size) {
@@ -83,13 +93,14 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, true);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
 				Thread.sleep(500);
-				SyncMessage arg = invocation.getArgument(1);
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -117,12 +128,13 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, true);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -150,12 +162,13 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, false);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				threadNames.add(Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+				return exchange;
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -198,13 +211,14 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, nonSnapshotMsgIndices.contains(i) ? false : true);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
 				Thread.sleep(500);
-				SyncMessage arg = invocation.getArgument(1);
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -241,13 +255,14 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size / 2; i++) {
 			SyncMessage m = createMessage(i, true);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
 				Thread.sleep(500);
-				SyncMessage arg = invocation.getArgument(1);
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		List<Integer> nonSnapshotMsgIndices = new ArrayList();
@@ -255,12 +270,13 @@ public class SiteMessageConsumerTest {
 			nonSnapshotMsgIndices.add(i);
 			SyncMessage m = createMessage(i, false);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -309,24 +325,26 @@ public class SiteMessageConsumerTest {
 			nonSnapshotMsgIndices.add(i);
 			SyncMessage m = createMessage(i, false);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
 			SyncMessage m = createMessage(i, true);
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
 				Thread.sleep(500);
-				SyncMessage arg = invocation.getArgument(1);
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -374,12 +392,13 @@ public class SiteMessageConsumerTest {
 			SyncMessage m = createMessage(i, true);
 			m.setIdentifier("same-uuid");
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -416,12 +435,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? PersonModel.class.getName() : PatientModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -458,12 +478,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? PatientModel.class.getName() : PersonModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -500,12 +521,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? OrderModel.class.getName() : TestOrderModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -542,12 +564,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? TestOrderModel.class.getName() : OrderModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -584,12 +607,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? OrderModel.class.getName() : DrugOrderModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);
@@ -626,12 +650,13 @@ public class SiteMessageConsumerTest {
 			m.setIdentifier("same-uuid");
 			m.setModelClassName(i == 0 ? DrugOrderModel.class.getName() : OrderModel.class.getName());
 			messages.add(m);
-			Mockito.doAnswer(invocation -> {
-				SyncMessage arg = invocation.getArgument(1);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_MSG_PROCESSOR, m);
+			});
 		}
 		
 		consumer.processMessages(messages);

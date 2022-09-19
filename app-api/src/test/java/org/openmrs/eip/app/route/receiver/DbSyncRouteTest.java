@@ -3,7 +3,11 @@ package org.openmrs.eip.app.route.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DELETE_SYNC_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
@@ -24,11 +28,12 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.entity.light.PatientLight;
+import org.openmrs.eip.component.entity.light.VisitTypeLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
@@ -40,12 +45,13 @@ import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.model.VisitModel;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 @Sql({ "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_DBSYNC + "=DEBUG")
 public class DbSyncRouteTest extends BaseReceiverRouteTest {
 	
@@ -86,8 +92,36 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
+	public void shouldCallTheLoadProducer() throws Exception {
+		final Class<? extends BaseModel> modelClass = VisitModel.class;
+		final String uuid = "visit-uuid";
+		VisitModel model = new VisitModel();
+		model.setUuid(uuid);
+		model.setPatientUuid(PatientLight.class.getName() + "(some-patient-uuid)");
+		model.setVisitTypeUuid(VisitTypeLight.class.getName() + "(some-visit-type-uuid)");
+		SyncModel syncModel = new SyncModel();
+		syncModel.setTableToSyncModelClass(modelClass);
+		syncModel.setModel(model);
+		syncModel.setMetadata(new SyncMetadata());
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
+		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
+		exchange.getIn().setBody(syncModel);
+		mockLoadEndpoint.expectedBodiesReceived(syncModel);
+		mockClearCacheEndpoint.expectedMessageCount(0);
+		mockUpdateSearchIndexEndpoint.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_DBSYNC, exchange);
+		
+		mockLoadEndpoint.assertIsSatisfied();
+		mockClearCacheEndpoint.assertIsSatisfied();
+		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
+		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
+	}
+	
+	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldFailIfTheEntityHasItemsInTheConflictQueue() throws Exception {
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		final String uuid = "uuid-1";
@@ -106,11 +140,12 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
+		assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldPassIfTheEntityHasResolvedItemsInTheConflictQueue() throws Exception {
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		final String uuid = "uuid-2";
@@ -172,6 +207,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
+		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -563,6 +599,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
+		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -608,6 +645,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
+		assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 }
