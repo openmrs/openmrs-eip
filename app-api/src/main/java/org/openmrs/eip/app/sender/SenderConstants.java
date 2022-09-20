@@ -68,4 +68,6 @@ public class SenderConstants {
 	
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
+	public static final String MASK = "#####";
+	
 }
