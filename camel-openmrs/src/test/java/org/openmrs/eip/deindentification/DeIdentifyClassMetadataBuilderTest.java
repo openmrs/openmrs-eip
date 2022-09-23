@@ -1,5 +1,6 @@
 package org.openmrs.eip.deindentification;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -27,15 +28,30 @@ public class DeIdentifyClassMetadataBuilderTest extends BaseDbDrivenTest {
 		deIndentifyColumns.add("gender");
 		deIndentifyColumns.add("birth_date");
 		DeIdentifyClassMetadata metadata = builder.build(MockEntity.class, deIndentifyColumns);
-		assertTrue(metadata.deIndentify(getField("identifier")));
-		assertTrue(metadata.deIndentify(getField("name")));
-		assertTrue(metadata.deIndentify(getField("gender")));
-		assertTrue(metadata.deIndentify(getField("birthdate")));
+		Field identifier = getField("identifier");
+        Field name = getField("name");
+        Field gender = getField("gender");
+        Field birthdate = getField("birthdate");
+		assertTrue(metadata.deIndentify(identifier));
+		assertTrue(metadata.deIndentify(name));
+		assertTrue(metadata.deIndentify(gender));
+		assertTrue(metadata.deIndentify(birthdate));
 		
-		assertTrue(metadata.isRequired(getField("identifier")));
-		assertTrue(metadata.isRequired(getField("name")));
-		assertFalse(metadata.isRequired(getField("gender")));
-		assertFalse(metadata.isRequired(getField("birthdate")));
+		assertTrue(metadata.isRequired(identifier));
+		assertTrue(metadata.isRequired(name));
+		assertFalse(metadata.isRequired(gender));
+		assertFalse(metadata.isRequired(birthdate));
+
+        assertTrue(metadata.isUnique(identifier));
+        assertFalse(metadata.isUnique(name));
+        assertFalse(metadata.isUnique(gender));
+        assertFalse(metadata.isUnique(birthdate));
+		
+		assertTrue(metadata.isUnique(identifier));
+		assertEquals(255, metadata.getLength(identifier).intValue());
+        assertEquals(255, metadata.getLength(name).intValue());
+        assertEquals(1, metadata.getLength(gender).intValue());
+        assertEquals(255, metadata.getLength(birthdate).intValue());
 	}
 	
 }

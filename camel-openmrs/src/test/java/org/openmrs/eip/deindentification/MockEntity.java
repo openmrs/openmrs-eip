@@ -3,6 +3,7 @@ package org.openmrs.eip.deindentification;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.entity.BaseCreatableEntity;
@@ -13,14 +14,13 @@ import org.openmrs.eip.component.entity.BaseEntity;
 public class MockEntity extends BaseCreatableEntity {
 	
 	@NotNull
-	@Column(nullable = false, unique = true)
+	@Column(unique = true)
 	private String identifier;
 	
-	@NotNull
 	@Column(nullable = false)
 	private String name;
 	
-	@Column
+	@Column(length = 1)
 	private String gender;
 	
 	@Column(name = "birth_date")
