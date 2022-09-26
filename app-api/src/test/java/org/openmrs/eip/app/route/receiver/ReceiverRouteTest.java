@@ -125,6 +125,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		assertEquals(msgUuid, msg.getMessageUuid());
 		assertEquals(JsonUtils.marshall(syncModel), msg.getEntityPayload());
 		assertEquals(siteInfo, msg.getSite());
+		assertEquals(dateSent, msg.getDateSentBySender());
 		assertFalse(msg.getSnapshot());
 		assertNotNull(msg.getDateCreated());
 		assertTrue(Whitebox.getInternalState(CustomMessageListenerContainer.class, "commit"));

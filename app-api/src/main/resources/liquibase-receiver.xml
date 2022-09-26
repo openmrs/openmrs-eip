@@ -1155,4 +1155,17 @@
         <modifyDataType tableName="receiver_sync_msg" columnName="date_created" newDataType="DATETIME(3)" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20220926-1601">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="date_sent_by_sender" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add date_sent_by_sender column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="date_sent_by_sender" type="DATETIME(3)" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

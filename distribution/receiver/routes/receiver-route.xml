@@ -122,6 +122,7 @@
                                 #{getProperty('messageToSave').setDateCreated(new java.util.Date())}
                                 #{getProperty('messageToSave').setSnapshot(getProperty('sync-model').metadata.snapshot == true)}
                                 #{getProperty('messageToSave').setMessageUuid(getProperty('sync-model').metadata.messageUuid)}
+                                #{getProperty('messageToSave').setDateSentBySender(getProperty('sync-model').metadata.dateSent)}
                             </spel>
                         </script>
                         <setBody>
