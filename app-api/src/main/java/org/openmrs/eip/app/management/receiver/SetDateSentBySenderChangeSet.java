@@ -1,8 +1,8 @@
 package org.openmrs.eip.app.management.receiver;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
@@ -21,14 +21,14 @@ import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
 
 /**
- * {@link CustomTaskChange} that sets receiver_sync_msg.date_sent_by_receiver values for existing
- * sync messages
+ * {@link CustomTaskChange} that sets receiver_sync_msg.date_sent_by_sender values for existing sync
+ * messages
  */
 public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	
 	private static final Logger log = LoggerFactory.getLogger(SetDateSentBySenderChangeSet.class);
 	
-	private static final String SQL = "UPDATE receiver_sync_msg SET date_sent_by_receiver = ?, WHERE id = ?";
+	private static final String SQL = "UPDATE receiver_sync_msg SET date_sent_by_sender = ? WHERE id = ?";
 	
 	@Override
 	public void execute(Database database) throws CustomChangeException {
@@ -36,7 +36,8 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 		
 		try {
 			JdbcConnection conn = (JdbcConnection) database.getConnection();
-			runBatchUpdate(null, null);
+			
+			runBatchUpdate(null, conn);
 		}
 		catch (SQLException | DatabaseException e) {
 			throw new CustomChangeException("An error occurred while setting date_sent_by_sender for existing sync messages",
@@ -54,23 +55,21 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	private void runBatchUpdate(Map<Long, LocalDateTime> idAndDateMap, JdbcConnection connection)
 	    throws SQLException, DatabaseException {
 		
+		Boolean autoCommit = null;
 		try (PreparedStatement s = connection.prepareStatement(SQL);) {
+			autoCommit = connection.getAutoCommit();
 			connection.setAutoCommit(false);
 			
 			idAndDateMap.entrySet().parallelStream().forEach(entry -> {
 				try {
-					s.setLong(1, entry.getKey());
-					s.setDate(2, new Date(entry.getValue().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+					s.setTimestamp(1, Timestamp.from(entry.getValue().atZone(ZoneId.systemDefault()).toInstant()));
+					s.setLong(2, entry.getKey());
 					s.addBatch();
 				}
 				catch (SQLException se) {
 					throw new EIPException("Failed to add to batch", se);
 				}
 			});
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Committing updates...");
-			}
 			
 			s.executeBatch();
 			connection.commit();
@@ -80,7 +79,9 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 			throw e;
 		}
 		finally {
-			connection.setAutoCommit(true);
+			if (autoCommit != null) {
+				connection.setAutoCommit(autoCommit);
+			}
 		}
 	}
 	

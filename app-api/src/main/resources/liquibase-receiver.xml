@@ -1168,4 +1168,26 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20220926-1602">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM receiver_sync_msg WHERE date_sent_by_sender IS NULL
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Setting date_sent_by_sender for existing sync messages</comment>
+
+        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentBySenderChangeSet" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220926-1603">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_sent_by_sender" tableName="receiver_sync_msg" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_sync_msg.date_sent_by_sender</comment>
+
+        <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_sent_by_sender" columnDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
