@@ -47,7 +47,7 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 			Map<Long, String> idAndPayloadMap = fetchBatchOfMessageDetails(conn);
 			while (idAndPayloadMap.size() > 0) {
 				Map<Long, LocalDateTime> idAndDateMap = new HashMap(idAndPayloadMap.size());
-				idAndPayloadMap.entrySet().parallelStream().forEach(e -> {
+				idAndPayloadMap.entrySet().stream().forEach(e -> {
 					SyncMetadata metadata = JsonUtils.unmarshal(e.getValue(), SyncModel.class).getMetadata();
 					idAndDateMap.put(e.getKey(), metadata.getDateSent());
 				});
@@ -98,7 +98,7 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 			autoCommit = connection.getAutoCommit();
 			connection.setAutoCommit(false);
 			
-			idAndDateMap.entrySet().parallelStream().forEach(entry -> {
+			idAndDateMap.entrySet().stream().forEach(entry -> {
 				try {
 					s.setTimestamp(1, Timestamp.from(entry.getValue().atZone(ZoneId.systemDefault()).toInstant()));
 					s.setLong(2, entry.getKey());
