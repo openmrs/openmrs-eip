@@ -1190,4 +1190,71 @@
         <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_sent_by_sender" columnDataType="DATETIME(3)" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20220928-1201">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_archive"/>
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_archive table</comment>
+
+        <createTable tableName="receiver_sync_archive">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="model_class_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_payload" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="site_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_snapshot" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)" />
+            <column name="date_sent_by_sender" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="receiver_sync_archive_site_fk"
+                                 baseTableName="receiver_sync_archive"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220928-1202">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add status column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="status" type="VARCHAR(50)" defaultValue="NEW">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220928-1203">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="status" tableName="receiver_sync_request" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_sync_request.status</comment>
+
+        <addNotNullConstraint tableName="receiver_sync_request" columnName="status" columnDataType="VARCHAR(50)" />
+    </changeSet>
+
 </databaseChangeLog>

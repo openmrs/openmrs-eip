@@ -1,32 +1,25 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-/**
- * Encapsulates info about a sync message received by the receiver
- */
+import org.openmrs.eip.app.management.entity.AbstractEntity;
+import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.springframework.beans.BeanUtils;
+
 @Entity
-@Table(name = "receiver_sync_msg")
-public class SyncMessage extends AbstractEntity {
+@Table(name = "receiver_sync_archive")
+public class ReceiverSyncArchive extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
 	
-	public enum ReceiverSyncMessageStatus {
-		NEW, PROCESSED
-	}
-	
-	//Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
 	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
@@ -47,14 +40,15 @@ public class SyncMessage extends AbstractEntity {
 	private String messageUuid;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
-	@Access(AccessType.FIELD)
-	private ReceiverSyncMessageStatus status = ReceiverSyncMessageStatus.NEW;
-	
-	@NotNull
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
 	private LocalDateTime dateSentBySender;
+	
+	public ReceiverSyncArchive() {
+	}
+	
+	public ReceiverSyncArchive(SyncMessage syncMessage) {
+		BeanUtils.copyProperties(syncMessage, this, "id");
+	}
 	
 	/**
 	 * Gets the identifier

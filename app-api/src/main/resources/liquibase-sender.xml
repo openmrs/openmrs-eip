@@ -341,5 +341,14 @@
 
         <modifyDataType tableName="sender_retry_queue" columnName="date_created" newDataType="DATETIME(3)" />
     </changeSet>
+
+    <changeSet author="wluyima" id="20220928-1301">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="status" tableName="sender_sync_request" />
+        </preConditions>
+        <comment>Adding not null constraint to sender_sync_request.status</comment>
+
+        <addNotNullConstraint tableName="sender_sync_request" columnName="status" columnDataType="VARCHAR(50)" />
+    </changeSet>
     
 </databaseChangeLog>
