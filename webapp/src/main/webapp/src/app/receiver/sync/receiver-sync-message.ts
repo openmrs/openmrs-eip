@@ -13,4 +13,6 @@ export class ReceiverSyncMessage extends BaseErrorEntity {
 
 	site?: Site;
 
+	dateSentBySender?: string;
+
 }

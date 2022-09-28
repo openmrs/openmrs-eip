@@ -10,6 +10,7 @@
 		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@common-sender-site">Sender Site</th>
 		<th i18n="@@common-dateAdded">Date Added</th>
+		<th i18n="@@receiver-dateSentByRemoteSite">Date Sent By Remote Site</th>
 		<th i18n="@@common-action">Action</th>
 	</tr>
 	</thead>
@@ -20,6 +21,7 @@
 		<td>{{m.messageUuid}}</td>
 		<td>{{m.site?.name}}</td>
 		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+		<td>{{m.dateSentBySender | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 		<td>
 			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSyncMessage(m)"></i>
 		</td>
