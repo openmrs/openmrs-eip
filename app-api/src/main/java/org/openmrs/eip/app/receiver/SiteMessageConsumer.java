@@ -4,7 +4,6 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DELETE_SYNC_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.ArrayList;
@@ -38,8 +37,9 @@ public class SiteMessageConsumer implements Runnable {
 	protected static final String ENTITY = SyncMessage.class.getSimpleName();
 	
 	//Order by dateCreated may be just in case the DB is migrated and id change
-	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
+	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY
+	        + " m WHERE m.status = 'NEW' AND m.site = :" + PARAM_SITE
+	        + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
 	
 	private SiteInfo site;
 	
@@ -80,8 +80,7 @@ public class SiteMessageConsumer implements Runnable {
 			}
 			
 			try {
-				List<SyncMessage> syncMessages = producerTemplate.requestBodyAndHeader(GET_JPA_URI, null,
-				    JpaConstants.JPA_PARAMETERS_HEADER, singletonMap(PARAM_SITE, site), List.class);
+				List<SyncMessage> syncMessages = fetchNextSyncMessageBatch();
 				
 				if (syncMessages.isEmpty()) {
 					if (log.isDebugEnabled()) {
@@ -145,6 +144,11 @@ public class SiteMessageConsumer implements Runnable {
 			AppUtils.shutdown();
 		}
 		
+	}
+	
+	protected List<SyncMessage> fetchNextSyncMessageBatch() throws Exception {
+		return producerTemplate.requestBodyAndHeader(GET_JPA_URI, null, JpaConstants.JPA_PARAMETERS_HEADER,
+		    singletonMap(PARAM_SITE, site), List.class);
 	}
 	
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
@@ -213,24 +217,8 @@ public class SiteMessageConsumer implements Runnable {
 		log.info("Submitting sync message to the processor");
 		
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
+		
 		CamelUtils.send(URI_MSG_PROCESSOR, exchange);
-		
-		boolean delete = exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class);
-		
-		final Long id = msg.getId();
-		if (delete) {
-			if (log.isDebugEnabled()) {
-				log.debug("Removing from the sync message queue an item with id: " + id);
-			}
-			
-			producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + id, null);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully removed the from sync message queue an item with id: " + id);
-			}
-		} else {
-			log.warn("Can't remove sync message from the queue, looks like something went wrong or it is a bug");
-		}
 	}
 	
 	/**

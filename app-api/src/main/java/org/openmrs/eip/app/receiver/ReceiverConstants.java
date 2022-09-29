@@ -37,8 +37,6 @@ public class ReceiverConstants {
 	public static final String EX_PROP_METADATA = "sync-metadata";
 	
 	public static final String EX_PROP_IS_FILE = "is-file";
-
-    public static final String EX_PROP_DELETE_SYNC_MSG = "org.openmrs.eip.app.receiver.SiteMessageConsumer-deleteSyncMsg";
 	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	

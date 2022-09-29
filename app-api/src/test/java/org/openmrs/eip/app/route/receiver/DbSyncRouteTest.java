@@ -3,11 +3,9 @@ package org.openmrs.eip.app.route.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DELETE_SYNC_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
@@ -116,7 +114,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
-		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -140,7 +137,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
-		assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 	@Test
@@ -207,7 +203,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
-		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -599,7 +594,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
-		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -645,7 +639,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
-		assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 }

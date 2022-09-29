@@ -22,7 +22,7 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverTest {
 	private ReceiverSyncMessageController controller;
 	
 	@Test
-	public void shouldGetAllSyncMessages() {
+	public void shouldGetAllUnProcessedSyncMessages() {
 		Map result = controller.getAll();
 		assertEquals(2, result.size());
 		assertEquals(3, result.get("count"));

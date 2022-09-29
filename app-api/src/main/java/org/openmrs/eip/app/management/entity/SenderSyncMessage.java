@@ -47,7 +47,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
 	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
 	

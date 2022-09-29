@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DELETE_SYNC_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
@@ -110,7 +109,6 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertNotNull(errorItem.getDateCreated());
 		assertEquals(siteInfo, errorItem.getSite());
 		assertNull(errorItem.getDateChanged());
-		assertTrue(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG, false, Boolean.class));
 	}
 	
 	@Test
@@ -163,7 +161,6 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertEquals(2, failedEntities.size());
 		assertTrue(failedEntities.contains(retryItem.getModelClassName() + "#" + retryItem.getIdentifier()));
 		assertTrue(failedEntities.contains(PatientModel.class.getName() + "#" + retryItem.getIdentifier()));
-		assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 	@Test

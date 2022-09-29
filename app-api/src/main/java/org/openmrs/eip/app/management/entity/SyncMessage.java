@@ -48,7 +48,7 @@ public class SyncMessage extends AbstractEntity {
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
 	private ReceiverSyncMessageStatus status = ReceiverSyncMessageStatus.NEW;
 	
@@ -155,6 +155,15 @@ public class SyncMessage extends AbstractEntity {
 	}
 	
 	/**
+	 * Gets the status
+	 *
+	 * @return the status
+	 */
+	public ReceiverSyncMessageStatus getStatus() {
+		return status;
+	}
+	
+	/**
 	 * Gets the dateSentBySender
 	 *
 	 * @return the dateSentBySender
@@ -172,11 +181,18 @@ public class SyncMessage extends AbstractEntity {
 		this.dateSentBySender = dateSentBySender;
 	}
 	
+	/**
+	 * Sets the status of the sync message to PROCESSED
+	 */
+	public void markAsProcessed() {
+		this.status = ReceiverSyncMessageStatus.PROCESSED;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid
-		        + ", dateSentBySender=" + dateSentBySender + "}";
+		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", status=" + status + ", messageUuid="
+		        + messageUuid + ", dateSentBySender=" + dateSentBySender + "}";
 	}
 	
 }
