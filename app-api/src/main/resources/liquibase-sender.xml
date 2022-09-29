@@ -351,4 +351,17 @@
         <addNotNullConstraint tableName="sender_sync_request" columnName="status" columnDataType="VARCHAR(50)" />
     </changeSet>
     
+    <changeSet author="dchirinda" id="20220929-1500">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="event_date" tableName="sender_sync_message" />
+            </not>
+        </preConditions>
+        <comment>Add event_date column to sender_sync_message table</comment>
+
+        <addColumn tableName="sender_sync_message">
+            <column name="event_date" type="DATETIME(3)"></column>
+        </addColumn>
+    </changeSet>
+    
 </databaseChangeLog>
