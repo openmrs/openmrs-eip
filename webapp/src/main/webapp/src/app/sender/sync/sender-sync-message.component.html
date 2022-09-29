@@ -9,6 +9,7 @@
 		<th i18n="@@common-operation">Operation</th>
 		<th i18n="@@common-status">Status</th>
 		<th i18n="@@common-dateAdded">Date Added</th>
+		<th i18n="@@common-dateSent">Date Sent</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -27,6 +28,7 @@
 			<i class="bi-envelope-check-fill text-success ui-cursor-pointer" [hidden]="m.status != 'SENT'" [ngbTooltip]="statusSentTemplate" [openDelay]="1000"></i>
 		</td>
 		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+		<td>{{m.dateSent | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 	</tr>
 	</tbody>
 </table>

@@ -285,7 +285,7 @@
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="DATETIME(3)" />
+            <column name="date_sent" type="DATETIME(3)" />
         </createTable>
 
     </changeSet>

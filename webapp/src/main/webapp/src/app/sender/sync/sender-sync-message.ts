@@ -14,4 +14,6 @@ export class SenderSyncMessage extends BaseEntity {
 
 	status?: string;
 
+	dateSent?: string;
+
 }

@@ -51,9 +51,9 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Access(AccessType.FIELD)
 	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
 	
-	@Column(name = "date_changed")
+	@Column(name = "date_sent")
 	@Access(AccessType.FIELD)
-	private Date dateChanged;
+	private Date dateSent;
 	
 	public String getTableName() {
 		return tableName;
@@ -107,20 +107,20 @@ public class SenderSyncMessage extends AbstractEntity {
 		return status;
 	}
 	
-	public Date getDateChanged() {
-		return dateChanged;
+	public Date getDateSent() {
+		return dateSent;
 	}
 	
 	public void markAsSent() {
 		this.status = SenderSyncMessageStatus.SENT;
-		this.dateChanged = new Date();
+		this.dateSent = new Date();
 	}
 	
 	@Override
 	public String toString() {
 		return "SenderSyncMessage [tableName=" + tableName + ", identifier=" + identifier + ", operation=" + operation
 		        + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid + ", snapshot=" + snapshot + ", status="
-		        + status + ", dateChanged=" + dateChanged + "]";
+		        + status + ", dateSent=" + dateSent + "]";
 	}
 	
 }
