@@ -6,6 +6,9 @@
 
         <log message="Processing message: ${body}" />
 
+        <setProperty name="${routeId}-message">
+            <simple>${body}</simple>
+        </setProperty>
         <setProperty name="entity-payload">
             <simple>${body.entityPayload}</simple>
         </setProperty>
@@ -55,6 +58,20 @@
         </setBody>
 
         <toD uri="direct:{{message.destination}}" />
+
+        <log loggingLevel="DEBUG" message="Updating status to PROCESSED for sync message with id: ${exchangeProperty.message-processor-message.id}" />
+
+        <setBody>
+            <simple>${exchangeProperty.message-processor-message}</simple>
+        </setBody>
+
+        <script>
+            <spel>#{body.markAsProcessed()}</spel>
+        </script>
+
+        <toD uri="jpa:SyncMessage" />
+
+        <log loggingLevel="DEBUG" message="Successfully update status for sync message with id: ${exchangeProperty.message-processor-message.id}" />
 
         <log message="Done processing message" />
 

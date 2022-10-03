@@ -15,29 +15,32 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.SyncMessage.ReceiverSyncMessageStatus;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncModel;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 @Sql(scripts = "classpath:mgt_receiver_retry_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+@TestPropertySource(properties = "logging.level." + ROUTE_ID_MSG_PROCESSOR + "=DEBUG")
 public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 	
 	@EndpointInject("mock:" + ROUTE_ID_INBOUND_DB_SYNC)
-	private MockEndpoint mockInboundDbSyncEndpoint;
+	private MockEndpoint mockDbSyncEndpoint;
 	
 	@Before
 	public void setup() throws Exception {
-		mockInboundDbSyncEndpoint.reset();
+		mockDbSyncEndpoint.reset();
 		advise(ROUTE_ID_MSG_PROCESSOR, new AdviceWithRouteBuilder() {
 			
 			@Override
 			public void configure() {
-				interceptSendToEndpoint(URI_INBOUND_DB_SYNC).skipSendToOriginalEndpoint().to(mockInboundDbSyncEndpoint);
+				interceptSendToEndpoint(URI_INBOUND_DB_SYNC).skipSendToOriginalEndpoint().to(mockDbSyncEndpoint);
 			}
 			
 		});
@@ -56,11 +59,11 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setEntityPayload("{}");
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
-		mockInboundDbSyncEndpoint.expectedMessageCount(0);
+		mockDbSyncEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
-		mockInboundDbSyncEndpoint.assertIsSatisfied();
+		mockDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
 	}
@@ -73,38 +76,34 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setEntityPayload("{}");
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
-		mockInboundDbSyncEndpoint.expectedMessageCount(0);
+		mockDbSyncEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
-		mockInboundDbSyncEndpoint.assertIsSatisfied();
+		mockDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
 	}
 	
 	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldProcessAMessageForAnEntityWithNoRetryItems() throws Exception {
-		final String modelClass = PersonModel.class.getName();
-		final String entityId = "uuid-3";
-		final String payload = "{}";
-		final SiteInfo site = new SiteInfo();
-		SyncMessage message = new SyncMessage();
-		message.setModelClassName(modelClass);
-		message.setIdentifier(entityId);
-		message.setEntityPayload(payload);
-		message.setSite(site);
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(message);
-		mockInboundDbSyncEndpoint.expectedMessageCount(1);
-		mockInboundDbSyncEndpoint.expectedBodyReceived().body(SyncModel.class).isNotNull();
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_MODEL_CLASS, modelClass);
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_ENTITY_ID, entityId);
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_PAYLOAD, payload);
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SITE, site);
+		SyncMessage msg = TestUtils.getEntity(SyncMessage.class, 2L);
+		assertEquals(ReceiverSyncMessageStatus.NEW, msg.getStatus());
+		exchange.getIn().setBody(msg);
+		mockDbSyncEndpoint.expectedMessageCount(1);
+		mockDbSyncEndpoint.expectedBodyReceived().body(SyncModel.class).isNotNull();
+		mockDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_MODEL_CLASS, msg.getModelClassName());
+		mockDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_ENTITY_ID, msg.getIdentifier());
+		mockDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_PAYLOAD, msg.getEntityPayload());
+		mockDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SITE, msg.getSite());
 		
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
-		mockInboundDbSyncEndpoint.assertIsSatisfied();
+		mockDbSyncEndpoint.assertIsSatisfied();
+		assertEquals(ReceiverSyncMessageStatus.PROCESSED, TestUtils.getEntity(SyncMessage.class, 2L).getStatus());
 	}
 	
 }
