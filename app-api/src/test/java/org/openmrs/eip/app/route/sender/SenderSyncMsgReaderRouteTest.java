@@ -73,6 +73,8 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 		assertEquals(msgCount, msgs.size());
 		assertTrue(msgs.get(0).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
 		assertTrue(msgs.get(1).getDateCreated().getTime() > (msgs.get(2).getDateCreated().getTime()));
+		assertTrue(msgs.get(0).getDateSent().getTime() < (msgs.get(2).getDateSent().getTime()));
+		assertTrue(msgs.get(0).getEventDate().getTime() < (msgs.get(2).getEventDate().getTime()));
 		mockProcessor.expectedBodyReceived().body(List.class).isEqualTo(msgs);
 		List<SenderSyncMessage> processedMsgs = new ArrayList();
 		mockProcessor.whenAnyExchangeReceived(e -> {

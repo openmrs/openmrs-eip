@@ -13,7 +13,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let m of syncMessages">
+	<tr *ngFor="let m of syncMessages" ngbTooltip="{{ 'Event Date: ' +  (m.eventDate | date:'yyyy-MM-dd HH:mm:ss')}}" [openDelay]="1000">
 		<td>{{m.tableName}}</td>
 		<td>{{m.identifier}}</td>
 		<td>{{m.messageUuid}}</td>
@@ -41,3 +41,4 @@
 <ng-template #statusSentTemplate>
 	<span i18n="@@common-sent">Sent</span>
 </ng-template>
+

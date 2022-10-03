@@ -56,7 +56,6 @@ public class SenderSyncMessage extends AbstractEntity {
 	private Date dateSent;
 	
 	@Column(name = "event_date")
-	@Access(AccessType.FIELD)
 	private Date eventDate;
 	
 	public String getTableName() {

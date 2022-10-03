@@ -17,8 +17,7 @@
                 #{body.setDateCreated(new java.util.Date())}
                 #{body.setMessageUuid(T(java.util.UUID).randomUUID().toString())}
                 #{body.setRequestUuid(getProperty('event').requestUuid)}
-                #{body.setEventDate(body.getDateCreated())}
-                
+                #{body.setEventDate(getProperty('dbzmEvent').dateCreated)}
             </spel>
         </script>
         
