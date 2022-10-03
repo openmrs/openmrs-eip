@@ -1,10 +1,13 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "receiver_retry_queue")
@@ -25,6 +28,10 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	@ManyToOne
 	@JoinColumn(name = "site_id", updatable = false)
 	private SiteInfo site;
+	
+	@NotNull
+	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
+	private LocalDateTime dateSentBySender;
 	
 	/**
 	 * Gets the modelClassName
@@ -98,10 +105,28 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 		this.site = site;
 	}
 	
+	/**
+	 * Gets the dateSentBySender
+	 *
+	 * @return the dateSentBySender
+	 */
+	public LocalDateTime getDateSentBySender() {
+		return dateSentBySender;
+	}
+	
+	/**
+	 * Sets the dateSentBySender
+	 *
+	 * @param dateSentBySender the dateSentBySender to set
+	 */
+	public void setDateSentBySender(LocalDateTime dateSentBySender) {
+		this.dateSentBySender = dateSentBySender;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
-		        + ", attemptCount=" + getAttemptCount() + ", site=" + site + "}";
+		        + ", attemptCount=" + getAttemptCount() + ", site=" + site + ", dateSentBySender=" + dateSentBySender + "}";
 	}
 	
 }

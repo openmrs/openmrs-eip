@@ -56,8 +56,6 @@
 
         <toD uri="direct:{{message.destination}}" />
 
-        <log message="Done processing message" />
-
         <log loggingLevel="DEBUG" message="End: ${routeId}" />
 
     </route>

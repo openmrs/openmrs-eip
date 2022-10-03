@@ -1164,7 +1164,7 @@
         <comment>Add date_sent_by_sender column to receiver_sync_msg table</comment>
 
         <addColumn tableName="receiver_sync_msg">
-            <column name="date_sent_by_sender" type="DATETIME(3)" />
+            <column name="date_sent_by_sender" type="DATETIME" />
         </addColumn>
     </changeSet>
 
@@ -1189,7 +1189,7 @@
         </preConditions>
         <comment>Adding not null constraint to receiver_sync_msg.date_sent_by_sender</comment>
 
-        <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_sent_by_sender" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_sent_by_sender" columnDataType="DATETIME" />
     </changeSet>
 
     <changeSet author="wluyima" id="20220928-1201">
@@ -1220,7 +1220,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="message_uuid" type="VARCHAR(38)" />
-            <column name="date_sent_by_sender" type="DATETIME(3)">
+            <column name="date_sent_by_sender" type="DATETIME">
                 <constraints nullable="false" />
             </column>
             <column name="date_created" type="DATETIME(3)">
@@ -1268,7 +1268,7 @@
         <comment>Add date_sent_by_sender column to receiver_retry_queue table</comment>
 
         <addColumn tableName="receiver_retry_queue">
-            <column name="date_sent_by_sender" type="DATETIME(3)" />
+            <column name="date_sent_by_sender" type="DATETIME" />
         </addColumn>
     </changeSet>
 
@@ -1281,7 +1281,7 @@
         <comment>Add date_sent_by_sender column to receiver_conflict_queue table</comment>
 
         <addColumn tableName="receiver_conflict_queue">
-            <column name="date_sent_by_sender" type="DATETIME(3)" />
+            <column name="date_sent_by_sender" type="DATETIME" />
         </addColumn>
     </changeSet>
 
@@ -1321,7 +1321,7 @@
         </preConditions>
         <comment>Adding not null constraint to receiver_retry_queue.date_sent_by_sender</comment>
 
-        <addNotNullConstraint tableName="receiver_retry_queue" columnName="date_sent_by_sender" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint tableName="receiver_retry_queue" columnName="date_sent_by_sender" columnDataType="DATETIME" />
     </changeSet>
 
     <changeSet author="wluyima" id="20220930-1206">
@@ -1330,7 +1330,7 @@
         </preConditions>
         <comment>Adding not null constraint to receiver_conflict_queue.date_sent_by_sender</comment>
 
-        <addNotNullConstraint tableName="receiver_conflict_queue" columnName="date_sent_by_sender" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint tableName="receiver_conflict_queue" columnName="date_sent_by_sender" columnDataType="DATETIME" />
     </changeSet>
 
 </databaseChangeLog>

@@ -4,7 +4,9 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +58,15 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ReceiverActiveMqMessagePublisher messagePublisher;
 	
+	private String messageProcessorUri;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param threadCount the number of threads to use to sync messages in parallel
 	 * @param msgExecutor {@link ExecutorService} instance to messages in parallel
 	 */
-	public SiteMessageConsumer(SiteInfo site, int threadCount, ExecutorService msgExecutor) {
+	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, ExecutorService msgExecutor) {
+		this.messageProcessorUri = messageProcessorUri;
 		this.site = site;
 		this.threadCount = threadCount;
 		this.msgExecutor = msgExecutor;
@@ -218,7 +224,38 @@ public class SiteMessageConsumer implements Runnable {
 		
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
 		
-		CamelUtils.send(URI_MSG_PROCESSOR, exchange);
+		CamelUtils.send(messageProcessorUri, exchange);
+		
+		boolean movedToConflict = exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, false, Boolean.class);
+		boolean movedToError = exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, false, Boolean.class);
+		
+		final Long id = msg.getId();
+		if (movedToConflict || movedToError) {
+			if (log.isDebugEnabled()) {
+				log.debug("Removing from the sync message queue an item with id: " + id);
+			}
+			
+			producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + id, null);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Successfully removed from sync message queue an item with id: " + id);
+			}
+		} else if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
+			if (log.isDebugEnabled()) {
+				log.debug("Updating status from " + msg.getStatus() + " to PROCESSED for sync message with id: " + id);
+			}
+			
+			msg.markAsProcessed();
+			producerTemplate.sendBody("jpa:SyncMessage", msg);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Successfully updated status for sync message with id: " + id);
+			}
+		} else {
+			throw new EIPException("Something went wrong while processing sync message with id: " + id);
+		}
+		
+		log.info("Done processing message");
 	}
 	
 	/**

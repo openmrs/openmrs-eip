@@ -4,6 +4,7 @@ import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class SiteMessageConsumerTest {
 		Whitebox.setInternalState(messagePublisher, ProducerTemplate.class, mockProducerTemplate);
 		
 		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(siteInfo, size, executor);
+		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, messagePublisher);
 	}
@@ -99,6 +100,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -133,6 +135,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -167,6 +170,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				threadNames.add(Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return exchange;
 			});
 		}
@@ -217,6 +221,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -275,6 +280,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -343,6 +349,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -397,6 +404,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -440,6 +448,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -483,6 +492,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -526,6 +536,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -569,6 +580,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -612,6 +624,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}
@@ -655,6 +668,7 @@ public class SiteMessageConsumerTest {
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
 			});
 		}

@@ -1,11 +1,12 @@
 package org.openmrs.eip.app.receiver;
 
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -96,7 +97,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				
-				siteExecutor.execute(new SiteMessageConsumer(site, threadCount, msgExecutor));
+				siteExecutor.execute(new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threadCount, msgExecutor));
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Started sync message consumer for site: " + site);
