@@ -3,17 +3,18 @@ package org.openmrs.eip.app.route.receiver;
 import static java.util.Collections.synchronizedSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_MSG_DESTINATION;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_MSG_DESTINATION;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_RETRY;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_RETRY;
 import static org.openmrs.eip.app.route.TestUtils.getEntities;
 import static org.openmrs.eip.app.route.receiver.ReceiverRetryRouteTest.ROUTE_ID_DESTINATION;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -170,6 +171,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
 		retry.setExceptionType(EIPException.class.getName());
+		retry.setDateSentBySender(LocalDateTime.now());
 		TestUtils.saveEntity(retry);
 		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
 		mockMsgProcessorEndpoint.expectedMessageCount(1);

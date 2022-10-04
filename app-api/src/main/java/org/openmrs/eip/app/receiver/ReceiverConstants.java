@@ -40,11 +40,11 @@ public class ReceiverConstants {
 	
 	public static final String EX_PROP_IS_FILE = "is-file";
 
-	public static final String EX_PROP_MSG_PROCESSED = "org.openmrs.eip.app.receiver.SiteMessageConsumer-msgProcessed";
+	public static final String EX_PROP_MSG_PROCESSED = "org.openmrs.eip.app.receiver.sync-msgProcessed";
 
-    public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.SiteMessageConsumer-movedToConflictQueue";
+    public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToConflictQueue";
 
-    public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.SiteMessageConsumer-movedToErrorQueue";
+    public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToErrorQueue";
 
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	

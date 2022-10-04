@@ -81,6 +81,7 @@
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
                                 #{getProperty('retry-item').setDateCreated(new java.util.Date())}
                                 #{getProperty('retry-item').setSite(getProperty('site'))}
+                                #{getProperty('retry-item').setDateSentBySender(getProperty('date-sent-by-sender'))}
                             </spel>
                         </script>
                         <setBody>
@@ -93,7 +94,7 @@
 
                         <log message="Successfully saved retry item" loggingLevel="DEBUG" />
 
-                        <setProperty name="org.openmrs.eip.app.receiver.SiteMessageConsumer-deleteSyncMsg">
+                        <setProperty name="org.openmrs.eip.app.receiver.sync-movedToErrorQueue">
                             <simple>true</simple>
                         </setProperty>
                     </when>

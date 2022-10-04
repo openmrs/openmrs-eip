@@ -226,7 +226,7 @@
                         </when>
                     </choice>
 
-                    <setProperty name="org.openmrs.eip.app.receiver.SiteMessageConsumer-msgProcessed">
+                    <setProperty name="org.openmrs.eip.app.receiver.sync-msgProcessed">
                         <simple>true</simple>
                     </setProperty>
 
@@ -280,7 +280,7 @@
 
                         <log message="Successfully saved conflict item" loggingLevel="DEBUG" />
 
-                        <setProperty name="org.openmrs.eip.app.receiver.SiteMessageConsumer-movedToConflictQueue">
+                        <setProperty name="org.openmrs.eip.app.receiver.sync-movedToConflictQueue">
                             <simple>true</simple>
                         </setProperty>
                     </doCatch>

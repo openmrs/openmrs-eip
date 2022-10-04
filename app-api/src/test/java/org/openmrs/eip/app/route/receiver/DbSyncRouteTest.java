@@ -146,7 +146,9 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
-		//assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
+		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
 	}
 	
 	@Test
