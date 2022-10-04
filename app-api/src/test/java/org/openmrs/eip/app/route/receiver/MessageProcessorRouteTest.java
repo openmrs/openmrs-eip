@@ -3,10 +3,13 @@ package org.openmrs.eip.app.route.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DATE_SENT_BY_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_INBOUND_DB_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_INBOUND_DB_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
+
+import java.time.LocalDateTime;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -54,6 +57,8 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setModelClassName(PersonModel.class.getName());
 		message.setIdentifier("uuid-1");
 		message.setEntityPayload("{}");
+		final LocalDateTime dateSentBySender = LocalDateTime.now();
+		message.setDateSentBySender(dateSentBySender);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
 		mockInboundDbSyncEndpoint.expectedMessageCount(0);
@@ -63,6 +68,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
+		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
 	}
 	
 	@Test
@@ -71,6 +77,8 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setModelClassName(PatientModel.class.getName());
 		message.setIdentifier("uuid-1");
 		message.setEntityPayload("{}");
+		final LocalDateTime dateSentBySender = LocalDateTime.now();
+		message.setDateSentBySender(dateSentBySender);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
 		mockInboundDbSyncEndpoint.expectedMessageCount(0);
@@ -80,6 +88,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
+		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
 	}
 	
 	@Test
@@ -93,6 +102,8 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setIdentifier(entityId);
 		message.setEntityPayload(payload);
 		message.setSite(site);
+		final LocalDateTime dateSentBySender = LocalDateTime.now();
+		message.setDateSentBySender(dateSentBySender);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
 		mockInboundDbSyncEndpoint.expectedMessageCount(1);
@@ -105,6 +116,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
+		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
 	}
 	
 }

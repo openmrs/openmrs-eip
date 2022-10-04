@@ -3,11 +3,16 @@ package org.openmrs.eip.app.route.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DATE_SENT_BY_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SITE;
@@ -16,6 +21,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_DBSYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_UPDATE_SEARCH_INDEX;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_DBSYNC;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +120,9 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
+		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
 	}
 	
 	@Test
@@ -137,6 +146,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		mockUpdateSearchIndexEndpoint.assertIsSatisfied();
 		mockClearCacheEndpoint.assertIsSatisfied();
+		//assertNull(exchange.getProperty(EX_PROP_DELETE_SYNC_MSG));
 	}
 	
 	@Test
@@ -556,7 +566,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldAddTheMessageToTheRetryQueueIfAConflictIsDetected() throws Exception {
+	public void shouldAddTheMessageToTheConflictQueueIfAConflictIsDetected() throws Exception {
 		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
 		final Class<? extends BaseModel> modelClass = UserModel.class;
 		final String uuid = "user-uuid";
@@ -568,6 +578,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		syncModel.setModel(model);
 		syncModel.setMetadata(new SyncMetadata());
 		Exchange exchange = new DefaultExchange(camelContext);
+		LocalDateTime dateSentBySender = LocalDateTime.now();
+		exchange.setProperty(EX_PROP_DATE_SENT_BY_SENDER, dateSentBySender);
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
 		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
@@ -591,13 +603,16 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertEquals(modelClass.getName(), conflicts.get(0).getModelClassName());
 		assertEquals(uuid, conflicts.get(0).getIdentifier());
 		assertEquals(payLoad, conflicts.get(0).getEntityPayload());
+		assertEquals(dateSentBySender, conflicts.get(0).getDateSentBySender());
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
+		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
+		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	
 	@Test
-	public void shouldAddTheMessageToTheRetryQueueIfAConflictIsDetectedForARetryItem() throws Exception {
+	public void shouldAddTheMessageToTheConflictQueueIfAConflictIsDetectedForARetryItem() throws Exception {
 		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
 		final Class<? extends BaseModel> modelClass = UserModel.class;
 		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
@@ -614,6 +629,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		retry.setIdentifier(uuid);
 		retry.setEntityPayload(payLoad);
 		retry.setSite(siteInfo);
+		LocalDateTime dateSentBySender = LocalDateTime.now();
+		retry.setDateSentBySender(dateSentBySender);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
@@ -636,9 +653,12 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertEquals(modelClass.getName(), conflicts.get(0).getModelClassName());
 		assertEquals(uuid, conflicts.get(0).getIdentifier());
 		assertEquals(payLoad, conflicts.get(0).getEntityPayload());
+		assertEquals(dateSentBySender, conflicts.get(0).getDateSentBySender());
 		assertFalse(conflicts.get(0).getResolved());
 		assertEquals(siteInfo, conflicts.get(0).getSite());
 		assertNotNull(conflicts.get(0).getDateCreated());
+		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
+		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	
 }
