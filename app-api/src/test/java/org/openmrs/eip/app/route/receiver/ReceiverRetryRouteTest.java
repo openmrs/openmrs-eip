@@ -2,10 +2,14 @@ package org.openmrs.eip.app.route.receiver;
 
 import static java.util.Collections.synchronizedSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.TestConstants.URI_ERROR_HANDLER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_MSG_DESTINATION;
@@ -31,7 +35,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.route.TestUtils;
@@ -102,6 +105,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 			receivedBodies.add(e.getIn().getBody(SyncModel.class));
 			receivedRetryItemIds.add(e.getProperty(EX_PROP_RETRY_ITEM_ID, Long.class));
 			receivedRetryItems.add(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class));
+			e.setProperty(EX_PROP_MSG_PROCESSED, true);
 		});
 		
 		producerTemplate.send(URI_RETRY, exchange);
@@ -133,16 +137,23 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 			
 			@Override
 			public void configure() {
-				onException(EIPException.class).to(TestConstants.URI_ERROR_HANDLER).process(e -> failedExchanges.add(e));
+				onException(EIPException.class).to(URI_ERROR_HANDLER).process(e -> failedExchanges.add(e));
 			}
 			
 		});
 		
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		mockMsgProcessorEndpoint.expectedMessageCount(3);
-		mockMsgProcessorEndpoint.whenExchangeReceived(2, e -> {
-			exchange.getProperty(EX_PROP_FAILED_ENTITIES, Set.class).addAll(
-			    Arrays.asList(PersonModel.class.getName() + "#uuid-1", PatientModel.class.getName() + "#uuid-1"));
+		mockMsgProcessorEndpoint.whenAnyExchangeReceived(e -> {
+			if (e.getProperty(EX_PROP_RETRY_ITEM_ID, Long.class) == 1L) {
+				ReceiverRetryQueueItem item = e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class);
+				exchange.getProperty(EX_PROP_FAILED_ENTITIES, Set.class)
+				        .addAll(Arrays.asList(item.getModelClassName() + "#" + item.getIdentifier(),
+				            PatientModel.class.getName() + "#" + item.getIdentifier()));
+				throw new EIPException("Some error");
+			} else {
+				e.setProperty(EX_PROP_MSG_PROCESSED, true);
+			}
 		});
 		
 		producerTemplate.send(URI_RETRY, exchange);
@@ -155,13 +166,14 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount().intValue());
 		}
 		retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
-		assertEquals(2, retries.size());
-		assertEquals(2, retries.get(0).getId().longValue());
-		assertEquals(3, retries.get(1).getId().longValue());
+		assertEquals(3, retries.size());
+		assertEquals(1, retries.get(0).getId().longValue());
+		assertEquals(2, retries.get(1).getId().longValue());
+		assertEquals(3, retries.get(2).getId().longValue());
 	}
 	
 	@Test
-	public void shouldProcessARetryItem() throws Exception {
+	public void shouldProcessARetryItemAndRemoveItFromTheErrorQueue() throws Exception {
 		final String uuid = "person-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
@@ -181,14 +193,85 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_ENTITY_ID, uuid);
 		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_FAILED_ENTITIES, synchronizedSet(new HashSet()));
 		final AtomicInteger attemptCountHolder = new AtomicInteger();
-		mockMsgProcessorEndpoint.whenAnyExchangeReceived(
-		    e -> attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount()));
+		mockMsgProcessorEndpoint.whenAnyExchangeReceived(e -> {
+			attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount());
+			e.setProperty(EX_PROP_MSG_PROCESSED, true);
+		});
 		
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
 		
 		mockMsgProcessorEndpoint.assertIsSatisfied();
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
+	}
+	
+	@Test
+	public void shouldProcessARetryItemAndRemoveItFromTheErrorQueueIfAConflictIsEncountered() throws Exception {
+		final String uuid = "person-uuid";
+		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
+		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setModelClassName(PersonModel.class.getName());
+		retry.setIdentifier(uuid);
+		retry.setDateCreated(new Date());
+		retry.setAttemptCount(1);
+		retry.setEntityPayload("{}");
+		retry.setExceptionType(EIPException.class.getName());
+		retry.setDateSentBySender(LocalDateTime.now());
+		TestUtils.saveEntity(retry);
+		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
+		mockMsgProcessorEndpoint.expectedMessageCount(1);
+		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_RETRY_ITEM_ID, retry.getId());
+		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_RETRY_ITEM, retry);
+		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_MODEL_CLASS, PersonModel.class.getName());
+		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_ENTITY_ID, uuid);
+		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_FAILED_ENTITIES, synchronizedSet(new HashSet()));
+		final AtomicInteger attemptCountHolder = new AtomicInteger();
+		mockMsgProcessorEndpoint.whenAnyExchangeReceived(e -> {
+			attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount());
+			e.setProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, true);
+		});
+		
+		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
+		
+		mockMsgProcessorEndpoint.assertIsSatisfied();
+		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
+		assertEquals(2, attemptCountHolder.get());
+	}
+	
+	@Test
+	public void shouldFailForAnUnknownOutComeWhenProcessingARetryItem() throws Exception {
+		final String uuid = "person-uuid";
+		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
+		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setModelClassName(PersonModel.class.getName());
+		retry.setIdentifier(uuid);
+		retry.setDateCreated(new Date());
+		retry.setAttemptCount(1);
+		retry.setEntityPayload("{}");
+		retry.setExceptionType(EIPException.class.getName());
+		retry.setDateSentBySender(LocalDateTime.now());
+		TestUtils.saveEntity(retry);
+		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
+		final AtomicInteger attemptCountHolder = new AtomicInteger();
+		mockMsgProcessorEndpoint.whenAnyExchangeReceived(
+		    e -> attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount()));
+		List<Exchange> failedExchanges = new ArrayList();
+		advise(ROUTE_ID_RETRY, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				onException(EIPException.class).to(URI_ERROR_HANDLER).process(e -> failedExchanges.add(e));
+			}
+			
+		});
+		
+		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
+		
+		assertNotNull(TestUtils.getEntity(ReceiverRetryQueueItem.class, retry.getId()));
+		assertEquals(2, attemptCountHolder.get());
+		assertEquals(1, failedExchanges.size());
+		assertEquals("Something went wrong while processing sync message with id: " + retry.getId(),
+		    getErrorMessage(failedExchanges.get(0)));
 	}
 	
 }

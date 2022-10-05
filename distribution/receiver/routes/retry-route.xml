@@ -64,11 +64,19 @@
 
                             <toD uri="direct:{{message.destination}}" />
 
-                            <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                            <choice>
+                                <when>
+                                    <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true || ${exchangeProperty.org.openmrs.eip.app.receiver.sync-movedToConflictQueue} == true</simple>
+                                    <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
-                            <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+                                    <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
 
-                            <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                    <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                </when>
+                                <otherwise>
+                                    <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Something went wrong while processing sync message with id: ${exchangeProperty.retry-item-id}" />
+                                </otherwise>
+                            </choice>
                         </otherwise>
                     </choice>
                 </split>
