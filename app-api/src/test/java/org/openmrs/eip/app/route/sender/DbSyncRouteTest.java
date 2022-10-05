@@ -2,14 +2,18 @@ package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_EVENT;
+import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_DBSYNC;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_DBSYNC;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
@@ -32,10 +36,14 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 		final String op = "c";
 		final String requestUuid = "some-request-uuid";
 		final boolean snapshot = true;
+	    DebeziumEvent  debeziumEvent = this.createDebeziumEvent(table, uuid, requestUuid, op);
+	    debeziumEvent.setDateCreated(new Date());
 		Event event = createEvent(table, null, uuid, op);
 		event.setSnapshot(snapshot);
 		event.setRequestUuid(requestUuid);
 		exchange.setProperty(EX_PROP_EVENT, event);
+		exchange.setProperty(EX_PROP_DBZM_EVENT, debeziumEvent);
+
 		
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
@@ -49,6 +57,8 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 		assertEquals(requestUuid, msg.getRequestUuid());
 		assertNotNull(msg.getDateCreated());
 		assertNotNull(msg.getMessageUuid());
+		assertNull(msg.getDateSent());
+		assertNotNull(msg.getEventDate());
 	}
 	
 }
