@@ -360,7 +360,9 @@
         <comment>Add event_date column to sender_sync_message table</comment>
 
         <addColumn tableName="sender_sync_message">
-            <column name="event_date" type="DATETIME(3)"></column>
+            <column name="event_date" type="DATETIME(3)">
+            	<constraints nullable="false"/>
+            </column>
         </addColumn>
     </changeSet>
     
