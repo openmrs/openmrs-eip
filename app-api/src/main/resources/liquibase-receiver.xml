@@ -1333,4 +1333,60 @@
         <addNotNullConstraint tableName="receiver_conflict_queue" columnName="date_sent_by_sender" columnDataType="DATETIME" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20221005-1101">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="message_uuid" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add message_uuid column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="message_uuid" type="VARCHAR(38)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221005-1102">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="message_uuid" tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Add message_uuid column to receiver_conflict_queue table</comment>
+
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="message_uuid" type="VARCHAR(38)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221005-1103">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="is_snapshot" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add is_snapshot column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221005-1104">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="is_snapshot" tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Add is_snapshot column to receiver_conflict_queue table</comment>
+
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

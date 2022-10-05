@@ -22,6 +22,9 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
+	@Column(name = "is_snapshot", nullable = false, updatable = false)
+	private Boolean snapshot = false;
+	
 	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
 	private String entityPayload;
 	
@@ -32,6 +35,9 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	@NotNull
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
 	private LocalDateTime dateSentBySender;
+	
+	@Column(name = "message_uuid", length = 38, updatable = false)
+	private String messageUuid;
 	
 	/**
 	 * Gets the modelClassName
@@ -67,6 +73,24 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	 */
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+	
+	/**
+	 * Gets the snapshot
+	 *
+	 * @return the snapshot
+	 */
+	public Boolean getSnapshot() {
+		return snapshot;
+	}
+	
+	/**
+	 * Sets the snapshot
+	 *
+	 * @param snapshot the snapshot to set
+	 */
+	public void setSnapshot(Boolean snapshot) {
+		this.snapshot = snapshot;
 	}
 	
 	/**
@@ -123,10 +147,29 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 		this.dateSentBySender = dateSentBySender;
 	}
 	
+	/**
+	 * Gets the messageUuid
+	 *
+	 * @return the messageUuid
+	 */
+	public String getMessageUuid() {
+		return messageUuid;
+	}
+	
+	/**
+	 * Sets the messageUuid
+	 *
+	 * @param messageUuid the messageUuid to set
+	 */
+	public void setMessageUuid(String messageUuid) {
+		this.messageUuid = messageUuid;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
-		        + ", attemptCount=" + getAttemptCount() + ", site=" + site + ", dateSentBySender=" + dateSentBySender + "}";
+		        + ", attemptCount=" + getAttemptCount() + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender="
+		        + dateSentBySender + ", messageUuid=" + messageUuid + "}";
 	}
 	
 }
