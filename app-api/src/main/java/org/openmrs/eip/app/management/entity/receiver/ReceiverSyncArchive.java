@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.springframework.beans.BeanUtils;
@@ -43,11 +45,19 @@ public class ReceiverSyncArchive extends AbstractEntity {
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
 	private LocalDateTime dateSentBySender;
 	
+	@Column(name = "date_received", updatable = false)
+	private Date dateReceived;
+	
 	public ReceiverSyncArchive() {
 	}
 	
 	public ReceiverSyncArchive(SyncMessage syncMessage) {
-		BeanUtils.copyProperties(syncMessage, this, "id");
+		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
+		setDateReceived(syncMessage.getDateCreated());
+	}
+	
+	public ReceiverSyncArchive(ReceiverRetryQueueItem retry) {
+		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
 	}
 	
 	/**
@@ -166,11 +176,29 @@ public class ReceiverSyncArchive extends AbstractEntity {
 		this.dateSentBySender = dateSentBySender;
 	}
 	
+	/**
+	 * Gets the dateReceived
+	 *
+	 * @return the dateReceived
+	 */
+	public Date getDateReceived() {
+		return dateReceived;
+	}
+	
+	/**
+	 * Sets the dateReceived
+	 *
+	 * @param dateReceived the dateReceived to set
+	 */
+	public void setDateReceived(Date dateReceived) {
+		this.dateReceived = dateReceived;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
 		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid
-		        + ", dateSentBySender=" + dateSentBySender + "}";
+		        + ", dateSentBySender=" + dateSentBySender + ", dateReceived=" + dateReceived + "}";
 	}
 	
 }

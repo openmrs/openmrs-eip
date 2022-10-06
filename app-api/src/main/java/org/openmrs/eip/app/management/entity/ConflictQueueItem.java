@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,6 +42,9 @@ public class ConflictQueueItem extends AbstractEntity {
 	
 	@Column(name = "message_uuid", length = 38, updatable = false)
 	private String messageUuid;
+	
+	@Column(name = "date_received", updatable = false)
+	private Date dateReceived;
 	
 	/**
 	 * Gets the modelClassName
@@ -186,11 +190,29 @@ public class ConflictQueueItem extends AbstractEntity {
 		this.messageUuid = messageUuid;
 	}
 	
+	/**
+	 * Gets the dateReceived
+	 *
+	 * @return the dateReceived
+	 */
+	public Date getDateReceived() {
+		return dateReceived;
+	}
+	
+	/**
+	 * Sets the dateReceived
+	 *
+	 * @param dateReceived the dateReceived to set
+	 */
+	public void setDateReceived(Date dateReceived) {
+		this.dateReceived = dateReceived;
+	}
+	
 	@Override
 	public String toString() {
 		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", payload="
 		        + entityPayload + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender=" + dateSentBySender
-		        + ", messageUuid=" + messageUuid + "}";
+		        + ", messageUuid=" + messageUuid + ", dateReceived=" + dateReceived + "}";
 	}
 	
 }

@@ -1223,6 +1223,7 @@
             <column name="date_sent_by_sender" type="DATETIME">
                 <constraints nullable="false" />
             </column>
+            <column name="date_received" type="DATETIME(3)" />
             <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
@@ -1386,6 +1387,32 @@
             <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false" />
             </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221007-1501">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="date_received" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add date_received column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="date_received" type="DATETIME(3)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221007-1203">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="date_received" tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Add date_received column to receiver_conflict_queue table</comment>
+
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="date_received" type="DATETIME(3)" />
         </addColumn>
     </changeSet>
 

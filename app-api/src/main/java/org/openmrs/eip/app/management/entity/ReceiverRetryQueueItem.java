@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,6 +39,9 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Column(name = "message_uuid", length = 38, updatable = false)
 	private String messageUuid;
+	
+	@Column(name = "date_received", updatable = false)
+	private Date dateReceived;
 	
 	/**
 	 * Gets the modelClassName
@@ -165,11 +169,29 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 		this.messageUuid = messageUuid;
 	}
 	
+	/**
+	 * Gets the dateReceived
+	 *
+	 * @return the dateReceived
+	 */
+	public Date getDateReceived() {
+		return dateReceived;
+	}
+	
+	/**
+	 * Sets the dateReceived
+	 *
+	 * @param dateReceived the dateReceived to set
+	 */
+	public void setDateReceived(Date dateReceived) {
+		this.dateReceived = dateReceived;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
 		        + ", attemptCount=" + getAttemptCount() + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender="
-		        + dateSentBySender + ", messageUuid=" + messageUuid + "}";
+		        + dateSentBySender + ", messageUuid=" + messageUuid + ", dateReceived=" + dateReceived + "}";
 	}
 	
 }
