@@ -37,6 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;
@@ -88,7 +90,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	@Sql(scripts = "classpath:mgt_receiver_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldLoadAllRetryItemsSortedByDateCreatedAndCallTheEventProcessorForEach() throws Exception {
 		final int retryCount = 5;
 		List<ReceiverRetryQueueItem> retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
@@ -128,7 +131,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	@Sql(scripts = "classpath:mgt_receiver_retry_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldFailIfAnEntityAlreadyHasAFailedRetryItemInTheCurrentIteration() throws Exception {
 		List<ReceiverRetryQueueItem> retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
 		assertEquals(5, retries.size());
@@ -173,17 +177,23 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
+	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldProcessARetryItemAndRemoveItFromTheErrorQueue() throws Exception {
 		final String uuid = "person-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
+		assertTrue(getEntities(ReceiverSyncArchive.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setMessageUuid("message-uuid");
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
+		retry.setSnapshot(true);
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
 		retry.setExceptionType(EIPException.class.getName());
 		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
+		retry.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		TestUtils.saveEntity(retry);
 		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
 		mockMsgProcessorEndpoint.expectedMessageCount(1);
@@ -203,6 +213,18 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		mockMsgProcessorEndpoint.assertIsSatisfied();
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
+		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
+		assertEquals(1, archives.size());
+		ReceiverSyncArchive archive = archives.get(0);
+		assertEquals(retry.getMessageUuid(), archive.getMessageUuid());
+		assertEquals(retry.getModelClassName(), archive.getModelClassName());
+		assertEquals(retry.getIdentifier(), archive.getIdentifier());
+		assertEquals(retry.getEntityPayload(), archive.getEntityPayload());
+		assertEquals(retry.getSite(), archive.getSite());
+		assertEquals(retry.getSnapshot(), archive.getSnapshot());
+		assertEquals(retry.getDateSentBySender(), archive.getDateSentBySender());
+		assertEquals(retry.getDateReceived(), archive.getDateReceived());
+		assertNotNull(retry.getDateCreated());
 	}
 	
 	@Test

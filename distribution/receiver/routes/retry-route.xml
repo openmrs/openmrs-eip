@@ -67,6 +67,26 @@
                             <choice>
                                 <when>
                                     <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true || ${exchangeProperty.org.openmrs.eip.app.receiver.sync-movedToConflictQueue} == true</simple>
+                                    <when>
+                                        <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true</simple>
+                                        <log message="Archiving the error item with id: ${exchangeProperty.retry-item-id}" />
+
+                                        <setBody>
+                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive(getProperty('retry-item'))}</spel>
+                                        </setBody>
+                                        <script>
+                                            <spel>
+                                                #{body.setDateCreated(new java.util.Date())}
+                                            </spel>
+                                        </script>
+
+                                        <log loggingLevel="DEBUG" message="Saving sync archive" />
+
+                                        <toD uri="jpa:ReceiverSyncArchive" />
+
+                                        <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
+                                    </when>
+
                                     <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
                                     <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
