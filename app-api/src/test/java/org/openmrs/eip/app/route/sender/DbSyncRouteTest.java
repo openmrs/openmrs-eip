@@ -21,44 +21,43 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_DBSYNC + "=DEBUG")
 public class DbSyncRouteTest extends BaseSenderRouteTest {
-	
-	@Override
-	public String getTestRouteFilename() {
-		return "db-sync-route";
-	}
-	
-	@Test
-	public void shouldCreateAndSaveTheSenderSyncMessageForTheEvent() {
-		final int count = TestUtils.getEntities(SenderSyncMessage.class).size();
-		DefaultExchange exchange = new DefaultExchange(camelContext);
-		final String table = "visit";
-		final String uuid = "some-uuid";
-		final String op = "c";
-		final String requestUuid = "some-request-uuid";
-		final boolean snapshot = true;
-	    DebeziumEvent  debeziumEvent = this.createDebeziumEvent(table, uuid, requestUuid, op);
-	    debeziumEvent.setDateCreated(new Date());
-		Event event = createEvent(table, null, uuid, op);
-		event.setSnapshot(snapshot);
-		event.setRequestUuid(requestUuid);
-		exchange.setProperty(EX_PROP_EVENT, event);
-		exchange.setProperty(EX_PROP_DBZM_EVENT, debeziumEvent);
 
-		
-		producerTemplate.send(URI_DBSYNC, exchange);
-		
-		List<SenderSyncMessage> syncMsgs = TestUtils.getEntities(SenderSyncMessage.class);
-		assertEquals(count + 1, syncMsgs.size());
-		SenderSyncMessage msg = syncMsgs.get(syncMsgs.size() - 1);
-		assertEquals(table, msg.getTableName());
-		assertEquals(uuid, msg.getIdentifier());
-		assertEquals(op, msg.getOperation());
-		assertEquals(snapshot, msg.getSnapshot());
-		assertEquals(requestUuid, msg.getRequestUuid());
-		assertNotNull(msg.getDateCreated());
-		assertNotNull(msg.getMessageUuid());
-		assertNull(msg.getDateSent());
-		assertNotNull(msg.getEventDate());
-	}
-	
+    @Override
+    public String getTestRouteFilename() {
+        return "db-sync-route";
+    }
+
+    @Test
+    public void shouldCreateAndSaveTheSenderSyncMessageForTheEvent() {
+        final int count = TestUtils.getEntities(SenderSyncMessage.class).size();
+        DefaultExchange exchange = new DefaultExchange(camelContext);
+        final String table = "visit";
+        final String uuid = "some-uuid";
+        final String op = "c";
+        final String requestUuid = "some-request-uuid";
+        final boolean snapshot = true;
+        DebeziumEvent debeziumEvent = this.createDebeziumEvent(table, requestUuid, uuid, op);
+        debeziumEvent.setDateCreated(new Date());
+        debeziumEvent.getEvent().setSnapshot(snapshot);
+        debeziumEvent.getEvent().setRequestUuid(requestUuid);
+        exchange.setProperty(EX_PROP_EVENT, debeziumEvent.getEvent());
+        exchange.setProperty(EX_PROP_DBZM_EVENT, debeziumEvent);
+
+        producerTemplate.send(URI_DBSYNC, exchange);
+
+        List<SenderSyncMessage> syncMsgs = TestUtils.getEntities(SenderSyncMessage.class);
+        assertEquals(count + 1, syncMsgs.size());
+        SenderSyncMessage msg = syncMsgs.get(syncMsgs.size() - 1);
+        assertEquals(table, msg.getTableName());
+        assertEquals(uuid, msg.getIdentifier());
+        assertEquals(op, msg.getOperation());
+        assertEquals(snapshot, msg.getSnapshot());
+        assertEquals(requestUuid, msg.getRequestUuid());
+        assertNotNull(msg.getDateCreated());
+        assertNotNull(msg.getMessageUuid());
+        assertNull(msg.getDateSent());
+        assertNotNull(msg.getEventDate());
+        assertEquals(msg.getEventDate().getTime(), debeziumEvent.getDateCreated().getTime());
+    }
+
 }

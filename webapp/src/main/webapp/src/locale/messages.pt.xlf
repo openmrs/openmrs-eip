@@ -397,5 +397,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-eventDate">
+			<segment>
+				<source>Event Date</source>
+				<target>Data Evento</target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
