@@ -15,12 +15,6 @@
         <setProperty name="entity-id">
             <simple>${body.identifier}</simple>
         </setProperty>
-        <setProperty name="site">
-            <simple>${body.site}</simple>
-        </setProperty>
-        <setProperty name="date-sent-by-sender">
-            <simple>${body.dateSentBySender}</simple>
-        </setProperty>
         <setProperty name="sync-message">
             <simple>${body}</simple>
         </setProperty>

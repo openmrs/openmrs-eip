@@ -3,7 +3,7 @@ package org.openmrs.eip.app.route.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_DATE_SENT_BY_SENDER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SYNC_MESSAGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_INBOUND_DB_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_INBOUND_DB_SYNC;
@@ -58,8 +58,6 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		message.setModelClassName(PersonModel.class.getName());
 		message.setIdentifier("uuid-1");
 		message.setEntityPayload("{}");
-		final LocalDateTime dateSentBySender = LocalDateTime.now();
-		message.setDateSentBySender(dateSentBySender);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(message);
 		mockInboundDbSyncEndpoint.expectedMessageCount(0);
@@ -69,7 +67,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
-		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
+		assertEquals(message, exchange.getProperty(EX_PROP_SYNC_MESSAGE));
 	}
 	
 	@Test
@@ -89,7 +87,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
 		assertEquals("Cannot process the message because the entity has 3 message(s) in the retry queue",
 		    getErrorMessage(exchange));
-		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
+		assertEquals(message, exchange.getProperty(EX_PROP_SYNC_MESSAGE));
 	}
 	
 	@Test
@@ -112,13 +110,11 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_MODEL_CLASS, modelClass);
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_ENTITY_ID, entityId);
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_PAYLOAD, payload);
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SITE, site);
-		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SYNC_MESSAGE, message);
+		mockInboundDbSyncEndpoint.expectedPropertyReceived(EX_PROP_SYNC_MESSAGE, message);
 		
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
 		mockInboundDbSyncEndpoint.assertIsSatisfied();
-		assertEquals(dateSentBySender, exchange.getProperty(EX_PROP_DATE_SENT_BY_SENDER));
 	}
 	
 }

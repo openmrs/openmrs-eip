@@ -250,8 +250,8 @@
                                         #{body.setModelClassName(getProperty('model-class'))}
                                         #{body.setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
                                         #{body.setDateCreated(new java.util.Date())}
-                                        #{body.setSite(getProperty('site'))}
-                                        #{body.setDateSentBySender(getProperty('date-sent-by-sender'))}
+                                        #{body.setSite(getProperty('sync-message').getSite())}
+                                        #{body.setDateSentBySender(getProperty('sync-message').getDateSentBySender())}
                                         #{body.setSnapshot(getProperty('sync-message').getSnapshot())}
                                         #{body.setMessageUuid(getProperty('sync-message').getMessageUuid())}
                                         #{body.setDateReceived(getProperty('sync-message').getDateCreated())}

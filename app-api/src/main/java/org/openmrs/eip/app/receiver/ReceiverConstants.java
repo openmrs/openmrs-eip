@@ -26,11 +26,7 @@ public class ReceiverConstants {
 	
 	public static final String EX_PROP_ENTITY_ID = "entity-id";
 
-	public static final String EX_PROP_SITE = "site";
-
 	public static final String EX_PROP_SYNC_MESSAGE = "sync-message";
-
-    public static final String EX_PROP_DATE_SENT_BY_SENDER = "date-sent-by-sender";
 	
 	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
 	
