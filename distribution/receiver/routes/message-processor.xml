@@ -21,6 +21,9 @@
         <setProperty name="date-sent-by-sender">
             <simple>${body.dateSentBySender}</simple>
         </setProperty>
+        <setProperty name="sync-message">
+            <simple>${body}</simple>
+        </setProperty>
         <setBody>
             <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body.entityPayload})" />
         </setBody>

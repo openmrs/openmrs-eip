@@ -27,7 +27,8 @@ import org.openmrs.eip.component.model.SyncModel;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@Sql(scripts = "classpath:mgt_receiver_retry_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+@Sql(scripts = { "classpath:mgt_site_info.sql",
+        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 	
 	@EndpointInject("mock:" + ROUTE_ID_INBOUND_DB_SYNC)
@@ -112,6 +113,7 @@ public class MessageProcessorRouteTest extends BaseReceiverRouteTest {
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_ENTITY_ID, entityId);
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_PAYLOAD, payload);
 		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SITE, site);
+		mockInboundDbSyncEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_SYNC_MESSAGE, message);
 		
 		producerTemplate.send(URI_MSG_PROCESSOR, exchange);
 		
