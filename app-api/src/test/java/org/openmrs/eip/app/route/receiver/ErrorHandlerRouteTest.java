@@ -16,11 +16,13 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SITE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SYNC_MESSAGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_ERROR_HANDLER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_ERROR_HANDLER;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseModel;
@@ -98,6 +101,11 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		exchange.setProperty(EX_PROP_SITE, siteInfo);
 		LocalDateTime dateSentBySender = LocalDateTime.now();
 		exchange.setProperty(EX_PROP_DATE_SENT_BY_SENDER, dateSentBySender);
+		SyncMessage syncMessage = new SyncMessage();
+		syncMessage.setSnapshot(true);
+		syncMessage.setMessageUuid("message-uuid");
+		syncMessage.setDateCreated(new Date());
+		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
@@ -114,6 +122,9 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertNotNull(errorItem.getDateCreated());
 		assertEquals(siteInfo, errorItem.getSite());
 		assertEquals(dateSentBySender, errorItem.getDateSentBySender());
+		assertEquals(syncMessage.getMessageUuid(), errorItem.getMessageUuid());
+		assertEquals(syncMessage.getSnapshot(), errorItem.getSnapshot());
+		assertEquals(syncMessage.getDateCreated(), errorItem.getDateReceived());
 		assertNull(errorItem.getDateChanged());
 		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, Boolean.class));
 	}
@@ -132,6 +143,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
 		exchange.setProperty(EX_PROP_SITE, siteInfo);
 		exchange.setProperty(EX_PROP_DATE_SENT_BY_SENDER, LocalDateTime.now());
+		exchange.setProperty(EX_PROP_SYNC_MESSAGE, new SyncMessage());
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
@@ -186,6 +198,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
 		exchange.setProperty(EX_PROP_SITE, siteInfo);
 		exchange.setProperty(EX_PROP_DATE_SENT_BY_SENDER, LocalDateTime.now());
+		exchange.setProperty(EX_PROP_SYNC_MESSAGE, new SyncMessage());
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
