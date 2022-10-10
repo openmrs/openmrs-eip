@@ -58,7 +58,7 @@ public class ReceiverSyncMessageController extends BaseRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public Object get(@PathVariable("id") Integer id) {
+	public Object get(@PathVariable("id") Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching receiver sync messages with id: " + id);
 		}

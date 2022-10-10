@@ -3,11 +3,10 @@ package org.openmrs.eip.web.receiver;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.web.contoller.BaseRestController;
 import org.openmrs.eip.web.RestConstants;
+import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +33,7 @@ public class ReceiverErrorController extends BaseRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public Object get(@PathVariable("id") Integer id) {
+	public Object get(@PathVariable("id") Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching receiver retry item with id: " + id);
 		}

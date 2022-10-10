@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
@@ -87,6 +88,40 @@ public class ReceiverSyncArchiveTest {
 		ignored.add("message");
 		ignored.add("attemptCount");
 		ignored.add("dateChanged");
+		for (PropertyDescriptor descriptor : descriptors) {
+			if (ignored.contains(descriptor.getName())) {
+				continue;
+			}
+			
+			String getter = descriptor.getReadMethod().getName();
+			assertEquals(invokeMethod(retry, getter), invokeMethod(archive, getter));
+		}
+	}
+	
+	@Test
+	public void shouldCreateAReceiverArchiveFromAConflictQueueItem() throws Exception {
+		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(ConflictQueueItem.class);
+		ConflictQueueItem retry = new ConflictQueueItem();
+		retry.setId(1L);
+		retry.setDateCreated(new Date());
+		retry.setIdentifier("uuid");
+		retry.setEntityPayload("payload");
+		retry.setModelClassName(PersonModel.class.getName());
+		retry.setSite(new SiteInfo());
+		retry.setSnapshot(true);
+		retry.setMessageUuid("message-uuid");
+		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(retry);
+		
+		Assert.assertNull(archive.getId());
+		Assert.assertNull(archive.getDateCreated());
+		Set<String> ignored = new HashSet();
+		ignored.add("id");
+		ignored.add("class");
+		ignored.add("dateCreated");
+		ignored.add("resolved");
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;

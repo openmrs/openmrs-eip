@@ -81,16 +81,16 @@ public class SiteMessageConsumer implements Runnable {
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
 			
-			if (log.isDebugEnabled()) {
-				log.debug("Fetching next batch of messages to sync for site: " + site);
+			if (log.isTraceEnabled()) {
+				log.trace("Fetching next batch of messages to sync for site: " + site);
 			}
 			
 			try {
 				List<SyncMessage> syncMessages = fetchNextSyncMessageBatch();
 				
 				if (syncMessages.isEmpty()) {
-					if (log.isDebugEnabled()) {
-						log.debug("No sync message found from site: " + site);
+					if (log.isTraceEnabled()) {
+						log.trace("No sync message found from site: " + site);
 					}
 					
 					//TODO Make the delay configurable

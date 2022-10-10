@@ -33,7 +33,7 @@ public class SenderSyncMessageController extends BaseRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public Object get(@PathVariable("id") Integer id) {
+	public Object get(@PathVariable("id") Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching sender sync message with id: " + id);
 		}

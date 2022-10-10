@@ -1,78 +1,87 @@
 package org.openmrs.eip.web.receiver;
 
 import static java.util.Collections.singletonMap;
-import static org.mockito.Mockito.when;
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
-import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
+import static org.junit.Assert.assertEquals;
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
-import org.apache.camel.ProducerTemplate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.component.management.hash.entity.PersonHash;
-import org.openmrs.eip.component.model.PersonModel;
-import org.openmrs.eip.component.service.TableToSyncEnum;
-import org.openmrs.eip.component.service.facade.EntityServiceFacade;
+import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.receiver.BaseReceiverTest;
+import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
+import org.openmrs.eip.component.management.hash.entity.PatientHash;
+import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.utils.HashUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(HashUtils.class)
-public class ConflictControllerTest {
+@Sql(scripts = { "classpath:mgt_site_info.sql",
+        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+public class ConflictControllerTest extends BaseReceiverTest {
 	
+	@Autowired
 	private ConflictController controller;
 	
-	@Mock
-	private ProducerTemplate mockProducerTemplate;
-	
-	@Mock
-	private EntityServiceFacade mockEntityServiceFacade;
-	
-	@Before
-	public void setup() {
-		PowerMockito.mockStatic(HashUtils.class);
-		controller = new ConflictController();
-		Whitebox.setInternalState(controller, ProducerTemplate.class, mockProducerTemplate);
-		Whitebox.setInternalState(controller, EntityServiceFacade.class, mockEntityServiceFacade);
+	@Test
+	public void shouldGetAllUnResolvedMessagesInTheConflictQueue() {
+		Map result = controller.getAll();
+		assertEquals(2, result.size());
+		assertEquals(4, result.get("count"));
+		assertEquals(4, ((List) result.get("items")).size());
 	}
 	
 	@Test
-	public void update_shouldUpdateTheEntityHashWithThatOfTheLatestDatabaseState() throws Exception {
-		final Integer conflictId = 1;
-		final String personUuid = "uuid";
-		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.PERSON;
+	public void shouldGetTheConflictItemMatchingTheSpecifiedId() {
+		assertEquals("2cfd940e-32dc-491f-8038-a8f3afe3e36d", ((ConflictQueueItem) controller.get(2L)).getMessageUuid());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
+	public void shouldCopyTheConflictMessageToTheArchiveQueueAndMarkItAsResolved() throws Exception {
+		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
+		Assert.assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
 		ConflictQueueItem conflict = new ConflictQueueItem();
-		conflict.setModelClassName(PersonModel.class.getName());
-		conflict.setIdentifier(personUuid);
+		conflict.setMessageUuid("message-uuid");
+		conflict.setModelClassName(PatientModel.class.getName());
+		conflict.setIdentifier(uuid);
+		conflict.setEntityPayload("{}");
+		conflict.setDateReceived(new Date());
+		conflict.setDateSentBySender(LocalDateTime.now());
+		conflict.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
+		conflict.setDateSentBySender(LocalDateTime.now());
+		conflict.setSnapshot(true);
+		conflict.setDateCreated(new Date());
 		Assert.assertFalse(conflict.getResolved());
-		final Class clazz = ConflictQueueItem.class;
-		when(mockProducerTemplate.requestBody("jpa:" + clazz.getSimpleName() + "?query=SELECT c FROM "
-		        + clazz.getSimpleName() + " c WHERE c.id = " + conflictId,
-		    null, clazz)).thenReturn(conflict);
-		when(mockProducerTemplate.requestBody("jpa:" + clazz.getSimpleName(), conflict, clazz)).thenReturn(conflict);
-		PersonModel dbModel = Mockito.mock(PersonModel.class);
-		when(mockEntityServiceFacade.getModel(tableToSyncEnum, personUuid)).thenReturn(dbModel);
-		PersonHash personHash = new PersonHash();
-		Assert.assertNull(personHash.getHash());
-		Assert.assertNull(personHash.getDateChanged());
-		when(HashUtils.getStoredHash(personUuid, PersonHash.class, mockProducerTemplate)).thenReturn(personHash);
-		final String newHash = "new-hash";
-		when(HashUtils.computeHash(dbModel)).thenReturn(newHash);
+		TestUtils.saveEntity(conflict);
 		
-		Assert.assertEquals(conflict, controller.update(singletonMap("resolved", "true"), conflictId));
+		BaseHashEntity hashEntity = new PatientHash();
+		hashEntity.setIdentifier(uuid);
+		final String currentHash = "current-hash";
+		hashEntity.setHash(currentHash);
+		hashEntity.setDateCreated(LocalDateTime.now());
+		producerTemplate.sendBody("jpa:" + PatientHash.class.getSimpleName() + "?usePersist=true", hashEntity);
+		Assert.assertNull(hashEntity.getDateChanged());
+		
+		controller.update(singletonMap("resolved", "true"), conflict.getId());
+		
+		conflict = TestUtils.getEntity(ConflictQueueItem.class, conflict.getId());
 		Assert.assertTrue(conflict.getResolved());
-		Assert.assertEquals(newHash, personHash.getHash());
-		Assert.assertNotNull(personHash.getHash());
-		Assert.assertNotNull(personHash.getDateChanged());
-		Mockito.verify(mockProducerTemplate)
-		        .sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()), personHash);
+		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class, producerTemplate);
+		Assert.assertNotEquals(currentHash, hashEntity.getHash());
+		Assert.assertNotNull(hashEntity.getDateChanged());
+		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
+		assertEquals(1, archives.size());
 	}
 	
 }

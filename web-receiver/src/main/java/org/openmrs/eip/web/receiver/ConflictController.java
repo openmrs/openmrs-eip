@@ -9,11 +9,13 @@ import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -72,7 +74,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public Object get(@PathVariable("id") Integer id) {
+	public Object get(@PathVariable("id") Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching conflict with id: " + id);
 		}
@@ -81,13 +83,28 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@PatchMapping("/{id}")
-	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Integer id) throws Exception {
+	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Long id) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Updating conflict with id: " + id);
 		}
 		
-		//Currently the only update allowed is marking the conflict as resolved
 		ConflictQueueItem conflict = (ConflictQueueItem) doGet(id);
+		
+		log.info("Archiving the conflict item");
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
+		archive.setDateCreated(new Date());
+		if (log.isDebugEnabled()) {
+			log.debug("Saving sync archive");
+		}
+		
+		producerTemplate.sendBody("jpa:" + ReceiverSyncArchive.class.getSimpleName(), archive);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved sync archive");
+		}
+		
+		//Currently the only update allowed is marking the conflict as resolved
 		conflict.setResolved(Boolean.valueOf(payload.get("resolved").toString()));
 		
 		conflict = producerTemplate.requestBody("jpa:" + getName(), conflict, ConflictQueueItem.class);

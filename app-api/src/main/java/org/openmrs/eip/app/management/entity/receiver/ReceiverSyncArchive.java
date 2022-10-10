@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
+import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
@@ -58,6 +59,10 @@ public class ReceiverSyncArchive extends AbstractEntity {
 	
 	public ReceiverSyncArchive(ReceiverRetryQueueItem retry) {
 		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
+	}
+	
+	public ReceiverSyncArchive(ConflictQueueItem conflict) {
+		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
 	}
 	
 	/**

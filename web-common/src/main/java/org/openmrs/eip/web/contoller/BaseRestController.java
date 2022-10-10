@@ -47,7 +47,7 @@ public abstract class BaseRestController {
 		return results;
 	}
 	
-	public Object doGet(Integer id) {
+	public Object doGet(Long id) {
 		return producerTemplate.requestBody(
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}

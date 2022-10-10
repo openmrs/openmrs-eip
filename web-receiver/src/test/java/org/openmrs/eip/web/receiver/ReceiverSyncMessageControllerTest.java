@@ -31,7 +31,7 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverTest {
 	
 	@Test
 	public void shouldGetTheSyncMessageMatchingTheSpecifiedId() {
-		assertEquals("27beb8bd-287c-47f2-9786-a7b98c933c05", ((SyncMessage) controller.get(2)).getMessageUuid());
+		assertEquals("27beb8bd-287c-47f2-9786-a7b98c933c05", ((SyncMessage) controller.get(2L)).getMessageUuid());
 	}
 	
 }
