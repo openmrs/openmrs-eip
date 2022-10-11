@@ -9,6 +9,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ER
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +21,7 @@ import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -231,6 +233,22 @@ public class SiteMessageConsumer implements Runnable {
 		
 		final Long id = msg.getId();
 		if (msgProcessed || movedToConflict || movedToError) {
+			if (msgProcessed) {
+				log.info("Archiving the sync message");
+				
+				ReceiverSyncArchive archive = new ReceiverSyncArchive(msg);
+				archive.setDateCreated(new Date());
+				if (log.isDebugEnabled()) {
+					log.debug("Saving sync archive");
+				}
+				
+				producerTemplate.sendBody("jpa:" + ReceiverSyncArchive.class.getSimpleName(), archive);
+				
+				if (log.isDebugEnabled()) {
+					log.debug("Successfully saved sync archive");
+				}
+			}
+			
 			if (log.isDebugEnabled()) {
 				log.debug("Removing from the sync message queue an item with id: " + id);
 			}
