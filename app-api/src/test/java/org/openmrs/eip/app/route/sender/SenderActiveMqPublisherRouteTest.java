@@ -64,6 +64,7 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		msg.setSnapshot(false);
 		msg.setDateCreated(new Date());
 		msg.setRequestUuid(requestUuid);
+		msg.setEventDate(new Date());
 		TestUtils.saveEntity(msg);
 		return msg;
 	}
