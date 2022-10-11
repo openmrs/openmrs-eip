@@ -2,12 +2,8 @@ package org.openmrs.eip.app.management.entity;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -21,10 +17,6 @@ import javax.validation.constraints.NotNull;
 public class SyncMessage extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
-	
-	public enum ReceiverSyncMessageStatus {
-		NEW, PROCESSED
-	}
 	
 	//Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
 	@Column(nullable = false, updatable = false)
@@ -45,12 +37,6 @@ public class SyncMessage extends AbstractEntity {
 	
 	@Column(name = "message_uuid", length = 38, updatable = false)
 	private String messageUuid;
-	
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 50)
-	@Access(AccessType.FIELD)
-	private ReceiverSyncMessageStatus status = ReceiverSyncMessageStatus.NEW;
 	
 	@NotNull
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
@@ -155,15 +141,6 @@ public class SyncMessage extends AbstractEntity {
 	}
 	
 	/**
-	 * Gets the status
-	 *
-	 * @return the status
-	 */
-	public ReceiverSyncMessageStatus getStatus() {
-		return status;
-	}
-	
-	/**
 	 * Gets the dateSentBySender
 	 *
 	 * @return the dateSentBySender
@@ -181,18 +158,11 @@ public class SyncMessage extends AbstractEntity {
 		this.dateSentBySender = dateSentBySender;
 	}
 	
-	/**
-	 * Sets the status of the sync message to PROCESSED
-	 */
-	public void markAsProcessed() {
-		this.status = ReceiverSyncMessageStatus.PROCESSED;
-	}
-	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", status=" + status + ", messageUuid="
-		        + messageUuid + ", dateSentBySender=" + dateSentBySender + "}";
+		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid
+		        + ", dateSentBySender=" + dateSentBySender + "}";
 	}
 	
 }

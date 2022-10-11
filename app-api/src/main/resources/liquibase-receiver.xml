@@ -1236,21 +1236,6 @@
                                  referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet author="wluyima" id="20220928-1202">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists columnName="status" tableName="receiver_sync_msg" />
-            </not>
-        </preConditions>
-        <comment>Add status column to receiver_sync_msg table</comment>
-
-        <addColumn tableName="receiver_sync_msg">
-            <column name="status" type="VARCHAR(50)" defaultValue="NEW">
-                <constraints nullable="false" />
-            </column>
-        </addColumn>
-    </changeSet>
-
     <changeSet author="wluyima" id="20220928-1203">
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="status" tableName="receiver_sync_request" />

@@ -25,7 +25,6 @@ public class ReceiverSyncArchiveTest {
 	@Test
 	public void shouldCreateAReceiverArchiveFromASyncMessage() throws Exception {
 		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(SyncMessage.class);
-		assertEquals(descriptors.length, BeanUtils.getPropertyDescriptors(ReceiverSyncArchive.class).length);
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setId(1L);
 		syncMessage.setDateCreated(new Date());
@@ -46,7 +45,6 @@ public class ReceiverSyncArchiveTest {
 		ignored.add("id");
 		ignored.add("class");
 		ignored.add("dateCreated");
-		ignored.add("status");
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;

@@ -22,15 +22,15 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverTest {
 	private ReceiverSyncMessageController controller;
 	
 	@Test
-	public void shouldGetAllUnProcessedSyncMessages() {
+	public void getAll_shouldGetAllSyncMessages() {
 		Map result = controller.getAll();
 		assertEquals(2, result.size());
-		assertEquals(3, result.get("count"));
-		assertEquals(3, ((List) result.get("items")).size());
+		assertEquals(4, result.get("count"));
+		assertEquals(4, ((List) result.get("items")).size());
 	}
 	
 	@Test
-	public void shouldGetTheSyncMessageMatchingTheSpecifiedId() {
+	public void get_shouldGetTheSyncMessageMatchingTheSpecifiedId() {
 		assertEquals("27beb8bd-287c-47f2-9786-a7b98c933c05", ((SyncMessage) controller.get(2L)).getMessageUuid());
 	}
 	

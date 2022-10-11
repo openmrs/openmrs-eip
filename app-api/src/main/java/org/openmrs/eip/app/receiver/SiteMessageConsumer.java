@@ -40,9 +40,8 @@ public class SiteMessageConsumer implements Runnable {
 	protected static final String ENTITY = SyncMessage.class.getSimpleName();
 	
 	//Order by dateCreated may be just in case the DB is migrated and id change
-	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY
-	        + " m WHERE m.status = 'NEW' AND m.site = :" + PARAM_SITE
-	        + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
+	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
+	        + PARAM_SITE + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
 	
 	private SiteInfo site;
 	
@@ -228,9 +227,10 @@ public class SiteMessageConsumer implements Runnable {
 		
 		boolean movedToConflict = exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, false, Boolean.class);
 		boolean movedToError = exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, false, Boolean.class);
+		boolean msgProcessed = exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class);
 		
 		final Long id = msg.getId();
-		if (movedToConflict || movedToError) {
+		if (msgProcessed || movedToConflict || movedToError) {
 			if (log.isDebugEnabled()) {
 				log.debug("Removing from the sync message queue an item with id: " + id);
 			}
@@ -239,17 +239,6 @@ public class SiteMessageConsumer implements Runnable {
 			
 			if (log.isDebugEnabled()) {
 				log.debug("Successfully removed from sync message queue an item with id: " + id);
-			}
-		} else if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
-			if (log.isDebugEnabled()) {
-				log.debug("Updating status from " + msg.getStatus() + " to PROCESSED for sync message with id: " + id);
-			}
-			
-			msg.markAsProcessed();
-			producerTemplate.sendBody("jpa:SyncMessage", msg);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully updated status for sync message with id: " + id);
 			}
 		} else {
 			throw new EIPException("Something went wrong while processing sync message with id: " + id);
