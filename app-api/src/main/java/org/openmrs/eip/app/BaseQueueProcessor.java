@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.sender;
+package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
 
@@ -8,22 +8,20 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.BaseParallelProcessor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for sender processors that operate on items in a DB sync related queue and forward
- * each item to another handler camel endpoint for processing
+ * Base class for processors that operate on items in a DB sync related queue and forward each item
+ * to another handler camel endpoint for processing
  * 
  * @param <T>
  */
-public abstract class BaseSenderQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor {
+public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor {
 	
-	private static final Logger log = LoggerFactory.getLogger(BaseSenderQueueProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseQueueProcessor.class);
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {

@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.sender;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component("debeziumEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class DebeziumEventProcessor extends BaseSenderQueueProcessor<DebeziumEvent> {
+public class DebeziumEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
 	
 	@Override
 	public String getProcessorName() {

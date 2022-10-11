@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.sender;
 
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component("senderSyncResponseProcessor")
 @Profile(SyncProfiles.SENDER)
-public class SenderSyncResponseProcessor extends BaseSenderQueueProcessor<SenderSyncResponse> {
+public class SenderSyncResponseProcessor extends BaseQueueProcessor<SenderSyncResponse> {
 	
 	@Override
 	public String getProcessorName() {
