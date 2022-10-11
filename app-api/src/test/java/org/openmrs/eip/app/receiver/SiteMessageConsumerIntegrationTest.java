@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
@@ -20,6 +21,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
@@ -59,7 +61,8 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void processMessage_shouldDeleteAProcessedMessage() throws Exception {
+	public void processMessage_shouldArchiveAndDeleteAProcessedMessage() throws Exception {
+		Assert.assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
@@ -75,6 +78,18 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		mockMsgProcessor.assertIsSatisfied();
 		Mockito.verify(mockResponsePublisher).sendSyncResponse(message);
 		assertNull(TestUtils.getEntity(SyncMessage.class, msgId));
+		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
+		assertEquals(1, archives.size());
+		ReceiverSyncArchive archive = archives.get(0);
+		assertEquals(message.getMessageUuid(), archive.getMessageUuid());
+		assertEquals(message.getModelClassName(), archive.getModelClassName());
+		assertEquals(message.getIdentifier(), archive.getIdentifier());
+		assertEquals(message.getEntityPayload(), archive.getEntityPayload());
+		assertEquals(message.getSite(), archive.getSite());
+		assertEquals(message.getSnapshot(), archive.getSnapshot());
+		assertEquals(message.getDateSentBySender(), archive.getDateSentBySender());
+		assertEquals(message.getDateCreated(), archive.getDateReceived());
+		assertNotNull(archive.getDateCreated());
 	}
 	
 	@Test

@@ -2,6 +2,7 @@ package org.openmrs.eip.web.receiver;
 
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
@@ -82,6 +83,16 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		Assert.assertNotNull(hashEntity.getDateChanged());
 		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
 		assertEquals(1, archives.size());
+        ReceiverSyncArchive archive = archives.get(0);
+        assertEquals(conflict.getMessageUuid(), archive.getMessageUuid());
+        assertEquals(conflict.getModelClassName(), archive.getModelClassName());
+        assertEquals(conflict.getIdentifier(), archive.getIdentifier());
+        assertEquals(conflict.getEntityPayload(), archive.getEntityPayload());
+        assertEquals(conflict.getSite(), archive.getSite());
+        assertEquals(conflict.getSnapshot(), archive.getSnapshot());
+        assertEquals(conflict.getDateSentBySender(), archive.getDateSentBySender());
+        assertEquals(conflict.getDateReceived(), archive.getDateReceived());
+        assertNotNull(archive.getDateCreated());
 	}
 	
 }

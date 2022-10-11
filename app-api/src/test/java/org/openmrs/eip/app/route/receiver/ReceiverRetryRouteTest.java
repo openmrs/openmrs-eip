@@ -224,7 +224,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		assertEquals(retry.getSnapshot(), archive.getSnapshot());
 		assertEquals(retry.getDateSentBySender(), archive.getDateSentBySender());
 		assertEquals(retry.getDateReceived(), archive.getDateReceived());
-		assertNotNull(retry.getDateCreated());
+		assertNotNull(archive.getDateCreated());
 	}
 	
 	@Test
