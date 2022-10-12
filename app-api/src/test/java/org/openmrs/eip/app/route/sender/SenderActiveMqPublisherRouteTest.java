@@ -1,7 +1,8 @@
 package org.openmrs.eip.app.route.sender;
 
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus.SENT;
@@ -11,6 +12,8 @@ import static org.openmrs.eip.app.sender.SenderConstants.PROP_SENDER_ID;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_ACTIVEMQ_PUBLISHER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_ACTIVEMQ_PUBLISHER;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,7 +101,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		assertNotNull(JsonPath.read(syncMsg, "metadata.dateSent"));
+		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
+		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
 	}
 	
@@ -132,7 +137,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		assertNotNull(JsonPath.read(syncMsg, "metadata.dateSent"));
+		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
+		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
 	}
 	
@@ -166,7 +173,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		assertNotNull(JsonPath.read(syncMsg, "metadata.dateSent"));
+		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
+		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
 	}
 	
@@ -220,7 +229,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		assertNotNull(JsonPath.read(syncMsg, "metadata.dateSent"));
+		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
+		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertEquals(requestUuid, JsonPath.read(syncMsg, "metadata.requestUuid"));
 	}
 	
@@ -254,7 +265,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		assertNotNull(JsonPath.read(syncMsg, "metadata.dateSent"));
+		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
+		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertEquals(requestUuid, JsonPath.read(syncMsg, "metadata.requestUuid"));
 		assertMessageLogged(Level.INFO, "Entity not found for request with uuid: " + requestUuid);
 	}

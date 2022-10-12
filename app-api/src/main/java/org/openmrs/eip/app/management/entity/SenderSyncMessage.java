@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import javax.persistence.Access;
@@ -18,8 +20,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	private static final long serialVersionUID = 1L;
 	
 	public enum SenderSyncMessageStatus {
-		NEW,
-		SENT
+		NEW, SENT
 	}
 	
 	@NotNull
@@ -113,19 +114,19 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	public Date getDateSent() {
 		return dateSent;
-	}	
+	}
 	
 	public Date getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(Date eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public void markAsSent() {
+		return eventDate;
+	}
+	
+	public void setEventDate(Date eventDate) {
+		this.eventDate = eventDate;
+	}
+	
+	public void markAsSent(LocalDateTime dateSent) {
 		this.status = SenderSyncMessageStatus.SENT;
-		this.dateSent = new Date();
+		this.dateSent = Date.from(dateSent.atZone(ZoneId.systemDefault()).toInstant());
 	}
 	
 	@Override

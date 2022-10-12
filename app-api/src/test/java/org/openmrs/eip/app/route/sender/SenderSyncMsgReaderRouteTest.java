@@ -6,6 +6,7 @@ import static org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSync
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_SYNC_MSG_READER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_SYNC_MSG_READER;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class SenderSyncMsgReaderRouteTest extends BaseSenderRouteTest {
 		mockProcessor.whenAnyExchangeReceived(e -> {
 			processedMsgs.addAll(e.getIn().getBody(List.class));
 			processedMsgs.forEach(m -> {
-				m.markAsSent();
+				m.markAsSent(LocalDateTime.now());
 				TestUtils.updateEntity(m);
 			});
 		});

@@ -70,10 +70,14 @@
                     </script>
                 </when>
 
+                <setProperty name="${routeId}-dateSent">
+                    <spel>#{T(java.time.LocalDateTime).now()}</spel>
+                </setProperty>
+                
                 <script>
                     <spel>
                         #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                        #{body.metadata.setDateSent(T(java.time.LocalDateTime).now())}
+                        #{body.metadata.setDateSent(getProperty('sender-activemq-publisher-dateSent'))}
                         #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
                         #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
                         #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
@@ -103,7 +107,7 @@
 
                 <script>
                     <spel>
-                        #{getProperty('senderSyncMessage').markAsSent()}
+                        #{getProperty('senderSyncMessage').markAsSent(getProperty('sender-activemq-publisher-dateSent'))}
                     </spel>
                 </script>
 
