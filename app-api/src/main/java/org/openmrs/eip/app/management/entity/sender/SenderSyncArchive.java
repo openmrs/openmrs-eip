@@ -1,27 +1,21 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.sender;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.openmrs.eip.app.management.entity.AbstractEntity;
+import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.springframework.beans.BeanUtils;
+
 @Entity
-@Table(name = "sender_sync_message")
-public class SenderSyncMessage extends AbstractEntity {
+@Table(name = "sender_sync_archive")
+public class SenderSyncArchive extends AbstractEntity {
 	
 	private static final long serialVersionUID = 1L;
-	
-	public enum SenderSyncMessageStatus {
-		NEW, SENT
-	}
 	
 	@NotNull
 	@Column(name = "table_name", length = 100, nullable = false, updatable = false)
@@ -36,7 +30,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	private String operation;
 	
 	@NotNull
-	@Column(name = "message_uuid", length = 38, nullable = false, unique = true, updatable = false)
+	@Column(name = "message_uuid", length = 38, nullable = false, updatable = false)
 	private String messageUuid;
 	
 	@Column(name = "request_uuid", length = 38, updatable = false)
@@ -47,19 +41,19 @@ public class SenderSyncMessage extends AbstractEntity {
 	private boolean snapshot;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 50)
-	@Access(AccessType.FIELD)
-	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
-	
-	@NotNull
-	@Column(name = "date_sent", nullable = false)
-	@Access(AccessType.FIELD)
+	@Column(name = "date_sent", nullable = false, updatable = false)
 	private Date dateSent;
 	
 	@NotNull
 	@Column(name = "event_date", nullable = false)
 	private Date eventDate;
+	
+	public SenderSyncArchive() {
+	}
+	
+	public SenderSyncArchive(SenderSyncMessage syncMessage) {
+		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
+	}
 	
 	public String getTableName() {
 		return tableName;
@@ -109,12 +103,12 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.snapshot = snapshot;
 	}
 	
-	public SenderSyncMessageStatus getStatus() {
-		return status;
-	}
-	
 	public Date getDateSent() {
 		return dateSent;
+	}
+	
+	public void setDateSent(Date dateSent) {
+		this.dateSent = dateSent;
 	}
 	
 	public Date getEventDate() {
@@ -125,16 +119,11 @@ public class SenderSyncMessage extends AbstractEntity {
 		this.eventDate = eventDate;
 	}
 	
-	public void markAsSent(LocalDateTime dateSent) {
-		this.status = SenderSyncMessageStatus.SENT;
-		this.dateSent = Date.from(dateSent.atZone(ZoneId.systemDefault()).toInstant());
-	}
-	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", tableName=" + tableName + ", identifier=" + identifier
 		        + ", operation=" + operation + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid
-		        + ", snapshot=" + snapshot + ", status=" + status + ", dateSent=" + dateSent + "}";
+		        + ", snapshot=" + snapshot + ", dateSent=" + dateSent + "}";
 	}
 	
 }

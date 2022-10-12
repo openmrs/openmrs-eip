@@ -1,4 +1,4 @@
-package org.openmrs.eip.management.entity.receiver;
+package org.openmrs.eip.app.management.entity.receiver;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
@@ -15,7 +15,6 @@ import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.beans.BeanUtils;
