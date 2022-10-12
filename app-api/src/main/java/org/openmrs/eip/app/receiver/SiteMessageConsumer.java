@@ -291,7 +291,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	protected String getThreadName(SyncMessage msg) {
 		return msg.getSite().getIdentifier() + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-"
-		        + msg.getIdentifier() + "-" + msg.getId();
+		        + msg.getIdentifier() + "-" + msg.getMessageUuid() + "-" + msg.getId();
 	}
 	
 }
