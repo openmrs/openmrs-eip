@@ -52,8 +52,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Access(AccessType.FIELD)
 	private SenderSyncMessageStatus status = SenderSyncMessageStatus.NEW;
 	
-	@NotNull
-	@Column(name = "date_sent", nullable = false)
+	@Column(name = "date_sent")
 	@Access(AccessType.FIELD)
 	private Date dateSent;
 	

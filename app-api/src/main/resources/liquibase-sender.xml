@@ -285,9 +285,7 @@
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_sent" type="DATETIME(3)">
-                <constraints nullable="false" />
-            </column>
+            <column name="date_sent" type="DATETIME(3)" />
             <column name="event_date" type="DATETIME(3)"> 
             	<constraints nullable="false" />
             </column>
