@@ -270,10 +270,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="operation" type="VARCHAR(1)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="message_uuid" type="VARCHAR(38)">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false" unique="true" />
             </column>
             <column name="request_uuid" type="VARCHAR(38)" />
             <column name="date_created" type="DATETIME(3)">
@@ -286,10 +286,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="date_sent" type="DATETIME(3)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="event_date" type="DATETIME(3)"> 
-            	<constraints nullable="false"/>
+            	<constraints nullable="false" />
             </column>
         </createTable>
 
@@ -375,20 +375,20 @@
                 <constraints nullable="false" />
             </column>
             <column name="operation" type="VARCHAR(1)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="message_uuid" type="VARCHAR(38)">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false" />
             </column>
             <column name="request_uuid" type="VARCHAR(38)" />
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
             <column name="date_sent" type="DATETIME(3)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="event_date" type="DATETIME(3)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />

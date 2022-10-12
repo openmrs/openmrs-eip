@@ -15,10 +15,27 @@
 
         <choice>
             <when>
-                <simple>${body.size()} > 0</simple>
+                <simple>${body.size()} == 1</simple>
                 <log loggingLevel="DEBUG" message="Fetched ${body.size()} sender sync message(s) matching message uuid ${exchangeProperty.syncResponse.messageUuid}" />
 
                 <log loggingLevel="DEBUG" message="Sender sync message(s) found -> ${body}" />
+
+                <log message="Archiving the sync message with id: ${body[0].id}" />
+
+                <setBody>
+                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncArchive(body[0])}</spel>
+                </setBody>
+                <script>
+                    <spel>
+                        #{body.setDateCreated(new java.util.Date())}
+                    </spel>
+                </script>
+
+                <log loggingLevel="DEBUG" message="Saving sync archive" />
+
+                <toD uri="jpa:SenderSyncArchive" />
+
+                <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
 
                 <log loggingLevel="DEBUG" message="Removing Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
 
