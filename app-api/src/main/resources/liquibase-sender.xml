@@ -282,6 +282,7 @@
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
+            <column name="entity_data" type="TEXT" />
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>

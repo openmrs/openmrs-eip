@@ -46,6 +46,9 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Column(nullable = false, updatable = false)
 	private boolean snapshot;
 	
+	@Column(name = "entity_data", columnDefinition = "text")
+	private String data;
+	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
@@ -106,6 +109,14 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	public void setSnapshot(boolean snapshot) {
 		this.snapshot = snapshot;
+	}
+	
+	public String getData() {
+		return data;
+	}
+	
+	public void setData(String data) {
+		this.data = data;
 	}
 	
 	public SenderSyncMessageStatus getStatus() {
