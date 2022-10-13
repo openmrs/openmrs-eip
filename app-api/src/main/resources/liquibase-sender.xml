@@ -383,6 +383,7 @@
             <column name="snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
+            <column name="entity_data" type="TEXT" />
             <column name="date_sent" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>

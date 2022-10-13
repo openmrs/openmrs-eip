@@ -30,6 +30,7 @@ public class SenderSyncArchiveTest {
 		syncMessage.setMessageUuid("message-uuid");
 		syncMessage.setRequestUuid("request-uuid");
 		syncMessage.markAsSent(LocalDateTime.now());
+		syncMessage.setData("{}");
 		
 		SenderSyncArchive archive = new SenderSyncArchive(syncMessage);
 		
