@@ -46,7 +46,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	@Column(nullable = false, updatable = false)
 	private boolean snapshot;
 	
-	@Column(name = "entity_data", columnDefinition = "text")
+	@Column(name = "sync_data", columnDefinition = "text")
 	private String data;
 	
 	@NotNull

@@ -8,129 +8,65 @@
 
         <log message="Preparing sender sync message -> ${body}" />
 
-        <setProperty name="senderSyncMessage">
+        <setProperty name="senderSyncMsg">
             <simple>${body}</simple>
         </setProperty>
 
-        <choice>
-            <when>
-                <simple>${exchangeProperty.senderSyncMessage.operation} == 'd'</simple>
-                <setBody>
-                    <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setTableToSyncModelClass(T(org.openmrs.eip.component.service.TableToSyncEnum).getTableToSyncEnum(getProperty('senderSyncMessage').tableName).modelClass)}
-                        #{body.setModel(body.tableToSyncModelClass.getConstructor().newInstance())}
-                        #{body.model.setUuid(getProperty('senderSyncMessage').identifier)}
-                        #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                    </spel>
-                </script>
+        <setBody>
+            <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshalSyncModel(${body.data})" />
+        </setBody>
 
-                <log message="Deleted entity payload -> ${body}" />
-            </when>
-            <otherwise>
-                <log message="Loading entity from DB with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
+        <setProperty name="${routeId}-dateSent">
+            <spel>#{T(java.time.LocalDateTime).now()}</spel>
+        </setProperty>
 
-                <toD uri="openmrs:extract?tableToSync=${exchangeProperty.senderSyncMessage.tableName.toUpperCase()}&amp;uuid=${exchangeProperty.senderSyncMessage.identifier}" />
+        <script>
+            <spel>
+                #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
+                #{body.metadata.setDateSent(getProperty('sender-activemq-publisher-dateSent'))}
+                #{body.metadata.setOperation(getProperty('senderSyncMsg').operation)}
+                #{body.metadata.setRequestUuid(getProperty('senderSyncMsg').requestUuid)}
+                #{body.metadata.setMessageUuid(getProperty('senderSyncMsg').messageUuid)}
+                #{body.metadata.setSnapshot(getProperty('senderSyncMsg').snapshot)}
+            </spel>
+        </script>
+        <setBody>
+            <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
+        </setBody>
 
-                <log loggingLevel="DEBUG" message="Loaded entity -> ${body}" />
+        <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
 
-                <choice>
-                    <when>
-                        <simple>${body.size()} == 1</simple>
-                        <setBody>
-                            <jsonpath>$[0]</jsonpath>
-                        </setBody>
-                    </when>
-                    <otherwise>
-                        <setBody>
-                            <simple>${null}</simple>
-                        </setBody>
-                    </otherwise>
-                </choice>
-            </otherwise>
-        </choice>
+        <when>
+            <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
+            <log message="Encrypting sync payload.." />
 
-        <choice>
-            <when>
-                <simple>${body} != null || ${exchangeProperty.senderSyncMessage.operation} == 'r'</simple>
-                <when>
-                    <simple>${body} == null</simple>
+            <process ref="pgpEncryptService" />
 
-                    <log message="Entity not found for request with uuid: ${exchangeProperty.senderSyncMessage.requestUuid}" />
+            <log loggingLevel="TRACE" message="Encrypted sync payload -> ${body}" />
+        </when>
 
-                    <setBody>
-                        <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                    </setBody>
-                    <script>
-                        <spel>
-                            #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                        </spel>
-                    </script>
-                </when>
+        <log message="Sending sync payload to sync destination: {{camel.output.endpoint}}" />
 
-                <setProperty name="${routeId}-dateSent">
-                    <spel>#{T(java.time.LocalDateTime).now()}</spel>
-                </setProperty>
-                
-                <script>
-                    <spel>
-                        #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
-                        #{body.metadata.setDateSent(getProperty('sender-activemq-publisher-dateSent'))}
-                        #{body.metadata.setOperation(getProperty('senderSyncMessage').operation)}
-                        #{body.metadata.setRequestUuid(getProperty('senderSyncMessage').requestUuid)}
-                        #{body.metadata.setMessageUuid(getProperty('senderSyncMessage').messageUuid)}
-                        #{body.metadata.setSnapshot(getProperty('senderSyncMessage').snapshot)}
-                    </spel>
-                </script>
-                <setBody>
-                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
-                </setBody>
+        <toD uri="{{camel.output.endpoint}}" />
 
-                <log loggingLevel="DEBUG" message="Sync payload -> ${body}" />
+        <log loggingLevel="DEBUG" message="Sync payload sent!"  />
 
-                <when>
-                    <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
-                    <log message="Encrypting entity payload.." />
+        <script>
+            <spel>
+                #{getProperty('senderSyncMsg').setData(body))}
+                #{getProperty('senderSyncMsg').markAsSent(getProperty('sender-activemq-publisher-dateSent'))}
+            </spel>
+        </script>
 
-                    <process ref="pgpEncryptService" />
+        <setBody>
+            <simple>${exchangeProperty.senderSyncMsg}</simple>
+        </setBody>
 
-                    <log message="Encrypted entity payload -> ${body}" loggingLevel="TRACE" />
-                </when>
+        <log loggingLevel="DEBUG" message="Updating sender sync message with identifier ${exchangeProperty.senderSyncMsg.identifier} to ${exchangeProperty.senderSyncMsg.status}" />
 
-                <log message="Sending entity to sync destination: {{camel.output.endpoint}}" />
+        <to uri="jpa:senderSyncMsg" />
 
-                <toD uri="{{camel.output.endpoint}}" />
-
-                <log message="Entity sent!" loggingLevel="DEBUG" />
-
-                <script>
-                    <spel>
-                        #{getProperty('senderSyncMessage').markAsSent(getProperty('sender-activemq-publisher-dateSent'))}
-                    </spel>
-                </script>
-
-                <setBody>
-                    <simple>${exchangeProperty.senderSyncMessage}</simple>
-                </setBody>
-
-                <log message="Updating sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" loggingLevel="DEBUG" />
-
-                <to uri="jpa:SenderSyncMessage" />
-
-                <log message="Successfully updated sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier} to ${exchangeProperty.senderSyncMessage.status}" />
-            </when>
-
-            <otherwise>
-                <log message="No entity found in the database matching identifier ${exchangeProperty.senderSyncMessage.identifier} in table ${exchangeProperty.senderSyncMessage.tableName}" />
-                <log message="Removing sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" loggingLevel="DEBUG" />
-
-                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE id = ${exchangeProperty.senderSyncMessage.id}" />
-
-                <log loggingLevel="DEBUG" message="Successfully removed sender sync message with identifier ${exchangeProperty.senderSyncMessage.identifier}" />
-            </otherwise>
-        </choice>
+        <log message="Successfully updated sender sync message with identifier ${exchangeProperty.senderSyncMsg.identifier} to ${exchangeProperty.senderSyncMsg.status}" />
 
         <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
     </route>
