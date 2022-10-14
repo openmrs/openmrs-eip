@@ -24,10 +24,6 @@
             <spel>
                 #{body.metadata.setSourceIdentifier('{{db-sync.senderId}}')}
                 #{body.metadata.setDateSent(getProperty('sender-activemq-publisher-dateSent'))}
-                #{body.metadata.setOperation(getProperty('senderSyncMsg').operation)}
-                #{body.metadata.setRequestUuid(getProperty('senderSyncMsg').requestUuid)}
-                #{body.metadata.setMessageUuid(getProperty('senderSyncMsg').messageUuid)}
-                #{body.metadata.setSnapshot(getProperty('senderSyncMsg').snapshot)}
             </spel>
         </script>
         <setBody>
