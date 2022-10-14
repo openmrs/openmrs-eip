@@ -38,7 +38,7 @@
 
         <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
 
-        <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
+        <log message="Removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" />
 
         <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
 

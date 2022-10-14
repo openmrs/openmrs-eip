@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.util.Date;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -23,6 +25,9 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
 	@AttributeOverride(name = "requestUuid", column = @Column(name = "request_uuid", unique = true, updatable = false, length = 38))
 	private Event event;
 	
+	@Column(name = "event_date", updatable = false)
+	private Date eventDate;
+	
 	/**
 	 * Gets the event
 	 *
@@ -41,9 +46,28 @@ public class SenderRetryQueueItem extends BaseRetryQueueItem {
 		this.event = event;
 	}
 	
+	/**
+	 * Gets the eventDate
+	 *
+	 * @return the eventDate
+	 */
+	public Date getEventDate() {
+		return eventDate;
+	}
+	
+	/**
+	 * Sets the eventDate
+	 *
+	 * @param eventDate the eventDate to set
+	 */
+	public void setEventDate(Date eventDate) {
+		this.eventDate = eventDate;
+	}
+	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + "}";
+		return getClass().getSimpleName() + " {attemptCount=" + getAttemptCount() + ", " + event + ", eventDate=" + eventDate
+		        + "}";
 	}
 	
 }

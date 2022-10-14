@@ -47,8 +47,7 @@ public class SenderSyncArchive extends AbstractEntity {
 	@Column(name = "date_sent", nullable = false, updatable = false)
 	private Date dateSent;
 	
-	@NotNull
-	@Column(name = "event_date", nullable = false, updatable = false)
+	@Column(name = "event_date", updatable = false)
 	private Date eventDate;
 	
 	public SenderSyncArchive() {

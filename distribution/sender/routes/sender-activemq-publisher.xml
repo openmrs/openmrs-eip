@@ -53,7 +53,7 @@
 
         <script>
             <spel>
-                #{getProperty('senderSyncMsg').setData(body))}
+                #{getProperty('senderSyncMsg').setData(body)}
                 #{getProperty('senderSyncMsg').markAsSent(getProperty('sender-activemq-publisher-dateSent'))}
             </spel>
         </script>
