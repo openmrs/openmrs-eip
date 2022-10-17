@@ -81,6 +81,7 @@
                                 #{getProperty('retry-item').setEvent(getProperty('event'))}
                                 #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
                                 #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
+                                #{getProperty('retry-item').setEventDate(getProperty('dbzmEvent').dateCreated)}
                                 #{getProperty('retry-item').setDateCreated(new java.util.Date())}
                             </spel>
                         </script>

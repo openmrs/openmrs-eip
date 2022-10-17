@@ -98,7 +98,6 @@
                         #{body.setMessageUuid(getProperty('out-bound-db-sync-msg-uuid'))}
                         #{body.setDateCreated(new java.util.Date())}
                         #{body.setRequestUuid(getProperty('event').requestUuid)}
-                        #{body.setEventDate(getProperty('dbzmEvent').dateCreated)}
                     </spel>
                 </script>
 
@@ -120,7 +119,7 @@
                         </script>
                     </when>
                     <otherwise>
-                        <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Don't know how to determine the event date" />
+                        <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="No debezium event or retry item found on the exchange" />
                     </otherwise>
                 </choice>
 
