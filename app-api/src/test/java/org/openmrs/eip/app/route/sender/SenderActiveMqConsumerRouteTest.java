@@ -77,10 +77,12 @@ public class SenderActiveMqConsumerRouteTest extends BaseSenderRouteTest {
 	public void shouldProcessAndSaveASyncResponseMessage() {
 		final String messageUuid = "message-uuid";
 		final LocalDateTime dateSent = LocalDateTime.now();
+		final LocalDateTime dateReceived = LocalDateTime.now();
 		Exchange exchange = new DefaultExchange(camelContext);
 		SyncResponseModel responseData = new SyncResponseModel();
 		responseData.setMessageUuid(messageUuid);
 		responseData.setDateSentByReceiver(dateSent);
+		responseData.setDateReceived(dateReceived);
 		exchange.getIn().setBody(JsonUtils.marshall(responseData));
 		assertEquals(0, TestUtils.getEntities(SenderSyncResponse.class).size());
 		
@@ -91,6 +93,7 @@ public class SenderActiveMqConsumerRouteTest extends BaseSenderRouteTest {
 		SenderSyncResponse savedResponse = responses.get(0);
 		assertEquals(messageUuid, savedResponse.getMessageUuid());
 		assertEquals(dateSent, savedResponse.getDateSentByReceiver());
+		assertEquals(dateReceived, savedResponse.getReceiverDateReceived());
 		assertNotNull(savedResponse.getDateCreated());
 		assertTrue(Whitebox.getInternalState(CustomMessageListenerContainer.class, "commit"));
 	}

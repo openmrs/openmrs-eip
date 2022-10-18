@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.camel.EndpointInject;
@@ -46,6 +47,7 @@ public class ReceiverActiveMqMessagePublisherTest extends BaseReceiverTest {
 		SyncMessage message = new SyncMessage();
 		message.setMessageUuid(msgUuid);
 		message.setSite(siteInfo);
+		message.setDateCreated(new Date());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		List<String> responses = new ArrayList();
 		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> responses.add(e.getIn().getBody(String.class)));
@@ -56,6 +58,7 @@ public class ReceiverActiveMqMessagePublisherTest extends BaseReceiverTest {
 		assertEquals(1, responses.size());
 		assertEquals(msgUuid, JsonPath.read(responses.get(0), "messageUuid"));
 		assertNotNull(JsonPath.read(responses.get(0), "dateSentByReceiver"));
+		assertNotNull(JsonPath.read(responses.get(0), "dateReceived"));
 	}
 	
 	@Test
@@ -75,6 +78,7 @@ public class ReceiverActiveMqMessagePublisherTest extends BaseReceiverTest {
 		assertEquals(1, responses.size());
 		assertEquals(msgUuid, JsonPath.read(responses.get(0), "messageUuid"));
 		assertNotNull(JsonPath.read(responses.get(0), "dateSentByReceiver"));
+		assertNotNull(JsonPath.read(responses.get(0), "dateReceived"));
 	}
 	
 }

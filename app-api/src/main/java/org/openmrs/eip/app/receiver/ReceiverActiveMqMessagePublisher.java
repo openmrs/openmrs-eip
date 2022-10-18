@@ -10,6 +10,7 @@ import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.DateUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,12 @@ public class ReceiverActiveMqMessagePublisher {
 		SyncResponseModel syncResponse = new SyncResponseModel();
 		syncResponse.setDateSentByReceiver(LocalDateTime.now());
 		syncResponse.setMessageUuid(messageUuid);
+		
+		if (sourceEntity instanceof SyncMessage) {
+		    syncResponse.setDateReceived(DateUtils.dateToLocalDateTime(sourceEntity.getDateCreated()));
+        } else {
+            syncResponse.setDateReceived(LocalDateTime.now());
+        } 
 		
 		String payload = JsonUtils.marshall(syncResponse);
 		

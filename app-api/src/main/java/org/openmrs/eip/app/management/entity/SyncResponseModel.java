@@ -11,4 +11,6 @@ public class SyncResponseModel {
 	
 	private LocalDateTime dateSentByReceiver;
 	
+	private LocalDateTime dateReceived;
+	
 }

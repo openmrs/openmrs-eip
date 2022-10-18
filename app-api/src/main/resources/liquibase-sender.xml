@@ -406,4 +406,20 @@
         </addColumn>
     </changeSet>
     
+    
+    <changeSet author="dchirinda" id="20220930-1500">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="receiver_date_received" tableName="sender_sync_response" />
+            </not>
+        </preConditions>
+        <comment>Add receiver_date_received column to sender_sync_response table</comment>
+
+        <addColumn tableName="sender_sync_response">
+            <column name="receiver_date_received" type="DATETIME" >
+            	<constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+    
 </databaseChangeLog>

@@ -21,6 +21,10 @@ public class SenderSyncResponse extends AbstractEntity {
 	@Column(name = "date_sent_by_receiver", nullable = false, updatable = false)
 	private LocalDateTime dateSentByReceiver;
 	
+	@NotNull
+	@Column(name = "receiver_date_received", nullable = false, updatable = false)
+	private LocalDateTime receiverDateReceived;
+	
 	public String getMessageUuid() {
 		return messageUuid;
 	}
@@ -37,9 +41,17 @@ public class SenderSyncResponse extends AbstractEntity {
 		this.dateSentByReceiver = dateSentByReceiver;
 	}
 	
-	@Override
+	public LocalDateTime getReceiverDateReceived() {
+        return receiverDateReceived;
+    }
+
+    public void setReceiverDateReceived(LocalDateTime receiverDateReceived) {
+        this.receiverDateReceived = receiverDateReceived;
+    }
+
+    @Override
 	public String toString() {
-		return "SyncResponse [messageUuid=" + messageUuid + ", dateSentByReceiver=" + dateSentByReceiver + "]";
+		return "SyncResponse {messageUuid=" + messageUuid + ", dateSentByReceiver=" + dateSentByReceiver + ", receiverDateReceived=" + receiverDateReceived + "}";
 	}
 	
 }
