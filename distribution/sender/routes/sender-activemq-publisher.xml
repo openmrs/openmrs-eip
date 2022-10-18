@@ -6,7 +6,7 @@
 
         <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
 
-        <log message="Preparing sender sync message -> ${body}" />
+        <log message="Preparing sync payload to submit -> ${body}" />
 
         <setProperty name="senderSyncMsg">
             <simple>${body}</simple>

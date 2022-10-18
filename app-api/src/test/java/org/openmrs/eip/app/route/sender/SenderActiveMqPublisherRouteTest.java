@@ -28,12 +28,12 @@ import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.SyncMetadata;
+import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 
 import com.jayway.jsonpath.JsonPath;
-
-import ch.qos.logback.classic.Level;
 
 @TestPropertySource(properties = PROP_SENDER_ID + "=" + SENDER_ID)
 @TestPropertySource(properties = "camel.output.endpoint=" + URI_ACTIVEMQ_SYNC)
@@ -57,29 +57,29 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		mockActiveMqEndpoint.reset();
 	}
 	
-	private SenderSyncMessage createSyncMessage(String table, String identifier, String msgUuid, String op,
-	                                            String requestUuid) {
+	@Test
+	public void shouldSubmitTheSyncMessageToActiveMq() throws Exception {
+		final String table = "patient";
+		final String uuid = "patient-uuid";
+		final String msgUuid = "msg-uuid";
+		final String op = "u";
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		SenderSyncMessage msg = new SenderSyncMessage();
 		msg.setTableName(table);
-		msg.setIdentifier(identifier);
+		msg.setIdentifier(uuid);
 		msg.setMessageUuid(msgUuid);
 		msg.setOperation(op);
-		msg.setSnapshot(false);
+		msg.setSnapshot(true);
 		msg.setDateCreated(new Date());
-		msg.setRequestUuid(requestUuid);
 		msg.setEventDate(new Date());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setOperation(op);
+		metadata.setMessageUuid(msgUuid);
+		metadata.setSnapshot(true);
+		PersonModel model = new PatientModel();
+		model.setUuid(uuid);
+		msg.setData(JsonUtils.marshall(new SyncModel(PersonModel.class, model, metadata)));
 		TestUtils.saveEntity(msg);
-		return msg;
-	}
-	
-	@Test
-	public void shouldProcessADeleteEvent() throws Exception {
-		final String table = "person";
-		final String uuid = "person-uuid";
-		final String msgUuid = "msg-uuid";
-		final String op = "d";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
 		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
 		mockActiveMqEndpoint.expectedMessageCount(1);
 		final List<String> syncMessages = new ArrayList();
@@ -100,176 +100,11 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(SENDER_ID, JsonPath.read(syncMsg, "metadata.sourceIdentifier"));
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
-		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
+		assertTrue(JsonPath.read(syncMsg, "metadata.snapshot"));
 		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
 		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
 		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
 		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void shouldProcessAnInsertEvent() throws Exception {
-		final String table = "patient";
-		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
-		final String msgUuid = "msg-uuid";
-		final String op = "c";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		mockActiveMqEndpoint.expectedMessageCount(1);
-		final List<String> syncMessages = new ArrayList();
-		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(msg);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
-		assertEquals(1, syncMessages.size());
-		
-		String syncMsg = syncMessages.get(0);
-		assertEquals(PatientModel.class.getName(), JsonPath.read(syncMsg, "tableToSyncModelClass"));
-		assertEquals(uuid, JsonPath.read(syncMsg, "model.uuid"));
-		assertEquals(SENDER_ID, JsonPath.read(syncMsg, "metadata.sourceIdentifier"));
-		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
-		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
-		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
-		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
-		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
-		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void shouldProcessAnUpdateEvent() throws Exception {
-		final String table = "patient";
-		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
-		final String msgUuid = "msg-uuid";
-		final String op = "u";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, null);
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		mockActiveMqEndpoint.expectedMessageCount(1);
-		final List<String> syncMessages = new ArrayList();
-		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(msg);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
-		assertEquals(1, syncMessages.size());
-		
-		String syncMsg = syncMessages.get(0);
-		assertEquals(PatientModel.class.getName(), JsonPath.read(syncMsg, "tableToSyncModelClass"));
-		assertEquals(uuid, JsonPath.read(syncMsg, "model.uuid"));
-		assertEquals(SENDER_ID, JsonPath.read(syncMsg, "metadata.sourceIdentifier"));
-		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
-		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
-		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
-		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
-		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
-		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
-	}
-	
-	@Test
-	public void shouldProcessAnInsertOrUpdateEventAndTheEntityIsNotFound() throws Exception {
-		final String table = "patient";
-		final String uuid = "person-uuid";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, "msg-uuid", "u", null);
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		mockActiveMqEndpoint.expectedMessageCount(0);
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(msg);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		assertMessageLogged(Level.INFO,
-		    "No entity found in the database matching identifier " + uuid + " in table " + table);
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void shouldProcessASyncRequest() throws Exception {
-		final String table = "patient";
-		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
-		final String msgUuid = "msg-uuid";
-		final String requestUuid = "request-uuid";
-		final String op = "r";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, requestUuid);
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		mockActiveMqEndpoint.expectedMessageCount(1);
-		final List<String> syncMessages = new ArrayList();
-		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(msg);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
-		assertEquals(1, syncMessages.size());
-		
-		String syncMsg = syncMessages.get(0);
-		assertEquals(PatientModel.class.getName(), JsonPath.read(syncMsg, "tableToSyncModelClass"));
-		assertEquals(uuid, JsonPath.read(syncMsg, "model.uuid"));
-		assertEquals(SENDER_ID, JsonPath.read(syncMsg, "metadata.sourceIdentifier"));
-		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
-		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
-		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
-		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
-		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
-		assertEquals(requestUuid, JsonPath.read(syncMsg, "metadata.requestUuid"));
-	}
-	
-	@Test
-	public void shouldProcessASyncRequestAndTheEntityIsNotFound() throws Exception {
-		final String table = "patient";
-		final String uuid = "person-uuid";
-		final String msgUuid = "msg-uuid";
-		final String requestUuid = "request-uuid";
-		final String op = "r";
-		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
-		SenderSyncMessage msg = createSyncMessage(table, uuid, msgUuid, op, requestUuid);
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		mockActiveMqEndpoint.expectedMessageCount(1);
-		final List<String> syncMessages = new ArrayList();
-		mockActiveMqEndpoint.whenAnyExchangeReceived(e -> syncMessages.add(e.getIn().getBody(String.class)));
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(msg);
-		
-		producerTemplate.send(URI_ACTIVEMQ_PUBLISHER, exchange);
-		
-		mockActiveMqEndpoint.assertIsSatisfied();
-		assertEquals(1, TestUtils.getEntities(SenderSyncMessage.class).size());
-		assertEquals(SENT, TestUtils.getEntity(SenderSyncMessage.class, msg.getId()).getStatus());
-		assertEquals(1, syncMessages.size());
-		
-		String syncMsg = syncMessages.get(0);
-		assertNull(JsonPath.read(syncMsg, "tableToSyncModelClass"));
-		assertNull(uuid, JsonPath.read(syncMsg, "model"));
-		assertEquals(SENDER_ID, JsonPath.read(syncMsg, "metadata.sourceIdentifier"));
-		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
-		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
-		assertEquals(false, JsonPath.read(syncMsg, "metadata.snapshot"));
-		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
-		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
-		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
-		assertEquals(requestUuid, JsonPath.read(syncMsg, "metadata.requestUuid"));
-		assertMessageLogged(Level.INFO, "Entity not found for request with uuid: " + requestUuid);
 	}
 	
 }
