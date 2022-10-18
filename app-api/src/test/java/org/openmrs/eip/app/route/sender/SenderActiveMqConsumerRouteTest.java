@@ -93,7 +93,7 @@ public class SenderActiveMqConsumerRouteTest extends BaseSenderRouteTest {
 		SenderSyncResponse savedResponse = responses.get(0);
 		assertEquals(messageUuid, savedResponse.getMessageUuid());
 		assertEquals(dateSent, savedResponse.getDateSentByReceiver());
-		assertEquals(dateReceived, savedResponse.getReceiverDateReceived());
+		assertEquals(dateReceived, savedResponse.getDateReceivedByReceiver());
 		assertNotNull(savedResponse.getDateCreated());
 		assertTrue(Whitebox.getInternalState(CustomMessageListenerContainer.class, "commit"));
 	}
