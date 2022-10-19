@@ -46,6 +46,7 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 		SenderSyncResponse response = new SenderSyncResponse();
 		response.setMessageUuid(messageUuid);
 		response.setDateSentByReceiver(LocalDateTime.now());
+		response.setDateReceivedByReceiver(LocalDateTime.now());
 		response.setDateCreated(new Date());
 		TestUtils.saveEntity(response);
 		return response;
@@ -79,6 +80,7 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 		assertEquals(msg.getMessageUuid(), archive.getMessageUuid());
 		assertEquals(msg.getRequestUuid(), archive.getRequestUuid());
 		assertEquals(msg.getDateSent(), archive.getDateSent());
+		assertEquals(response.getDateReceivedByReceiver(), archive.getDateReceivedByReceiver());
 		assertNotNull(msg.getDateCreated());
 	}
 	

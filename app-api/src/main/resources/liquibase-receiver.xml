@@ -1224,7 +1224,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="date_received" type="DATETIME(3)" />
-            <column name="date_created" type="DATETIME(3)">
+            <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
         </createTable>

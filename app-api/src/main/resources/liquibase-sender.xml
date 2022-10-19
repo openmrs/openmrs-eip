@@ -389,7 +389,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="event_date" type="DATETIME(3)" />
-            <column name="date_created" type="DATETIME(3)">
+            <column name="date_received_by_receiver" type="DATETIME" >
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
         </createTable>

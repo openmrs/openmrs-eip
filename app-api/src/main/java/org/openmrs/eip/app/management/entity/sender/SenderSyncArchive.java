@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.entity.sender;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -49,6 +50,10 @@ public class SenderSyncArchive extends AbstractEntity {
 	
 	@Column(name = "event_date", updatable = false)
 	private Date eventDate;
+	
+	@NotNull
+	@Column(name = "date_received_by_receiver", nullable = false, updatable = false)
+	private LocalDateTime dateReceivedByReceiver;
 	
 	public SenderSyncArchive() {
 	}
@@ -129,11 +134,20 @@ public class SenderSyncArchive extends AbstractEntity {
 		this.eventDate = eventDate;
 	}
 	
+	public LocalDateTime getDateReceivedByReceiver() {
+		return dateReceivedByReceiver;
+	}
+	
+	public void setDateReceivedByReceiver(LocalDateTime dateReceivedByReceiver) {
+		this.dateReceivedByReceiver = dateReceivedByReceiver;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", tableName=" + tableName + ", identifier=" + identifier
 		        + ", operation=" + operation + ", messageUuid=" + messageUuid + ", requestUuid=" + requestUuid
-		        + ", snapshot=" + snapshot + ", dateSent=" + dateSent + "}";
+		        + ", snapshot=" + snapshot + ", dateSent=" + dateSent + ", dateReceivedByReceiver=" + dateReceivedByReceiver
+		        + "}";
 	}
 	
 }

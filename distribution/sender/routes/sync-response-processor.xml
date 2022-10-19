@@ -28,6 +28,7 @@
                 <script>
                     <spel>
                         #{body.setDateCreated(new java.util.Date())}
+                        #{body.setDateReceivedByReceiver(getProperty('syncResponse').dateReceivedByReceiver)}
                     </spel>
                 </script>
 
