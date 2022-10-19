@@ -30,7 +30,7 @@ import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
 import org.powermock.reflect.Whitebox;
 
-public class BaseSenderQueueProcessorTest {
+public class BaseQueueProcessorTest {
 	
 	private DebeziumEventProcessor processor;
 	
@@ -41,17 +41,14 @@ public class BaseSenderQueueProcessorTest {
 	
 	@BeforeClass
 	public static void beforeClass() {
-		if (Whitebox.getInternalState(BaseParallelProcessor.class, "executor") == null) {
-			executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
-			Whitebox.setInternalState(BaseParallelProcessor.class, "executor", executor);
-		}
+		executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
+		Whitebox.setInternalState(BaseParallelProcessor.class, "executor", executor);
 	}
 	
 	@AfterClass
 	public static void afterClass() {
-		if (executor != null) {
-			executor.shutdownNow();
-		}
+		executor.shutdownNow();
+		Whitebox.setInternalState(BaseParallelProcessor.class, "executor", (Object) null);
 	}
 	
 	@Before

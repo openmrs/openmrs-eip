@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
@@ -24,6 +25,7 @@ import org.testcontainers.lifecycle.Startables;
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
 @Import({ TestDBConfig.class })
+@DirtiesContext
 @TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")
