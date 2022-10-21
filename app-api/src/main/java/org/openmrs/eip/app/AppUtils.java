@@ -1,13 +1,20 @@
 package org.openmrs.eip.app;
 
+import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_FILE;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +22,8 @@ import org.slf4j.LoggerFactory;
 public class AppUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(AppUtils.class);
+	
+	private static final Properties PROPERTIES;
 	
 	private static boolean appContextStopping = false;
 	
@@ -32,6 +41,14 @@ public class AppUtils {
 		IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
 		IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
+		
+		try (InputStream file = SyncConstants.class.getClassLoader().getResourceAsStream(DBSYNC_PROP_FILE)) {
+			PROPERTIES = new Properties();
+			PROPERTIES.load(file);
+		}
+		catch (IOException e) {
+			throw new EIPException("Failed to load the dbsync properties file: ", e);
+		}
 	}
 	
 	private static Map<String, String> classAndSimpleNameMap = null;
@@ -134,6 +151,20 @@ public class AppUtils {
 		
 		//Shutdown in a new thread to ensure other background shutdown threads complete too
 		new Thread(() -> System.exit(129)).start();
+	}
+	
+	/**
+	 * Gets the application version
+	 *
+	 * @return application version
+	 */
+	public static String getVersion() {
+		String version = PROPERTIES.getProperty("version");
+		if (StringUtils.isBlank(version)) {
+			log.warn("Failed to determine the application version");
+		}
+		
+		return version;
 	}
 	
 }

@@ -1,8 +1,9 @@
 package org.openmrs.eip.web.contoller;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +23,16 @@ public class AppPropertiesController {
 	private Environment env;
 	
 	/**
-	 * Gets the sync mode i.e. receiver vs sender
+	 * Gets the application properties
 	 * 
 	 * @return
 	 */
 	@GetMapping
-	public Map<String, Object> getSyncMode() {
-		return Collections.singletonMap("syncMode", env.getActiveProfiles()[0].toUpperCase());
+	public Map<String, Object> getAppProperties() {
+		HashMap<String, Object> properties = new HashMap();
+		properties.put("version", AppUtils.getVersion());
+		properties.put("syncMode", env.getActiveProfiles()[0].toUpperCase());
+		return properties;
 	}
 	
 }

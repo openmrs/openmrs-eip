@@ -27,16 +27,15 @@ body {
 
 #body-main {
 	top: 57px;
-	bottom: 20px;
+	bottom: 16px;
 	overflow: auto;
 }
 
 #body-footer {
 	bottom: 0;
-	height: 20px;
-	text-align: center;
+	height: 16px !important;
 	color: $themeColorSecondary;
-	font-size: 0.8em;
+	font-size: 0.6em;
 }
 
 #header-main nav.navbar {
