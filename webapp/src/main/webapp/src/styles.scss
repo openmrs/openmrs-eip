@@ -7,17 +7,50 @@
 @import '~bootstrap/scss/bootstrap';
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
 body {
 	color: $textColorDarkGray;
 }
 
-.ui-bar-header {
+#body-header {
+	top: 0;
+	height: 57px;
+	color: $themeColorSecondary;
+	font-size: 0.8em;
+}
+
+#body-main {
+	top: 57px;
+	bottom: 20px;
+	overflow: auto;
+}
+
+#body-footer {
+	bottom: 0;
+	height: 20px;
+	text-align: center;
+	color: $themeColorSecondary;
+	font-size: 0.8em;
+}
+
+#header-main nav.navbar {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+#ui-bar-header {
 	height: 3px !important;
 	background-color: $themeColorSecondary;
 }
 
 .ui-bar-spacer {
-	height: 15px !important;
+	height: 10px !important;
 }
 
 .ui-bar-spacer-content {
@@ -108,10 +141,6 @@ body {
 
 .ui-no-wrap {
 	white-space: nowrap;
-}
-
-.tab-content-container {
-	min-height: 500px;
 }
 
 

@@ -1,7 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
-<div>
+<div id="header-main">
     <nav class="navbar navbar-expand-lg bg-gradient-dark text-white justify-content-between">
         <span class="navbar-brand">DB SYNC</span>
         <sec:authorize access="isFullyAuthenticated()">
@@ -16,5 +16,5 @@
         </sec:authorize>
     </nav>
 </div>
-<div class="ui-bar-header"></div>
+<div id="ui-bar-header"></div>
 <div class="ui-bar-spacer bg-silver"></div>
