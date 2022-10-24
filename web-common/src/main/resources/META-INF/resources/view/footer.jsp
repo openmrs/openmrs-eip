@@ -1,5 +1,6 @@
 <%@ page import="org.openmrs.eip.app.AppUtils" %>
 
-<div class="bg-silver text-center w-100 h-100">
-    <span id="appVersion"><spring:message code="app.version" />: <%= AppUtils.getVersion() %></span>
+<div class="bg-silver text-left w-100 h-100 pl-3">
+    <span id="app-version"><spring:message code="app.version" />: <%= AppUtils.getVersion() %></span>
+    <span id="app-build-number"><spring:message code="app.build.number" />: <%= AppUtils.getBuildNumber() %></span>
 </div>

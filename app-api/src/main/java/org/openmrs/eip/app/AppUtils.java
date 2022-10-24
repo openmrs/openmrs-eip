@@ -1,6 +1,8 @@
 package org.openmrs.eip.app;
 
+import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_BUILD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_FILE;
+import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_VERSION;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,12 +161,26 @@ public class AppUtils {
 	 * @return application version
 	 */
 	public static String getVersion() {
-		String version = PROPERTIES.getProperty("version");
+		String version = PROPERTIES.getProperty(DBSYNC_PROP_VERSION);
 		if (StringUtils.isBlank(version)) {
 			log.warn("Failed to determine the application version");
 		}
 		
 		return version;
+	}
+	
+	/**
+	 * Gets the buildnumber
+	 *
+	 * @return application version
+	 */
+	public static String getBuildNumber() {
+		String build = PROPERTIES.getProperty(DBSYNC_PROP_BUILD_NUMBER);
+		if (StringUtils.isBlank(build)) {
+			log.warn("Failed to determine the application's build number");
+		}
+		
+		return build;
 	}
 	
 }
