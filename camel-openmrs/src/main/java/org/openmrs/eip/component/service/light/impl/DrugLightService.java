@@ -10,21 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DrugLightService extends AbstractLightService<DrugLight> {
-
-    private LightService<ConceptLight> conceptService;
-
-    public DrugLightService(final OpenmrsRepository<DrugLight> repository,
-                            final LightService<ConceptLight> conceptService) {
-        super(repository);
-        this.conceptService = conceptService;
-    }
-
-    @Override
-    protected DrugLight createPlaceholderEntity(final String uuid) {
-        DrugLight drug = new DrugLight();
-        drug.setDateCreated(DEFAULT_DATE);
-        drug.setCreator(SyncContext.getAppUser().getId());
-        drug.setConcept(conceptService.getOrInitPlaceholderEntity());
-        return drug;
-    }
+	
+	private LightService<ConceptLight> conceptService;
+	
+	public DrugLightService(final OpenmrsRepository<DrugLight> repository, final LightService<ConceptLight> conceptService) {
+		super(repository);
+		this.conceptService = conceptService;
+	}
+	
+	@Override
+	protected DrugLight createPlaceholderEntity(final String uuid) {
+		DrugLight drug = new DrugLight();
+		drug.setDateCreated(DEFAULT_DATE);
+		drug.setCreator(SyncContext.getAppUser().getId());
+		drug.setConcept(conceptService.getOrInitPlaceholderEntity());
+		return drug;
+	}
 }

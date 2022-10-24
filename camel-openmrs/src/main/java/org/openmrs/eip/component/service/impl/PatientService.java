@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PatientService extends AbstractSubclassEntityService<Person, Patient, PatientModel> {
-
-    public PatientService(final SyncEntityRepository<Patient> patientRepository, SyncEntityRepository<Person> personRepository,
-                          final EntityToModelMapper<Patient, PatientModel> entityToModelMapper,
-                          final ModelToEntityMapper<PatientModel, Patient> modelToEntityMapper) {
-
-        super(patientRepository, personRepository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.PATIENT;
-    }
-
+	
+	public PatientService(final SyncEntityRepository<Patient> patientRepository,
+	    SyncEntityRepository<Person> personRepository, final EntityToModelMapper<Patient, PatientModel> entityToModelMapper,
+	    final ModelToEntityMapper<PatientModel, Patient> modelToEntityMapper) {
+		
+		super(patientRepository, personRepository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.PATIENT;
+	}
+	
 }

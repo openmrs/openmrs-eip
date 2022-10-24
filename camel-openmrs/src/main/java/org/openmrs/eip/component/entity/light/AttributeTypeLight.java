@@ -11,12 +11,12 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
 public abstract class AttributeTypeLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    @Column(name = "min_occurs")
-    private long minOccurs;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
+	
+	@NotNull
+	@Column(name = "min_occurs")
+	private long minOccurs;
 }

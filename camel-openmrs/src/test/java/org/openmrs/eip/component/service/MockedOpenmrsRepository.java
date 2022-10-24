@@ -6,5 +6,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface MockedOpenmrsRepository extends SyncEntityRepository<MockedEntity> {
-
+	
 }

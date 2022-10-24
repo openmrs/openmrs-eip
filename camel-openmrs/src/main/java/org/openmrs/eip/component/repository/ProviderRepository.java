@@ -9,14 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ProviderRepository extends SyncEntityRepository<Provider> {
-
-    @Override
-    @Query(" select p from Provider p " +
-           " where p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-           " or p.dateChanged >= :lastSyncDate")
-    List<Provider> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
-    
-    @Override
-    @Cacheable(cacheNames = "providerAll")
-    List<Provider> findAll();
+	
+	@Override
+	@Query(" select p from Provider p " + " where p.dateChanged is null and p.dateCreated >= :lastSyncDate "
+	        + " or p.dateChanged >= :lastSyncDate")
+	List<Provider> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Cacheable(cacheNames = "providerAll")
+	List<Provider> findAll();
 }

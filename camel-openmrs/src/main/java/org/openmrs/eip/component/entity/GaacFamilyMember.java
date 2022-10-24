@@ -24,36 +24,37 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac_family_member")
 @AttributeOverride(name = "id", column = @Column(name = "family_member_id"))
 public class GaacFamilyMember extends BaseChangeableDataEntity {
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "family_id")
-    private GaacFamilyLight family;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private PatientLight member;
-    
-    @ManyToOne
-    @JoinColumn(name = "family_member_relacao")
-    private RelationshipLight familyMemberRelacao;
-    
-    @Column(name = "start_date")
-    protected LocalDateTime startDate;
-    
-    @Column(name = "end_date")
-    protected LocalDateTime endDate;
-    
-    @ManyToOne
-    @JoinColumn(name = "reason_leaving_type")
-    private GaacReasonLeavingTypeLight reasonLeavingType;
-    
-    @Column(name = "leaving")
-    private Boolean leaving;
-    
-    @Column(name = "restart")
-    private Boolean restart;
-    
-    @Column(name = "restart_date")
-    protected LocalDateTime restartDate;
- }
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "family_id")
+	private GaacFamilyLight family;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "member_id")
+	private PatientLight member;
+	
+	@ManyToOne
+	@JoinColumn(name = "family_member_relacao")
+	private RelationshipLight familyMemberRelacao;
+	
+	@Column(name = "start_date")
+	protected LocalDateTime startDate;
+	
+	@Column(name = "end_date")
+	protected LocalDateTime endDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "reason_leaving_type")
+	private GaacReasonLeavingTypeLight reasonLeavingType;
+	
+	@Column(name = "leaving")
+	private Boolean leaving;
+	
+	@Column(name = "restart")
+	private Boolean restart;
+	
+	@Column(name = "restart_date")
+	protected LocalDateTime restartDate;
+}

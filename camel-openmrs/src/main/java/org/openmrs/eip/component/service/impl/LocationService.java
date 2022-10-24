@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LocationService extends AbstractEntityService<Location, LocationModel> {
-
-    public LocationService(final SyncEntityRepository<Location> repository,
-                           final EntityToModelMapper<Location, LocationModel> entityToModelMapper,
-                           final ModelToEntityMapper<LocationModel, Location> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.LOCATION;
-    }
+	
+	public LocationService(final SyncEntityRepository<Location> repository,
+	    final EntityToModelMapper<Location, LocationModel> entityToModelMapper,
+	    final ModelToEntityMapper<LocationModel, Location> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.LOCATION;
+	}
 }

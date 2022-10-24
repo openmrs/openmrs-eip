@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AllergyRepository extends SyncEntityRepository<Allergy> {
-
-    @Override
-    @Query("select a from Allergy a " +
-            "where a.dateChanged is null and a.dateCreated >= :lastSyncDate " +
-            "or a.dateChanged >= :lastSyncDate")
-    List<Allergy> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select a from Allergy a " + "where a.dateChanged is null and a.dateCreated >= :lastSyncDate "
+	        + "or a.dateChanged >= :lastSyncDate")
+	List<Allergy> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

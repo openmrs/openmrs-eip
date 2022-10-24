@@ -11,27 +11,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProgramWorkflowLightService extends AbstractLightService<ProgramWorkflowLight> {
-
-    private LightService<ConceptLight> conceptService;
-
-    private LightService<ProgramLight> programService;
-
-    public ProgramWorkflowLightService(final OpenmrsRepository<ProgramWorkflowLight> repository,
-                                       final LightService<ConceptLight> conceptService,
-                                       final LightService<ProgramLight> programService) {
-        super(repository);
-        this.conceptService = conceptService;
-        this.programService = programService;
-    }
-
-    @Override
-    protected ProgramWorkflowLight createPlaceholderEntity(final String uuid) {
-        ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
-        programWorkflow.setDateCreated(DEFAULT_DATE);
-        programWorkflow.setCreator(SyncContext.getAppUser().getId());
-        programWorkflow.setConcept(conceptService.getOrInitPlaceholderEntity());
-        programWorkflow.setProgram(programService.getOrInitPlaceholderEntity());
-
-        return programWorkflow;
-    }
+	
+	private LightService<ConceptLight> conceptService;
+	
+	private LightService<ProgramLight> programService;
+	
+	public ProgramWorkflowLightService(final OpenmrsRepository<ProgramWorkflowLight> repository,
+	    final LightService<ConceptLight> conceptService, final LightService<ProgramLight> programService) {
+		super(repository);
+		this.conceptService = conceptService;
+		this.programService = programService;
+	}
+	
+	@Override
+	protected ProgramWorkflowLight createPlaceholderEntity(final String uuid) {
+		ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
+		programWorkflow.setDateCreated(DEFAULT_DATE);
+		programWorkflow.setCreator(SyncContext.getAppUser().getId());
+		programWorkflow.setConcept(conceptService.getOrInitPlaceholderEntity());
+		programWorkflow.setProgram(programService.getOrInitPlaceholderEntity());
+		
+		return programWorkflow;
+	}
 }

@@ -4,16 +4,21 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class EncounterProviderModel extends BaseChangeableDataModel {
-    private String encounterUuid;
-    private String providerUuid;
-    private String encounterRoleUuid;
-    
+	
+	private String encounterUuid;
+	
+	private String providerUuid;
+	
+	private String encounterRoleUuid;
+	
 	public String getEncounterUuid() {
 		return encounterUuid;
 	}
+	
 	public void setEncounterUuid(String encounterUuid) {
 		this.encounterUuid = encounterUuid;
 	}
+	
 	public String getProviderUuid() {
 		return providerUuid;
 	}
@@ -25,6 +30,7 @@ public class EncounterProviderModel extends BaseChangeableDataModel {
 	public String getEncounterRoleUuid() {
 		return encounterRoleUuid;
 	}
+	
 	public void setEncounterRoleUuid(String encounterRoleUuid) {
 		this.encounterRoleUuid = encounterRoleUuid;
 	}

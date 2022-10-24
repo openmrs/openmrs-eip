@@ -5,8 +5,8 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface EncounterLightRepository extends OpenmrsRepository<EncounterLight> {
-
-    @Override
-    @Cacheable(cacheNames = "encounter", unless="#result == null")
-    EncounterLight findByUuid(String uuid);
+	
+	@Override
+	@Cacheable(cacheNames = "encounter", unless = "#result == null")
+	EncounterLight findByUuid(String uuid);
 }

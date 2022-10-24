@@ -13,5 +13,4 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "provider_attribute_type")
 @AttributeOverride(name = "id", column = @Column(name = "provider_attribute_type_id"))
-public class ProviderAttributeTypeLight extends AttributeTypeLight {
-}
+public class ProviderAttributeTypeLight extends AttributeTypeLight {}

@@ -15,27 +15,27 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import static org.junit.Assert.assertEquals;
 
 public class AllergyServiceTest {
-
-    @Mock
-    private SyncEntityRepository<Allergy> repository;
-
-    @Mock
-    private EntityToModelMapper<Allergy, AllergyModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<AllergyModel, Allergy> modelToEntityMapper;
-
-    private AllergyService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new AllergyService(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.ALLERGY, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<Allergy> repository;
+	
+	@Mock
+	private EntityToModelMapper<Allergy, AllergyModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<AllergyModel, Allergy> modelToEntityMapper;
+	
+	private AllergyService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new AllergyService(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.ALLERGY, service.getTableToSync());
+	}
 }

@@ -13,5 +13,4 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "concept_attribute_type")
 @AttributeOverride(name = "id", column = @Column(name = "concept_attribute_type_id"))
-public class ConceptAttributeTypeLight extends AttributeTypeLight {
-}
+public class ConceptAttributeTypeLight extends AttributeTypeLight {}

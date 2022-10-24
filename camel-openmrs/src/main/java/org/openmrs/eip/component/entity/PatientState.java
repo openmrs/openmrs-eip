@@ -20,20 +20,20 @@ import java.time.LocalDate;
 @Table(name = "patient_state")
 @AttributeOverride(name = "id", column = @Column(name = "patient_state_id"))
 public class PatientState extends BaseChangeableDataEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "patient_program_id")
-    private PatientProgramLight patientProgram;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "state")
-    private ProgramWorkflowStateLight state;
-
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "patient_program_id")
+	private PatientProgramLight patientProgram;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "state")
+	private ProgramWorkflowStateLight state;
+	
+	@Column(name = "start_date")
+	private LocalDate startDate;
+	
+	@Column(name = "end_date")
+	private LocalDate endDate;
 }

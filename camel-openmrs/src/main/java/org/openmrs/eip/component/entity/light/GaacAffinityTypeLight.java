@@ -15,8 +15,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac_affinity_type")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_affinity_type_id"))
 public class GaacAffinityTypeLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
 }

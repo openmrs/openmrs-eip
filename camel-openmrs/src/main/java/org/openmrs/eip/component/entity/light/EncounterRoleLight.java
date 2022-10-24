@@ -14,8 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "encounter_role")
 @AttributeOverride(name = "id", column = @Column(name = "encounter_role_id"))
-public class EncounterRoleLight extends RetireableLightEntity{
+public class EncounterRoleLight extends RetireableLightEntity {
+	
 	@NotNull
-    @Column(name = "name")
-    private String name;
+	@Column(name = "name")
+	private String name;
 }

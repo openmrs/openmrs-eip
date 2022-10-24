@@ -13,24 +13,24 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
 public abstract class LightEntity extends BaseEntity {
-
-    @Column(name = "creator")
-    private Long creator;
-
-    @NotNull
-    @Column(name = "date_created")
-    private LocalDateTime dateCreated;
-
-    public abstract void setMuted(boolean mute);
-
-    public abstract void setDateMuted(LocalDateTime dateMuted);
-
-    public abstract void setMuteReason(String muteReason);
-
-    public abstract void setMutedBy(Long mutedBy);
-
-    @Override
-    public boolean wasModifiedAfter(final BaseEntity model) {
-        return false;
-    }
+	
+	@Column(name = "creator")
+	private Long creator;
+	
+	@NotNull
+	@Column(name = "date_created")
+	private LocalDateTime dateCreated;
+	
+	public abstract void setMuted(boolean mute);
+	
+	public abstract void setDateMuted(LocalDateTime dateMuted);
+	
+	public abstract void setMuteReason(String muteReason);
+	
+	public abstract void setMutedBy(Long mutedBy);
+	
+	@Override
+	public boolean wasModifiedAfter(final BaseEntity model) {
+		return false;
+	}
 }

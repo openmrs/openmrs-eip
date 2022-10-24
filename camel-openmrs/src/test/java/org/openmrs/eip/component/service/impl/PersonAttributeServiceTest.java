@@ -13,25 +13,25 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 
 public class PersonAttributeServiceTest {
-
+	
 	@Mock
 	private SyncEntityRepository<PersonAttribute> repository;
-
+	
 	@Mock
 	private EntityToModelMapper<PersonAttribute, PersonAttributeModel> entityToModelMapper;
-
+	
 	@Mock
 	private ModelToEntityMapper<PersonAttributeModel, PersonAttribute> modelToEntityMapper;
-
+	
 	private PersonAttributeService service;
-
+	
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
-
+		
 		service = new PersonAttributeService(repository, entityToModelMapper, modelToEntityMapper);
 	}
-
+	
 	@Test
 	public void getTableToSync() {
 		Assert.assertEquals(TableToSyncEnum.PERSON_ATTRIBUTE, service.getTableToSync());

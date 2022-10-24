@@ -12,14 +12,14 @@ import javax.validation.constraints.NotNull;
 @Table(name = "patient_program")
 @AttributeOverride(name = "id", column = @Column(name = "patient_program_id"))
 public class PatientProgramLight extends VoidableLightEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private PatientLight patient;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "program_id")
-    private ProgramLight program;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "patient_id")
+	private PatientLight patient;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "program_id")
+	private ProgramLight program;
 }

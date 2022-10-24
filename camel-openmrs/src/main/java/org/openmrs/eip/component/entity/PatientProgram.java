@@ -22,28 +22,28 @@ import java.time.LocalDateTime;
 @Table(name = "patient_program")
 @AttributeOverride(name = "id", column = @Column(name = "patient_program_id"))
 public class PatientProgram extends BaseChangeableDataEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private PatientLight patient;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "program_id")
-    private ProgramLight program;
-
-    @Column(name = "date_enrolled")
-    private LocalDateTime dateEnrolled;
-
-    @Column(name = "date_completed")
-    private LocalDateTime dateCompleted;
-
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationLight location;
-
-    @ManyToOne
-    @JoinColumn(name = "outcome_concept_id")
-    private ConceptLight outcomeConcept;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "patient_id")
+	private PatientLight patient;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "program_id")
+	private ProgramLight program;
+	
+	@Column(name = "date_enrolled")
+	private LocalDateTime dateEnrolled;
+	
+	@Column(name = "date_completed")
+	private LocalDateTime dateCompleted;
+	
+	@ManyToOne
+	@JoinColumn(name = "location_id")
+	private LocationLight location;
+	
+	@ManyToOne
+	@JoinColumn(name = "outcome_concept_id")
+	private ConceptLight outcomeConcept;
 }

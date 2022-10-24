@@ -15,20 +15,21 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "relationship_type")
 @AttributeOverride(name = "id", column = @Column(name = "relationship_type_id"))
-public class RelationshipTypeLight extends RetireableLightEntity{
-	@NotNull
-    @Column(name = "a_is_to_b")
-    private String aIsToB;
+public class RelationshipTypeLight extends RetireableLightEntity {
 	
 	@NotNull
-    @Column(name = "b_is_to_a")
-    private String bIsToA;
+	@Column(name = "a_is_to_b")
+	private String aIsToB;
 	
 	@NotNull
-    @Column(name = "weight")
-    private Integer weight;
+	@Column(name = "b_is_to_a")
+	private String bIsToA;
 	
 	@NotNull
-    @Column(name = "preferred")
-    private Boolean preferred;
+	@Column(name = "weight")
+	private Integer weight;
+	
+	@NotNull
+	@Column(name = "preferred")
+	private Boolean preferred;
 }

@@ -64,7 +64,7 @@ import ch.qos.logback.core.read.ListAppender;
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
-
+	
 	@Autowired
 	protected ApplicationContext applicationContext;
 	

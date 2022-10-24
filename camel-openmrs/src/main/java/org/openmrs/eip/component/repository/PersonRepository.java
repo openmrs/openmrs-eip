@@ -9,14 +9,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PersonRepository extends SyncEntityRepository<Person> {
-
-    @Override
-    @Query("select p from Person p " +
-            "where (p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-            "or p.dateChanged >= :lastSyncDate)")
-    List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
-
-    @Override
-    @Cacheable(cacheNames = "personAll")
-    List<Person> findAll();
+	
+	@Override
+	@Query("select p from Person p " + "where (p.dateChanged is null and p.dateCreated >= :lastSyncDate "
+	        + "or p.dateChanged >= :lastSyncDate)")
+	List<Person> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Cacheable(cacheNames = "personAll")
+	List<Person> findAll();
 }

@@ -8,18 +8,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CareSettingLightService extends AbstractLightService<CareSettingLight> {
-
-    public CareSettingLightService(final OpenmrsRepository<CareSettingLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected CareSettingLight createPlaceholderEntity(final String uuid) {
-        CareSettingLight careSetting = new CareSettingLight();
-        careSetting.setDateCreated(DEFAULT_DATE);
-        careSetting.setCreator(SyncContext.getAppUser().getId());
-        careSetting.setCareSettingType(DEFAULT_STRING);
-        careSetting.setName(DEFAULT_STRING);
-        return careSetting;
-    }
+	
+	public CareSettingLightService(final OpenmrsRepository<CareSettingLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected CareSettingLight createPlaceholderEntity(final String uuid) {
+		CareSettingLight careSetting = new CareSettingLight();
+		careSetting.setDateCreated(DEFAULT_DATE);
+		careSetting.setCreator(SyncContext.getAppUser().getId());
+		careSetting.setCareSettingType(DEFAULT_STRING);
+		careSetting.setName(DEFAULT_STRING);
+		return careSetting;
+	}
 }

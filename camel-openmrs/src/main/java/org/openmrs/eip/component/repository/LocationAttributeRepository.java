@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LocationAttributeRepository extends SyncEntityRepository<LocationAttribute> {
-
-    @Override
-    @Query("select l from LocationAttribute l " +
-            "where l.dateChanged is null and l.dateCreated >= :lastSyncDate " +
-            "or l.dateChanged >= :lastSyncDate")
-    List<LocationAttribute> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select l from LocationAttribute l " + "where l.dateChanged is null and l.dateCreated >= :lastSyncDate "
+	        + "or l.dateChanged >= :lastSyncDate")
+	List<LocationAttribute> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

@@ -17,6 +17,6 @@ import lombok.EqualsAndHashCode;
 public class ProviderManagementProviderRoleLight extends RetireableLightEntity {
 	
 	@NotNull
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
 }

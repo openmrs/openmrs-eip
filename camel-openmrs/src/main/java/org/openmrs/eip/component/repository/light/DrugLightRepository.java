@@ -5,8 +5,8 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface DrugLightRepository extends OpenmrsRepository<DrugLight> {
-
-    @Override
-    @Cacheable(cacheNames = "drug", unless="#result == null")
-    DrugLight findByUuid(String uuid);
+	
+	@Override
+	@Cacheable(cacheNames = "drug", unless = "#result == null")
+	DrugLight findByUuid(String uuid);
 }

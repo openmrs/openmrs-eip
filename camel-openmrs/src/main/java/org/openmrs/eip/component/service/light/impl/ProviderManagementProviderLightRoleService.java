@@ -8,17 +8,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderManagementProviderLightRoleService extends AbstractLightService<ProviderManagementProviderRoleLight> {
-
-    public ProviderManagementProviderLightRoleService(final OpenmrsRepository<ProviderManagementProviderRoleLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected ProviderManagementProviderRoleLight createPlaceholderEntity(final String uuid) {
-    	ProviderManagementProviderRoleLight type = new ProviderManagementProviderRoleLight();
-        type.setName(DEFAULT_STRING);
-        type.setCreator(SyncContext.getAppUser().getId());
-        type.setDateCreated(DEFAULT_DATE);
-        return type;
-    }
+	
+	public ProviderManagementProviderLightRoleService(
+	    final OpenmrsRepository<ProviderManagementProviderRoleLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected ProviderManagementProviderRoleLight createPlaceholderEntity(final String uuid) {
+		ProviderManagementProviderRoleLight type = new ProviderManagementProviderRoleLight();
+		type.setName(DEFAULT_STRING);
+		type.setCreator(SyncContext.getAppUser().getId());
+		type.setDateCreated(DEFAULT_DATE);
+		return type;
+	}
 }

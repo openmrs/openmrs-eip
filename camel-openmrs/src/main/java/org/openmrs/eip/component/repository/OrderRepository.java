@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends SyncEntityRepository<Order> {
-
-    @Override
-    default List<Order> findModelsChangedAfterDate(LocalDateTime lastSyncDate) {
-        return null;
-    }
+	
+	@Override
+	default List<Order> findModelsChangedAfterDate(LocalDateTime lastSyncDate) {
+		return null;
+	}
 }

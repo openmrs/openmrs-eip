@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 @Table(name = "concept_class")
 @AttributeOverride(name = "id", column = @Column(name = "concept_class_id"))
 public class ConceptClassLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
 }

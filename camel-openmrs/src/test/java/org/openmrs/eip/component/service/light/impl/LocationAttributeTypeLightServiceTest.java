@@ -10,21 +10,21 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import static org.junit.Assert.assertNotNull;
 
 public class LocationAttributeTypeLightServiceTest {
-
-    @Mock
-    private OpenmrsRepository<LocationAttributeTypeLight> repository;
-
-    private LocationAttributeTypeLightService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new LocationAttributeTypeLightService(repository);
-    }
-
-    @Test
-    public void createEntity() {
-        assertNotNull(service.createEntity());
-    }
+	
+	@Mock
+	private OpenmrsRepository<LocationAttributeTypeLight> repository;
+	
+	private LocationAttributeTypeLightService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new LocationAttributeTypeLightService(repository);
+	}
+	
+	@Test
+	public void createEntity() {
+		assertNotNull(service.createEntity());
+	}
 }

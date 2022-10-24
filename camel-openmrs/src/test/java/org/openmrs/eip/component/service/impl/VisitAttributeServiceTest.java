@@ -15,27 +15,27 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import static org.junit.Assert.assertEquals;
 
 public class VisitAttributeServiceTest {
-
-    @Mock
-    private SyncEntityRepository<VisitAttribute> repository;
-
-    @Mock
-    private EntityToModelMapper<VisitAttribute, VisitAttributeModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<VisitAttributeModel, VisitAttribute> modelToEntityMapper;
-
-    private VisitAttributeService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new VisitAttributeService(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.VISIT_ATTRIBUTE, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<VisitAttribute> repository;
+	
+	@Mock
+	private EntityToModelMapper<VisitAttribute, VisitAttributeModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<VisitAttributeModel, VisitAttribute> modelToEntityMapper;
+	
+	private VisitAttributeService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new VisitAttributeService(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.VISIT_ATTRIBUTE, service.getTableToSync());
+	}
 }

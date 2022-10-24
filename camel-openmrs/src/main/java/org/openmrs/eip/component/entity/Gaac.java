@@ -25,40 +25,40 @@ import lombok.EqualsAndHashCode;
 public class Gaac extends BaseChangeableDataEntity {
 	
 	@NotNull
-    @Column(name = "name")
-    private String name;
-    
-    @Column(name = "description")
-    private String description;
-    
-    @Column(name = "gaac_identifier")
-    private String gaac_identifier;
-    
-    @NotNull
-    @Column(name = "start_date")
-    protected LocalDateTime startDate;
-    
-    @Column(name = "end_date")
-    protected LocalDateTime endDate;
-    
-    @ManyToOne
-    @JoinColumn(name = "focal_patient_id")
-    private PatientLight focalPatient;
-
-    @ManyToOne
-    @JoinColumn(name = "affinity_type")
-    private GaacAffinityTypeLight affinityType;
-    		
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationLight location;
-
-    @Column(name = "crumbled")
-    private Boolean crumbled;
-    
-    @Column(name = "reason_crumbled")
-    private String reasonCrumbled;
-   
-    @Column(name = "date_crumbled")
-    protected LocalDateTime dateCrumbled;
+	@Column(name = "name")
+	private String name;
+	
+	@Column(name = "description")
+	private String description;
+	
+	@Column(name = "gaac_identifier")
+	private String gaac_identifier;
+	
+	@NotNull
+	@Column(name = "start_date")
+	protected LocalDateTime startDate;
+	
+	@Column(name = "end_date")
+	protected LocalDateTime endDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "focal_patient_id")
+	private PatientLight focalPatient;
+	
+	@ManyToOne
+	@JoinColumn(name = "affinity_type")
+	private GaacAffinityTypeLight affinityType;
+	
+	@ManyToOne
+	@JoinColumn(name = "location_id")
+	private LocationLight location;
+	
+	@Column(name = "crumbled")
+	private Boolean crumbled;
+	
+	@Column(name = "reason_crumbled")
+	private String reasonCrumbled;
+	
+	@Column(name = "date_crumbled")
+	protected LocalDateTime dateCrumbled;
 }

@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderAttributeTypeLightService extends AbstractAttributeTypeLightService<ProviderAttributeTypeLight> {
-
-    public ProviderAttributeTypeLightService(final OpenmrsRepository<ProviderAttributeTypeLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected ProviderAttributeTypeLight createEntity() {
-        return new ProviderAttributeTypeLight();
-    }
+	
+	public ProviderAttributeTypeLightService(final OpenmrsRepository<ProviderAttributeTypeLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected ProviderAttributeTypeLight createEntity() {
+		return new ProviderAttributeTypeLight();
+	}
 }

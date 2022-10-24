@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProviderAttributeRepository extends SyncEntityRepository<ProviderAttribute> {
-
-    @Override
-    @Query("select p from ProviderAttribute p " +
-            "where p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-            "or p.dateChanged >= :lastSyncDate")
-    List<ProviderAttribute> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select p from ProviderAttribute p " + "where p.dateChanged is null and p.dateCreated >= :lastSyncDate "
+	        + "or p.dateChanged >= :lastSyncDate")
+	List<ProviderAttribute> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

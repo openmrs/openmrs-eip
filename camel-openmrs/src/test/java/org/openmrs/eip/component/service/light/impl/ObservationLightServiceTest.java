@@ -20,68 +20,68 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class ObservationLightServiceTest {
-
-    @Mock
-    private OpenmrsRepository<ObservationLight> repository;
-
-    @Mock
-    private LightService<PersonLight> personService;
-
-    @Mock
-    private LightService<ConceptLight> conceptService;
-
-    private ObservationLightService service;
-
-    private static final Long USER_ID = 6L;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new ObservationLightService(repository, personService, conceptService);
-        UserLight user = new UserLight();
-        user.setId(USER_ID);
-        SyncContext.setAppUser(user);
-    }
-
-    @After
-    public void tearDown() {
-        SyncContext.setAppUser(null);
-    }
-
-    @Test
-    public void createPlaceholderEntity() {
-        // Given
-        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
-        when(personService.getOrInitPlaceholderEntity()).thenReturn(getPerson());
-        String uuid = "uuid";
-
-        // When
-        ObservationLight result = service.createPlaceholderEntity(uuid);
-
-        // Then
-        assertEquals(getExpectedObservation(), result);
-    }
-
-    private ObservationLight getExpectedObservation() {
-        ObservationLight observation = new ObservationLight();
-        observation.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        observation.setCreator(USER_ID);
-        observation.setObsDatetime(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        observation.setConcept(getConcept());
-        observation.setPerson(getPerson());
-        return observation;
-    }
-
-    private PersonLight getPerson() {
-        PersonLight person = new PersonLight();
-        person.setUuid("PLACEHOLDER_PERSON");
-        return person;
-    }
-
-    private ConceptLight getConcept() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("PLACEHOLDER_CONCEPT");
-        return concept;
-    }
+	
+	@Mock
+	private OpenmrsRepository<ObservationLight> repository;
+	
+	@Mock
+	private LightService<PersonLight> personService;
+	
+	@Mock
+	private LightService<ConceptLight> conceptService;
+	
+	private ObservationLightService service;
+	
+	private static final Long USER_ID = 6L;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new ObservationLightService(repository, personService, conceptService);
+		UserLight user = new UserLight();
+		user.setId(USER_ID);
+		SyncContext.setAppUser(user);
+	}
+	
+	@After
+	public void tearDown() {
+		SyncContext.setAppUser(null);
+	}
+	
+	@Test
+	public void createPlaceholderEntity() {
+		// Given
+		when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+		when(personService.getOrInitPlaceholderEntity()).thenReturn(getPerson());
+		String uuid = "uuid";
+		
+		// When
+		ObservationLight result = service.createPlaceholderEntity(uuid);
+		
+		// Then
+		assertEquals(getExpectedObservation(), result);
+	}
+	
+	private ObservationLight getExpectedObservation() {
+		ObservationLight observation = new ObservationLight();
+		observation.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+		observation.setCreator(USER_ID);
+		observation.setObsDatetime(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+		observation.setConcept(getConcept());
+		observation.setPerson(getPerson());
+		return observation;
+	}
+	
+	private PersonLight getPerson() {
+		PersonLight person = new PersonLight();
+		person.setUuid("PLACEHOLDER_PERSON");
+		return person;
+	}
+	
+	private ConceptLight getConcept() {
+		ConceptLight concept = new ConceptLight();
+		concept.setUuid("PLACEHOLDER_CONCEPT");
+		return concept;
+	}
 }

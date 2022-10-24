@@ -11,27 +11,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProgramWorkflowStateLightService extends AbstractLightService<ProgramWorkflowStateLight> {
-
-    private LightService<ConceptLight> conceptService;
-
-    private LightService<ProgramWorkflowLight> programWorkflowService;
-
-    public ProgramWorkflowStateLightService(final OpenmrsRepository<ProgramWorkflowStateLight> repository,
-                                            final LightService<ConceptLight> conceptService,
-                                            final LightService<ProgramWorkflowLight> programWorkflowService) {
-        super(repository);
-        this.conceptService = conceptService;
-        this.programWorkflowService = programWorkflowService;
-    }
-
-    @Override
-    protected ProgramWorkflowStateLight createPlaceholderEntity(final String uuid) {
-        ProgramWorkflowStateLight workflowState = new ProgramWorkflowStateLight();
-        workflowState.setDateCreated(DEFAULT_DATE);
-        workflowState.setCreator(SyncContext.getAppUser().getId());
-        workflowState.setConcept(conceptService.getOrInitPlaceholderEntity());
-        workflowState.setProgramWorkflow(programWorkflowService.getOrInitPlaceholderEntity());
-
-        return workflowState;
-    }
+	
+	private LightService<ConceptLight> conceptService;
+	
+	private LightService<ProgramWorkflowLight> programWorkflowService;
+	
+	public ProgramWorkflowStateLightService(final OpenmrsRepository<ProgramWorkflowStateLight> repository,
+	    final LightService<ConceptLight> conceptService, final LightService<ProgramWorkflowLight> programWorkflowService) {
+		super(repository);
+		this.conceptService = conceptService;
+		this.programWorkflowService = programWorkflowService;
+	}
+	
+	@Override
+	protected ProgramWorkflowStateLight createPlaceholderEntity(final String uuid) {
+		ProgramWorkflowStateLight workflowState = new ProgramWorkflowStateLight();
+		workflowState.setDateCreated(DEFAULT_DATE);
+		workflowState.setCreator(SyncContext.getAppUser().getId());
+		workflowState.setConcept(conceptService.getOrInitPlaceholderEntity());
+		workflowState.setProgramWorkflow(programWorkflowService.getOrInitPlaceholderEntity());
+		
+		return workflowState;
+	}
 }

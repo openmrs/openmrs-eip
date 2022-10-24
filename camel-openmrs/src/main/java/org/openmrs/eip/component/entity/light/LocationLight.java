@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 @Table(name = "location")
 @AttributeOverride(name = "id", column = @Column(name = "location_id"))
 public class LocationLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
 }

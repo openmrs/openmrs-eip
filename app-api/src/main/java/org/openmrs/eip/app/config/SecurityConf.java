@@ -8,16 +8,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SecurityConf {
-
-    @Bean
-    @ConfigurationProperties(prefix = "pgp.sender")
-    public SenderEncryptionProperties senderProperties() {
-        return new SenderEncryptionProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "pgp.receiver")
-    public ReceiverEncryptionProperties receiverProperties() {
-        return new ReceiverEncryptionProperties();
-    }
+	
+	@Bean
+	@ConfigurationProperties(prefix = "pgp.sender")
+	public SenderEncryptionProperties senderProperties() {
+		return new SenderEncryptionProperties();
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix = "pgp.receiver")
+	public ReceiverEncryptionProperties receiverProperties() {
+		return new ReceiverEncryptionProperties();
+	}
 }

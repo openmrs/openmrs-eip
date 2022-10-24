@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ConditionService extends AbstractEntityService<Condition, ConditionModel> {
-
-    public ConditionService(final SyncEntityRepository<Condition> repository,
-                            final EntityToModelMapper<Condition, ConditionModel> entityToModelMapper,
-                            final ModelToEntityMapper<ConditionModel, Condition> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.CONDITION;
-    }
+	
+	public ConditionService(final SyncEntityRepository<Condition> repository,
+	    final EntityToModelMapper<Condition, ConditionModel> entityToModelMapper,
+	    final ModelToEntityMapper<ConditionModel, Condition> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.CONDITION;
+	}
 }

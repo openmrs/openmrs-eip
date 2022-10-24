@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Table(name = "location_attribute")
 @AttributeOverride(name = "id", column = @Column(name = "location_attribute_id"))
 public class LocationAttribute extends Attribute<LocationAttributeTypeLight> {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationLight referencedEntity;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "location_id")
+	private LocationLight referencedEntity;
 }

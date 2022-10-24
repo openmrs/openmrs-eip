@@ -15,7 +15,7 @@ public class SenderRouteValidatorTest extends BaseRouteValidatorTest {
 		retryErrorHandlerRoutes.add("debezium-event-processor");
 		retryErrorHandlerRoutes.add("db-event-processor");
 		retryErrorHandlerRoutes.add("out-bound-db-sync");
-        retryErrorHandlerRoutes.add("sender-retry");
+		retryErrorHandlerRoutes.add("sender-retry");
 	}
 	
 	@Override

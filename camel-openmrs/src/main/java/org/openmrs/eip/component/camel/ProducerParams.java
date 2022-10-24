@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @EqualsAndHashCode
 public class ProducerParams {
-
-    private TableToSyncEnum tableToSync;
-
-    private LocalDateTime lastSyncDate;
-
-    private String uuid;
-
-    private Long id;
+	
+	private TableToSyncEnum tableToSync;
+	
+	private LocalDateTime lastSyncDate;
+	
+	private String uuid;
+	
+	private Long id;
 }

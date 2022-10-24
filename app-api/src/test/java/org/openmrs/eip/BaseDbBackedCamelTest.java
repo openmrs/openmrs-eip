@@ -57,7 +57,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
 		mysqlContainer.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
-
+		
 		Resource[] scripts = RESOURCE_RESOLVER.getResources("classpath*:" + SCRIPT_DIR + "*.sql");
 		
 		for (Resource script : scripts) {

@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Table(name = "concept_attribute")
 @AttributeOverride(name = "id", column = @Column(name = "concept_attribute_id"))
 public class ConceptAttribute extends Attribute<ConceptAttributeTypeLight> {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "concept_id")
-    private ConceptLight referencedEntity;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "concept_id")
+	private ConceptLight referencedEntity;
 }

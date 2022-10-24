@@ -11,13 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderService extends AbstractEntityService<Provider, ProviderModel> {
-
-    public ProviderService(final SyncEntityRepository<Provider> repository, final EntityToModelMapper<Provider, ProviderModel> entityToModelMapper, final ModelToEntityMapper<ProviderModel, Provider> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.PROVIDER;
-    }
+	
+	public ProviderService(final SyncEntityRepository<Provider> repository,
+	    final EntityToModelMapper<Provider, ProviderModel> entityToModelMapper,
+	    final ModelToEntityMapper<ProviderModel, Provider> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.PROVIDER;
+	}
 }

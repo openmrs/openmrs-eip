@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EncounterRepository extends SyncEntityRepository<Encounter> {
-
-    @Override
-    @Query("select e from Encounter e " +
-            "where e.dateChanged is null and e.dateCreated >= :lastSyncDate " +
-            "or e.dateChanged >= :lastSyncDate")
-    List<Encounter> findModelsChangedAfterDate(@Param(value = "lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select e from Encounter e " + "where e.dateChanged is null and e.dateCreated >= :lastSyncDate "
+	        + "or e.dateChanged >= :lastSyncDate")
+	List<Encounter> findModelsChangedAfterDate(@Param(value = "lastSyncDate") LocalDateTime lastSyncDate);
 }

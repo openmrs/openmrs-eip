@@ -10,14 +10,16 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 
 //@Service
 public class ErpWorkOrderStateService extends AbstractEntityService<ErpWorkOrderState, ErpWorkOrderStateModel> {
-
-    public ErpWorkOrderStateService(SyncEntityRepository<ErpWorkOrderState> repository, EntityToModelMapper<ErpWorkOrderState, ErpWorkOrderStateModel> entityToModelMapper, ModelToEntityMapper<ErpWorkOrderStateModel, ErpWorkOrderState> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return null;//TableToSyncEnum.ICRC_ERP_WORK_ORDER_STATE;
-    }
-
+	
+	public ErpWorkOrderStateService(SyncEntityRepository<ErpWorkOrderState> repository,
+	    EntityToModelMapper<ErpWorkOrderState, ErpWorkOrderStateModel> entityToModelMapper,
+	    ModelToEntityMapper<ErpWorkOrderStateModel, ErpWorkOrderState> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return null;//TableToSyncEnum.ICRC_ERP_WORK_ORDER_STATE;
+	}
+	
 }

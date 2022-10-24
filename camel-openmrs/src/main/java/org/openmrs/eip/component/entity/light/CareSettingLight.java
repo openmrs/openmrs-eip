@@ -15,12 +15,12 @@ import javax.validation.constraints.NotNull;
 @Table(name = "care_setting")
 @AttributeOverride(name = "id", column = @Column(name = "care_setting_id"))
 public class CareSettingLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    @Column(name = "care_setting_type")
-    private String careSettingType;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
+	
+	@NotNull
+	@Column(name = "care_setting_type")
+	private String careSettingType;
 }

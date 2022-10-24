@@ -100,7 +100,7 @@ public class SyncMetadata {
 	public void setMessageUuid(String messageUuid) {
 		this.messageUuid = messageUuid;
 	}
-  
+	
 	/**
 	 * Gets the snapshot
 	 *
@@ -122,7 +122,8 @@ public class SyncMetadata {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{sourceIdentifier=" + sourceIdentifier + ", operation=" + operation
-		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", messageUuid=" + messageUuid + ", snapshot=" + snapshot + "}";
+		        + ", dateSent=" + dateSent + ", requestUuid=" + requestUuid + ", messageUuid=" + messageUuid + ", snapshot="
+		        + snapshot + "}";
 	}
 	
 }

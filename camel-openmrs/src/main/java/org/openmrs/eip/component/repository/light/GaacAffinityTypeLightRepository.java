@@ -5,8 +5,8 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface GaacAffinityTypeLightRepository extends OpenmrsRepository<GaacAffinityTypeLight> {
-
-    @Override
-    @Cacheable(cacheNames = "gaacAffinityType", unless="#result == null")
-    GaacAffinityTypeLight findByUuid(String uuid);
+	
+	@Override
+	@Cacheable(cacheNames = "gaacAffinityType", unless = "#result == null")
+	GaacAffinityTypeLight findByUuid(String uuid);
 }

@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PersonAddressService extends AbstractEntityService<PersonAddress, PersonAddressModel> {
-
-    public PersonAddressService(final SyncEntityRepository<PersonAddress> repository,
-                                final EntityToModelMapper<PersonAddress, PersonAddressModel> entityToModelMapper,
-                                final ModelToEntityMapper<PersonAddressModel, PersonAddress> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.PERSON_ADDRESS;
-    }
+	
+	public PersonAddressService(final SyncEntityRepository<PersonAddress> repository,
+	    final EntityToModelMapper<PersonAddress, PersonAddressModel> entityToModelMapper,
+	    final ModelToEntityMapper<PersonAddressModel, PersonAddress> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.PERSON_ADDRESS;
+	}
 }

@@ -10,20 +10,20 @@ import java.util.List;
 
 @Component
 public class FetchModelsByIdRule implements FetchModelsRule {
-
-    private EntityServiceFacade entityServiceFacade;
-
-    public FetchModelsByIdRule(final EntityServiceFacade entityServiceFacade) {
-        this.entityServiceFacade = entityServiceFacade;
-    }
-
-    @Override
-    public boolean evaluate(final ProducerParams params) {
-        return params.getId() != null;
-    }
-
-    @Override
-    public List<BaseModel> getModels(final ProducerParams params) {
-        return Collections.singletonList(entityServiceFacade.getModel(params.getTableToSync(), params.getId()));
-    }
+	
+	private EntityServiceFacade entityServiceFacade;
+	
+	public FetchModelsByIdRule(final EntityServiceFacade entityServiceFacade) {
+		this.entityServiceFacade = entityServiceFacade;
+	}
+	
+	@Override
+	public boolean evaluate(final ProducerParams params) {
+		return params.getId() != null;
+	}
+	
+	@Override
+	public List<BaseModel> getModels(final ProducerParams params) {
+		return Collections.singletonList(entityServiceFacade.getModel(params.getTableToSync(), params.getId()));
+	}
 }

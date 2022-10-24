@@ -10,21 +10,21 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import static org.junit.Assert.assertNotNull;
 
 public class ConceptAttributeTypeLightServiceTest {
-
-    @Mock
-    private OpenmrsRepository<ConceptAttributeTypeLight> repository;
-
-    private ConceptAttributeTypeLightService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new ConceptAttributeTypeLightService(repository);
-    }
-
-    @Test
-    public void createEntity() {
-        assertNotNull(service.createEntity());
-    }
+	
+	@Mock
+	private OpenmrsRepository<ConceptAttributeTypeLight> repository;
+	
+	private ConceptAttributeTypeLightService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new ConceptAttributeTypeLightService(repository);
+	}
+	
+	@Test
+	public void createEntity() {
+		assertNotNull(service.createEntity());
+	}
 }

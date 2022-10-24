@@ -6,20 +6,31 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class GaacFamilyMemberModel extends BaseChangeableDataModel {
-    private String familyUuid;
-    private String memberUuid;
-    private Boolean leaving;
-    private Boolean restart;
-    protected LocalDateTime restartDate;
-    private String reasonLeavingTypeUuid;
-    private String description;
-    protected LocalDateTime startDate;
-    protected LocalDateTime endDate;
-    private String familyMemberRelacaoUuid;
+	
+	private String familyUuid;
+	
+	private String memberUuid;
+	
+	private Boolean leaving;
+	
+	private Boolean restart;
+	
+	protected LocalDateTime restartDate;
+	
+	private String reasonLeavingTypeUuid;
+	
+	private String description;
+	
+	protected LocalDateTime startDate;
+	
+	protected LocalDateTime endDate;
+	
+	private String familyMemberRelacaoUuid;
 	
 	public String getMemberUuid() {
 		return memberUuid;
 	}
+	
 	public void setMemberUuid(String memberUuid) {
 		this.memberUuid = memberUuid;
 	}
@@ -27,6 +38,7 @@ public class GaacFamilyMemberModel extends BaseChangeableDataModel {
 	public Boolean getLeaving() {
 		return leaving;
 	}
+	
 	public void setLeaving(Boolean leaving) {
 		this.leaving = leaving;
 	}
@@ -34,6 +46,7 @@ public class GaacFamilyMemberModel extends BaseChangeableDataModel {
 	public Boolean getRestart() {
 		return restart;
 	}
+	
 	public void setRestart(Boolean restart) {
 		this.restart = restart;
 	}
@@ -41,13 +54,15 @@ public class GaacFamilyMemberModel extends BaseChangeableDataModel {
 	public LocalDateTime getRestartDate() {
 		return restartDate;
 	}
+	
 	public void setRestartDate(LocalDateTime restartDate) {
 		this.restartDate = restartDate;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -55,6 +70,7 @@ public class GaacFamilyMemberModel extends BaseChangeableDataModel {
 	public LocalDateTime getStartDate() {
 		return startDate;
 	}
+	
 	public void setStartDate(LocalDateTime startDate) {
 		this.startDate = startDate;
 	}
@@ -62,25 +78,32 @@ public class GaacFamilyMemberModel extends BaseChangeableDataModel {
 	public LocalDateTime getEndDate() {
 		return endDate;
 	}
+	
 	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
 	}
+	
 	public String getFamilyMemberRelacaoUuid() {
 		return familyMemberRelacaoUuid;
 	}
+	
 	public void setFamilyMemberRelacaoUuid(String familyMemberRelacaoUuid) {
 		this.familyMemberRelacaoUuid = familyMemberRelacaoUuid;
 	}
+	
 	public String getFamilyUuid() {
 		return familyUuid;
 	}
+	
 	public void setFamilyUuid(String familyUuid) {
 		this.familyUuid = familyUuid;
 	}
+	
 	public String getReasonLeavingTypeUuid() {
 		return reasonLeavingTypeUuid;
 	}
+	
 	public void setReasonLeavingTypeUuid(String reasonLeavingTypeUuid) {
 		this.reasonLeavingTypeUuid = reasonLeavingTypeUuid;
-	} 
+	}
 }

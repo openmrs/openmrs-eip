@@ -12,34 +12,30 @@ import java.util.function.UnaryOperator;
 
 @Component
 public class ModelToEntityMapper<M extends BaseModel, E extends BaseEntity> implements Function<M, E> {
-
-    private Function<M, Context<E, M>> instantiateEntity;
-
-    private UnaryOperator<Context<E, M>> copyStandardFields;
-
-    private BiConsumer<Context<E, M>, String> linkLightEntity;
-
-    private BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute;
-
-    public ModelToEntityMapper(final Function<M, Context<E, M>> instantiateEntity,
-                               final UnaryOperator<Context<E, M>> copyStandardFields,
-                               final BiConsumer<Context<E, M>, String> linkLightEntity,
-                               final BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute) {
-        this.instantiateEntity = instantiateEntity;
-        this.copyStandardFields = copyStandardFields;
-        this.linkLightEntity = linkLightEntity;
-        this.forEachUuidAttribute = forEachUuidAttribute;
-    }
-
-    @Override
-    public E apply(final M model) {
-        return instantiateEntity
-                .andThen(copyStandardFields)
-                .andThen(forEachUuidAttribute(linkLightEntity))
-                .apply(model);
-    }
-
-    private Function<Context<E, M>, E> forEachUuidAttribute(final BiConsumer<Context<E, M>, String> linkEntity) {
-        return context -> forEachUuidAttribute.apply(context, linkEntity);
-    }
+	
+	private Function<M, Context<E, M>> instantiateEntity;
+	
+	private UnaryOperator<Context<E, M>> copyStandardFields;
+	
+	private BiConsumer<Context<E, M>, String> linkLightEntity;
+	
+	private BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute;
+	
+	public ModelToEntityMapper(final Function<M, Context<E, M>> instantiateEntity,
+	    final UnaryOperator<Context<E, M>> copyStandardFields, final BiConsumer<Context<E, M>, String> linkLightEntity,
+	    final BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> forEachUuidAttribute) {
+		this.instantiateEntity = instantiateEntity;
+		this.copyStandardFields = copyStandardFields;
+		this.linkLightEntity = linkLightEntity;
+		this.forEachUuidAttribute = forEachUuidAttribute;
+	}
+	
+	@Override
+	public E apply(final M model) {
+		return instantiateEntity.andThen(copyStandardFields).andThen(forEachUuidAttribute(linkLightEntity)).apply(model);
+	}
+	
+	private Function<Context<E, M>, E> forEachUuidAttribute(final BiConsumer<Context<E, M>, String> linkEntity) {
+		return context -> forEachUuidAttribute.apply(context, linkEntity);
+	}
 }

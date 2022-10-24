@@ -5,8 +5,8 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface PersonAttributeTypeLightRepository extends OpenmrsRepository<PersonAttributeTypeLight> {
-
-    @Override
-    @Cacheable(cacheNames = "personAttributeType", unless="#result == null")
-    PersonAttributeTypeLight findByUuid(String uuid);
+	
+	@Override
+	@Cacheable(cacheNames = "personAttributeType", unless = "#result == null")
+	PersonAttributeTypeLight findByUuid(String uuid);
 }

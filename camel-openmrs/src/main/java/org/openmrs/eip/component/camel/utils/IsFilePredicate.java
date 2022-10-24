@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
  */
 @Component("isFilePredicate")
 public class IsFilePredicate implements Predicate {
-
-    @Override
-    public boolean matches(final Exchange exchange) {
-        Object in = exchange.getIn().getBody();
-        if(in instanceof String){
-            String body = (String) in;
-
-            return body.startsWith(TypeEnum.FILE.getOpeningTag()) && body.endsWith(TypeEnum.FILE.getClosingTag());
-        }
-
-        return false;
-    }
+	
+	@Override
+	public boolean matches(final Exchange exchange) {
+		Object in = exchange.getIn().getBody();
+		if (in instanceof String) {
+			String body = (String) in;
+			
+			return body.startsWith(TypeEnum.FILE.getOpeningTag()) && body.endsWith(TypeEnum.FILE.getClosingTag());
+		}
+		
+		return false;
+	}
 }

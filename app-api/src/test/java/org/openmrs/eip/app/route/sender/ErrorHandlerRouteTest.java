@@ -89,7 +89,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 		assertEquals(event.getSnapshot(), errorItem.getEvent().getSnapshot());
 		assertEquals(event.getRequestUuid(), errorItem.getEvent().getRequestUuid());
 		assertEquals(1, errorItem.getAttemptCount().intValue());
-        assertEquals(debeziumEvent.getDateCreated(), errorItem.getEventDate());
+		assertEquals(debeziumEvent.getDateCreated(), errorItem.getEventDate());
 		assertNotNull(errorItem.getDateCreated());
 		assertNull(errorItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());

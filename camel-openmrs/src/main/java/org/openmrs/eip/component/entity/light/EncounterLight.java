@@ -13,18 +13,18 @@ import java.time.LocalDateTime;
 @Table(name = "encounter")
 @AttributeOverride(name = "id", column = @Column(name = "encounter_id"))
 public class EncounterLight extends VoidableLightEntity {
-
-    @NotNull
-    @Column(name = "encounter_datetime")
-    private LocalDateTime encounterDatetime;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private PatientLight patient;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "encounter_type")
-    private EncounterTypeLight encounterType;
+	
+	@NotNull
+	@Column(name = "encounter_datetime")
+	private LocalDateTime encounterDatetime;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "patient_id")
+	private PatientLight patient;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "encounter_type")
+	private EncounterTypeLight encounterType;
 }

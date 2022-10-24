@@ -85,7 +85,8 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 					log.info("No matching row in the patient table, inserting one");
 					id = person.getId();
 					PatientLight p = (PatientLight) entity;
-					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator() : SyncContext.getAppUser().getId();
+					Long creatorId = p.getPatientCreator() != null ? p.getPatientCreator()
+					        : SyncContext.getAppUser().getId();
 					
 					PatientServiceUtils.createPatient(id, uuid, p.isVoided(), creatorId, p.getPatientDateCreated());
 					

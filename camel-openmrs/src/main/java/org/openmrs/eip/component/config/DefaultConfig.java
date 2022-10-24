@@ -5,5 +5,4 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableCaching
-public class DefaultConfig {
-}
+public class DefaultConfig {}

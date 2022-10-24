@@ -8,19 +8,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PatientLightService extends AbstractLightService<PatientLight> {
-
-    public PatientLightService(final OpenmrsRepository<PatientLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected PatientLight createPlaceholderEntity(final String uuid) {
-        PatientLight patient = new PatientLight();
-        patient.setAllergyStatus(DEFAULT_STRING);
-        patient.setCreator(SyncContext.getAppUser().getId());
-        patient.setPatientCreator(SyncContext.getAppUser().getId());
-        patient.setDateCreated(DEFAULT_DATE);
-        patient.setPatientDateCreated(DEFAULT_DATE);
-        return patient;
-    }
+	
+	public PatientLightService(final OpenmrsRepository<PatientLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected PatientLight createPlaceholderEntity(final String uuid) {
+		PatientLight patient = new PatientLight();
+		patient.setAllergyStatus(DEFAULT_STRING);
+		patient.setCreator(SyncContext.getAppUser().getId());
+		patient.setPatientCreator(SyncContext.getAppUser().getId());
+		patient.setDateCreated(DEFAULT_DATE);
+		patient.setPatientDateCreated(DEFAULT_DATE);
+		return patient;
+	}
 }

@@ -12,18 +12,18 @@ import java.time.format.DateTimeFormatter;
  * Custom {@link com.fasterxml.jackson.databind.JsonSerializer} from {@link LocalDate} to String
  */
 public class LocalDateSerializer extends StdSerializer<LocalDate> {
-
-    public LocalDateSerializer() {
-        this(LocalDate.class);
-    }
-
-    public LocalDateSerializer(Class<LocalDate> ldt) {
-        super(ldt);
-    }
-
-    @Override
-    public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        gen.writeString(value.format(DateTimeFormatter.ISO_LOCAL_DATE));
-    }
-
+	
+	public LocalDateSerializer() {
+		this(LocalDate.class);
+	}
+	
+	public LocalDateSerializer(Class<LocalDate> ldt) {
+		super(ldt);
+	}
+	
+	@Override
+	public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeString(value.format(DateTimeFormatter.ISO_LOCAL_DATE));
+	}
+	
 }

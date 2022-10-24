@@ -23,24 +23,24 @@ import lombok.EqualsAndHashCode;
 @AttributeOverride(name = "id", column = @Column(name = "relationship_id"))
 public class Relationship extends BaseChangeableDataEntity {
 	
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_a")
-    private PersonLight persona;
-    
 	@NotNull
 	@ManyToOne
-    @JoinColumn(name = "relationship")
+	@JoinColumn(name = "person_a")
+	private PersonLight persona;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "relationship")
 	private RelationshipTypeLight relationshipType;
 	
 	@NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_b")
-    private PersonLight personb;
-    
-    @Column(name = "start_date")
-    protected LocalDateTime startDate;
-    
-    @Column(name = "end_date")
-    protected LocalDateTime endDate;
+	@ManyToOne
+	@JoinColumn(name = "person_b")
+	private PersonLight personb;
+	
+	@Column(name = "start_date")
+	protected LocalDateTime startDate;
+	
+	@Column(name = "end_date")
+	protected LocalDateTime endDate;
 }

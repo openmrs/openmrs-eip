@@ -9,17 +9,17 @@ import javax.jms.ConnectionFactory;
 
 @Configuration
 public class JmsConfig {
-
-    @Bean
-    public JmsTransactionManager jmsTransactionManager(final ConnectionFactory connectionFactory) {
-        JmsTransactionManager jmsTransactionManager = new JmsTransactionManager();
-        jmsTransactionManager.setConnectionFactory(connectionFactory);
-        return jmsTransactionManager;
-    }
-
-    @Bean
-    public JmsComponent jmsComponent(final ConnectionFactory connectionFactory,
-                                     final JmsTransactionManager jmsTransactionManager) {
-        return JmsComponent.jmsComponentTransacted(connectionFactory, jmsTransactionManager);
-    }
+	
+	@Bean
+	public JmsTransactionManager jmsTransactionManager(final ConnectionFactory connectionFactory) {
+		JmsTransactionManager jmsTransactionManager = new JmsTransactionManager();
+		jmsTransactionManager.setConnectionFactory(connectionFactory);
+		return jmsTransactionManager;
+	}
+	
+	@Bean
+	public JmsComponent jmsComponent(final ConnectionFactory connectionFactory,
+	                                 final JmsTransactionManager jmsTransactionManager) {
+		return JmsComponent.jmsComponentTransacted(connectionFactory, jmsTransactionManager);
+	}
 }

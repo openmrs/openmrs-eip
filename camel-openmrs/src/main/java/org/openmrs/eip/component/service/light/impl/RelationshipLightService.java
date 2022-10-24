@@ -11,25 +11,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RelationshipLightService extends AbstractLightService<RelationshipLight> {
-
-	  private LightService<PersonLight> personService;
-	  private LightService<RelationshipTypeLight> relationshipService;
-	  					   
-    public RelationshipLightService(final OpenmrsRepository<RelationshipLight> repository,
-                                   final LightService<PersonLight> personService) {
-        super(repository);
-        this.personService = personService;
-    }
-
-    @Override
-    protected RelationshipLight createPlaceholderEntity(final String uuid) {
-    	RelationshipLight relationship = new RelationshipLight();
-        relationship.setDateCreated(DEFAULT_DATE);
-        relationship.setCreator(SyncContext.getAppUser().getId());
-        relationship.setPersona(personService.getOrInitPlaceholderEntity());
-        relationship.setPersonb(personService.getOrInitPlaceholderEntity());
-        relationship.setRelationshipType(relationshipService.getOrInitPlaceholderEntity());
-        
-        return relationship;
-    }
+	
+	private LightService<PersonLight> personService;
+	
+	private LightService<RelationshipTypeLight> relationshipService;
+	
+	public RelationshipLightService(final OpenmrsRepository<RelationshipLight> repository,
+	    final LightService<PersonLight> personService) {
+		super(repository);
+		this.personService = personService;
+	}
+	
+	@Override
+	protected RelationshipLight createPlaceholderEntity(final String uuid) {
+		RelationshipLight relationship = new RelationshipLight();
+		relationship.setDateCreated(DEFAULT_DATE);
+		relationship.setCreator(SyncContext.getAppUser().getId());
+		relationship.setPersona(personService.getOrInitPlaceholderEntity());
+		relationship.setPersonb(personService.getOrInitPlaceholderEntity());
+		relationship.setRelationshipType(relationshipService.getOrInitPlaceholderEntity());
+		
+		return relationship;
+	}
 }

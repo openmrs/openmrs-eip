@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Table(name = "visit_attribute")
 @AttributeOverride(name = "id", column = @Column(name = "visit_attribute_id"))
 public class VisitAttribute extends Attribute<VisitAttributeTypeLight> {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "visit_id")
-    private VisitLight referencedEntity;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "visit_id")
+	private VisitLight referencedEntity;
 }

@@ -11,7 +11,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "receiver_sync_status")
-public class ReceiverSyncStatus extends AbstractEntity {	
+public class ReceiverSyncStatus extends AbstractEntity {
+	
 	public static final long serialVersionUID = 1;
 	
 	@OneToOne(cascade = CascadeType.ALL, optional = false)
@@ -26,7 +27,7 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	}
 	
 	public ReceiverSyncStatus(SiteInfo siteInfo, Date lastSyncDate) {
-		this.siteInfo= siteInfo;
+		this.siteInfo = siteInfo;
 		this.lastSyncDate = lastSyncDate;
 	}
 	

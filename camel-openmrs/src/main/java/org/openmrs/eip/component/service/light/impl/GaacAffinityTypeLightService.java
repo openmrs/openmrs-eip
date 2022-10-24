@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GaacAffinityTypeLightService extends AbstractLightService<GaacAffinityTypeLight> {
-
-    public GaacAffinityTypeLightService(final OpenmrsRepository<GaacAffinityTypeLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected GaacAffinityTypeLight createPlaceholderEntity(final String uuid) {
-    	GaacAffinityTypeLight type = new GaacAffinityTypeLight();
-        type.setName(DEFAULT_STRING);
-        type.setCreator(SyncContext.getAppUser().getId());
-        type.setDateCreated(DEFAULT_DATE);
-        return type;
-    }
+	
+	public GaacAffinityTypeLightService(final OpenmrsRepository<GaacAffinityTypeLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected GaacAffinityTypeLight createPlaceholderEntity(final String uuid) {
+		GaacAffinityTypeLight type = new GaacAffinityTypeLight();
+		type.setName(DEFAULT_STRING);
+		type.setCreator(SyncContext.getAppUser().getId());
+		type.setDateCreated(DEFAULT_DATE);
+		return type;
+	}
 }

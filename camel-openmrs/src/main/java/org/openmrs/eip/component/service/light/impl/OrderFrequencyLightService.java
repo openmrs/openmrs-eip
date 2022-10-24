@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderFrequencyLightService extends AbstractLightService<OrderFrequencyLight> {
-
-    private LightService<ConceptLight> conceptService;
-
-    public OrderFrequencyLightService(final OpenmrsRepository<OrderFrequencyLight> repository,
-                                      final LightService<ConceptLight> conceptService) {
-        super(repository);
-        this.conceptService = conceptService;
-    }
-
-    @Override
-    protected OrderFrequencyLight createPlaceholderEntity(final String uuid) {
-        OrderFrequencyLight orderFrequency = new OrderFrequencyLight();
-        orderFrequency.setCreator(SyncContext.getAppUser().getId());
-        orderFrequency.setDateCreated(DEFAULT_DATE);
-        orderFrequency.setConcept(conceptService.getOrInitPlaceholderEntity());
-
-        return orderFrequency;
-    }
+	
+	private LightService<ConceptLight> conceptService;
+	
+	public OrderFrequencyLightService(final OpenmrsRepository<OrderFrequencyLight> repository,
+	    final LightService<ConceptLight> conceptService) {
+		super(repository);
+		this.conceptService = conceptService;
+	}
+	
+	@Override
+	protected OrderFrequencyLight createPlaceholderEntity(final String uuid) {
+		OrderFrequencyLight orderFrequency = new OrderFrequencyLight();
+		orderFrequency.setCreator(SyncContext.getAppUser().getId());
+		orderFrequency.setDateCreated(DEFAULT_DATE);
+		orderFrequency.setConcept(conceptService.getOrInitPlaceholderEntity());
+		
+		return orderFrequency;
+	}
 }

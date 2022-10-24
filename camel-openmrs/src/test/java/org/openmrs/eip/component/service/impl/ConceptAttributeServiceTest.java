@@ -15,27 +15,27 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import static org.junit.Assert.assertEquals;
 
 public class ConceptAttributeServiceTest {
-
-    @Mock
-    private SyncEntityRepository<ConceptAttribute> repository;
-
-    @Mock
-    private EntityToModelMapper<ConceptAttribute, ConceptAttributeModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<ConceptAttributeModel, ConceptAttribute> modelToEntityMapper;
-
-    private ConceptAttributeService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new ConceptAttributeService(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.CONCEPT_ATTRIBUTE, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<ConceptAttribute> repository;
+	
+	@Mock
+	private EntityToModelMapper<ConceptAttribute, ConceptAttributeModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<ConceptAttributeModel, ConceptAttribute> modelToEntityMapper;
+	
+	private ConceptAttributeService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new ConceptAttributeService(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.CONCEPT_ATTRIBUTE, service.getTableToSync());
+	}
 }

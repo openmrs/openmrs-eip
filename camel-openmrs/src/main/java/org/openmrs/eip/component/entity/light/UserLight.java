@@ -12,12 +12,12 @@ import javax.validation.constraints.NotNull;
 @Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 public class UserLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "system_id")
-    private String systemId;
-
-    @NotNull
-    @Column(name = "person_id")
-    private Long personId;
+	
+	@NotNull
+	@Column(name = "system_id")
+	private String systemId;
+	
+	@NotNull
+	@Column(name = "person_id")
+	private Long personId;
 }

@@ -13,12 +13,12 @@ import javax.validation.constraints.NotNull;
 @AttributeOverride(name = "id", column = @Column(name = "form_id"))
 @AttributeOverride(name = "retireReason", column = @Column(name = "retired_reason"))
 public class FormLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    @Column(name = "version")
-    private String version;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
+	
+	@NotNull
+	@Column(name = "version")
+	private String version;
 }

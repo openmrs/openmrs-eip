@@ -52,9 +52,9 @@ public abstract class BaseDbDrivenTest {
 	@Autowired
 	@Qualifier(Constants.OPENMRS_DATASOURCE_NAME)
 	protected DataSource openmrsDataSource;
-
-    @Autowired
-    protected ProducerTemplate producerTemplate;
+	
+	@Autowired
+	protected ProducerTemplate producerTemplate;
 	
 	@BeforeClass
 	public static void startContainers() {

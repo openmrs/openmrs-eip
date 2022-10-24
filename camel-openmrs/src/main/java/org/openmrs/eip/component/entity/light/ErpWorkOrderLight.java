@@ -13,5 +13,4 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "icrc_erp_work_order")
 @AttributeOverride(name = "id", column = @Column(name = "erp_work_order_id"))
-public class ErpWorkOrderLight extends VoidableLightEntity {
-}
+public class ErpWorkOrderLight extends VoidableLightEntity {}

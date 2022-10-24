@@ -5,8 +5,8 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface LocationAttributeTypeLightRepository extends OpenmrsRepository<LocationAttributeTypeLight> {
-
-    @Override
-    @Cacheable(cacheNames = "locationAttributeType", unless="#result == null")
-    LocationAttributeTypeLight findByUuid(String uuid);
+	
+	@Override
+	@Cacheable(cacheNames = "locationAttributeType", unless = "#result == null")
+	LocationAttributeTypeLight findByUuid(String uuid);
 }

@@ -9,13 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface RelationshipRepository extends SyncEntityRepository<Relationship> {
-
-    @Override
-    @Query("select r from Relationship r " +
-            "where (r.dateChanged is null and r.dateCreated >= :lastSyncDate) or r.dateChanged >= :lastSyncDate")
-    List<Relationship> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
-
-    @Override
-    @Cacheable(cacheNames = "relationshipAll")
-    List<Relationship> findAll();
+	
+	@Override
+	@Query("select r from Relationship r "
+	        + "where (r.dateChanged is null and r.dateCreated >= :lastSyncDate) or r.dateChanged >= :lastSyncDate")
+	List<Relationship> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Cacheable(cacheNames = "relationshipAll")
+	List<Relationship> findAll();
 }

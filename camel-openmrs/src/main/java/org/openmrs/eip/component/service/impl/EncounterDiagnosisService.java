@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EncounterDiagnosisService extends AbstractEntityService<EncounterDiagnosis, EncounterDiagnosisModel> {
-
-    public EncounterDiagnosisService(final SyncEntityRepository<EncounterDiagnosis> repository,
-                                     final EntityToModelMapper<EncounterDiagnosis, EncounterDiagnosisModel> entityToModelMapper,
-                                     final ModelToEntityMapper<EncounterDiagnosisModel, EncounterDiagnosis> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.ENCOUNTER_DIAGNOSIS;
-    }
+	
+	public EncounterDiagnosisService(final SyncEntityRepository<EncounterDiagnosis> repository,
+	    final EntityToModelMapper<EncounterDiagnosis, EncounterDiagnosisModel> entityToModelMapper,
+	    final ModelToEntityMapper<EncounterDiagnosisModel, EncounterDiagnosis> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.ENCOUNTER_DIAGNOSIS;
+	}
 }

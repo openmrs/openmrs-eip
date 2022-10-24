@@ -15,7 +15,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "gaac_reason_leaving_type")
 @AttributeOverride(name = "id", column = @Column(name = "gaac_reason_leaving_type_id"))
 public class GaacReasonLeavingTypeLight extends RetireableLightEntity {
-    @NotNull
-    @Column(name = "name")
-    private String name;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
 }

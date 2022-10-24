@@ -16,46 +16,46 @@ import java.time.Month;
 import static org.junit.Assert.assertEquals;
 
 public class PatientIdentifierTypeLightServiceTest {
-
-    @Mock
-    private OpenmrsRepository<PatientIdentifierTypeLight> repository;
-
-    private PatientIdentifierTypeLightService service;
-
-    private static final Long USER_ID = 6L;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new PatientIdentifierTypeLightService(repository);
-        UserLight user = new UserLight();
-        user.setId(USER_ID);
-        SyncContext.setAppUser(user);
-    }
-
-    @After
-    public void tearDown() {
-        SyncContext.setAppUser(null);
-    }
-
-    @Test
-    public void createPlaceholderEntity() {
-        // Given
-        String uuid = "uuid";
-
-        // When
-        PatientIdentifierTypeLight result = service.createPlaceholderEntity(uuid);
-
-        // Then
-        assertEquals(getExpectedPatientIdentifierType(), result);
-    }
-
-    private PatientIdentifierTypeLight getExpectedPatientIdentifierType() {
-        PatientIdentifierTypeLight location = new PatientIdentifierTypeLight();
-        location.setCreator(USER_ID);
-        location.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        location.setName("[Default]");
-        return location;
-    }
+	
+	@Mock
+	private OpenmrsRepository<PatientIdentifierTypeLight> repository;
+	
+	private PatientIdentifierTypeLightService service;
+	
+	private static final Long USER_ID = 6L;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new PatientIdentifierTypeLightService(repository);
+		UserLight user = new UserLight();
+		user.setId(USER_ID);
+		SyncContext.setAppUser(user);
+	}
+	
+	@After
+	public void tearDown() {
+		SyncContext.setAppUser(null);
+	}
+	
+	@Test
+	public void createPlaceholderEntity() {
+		// Given
+		String uuid = "uuid";
+		
+		// When
+		PatientIdentifierTypeLight result = service.createPlaceholderEntity(uuid);
+		
+		// Then
+		assertEquals(getExpectedPatientIdentifierType(), result);
+	}
+	
+	private PatientIdentifierTypeLight getExpectedPatientIdentifierType() {
+		PatientIdentifierTypeLight location = new PatientIdentifierTypeLight();
+		location.setCreator(USER_ID);
+		location.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+		location.setName("[Default]");
+		return location;
+	}
 }

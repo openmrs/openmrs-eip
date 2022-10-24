@@ -44,7 +44,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	public void setup() throws Exception {
 		setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
-        setInternalState(AppUtils.class, "appContextStopping", false);
+		setInternalState(AppUtils.class, "appContextStopping", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
 		
@@ -86,18 +86,18 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 		mockEmailNoticeProcessor.assertIsSatisfied();
 		mockShutdownBean.assertIsSatisfied();
 	}
-
-    @Test
-    public void shouldSkipIfTheApplicationContextIsStopping() throws Exception {
-        Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
-        mockEmailNoticeProcessor.expectedMessageCount(0);
-        mockShutdownBean.expectedMessageCount(0);
-
-        producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
-
-        mockEmailNoticeProcessor.assertIsSatisfied();
-        mockShutdownBean.assertIsSatisfied();
-        assertMessageLogged(Level.DEBUG, "The application context is already stopping");
-    }
+	
+	@Test
+	public void shouldSkipIfTheApplicationContextIsStopping() throws Exception {
+		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+		mockEmailNoticeProcessor.expectedMessageCount(0);
+		mockShutdownBean.expectedMessageCount(0);
+		
+		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
+		
+		mockEmailNoticeProcessor.assertIsSatisfied();
+		mockShutdownBean.assertIsSatisfied();
+		assertMessageLogged(Level.DEBUG, "The application context is already stopping");
+	}
 	
 }

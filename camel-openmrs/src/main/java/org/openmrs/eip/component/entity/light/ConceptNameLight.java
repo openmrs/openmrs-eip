@@ -15,12 +15,12 @@ import javax.validation.constraints.NotNull;
 @Table(name = "concept_name")
 @AttributeOverride(name = "id", column = @Column(name = "concept_name_id"))
 public class ConceptNameLight extends VoidableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    @Column(name = "locale")
-    private String locale;
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
+	
+	@NotNull
+	@Column(name = "locale")
+	private String locale;
 }

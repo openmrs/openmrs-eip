@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PatientProgramRepository extends SyncEntityRepository<PatientProgram> {
-
-    @Override
-    @Query("select p from PatientProgram p " +
-            "where p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-            "or p.dateChanged >= :lastSyncDate")
-    List<PatientProgram> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select p from PatientProgram p " + "where p.dateChanged is null and p.dateCreated >= :lastSyncDate "
+	        + "or p.dateChanged >= :lastSyncDate")
+	List<PatientProgram> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

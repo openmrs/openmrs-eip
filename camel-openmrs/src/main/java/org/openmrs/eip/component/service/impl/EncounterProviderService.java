@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EncounterProviderService extends AbstractEntityService<EncounterProvider, EncounterProviderModel> {
-
-    public EncounterProviderService(final SyncEntityRepository<EncounterProvider> repository,
-                                     final EntityToModelMapper<EncounterProvider, EncounterProviderModel> entityToModelMapper,
-                                     final ModelToEntityMapper<EncounterProviderModel, EncounterProvider> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.ENCOUNTER_PROVIDER;
-    }
+	
+	public EncounterProviderService(final SyncEntityRepository<EncounterProvider> repository,
+	    final EntityToModelMapper<EncounterProvider, EncounterProviderModel> entityToModelMapper,
+	    final ModelToEntityMapper<EncounterProviderModel, EncounterProvider> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.ENCOUNTER_PROVIDER;
+	}
 }

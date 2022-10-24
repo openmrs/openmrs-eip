@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ConditionLightService extends AbstractLightService<ConditionLight> {
-
-    private LightService<PatientLight> patientService;
-
-    public ConditionLightService(final OpenmrsRepository<ConditionLight> repository,
-                                 final LightService<PatientLight> patientService) {
-        super(repository);
-        this.patientService = patientService;
-    }
-
-    @Override
-    protected ConditionLight createPlaceholderEntity(final String uuid) {
-        ConditionLight condition = new ConditionLight();
-        condition.setDateCreated(DEFAULT_DATE);
-        condition.setCreator(SyncContext.getAppUser().getId());
-        condition.setClinicalStatus(DEFAULT_STRING);
-        condition.setPatient(patientService.getOrInitPlaceholderEntity());
-        return condition;
-    }
+	
+	private LightService<PatientLight> patientService;
+	
+	public ConditionLightService(final OpenmrsRepository<ConditionLight> repository,
+	    final LightService<PatientLight> patientService) {
+		super(repository);
+		this.patientService = patientService;
+	}
+	
+	@Override
+	protected ConditionLight createPlaceholderEntity(final String uuid) {
+		ConditionLight condition = new ConditionLight();
+		condition.setDateCreated(DEFAULT_DATE);
+		condition.setCreator(SyncContext.getAppUser().getId());
+		condition.setClinicalStatus(DEFAULT_STRING);
+		condition.setPatient(patientService.getOrInitPlaceholderEntity());
+		return condition;
+	}
 }

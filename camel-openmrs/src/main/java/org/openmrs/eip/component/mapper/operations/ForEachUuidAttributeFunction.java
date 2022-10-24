@@ -12,18 +12,15 @@ import java.util.stream.Stream;
 
 @Component("forEachUuidAttribute")
 public class ForEachUuidAttributeFunction<E extends BaseEntity, M extends BaseModel> implements BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, E> {
-
-    private static final String UUID_SUFFIX = "Uuid";
-
-    @Override
-    public E apply(final Context<E, M> context,
-                   final BiConsumer<Context<E, M>, String> action) {
-        PropertyDescriptor[] descs = context.getModelBeanWrapper().getPropertyDescriptors();
-        Stream.of(descs)
-                .filter(desc -> desc.getName().endsWith(UUID_SUFFIX))
-                .map(FeatureDescriptor::getName)
-                .forEach(attributeName -> action.accept(context, attributeName));
-
-        return context.getEntity();
-    }
+	
+	private static final String UUID_SUFFIX = "Uuid";
+	
+	@Override
+	public E apply(final Context<E, M> context, final BiConsumer<Context<E, M>, String> action) {
+		PropertyDescriptor[] descs = context.getModelBeanWrapper().getPropertyDescriptors();
+		Stream.of(descs).filter(desc -> desc.getName().endsWith(UUID_SUFFIX)).map(FeatureDescriptor::getName)
+		        .forEach(attributeName -> action.accept(context, attributeName));
+		
+		return context.getEntity();
+	}
 }

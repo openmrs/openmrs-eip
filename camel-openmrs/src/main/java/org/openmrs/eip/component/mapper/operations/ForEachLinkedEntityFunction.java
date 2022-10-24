@@ -13,16 +13,13 @@ import java.util.stream.Stream;
 
 @Component("forEachLinkedEntity")
 public class ForEachLinkedEntityFunction<E extends BaseEntity, M extends BaseModel> implements BiFunction<Context<E, M>, BiConsumer<Context<E, M>, String>, M> {
-
-    @Override
-    public M apply(final Context<E, M> context,
-                   final BiConsumer<Context<E, M>, String> action) {
-        PropertyDescriptor[] descs = context.getEntityBeanWrapper().getPropertyDescriptors();
-        Stream.of(descs)
-                .filter(desc -> LightEntity.class.isAssignableFrom(desc.getReadMethod().getReturnType()))
-                .map(FeatureDescriptor::getName)
-                .forEach(attributeName -> action.accept(context, attributeName));
-
-        return context.getModel();
-    }
+	
+	@Override
+	public M apply(final Context<E, M> context, final BiConsumer<Context<E, M>, String> action) {
+		PropertyDescriptor[] descs = context.getEntityBeanWrapper().getPropertyDescriptors();
+		Stream.of(descs).filter(desc -> LightEntity.class.isAssignableFrom(desc.getReadMethod().getReturnType()))
+		        .map(FeatureDescriptor::getName).forEach(attributeName -> action.accept(context, attributeName));
+		
+		return context.getModel();
+	}
 }

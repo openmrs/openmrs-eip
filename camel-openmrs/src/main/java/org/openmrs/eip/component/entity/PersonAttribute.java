@@ -19,18 +19,18 @@ import javax.validation.constraints.NotNull;
 @Table(name = "person_attribute")
 @AttributeOverride(name = "id", column = @Column(name = "person_attribute_id"))
 public class PersonAttribute extends BaseChangeableDataEntity {
-
-    @NotNull
-    @Column(name = "value")
-    private String value;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_id")
-    private PersonLight person;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_attribute_type_id")
-    private PersonAttributeTypeLight personAttributeType;
+	
+	@NotNull
+	@Column(name = "value")
+	private String value;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "person_id")
+	private PersonLight person;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "person_attribute_type_id")
+	private PersonAttributeTypeLight personAttributeType;
 }

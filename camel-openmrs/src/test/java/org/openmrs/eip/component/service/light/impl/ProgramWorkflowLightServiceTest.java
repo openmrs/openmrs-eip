@@ -20,67 +20,67 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class ProgramWorkflowLightServiceTest {
-
-    @Mock
-    private OpenmrsRepository<ProgramWorkflowLight> repository;
-
-    @Mock
-    private LightService<ConceptLight> conceptService;
-
-    @Mock
-    private LightService<ProgramLight> programService;
-
-    private ProgramWorkflowLightService service;
-
-    private static final Long USER_ID = 6L;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new ProgramWorkflowLightService(repository, conceptService, programService);
-        UserLight user = new UserLight();
-        user.setId(USER_ID);
-        SyncContext.setAppUser(user);
-    }
-
-    @After
-    public void tearDown() {
-        SyncContext.setAppUser(null);
-    }
-
-    @Test
-    public void createPlaceholderEntity() {
-        // Given
-        when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
-        when(programService.getOrInitPlaceholderEntity()).thenReturn(getProgram());
-        String uuid = "uuid";
-
-        // When
-        ProgramWorkflowLight result = service.createPlaceholderEntity(uuid);
-
-        // Then
-        assertEquals(getExpectedProgramWorkflow(), result);
-    }
-
-    private ProgramWorkflowLight getExpectedProgramWorkflow() {
-        ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
-        programWorkflow.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
-        programWorkflow.setCreator(USER_ID);
-        programWorkflow.setConcept(getConcept());
-        programWorkflow.setProgram(getProgram());
-        return programWorkflow;
-    }
-
-    private ProgramLight getProgram() {
-        ProgramLight program = new ProgramLight();
-        program.setUuid("PLACEHOLDER_PROGRAM");
-        return program;
-    }
-
-    private ConceptLight getConcept() {
-        ConceptLight concept = new ConceptLight();
-        concept.setUuid("PLACEHOLDER_CONCEPT");
-        return concept;
-    }
+	
+	@Mock
+	private OpenmrsRepository<ProgramWorkflowLight> repository;
+	
+	@Mock
+	private LightService<ConceptLight> conceptService;
+	
+	@Mock
+	private LightService<ProgramLight> programService;
+	
+	private ProgramWorkflowLightService service;
+	
+	private static final Long USER_ID = 6L;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new ProgramWorkflowLightService(repository, conceptService, programService);
+		UserLight user = new UserLight();
+		user.setId(USER_ID);
+		SyncContext.setAppUser(user);
+	}
+	
+	@After
+	public void tearDown() {
+		SyncContext.setAppUser(null);
+	}
+	
+	@Test
+	public void createPlaceholderEntity() {
+		// Given
+		when(conceptService.getOrInitPlaceholderEntity()).thenReturn(getConcept());
+		when(programService.getOrInitPlaceholderEntity()).thenReturn(getProgram());
+		String uuid = "uuid";
+		
+		// When
+		ProgramWorkflowLight result = service.createPlaceholderEntity(uuid);
+		
+		// Then
+		assertEquals(getExpectedProgramWorkflow(), result);
+	}
+	
+	private ProgramWorkflowLight getExpectedProgramWorkflow() {
+		ProgramWorkflowLight programWorkflow = new ProgramWorkflowLight();
+		programWorkflow.setDateCreated(LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0));
+		programWorkflow.setCreator(USER_ID);
+		programWorkflow.setConcept(getConcept());
+		programWorkflow.setProgram(getProgram());
+		return programWorkflow;
+	}
+	
+	private ProgramLight getProgram() {
+		ProgramLight program = new ProgramLight();
+		program.setUuid("PLACEHOLDER_PROGRAM");
+		return program;
+	}
+	
+	private ConceptLight getConcept() {
+		ConceptLight concept = new ConceptLight();
+		concept.setUuid("PLACEHOLDER_CONCEPT");
+		return concept;
+	}
 }

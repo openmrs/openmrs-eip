@@ -23,17 +23,17 @@ import lombok.EqualsAndHashCode;
 public class EncounterProvider extends BaseChangeableDataEntity {
 	
 	@NotNull
-    @ManyToOne
-    @JoinColumn(name = "encounter_role_id")
-    private EncounterRoleLight encounterRole;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "encounter_id")
-    private EncounterLight encounter;
-    
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "provider_id")
-    private ProviderLight provider;
+	@ManyToOne
+	@JoinColumn(name = "encounter_role_id")
+	private EncounterRoleLight encounterRole;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "encounter_id")
+	private EncounterLight encounter;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "provider_id")
+	private ProviderLight provider;
 }

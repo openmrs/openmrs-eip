@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PersonAddressRepository extends SyncEntityRepository<PersonAddress> {
-
-    @Override
-    @Query("select p from PersonAddress p " +
-            "where p.dateChanged is null and p.dateCreated >= :lastSyncDate " +
-            "or p.dateChanged >= :lastSyncDate")
-    List<PersonAddress> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select p from PersonAddress p " + "where p.dateChanged is null and p.dateCreated >= :lastSyncDate "
+	        + "or p.dateChanged >= :lastSyncDate")
+	List<PersonAddress> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

@@ -9,7 +9,7 @@ public class ReceiverConstants {
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
 	
 	public static final String PROP_RECEIVER_ID = "db-sync.receiverId";
-
+	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
 	public static final String URI_MSG_PROCESSOR = "direct:" + ROUTE_ID_MSG_PROCESSOR;
@@ -25,7 +25,7 @@ public class ReceiverConstants {
 	public static final String EX_PROP_MODEL_CLASS = "model-class";
 	
 	public static final String EX_PROP_ENTITY_ID = "entity-id";
-
+	
 	public static final String EX_PROP_SYNC_MESSAGE = "sync-message";
 	
 	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
@@ -37,13 +37,13 @@ public class ReceiverConstants {
 	public static final String EX_PROP_METADATA = "sync-metadata";
 	
 	public static final String EX_PROP_IS_FILE = "is-file";
-
+	
 	public static final String EX_PROP_MSG_PROCESSED = "org.openmrs.eip.app.receiver.sync-msgProcessed";
-
-    public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToConflictQueue";
-
-    public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToErrorQueue";
-
+	
+	public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToConflictQueue";
+	
+	public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToErrorQueue";
+	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	
 	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;

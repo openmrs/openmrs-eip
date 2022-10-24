@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class VisitAttributeTypeLightService extends AbstractAttributeTypeLightService<VisitAttributeTypeLight> {
-
-    public VisitAttributeTypeLightService(final OpenmrsRepository<VisitAttributeTypeLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected VisitAttributeTypeLight createEntity() {
-        return new VisitAttributeTypeLight();
-    }
+	
+	public VisitAttributeTypeLightService(final OpenmrsRepository<VisitAttributeTypeLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected VisitAttributeTypeLight createEntity() {
+		return new VisitAttributeTypeLight();
+	}
 }

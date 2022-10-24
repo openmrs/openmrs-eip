@@ -11,27 +11,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class VisitLightService extends AbstractLightService<VisitLight> {
-
-    private LightService<PatientLight> patientService;
-
-    private LightService<VisitTypeLight> visitTypeService;
-
-    public VisitLightService(final OpenmrsRepository<VisitLight> repository,
-                             final LightService<PatientLight> patientService,
-                             final LightService<VisitTypeLight> visitTypeService) {
-        super(repository);
-        this.patientService = patientService;
-        this.visitTypeService = visitTypeService;
-    }
-
-    @Override
-    protected VisitLight createPlaceholderEntity(final String uuid) {
-        VisitLight visit = new VisitLight();
-        visit.setPatient(patientService.getOrInitPlaceholderEntity());
-        visit.setDateStarted(DEFAULT_DATE);
-        visit.setVisitType(visitTypeService.getOrInitPlaceholderEntity());
-        visit.setCreator(SyncContext.getAppUser().getId());
-        visit.setDateCreated(DEFAULT_DATE);
-        return visit;
-    }
+	
+	private LightService<PatientLight> patientService;
+	
+	private LightService<VisitTypeLight> visitTypeService;
+	
+	public VisitLightService(final OpenmrsRepository<VisitLight> repository, final LightService<PatientLight> patientService,
+	    final LightService<VisitTypeLight> visitTypeService) {
+		super(repository);
+		this.patientService = patientService;
+		this.visitTypeService = visitTypeService;
+	}
+	
+	@Override
+	protected VisitLight createPlaceholderEntity(final String uuid) {
+		VisitLight visit = new VisitLight();
+		visit.setPatient(patientService.getOrInitPlaceholderEntity());
+		visit.setDateStarted(DEFAULT_DATE);
+		visit.setVisitType(visitTypeService.getOrInitPlaceholderEntity());
+		visit.setCreator(SyncContext.getAppUser().getId());
+		visit.setDateCreated(DEFAULT_DATE);
+		return visit;
+	}
 }

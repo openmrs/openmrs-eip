@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ConceptClassLightService extends AbstractLightService<ConceptClassLight> {
-
-    public ConceptClassLightService(final OpenmrsRepository<ConceptClassLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected ConceptClassLight createPlaceholderEntity(final String uuid) {
-        ConceptClassLight conceptClass = new ConceptClassLight();
-        conceptClass.setDateCreated(DEFAULT_DATE);
-        conceptClass.setCreator(SyncContext.getAppUser().getId());
-        conceptClass.setName(DEFAULT_STRING);
-        return conceptClass;
-    }
+	
+	public ConceptClassLightService(final OpenmrsRepository<ConceptClassLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected ConceptClassLight createPlaceholderEntity(final String uuid) {
+		ConceptClassLight conceptClass = new ConceptClassLight();
+		conceptClass.setDateCreated(DEFAULT_DATE);
+		conceptClass.setCreator(SyncContext.getAppUser().getId());
+		conceptClass.setName(DEFAULT_STRING);
+		return conceptClass;
+	}
 }

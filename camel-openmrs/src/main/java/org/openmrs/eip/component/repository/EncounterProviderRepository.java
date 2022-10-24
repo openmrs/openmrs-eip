@@ -8,10 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface EncounterProviderRepository extends SyncEntityRepository<EncounterProvider> {
-
-    @Override
-    @Query("select e from EncounterProvider e " +
-            "where e.dateChanged is null and e.dateCreated >= :lastSyncDate " +
-            "or e.dateChanged >= :lastSyncDate")
-    List<EncounterProvider> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
+	
+	@Override
+	@Query("select e from EncounterProvider e " + "where e.dateChanged is null and e.dateCreated >= :lastSyncDate "
+	        + "or e.dateChanged >= :lastSyncDate")
+	List<EncounterProvider> findModelsChangedAfterDate(@Param("lastSyncDate") LocalDateTime lastSyncDate);
 }

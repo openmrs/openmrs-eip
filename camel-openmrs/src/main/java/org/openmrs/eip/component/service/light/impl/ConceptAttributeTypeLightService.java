@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ConceptAttributeTypeLightService extends AbstractAttributeTypeLightService<ConceptAttributeTypeLight> {
-
-    public ConceptAttributeTypeLightService(final OpenmrsRepository<ConceptAttributeTypeLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected ConceptAttributeTypeLight createEntity() {
-        return new ConceptAttributeTypeLight();
-    }
+	
+	public ConceptAttributeTypeLightService(final OpenmrsRepository<ConceptAttributeTypeLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected ConceptAttributeTypeLight createEntity() {
+		return new ConceptAttributeTypeLight();
+	}
 }

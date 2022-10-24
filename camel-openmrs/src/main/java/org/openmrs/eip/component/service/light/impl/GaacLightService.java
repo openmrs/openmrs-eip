@@ -8,17 +8,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GaacLightService extends AbstractLightService<GaacLight> {
-    public GaacLightService(final OpenmrsRepository<GaacLight> repository) {
-        super(repository);
-    }
-
-    @Override
-    protected GaacLight createPlaceholderEntity(final String uuid) {
-    	GaacLight gaac = new GaacLight();
-        gaac.setDateCreated(DEFAULT_DATE);
-        gaac.setCreator(SyncContext.getAppUser().getId());
-        gaac.setName(DEFAULT_STRING);
-        gaac.setStartDate(DEFAULT_DATE);
-        return gaac;
-    }
+	
+	public GaacLightService(final OpenmrsRepository<GaacLight> repository) {
+		super(repository);
+	}
+	
+	@Override
+	protected GaacLight createPlaceholderEntity(final String uuid) {
+		GaacLight gaac = new GaacLight();
+		gaac.setDateCreated(DEFAULT_DATE);
+		gaac.setCreator(SyncContext.getAppUser().getId());
+		gaac.setName(DEFAULT_STRING);
+		gaac.setStartDate(DEFAULT_DATE);
+		return gaac;
+	}
 }

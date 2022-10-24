@@ -19,30 +19,30 @@ import javax.validation.constraints.NotNull;
 @Table(name = "concept")
 @AttributeOverride(name = "id", column = @Column(name = "concept_id"))
 public class Concept extends BaseChangeableMetaDataEntity {
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "datatype_id")
-    private ConceptDatatypeLight datatype;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private ConceptClassLight conceptClass;
-
-    @Column(name = "short_name")
-    private String shortName;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "form_text")
-    private String formText;
-
-    @Column(name = "version")
-    private String version;
-
-    @NotNull
-    @Column(name = "is_set")
-    private boolean isSet;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "datatype_id")
+	private ConceptDatatypeLight datatype;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "class_id")
+	private ConceptClassLight conceptClass;
+	
+	@Column(name = "short_name")
+	private String shortName;
+	
+	@Column(name = "description")
+	private String description;
+	
+	@Column(name = "form_text")
+	private String formText;
+	
+	@Column(name = "version")
+	private String version;
+	
+	@NotNull
+	@Column(name = "is_set")
+	private boolean isSet;
 }

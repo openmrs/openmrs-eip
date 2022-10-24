@@ -18,18 +18,18 @@ import lombok.EqualsAndHashCode;
 @AttributeOverride(name = "id", column = @Column(name = "relationship_id"))
 public class RelationshipLight extends VoidableLightEntity {
 	
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_a")
-    private PersonLight persona;
-    
 	@NotNull
 	@ManyToOne
-    @JoinColumn(name = "relationship")
+	@JoinColumn(name = "person_a")
+	private PersonLight persona;
+	
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "relationship")
 	private RelationshipTypeLight relationshipType;
 	
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "person_b")
-    private PersonLight personb;
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "person_b")
+	private PersonLight personb;
 }

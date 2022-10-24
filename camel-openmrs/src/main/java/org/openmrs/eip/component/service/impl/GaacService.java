@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GaacService extends AbstractEntityService<Gaac, GaacModel> {
-
-    public GaacService(final SyncEntityRepository<Gaac> repository,
-                            final EntityToModelMapper<Gaac, GaacModel> entityToModelMapper,
-                            final ModelToEntityMapper<GaacModel, Gaac> modelToEntityMapper) {
-        super(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Override
-    public TableToSyncEnum getTableToSync() {
-        return TableToSyncEnum.GAAC;
-    }
+	
+	public GaacService(final SyncEntityRepository<Gaac> repository,
+	    final EntityToModelMapper<Gaac, GaacModel> entityToModelMapper,
+	    final ModelToEntityMapper<GaacModel, Gaac> modelToEntityMapper) {
+		super(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Override
+	public TableToSyncEnum getTableToSync() {
+		return TableToSyncEnum.GAAC;
+	}
 }

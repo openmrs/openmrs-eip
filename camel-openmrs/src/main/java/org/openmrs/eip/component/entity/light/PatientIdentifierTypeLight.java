@@ -15,16 +15,16 @@ import javax.validation.constraints.NotNull;
 @Table(name = "patient_identifier_type")
 @AttributeOverride(name = "id", column = @Column(name = "patient_identifier_type_id"))
 public class PatientIdentifierTypeLight extends RetireableLightEntity {
-
-    @NotNull
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    private Boolean required;
-
-    @NotNull
-    @Column(name="check_digit")
-    private Boolean checkDigit;
-    
+	
+	@NotNull
+	@Column(name = "name")
+	private String name;
+	
+	@NotNull
+	private Boolean required;
+	
+	@NotNull
+	@Column(name = "check_digit")
+	private Boolean checkDigit;
+	
 }

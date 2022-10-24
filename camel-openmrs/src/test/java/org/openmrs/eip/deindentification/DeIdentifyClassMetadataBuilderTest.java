@@ -29,9 +29,9 @@ public class DeIdentifyClassMetadataBuilderTest extends BaseDbDrivenTest {
 		deIndentifyColumns.add("birth_date");
 		DeIdentifyClassMetadata metadata = builder.build(MockEntity.class, deIndentifyColumns);
 		Field identifier = getField("identifier");
-        Field name = getField("name");
-        Field gender = getField("gender");
-        Field birthdate = getField("birthdate");
+		Field name = getField("name");
+		Field gender = getField("gender");
+		Field birthdate = getField("birthdate");
 		assertTrue(metadata.deIndentify(identifier));
 		assertTrue(metadata.deIndentify(name));
 		assertTrue(metadata.deIndentify(gender));
@@ -41,17 +41,17 @@ public class DeIdentifyClassMetadataBuilderTest extends BaseDbDrivenTest {
 		assertTrue(metadata.isRequired(name));
 		assertFalse(metadata.isRequired(gender));
 		assertFalse(metadata.isRequired(birthdate));
-
-        assertTrue(metadata.isUnique(identifier));
-        assertFalse(metadata.isUnique(name));
-        assertFalse(metadata.isUnique(gender));
-        assertFalse(metadata.isUnique(birthdate));
+		
+		assertTrue(metadata.isUnique(identifier));
+		assertFalse(metadata.isUnique(name));
+		assertFalse(metadata.isUnique(gender));
+		assertFalse(metadata.isUnique(birthdate));
 		
 		assertTrue(metadata.isUnique(identifier));
 		assertEquals(255, metadata.getLength(identifier).intValue());
-        assertEquals(255, metadata.getLength(name).intValue());
-        assertEquals(1, metadata.getLength(gender).intValue());
-        assertEquals(255, metadata.getLength(birthdate).intValue());
+		assertEquals(255, metadata.getLength(name).intValue());
+		assertEquals(1, metadata.getLength(gender).intValue());
+		assertEquals(255, metadata.getLength(birthdate).intValue());
 	}
 	
 }

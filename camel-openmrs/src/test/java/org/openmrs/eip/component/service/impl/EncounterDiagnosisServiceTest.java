@@ -15,27 +15,27 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import static org.junit.Assert.assertEquals;
 
 public class EncounterDiagnosisServiceTest {
-
-    @Mock
-    private SyncEntityRepository<EncounterDiagnosis> repository;
-
-    @Mock
-    private EntityToModelMapper<EncounterDiagnosis, EncounterDiagnosisModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<EncounterDiagnosisModel, EncounterDiagnosis> modelToEntityMapper;
-
-    private EncounterDiagnosisService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new EncounterDiagnosisService(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.ENCOUNTER_DIAGNOSIS, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<EncounterDiagnosis> repository;
+	
+	@Mock
+	private EntityToModelMapper<EncounterDiagnosis, EncounterDiagnosisModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<EncounterDiagnosisModel, EncounterDiagnosis> modelToEntityMapper;
+	
+	private EncounterDiagnosisService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new EncounterDiagnosisService(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.ENCOUNTER_DIAGNOSIS, service.getTableToSync());
+	}
 }

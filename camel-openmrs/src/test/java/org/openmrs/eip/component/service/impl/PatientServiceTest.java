@@ -14,30 +14,30 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 
 public class PatientServiceTest {
-
-    @Mock
-    private SyncEntityRepository<Patient> repository;
-
-    @Mock
-    private SyncEntityRepository<Person> personRepo;
-
-    @Mock
-    private EntityToModelMapper<Patient, PatientModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<PatientModel, Patient> modelToEntityMapper;
-
-    private PatientService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new PatientService(repository, personRepo, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.PATIENT, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<Patient> repository;
+	
+	@Mock
+	private SyncEntityRepository<Person> personRepo;
+	
+	@Mock
+	private EntityToModelMapper<Patient, PatientModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<PatientModel, Patient> modelToEntityMapper;
+	
+	private PatientService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new PatientService(repository, personRepo, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.PATIENT, service.getTableToSync());
+	}
 }

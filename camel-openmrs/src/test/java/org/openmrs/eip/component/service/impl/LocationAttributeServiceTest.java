@@ -15,27 +15,27 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import static org.junit.Assert.assertEquals;
 
 public class LocationAttributeServiceTest {
-
-    @Mock
-    private SyncEntityRepository<LocationAttribute> repository;
-
-    @Mock
-    private EntityToModelMapper<LocationAttribute, AttributeModel> entityToModelMapper;
-
-    @Mock
-    private ModelToEntityMapper<AttributeModel, LocationAttribute> modelToEntityMapper;
-
-    private LocationAttributeService service;
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-
-        service = new LocationAttributeService(repository, entityToModelMapper, modelToEntityMapper);
-    }
-
-    @Test
-    public void getTableToSync() {
-        Assert.assertEquals(TableToSyncEnum.LOCATION_ATTRIBUTE, service.getTableToSync());
-    }
+	
+	@Mock
+	private SyncEntityRepository<LocationAttribute> repository;
+	
+	@Mock
+	private EntityToModelMapper<LocationAttribute, AttributeModel> entityToModelMapper;
+	
+	@Mock
+	private ModelToEntityMapper<AttributeModel, LocationAttribute> modelToEntityMapper;
+	
+	private LocationAttributeService service;
+	
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		
+		service = new LocationAttributeService(repository, entityToModelMapper, modelToEntityMapper);
+	}
+	
+	@Test
+	public void getTableToSync() {
+		Assert.assertEquals(TableToSyncEnum.LOCATION_ATTRIBUTE, service.getTableToSync());
+	}
 }
