@@ -2,6 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
@@ -84,11 +85,13 @@ public class SiteMessageConsumerTest {
 	
 	@Test
 	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForSlowThreads() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -114,17 +117,20 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
 			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
 	}
 	
 	@Test
 	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForFastThreads() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -149,29 +155,34 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
 			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessAllNonSnapshotMessagesInSerialInCurrentThread() throws Exception {
+	public void processMessages_shouldProcessAllNonSnapshotMessagesInParallel() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 10;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
-		List<Long> expectedResults = new ArrayList(size);
-		List<String> threadNames = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, false);
 			messages.add(m);
 			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Thread.sleep(500);
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
-				threadNames.add(Thread.currentThread().getName());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
-				return exchange;
+				return null;
 			});
 		}
 		
@@ -179,14 +190,13 @@ public class SiteMessageConsumerTest {
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
-		assertEquals(size, threadNames.size());
+		assertEquals(size, expectedMsgIdThreadNameMap.size());
 		
 		for (int i = 0; i < size; i++) {
-			Assert.assertEquals(Long.valueOf(i), expectedResults.get(i));
 			SyncMessage msg = messages.get(i);
-			String threadName = threadNames.get(i);
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), threadName.split(":")[1]);
+			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
+			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
 	}
 	
