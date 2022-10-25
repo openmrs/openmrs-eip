@@ -170,9 +170,9 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			//Only process snapshot events in parallel if they don't belong to the same entity to avoid false conflicts 
+			//Only process events in parallel if they don't belong to the same entity to avoid false conflicts
 			//and unique key constraint violations, this applies to subclasses
-			if (msg.getSnapshot() && !typeAndIdentifier.contains(msg.getModelClassName() + "#" + msg.getIdentifier())) {
+			if (!typeAndIdentifier.contains(msg.getModelClassName() + "#" + msg.getIdentifier())) {
 				for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
 					typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
 				}

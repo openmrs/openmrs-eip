@@ -92,7 +92,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	public abstract String getItemKey(T item);
 	
 	/**
-	 * Checks if the item if the item should be processed in parallel or not
+	 * Checks if the item should be processed in parallel or not
 	 * 
 	 * @param item the queue item
 	 * @return true to process in parallel otherwise false
