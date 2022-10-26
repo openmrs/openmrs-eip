@@ -170,41 +170,41 @@ public class SiteMessageConsumer implements Runnable {
 				break;
 			}
 			
-			//Only process events in parallel if they don't belong to the same entity to avoid false conflicts
-			//and unique key constraint violations, this applies to subclasses
-			if (!typeAndIdentifier.contains(msg.getModelClassName() + "#" + msg.getIdentifier())) {
-				for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
-					typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
-				}
-				
-				//TODO Periodically wait and reset futures to save memory
-				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
-					final String originalThreadName = Thread.currentThread().getName();
-					try {
-						setThreadName(msg);
-						processMessage(msg);
-					}
-					finally {
-						//Maybe we should also remove the entity from typeAndIdentifier list but typically there is
-						//going to be at most 2 snapshot events for the same entity i.e for tables with a hierarchy
-						Thread.currentThread().setName(originalThreadName);
-					}
-				}, msgExecutor));
-			} else {
+			//Only process events if they don't belong to the same entity to avoid false conflicts and unique key
+			//constraint violations, this applies to subclasses
+			if (typeAndIdentifier.contains(msg.getModelClassName() + "#" + msg.getIdentifier())) {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(msg);
 					//TODO Record as skipped and go to next
 					if (log.isDebugEnabled()) {
-						log.debug(
-						    "Skipping {}" + " because there is an earlier item for the entity that is not yet processed",
-						    msg);
+						log.debug("Postponed sync of {} because of an earlier unprocessed sync message for the entity", msg);
 					}
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
 				}
+				
+				continue;
 			}
+			
+			for (String modelClass : Utils.getListOfModelClassHierarchy(msg.getModelClassName())) {
+				typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
+			}
+			
+			//TODO Periodically wait and reset futures to save memory
+			syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+				final String originalThreadName = Thread.currentThread().getName();
+				try {
+					setThreadName(msg);
+					processMessage(msg);
+				}
+				finally {
+					//Maybe we should also remove the entity from typeAndIdentifier list, may be not because there can  
+					//be 2 snapshot events for the same entity i.e. for tables with a hierarchy
+					Thread.currentThread().setName(originalThreadName);
+				}
+			}, msgExecutor));
 			
 		}
 		

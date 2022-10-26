@@ -251,48 +251,6 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsInSerialForTheSameEntity() throws Exception {
-		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 5;
-		initExecutorAndConsumer(size);
-		List<SyncMessage> messages = new ArrayList(size);
-		List<Long> expectedResults = synchronizedList(new ArrayList(size));
-		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
-		
-		for (int i = 0; i < size; i++) {
-			SyncMessage m = createMessage(i, true);
-			m.setIdentifier("same-uuid");
-			messages.add(m);
-			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
-				Exchange exchange = invocation.getArgument(1);
-				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
-				return null;
-			});
-		}
-		
-		consumer.processMessages(messages);
-		
-		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
-		
-		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
-		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
-		for (int i = 1; i < size; i++) {
-			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
-		}
-	}
-	
-	@Test
 	public void processMessages_shouldProcessSnapshotEventsForTheSamePatientInSerialIfPrecededByPersonEvents()
 	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
