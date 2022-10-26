@@ -185,7 +185,7 @@ public class SiteMessageConsumer implements Runnable {
 						processMessage(msg);
 					}
 					finally {
-						//May be we should also remove the entity from typeAndIdentifier list but typically there is
+						//Maybe we should also remove the entity from typeAndIdentifier list but typically there is
 						//going to be at most 2 snapshot events for the same entity i.e for tables with a hierarchy
 						Thread.currentThread().setName(originalThreadName);
 					}
@@ -194,12 +194,12 @@ public class SiteMessageConsumer implements Runnable {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(msg);
-					if (syncThreadFutures.size() > 0) {
-						waitForFutures(syncThreadFutures);
-						syncThreadFutures.clear();
+					//TODO Record as skipped and go to next
+					if (log.isDebugEnabled()) {
+						log.debug(
+						    "Skipping {}" + " because there is an earlier item for the entity that is not yet processed",
+						    msg);
 					}
-					
-					processMessage(msg);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);

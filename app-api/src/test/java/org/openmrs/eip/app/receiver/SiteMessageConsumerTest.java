@@ -201,6 +201,56 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
+	public void processMessages_shouldProcessOnlyTheFirstMessageForAnEntityAndSkipTheOthersForTheSameEntity()
+	    throws Exception {
+		Thread originalThread = Thread.currentThread();
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 20;
+		initExecutorAndConsumer(size);
+		List<SyncMessage> messages = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		List<SyncMessage> sameEntityMessages = new ArrayList();
+		final int multiplesOf = 4;
+		final int expectedProcessedMsgSize = 17;
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage m = createMessage(i, false);
+			if (i > 0 && i % multiplesOf == 0) {
+				m.setIdentifier("same-uuid");
+				sameEntityMessages.add(m);
+			}
+			messages.add(m);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
+				return null;
+			});
+		}
+		
+		consumer.processMessages(messages);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(expectedProcessedMsgSize, expectedResults.size());
+		assertEquals(expectedProcessedMsgSize, expectedMsgIdThreadNameMap.size());
+		
+		for (int i = 0; i < size; i++) {
+			SyncMessage msg = messages.get(i);
+			//All other messages for the same entity are skipped after first for the entity is encountered
+			if (i == multiplesOf || i % multiplesOf != 0) {
+				Assert.assertTrue(expectedResults.contains(msg.getId()));
+				assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
+				assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			}
+		}
+	}
+	
+	@Test
 	public void processMessages_shouldProcessSnapshotEventsInSerialForTheSameEntity() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 5;
