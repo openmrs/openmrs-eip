@@ -2,7 +2,10 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
@@ -18,7 +21,6 @@ import java.util.concurrent.Executors;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,7 +118,7 @@ public class SiteMessageConsumerTest {
 		
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertTrue(expectedResults.contains(msg.getId()));
 			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
@@ -154,7 +156,7 @@ public class SiteMessageConsumerTest {
 		
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertTrue(expectedResults.contains(msg.getId()));
 			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
@@ -194,7 +196,7 @@ public class SiteMessageConsumerTest {
 		
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			Assert.assertTrue(expectedResults.contains(msg.getId()));
+			assertTrue(expectedResults.contains(msg.getId()));
 			assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 		}
@@ -242,8 +244,13 @@ public class SiteMessageConsumerTest {
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
 			//All other messages for the same entity are skipped after first for the entity is encountered
-			if (i == multiplesOf || i % multiplesOf != 0) {
-				Assert.assertTrue(expectedResults.contains(msg.getId()));
+			if (i > multiplesOf && i % multiplesOf == 0) {
+				assertFalse(expectedResults.contains(msg.getId()));
+				assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+				assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
+			} else {
+				assertTrue(expectedResults.contains(msg.getId()));
+				assertNotNull(expectedMsgIdThreadMap.get(msg.getId()));
 				assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 				assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
 			}
@@ -251,13 +258,14 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSamePatientInSerialIfPrecededByPersonEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSamePatientIfPrecededByPersonMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -269,6 +277,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -278,30 +287,33 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSamePersonInSerialIfPrecededByPatientEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSamePersonIfPrecededByPatientMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -313,6 +325,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -322,30 +335,33 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSameTestOrderInSerialIfPrecededByOrderEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSameTestOrderIfPrecededByOrderMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -357,6 +373,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -366,30 +383,33 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByTestOrderEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSameOrderIfPrecededByTestOrderMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -401,6 +421,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -410,30 +431,33 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSameDrugOrderInSerialIfPrecededByOrderEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSameDrugOrderIfPrecededByOrderMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -445,6 +469,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -454,30 +479,33 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
 	@Test
-	public void processMessages_shouldProcessSnapshotEventsForTheSameOrderInSerialIfPrecededByDrugOrderEvents()
-	    throws Exception {
+	public void processMessages_shouldSkipMessagesForTheSameOrderIfPrecededByDrugOrderMessages() throws Exception {
+		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 3;
 		initExecutorAndConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
@@ -489,6 +517,7 @@ public class SiteMessageConsumerTest {
 				Exchange exchange = invocation.getArgument(1);
 				SyncMessage arg = exchange.getIn().getBody(SyncMessage.class);
 				expectedResults.add(arg.getId());
+				expectedMsgIdThreadMap.put(arg.getId(), Thread.currentThread());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
 				return null;
@@ -498,19 +527,21 @@ public class SiteMessageConsumerTest {
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(1, expectedResults.size());
+		assertEquals(1, expectedMsgIdThreadNameMap.size());
 		
 		SyncMessage firstMsg = messages.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
+		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
 		
-		//All other events for the same entity are only processed in serial after first snapshot messages is encountered
+		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
 			SyncMessage msg = messages.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(msg.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
+			assertFalse(expectedResults.contains(msg.getId()));
+			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
+			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
 		}
 	}
 	
