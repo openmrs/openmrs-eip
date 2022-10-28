@@ -10,6 +10,6 @@ public final class RestConstants {
 	
 	public static final String FIELD_ITEMS = "items";
 	
-	public static final Integer DEFAULT_MAX_COUNT = 100;
+	public static final Integer DEFAULT_MAX_COUNT = 500;
 	
 }

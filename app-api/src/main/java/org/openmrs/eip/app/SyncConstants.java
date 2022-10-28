@@ -14,8 +14,6 @@ public class SyncConstants {
 	
 	public static final int MAX_COUNT = 200;
 	
-	public static final int WAIT_IN_SECONDS = 60;
-	
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
 	
 	public static final int DEFAULT_THREAD_NUMBER = 10;

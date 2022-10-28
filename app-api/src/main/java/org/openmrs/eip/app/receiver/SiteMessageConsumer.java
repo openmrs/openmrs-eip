@@ -3,7 +3,6 @@ package org.openmrs.eip.app.receiver;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
-import static org.openmrs.eip.app.SyncConstants.WAIT_IN_SECONDS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
@@ -61,16 +60,22 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private String messageProcessorUri;
 	
+	private int delay;
+	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param threadCount the number of threads to use to sync messages in parallel
+	 * @param delay when the message queue is empty, this specifies the delay in milliseconds before the
+	 *            next read from the queue
 	 * @param msgExecutor {@link ExecutorService} instance to messages in parallel
 	 */
-	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, ExecutorService msgExecutor) {
+	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, int delay,
+	    ExecutorService msgExecutor) {
 		this.messageProcessorUri = messageProcessorUri;
 		this.site = site;
 		this.threadCount = threadCount;
 		this.msgExecutor = msgExecutor;
+		this.delay = delay;
 		failureCount = 0;
 	}
 	
@@ -94,9 +99,8 @@ public class SiteMessageConsumer implements Runnable {
 						log.trace("No sync message found from site: " + site);
 					}
 					
-					//TODO Make the delay configurable
 					try {
-						Thread.sleep(WAIT_IN_SECONDS * 1000);
+						Thread.sleep(delay);
 					}
 					catch (InterruptedException e) {
 						//ignore

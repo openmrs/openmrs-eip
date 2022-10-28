@@ -10,6 +10,10 @@ public class ReceiverConstants {
 	
 	public static final String PROP_RECEIVER_ID = "db-sync.receiverId";
 	
+	public static final String PROP_DELAY_IN_SECONDS = "site.message.reader.delay";
+	
+	public static final int DEFAULT_DELAY_IN_SECONDS = 5 * 60;
+	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
 	public static final String URI_MSG_PROCESSOR = "direct:" + ROUTE_ID_MSG_PROCESSOR;
