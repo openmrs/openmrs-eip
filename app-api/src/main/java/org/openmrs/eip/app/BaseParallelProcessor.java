@@ -21,7 +21,7 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseParallelProcessor.class);
 	
-	protected static final int WAIT_IN_SECONDS = 300;
+	protected static final int WAIT_IN_SECONDS = 60;
 	
 	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
 	protected int threadCount;
