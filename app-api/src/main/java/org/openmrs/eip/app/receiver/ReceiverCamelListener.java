@@ -109,22 +109,21 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			});
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
-			int effectiveWait = wait + 10;
-			
+			int timeout = 15;
 			if (msgExecutor != null) {
-				log.info("Shutting down executor for sync message threads");
+				log.info("Shutting down executor for message sync threads");
 				
 				msgExecutor.shutdown();
 				
 				try {
-					log.info("Waiting for " + effectiveWait + " seconds for sync threads to terminate");
+					log.info("Waiting for " + timeout + " seconds for message sync threads to terminate");
 					
-					msgExecutor.awaitTermination(effectiveWait, TimeUnit.SECONDS);
+					msgExecutor.awaitTermination(timeout, TimeUnit.SECONDS);
 					
-					log.info("Done shutting down executor for site message consumer threads");
+					log.info("Done shutting down executor for message sync threads");
 				}
 				catch (Exception e) {
-					log.error("An error occurred while waiting for sync threads to terminate");
+					log.error("An error occurred while waiting for message sync threads to terminate");
 				}
 			}
 			
@@ -134,9 +133,9 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				siteExecutor.shutdown();
 				
 				try {
-					log.info("Waiting for " + effectiveWait + " seconds for site message consumer threads to terminate");
+					log.info("Waiting for " + timeout + " seconds for site message consumer threads to terminate");
 					
-					siteExecutor.awaitTermination(effectiveWait, TimeUnit.SECONDS);
+					siteExecutor.awaitTermination(timeout, TimeUnit.SECONDS);
 					
 					log.info("Done shutting down executor for site message consumer threads");
 				}
