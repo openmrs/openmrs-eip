@@ -10,6 +10,9 @@ import {DbEventComponent} from "./event/db-event.component";
 import {dbEventReducer} from "./event/state/db-event.reducer";
 import {senderSyncMessageReducer} from "./sync/state/sender-sync-message.reducer";
 import {SenderSyncMessageComponent} from "./sync/sender-sync-message.component";
+import { SenderArchiveComponent } from './archive/sender-archive.component';
+import { senderArchiveReducer } from './archive/state/sender-archive.reducer';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -19,13 +22,16 @@ import {SenderSyncMessageComponent} from "./sync/sender-sync-message.component";
 		SenderDashboardComponent,
 		TableStatsComponent,
 		DbEventComponent,
-		SenderSyncMessageComponent
+		SenderSyncMessageComponent,
+		SenderArchiveComponent,
 	],
 	imports: [
 		SharedModule,
 		StoreModule.forFeature('senderErrorQueue', senderErrorReducer),
 		StoreModule.forFeature('eventQueue', dbEventReducer),
-		StoreModule.forFeature('syncQueue', senderSyncMessageReducer)
+		StoreModule.forFeature('syncQueue', senderSyncMessageReducer),
+		StoreModule.forFeature('senderArchiveQueue', senderArchiveReducer),
+		FormsModule,
 	], exports: [SenderComponent]
 })
 

@@ -18,6 +18,8 @@ public class SenderSyncArchive extends AbstractEntity {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public static final String EVENT_DATE = "eventDate";
+	
 	@NotNull
 	@Column(name = "table_name", length = 100, nullable = false, updatable = false)
 	private String tableName;

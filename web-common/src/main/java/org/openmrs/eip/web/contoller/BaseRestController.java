@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,40 @@ public abstract class BaseRestController {
 	public Object doGet(Long id) {
 		return producerTemplate.requestBody(
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
+	}
+	
+	public Map<String, Object> doSearchByPeriod(String startDate, String endDate, String property) {
+		
+		Map<String, Object> results = new HashMap<String, Object>(2);
+		
+		String whereClause = StringUtils.EMPTY;
+		
+		if (!StringUtils.isBlank(startDate)) {
+			whereClause = " where c." + property + " >= '" + startDate + "'";
+		}
+		
+		if (!StringUtils.isBlank(endDate)) {
+			whereClause += (StringUtils.isBlank(whereClause) ? " where " : " and ") + " c." + property + " <= '" + endDate
+			        + "'";
+		}
+		
+		Long count = on(camelContext)
+		        .to("jpa:" + getName() + "?query=SELECT count(c) FROM " + getName() + " c " + whereClause)
+		        .request(Long.class);
+		
+		if (count == 0) {
+			results.put(FIELD_COUNT, 0);
+			results.put(FIELD_ITEMS, Collections.emptyList());
+			return results;
+		}
+		
+		List<Object> items = on(camelContext).to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c "
+		        + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT).request(List.class);
+		
+		results.put(FIELD_COUNT, items.size());
+		results.put(FIELD_ITEMS, items);
+		
+		return results;
 	}
 	
 	public String getName() {

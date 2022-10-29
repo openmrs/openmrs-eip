@@ -263,7 +263,7 @@
 		<unit id="sender-db-events">
 			<segment>
 				<source>Database Events</source>
-				<target></target>
+				<target>Eventos da Base de dados</target>
 			</segment>
 		</unit>
 		<unit id="common-databaseId">
@@ -293,12 +293,13 @@
 		<unit id="sender-unprocessed-events">
 			<segment>
 				<source>Unprocessed Database Events</source>
-				<target></target>
+				<target>Eventos de base de dados não processados</target>
 			</segment>
 		</unit>
 		<unit id="common-no-events-msg">
 			<segment>
 				<source>No events, everything looks good!</source>
+				<target>Sem eventos, tudo parece estar bem!</target>
 			</segment>
 		</unit>
 		<unit id="common-sender-site">
@@ -328,61 +329,61 @@
 		<unit id="common-sync-msgs">
 			<segment>
 				<source>Sync Items</source>
-				<target></target>
+				<target>Itens Sincronizados</target>
 			</segment>
 		</unit>
 		<unit id="common-message-id">
 			<segment>
 				<source>Message Id</source>
-				<target></target>
+				<target>ID da Mensagem</target>
 			</segment>
 		</unit>
 		<unit id="common-request-id">
 			<segment>
 				<source>Request Id</source>
-				<target></target>
+				<target>Id da Solicitação</target>
 			</segment>
 		</unit>
 		<unit id="common-status">
 			<segment>
 				<source>Status</source>
-				<target></target>
+				<target>Estado</target>
 			</segment>
 		</unit>
 		<unit id="common-request">
 			<segment>
 				<source>Request</source>
-				<target></target>
+				<target>Solicitação</target>
 			</segment>
 		</unit>
 		<unit id="common-sent">
 			<segment>
 				<source>Sent</source>
-				<target></target>
+				<target>Enviado</target>
 			</segment>
 		</unit>
 		<unit id="common-waiting-to-sent">
 			<segment>
 				<source>Waiting To Be Sent</source>
-				<target></target>
+				<target>Aguardando Envio</target>
 			</segment>
 		</unit>
 		<unit id="common-no-sync-msg">
 			<segment>
 				<source>No items, everything looks good!</source>
-				<target></target>
+				<target>Sem itens, tudo parece estar bem!</target>
 			</segment>
 		</unit>
 		<unit id="common-requests">
 			<segment>
 				<source>Requests</source>
-				<target></target>
+				<target>solicitações</target>
 			</segment>
 		</unit>
 		<unit id="common-status-breakdown">
 			<segment>
 				<source>Status Breakdown</source>
-				<target></target>
+				<target> Detalhes do Estado de envio</target>
 			</segment>
 		</unit>
 		<unit id="common-dateSent">
@@ -394,13 +395,37 @@
 		<unit id="receiver-dateSentByRemoteSite">
 			<segment>
 				<source>Date Sent By Remote Site</source>
-				<target></target>
+				<target>Data de envio pelo Remetente</target>
 			</segment>
 		</unit>
 		<unit id="common-eventDate">
 			<segment>
 				<source>Event Date</source>
 				<target>Data Evento</target>
+			</segment>
+		</unit>
+		<unit id="common-start">
+			<segment>
+				<source>Start Time</source>
+				<target>Data Inicio</target>
+			</segment>
+		</unit>
+		<unit id="common-end">
+			<segment>
+				<source>Start Time</source>
+				<target>Data Fim</target>
+			</segment>
+		</unit>
+		<unit id="common-archived-items">
+			<segment>
+				<source>Archived Itens</source>
+				<target>Eventos Arquivados</target>
+			</segment>
+		</unit>
+		<unit id="common-dateReceivedByReceiver">
+			<segment>
+				<source>Date Received By Receiver</source>
+				<target>Data Recebida pelo Receptor</target>
 			</segment>
 		</unit>
 	</file>
