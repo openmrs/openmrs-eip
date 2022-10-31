@@ -1,11 +1,13 @@
 package org.openmrs.eip.web.contoller;
 
+import static org.apache.camel.component.jpa.JpaConstants.JPA_PARAMETERS_HEADER;
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,24 +55,27 @@ public abstract class BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
-	public Map<String, Object> doSearchByPeriod(String startDate, String endDate, String property) {
-		
-		Map<String, Object> results = new HashMap<String, Object>(2);
-		
+	public Map<String, Object> searchByDate(String dateProperty, Date startDate, Date endDate) {
+		final String queryParamStartDate = "startDate";
+		final String queryParamEndDate = "endDate";
+		Map<String, Object> results = new HashMap(2);
 		String whereClause = StringUtils.EMPTY;
 		
-		if (!StringUtils.isBlank(startDate)) {
-			whereClause = " where c." + property + " >= '" + startDate + "'";
+		Map<String, Object> paramAndValueMap = new HashMap(2);
+		if (startDate != null) {
+			whereClause = " WHERE e." + dateProperty + " >= :" + queryParamStartDate;
+			paramAndValueMap.put(queryParamStartDate, startDate);
 		}
 		
-		if (!StringUtils.isBlank(endDate)) {
-			whereClause += (StringUtils.isBlank(whereClause) ? " where " : " and ") + " c." + property + " <= '" + endDate
-			        + "'";
+		if (endDate != null) {
+			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE " : " AND") + " e." + dateProperty + " <= :"
+			        + queryParamEndDate;
+			paramAndValueMap.put(queryParamEndDate, endDate);
 		}
 		
-		Long count = on(camelContext)
-		        .to("jpa:" + getName() + "?query=SELECT count(c) FROM " + getName() + " c " + whereClause)
-		        .request(Long.class);
+		Integer count = on(camelContext)
+		        .to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName() + " e " + whereClause)
+		        .withHeader(JPA_PARAMETERS_HEADER, paramAndValueMap).request(Integer.class);
 		
 		if (count == 0) {
 			results.put(FIELD_COUNT, 0);
@@ -78,10 +83,11 @@ public abstract class BaseRestController {
 			return results;
 		}
 		
-		List<Object> items = on(camelContext).to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c "
-		        + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT).request(List.class);
+		List<Object> items = on(camelContext).to("jpa:" + getName() + "?query=SELECT e FROM " + getName() + " e "
+		        + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT).withHeader(JPA_PARAMETERS_HEADER, paramAndValueMap)
+		        .request(List.class);
 		
-		results.put(FIELD_COUNT, items.size());
+		results.put(FIELD_COUNT, count);
 		results.put(FIELD_ITEMS, items);
 		
 		return results;

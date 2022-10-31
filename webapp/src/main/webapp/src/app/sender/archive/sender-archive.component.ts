@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-import { BaseListingComponent } from 'src/app/shared/base-listing.component';
-import { SenderSyncArchive } from './sender-archive';
-import { SenderArchiveService } from './sender-archive.service';
-import { SenderSyncArchiveCountAndItems } from './sender-sync-archive-count-and-items';
-import { SenderArchivedLoaded } from './state/sender-archive.actions';
-import { GET_SYNC_ARCHIVE } from './state/sender-archive.reducer';
+import {Component, OnInit} from '@angular/core';
+import {select, Store} from '@ngrx/store';
+import {Subscription} from 'rxjs';
+import {BaseListingComponent} from 'src/app/shared/base-listing.component';
+import {SenderSyncArchive} from './sender-archive';
+import {SenderArchiveService} from './sender-archive.service';
+import {SenderSyncArchiveCountAndItems} from './sender-sync-archive-count-and-items';
+import {SenderArchivedLoaded} from './state/sender-archive.actions';
+import {GET_SYNC_ARCHIVE} from './state/sender-archive.reducer';
 
 @Component({
 	selector: 'app-sender-archive',
@@ -25,7 +25,7 @@ export class SenderArchiveComponent extends BaseListingComponent implements OnIn
 	endDate?: string;
 
 	constructor(private service: SenderArchiveService,
-		private store: Store) {
+				private store: Store) {
 		super();
 	}
 
@@ -47,14 +47,16 @@ export class SenderArchiveComponent extends BaseListingComponent implements OnIn
 		});
 	}
 
-	searchByPeriod(event: Event) {
-		//Clear table content
-		let syncArchiveItens = new SenderSyncArchiveCountAndItems();
-		syncArchiveItens.count = 0;
-		syncArchiveItens.items = [];
+	filterByEventDate() {
+		let initialItems = new SenderSyncArchiveCountAndItems();
+		initialItems.count = 0;
+		initialItems.items = [];
 
-		this.store.dispatch(new SenderArchivedLoaded(syncArchiveItens));
-		this.service.searchByEventDate(this.startDate, this.endDate).subscribe(countAndItems => {
+		//Clear table content
+		this.store.dispatch(new SenderArchivedLoaded(initialItems));
+		let start = this.startDate != undefined ? this.startDate : '';
+		let end = this.endDate != undefined ? this.endDate : '';
+		this.service.searchByEventDate(start, end).subscribe(countAndItems => {
 			this.store.dispatch(new SenderArchivedLoaded(countAndItems));
 		});
 	}

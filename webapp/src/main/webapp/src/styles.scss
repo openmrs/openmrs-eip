@@ -49,11 +49,11 @@ body {
 }
 
 .ui-bar-spacer {
-	height: 10px !important;
+	height: 10px !important; clear: both !important;
 }
 
 .ui-bar-spacer-content {
-	height: 10px !important;
+	height: 5px !important;
 }
 
 .modal-header {
@@ -140,6 +140,10 @@ body {
 
 .ui-no-wrap {
 	white-space: nowrap;
+}
+
+.archives-filter {
+	float: right !important;
 }
 
 

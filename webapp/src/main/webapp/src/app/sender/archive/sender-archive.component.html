@@ -1,74 +1,55 @@
-<!--View sync message overall status-->
-<div>
-	<div class="row">
-		<div class="col-md-8">
-		</div>
-		<div class="col-md-4">
-			<div>
-				<table style="left: 0;">
-					<tr>
-						<td></td>
-						<td colspan="4"></td>
-						<td colspan="2" i18n="@@common-start">Start</td>
-						<td></td>
-						<td i18n="@@common-end">End </td>
-						<td> </td>
-					</tr>
-					<tr>
-						<td >
-							<button class="btn btn-outline-primary" (click)="searchByPeriod($event)">
-								<span i18n="@@common-search-period">Search By Event Date</span>
-							</button>
-						</td>
-						<td colspan="4"></td>
-						<td colspan="2">
-							<input type="date" [(ngModel)]="startDate" />
-						</td>
-						<td></td>
-						<td>
-							<input type="date" [(ngModel)]="endDate" />
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-	</div>
-	<!--Archived message -->
-	<div>
-		<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span
-				class="badge border border-secondary">{{count}}</span></h5>
-		<div class="ui-bar-spacer">
-			<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
-				<thead>
-					<tr>
-						<th i18n="@@common-table-name">Table Name</th>
-						<th i18n="@@common-identifier">Identifier</th>
-						<th i18n="@@common-operation">Operation</th>
-						<th i18n="@@common-eventDate">Event Date</th>
-						<th i18n="@@common-dateSent">Date Sent</th>
-						<th i18n="@@common-dateReceivedByReceiver">Date Received By Receiver</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr *ngFor="let e of senderArchiveItems;">
-						<td>{{e.tableName}}</td>
-						<td>{{e.identifier}}</td>
-						<td>
-							<span class="text-success" [hidden]="e.operation != 'c'"
-								i18n="@@common-insert">Insert</span>
-							<span [hidden]="e.operation != 'u'" i18n="@@common-update">Update</span>
-							<span class="text-danger" [hidden]="e.operation != 'd'" i18n="@@common-delete">Delete</span>
-						</td>
-						<td container="body" ngbTooltip="{{e.eventDate | date:'EEEE, MMMM dd, y, h:mm:ss a'}}"
-						[openDelay]="1000">{{e.eventDate | date:'MMM dd, y'}}</td>
-						<td container="body" ngbTooltip="{{e.dateSent | date:'EEEE, MMMM dd, y, h:mm:ss a'}}"
-							[openDelay]="1000">{{e.dateSent | date:'MMM dd, y'}}</td>
-						<td container="body" ngbTooltip="{{e.dateReceivedByReceiver | date:'EEEE, MMMM dd, y, h:mm:ss a'}}"
-							[openDelay]="1000">{{e.dateReceivedByReceiver | date:'MMM dd, y'}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<!--Archived message -->
+<div class="archives-filter">
+	<table class="text-center">
+		<tr>
+			<th></th>
+			<th i18n="@@common-from">From</th>
+			<th i18n="@@common-to">To</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td class="pr-2" i18n="@@sender-filter-by-event-date">Filter By Event Date:</td>
+			<td><input type="date" [(ngModel)]="startDate" /></td>
+			<td><input type="date" [(ngModel)]="endDate" /></td>
+			<td class="pl-2">
+				<button class="btn btn-outline-primary btn-sm" (click)="filterByEventDate()"
+						[disabled]="(startDate == undefined || startDate == '') && (endDate == undefined || endDate == '')">
+					<span i18n="@@common-filter">Filter</span>
+				</button>
+			</td>
+		</tr>
+	</table>
 </div>
+<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span></h5>
+<div class="ui-bar-spacer"></div>
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-table-name">Table Name</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-event-date">Event Date</th>
+		<th i18n="@@common-date-sent">Date Sent</th>
+		<th i18n="@@common-date-received-by-central">Date Received By Central</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let e of senderArchiveItems;">
+		<td>{{e.tableName}}</td>
+		<td>{{e.identifier}}</td>
+		<td>
+			<span class="text-success" [hidden]="e.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="e.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="e.operation != 'd'" i18n="@@common-delete">Delete</span>
+		</td>
+		<td container="body" ngbTooltip="{{e.eventDate | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
+			{{e.eventDate | date:'MMM dd, y'}}
+		</td>
+		<td container="body" ngbTooltip="{{e.dateSent | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
+			{{e.dateSent | date:'MMM dd, y'}}
+		</td>
+		<td container="body" ngbTooltip="{{e.dateReceivedByReceiver | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
+			{{e.dateReceivedByReceiver | date:'MMM dd, y'}}
+		</td>
+	</tr>
+	</tbody>
+</table>

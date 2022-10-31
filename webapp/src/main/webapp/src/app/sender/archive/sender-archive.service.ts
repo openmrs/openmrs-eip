@@ -15,7 +15,7 @@ export class SenderArchiveService extends BaseService<SenderSyncArchive> {
 		return this.getCountAndItems(RESOURCE_NAME);
 	}
 
-	searchByEventDate(startDate: string | undefined, endDate: string | undefined): Observable<SenderSyncArchiveCountAndItems> {
+	searchByEventDate(startDate: string, endDate: string): Observable<SenderSyncArchiveCountAndItems> {
 		return this.searchCountAndItems(RESOURCE_NAME, { startDate: startDate, endDate: endDate })
 	}
 

@@ -31,7 +31,7 @@
 				<target>Identificador</target>
 			</segment>
 		</unit>
-		<unit id="common-dateAdded">
+		<unit id="common-date-added">
 			<segment>
 				<source>Date Added</source>
 				<target>Data criação</target>
@@ -266,7 +266,7 @@
 				<target>Eventos da Base de dados</target>
 			</segment>
 		</unit>
-		<unit id="common-databaseId">
+		<unit id="common-database-id">
 			<segment>
 				<source>Database Id</source>
 				<target>ID Base de Dados</target>
@@ -383,49 +383,61 @@
 		<unit id="common-status-breakdown">
 			<segment>
 				<source>Status Breakdown</source>
-				<target> Detalhes do Estado de envio</target>
+				<target>Detalhes do Estado de envio</target>
 			</segment>
 		</unit>
-		<unit id="common-dateSent">
+		<unit id="common-date-sent">
 			<segment>
 				<source>Date Sent</source>
 				<target>Data Envio</target>
 			</segment>
 		</unit>
-		<unit id="receiver-dateSentByRemoteSite">
+		<unit id="receiver-date-sent-by-remote">
 			<segment>
 				<source>Date Sent By Remote Site</source>
 				<target>Data de envio pelo Remetente</target>
 			</segment>
 		</unit>
-		<unit id="common-eventDate">
+		<unit id="common-event-date">
 			<segment>
 				<source>Event Date</source>
 				<target>Data Evento</target>
 			</segment>
 		</unit>
-		<unit id="common-start">
+		<unit id="common-from">
 			<segment>
-				<source>Start Time</source>
-				<target>Data Inicio</target>
+				<source>From</source>
+				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-end">
+		<unit id="common-to">
 			<segment>
-				<source>Start Time</source>
-				<target>Data Fim</target>
+				<source>To</source>
+				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-archived-items">
+		<unit id="common-sync-archives">
 			<segment>
-				<source>Archived Itens</source>
-				<target>Eventos Arquivados</target>
+				<source>Sync Archives</source>
+				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-dateReceivedByReceiver">
+		<unit id="common-filter">
 			<segment>
-				<source>Date Received By Receiver</source>
-				<target>Data Recebida pelo Receptor</target>
+				<source>Filter</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-date-received-by-central">
+			<segment>
+				<source>Date Received By Central</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="sender-filter-by-event-date">
+			<segment>
+				<source>Filter By Event Date</source>
+				<target></target>
 			</segment>
 		</unit>
 	</file>
