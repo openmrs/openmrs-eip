@@ -38,10 +38,11 @@ export class SenderArchiveComponent extends BaseListingComponent implements OnIn
 				this.reRender();
 			}
 		);
-		this.loadSenderArchiveData();
+
+		this.loadArchives();
 	}
 
-	loadSenderArchiveData() {
+	loadArchives() {
 		this.service.getArchiveCountAndItems().subscribe(countAndItems => {
 			this.store.dispatch(new SenderArchivedLoaded(countAndItems));
 		});

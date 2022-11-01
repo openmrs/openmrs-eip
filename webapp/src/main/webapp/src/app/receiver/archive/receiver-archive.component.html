@@ -1,67 +1,49 @@
-<div>
-	<div class="row">
-		<div class="col-md-8">
-		</div>
-		<div class="col-md-4">
-			<div>
-				<table style="left: 0;">
-					<tr>
-						<td></td>
-						<td colspan="4"></td>
-						<td colspan="2" i18n="@@common-start">Start</td>
-						<td></td>
-						<td i18n="@@common-end">End</td>
-						<td> </td>
-					</tr>
-					<tr>
-						<td>
-							<button class="btn btn-outline-primary" (click)="searchByPeriod($event)">
-								<span i18n="@@common-search-period">Search by Date Created</span>
-							</button>
-						</td>
-						<td colspan="4"></td>
-						<td colspan="2">
-							<input type="date" [(ngModel)]="startDate" />
-						</td>
-						<td></td>
-						<td>
-							<input type="date" [(ngModel)]="endDate" />
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-	</div>
-	<div>
-		<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span
-				class="badge border border-secondary">{{count}}</span></h5>
-		<div class="ui-bar-spacer">
-			<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
-				<thead>
-					<tr>
-						<th i18n="@@common-table-name">Table Name</th>
-						<th i18n="@@common-identifier">Identifier</th>
-						<th i18n="@@common-district">District</th>
-						<th i18n="@@common-health-facility">Health Facility</th>
-						<th i18n="@@common-dateCreated">Date Created</th>
-						<th i18n="@@common-dateSent">Date Sent</th>
-						<th i18n="@@common-dateReceived">Date Reiceved</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr *ngFor="let e of events">
-						<td>{{e.modelClassName | modelClass}}</td>
-						<td>{{e.identifier}}</td>
-						<td>{{e.site?.name}}</td>
-						<td>{{e.site?.identifier}}</td>
-						<td>{{e.dateCreated | date: 'MMM dd, y'}}</td>
-						<td container="body" ngbTooltip="{{e.dateSentBySender | date:'EEEE, MMMM dd, y, h:mm:ss a'}}"
-							[openDelay]="1000">{{e.dateSentBySender| date:'MMM dd, y'}}</td>
-						<td container="body" ngbTooltip="{{e.dateReceived | date:'EEEE, MMMM dd, y, h:mm:ss a'}}"
-							[openDelay]="1000">{{e.dateReceived | date:'MMM dd, y'}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+<div class="archives-filter">
+	<table class="text-center">
+		<tr>
+			<th></th>
+			<th i18n="@@common-from">From</th>
+			<th i18n="@@common-to">To</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td class="pr-2" i18n="@@receiver-filter-by-date-received">Filter By Date Received:</td>
+			<td><input type="date" [(ngModel)]="startDate" /></td>
+			<td><input type="date" [(ngModel)]="endDate" /></td>
+			<td class="pl-2">
+				<button class="btn btn-outline-primary btn-sm" (click)="filterByDateReceived()"
+						[disabled]="(startDate == undefined || startDate == '') && (endDate == undefined || endDate == '')">
+					<span i18n="@@common-filter">Filter</span>
+				</button>
+			</td>
+		</tr>
+	</table>
 </div>
+<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span></h5>
+<div class="ui-bar-spacer"></div>
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-entity">Entity</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-message-id">Message Id</th>
+		<th i18n="@@common-sender-site">Sender Site</th>
+		<th i18n="@@common-district">District</th>
+		<th i18n="@@receiver-date-sent-by-remote">Date Sent By Remote Site</th>
+		<th i18n="@@common-date-received">Date Received</th>
+		<th i18n="@@common-date-added">Date Added</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let e of events">
+		<td>{{e.modelClassName | modelClass}}</td>
+		<td>{{e.identifier}}</td>
+		<td>{{e.messageUuid}}</td>
+		<td>{{e.site?.name}}</td>
+		<td>{{e.site?.siteDistrict}}</td>
+		<td container="body" ngbTooltip="{{e.dateSentBySender | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{e.dateSentBySender| date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{e.dateReceived | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{e.dateReceived | date:'MMM dd, y'}}</td>
+		<td>{{e.dateCreated | date: 'MMM dd, y'}}</td>
+	</tr>
+	</tbody>
+</table>

@@ -31,7 +31,7 @@ import { FormsModule } from '@angular/forms';
 		StoreModule.forFeature('receiverErrorQueue', receiverErrorReducer),
 		StoreModule.forFeature('siteStatuses', siteStatusReducer),
 		StoreModule.forFeature('syncMsgQueue', syncMessageReducer),
-		StoreModule.forFeature('syncArquiveQueue', syncArchiveReducer),
+		StoreModule.forFeature('receiverArchiveQueue', syncArchiveReducer),
 		FormsModule
 	], exports: [ReceiverComponent]
 })

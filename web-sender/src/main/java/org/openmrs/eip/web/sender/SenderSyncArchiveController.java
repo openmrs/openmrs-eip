@@ -1,13 +1,10 @@
 package org.openmrs.eip.web.sender;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,12 +25,6 @@ public class SenderSyncArchiveController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(SenderSyncArchiveController.class);
 	
-	private static final String DATE_PATTERN = "yyyy-MM-dd";
-	
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
-	
-	private static final String EVENT_DATE = "eventDate";
-	
 	@Override
 	public Class<?> getClazz() {
 		return SenderSyncArchive.class;
@@ -42,7 +33,7 @@ public class SenderSyncArchiveController extends BaseRestController {
 	@GetMapping
 	public Map<String, Object> getAll() {
 		if (log.isDebugEnabled()) {
-			log.debug("Fetching sender sync Archives");
+			log.debug("Fetching sender sync archives");
 		}
 		
 		return doGetAll();
@@ -55,30 +46,30 @@ public class SenderSyncArchiveController extends BaseRestController {
 	    throws ParseException {
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Fetching archived events: ");
+			log.debug("Searching sender sync archives by start date: " + startDate + ", end date: " + endDate);
 		}
 		
 		Date start = null;
 		if (StringUtils.isNotBlank(startDate)) {
-			start = DATE_FORMAT.parse(startDate);
+			start = RestConstants.DATE_FORMAT.parse(startDate);
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Start Date: " + start);
+			log.debug("Start date: " + start);
 		}
 		
 		Date end = null;
 		if (StringUtils.isNotBlank(endDate)) {
 			//Roll date to end of day so that we include all archives on same day regardless of time
-			LocalDateTime ldt = LocalDate.parse(endDate, DateTimeFormatter.ofPattern(DATE_PATTERN)).atTime(LocalTime.MAX);
+			LocalDateTime ldt = LocalDate.parse(endDate, RestConstants.DATE_FORMATTER).atTime(LocalTime.MAX);
 			end = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("End Date: " + end);
+			log.debug("End date: " + end);
 		}
 		
-		return searchByDate(EVENT_DATE, start, end);
+		return searchByDate("eventDate", start, end);
 	}
 	
 }

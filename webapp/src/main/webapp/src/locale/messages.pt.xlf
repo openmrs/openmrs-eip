@@ -440,10 +440,22 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-dateReceived">
+		<unit id="common-date-received">
 			<segment>
-				<source>Date Reiceved</source>
+				<source>Date Received</source>
 				<target>Data Recebido</target>
+			</segment>
+		</unit>
+		<unit id="receiver-filter-by-date-received">
+			<segment>
+				<source>Filter By Date Received</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-district">
+			<segment>
+				<source>District</source>
+				<target></target>
 			</segment>
 		</unit>
 	</file>

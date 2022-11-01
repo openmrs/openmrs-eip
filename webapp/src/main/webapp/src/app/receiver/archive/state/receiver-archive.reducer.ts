@@ -6,7 +6,7 @@ export interface ReceiverArchiveState {
 	countAndItems: ReceiverSyncArchiveCountAndItems;
 }
 
-const GET_SYNC_ARCHIVE_FEATURE_STATE = createFeatureSelector<ReceiverArchiveState>('syncArquiveQueue');
+const GET_SYNC_ARCHIVE_FEATURE_STATE = createFeatureSelector<ReceiverArchiveState>('receiverArchiveQueue');
 
 export const GET_SYNC_ARCHIVE = createSelector(
 	GET_SYNC_ARCHIVE_FEATURE_STATE,

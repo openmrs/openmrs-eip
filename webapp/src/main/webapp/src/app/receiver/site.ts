@@ -6,4 +6,6 @@ export class Site extends BaseEntity {
 
 	identifier?: string;
 
+	siteDistrict?: string;
+
 }

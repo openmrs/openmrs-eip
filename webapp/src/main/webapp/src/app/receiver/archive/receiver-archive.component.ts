@@ -14,7 +14,6 @@ import {GET_SYNC_ARCHIVE} from './state/receiver-archive.reducer';
 })
 export class ReceiverArchiveComponent extends BaseListingComponent implements OnInit {
 
-
 	count?: number;
 
 	events?: ReceiverSyncArchive[];
@@ -33,7 +32,6 @@ export class ReceiverArchiveComponent extends BaseListingComponent implements On
 	}
 
 	ngOnInit(): void {
-
 		this.init();
 		this.loadedSubscription = this.store.pipe(select(GET_SYNC_ARCHIVE)).subscribe(
 			countAndItems => {
@@ -53,14 +51,16 @@ export class ReceiverArchiveComponent extends BaseListingComponent implements On
 		});
 	}
 
-	searchByPeriod(event: Event) {
-		//Clear table content
-		let syncArchiveItens = new ReceiverSyncArchiveCountAndItems();
-		syncArchiveItens.count = 0;
-		syncArchiveItens.items = [];
+	filterByDateReceived() {
+		let initialItems = new ReceiverSyncArchiveCountAndItems();
+		initialItems.count = 0;
+		initialItems.items = [];
 
-		this.store.dispatch(new ReceiverArchiveLoaded(syncArchiveItens));
-		this.service.doSearchByPeriod(this.startDate, this.endDate).subscribe(countAndItems => {
+		//Clear table content
+		this.store.dispatch(new ReceiverArchiveLoaded(initialItems));
+		let start = this.startDate != undefined ? this.startDate : '';
+		let end = this.endDate != undefined ? this.endDate : '';
+		this.service.searchByDateReceived(start, end).subscribe(countAndItems => {
 			this.store.dispatch(new ReceiverArchiveLoaded(countAndItems));
 		});
 	}

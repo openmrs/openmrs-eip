@@ -1,7 +1,6 @@
 package org.openmrs.eip.web.receiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
@@ -23,54 +22,41 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverTest {
 	private ReceiverSyncArchiveController controller;
 	
 	@Test
-	public void shouldGetAllArchiveMessages() {
+	public void shouldGetAllArchives() {
 		Map result = controller.getAll();
 		assertEquals(2, result.size());
 		assertEquals(3, result.get("count"));
 		assertEquals(3, ((List) result.get("items")).size());
-	}
-	
-	@Test
-	public void shouldDoSearchByPeriod() {
-		// Do Search with startDate and EndDate
-		String stardDate = "2022-10-25";
-		String endDate = "2022-10-30";
-		
-		Map results = controller.doSearchByPeriod(stardDate, endDate, ReceiverSyncArchive.DATE_CREATED);
-		assertEquals(1, results.get("count"));
-		assertEquals(2, results.size());
-		assertNotNull(((List<ReceiverSyncArchive>) results.get("items")).get(0).getDateCreated());
-		assertNotNull(((List<ReceiverSyncArchive>) results.get("items")).get(0).getDateReceived());
-		assertNotNull(((List<ReceiverSyncArchive>) results.get("items")).get(0).getDateSentBySender());
-	}
-	
-	@Test
-	public void shouldDoSearchByDateReceivedWithEndDate() {
-		// Do Search with EndDate
-		String stardDate = "";
-		String endDate = "2022-10-23";
-		
-		Map result = controller.doSearchByPeriod(stardDate, endDate, ReceiverSyncArchive.DATE_CREATED);
-		assertEquals(1, result.get("count"));
-		assertEquals("8cd540b1-dbcc-4dc0-bb85-d5d2763bbw6e",
-		    ((List<ReceiverSyncArchive>) result.get("items")).get(0).getIdentifier());
-		assertNotNull(((List<ReceiverSyncArchive>) result.get("items")).get(0).getDateCreated());
-		assertNotNull(((List<ReceiverSyncArchive>) result.get("items")).get(0).getDateReceived());
-		assertNotNull(((List<ReceiverSyncArchive>) result.get("items")).get(0).getDateSentBySender());
 		
 	}
 	
 	@Test
-	public void shouldDoSearchByDateReceivedWithStartDate() {
-		// Do Search with startDate
-		String stardDate = "2022-10-30";
-		String endDate = "";
-		
-		Map res = controller.doSearchByPeriod(stardDate, endDate, ReceiverSyncArchive.DATE_CREATED);
-		assertEquals(0, res.get("count"));
-		assertEquals(0, ((List) res.get("items")).size());
-		assertEquals(2, res.size());
-		
+	public void shouldReturnArchivesMatchingTheSpecifiedStartAndEndDates() throws Exception {
+		Map response = controller.searchByDateReceived("2022-10-25", "2022-10-30");
+		assertEquals(2, response.size());
+		assertEquals(1, response.get("count"));
+		assertEquals(1, ((List) response.get("items")).size());
+		assertEquals(3, ((List<ReceiverSyncArchive>) response.get("items")).get(0).getId().longValue());
+	}
+	
+	@Test
+	public void shouldReturnArchivesMatchingTheSpecifiedEndDate() throws Exception {
+		Map response = controller.searchByDateReceived(null, "2022-10-23");
+		assertEquals(2, response.size());
+		assertEquals(2, response.get("count"));
+		assertEquals(2, ((List) response.get("items")).size());
+		assertEquals(1, ((List<ReceiverSyncArchive>) response.get("items")).get(0).getId().longValue());
+		assertEquals(2, ((List<ReceiverSyncArchive>) response.get("items")).get(1).getId().longValue());
+	}
+	
+	@Test
+	public void shouldReturnArchivesMatchingTheSpecifiedStartDate() throws Exception {
+		Map response = controller.searchByDateReceived("2022-10-23", null);
+		assertEquals(2, response.size());
+		assertEquals(2, response.get("count"));
+		assertEquals(2, ((List) response.get("items")).size());
+		assertEquals(2, ((List<ReceiverSyncArchive>) response.get("items")).get(0).getId().longValue());
+		assertEquals(3, ((List<ReceiverSyncArchive>) response.get("items")).get(1).getId().longValue());
 	}
 	
 }
