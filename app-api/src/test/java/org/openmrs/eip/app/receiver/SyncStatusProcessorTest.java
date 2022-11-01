@@ -68,7 +68,7 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 		List<ReceiverSyncStatus> statuses = TestUtils.getEntities(ReceiverSyncStatus.class);
 		assertEquals(1, statuses.size());
 		assertEquals(siteInfo, statuses.get(0).getSiteInfo());
-		assertTrue(statuses.get(0).getLastSyncDate().getTime() > timestamp.getTime());
+		assertTrue(statuses.get(0).getLastSyncDate().getTime() >= timestamp.getTime());
 	}
 	
 	@Test
@@ -113,7 +113,7 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 		List<ReceiverSyncStatus> statuses = TestUtils.getEntities(ReceiverSyncStatus.class);
 		assertEquals(1, statuses.size());
 		assertEquals(siteInfo, statuses.get(0).getSiteInfo());
-		assertTrue(statuses.get(0).getLastSyncDate().getTime() > timestamp.getTime());
+		assertTrue(statuses.get(0).getLastSyncDate().getTime() >= timestamp.getTime());
 	}
 	
 }
