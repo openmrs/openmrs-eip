@@ -22,6 +22,8 @@ import org.springframework.beans.BeanUtils;
 public class ReceiverSyncArchive extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
+
+    public static final String DATE_CREATED = "dateReceived";
 	
 	@Column(nullable = false, updatable = false)
 	private String identifier;

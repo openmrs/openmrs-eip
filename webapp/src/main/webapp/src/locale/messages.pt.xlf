@@ -440,5 +440,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-dateReceived">
+			<segment>
+				<source>Date Reiceved</source>
+				<target>Data Recebido</target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

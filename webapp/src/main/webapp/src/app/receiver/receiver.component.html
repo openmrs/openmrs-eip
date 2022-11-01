@@ -30,6 +30,12 @@
 				<site-statuses></site-statuses>
 			</ng-template>
 		</li>
+		<li ngbNavItem="archive">
+			<a ngbNavLink i18n="@@sync-Archive">Sync Archive</a>
+			<ng-template ngbNavContent>
+				<app-archive></app-archive>
+			</ng-template>
+		</li>
 	</ul>
 	<div class="container mw-100 bg-white">
 		<div [ngbNavOutlet]="nav" class="mt-2 mb-3"></div>
