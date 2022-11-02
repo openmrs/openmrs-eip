@@ -5,10 +5,14 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.openmrs.eip.component.SyncOperation;
 
 @Entity
 @Table(name = "receiver_retry_queue")
@@ -22,6 +26,11 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	//Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
 	@Column(nullable = false, updatable = false)
 	private String identifier;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = false, length = 1)
+	private SyncOperation operation;
 	
 	@Column(name = "is_snapshot", nullable = false, updatable = false)
 	private Boolean snapshot = false;
@@ -77,6 +86,24 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	 */
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+	
+	/**
+	 * Gets the operation
+	 *
+	 * @return the operation
+	 */
+	public SyncOperation getOperation() {
+		return operation;
+	}
+	
+	/**
+	 * Sets the operation
+	 *
+	 * @param operation the operation to set
+	 */
+	public void setOperation(SyncOperation operation) {
+		this.operation = operation;
 	}
 	
 	/**
@@ -190,8 +217,9 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {identifier=" + identifier + ", modelClassName=" + modelClassName
-		        + ", attemptCount=" + getAttemptCount() + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender="
-		        + dateSentBySender + ", messageUuid=" + messageUuid + ", dateReceived=" + dateReceived + "}";
+		        + ", operation=" + operation + ", attemptCount=" + getAttemptCount() + ", snapshot=" + snapshot + ", site="
+		        + site + ", dateSentBySender=" + dateSentBySender + ", messageUuid=" + messageUuid + ", dateReceived="
+		        + dateReceived + "}";
 	}
 	
 }

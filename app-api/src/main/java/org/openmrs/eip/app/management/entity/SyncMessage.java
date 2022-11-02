@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.openmrs.eip.component.SyncOperation;
 
 /**
  * Encapsulates info about a sync message received by the receiver
@@ -27,6 +31,11 @@ public class SyncMessage extends AbstractEntity {
 	
 	@Column(name = "model_class_name", nullable = false, updatable = false)
 	private String modelClassName;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = false, length = 1)
+	private SyncOperation operation;
 	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
@@ -97,6 +106,24 @@ public class SyncMessage extends AbstractEntity {
 	}
 	
 	/**
+	 * Gets the operation
+	 *
+	 * @return the operation
+	 */
+	public SyncOperation getOperation() {
+		return operation;
+	}
+	
+	/**
+	 * Sets the operation
+	 *
+	 * @param operation the operation to set
+	 */
+	public void setOperation(SyncOperation operation) {
+		this.operation = operation;
+	}
+	
+	/**
 	 * Gets the site
 	 *
 	 * @return the site
@@ -161,8 +188,8 @@ public class SyncMessage extends AbstractEntity {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
-		        + modelClassName + ", site=" + site + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid
-		        + ", dateSentBySender=" + dateSentBySender + "}";
+		        + modelClassName + ", operation=" + operation + ", site=" + site + ", snapshot=" + snapshot
+		        + ", messageUuid=" + messageUuid + ", dateSentBySender=" + dateSentBySender + "}";
 	}
 	
 }

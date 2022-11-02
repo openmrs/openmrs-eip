@@ -5,10 +5,14 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.openmrs.eip.component.SyncOperation;
 
 @Entity
 @Table(name = "receiver_conflict_queue")
@@ -22,6 +26,11 @@ public class ConflictQueueItem extends AbstractEntity {
 	//Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
 	@Column(nullable = false, updatable = false)
 	private String identifier;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = false, length = 1)
+	private SyncOperation operation;
 	
 	@Column(name = "is_snapshot", nullable = false, updatable = false)
 	private Boolean snapshot = false;
@@ -80,6 +89,24 @@ public class ConflictQueueItem extends AbstractEntity {
 	 */
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+	
+	/**
+	 * Gets the operation
+	 *
+	 * @return the operation
+	 */
+	public SyncOperation getOperation() {
+		return operation;
+	}
+	
+	/**
+	 * Sets the operation
+	 *
+	 * @param operation the operation to set
+	 */
+	public void setOperation(SyncOperation operation) {
+		this.operation = operation;
 	}
 	
 	/**
@@ -210,9 +237,10 @@ public class ConflictQueueItem extends AbstractEntity {
 	
 	@Override
 	public String toString() {
-		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", payload="
-		        + entityPayload + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender=" + dateSentBySender
-		        + ", messageUuid=" + messageUuid + ", dateReceived=" + dateReceived + "}";
+		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", operation="
+		        + operation + ", payload=" + entityPayload + ", snapshot=" + snapshot + ", site=" + site
+		        + ", dateSentBySender=" + dateSentBySender + ", messageUuid=" + messageUuid + ", dateReceived="
+		        + dateReceived + "}";
 	}
 	
 }

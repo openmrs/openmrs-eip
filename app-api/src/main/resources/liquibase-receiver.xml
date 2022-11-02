@@ -1216,6 +1216,9 @@
             <column name="site_id" type="BIGINT">
                 <constraints nullable="false" />
             </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
             <column name="is_snapshot" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
@@ -1399,6 +1402,72 @@
         <addColumn tableName="receiver_conflict_queue">
             <column name="date_received" type="DATETIME(3)" />
         </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0731">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="operation" tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Add operation column to receiver_sync_msg table</comment>
+
+        <addColumn tableName="receiver_sync_msg">
+            <column name="operation" type="VARCHAR(1)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0732">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="operation" tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Add operation column to receiver_retry_queue table</comment>
+
+        <addColumn tableName="receiver_retry_queue">
+            <column name="operation" type="VARCHAR(1)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0733">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="operation" tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Add operation column to receiver_conflict_queue table</comment>
+
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="operation" type="VARCHAR(1)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0734">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="operation" tableName="receiver_sync_msg" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_sync_msg.operation</comment>
+
+        <addNotNullConstraint tableName="receiver_sync_msg" columnName="operation" columnDataType="VARCHAR(1)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0735">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="operation" tableName="receiver_retry_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_retry_queue.operation</comment>
+
+        <addNotNullConstraint tableName="receiver_retry_queue" columnName="operation" columnDataType="VARCHAR(1)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20221101-0736">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="operation" tableName="receiver_conflict_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_conflict_queue.operation</comment>
+
+        <addNotNullConstraint tableName="receiver_conflict_queue" columnName="operation" columnDataType="VARCHAR(1)" />
     </changeSet>
 
 </databaseChangeLog>
