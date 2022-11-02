@@ -1185,13 +1185,13 @@
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM receiver_sync_msg WHERE date_sent_by_sender IS NULL
+                    SELECT COUNT(*) FROM receiver_sync_msg
                 </sqlCheck>
             </not>
         </preConditions>
-        <comment>Setting date_sent_by_sender for existing sync messages</comment>
+        <comment>Setting date_sent_by_sender and operation for existing sync messages</comment>
 
-        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentBySenderChangeSet">
+        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentAndOperationChangeSet">
             <param name="tableName" value="receiver_sync_msg" />
         </customChange>
     </changeSet>
@@ -1300,13 +1300,13 @@
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM receiver_retry_queue WHERE date_sent_by_sender IS NULL
+                    SELECT COUNT(*) FROM receiver_retry_queue
                 </sqlCheck>
             </not>
         </preConditions>
-        <comment>Setting date_sent_by_sender for existing messages in error queue</comment>
+        <comment>Setting date_sent_by_sender and operation for existing messages in error queue</comment>
 
-        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentBySenderChangeSet">
+        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentAndOperationChangeSet">
             <param name="tableName" value="receiver_retry_queue" />
         </customChange>
     </changeSet>
@@ -1359,13 +1359,13 @@
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM receiver_conflict_queue WHERE date_sent_by_sender IS NULL
+                    SELECT COUNT(*) FROM receiver_conflict_queue
                 </sqlCheck>
             </not>
         </preConditions>
-        <comment>Setting date_sent_by_sender for existing messages in the conflict queue</comment>
+        <comment>Setting date_sent_by_sender and operation for existing messages in the conflict queue</comment>
 
-        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentBySenderChangeSet">
+        <customChange class="org.openmrs.eip.app.management.receiver.SetDateSentAndOperationChangeSet">
             <param name="tableName" value="receiver_conflict_queue" />
         </customChange>
     </changeSet>

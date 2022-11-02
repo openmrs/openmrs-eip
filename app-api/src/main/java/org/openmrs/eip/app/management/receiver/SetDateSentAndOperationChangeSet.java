@@ -10,7 +10,6 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -27,16 +26,15 @@ import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
 
 /**
- * {@link CustomTaskChange} that sets date_sent_by_sender values for existing messages in a specific
- * table
+ * {@link CustomTaskChange} that sets column values for existing messages in a specific table
  */
-public class SetDateSentBySenderChangeSet implements CustomTaskChange {
+public class SetDateSentAndOperationChangeSet implements CustomTaskChange {
 	
-	private static final Logger log = LoggerFactory.getLogger(SetDateSentBySenderChangeSet.class);
+	private static final Logger log = LoggerFactory.getLogger(SetDateSentAndOperationChangeSet.class);
 	
 	private static final String QUERY = "SELECT id, entity_payload FROM TABLE WHERE date_sent_by_sender IS NULL LIMIT 1000";
 	
-	private static final String UPDATE_SQL = "UPDATE TABLE SET date_sent_by_sender = ? WHERE id = ?";
+	private static final String UPDATE_SQL = "UPDATE TABLE SET date_sent_by_sender = ?, operation = ? WHERE id = ?";
 	
 	private String tableName;
 	
@@ -67,13 +65,14 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	private void setDateSentBySender(String tableName, JdbcConnection conn) throws SQLException, DatabaseException {
 		Map<Long, String> idAndPayloadMap = fetchBatchOfMessageDetails(tableName, conn);
 		while (idAndPayloadMap.size() > 0) {
-			Map<Long, LocalDateTime> idAndDateMap = new HashMap(idAndPayloadMap.size());
+			Map<Long, RowData> idAndDataMap = new HashMap(idAndPayloadMap.size());
 			idAndPayloadMap.entrySet().stream().forEach(e -> {
 				SyncMetadata metadata = JsonUtils.unmarshal(e.getValue(), SyncModel.class).getMetadata();
-				idAndDateMap.put(e.getKey(), metadata.getDateSent());
+				RowData rowData = new RowData(metadata.getDateSent(), metadata.getOperation());
+				idAndDataMap.put(e.getKey(), rowData);
 			});
 			
-			runBatchUpdate(tableName, idAndDateMap, conn);
+			runBatchUpdate(tableName, idAndDataMap, conn);
 			
 			idAndPayloadMap = fetchBatchOfMessageDetails(tableName, conn);
 		}
@@ -104,28 +103,23 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	 * Executes all the updates in a batch.
 	 * 
 	 * @param tableName the name of the table to update
-	 * @param idAndDateMap mapping between sync message ids and their respective date sent by sender
-	 *            values
+	 * @param idAndDataMap mapping between sync message ids and their respective {@link RowData}
+	 *            instances
 	 * @param connection The database connection
 	 */
-	private void runBatchUpdate(String tableName, Map<Long, LocalDateTime> idAndDateMap, JdbcConnection connection)
+	private void runBatchUpdate(String tableName, Map<Long, RowData> idAndDataMap, JdbcConnection connection)
 	    throws SQLException, DatabaseException {
 		
 		Boolean autoCommit = null;
 		try (PreparedStatement s = connection.prepareStatement(UPDATE_SQL.replace("TABLE", tableName))) {
 			autoCommit = connection.getAutoCommit();
 			connection.setAutoCommit(false);
-			
-			idAndDateMap.entrySet().stream().forEach(entry -> {
-				try {
-					s.setTimestamp(1, Timestamp.from(entry.getValue().atZone(ZoneId.systemDefault()).toInstant()));
-					s.setLong(2, entry.getKey());
-					s.addBatch();
-				}
-				catch (SQLException se) {
-					throw new EIPException("Failed to add to batch", se);
-				}
-			});
+			for (Map.Entry<Long, RowData> entry : idAndDataMap.entrySet()) {
+				s.setTimestamp(1, Timestamp.from(entry.getValue().dateSent.atZone(ZoneId.systemDefault()).toInstant()));
+				s.setString(2, entry.getValue().operation);
+				s.setLong(3, entry.getKey());
+				s.addBatch();
+			}
 			
 			s.executeBatch();
 			connection.commit();
@@ -148,7 +142,6 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	
 	@Override
 	public void setUp() throws SetupException {
-		
 	}
 	
 	@Override
@@ -158,6 +151,19 @@ public class SetDateSentBySenderChangeSet implements CustomTaskChange {
 	@Override
 	public ValidationErrors validate(Database database) {
 		return null;
+	}
+	
+	private class RowData {
+		
+		LocalDateTime dateSent;
+		
+		String operation;
+		
+		RowData(LocalDateTime dateSent, String operation) {
+			this.dateSent = dateSent;
+			this.operation = operation;
+		}
+		
 	}
 	
 }
