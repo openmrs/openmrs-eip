@@ -80,6 +80,7 @@
                                 #{body.setExceptionType(getProperty('exceptionType'))}
                                 #{body.setMessage(getProperty('error-msg'))}
                                 #{body.setDateCreated(new java.util.Date())}
+                                #{body.setOperation(getProperty('sync-message').getOperation())}
                                 #{body.setSite(getProperty('sync-message').getSite())}
                                 #{body.setDateSentBySender(getProperty('sync-message').getDateSentBySender())}
                                 #{body.setSnapshot(getProperty('sync-message').getSnapshot())}

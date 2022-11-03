@@ -117,6 +117,7 @@
                             <spel>
                                 #{getProperty('messageToSave').setIdentifier(getProperty('sync-model').model.uuid)}
                                 #{getProperty('messageToSave').setModelClassName(getProperty('sync-model').tableToSyncModelClass.name)}
+                                #{getProperty('messageToSave').setOperation(T(org.openmrs.eip.component.SyncOperation).valueOf(getProperty('sync-model').metadata.operation))}
                                 #{getProperty('messageToSave').setEntityPayload(getProperty('entity-payload'))}
                                 #{getProperty('messageToSave').setSite(T(org.openmrs.eip.app.receiver.ReceiverContext).getSiteInfo(getProperty('sync-model').metadata.sourceIdentifier))}
                                 #{getProperty('messageToSave').setDateCreated(new java.util.Date())}

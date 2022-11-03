@@ -37,6 +37,7 @@ import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.entity.light.PatientLight;
 import org.openmrs.eip.component.entity.light.VisitTypeLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
@@ -585,6 +586,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
 		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
 		SyncMessage syncMessage = new SyncMessage();
+		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSnapshot(true);
 		syncMessage.setMessageUuid("message-uuid");
 		syncMessage.setDateCreated(new Date());
@@ -609,6 +611,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		ConflictQueueItem conflict = conflicts.get(0);
 		assertEquals(modelClass.getName(), conflict.getModelClassName());
 		assertEquals(uuid, conflict.getIdentifier());
+		assertEquals(syncMessage.getOperation(), conflict.getOperation());
 		assertEquals(payLoad, conflict.getEntityPayload());
 		assertEquals(syncMessage.getSite(), conflict.getSite());
 		assertEquals(syncMessage.getDateSentBySender(), conflict.getDateSentBySender());
@@ -636,6 +639,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setModelClassName(modelClass.getName());
 		retry.setIdentifier(uuid);
+		retry.setOperation(SyncOperation.u);
 		retry.setEntityPayload(payLoad);
 		retry.setSnapshot(true);
 		retry.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
@@ -662,6 +666,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		ConflictQueueItem conflict = conflicts.get(0);
 		assertEquals(modelClass.getName(), conflict.getModelClassName());
 		assertEquals(uuid, conflict.getIdentifier());
+		assertEquals(retry.getOperation(), conflict.getOperation());
 		assertEquals(payLoad, conflict.getEntityPayload());
 		assertEquals(retry.getDateSentBySender(), conflict.getDateSentBySender());
 		assertEquals(retry.getMessageUuid(), conflict.getMessageUuid());

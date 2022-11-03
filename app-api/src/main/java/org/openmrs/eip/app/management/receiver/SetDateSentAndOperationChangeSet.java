@@ -26,13 +26,14 @@ import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
 
 /**
- * {@link CustomTaskChange} that sets column values for existing messages in a specific table
+ * {@link CustomTaskChange} that sets date_sent_by_sender and operation for existing messages in a
+ * specific table
  */
 public class SetDateSentAndOperationChangeSet implements CustomTaskChange {
 	
 	private static final Logger log = LoggerFactory.getLogger(SetDateSentAndOperationChangeSet.class);
 	
-	private static final String QUERY = "SELECT id, entity_payload FROM TABLE WHERE date_sent_by_sender IS NULL LIMIT 1000";
+	private static final String QUERY = "SELECT id, entity_payload FROM TABLE WHERE date_sent_by_sender IS NULL AND operation IS NULL LIMIT 1000";
 	
 	private static final String UPDATE_SQL = "UPDATE TABLE SET date_sent_by_sender = ?, operation = ? WHERE id = ?";
 	
@@ -49,7 +50,7 @@ public class SetDateSentAndOperationChangeSet implements CustomTaskChange {
 	
 	@Override
 	public void execute(Database database) throws CustomChangeException {
-		log.info("Setting date_sent_by_sender for existing messages in " + tableName + " table");
+		log.info("Setting date_sent_by_sender and operation for existing messages in " + tableName + " table");
 		
 		try {
 			JdbcConnection conn = (JdbcConnection) database.getConnection();
@@ -57,7 +58,8 @@ public class SetDateSentAndOperationChangeSet implements CustomTaskChange {
 		}
 		catch (SQLException | DatabaseException e) {
 			throw new CustomChangeException(
-			        "An error occurred while setting date_sent_by_sender for existing messages in " + tableName + " table",
+			        "An error occurred while setting date_sent_by_sender and operation for existing messages in " + tableName
+			                + " table",
 			        e);
 		}
 	}
@@ -137,7 +139,8 @@ public class SetDateSentAndOperationChangeSet implements CustomTaskChange {
 	
 	@Override
 	public String getConfirmationMessage() {
-		return "Setting date_sent_by_sender for existing messages in " + tableName + " table completed successfully";
+		return "Setting date_sent_by_sender and operation for existing messages in " + tableName
+		        + " table completed successfully";
 	}
 	
 	@Override

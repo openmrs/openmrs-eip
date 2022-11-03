@@ -15,6 +15,7 @@ import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,7 @@ public class ReceiverSyncArchiveTest {
 		syncMessage.setSnapshot(true);
 		syncMessage.setMessageUuid("message-uuid");
 		syncMessage.setDateSentBySender(LocalDateTime.now());
+		syncMessage.setOperation(SyncOperation.c);
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(syncMessage);
 		

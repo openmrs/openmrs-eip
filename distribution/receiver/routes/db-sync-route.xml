@@ -250,6 +250,7 @@
                                         #{body.setModelClassName(getProperty('model-class'))}
                                         #{body.setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
                                         #{body.setDateCreated(new java.util.Date())}
+                                        #{body.setOperation(getProperty('sync-message').getOperation())}
                                         #{body.setSite(getProperty('sync-message').getSite())}
                                         #{body.setDateSentBySender(getProperty('sync-message').getDateSentBySender())}
                                         #{body.setSnapshot(getProperty('sync-message').getSnapshot())}
@@ -264,6 +265,7 @@
                                     <spel>
                                         #{body.setIdentifier(getProperty('retry-item').getIdentifier())}
                                         #{body.setModelClassName(getProperty('retry-item').getModelClassName())}
+                                        #{body.setOperation(getProperty('retry-item').getOperation())}
                                         #{body.setEntityPayload(getProperty('retry-item').getEntityPayload())}
                                         #{body.setDateCreated(new java.util.Date())}
                                         #{body.setSite(getProperty('retry-item').getSite())}

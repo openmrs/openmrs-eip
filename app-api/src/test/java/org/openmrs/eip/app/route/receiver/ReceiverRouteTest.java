@@ -36,6 +36,7 @@ import org.openmrs.eip.app.management.entity.ReceiverSyncRequest.ReceiverRequest
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.camel.TypeEnum;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncMetadata;
@@ -94,7 +95,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
-		final String op = "u";
+		final SyncOperation op = SyncOperation.u;
 		assertTrue(TestUtils.getEntities(SyncMessage.class).isEmpty());
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
@@ -104,7 +105,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setMessageUuid(msgUuid);
 		metadata.setSnapshot(false);
-		metadata.setOperation(op);
+		metadata.setOperation(op.toString());
 		SiteInfo siteInfo = getEntity(SiteInfo.class, 1L);
 		metadata.setSourceIdentifier(siteInfo.getIdentifier());
 		metadata.setDateSent(dateSent);
@@ -122,6 +123,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		SyncMessage msg = msgs.get(0);
 		assertEquals(PersonModel.class.getName(), msg.getModelClassName());
 		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
 		assertEquals(msgUuid, msg.getMessageUuid());
 		assertEquals(JsonUtils.marshall(syncModel), msg.getEntityPayload());
 		assertEquals(siteInfo, msg.getSite());
@@ -163,7 +165,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
-		final String op = "r";
+		final SyncOperation op = SyncOperation.r;
 		final String requestUuid = "46beb8bd-287c-47f2-9786-a7b98c933c04";
 		ReceiverSyncRequest request = getEntity(ReceiverSyncRequest.class, 4L);
 		assertEquals(requestUuid, request.getRequestUuid());
@@ -177,7 +179,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setMessageUuid(msgUuid);
 		metadata.setSnapshot(false);
-		metadata.setOperation(op);
+		metadata.setOperation(op.toString());
 		metadata.setRequestUuid(requestUuid);
 		SiteInfo siteInfo = getEntity(SiteInfo.class, 1L);
 		metadata.setSourceIdentifier(siteInfo.getIdentifier());

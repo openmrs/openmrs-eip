@@ -37,6 +37,7 @@ import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -98,6 +99,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setSnapshot(true);
 		syncMessage.setMessageUuid("message-uuid");
+		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setDateCreated(new Date());
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncMessage.setDateSentBySender(LocalDateTime.now());
@@ -116,6 +118,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertEquals(errorMsg, errorItem.getMessage());
 		assertEquals(1, errorItem.getAttemptCount().intValue());
 		assertNotNull(errorItem.getDateCreated());
+		assertEquals(syncMessage.getOperation(), errorItem.getOperation());
 		assertEquals(syncMessage.getSite(), errorItem.getSite());
 		assertEquals(syncMessage.getDateSentBySender(), errorItem.getDateSentBySender());
 		assertEquals(syncMessage.getMessageUuid(), errorItem.getMessageUuid());
@@ -137,6 +140,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
 		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
 		SyncMessage syncMessage = new SyncMessage();
+		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncMessage.setDateSentBySender(LocalDateTime.now());
 		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
@@ -192,6 +196,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
 		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
 		SyncMessage syncMessage = new SyncMessage();
+		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncMessage.setDateSentBySender(LocalDateTime.now());
 		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
