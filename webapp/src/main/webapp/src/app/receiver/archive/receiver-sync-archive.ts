@@ -7,6 +7,8 @@ export class ReceiverSyncArchive extends BaseEntity {
 
 	modelClassName?: string;
 
+	operation?: string;
+
 	messageUuid?: string;
 
 	site?: Site;

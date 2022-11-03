@@ -16,7 +16,7 @@ export class ReceiverArchiveComponent extends BaseListingComponent implements On
 
 	count?: number;
 
-	events?: ReceiverSyncArchive[];
+	archives?: ReceiverSyncArchive[];
 
 	loadedSubscription?: Subscription;
 
@@ -36,7 +36,7 @@ export class ReceiverArchiveComponent extends BaseListingComponent implements On
 		this.loadedSubscription = this.store.pipe(select(GET_SYNC_ARCHIVE)).subscribe(
 			countAndItems => {
 				this.count = countAndItems?.count;
-				this.events = countAndItems?.items;
+				this.archives = countAndItems?.items;
 				this.reRender();
 			}
 		);

@@ -7,6 +7,8 @@ export class ReceiverSyncMessage extends BaseErrorEntity {
 
 	modelClassName?: string;
 
+	operation?: string;
+
 	messageUuid?: string;
 
 	entityPayload?: string;

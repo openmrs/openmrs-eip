@@ -7,8 +7,16 @@ export class ReceiverError extends BaseErrorEntity {
 
 	modelClassName?: string;
 
+	operation?: string;
+
 	entityPayload?: string;
 
 	site?: Site;
+
+	messageUuid?: string;
+
+	dateSentBySender?: string;
+
+	dateReceived?: string;
 
 }

@@ -7,10 +7,18 @@ export class Conflict extends BaseEntity {
 
 	modelClassName?: string;
 
+	operation?: string;
+
 	entityPayload?: string;
 
 	site?: Site;
 
 	resolved: boolean = false;
+
+	messageUuid?: string;
+
+	dateSentBySender?: string;
+
+	dateReceived?: string;
 
 }

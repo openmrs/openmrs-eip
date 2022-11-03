@@ -302,10 +302,10 @@
 				<target>Sem eventos, tudo parece estar bem!</target>
 			</segment>
 		</unit>
-		<unit id="common-sender-site">
+		<unit id="common-health-facility">
 			<segment>
-				<source>Sender Site</source>
-				<target>Site Origem</target>
+				<source>Health Facility</source>
+				<target></target>
 			</segment>
 		</unit>
 		<unit id="site-statuses">
@@ -390,12 +390,6 @@
 			<segment>
 				<source>Date Sent</source>
 				<target>Data Envio</target>
-			</segment>
-		</unit>
-		<unit id="receiver-date-sent-by-remote">
-			<segment>
-				<source>Date Sent By Remote Site</source>
-				<target>Data de envio pelo Remetente</target>
 			</segment>
 		</unit>
 		<unit id="common-event-date">

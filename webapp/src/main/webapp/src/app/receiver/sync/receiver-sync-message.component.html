@@ -7,10 +7,12 @@
 	<tr>
 		<th i18n="@@common-entity">Entity</th>
 		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-health-facility">Health Facility</th>
+		<th i18n="@@common-district">District</th>
+		<th i18n="@@common-operation">Operation</th>
 		<th i18n="@@common-message-id">Message Id</th>
-		<th i18n="@@common-sender-site">Sender Site</th>
-		<th i18n="@@common-date-added">Date Added</th>
-		<th i18n="@@receiver-date-sent-by-remote">Date Sent By Remote Site</th>
+		<th i18n="@@commom-date-sent">Date Sent</th>
+		<th i18n="@@common-date-received">Date Received</th>
 		<th i18n="@@common-action">Action</th>
 	</tr>
 	</thead>
@@ -18,10 +20,17 @@
 	<tr *ngFor="let m of syncMessages" class="ui-row-highlight">
 		<td>{{m.modelClassName | modelClass}}</td>
 		<td>{{m.identifier}}</td>
-		<td>{{m.messageUuid}}</td>
 		<td>{{m.site?.name}}</td>
-		<td>{{m.dateCreated | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-		<td>{{m.dateSentBySender | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+		<td>{{m.site?.siteDistrict}}</td>
+		<td>
+			<span class="text-success" [hidden]="m.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="m.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
+		</td>
+		<td>{{m.messageUuid}}</td>
+		<td container="body" ngbTooltip="{{m.dateSentBySender | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{m.dateSentBySender| date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{m.dateCreated | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{m.dateCreated | date:'MMM dd, y'}}</td>
 		<td>
 			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSyncMessage(m)"></i>
 		</td>
