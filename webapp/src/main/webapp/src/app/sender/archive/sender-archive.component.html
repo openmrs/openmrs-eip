@@ -27,28 +27,30 @@
 		<th i18n="@@common-table-name">Table Name</th>
 		<th i18n="@@common-identifier">Identifier</th>
 		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@common-event-date">Event Date</th>
 		<th i18n="@@common-date-sent">Date Sent</th>
-		<th i18n="@@common-date-received-by-central">Date Received By Central</th>
+		<th i18n="@@common-date-received">Date Received</th>
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let e of senderArchiveItems;">
-		<td>{{e.tableName}}</td>
-		<td>{{e.identifier}}</td>
+	<tr *ngFor="let a of archives;">
+		<td>{{a.tableName}}</td>
+		<td>{{a.identifier}}</td>
 		<td>
-			<span class="text-success" [hidden]="e.operation != 'c'" i18n="@@common-insert">Insert</span>
-			<span [hidden]="e.operation != 'u'" i18n="@@common-update">Update</span>
-			<span class="text-danger" [hidden]="e.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-success" [hidden]="a.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="a.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="a.operation != 'd'" i18n="@@common-delete">Delete</span>
 		</td>
-		<td container="body" ngbTooltip="{{e.eventDate | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
-			{{e.eventDate | date:'MMM dd, y'}}
+		<td>{{a.messageUuid}}</td>
+		<td container="body" ngbTooltip="{{a.eventDate | date:'EEEE, MMMM dd, y, HH:mm:ss.SSS'}}" [openDelay]="1000">
+			{{a.eventDate | date:'MMM dd, y'}}
 		</td>
-		<td container="body" ngbTooltip="{{e.dateSent | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
-			{{e.dateSent | date:'MMM dd, y'}}
+		<td container="body" ngbTooltip="{{a.dateSent | date:'EEEE, MMMM dd, y, HH:mm:ss.SSS'}}" [openDelay]="1000">
+			{{a.dateSent | date:'MMM dd, y'}}
 		</td>
-		<td container="body" ngbTooltip="{{e.dateReceivedByReceiver | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">
-			{{e.dateReceivedByReceiver | date:'MMM dd, y'}}
+		<td container="body" ngbTooltip="{{a.dateReceivedByReceiver | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">
+			{{a.dateReceivedByReceiver | date:'MMM dd, y'}}
 		</td>
 	</tr>
 	</tbody>

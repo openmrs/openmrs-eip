@@ -422,12 +422,6 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-date-received-by-central">
-			<segment>
-				<source>Date Received By Central</source>
-				<target></target>
-			</segment>
-		</unit>
 		<unit id="sender-filter-by-event-date">
 			<segment>
 				<source>Filter By Event Date</source>

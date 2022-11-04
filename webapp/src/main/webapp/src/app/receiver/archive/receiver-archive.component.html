@@ -32,7 +32,6 @@
 		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@commom-date-sent">Date Sent</th>
 		<th i18n="@@common-date-received">Date Received</th>
-		<th i18n="@@common-date-added">Date Added</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -48,9 +47,8 @@
 			<span class="text-info" [hidden]="a.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
 		<td>{{a.messageUuid}}</td>
-		<td container="body" ngbTooltip="{{a.dateSentBySender | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{a.dateSentBySender| date:'MMM dd, y'}}</td>
-		<td container="body" ngbTooltip="{{a.dateReceived | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{a.dateReceived | date:'MMM dd, y'}}</td>
-		<td container="body" ngbTooltip="{{a.dateCreated | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{a.dateCreated | date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{a.dateSentBySender | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{a.dateSentBySender| date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{a.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{a.dateReceived | date:'MMM dd, y'}}</td>
 	</tr>
 	</tbody>
 </table>

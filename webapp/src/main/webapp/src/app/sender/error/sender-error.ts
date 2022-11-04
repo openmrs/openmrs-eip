@@ -7,4 +7,6 @@ export class SenderError extends BaseErrorEntity {
 
 	event?: Event;
 
+	eventDate?: string;
+
 }

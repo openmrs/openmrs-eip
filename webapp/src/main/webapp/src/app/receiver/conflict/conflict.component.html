@@ -30,9 +30,9 @@
 				<span class="text-info" [hidden]="c.operation != 'r'" i18n="@@common-request">Request</span>
 			</td>
 			<td>{{c.messageUuid}}</td>
-			<td container="body" ngbTooltip="{{c.dateSentBySender | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{c.dateSentBySender| date:'MMM dd, y'}}</td>
-			<td container="body" ngbTooltip="{{c.dateReceived | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{c.dateReceived | date:'MMM dd, y'}}</td>
-			<td container="body" ngbTooltip="{{c.dateCreated | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{c.dateCreated | date:'MMM dd, y'}}</td>
+			<td container="body" ngbTooltip="{{c.dateSentBySender | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateSentBySender| date:'MMM dd, y'}}</td>
+			<td container="body" ngbTooltip="{{c.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateReceived | date:'MMM dd, y'}}</td>
+			<td container="body" ngbTooltip="{{c.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateCreated | date:'MMM dd, y'}}</td>
 			<td>
 				<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>
 				&nbsp;

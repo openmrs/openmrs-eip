@@ -18,7 +18,7 @@ export class SenderArchiveComponent extends BaseListingComponent implements OnIn
 
 	loadedSubscription?: Subscription;
 
-	senderArchiveItems?: SenderSyncArchive[];
+	archives?: SenderSyncArchive[];
 
 	startDate?: string;
 
@@ -34,7 +34,7 @@ export class SenderArchiveComponent extends BaseListingComponent implements OnIn
 		this.loadedSubscription = this.store.pipe(select(GET_SYNC_ARCHIVE)).subscribe(
 			countAndItems => {
 				this.count = countAndItems.count;
-				this.senderArchiveItems = countAndItems.items
+				this.archives = countAndItems.items
 				this.reRender();
 			}
 		);

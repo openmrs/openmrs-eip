@@ -5,11 +5,10 @@
 	<tr>
 		<th i18n="@@common-table-name">Table Name</th>
 		<th i18n="@@common-identifier">Identifier</th>
-		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-message-id">Message Id</th>
 		<th i18n="@@common-status">Status</th>
 		<th i18n="@@common-event-date">Event Date</th>
-		<th i18n="@@common-date-added">Date Added</th>
 		<th i18n="@@common-date-sent">Date Sent</th>
 	</tr>
 	</thead>
@@ -17,20 +16,23 @@
 	<tr *ngFor="let m of syncMessages">
 		<td>{{m.tableName}}</td>
 		<td>{{m.identifier}}</td>
-		<td>{{m.messageUuid}}</td>
 		<td>
 			<span class="text-success" [hidden]="m.operation != 'c'" i18n="@@common-insert">Insert</span>
 			<span [hidden]="m.operation != 'u'" i18n="@@common-update">Update</span>
 			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
 			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
+		<td>{{m.messageUuid}}</td>
 		<td>
 			<i class="bi-envelope-dash text-warning ui-cursor-pointer" [hidden]="m.status != 'NEW'" [ngbTooltip]="statusWaitingTemplate" [openDelay]="1000"></i>
 			<i class="bi-envelope-check-fill text-success ui-cursor-pointer" [hidden]="m.status != 'SENT'" [ngbTooltip]="statusSentTemplate" [openDelay]="1000"></i>
 		</td>
-		<td container="body" ngbTooltip="{{m.eventDate | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{m.eventDate | date:'MMM dd, y'}}</td>
-		<td container="body" ngbTooltip="{{m.dateCreated | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{m.dateCreated | date:'MMM dd, y'}}</td>
-		<td container="body" ngbTooltip="{{m.dateSent | date:'EEEE, MMMM dd, y, h:mm:ss a'}}" [openDelay]="1000">{{m.dateSent | date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{m.eventDate | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">
+			{{m.eventDate | date:'MMM dd, y'}}
+		</td>
+		<td container="body" ngbTooltip="{{m.dateSent | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">
+			{{m.dateSent | date:'MMM dd, y'}}
+		</td>
 	</tr>
 	</tbody>
 </table>
