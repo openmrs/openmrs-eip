@@ -23,12 +23,14 @@ body {
 	height: 57px;
 	color: $themeColorSecondary;
 	font-size: 0.8em;
+	min-width: $minWidth;
 }
 
 #body-main {
 	top: 57px;
 	bottom: 16px;
 	overflow: auto;
+	min-width: $minWidth;
 }
 
 #body-footer {
@@ -36,6 +38,7 @@ body {
 	height: 16px !important;
 	color: $themeColorSecondary;
 	font-size: 0.6em;
+	min-width: $minWidth;
 }
 
 #header-main nav.navbar {
