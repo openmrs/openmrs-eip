@@ -18,6 +18,7 @@ import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
@@ -56,6 +57,7 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		conflict.setMessageUuid("message-uuid");
 		conflict.setModelClassName(PatientModel.class.getName());
 		conflict.setIdentifier(uuid);
+		conflict.setOperation(SyncOperation.c);
 		conflict.setEntityPayload("{}");
 		conflict.setDateReceived(new Date());
 		conflict.setDateSentBySender(LocalDateTime.now());
