@@ -40,6 +40,7 @@ import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
@@ -186,6 +187,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setMessageUuid("message-uuid");
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
+		retry.setOperation(SyncOperation.c);
 		retry.setSnapshot(true);
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
@@ -234,6 +236,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
+		retry.setOperation(SyncOperation.c);
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
@@ -267,6 +270,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
+		retry.setOperation(SyncOperation.c);
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
