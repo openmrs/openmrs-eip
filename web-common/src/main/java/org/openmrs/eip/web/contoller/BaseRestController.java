@@ -29,16 +29,17 @@ public abstract class BaseRestController {
 	@Autowired
 	protected CamelContext camelContext;
 	
+	protected Integer getAllCount() {
+		return on(camelContext).to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName()).request(Integer.class);
+	}
+	
 	public Map<String, Object> doGetAll() {
 		Map<String, Object> results = new HashMap(2);
-		Integer count = on(camelContext).to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName())
-		        .request(Integer.class);
-		
+		Integer count = getAllCount();
 		results.put(FIELD_COUNT, count);
 		
-		List<Object> items;
 		if (count > 0) {
-			items = on(camelContext)
+			List<Object> items = on(camelContext)
 			        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT)
 			        .request(List.class);
 			
