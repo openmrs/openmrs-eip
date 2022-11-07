@@ -56,7 +56,7 @@ public class OauthProcessor implements Processor {
 		}
 		
 		synchronized (this) {
-			if (oauthToken == null || oauthToken.isExpired(LocalDateTime.now())) {
+			if (oauthToken == null || oauthToken.isExpired(LocalDateTime.now().plusSeconds(10))) {
 				if (oauthToken != null) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Cached oauth token is expired, fetching a new one");
