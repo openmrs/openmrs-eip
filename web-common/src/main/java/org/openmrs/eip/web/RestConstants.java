@@ -10,6 +10,12 @@ public final class RestConstants {
 	
 	public static final String PATH_LOGIN = "/login";
 	
+	public static final String SUB_PATH_RECEIVER = API_PATH + "/dbsync/receiver/";
+	
+	public static final String PATH_RECEIVER_SYNC_MSG = SUB_PATH_RECEIVER + "sync";
+	
+	public static final String PARAM_ID = "id";
+	
 	public static final String FIELD_COUNT = "count";
 	
 	public static final String FIELD_ITEMS = "items";
