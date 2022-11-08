@@ -4,8 +4,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
-import static org.openmrs.eip.web.RestConstants.PARAM_ID;
+import static org.openmrs.eip.web.RestConstants.PARAM_GRP_PROP;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_SYNC_MSG;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,7 +37,7 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverWebTest {
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void get_shouldGetTheSyncMessageMatchingTheSpecifiedId() throws Exception {
-		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNC_MSG + "/{" + PARAM_ID + "}", 2L);
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNC_MSG + "/{" + PATH_VAR + "}", 2L);
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("messageUuid", equalTo("27beb8bd-287c-47f2-9786-a7b98c933c05")));
@@ -47,7 +48,7 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverWebTest {
 	        "classpath:mgt_receiver_sync_msg_web.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void get_shouldGetTheSyncMessagesGroupedBySite() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNC_MSG);
-		builder.param("groupProperty", "site.name");
+		builder.param(PARAM_GRP_PROP, "site.name");
 		ResultActions result = mockMvc.perform(builder);
 		result.andDo(MockMvcResultHandlers.print());
 		result.andExpect(status().isOk());

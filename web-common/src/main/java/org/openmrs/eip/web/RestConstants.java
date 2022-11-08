@@ -14,7 +14,9 @@ public final class RestConstants {
 	
 	public static final String PATH_RECEIVER_SYNC_MSG = SUB_PATH_RECEIVER + "sync";
 	
-	public static final String PARAM_ID = "id";
+	public static final String PATH_VAR = "id";
+	
+	public static final String PARAM_GRP_PROP = "groupProperty";
 	
 	public static final String FIELD_COUNT = "count";
 	

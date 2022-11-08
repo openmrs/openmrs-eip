@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
-import static org.openmrs.eip.web.RestConstants.PARAM_ID;
+import static org.openmrs.eip.web.RestConstants.PARAM_GRP_PROP;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR;
 
 import java.util.Map;
 
@@ -34,8 +35,8 @@ public class ReceiverSyncMessageController extends BaseReceiverController {
 		return doGetAll();
 	}
 	
-	@GetMapping("/{" + PARAM_ID + "}")
-	public Object get(@PathVariable(PARAM_ID) Long id) {
+	@GetMapping("/{" + PATH_VAR + "}")
+	public Object get(@PathVariable(PATH_VAR) Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching receiver sync messages with id: " + id);
 		}
@@ -43,8 +44,8 @@ public class ReceiverSyncMessageController extends BaseReceiverController {
 		return doGet(id);
 	}
 	
-	@GetMapping(params = "groupProperty")
-	public Object getGroupedSyncMessages(@RequestParam("groupProperty") String groupProperty) {
+	@GetMapping(params = PARAM_GRP_PROP)
+	public Object getGroupedSyncMessages(@RequestParam(PARAM_GRP_PROP) String groupProperty) {
 		return getGroupedItems(groupProperty);
 	}
 	
