@@ -14,12 +14,14 @@ public class OauthToken {
 	private LocalDateTime expiryDatetime;
 	
 	/**
+	 * Subtracts 10s so that the epiration happens 10s before actual expiration
+	 *
 	 * @param accessToken the oauth access token
 	 * @param expiresAt seconds since the epoch when the token will expire
 	 */
 	public OauthToken(String accessToken, long expiresAt) {
 		this.accessToken = accessToken;
-		expiryDatetime = Instant.ofEpochSecond(expiresAt).atZone(ZoneId.systemDefault()).toLocalDateTime();
+		expiryDatetime = Instant.ofEpochSecond(expiresAt).atZone(ZoneId.systemDefault()).toLocalDateTime().minusSeconds(10);
 	}
 	
 	/**
