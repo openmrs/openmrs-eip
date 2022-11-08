@@ -17,6 +17,12 @@ export abstract class BaseService<T extends BaseEntity> {
 		return this.httpClient.get<BaseCountAndItems<T>>(environment.apiBaseUrl + resource);
 	}
 
+	getGroupedCountAndItems(resource: string, groupProperty: string): Observable<BaseCountAndItems<T>> {
+		return this.httpClient.get<BaseCountAndItems<T>>(environment.apiBaseUrl + resource, {
+			params: {"groupProperty": groupProperty}
+		});
+	}
+
 	update(resource: string, entity: T): Observable<T> {
 		return this.httpClient.patch<T>(environment.apiBaseUrl + resource + '/' + entity.id, entity);
 	}
