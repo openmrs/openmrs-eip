@@ -305,7 +305,7 @@
 		<unit id="common-health-facility">
 			<segment>
 				<source>Health Facility</source>
-				<target></target>
+				<target>Unidade Sanitária</target>
 			</segment>
 		</unit>
 		<unit id="site-statuses">
@@ -401,31 +401,31 @@
 		<unit id="common-from">
 			<segment>
 				<source>From</source>
-				<target></target>
+				<target>De</target>
 			</segment>
 		</unit>
 		<unit id="common-to">
 			<segment>
 				<source>To</source>
-				<target></target>
+				<target>Até</target>
 			</segment>
 		</unit>
 		<unit id="common-sync-archives">
 			<segment>
 				<source>Sync Archives</source>
-				<target></target>
+				<target>Eventos Arquivados</target>
 			</segment>
 		</unit>
 		<unit id="common-filter">
 			<segment>
 				<source>Filter</source>
-				<target></target>
+				<target>Filtrar</target>
 			</segment>
 		</unit>
 		<unit id="sender-filter-by-event-date">
 			<segment>
 				<source>Filter By Event Date</source>
-				<target></target>
+				<target>Filtrar pela Data do Evento</target>
 			</segment>
 		</unit>
 		<unit id="common-date-received">
@@ -437,13 +437,13 @@
 		<unit id="receiver-filter-by-date-received">
 			<segment>
 				<source>Filter By Date Received</source>
-				<target></target>
+				<target>Filtrar pela Data de Recepção</target>
 			</segment>
 		</unit>
 		<unit id="common-district">
 			<segment>
 				<source>District</source>
-				<target></target>
+				<target>Distrito</target>
 			</segment>
 		</unit>
 	</file>
