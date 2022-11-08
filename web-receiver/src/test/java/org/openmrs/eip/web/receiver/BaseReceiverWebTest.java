@@ -15,7 +15,7 @@ public abstract class BaseReceiverWebTest extends BaseReceiverTest {
 	protected MockMvc mockMvc;
 	
 	@Before
-	public void setup() {
+	public void setupReceiverWebTest() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 	
