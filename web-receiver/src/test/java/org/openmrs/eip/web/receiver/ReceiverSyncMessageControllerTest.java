@@ -23,7 +23,7 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverWebTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void getAll_shouldGetAllSyncMessages() throws Exception {
+	public void get_shouldGetAllSyncMessages() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNC_MSG);
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());

@@ -1,7 +1,6 @@
 package org.openmrs.eip.web.contoller;
 
 import static org.apache.camel.component.jpa.JpaConstants.JPA_PARAMETERS_HEADER;
-import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
@@ -30,7 +29,8 @@ public abstract class BaseRestController {
 	protected CamelContext camelContext;
 	
 	protected Integer getAllCount() {
-		return on(camelContext).to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName()).request(Integer.class);
+		return producerTemplate.requestBody("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName(), null,
+		    Integer.class);
 	}
 	
 	public Map<String, Object> doGetAll() {
@@ -39,9 +39,9 @@ public abstract class BaseRestController {
 		results.put(FIELD_COUNT, count);
 		
 		if (count > 0) {
-			List<Object> items = on(camelContext)
-			        .to("jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT)
-			        .request(List.class);
+			List<Object> items = producerTemplate.requestBody(
+			    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c &maximumResults=" + DEFAULT_MAX_COUNT, null,
+			    List.class);
 			
 			results.put(FIELD_ITEMS, items);
 		} else {
@@ -74,9 +74,9 @@ public abstract class BaseRestController {
 			paramAndValueMap.put(queryParamEndDate, endDate);
 		}
 		
-		Integer count = on(camelContext)
-		        .to("jpa:" + getName() + "?query=SELECT count(*) FROM " + getName() + " e " + whereClause)
-		        .withHeader(JPA_PARAMETERS_HEADER, paramAndValueMap).request(Integer.class);
+		Integer count = producerTemplate.requestBodyAndHeader(
+		    "jpa:" + getName() + "?query=SELECT count(*) FROM " + getName() + " e " + whereClause, null,
+		    JPA_PARAMETERS_HEADER, paramAndValueMap, Integer.class);
 		
 		if (count == 0) {
 			results.put(FIELD_COUNT, 0);
@@ -84,9 +84,9 @@ public abstract class BaseRestController {
 			return results;
 		}
 		
-		List<Object> items = on(camelContext).to("jpa:" + getName() + "?query=SELECT e FROM " + getName() + " e "
-		        + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT).withHeader(JPA_PARAMETERS_HEADER, paramAndValueMap)
-		        .request(List.class);
+		List<Object> items = producerTemplate.requestBodyAndHeader("jpa:" + getName() + "?query=SELECT e FROM " + getName()
+		        + " e " + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT,
+		    null, JPA_PARAMETERS_HEADER, paramAndValueMap, List.class);
 		
 		results.put(FIELD_COUNT, count);
 		results.put(FIELD_ITEMS, items);

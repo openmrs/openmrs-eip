@@ -1,6 +1,5 @@
 package org.openmrs.eip.web.receiver;
 
-import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
@@ -17,9 +16,9 @@ public abstract class BaseReceiverController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseReceiverController.class);
 	
-	public Object getGroupedItems(String groupByProperty) {
+	public Object getGroupedItems(String groupProperty) {
 		if (log.isDebugEnabled()) {
-			log.debug("Fetching items of type " + getName() + " grouped by " + groupByProperty);
+			log.debug("Fetching items of type " + getName() + " grouped by " + groupProperty);
 		}
 		
 		Map<String, Object> results = new HashMap(2);
@@ -27,8 +26,9 @@ public abstract class BaseReceiverController extends BaseRestController {
 		results.put(FIELD_COUNT, count);
 		
 		if (count > 0) {
-			List<Object[]> items = on(camelContext).to("jpa:" + getName() + "?query=SELECT e." + groupByProperty
-			        + ", count(*) FROM " + getName() + " e GROUP BY e." + groupByProperty).request(List.class);
+			List<Object[]> items = producerTemplate.requestBody("jpa:" + getName() + "?query=SELECT e." + groupProperty
+			        + ", count(*) FROM " + getName() + " e GROUP BY e." + groupProperty,
+			    null, List.class);
 			final Map<String, Integer> propCountMap = new HashMap();
 			items.forEach(values -> {
 				propCountMap.put(values[0].toString(), Integer.valueOf(values[1].toString()));
