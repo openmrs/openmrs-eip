@@ -20,7 +20,8 @@ import {GroupedViewComponent} from "./view/grouped/grouped-view.component";
 		ModelClassPipe
 	],
 	imports: [
-		CommonModule
+		CommonModule,
+		DataTablesModule
 	],
 	exports: [
 		CommonModule,

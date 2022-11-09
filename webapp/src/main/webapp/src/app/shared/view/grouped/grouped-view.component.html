@@ -1,10 +1,14 @@
-<table class="text-center w-100">
+<table datatable [dtOptions]="dtOptions" class="table table-striped text-center">
+	<thead>
 	<tr>
-		<th class="w-75 p-2 border">{{propertyColumnLabel}}</th>
-		<th class="p-2 border" i18n="@@common-count">Count</th>
+		<th class="w-75">{{propertyColumnLabel}}</th>
+		<th i18n="@@common-count">Count</th>
 	</tr>
+	</thead>
+	<tbody>
 	<tr *ngFor="let e of propertyCountMap | keyvalue">
-		<td class="p-1 border text-left">{{e.key}}</td>
-		<td class="p-1 border">{{e.value}}</td>
+		<td class="text-left">{{e.key}}</td>
+		<td>{{e.value}}</td>
 	</tr>
+	</tbody>
 </table>
