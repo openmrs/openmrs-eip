@@ -166,8 +166,8 @@ public class OauthProcessorTest {
 	public void process_shouldNotCallGetNewTokenIfEnabledAndTheCachedTokenExpiresInMoreThan10seconds() throws Exception {
 		final long testSeconds = LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset()) + 11;
 		OauthToken token = new OauthToken("some-token", LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset()) + 11);
-		setInternalState(processor, "oauthToken", token);
 		
+		setInternalState(processor, "oauthToken", token);
 		setInternalState(processor, "isOauthEnabled", true);
 		
 		mockStatic(Utils.class);
@@ -176,11 +176,11 @@ public class OauthProcessorTest {
 		
 		processor.process(exchange);
 		
-		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
-		assertNotNull(newCachedOauthToken);
-		assertEquals(token.getAccessToken(), newCachedOauthToken.getAccessToken());
+		OauthToken cachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(cachedOauthToken);
+		assertEquals(token.getAccessToken(), cachedOauthToken.getAccessToken());
 		LocalDateTime testLocalDt = ofEpochSecond(testSeconds).atZone(systemDefault()).toLocalDateTime();
-		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
+		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
 		assertEquals(HTTP_AUTH_SCHEME + " " + token.getAccessToken(), exchange.getIn().getBody());
 	}
 	
