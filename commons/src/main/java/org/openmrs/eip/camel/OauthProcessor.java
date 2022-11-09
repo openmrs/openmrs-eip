@@ -71,7 +71,8 @@ public class OauthProcessor implements Processor {
 					throw new EIPException("Unsupported oauth token type: " + type);
 				}
 				
-				long expiresAt = currentSeconds + Long.valueOf(response.get(FIELD_EXPIRES_IN).toString());
+				// Subtracting 10s such that renewing of token happens 10s before it actually expires
+				long expiresAt = currentSeconds + Long.valueOf(response.get(FIELD_EXPIRES_IN).toString()) - 10;
 				
 				oauthToken = new OauthToken(response.get(FIELD_TOKEN).toString(), expiresAt);
 			} else {

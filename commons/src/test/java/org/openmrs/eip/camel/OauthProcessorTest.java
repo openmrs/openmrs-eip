@@ -15,6 +15,7 @@ import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,7 +99,7 @@ public class OauthProcessorTest {
 		OauthToken cachedOauthToken = getInternalState(processor, "oauthToken");
 		assertNotNull(cachedOauthToken);
 		assertEquals(expectedToken, cachedOauthToken.getAccessToken());
-		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime().minusSeconds(10);
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
 		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getBody());
 	}
@@ -128,9 +129,59 @@ public class OauthProcessorTest {
 		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
 		assertNotNull(newCachedOauthToken);
 		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
-		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime().minusSeconds(10);
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
 		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getBody());
+	}
+	
+	@Test
+	public void process_shouldCallGetNewTokenAndSetTheHeaderIfEnabledAndTheCachedTokenExpiresIn10seconds() throws Exception {
+		OauthToken token = new OauthToken("some-token-about-to-expire", LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset()) - 9);
+		setInternalState(processor, "oauthToken", token);
+		
+		final String expectedNewToken = "new-token";
+		final long expiresIn = 360;
+		final long testSeconds = 1626898515;
+		setInternalState(processor, "isOauthEnabled", true);
+		Map<String, Object> testResponse = new HashMap();
+		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedNewToken);
+		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
+		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
+		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		mockStatic(Utils.class);
+		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		processor.process(exchange);
+		
+		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(newCachedOauthToken);
+		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
+		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getBody());
+	}
+	
+	@Test
+	public void process_shouldNotCallGetNewTokenIfEnabledAndTheCachedTokenExpiresInMoreThan10seconds() throws Exception {
+		final long testSeconds = LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset()) + 11;
+		OauthToken token = new OauthToken("some-token", LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset()) + 11);
+		setInternalState(processor, "oauthToken", token);
+		
+		setInternalState(processor, "isOauthEnabled", true);
+		
+		mockStatic(Utils.class);
+		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		processor.process(exchange);
+		
+		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(newCachedOauthToken);
+		assertEquals(token.getAccessToken(), newCachedOauthToken.getAccessToken());
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds).atZone(systemDefault()).toLocalDateTime();
+		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
+		assertEquals(HTTP_AUTH_SCHEME + " " + token.getAccessToken(), exchange.getIn().getBody());
 	}
 	
 	@Test
