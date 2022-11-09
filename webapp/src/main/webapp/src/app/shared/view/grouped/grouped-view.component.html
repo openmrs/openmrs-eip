@@ -1,0 +1,10 @@
+<table class="text-center w-100">
+	<tr>
+		<th class="w-75 p-2 border">{{propertyColumnLabel}}</th>
+		<th class="p-2 border" i18n="@@common-count">Count</th>
+	</tr>
+	<tr *ngFor="let e of propertyCountMap | keyvalue">
+		<td class="p-1 border text-left">{{e.key}}</td>
+		<td class="p-1 border">{{e.value}}</td>
+	</tr>
+</table>

@@ -446,5 +446,23 @@
 				<target>Distrito</target>
 			</segment>
 		</unit>
+		<unit id="common-view">
+			<segment>
+				<source>View</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-list">
+			<segment>
+				<source>List</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-count">
+			<segment>
+				<source>Count</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

@@ -9,16 +9,26 @@ import {HttpErrorInterceptor} from "./http-error.interceptor";
 import {ModelClassPipe} from "./pipes/model-class.pipe";
 import {GlobalErrorHandler} from "./global-error.handler";
 import {ClassNamePipe} from "./pipes/class-name.pipe";
+import {GroupedViewComponent} from "./view/grouped/grouped-view.component";
 
 
 @NgModule({
-	declarations: [ConfirmDialogComponent, ClassNamePipe, ModelClassPipe],
+	declarations: [
+		ConfirmDialogComponent,
+		GroupedViewComponent,
+		ClassNamePipe,
+		ModelClassPipe
+	],
+	imports: [
+		CommonModule
+	],
 	exports: [
 		CommonModule,
 		BrowserModule,
 		HttpClientModule,
 		NgbModule,
 		DataTablesModule,
+		GroupedViewComponent,
 		ClassNamePipe,
 		ModelClassPipe
 	],
