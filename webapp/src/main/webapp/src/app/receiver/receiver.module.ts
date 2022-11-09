@@ -10,10 +10,11 @@ import {SiteStatusComponent} from "./status/site-status.component";
 import {siteStatusReducer} from "./status/state/site-status.reducer";
 import {ReceiverSyncMessageComponent} from './sync/receiver-sync-message.component';
 import {syncMessageReducer} from "./sync/state/sync-message.reducer";
-import { ReceiverArchiveComponent } from './archive/receiver-archive.component';
-import { syncArchiveReducer } from './archive/state/receiver-archive.reducer';
-import { ReceiverTableStatsComponent } from './stats/receiver-table-stats.component';
-import { FormsModule } from '@angular/forms';
+import {ReceiverArchiveComponent} from './archive/receiver-archive.component';
+import {syncArchiveReducer} from './archive/state/receiver-archive.reducer';
+import {ReceiverTableStatsComponent} from './stats/receiver-table-stats.component';
+import {FormsModule} from '@angular/forms';
+import {ReceiverSyncMessageListViewComponent} from "./sync/view/list/receiver-sync-message-list-view.component";
 
 @NgModule({
 	declarations: [
@@ -23,7 +24,8 @@ import { FormsModule } from '@angular/forms';
 		SiteStatusComponent,
 		ReceiverSyncMessageComponent,
 		ReceiverArchiveComponent,
-		ReceiverTableStatsComponent
+		ReceiverTableStatsComponent,
+		ReceiverSyncMessageListViewComponent
 	],
 	imports: [
 		SharedModule,
