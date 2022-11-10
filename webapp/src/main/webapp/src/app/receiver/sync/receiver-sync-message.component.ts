@@ -1,7 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
-import {GET_TOTAL_COUNT} from "./state/sync-message.reducer";
+import {GET_TOTAL_COUNT, GET_VIEW} from "./state/sync-message.reducer";
+import {View} from "../shared/view.enum";
+import {ChangeView} from "./state/sync-message.actions";
+import {ViewInfo} from "../shared/view-info";
 
 @Component({
 	selector: 'receiver-sync-messages',
@@ -11,11 +14,13 @@ export class ReceiverSyncMessageComponent implements OnInit, OnDestroy {
 
 	count?: number;
 
-	viewLabel?: string;
+	view = View;
 
-	view?: string;
+	viewInfo?: ViewInfo;
 
 	totalCountSubscription?: Subscription;
+
+	viewSubscription?: Subscription;
 
 	constructor(private store: Store) {
 	}
@@ -27,27 +32,30 @@ export class ReceiverSyncMessageComponent implements OnInit, OnDestroy {
 			}
 		);
 
-		this.changeView('list');
+		this.viewSubscription = this.store.pipe(select(GET_VIEW)).subscribe(
+			viewInfo => {
+				this.viewInfo = viewInfo;
+			}
+		);
+
+		this.changeToListView();
 	}
 
-	changeView(view: string) {
-		//TODO Clear count and items in the store state
-		this.view = view;
-		switch (this.view) {
-			case 'list':
-				this.viewLabel = $localize`:@@common-list:List`;
-				break;
-			case 'site':
-				this.viewLabel = $localize`:@@common-health-facility:Health Facility`;
-				break;
-			case 'entity':
-				this.viewLabel = $localize`:@@common-entity:Entity`;
-				break;
-		}
+	changeToListView() {
+		this.changeView(View.LIST, $localize`:@@common-list:List`);
+	}
+
+	changeToSiteView() {
+		this.changeView(View.SITE, $localize`:@@common-health-facility:Health Facility`);
+	}
+
+	changeView(selectedView: View, viewLabel: string) {
+		this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
 	}
 
 	ngOnDestroy(): void {
 		this.totalCountSubscription?.unsubscribe();
+		this.viewSubscription?.unsubscribe();
 	}
 
 }

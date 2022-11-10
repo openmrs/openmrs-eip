@@ -1,11 +1,10 @@
 <div class="float-right">
 	<span i18n="@@common-view">View</span>:&nbsp;
 	<div ngbDropdown class="d-inline-block">
-		<button class="btn btn-outline-primary" ngbDropdownToggle>{{viewLabel}}</button>
+		<button class="btn btn-outline-primary" ngbDropdownToggle>{{viewInfo?.viewLabel}}</button>
 		<div ngbDropdownMenu>
-			<button ngbDropdownItem (click)="changeView('list')" i18n="@@common-list">List</button>
-			<button ngbDropdownItem (click)="changeView('site')" i18n="@@common-health-facility">Health Facility</button>
-			<button ngbDropdownItem (click)="changeView('entity')" i18n="@common-entity">Entity</button>
+			<button ngbDropdownItem (click)="changeToListView()" i18n="@@common-list">List</button>
+			<button ngbDropdownItem (click)="changeToSiteView()" i18n="@@common-health-facility">Health Facility</button>
 		</div>
 	</div>
 </div>
@@ -13,7 +12,7 @@
 	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
 </h5>
 <div class="ui-bar-spacer"></div>
-<ng-container [ngSwitch]="view">
-	<receiver-sync-msg-list-view *ngSwitchCase="'list'"></receiver-sync-msg-list-view>
-	<receiver-sync-msg-site-view *ngSwitchCase="'site'"></receiver-sync-msg-site-view>
+<ng-container [ngSwitch]="viewInfo?.view">
+	<receiver-sync-msg-list-view *ngSwitchCase="view.LIST"></receiver-sync-msg-list-view>
+	<receiver-sync-msg-site-view *ngSwitchCase="view.SITE"></receiver-sync-msg-site-view>
 </ng-container>
