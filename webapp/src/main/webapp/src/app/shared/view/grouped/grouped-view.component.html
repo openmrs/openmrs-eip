@@ -1,12 +1,12 @@
 <table datatable [dtOptions]="dtOptions" class="table table-striped text-center">
 	<thead>
 	<tr>
-		<th class="w-75">{{propertyColumnLabel}}</th>
+		<th class="w-75">{{columnLabel}}</th>
 		<th i18n="@@common-count">Count</th>
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let e of propertyCountMap | keyvalue">
+	<tr *ngFor="let e of items | keyvalue">
 		<td class="text-left">{{e.key}}</td>
 		<td>{{e.value}}</td>
 	</tr>

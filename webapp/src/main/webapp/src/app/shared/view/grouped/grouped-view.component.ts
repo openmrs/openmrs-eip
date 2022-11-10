@@ -8,10 +8,10 @@ import {DataTableDirective} from "angular-datatables";
 export class GroupedViewComponent {
 
 	@Input()
-	propertyColumnLabel?: string;
+	columnLabel?: string;
 
 	@Input()
-	propertyCountMap?: Map<string, number>;
+	items?: Map<string, number>;
 
 	@ViewChild(DataTableDirective, {static: false})
 	datatableElement?: DataTableDirective;
