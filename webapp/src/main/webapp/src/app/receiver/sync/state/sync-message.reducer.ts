@@ -4,6 +4,7 @@ import {ReceiverSyncMessage} from "../receiver-sync-message";
 import {SyncMessageAction, SyncMessageActionType} from "./sync-message.actions";
 
 export interface SyncMessageState {
+	totalCount?: number;
 	countAndItems: ReceiverSyncMessageCountAndItems;
 	msgToView?: ReceiverSyncMessage;
 }
@@ -20,6 +21,11 @@ export const MSG_TO_VIEW = createSelector(
 	state => state.msgToView
 );
 
+export const GET_TOTAL_COUNT = createSelector(
+	GET_MSG_FEATURE_STATE,
+	state => state.totalCount
+);
+
 const initialState: SyncMessageState = {
 	countAndItems: new ReceiverSyncMessageCountAndItems()
 };
@@ -31,6 +37,7 @@ export function syncMessageReducer(state = initialState, action: SyncMessageActi
 		case SyncMessageActionType.MSGS_LOADED:
 			return {
 				...state,
+				totalCount: action.countAndItems?.count,
 				countAndItems: action.countAndItems
 			};
 

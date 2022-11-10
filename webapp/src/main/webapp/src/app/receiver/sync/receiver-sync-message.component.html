@@ -14,6 +14,6 @@
 </h5>
 <div class="ui-bar-spacer"></div>
 <ng-container [ngSwitch]="view">
-	<receiver-sync-msg-list-view *ngSwitchCase="'list'" (countEventEmitter)="updateCount($event)"></receiver-sync-msg-list-view>
+	<receiver-sync-msg-list-view *ngSwitchCase="'list'"></receiver-sync-msg-list-view>
 	<receiver-sync-msg-site-view *ngSwitchCase="'site'"></receiver-sync-msg-site-view>
 </ng-container>

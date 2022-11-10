@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
@@ -13,9 +13,6 @@ import {ReceiverSyncMessageService} from "../../receiver-sync-message.service";
 	templateUrl: './receiver-sync-message-list-view.component.html'
 })
 export class ReceiverSyncMessageListViewComponent extends BaseListingComponent implements OnInit {
-
-	@Output()
-	countEventEmitter = new EventEmitter<number>();
 
 	syncMessages?: ReceiverSyncMessage[];
 
@@ -44,7 +41,6 @@ export class ReceiverSyncMessageListViewComponent extends BaseListingComponent i
 		this.init();
 		this.loadedSubscription = this.store.pipe(select(GET_MSGS)).subscribe(
 			countAndItems => {
-				this.countEventEmitter.emit(countAndItems.count);
 				this.syncMessages = countAndItems.items;
 				this.reRender();
 			}
