@@ -7,7 +7,7 @@ import {ViewInfo} from "../../shared/view-info";
 export interface SyncMessageState {
 	totalCount?: number;
 	viewInfo?: ViewInfo;
-	countAndItems: ReceiverSyncMessageCountAndItems;
+	syncItems?: ReceiverSyncMessage[];
 	msgToView?: ReceiverSyncMessage;
 }
 
@@ -15,7 +15,7 @@ const GET_MSG_FEATURE_STATE = createFeatureSelector<SyncMessageState>('syncMsgQu
 
 export const GET_MSGS = createSelector(
 	GET_MSG_FEATURE_STATE,
-	state => state.countAndItems
+	state => state.syncItems
 );
 
 export const MSG_TO_VIEW = createSelector(
@@ -33,11 +33,7 @@ export const GET_VIEW = createSelector(
 	state => state.viewInfo
 );
 
-const initialState: SyncMessageState = {
-	countAndItems: new ReceiverSyncMessageCountAndItems()
-};
-
-export function syncMessageReducer(state = initialState, action: SyncMessageAction) {
+export function syncMessageReducer(state = {}, action: SyncMessageAction) {
 
 	switch (action.type) {
 
@@ -45,7 +41,7 @@ export function syncMessageReducer(state = initialState, action: SyncMessageActi
 			return {
 				...state,
 				totalCount: action.countAndItems?.count,
-				countAndItems: action.countAndItems
+				syncItems: action.countAndItems?.items
 			};
 
 		case SyncMessageActionType.VIEW_MSG:

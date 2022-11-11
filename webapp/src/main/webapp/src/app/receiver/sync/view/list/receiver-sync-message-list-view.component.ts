@@ -40,8 +40,8 @@ export class ReceiverSyncMessageListViewComponent extends BaseListingComponent i
 	ngOnInit(): void {
 		this.init();
 		this.loadedSubscription = this.store.pipe(select(GET_MSGS)).subscribe(
-			countAndItems => {
-				this.syncMessages = countAndItems.items;
+			syncItems => {
+				this.syncMessages = syncItems;
 				this.reRender();
 			}
 		);
