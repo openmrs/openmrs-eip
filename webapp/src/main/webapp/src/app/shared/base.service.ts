@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {BaseEntity} from "./base-entity";
 import {environment} from "../../environments/environment";
 import {BaseCountAndItems} from "./base-count-and-items";
+import {TotalCountAndGroupedItems} from "./total-count-and-grouped-items";
 
 @Injectable({
 	providedIn: 'root'
@@ -17,8 +18,8 @@ export abstract class BaseService<T extends BaseEntity> {
 		return this.httpClient.get<BaseCountAndItems<T>>(environment.apiBaseUrl + resource);
 	}
 
-	getGroupedCountAndItems(resource: string, groupProperty: string): Observable<BaseCountAndItems<T>> {
-		return this.httpClient.get<BaseCountAndItems<T>>(environment.apiBaseUrl + resource, {
+	getTotalCountAndGroupedItems(resource: string, groupProperty: string): Observable<TotalCountAndGroupedItems> {
+		return this.httpClient.get<TotalCountAndGroupedItems>(environment.apiBaseUrl + resource, {
 			params: {"groupProperty": groupProperty}
 		});
 	}

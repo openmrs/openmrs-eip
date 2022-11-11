@@ -1,14 +1,18 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
-import {ReceiverSyncMessageCountAndItems} from "../receiver-sync-message-count-and-items";
 import {ReceiverSyncMessage} from "../receiver-sync-message";
 import {SyncMessageAction, SyncMessageActionType} from "./sync-message.actions";
 import {ViewInfo} from "../../shared/view-info";
 
 export interface SyncMessageState {
 	totalCount?: number;
+
 	viewInfo?: ViewInfo;
+
 	syncItems?: ReceiverSyncMessage[];
+
 	msgToView?: ReceiverSyncMessage;
+
+	siteCountMap?: Map<string, number>;
 }
 
 const GET_MSG_FEATURE_STATE = createFeatureSelector<SyncMessageState>('syncMsgQueue');
@@ -33,6 +37,11 @@ export const GET_VIEW = createSelector(
 	state => state.viewInfo
 );
 
+export const GET_SITE_COUNT_MAP = createSelector(
+	GET_MSG_FEATURE_STATE,
+	state => state.siteCountMap
+);
+
 export function syncMessageReducer(state = {}, action: SyncMessageAction) {
 
 	switch (action.type) {
@@ -55,6 +64,13 @@ export function syncMessageReducer(state = {}, action: SyncMessageAction) {
 				...state,
 				totalCount: undefined,
 				viewInfo: action.viewInfo
+			};
+
+		case SyncMessageActionType.MSGS_BY_SITE_LOADED:
+			return {
+				...state,
+				totalCount: action.countAndGroupedItems?.count,
+				siteCountMap: action.countAndGroupedItems?.items
 			};
 
 		default:
