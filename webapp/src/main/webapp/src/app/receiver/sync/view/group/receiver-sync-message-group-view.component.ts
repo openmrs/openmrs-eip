@@ -1,17 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ReceiverSyncMessageService} from "../../receiver-sync-message.service";
 import {select, Store} from "@ngrx/store";
 import {GET_SITE_COUNT_MAP} from "../../state/sync-message.reducer";
 import {Subscription} from "rxjs";
-import {SyncMessagesGroupedBySiteLoaded} from "../../state/sync-message.actions";
+import {ViewInfo} from "../../../shared/view-info";
+import {GroupedSyncMessagesLoaded} from "../../state/sync-message.actions";
 
 @Component({
-	selector: 'receiver-sync-msg-site-view',
-	templateUrl: './receiver-sync-message-site-view.component.html'
+	selector: 'receiver-sync-msg-group-view',
+	templateUrl: './receiver-sync-message-group-view.component.html'
 })
-export class ReceiverSyncMessageSiteViewComponent implements OnInit {
+export class ReceiverSyncMessageGroupViewComponent implements OnInit {
 
-	columnLabel = $localize`:@@common-health-facility:Health Facility`;
+	@Input()
+	viewInfo?: ViewInfo;
 
 	siteCountMap?: Map<string, number>;
 
@@ -27,8 +29,10 @@ export class ReceiverSyncMessageSiteViewComponent implements OnInit {
 			}
 		);
 
-		this.service.getTotalCountAndSyncMessagesGroupedBySite("site").subscribe(countAndGroupedItems => {
-			this.store.dispatch(new SyncMessagesGroupedBySiteLoaded(countAndGroupedItems));
+		let groupBy: string = 'site';
+
+		this.service.getTotalCountAndGroupedSyncMessages(groupBy).subscribe(countAndGroupedItems => {
+			this.store.dispatch(new GroupedSyncMessagesLoaded(countAndGroupedItems));
 		});
 	}
 

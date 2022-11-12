@@ -66,7 +66,7 @@ export function syncMessageReducer(state = {}, action: SyncMessageAction) {
 				viewInfo: action.viewInfo
 			};
 
-		case SyncMessageActionType.MSGS_BY_SITE_LOADED:
+		case SyncMessageActionType.GROUPED_MSGS_LOADED:
 			return {
 				...state,
 				totalCount: action.countAndGroupedItems?.count,

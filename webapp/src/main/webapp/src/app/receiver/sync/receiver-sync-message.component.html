@@ -14,5 +14,5 @@
 <div class="ui-bar-spacer"></div>
 <ng-container [ngSwitch]="viewInfo?.view">
 	<receiver-sync-msg-list-view *ngSwitchCase="view.LIST"></receiver-sync-msg-list-view>
-	<receiver-sync-msg-site-view *ngSwitchCase="view.SITE"></receiver-sync-msg-site-view>
+	<receiver-sync-msg-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-sync-msg-group-view>
 </ng-container>

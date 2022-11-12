@@ -12,7 +12,7 @@ export enum SyncMessageActionType {
 
 	CHANGE_VIEW = 'CHANGE_VIEW',
 
-	MSGS_BY_SITE_LOADED = 'MSGS_BY_SITE_LOADED'
+	GROUPED_MSGS_LOADED = 'GROUPED_MSGS_LOADED'
 
 }
 
@@ -43,13 +43,13 @@ export class ChangeView implements Action {
 
 }
 
-export class SyncMessagesGroupedBySiteLoaded implements Action {
+export class GroupedSyncMessagesLoaded implements Action {
 
-	readonly type = SyncMessageActionType.MSGS_BY_SITE_LOADED;
+	readonly type = SyncMessageActionType.GROUPED_MSGS_LOADED;
 
 	constructor(public countAndGroupedItems?: TotalCountAndGroupedItems) {
 	}
 
 }
 
-export type SyncMessageAction = SyncMessagesLoaded | ViewSyncMessage | ChangeView | SyncMessagesGroupedBySiteLoaded;
+export type SyncMessageAction = SyncMessagesLoaded | ViewSyncMessage | ChangeView | GroupedSyncMessagesLoaded;

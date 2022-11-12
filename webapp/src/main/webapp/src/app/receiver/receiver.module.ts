@@ -15,7 +15,7 @@ import {syncArchiveReducer} from './archive/state/receiver-archive.reducer';
 import {ReceiverTableStatsComponent} from './stats/receiver-table-stats.component';
 import {FormsModule} from '@angular/forms';
 import {ReceiverSyncMessageListViewComponent} from "./sync/view/list/receiver-sync-message-list-view.component";
-import { ReceiverSyncMessageSiteViewComponent } from './sync/view/site/receiver-sync-message-site-view.component';
+import {ReceiverSyncMessageGroupViewComponent} from './sync/view/group/receiver-sync-message-group-view.component';
 
 @NgModule({
 	declarations: [
@@ -27,7 +27,7 @@ import { ReceiverSyncMessageSiteViewComponent } from './sync/view/site/receiver-
 		ReceiverArchiveComponent,
 		ReceiverTableStatsComponent,
 		ReceiverSyncMessageListViewComponent,
-		ReceiverSyncMessageSiteViewComponent
+		ReceiverSyncMessageGroupViewComponent
 	],
 	imports: [
 		SharedModule,

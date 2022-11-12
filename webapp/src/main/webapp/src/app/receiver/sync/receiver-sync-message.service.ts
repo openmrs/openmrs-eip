@@ -16,7 +16,7 @@ export class ReceiverSyncMessageService extends BaseService<ReceiverSyncMessage>
 		return this.getCountAndItems(RESOURCE_NAME);
 	}
 
-	getTotalCountAndSyncMessagesGroupedBySite(groupProperty: string): Observable<TotalCountAndGroupedItems> {
+	getTotalCountAndGroupedSyncMessages(groupProperty: string): Observable<TotalCountAndGroupedItems> {
 		return this.getTotalCountAndGroupedItems(RESOURCE_NAME, groupProperty);
 	}
 

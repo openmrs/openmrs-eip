@@ -2,10 +2,10 @@ import {Component, Input, ViewChild} from '@angular/core';
 import {DataTableDirective} from "angular-datatables";
 
 @Component({
-	selector: 'grouped-view',
-	templateUrl: './grouped-view.component.html'
+	selector: 'group-view',
+	templateUrl: './group-view.component.html'
 })
-export class GroupedViewComponent {
+export class GroupViewComponent {
 
 	@Input()
 	columnLabel?: string;

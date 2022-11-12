@@ -9,13 +9,13 @@ import {HttpErrorInterceptor} from "./http-error.interceptor";
 import {ModelClassPipe} from "./pipes/model-class.pipe";
 import {GlobalErrorHandler} from "./global-error.handler";
 import {ClassNamePipe} from "./pipes/class-name.pipe";
-import {GroupedViewComponent} from "./view/grouped/grouped-view.component";
+import {GroupViewComponent} from "./view/group/group-view.component";
 
 
 @NgModule({
 	declarations: [
 		ConfirmDialogComponent,
-		GroupedViewComponent,
+		GroupViewComponent,
 		ClassNamePipe,
 		ModelClassPipe
 	],
@@ -29,7 +29,7 @@ import {GroupedViewComponent} from "./view/grouped/grouped-view.component";
 		HttpClientModule,
 		NgbModule,
 		DataTablesModule,
-		GroupedViewComponent,
+		GroupViewComponent,
 		ClassNamePipe,
 		ModelClassPipe
 	],
