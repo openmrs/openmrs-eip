@@ -6,7 +6,7 @@ export class ModelClassPipe extends BaseClassPipe implements PipeTransform {
 
 	transform(className: any, ...args: any[]): any {
 		let simpleClassName = this.getSimpleName(className);
-		return simpleClassName.substring(0, simpleClassName.lastIndexOf('Model'));
+		return this.beautify(simpleClassName.substring(0, simpleClassName.lastIndexOf('Model')));
 	}
 
 }

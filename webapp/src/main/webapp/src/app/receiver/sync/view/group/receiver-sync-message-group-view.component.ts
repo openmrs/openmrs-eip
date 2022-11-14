@@ -6,6 +6,7 @@ import {ViewInfo} from "../../../shared/view-info";
 import {GroupedSyncMessagesLoaded} from "../../state/sync-message.actions";
 import {GET_GRP_PROP_COUNT_MAP} from "../../state/sync-message.reducer";
 import {View} from "../../../shared/view.enum";
+import {ModelClassPipe} from "../../../../shared/pipes/model-class.pipe";
 
 @Component({
 	selector: 'receiver-sync-msg-group-view',
@@ -20,13 +21,24 @@ export class ReceiverSyncMessageGroupViewComponent implements OnInit {
 
 	loadedSubscription?: Subscription;
 
-	constructor(private service: ReceiverSyncMessageService, private store: Store) {
+	constructor(private service: ReceiverSyncMessageService, private store: Store, private classPipe: ModelClassPipe) {
 	}
 
 	ngOnInit(): void {
 		this.loadedSubscription = this.store.pipe(select(GET_GRP_PROP_COUNT_MAP)).subscribe(
 			map => {
-				this.groupPropertyCountMap = map;
+				if (this.viewInfo?.view == View.ENTITY) {
+					let transformedMap = new Map<string, number>();
+					if (map != undefined) {
+						Object.entries(map).forEach((entry) => {
+							transformedMap?.set(this.classPipe.transform(entry[0]), entry[1]);
+						});
+					}
+
+					this.groupPropertyCountMap = transformedMap;
+				} else {
+					this.groupPropertyCountMap = map;
+				}
 			}
 		);
 

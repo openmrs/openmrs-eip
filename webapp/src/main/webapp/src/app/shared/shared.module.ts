@@ -42,7 +42,8 @@ import {GroupViewComponent} from "./view/group/group-view.component";
 		{
 			provide: ErrorHandler,
 			useClass: GlobalErrorHandler
-		}
+		},
+		ModelClassPipe
 	]
 })
 
