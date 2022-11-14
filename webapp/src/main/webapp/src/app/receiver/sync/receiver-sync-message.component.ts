@@ -49,6 +49,10 @@ export class ReceiverSyncMessageComponent implements OnInit, OnDestroy {
 		this.changeView(View.SITE, $localize`:@@common-health-facility:Health Facility`);
 	}
 
+	changeToEntityView() {
+		this.changeView(View.ENTITY, $localize`:@@common-entity:Entity`);
+	}
+
 	changeView(selectedView: View, viewLabel: string) {
 		this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
 	}

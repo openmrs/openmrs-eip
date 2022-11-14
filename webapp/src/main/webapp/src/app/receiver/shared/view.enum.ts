@@ -2,6 +2,8 @@ export enum View {
 
 	LIST,
 
-	SITE
+	SITE,
+
+	ENTITY
 
 }

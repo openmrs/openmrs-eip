@@ -5,6 +5,7 @@
 		<div ngbDropdownMenu>
 			<button ngbDropdownItem (click)="changeToListView()" i18n="@@common-list">List</button>
 			<button ngbDropdownItem (click)="changeToSiteView()" i18n="@@common-health-facility">Health Facility</button>
+			<button ngbDropdownItem (click)="changeToEntityView()" i18n="@common-entity">Entity</button>
 		</div>
 	</div>
 </div>
@@ -15,4 +16,5 @@
 <ng-container [ngSwitch]="viewInfo?.view">
 	<receiver-sync-msg-list-view *ngSwitchCase="view.LIST"></receiver-sync-msg-list-view>
 	<receiver-sync-msg-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-sync-msg-group-view>
+	<receiver-sync-msg-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.ENTITY"></receiver-sync-msg-group-view>
 </ng-container>

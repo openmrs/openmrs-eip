@@ -37,7 +37,7 @@ export const GET_VIEW = createSelector(
 	state => state.viewInfo
 );
 
-export const GET_SITE_COUNT_MAP = createSelector(
+export const GET_GRP_PROP_COUNT_MAP = createSelector(
 	GET_MSG_FEATURE_STATE,
 	state => state.siteCountMap
 );
