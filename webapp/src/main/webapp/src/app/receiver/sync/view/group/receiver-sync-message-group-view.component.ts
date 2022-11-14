@@ -29,7 +29,7 @@ export class ReceiverSyncMessageGroupViewComponent implements OnInit {
 			map => {
 				if (this.viewInfo?.view == View.ENTITY) {
 					let transformedMap = new Map<string, number>();
-					if (map != undefined) {
+					if (map) {
 						Object.entries(map).forEach((entry) => {
 							transformedMap?.set(this.classPipe.transform(entry[0]), entry[1]);
 						});
