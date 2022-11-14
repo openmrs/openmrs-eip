@@ -263,7 +263,7 @@
 		<unit id="sender-db-events">
 			<segment>
 				<source>Database Events</source>
-				<target>Eventos da Base de dados</target>
+				<target>Eventos Pendentes</target>
 			</segment>
 		</unit>
 		<unit id="common-database-id">
@@ -275,25 +275,25 @@
 		<unit id="common-insert">
 			<segment>
 				<source>Insert</source>
-				<target>Insercoes</target>
+				<target>Inserção</target>
 			</segment>
 		</unit>
 		<unit id="common-update">
 			<segment>
 				<source>Update</source>
-				<target>Actualizacoes</target>
+				<target>Actualização</target>
 			</segment>
 		</unit>
 		<unit id="common-delete">
 			<segment>
 				<source>Delete</source>
-				<target>Remocoes</target>
+				<target>Remoção</target>
 			</segment>
 		</unit>
 		<unit id="sender-unprocessed-events">
 			<segment>
 				<source>Unprocessed Database Events</source>
-				<target>Eventos de base de dados não processados</target>
+				<target>Eventos Pendentes</target>
 			</segment>
 		</unit>
 		<unit id="common-no-events-msg">
@@ -329,7 +329,7 @@
 		<unit id="common-sync-msgs">
 			<segment>
 				<source>Sync Items</source>
-				<target>Itens Sincronizados</target>
+				<target>Caixa de Saída</target>
 			</segment>
 		</unit>
 		<unit id="common-message-id">
