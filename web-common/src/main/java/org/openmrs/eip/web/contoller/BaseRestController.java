@@ -5,6 +5,11 @@ import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +19,7 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +62,31 @@ public abstract class BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
-	public Map<String, Object> searchByDate(String dateProperty, Date startDate, Date endDate) {
+	public Map<String, Object> doSearchByDate(String dateProperty, String startDate, String endDate) throws ParseException {
+		Date start = null;
+		if (StringUtils.isNotBlank(startDate)) {
+			start = RestConstants.DATE_FORMAT.parse(startDate);
+		}
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Start date: " + start);
+		}
+		
+		Date end = null;
+		if (StringUtils.isNotBlank(endDate)) {
+			//Roll date to end of day so that we include all items on the same day regardless of time
+			LocalDateTime ldt = LocalDate.parse(endDate, RestConstants.DATE_FORMATTER).atTime(LocalTime.MAX);
+			end = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+		}
+		
+		if (log.isDebugEnabled()) {
+			log.debug("End date: " + end);
+		}
+		
+		return searchByDate(dateProperty, start, end);
+	}
+	
+	private Map<String, Object> searchByDate(String dateProperty, Date startDate, Date endDate) {
 		final String queryParamStartDate = "startDate";
 		final String queryParamEndDate = "endDate";
 		Map<String, Object> results = new HashMap(2);
