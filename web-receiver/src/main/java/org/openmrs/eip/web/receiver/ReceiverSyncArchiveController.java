@@ -19,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.openmrs.eip.web.RestConstants.PARAM_END_DATE;
+import static org.openmrs.eip.web.RestConstants.PARAM_GRP_PROP;
+import static org.openmrs.eip.web.RestConstants.PARAM_START_DATE;
+
 @RestController
-@RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/archive")
-public class ReceiverSyncArchiveController extends BaseRestController {
+@RequestMapping(RestConstants.PATH_RECEIVER_ARCHIVE)
+public class ReceiverSyncArchiveController extends BaseReceiverController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverSyncArchiveController.class);
 	
@@ -39,11 +43,11 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 		return doGetAll();
 	}
 	
-	@GetMapping
-	@RequestMapping(params = { "startDate", "endDate" })
-	public Map<String, Object> searchByDateReceived(@RequestParam(name = "startDate") String startDate,
-	                                                @RequestParam(name = "endDate") String endDate)
+	@GetMapping(params = { PARAM_START_DATE, PARAM_END_DATE })
+	public Map<String, Object> searchByDateReceived(@RequestParam(name = PARAM_START_DATE) String startDate,
+	                                                @RequestParam(name = PARAM_END_DATE) String endDate)
 	    throws ParseException {
+		
 		if (log.isDebugEnabled()) {
 			log.debug("Searching receiver sync archives by start date: " + startDate + ", end date: " + endDate);
 		}
@@ -69,6 +73,11 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 		}
 		
 		return searchByDate("dateReceived", start, end);
+	}
+	
+	@GetMapping(params = PARAM_GRP_PROP)
+	public Object getGroupedSyncMessages(@RequestParam(PARAM_GRP_PROP) String groupProperty) {
+		return getGroupedItems(groupProperty);
 	}
 	
 }

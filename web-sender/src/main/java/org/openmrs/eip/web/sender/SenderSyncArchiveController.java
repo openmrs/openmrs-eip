@@ -1,5 +1,8 @@
 package org.openmrs.eip.web.sender;
 
+import static org.openmrs.eip.web.RestConstants.PARAM_END_DATE;
+import static org.openmrs.eip.web.RestConstants.PARAM_START_DATE;
+
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,10 +42,9 @@ public class SenderSyncArchiveController extends BaseRestController {
 		return doGetAll();
 	}
 	
-	@GetMapping
-	@RequestMapping(params = { "startDate", "endDate" })
-	public Map<String, Object> searchByEventDate(@RequestParam(name = "startDate") String startDate,
-	                                             @RequestParam(name = "endDate") String endDate)
+	@GetMapping(params = { PARAM_START_DATE, PARAM_END_DATE })
+	public Map<String, Object> searchByEventDate(@RequestParam(name = PARAM_START_DATE) String startDate,
+	                                             @RequestParam(name = PARAM_END_DATE) String endDate)
 	    throws ParseException {
 		
 		if (log.isDebugEnabled()) {
