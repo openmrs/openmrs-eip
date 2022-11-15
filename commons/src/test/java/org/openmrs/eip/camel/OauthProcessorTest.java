@@ -98,7 +98,7 @@ public class OauthProcessorTest {
 		OauthToken cachedOauthToken = getInternalState(processor, "oauthToken");
 		assertNotNull(cachedOauthToken);
 		assertEquals(expectedToken, cachedOauthToken.getAccessToken());
-		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
 		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getBody());
 	}
@@ -128,7 +128,7 @@ public class OauthProcessorTest {
 		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
 		assertNotNull(newCachedOauthToken);
 		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
-		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn).atZone(systemDefault()).toLocalDateTime();
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
 		assertEquals(testLocalDt, getInternalState(newCachedOauthToken, "expiryDatetime"));
 		assertEquals(HTTP_AUTH_SCHEME + " " + expectedNewToken, exchange.getIn().getBody());
 	}
