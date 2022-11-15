@@ -1,8 +1,16 @@
 import {Action} from "@ngrx/store";
-import { ReceiverSyncArchiveCountAndItems } from "../receiver-sync-archive-count-and-items";
+import {ReceiverSyncArchiveCountAndItems} from "../receiver-sync-archive-count-and-items";
+import {ViewInfo} from "../../shared/view-info";
+import {TotalCountAndGroupedItems} from "../../../shared/total-count-and-grouped-items";
 
 export enum ReceiverArchiveActionType {
+
 	SYNC_ARCHIVE_LOADED = 'SYNC_ARCHIVE_LOADED',
+
+	CHANGE_VIEW = 'CHANGE_VIEW',
+
+	GROUPED_MSGS_LOADED = 'GROUPED_MSGS_LOADED'
+
 }
 
 export class ReceiverArchiveLoaded implements Action {
@@ -14,4 +22,22 @@ export class ReceiverArchiveLoaded implements Action {
 
 }
 
-export type ReceiverArchiveAction = ReceiverArchiveLoaded;
+export class ChangeView implements Action {
+
+	readonly type = ReceiverArchiveActionType.CHANGE_VIEW;
+
+	constructor(public viewInfo?: ViewInfo) {
+	}
+
+}
+
+export class GroupedArchivesLoaded implements Action {
+
+	readonly type = ReceiverArchiveActionType.GROUPED_MSGS_LOADED;
+
+	constructor(public countAndGroupedItems?: TotalCountAndGroupedItems) {
+	}
+
+}
+
+export type ReceiverArchiveAction = ReceiverArchiveLoaded | ChangeView | GroupedArchivesLoaded;

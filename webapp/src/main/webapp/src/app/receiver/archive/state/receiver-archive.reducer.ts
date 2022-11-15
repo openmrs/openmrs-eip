@@ -1,30 +1,65 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
-import {ReceiverSyncArchiveCountAndItems} from "../receiver-sync-archive-count-and-items";
 import {ReceiverArchiveAction, ReceiverArchiveActionType} from "./receiver-archive.actions";
+import {ViewInfo} from "../../shared/view-info";
+import {ReceiverSyncArchive} from "../receiver-sync-archive";
 
 export interface ReceiverArchiveState {
-	countAndItems: ReceiverSyncArchiveCountAndItems;
+
+	totalCount?: number;
+
+	viewInfo?: ViewInfo;
+
+	syncItems?: ReceiverSyncArchive[];
+
+	siteCountMap?: Map<string, number>;
+
 }
 
 const GET_SYNC_ARCHIVE_FEATURE_STATE = createFeatureSelector<ReceiverArchiveState>('receiverArchiveQueue');
 
 export const GET_SYNC_ARCHIVE = createSelector(
 	GET_SYNC_ARCHIVE_FEATURE_STATE,
-	state => state.countAndItems
+	state => state.syncItems
 );
 
-const initialState: ReceiverArchiveState = {
-	countAndItems: new ReceiverSyncArchiveCountAndItems()
-};
+export const GET_TOTAL_COUNT = createSelector(
+	GET_SYNC_ARCHIVE_FEATURE_STATE,
+	state => state.totalCount
+);
 
-export function syncArchiveReducer(state = initialState, action: ReceiverArchiveAction) {
+export const GET_VIEW = createSelector(
+	GET_SYNC_ARCHIVE_FEATURE_STATE,
+	state => state.viewInfo
+);
+
+export const GET_GRP_PROP_COUNT_MAP = createSelector(
+	GET_SYNC_ARCHIVE_FEATURE_STATE,
+	state => state.siteCountMap
+);
+
+export function syncArchiveReducer(state = {}, action: ReceiverArchiveAction) {
 
 	switch (action.type) {
 
 		case ReceiverArchiveActionType.SYNC_ARCHIVE_LOADED:
 			return {
 				...state,
-				countAndItems: action.countAndItems
+				totalCount: action.countAndItems?.count,
+				syncItems: action.countAndItems?.items
+			};
+
+		case ReceiverArchiveActionType.CHANGE_VIEW:
+			return {
+				...state,
+				totalCount: undefined,
+				viewInfo: action.viewInfo
+			};
+
+		case ReceiverArchiveActionType.GROUPED_MSGS_LOADED:
+			return {
+				...state,
+				totalCount: action.countAndGroupedItems?.count,
+				siteCountMap: action.countAndGroupedItems?.items
 			};
 
 		default:

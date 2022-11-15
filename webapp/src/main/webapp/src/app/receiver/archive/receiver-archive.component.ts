@@ -1,72 +1,64 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {select, Store} from '@ngrx/store';
 import {Subscription} from 'rxjs';
-import {BaseListingComponent} from 'src/app/shared/base-listing.component';
-import {ReceiverSyncArchive} from './receiver-sync-archive';
-import {ReceiverSyncArchiveCountAndItems} from './receiver-sync-archive-count-and-items';
-import {ReceiverSyncArchiveService} from './receiver-sync-archive.service';
-import {ReceiverArchiveLoaded} from './state/receiver-archive.actions';
-import {GET_SYNC_ARCHIVE} from './state/receiver-archive.reducer';
+import {View} from "../shared/view.enum";
+import {ViewInfo} from "../shared/view-info";
+import {GET_TOTAL_COUNT, GET_VIEW} from "./state/receiver-archive.reducer";
+import {ChangeView} from "./state/receiver-archive.actions";
 
 @Component({
-	selector: 'app-archive',
+	selector: 'receiver-archives',
 	templateUrl: './receiver-archive.component.html',
 })
-export class ReceiverArchiveComponent extends BaseListingComponent implements OnInit {
+export class ReceiverArchiveComponent implements OnInit, OnDestroy {
 
 	count?: number;
 
-	archives?: ReceiverSyncArchive[];
+	view = View;
 
-	loadedSubscription?: Subscription;
+	viewInfo?: ViewInfo;
 
-	startDate?: string;
+	totalCountSubscription?: Subscription;
 
-	endDate?: string;
+	viewSubscription?: Subscription;
 
-	constructor(
-		private service: ReceiverSyncArchiveService,
-		private store: Store,
-	) {
-		super();
+	constructor(private store: Store) {
 	}
 
 	ngOnInit(): void {
-		this.init();
-		this.loadedSubscription = this.store.pipe(select(GET_SYNC_ARCHIVE)).subscribe(
-			countAndItems => {
-				this.count = countAndItems?.count;
-				this.archives = countAndItems?.items;
-				this.reRender();
+		this.totalCountSubscription = this.store.pipe(select(GET_TOTAL_COUNT)).subscribe(
+			count => {
+				this.count = count;
 			}
 		);
 
-		this.loadArchives();
+		this.viewSubscription = this.store.pipe(select(GET_VIEW)).subscribe(
+			viewInfo => {
+				this.viewInfo = viewInfo;
+			}
+		);
 
+		this.changeToListView();
 	}
 
-	loadArchives(): void {
-		this.service.getSyncArchiveCountAndItems().subscribe(countAndItems => {
-			this.store.dispatch(new ReceiverArchiveLoaded(countAndItems));
-		});
+	changeToListView() {
+		this.changeView(View.LIST, $localize`:@@common-list:List`);
 	}
 
-	filterByDateReceived() {
-		let initialItems = new ReceiverSyncArchiveCountAndItems();
-		initialItems.count = 0;
-		initialItems.items = [];
+	changeToSiteView() {
+		this.changeView(View.SITE, $localize`:@@common-health-facility:Health Facility`);
+	}
 
-		//Clear table content
-		this.store.dispatch(new ReceiverArchiveLoaded(initialItems));
-		let start = this.startDate != undefined ? this.startDate : '';
-		let end = this.endDate != undefined ? this.endDate : '';
-		this.service.searchByDateReceived(start, end).subscribe(countAndItems => {
-			this.store.dispatch(new ReceiverArchiveLoaded(countAndItems));
-		});
+	changeToEntityView() {
+		this.changeView(View.ENTITY, $localize`:@@common-entity:Entity`);
+	}
+
+	changeView(selectedView: View, viewLabel: string) {
+		this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
 	}
 
 	ngOnDestroy(): void {
-		this.loadedSubscription?.unsubscribe();
-		super.ngOnDestroy();
+		this.totalCountSubscription?.unsubscribe();
+		this.viewSubscription?.unsubscribe();
 	}
 }
