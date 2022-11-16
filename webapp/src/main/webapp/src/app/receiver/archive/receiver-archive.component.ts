@@ -54,7 +54,9 @@ export class ReceiverArchiveComponent implements OnInit, OnDestroy {
 	}
 
 	changeView(selectedView: View, viewLabel: string) {
-		this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
+		if (this.viewInfo?.view != selectedView) {
+			this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
+		}
 	}
 
 	ngOnDestroy(): void {
