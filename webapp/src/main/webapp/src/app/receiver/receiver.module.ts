@@ -16,6 +16,7 @@ import {ReceiverTableStatsComponent} from './stats/receiver-table-stats.componen
 import {FormsModule} from '@angular/forms';
 import {ReceiverSyncMessageListViewComponent} from "./sync/view/list/receiver-sync-message-list-view.component";
 import {ReceiverSyncMessageGroupViewComponent} from './sync/view/group/receiver-sync-message-group-view.component'
+import {ReceiverArchiveGroupViewComponent} from "./archive/view/group/receiver-archive-group-view.component";
 import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-archive-list-view.component";
 
 @NgModule({
@@ -29,7 +30,8 @@ import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-arc
 		ReceiverTableStatsComponent,
 		ReceiverSyncMessageListViewComponent,
 		ReceiverSyncMessageGroupViewComponent,
-		ReceiverArchiveListViewComponent
+		ReceiverArchiveListViewComponent,
+		ReceiverArchiveGroupViewComponent
 	],
 	imports: [
 		SharedModule,

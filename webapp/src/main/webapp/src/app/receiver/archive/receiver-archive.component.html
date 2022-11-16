@@ -15,4 +15,5 @@
 <div class="ui-bar-spacer"></div>
 <ng-container [ngSwitch]="viewInfo?.view">
 	<receiver-archive-list-view *ngSwitchCase="view.LIST"></receiver-archive-list-view>
+	<receiver-archive-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-archive-group-view>
 </ng-container>
