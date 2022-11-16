@@ -1,7 +1,7 @@
-import {BaseErrorEntity} from "../../shared/base-error-entity";
 import {Site} from "../site";
+import {BaseEntity} from "../../shared/base-entity";
 
-export class ReceiverSyncMessage extends BaseErrorEntity {
+export class ReceiverSyncMessage extends BaseEntity {
 
 	identifier?: string;
 
