@@ -34,7 +34,7 @@ export class ViewSyncMessage implements Action {
 
 }
 
-export class ChangeView implements Action {
+export class ChangeSyncMessageView implements Action {
 
 	readonly type = SyncMessageActionType.CHANGE_SYNC_MSG_VIEW;
 
@@ -52,4 +52,4 @@ export class GroupedSyncMessagesLoaded implements Action {
 
 }
 
-export type SyncMessageAction = SyncMessagesLoaded | ViewSyncMessage | ChangeView | GroupedSyncMessagesLoaded;
+export type SyncMessageAction = SyncMessagesLoaded | ViewSyncMessage | ChangeSyncMessageView | GroupedSyncMessagesLoaded;

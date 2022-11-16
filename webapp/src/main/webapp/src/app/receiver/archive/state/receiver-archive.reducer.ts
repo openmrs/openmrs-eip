@@ -22,17 +22,17 @@ export const GET_SYNC_ARCHIVE = createSelector(
 	state => state.syncItems
 );
 
-export const GET_TOTAL_COUNT = createSelector(
+export const GET_ARCHIVE_TOTAL_COUNT = createSelector(
 	GET_SYNC_ARCHIVE_FEATURE_STATE,
 	state => state.totalCount
 );
 
-export const GET_VIEW = createSelector(
+export const GET_ARCHIVE_VIEW = createSelector(
 	GET_SYNC_ARCHIVE_FEATURE_STATE,
 	state => state.viewInfo
 );
 
-export const GET_GRP_PROP_COUNT_MAP = createSelector(
+export const GET_ARCHIVE_GRP_PROP_COUNT_MAP = createSelector(
 	GET_SYNC_ARCHIVE_FEATURE_STATE,
 	state => state.siteCountMap
 );

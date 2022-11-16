@@ -4,7 +4,7 @@ import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
 import {ViewInfo} from "../../../shared/view-info";
 import {GroupedSyncMessagesLoaded} from "../../state/sync-message.actions";
-import {GET_GRP_PROP_COUNT_MAP} from "../../state/sync-message.reducer";
+import {GET_SYNC_MSG_GRP_PROP_COUNT_MAP} from "../../state/sync-message.reducer";
 import {View} from "../../../shared/view.enum";
 import {ModelClassPipe} from "../../../../shared/pipes/model-class.pipe";
 
@@ -25,7 +25,7 @@ export class ReceiverSyncMessageGroupViewComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loadedSubscription = this.store.pipe(select(GET_GRP_PROP_COUNT_MAP)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_SYNC_MSG_GRP_PROP_COUNT_MAP)).subscribe(
 			map => {
 				if (this.viewInfo?.view == View.ENTITY) {
 					let transformedMap = new Map<string, number>();

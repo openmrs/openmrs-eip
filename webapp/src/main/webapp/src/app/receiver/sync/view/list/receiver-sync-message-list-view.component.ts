@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
-import {GET_MSGS, MSG_TO_VIEW} from "../../state/sync-message.reducer";
+import {GET_SYNC_MSGS, MSG_TO_VIEW} from "../../state/sync-message.reducer";
 import {SyncMessagesLoaded, ViewSyncMessage} from "../../state/sync-message.actions";
 import {BaseListingComponent} from "../../../../shared/base-listing.component";
 import {ReceiverSyncMessage} from "../../receiver-sync-message";
@@ -39,7 +39,7 @@ export class ReceiverSyncMessageListViewComponent extends BaseListingComponent i
 
 	ngOnInit(): void {
 		this.init();
-		this.loadedSubscription = this.store.pipe(select(GET_MSGS)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_SYNC_MSGS)).subscribe(
 			syncItems => {
 				this.syncMessages = syncItems;
 				this.reRender();

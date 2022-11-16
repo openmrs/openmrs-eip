@@ -17,7 +17,7 @@ export interface SyncMessageState {
 
 const GET_MSG_FEATURE_STATE = createFeatureSelector<SyncMessageState>('syncMsgQueue');
 
-export const GET_MSGS = createSelector(
+export const GET_SYNC_MSGS = createSelector(
 	GET_MSG_FEATURE_STATE,
 	state => state.syncItems
 );
@@ -27,17 +27,17 @@ export const MSG_TO_VIEW = createSelector(
 	state => state.msgToView
 );
 
-export const GET_TOTAL_COUNT = createSelector(
+export const GET_SYNC_MSG_TOTAL_COUNT = createSelector(
 	GET_MSG_FEATURE_STATE,
 	state => state.totalCount
 );
 
-export const GET_VIEW = createSelector(
+export const GET_SYNC_MSG_VIEW = createSelector(
 	GET_MSG_FEATURE_STATE,
 	state => state.viewInfo
 );
 
-export const GET_GRP_PROP_COUNT_MAP = createSelector(
+export const GET_SYNC_MSG_GRP_PROP_COUNT_MAP = createSelector(
 	GET_MSG_FEATURE_STATE,
 	state => state.siteCountMap
 );

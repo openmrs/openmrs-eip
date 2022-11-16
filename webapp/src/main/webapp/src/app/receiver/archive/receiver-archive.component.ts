@@ -1,66 +1,30 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {select, Store} from '@ngrx/store';
-import {Subscription} from 'rxjs';
-import {View} from "../shared/view.enum";
+import {Component} from '@angular/core';
+import {DefaultProjectorFn, MemoizedSelector, Store} from '@ngrx/store';
 import {ViewInfo} from "../shared/view-info";
-import {GET_TOTAL_COUNT, GET_VIEW} from "./state/receiver-archive.reducer";
-import {ChangeView} from "./state/receiver-archive.actions";
+import {GET_ARCHIVE_TOTAL_COUNT, GET_ARCHIVE_VIEW} from "./state/receiver-archive.reducer";
+import {BaseReceiverMultipleViewComponent} from "../shared/base-receiver-multiple-view.component";
+import {ChangeArchivesView} from "./state/receiver-archive.actions";
 
 @Component({
 	selector: 'receiver-archives',
 	templateUrl: './receiver-archive.component.html',
 })
-export class ReceiverArchiveComponent implements OnInit, OnDestroy {
+export class ReceiverArchiveComponent extends BaseReceiverMultipleViewComponent {
 
-	count?: number;
-
-	view = View;
-
-	viewInfo?: ViewInfo;
-
-	totalCountSubscription?: Subscription;
-
-	viewSubscription?: Subscription;
-
-	constructor(private store: Store) {
+	constructor(store: Store) {
+		super(store);
 	}
 
-	ngOnInit(): void {
-		this.totalCountSubscription = this.store.pipe(select(GET_TOTAL_COUNT)).subscribe(
-			count => {
-				this.count = count;
-			}
-		);
-
-		this.viewSubscription = this.store.pipe(select(GET_VIEW)).subscribe(
-			viewInfo => {
-				this.viewInfo = viewInfo;
-			}
-		);
-
-		this.changeToListView();
+	getViewTotalCountSelector(): MemoizedSelector<object, number | undefined, DefaultProjectorFn<number | undefined>> {
+		return GET_ARCHIVE_TOTAL_COUNT;
 	}
 
-	changeToListView() {
-		this.changeView(View.LIST, $localize`:@@common-list:List`);
+	getViewSelector(): MemoizedSelector<object, ViewInfo | undefined, DefaultProjectorFn<ViewInfo | undefined>> {
+		return GET_ARCHIVE_VIEW;
 	}
 
-	changeToSiteView() {
-		this.changeView(View.SITE, $localize`:@@common-health-facility:Health Facility`);
+	createChangeViewAction(viewInfo: ViewInfo): ChangeArchivesView {
+		return new ChangeArchivesView(viewInfo);
 	}
 
-	changeToEntityView() {
-		this.changeView(View.ENTITY, $localize`:@@common-entity:Entity`);
-	}
-
-	changeView(selectedView: View, viewLabel: string) {
-		if (this.viewInfo?.view != selectedView) {
-			this.store.dispatch(new ChangeView(new ViewInfo(selectedView, viewLabel)));
-		}
-	}
-
-	ngOnDestroy(): void {
-		this.totalCountSubscription?.unsubscribe();
-		this.viewSubscription?.unsubscribe();
-	}
 }

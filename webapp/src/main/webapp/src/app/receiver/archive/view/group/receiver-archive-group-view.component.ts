@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
 import {ModelClassPipe} from "../../../../shared/pipes/model-class.pipe";
 import {View} from "../../../shared/view.enum";
-import {GET_GRP_PROP_COUNT_MAP} from "../../state/receiver-archive.reducer";
+import {GET_ARCHIVE_GRP_PROP_COUNT_MAP} from "../../state/receiver-archive.reducer";
 import {ReceiverSyncArchiveService} from "../../receiver-sync-archive.service";
 import {GroupedArchivesLoaded} from "../../state/receiver-archive.actions";
 
@@ -25,7 +25,7 @@ export class ReceiverArchiveGroupViewComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loadedSubscription = this.store.pipe(select(GET_GRP_PROP_COUNT_MAP)).subscribe(
+		this.loadedSubscription = this.store.pipe(select(GET_ARCHIVE_GRP_PROP_COUNT_MAP)).subscribe(
 			map => {
 				if (this.viewInfo?.view == View.ENTITY) {
 					let transformedMap = new Map<string, number>();

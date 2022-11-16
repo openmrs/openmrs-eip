@@ -22,7 +22,7 @@ export class ReceiverArchiveLoaded implements Action {
 
 }
 
-export class ChangeView implements Action {
+export class ChangeArchivesView implements Action {
 
 	readonly type = ReceiverArchiveActionType.CHANGE_ARCHIVE_VIEW;
 
@@ -40,4 +40,4 @@ export class GroupedArchivesLoaded implements Action {
 
 }
 
-export type ReceiverArchiveAction = ReceiverArchiveLoaded | ChangeView | GroupedArchivesLoaded;
+export type ReceiverArchiveAction = ReceiverArchiveLoaded | ChangeArchivesView | GroupedArchivesLoaded;
