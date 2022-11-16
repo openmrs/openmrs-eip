@@ -1,59 +1,33 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ViewInfo} from "../../../shared/view-info";
-import {Subscription} from "rxjs";
-import {select, Store} from "@ngrx/store";
+import {Component} from '@angular/core';
+import {Observable} from "rxjs";
+import {Action, DefaultProjectorFn, MemoizedSelector, Store} from "@ngrx/store";
 import {ModelClassPipe} from "../../../../shared/pipes/model-class.pipe";
-import {View} from "../../../shared/view.enum";
-import {GET_ARCHIVE_GRP_PROP_COUNT_MAP} from "../../state/receiver-archive.reducer";
+import {BaseReceiverGroupViewComponent} from "../../../shared/base-receiver-group-view.component";
+import {TotalCountAndGroupedItems} from "../../../../shared/total-count-and-grouped-items";
 import {ReceiverSyncArchiveService} from "../../receiver-sync-archive.service";
+import {GET_ARCHIVE_GRP_PROP_COUNT_MAP} from "../../state/receiver-archive.reducer";
 import {GroupedArchivesLoaded} from "../../state/receiver-archive.actions";
 
 @Component({
 	selector: 'receiver-archive-group-view',
 	templateUrl: './receiver-archive-group-view.component.html'
 })
-export class ReceiverArchiveGroupViewComponent implements OnInit {
+export class ReceiverArchiveGroupViewComponent extends BaseReceiverGroupViewComponent {
 
-	@Input()
-	viewInfo?: ViewInfo;
-
-	groupPropertyCountMap?: Map<string, number>;
-
-	loadedSubscription?: Subscription;
-
-	constructor(private service: ReceiverSyncArchiveService, private store: Store, private classPipe: ModelClassPipe) {
+	constructor(private service: ReceiverSyncArchiveService, store: Store, classPipe: ModelClassPipe) {
+		super(store, classPipe)
 	}
 
-	ngOnInit(): void {
-		this.loadedSubscription = this.store.pipe(select(GET_ARCHIVE_GRP_PROP_COUNT_MAP)).subscribe(
-			map => {
-				if (this.viewInfo?.view == View.ENTITY) {
-					let transformedMap = new Map<string, number>();
-					if (map) {
-						Object.entries(map).forEach((entry) => {
-							transformedMap?.set(this.classPipe.transform(entry[0]), entry[1]);
-						});
-					}
-
-					this.groupPropertyCountMap = transformedMap;
-				} else {
-					this.groupPropertyCountMap = map;
-				}
-			}
-		);
-
-		let groupBy: string = 'site';
-		if (this.viewInfo?.view == View.ENTITY) {
-			groupBy = 'modelClassName';
-		}
-
-		this.service.getTotalCountAndGroupedArchives(groupBy).subscribe(countAndGroupedItems => {
-			this.store.dispatch(new GroupedArchivesLoaded(countAndGroupedItems));
-		});
+	getTotalCountAndGroupedItems(groupProperty: string): Observable<TotalCountAndGroupedItems> {
+		return this.service.getTotalCountAndGroupedArchives(groupProperty);
 	}
 
-	ngOnDestroy(): void {
-		this.loadedSubscription?.unsubscribe();
+	getSelector(): MemoizedSelector<object, Map<string, number> | undefined, DefaultProjectorFn<Map<string, number> | undefined>> {
+		return GET_ARCHIVE_GRP_PROP_COUNT_MAP;
+	}
+
+	createLoadAction(countAndGroupedItems: TotalCountAndGroupedItems): Action {
+		return new GroupedArchivesLoaded(countAndGroupedItems);
 	}
 
 }

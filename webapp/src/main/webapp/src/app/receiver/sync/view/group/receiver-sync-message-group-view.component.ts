@@ -1,59 +1,33 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ReceiverSyncMessageService} from "../../receiver-sync-message.service";
-import {select, Store} from "@ngrx/store";
-import {Subscription} from "rxjs";
-import {ViewInfo} from "../../../shared/view-info";
-import {GroupedSyncMessagesLoaded} from "../../state/sync-message.actions";
-import {GET_SYNC_MSG_GRP_PROP_COUNT_MAP} from "../../state/sync-message.reducer";
-import {View} from "../../../shared/view.enum";
+import {Action, DefaultProjectorFn, MemoizedSelector, Store} from "@ngrx/store";
 import {ModelClassPipe} from "../../../../shared/pipes/model-class.pipe";
+import {BaseReceiverGroupViewComponent} from "../../../shared/base-receiver-group-view.component";
+import {TotalCountAndGroupedItems} from "../../../../shared/total-count-and-grouped-items";
+import {GET_SYNC_MSG_GRP_PROP_COUNT_MAP} from "../../state/sync-message.reducer";
+import {Observable} from "rxjs";
+import {GroupedSyncMessagesLoaded} from "../../state/sync-message.actions";
 
 @Component({
 	selector: 'receiver-sync-msg-group-view',
 	templateUrl: './receiver-sync-message-group-view.component.html'
 })
-export class ReceiverSyncMessageGroupViewComponent implements OnInit {
+export class ReceiverSyncMessageGroupViewComponent extends BaseReceiverGroupViewComponent {
 
-	@Input()
-	viewInfo?: ViewInfo;
-
-	groupPropertyCountMap?: Map<string, number>;
-
-	loadedSubscription?: Subscription;
-
-	constructor(private service: ReceiverSyncMessageService, private store: Store, private classPipe: ModelClassPipe) {
+	constructor(private service: ReceiverSyncMessageService, store: Store, classPipe: ModelClassPipe) {
+		super(store, classPipe)
 	}
 
-	ngOnInit(): void {
-		this.loadedSubscription = this.store.pipe(select(GET_SYNC_MSG_GRP_PROP_COUNT_MAP)).subscribe(
-			map => {
-				if (this.viewInfo?.view == View.ENTITY) {
-					let transformedMap = new Map<string, number>();
-					if (map) {
-						Object.entries(map).forEach((entry) => {
-							transformedMap?.set(this.classPipe.transform(entry[0]), entry[1]);
-						});
-					}
-
-					this.groupPropertyCountMap = transformedMap;
-				} else {
-					this.groupPropertyCountMap = map;
-				}
-			}
-		);
-
-		let groupBy: string = 'site';
-		if (this.viewInfo?.view == View.ENTITY) {
-			groupBy = 'modelClassName';
-		}
-
-		this.service.getTotalCountAndGroupedSyncMessages(groupBy).subscribe(countAndGroupedItems => {
-			this.store.dispatch(new GroupedSyncMessagesLoaded(countAndGroupedItems));
-		});
+	getTotalCountAndGroupedItems(groupProperty: string): Observable<TotalCountAndGroupedItems> {
+		return this.service.getTotalCountAndGroupedSyncMessages(groupProperty);
 	}
 
-	ngOnDestroy(): void {
-		this.loadedSubscription?.unsubscribe();
+	getSelector(): MemoizedSelector<object, Map<string, number> | undefined, DefaultProjectorFn<Map<string, number> | undefined>> {
+		return GET_SYNC_MSG_GRP_PROP_COUNT_MAP;
+	}
+
+	createLoadAction(countAndGroupedItems: TotalCountAndGroupedItems): Action {
+		return new GroupedSyncMessagesLoaded(countAndGroupedItems);
 	}
 
 }
