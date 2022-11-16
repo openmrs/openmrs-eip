@@ -55,7 +55,7 @@ export function syncArchiveReducer(state = {}, action: ReceiverArchiveAction) {
 				viewInfo: action.viewInfo
 			};
 
-		case ReceiverArchiveActionType.GROUPED_MSGS_LOADED:
+		case ReceiverArchiveActionType.GROUPED_ARCHIVES_LOADED:
 			return {
 				...state,
 				totalCount: action.countAndGroupedItems?.count,

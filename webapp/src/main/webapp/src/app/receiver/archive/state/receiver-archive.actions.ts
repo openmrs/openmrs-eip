@@ -9,7 +9,7 @@ export enum ReceiverArchiveActionType {
 
 	CHANGE_VIEW = 'CHANGE_VIEW',
 
-	GROUPED_MSGS_LOADED = 'GROUPED_MSGS_LOADED'
+	GROUPED_ARCHIVES_LOADED = 'GROUPED_ARCHIVES_LOADED'
 
 }
 
@@ -33,7 +33,7 @@ export class ChangeView implements Action {
 
 export class GroupedArchivesLoaded implements Action {
 
-	readonly type = ReceiverArchiveActionType.GROUPED_MSGS_LOADED;
+	readonly type = ReceiverArchiveActionType.GROUPED_ARCHIVES_LOADED;
 
 	constructor(public countAndGroupedItems?: TotalCountAndGroupedItems) {
 	}
