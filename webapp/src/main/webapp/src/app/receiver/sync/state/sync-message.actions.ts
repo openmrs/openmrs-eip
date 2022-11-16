@@ -6,19 +6,19 @@ import {TotalCountAndGroupedItems} from "../../../shared/total-count-and-grouped
 
 export enum SyncMessageActionType {
 
-	MSGS_LOADED = 'MSGS_LOADED',
+	SYNC_MSGS_LOADED = 'SYNC_MSGS_LOADED',
 
-	VIEW_MSG = 'VIEW_MSG',
+	VIEW_SYNC_MSG = 'VIEW_SYNC_MSG',
 
-	CHANGE_VIEW = 'CHANGE_VIEW',
+	CHANGE_SYNC_MSG_VIEW = 'CHANGE_SYNC_MSG_VIEW',
 
-	GROUPED_MSGS_LOADED = 'GROUPED_MSGS_LOADED'
+	GROUPED_SYNC_MSGS_LOADED = 'GROUPED_SYNC_MSGS_LOADED'
 
 }
 
 export class SyncMessagesLoaded implements Action {
 
-	readonly type = SyncMessageActionType.MSGS_LOADED;
+	readonly type = SyncMessageActionType.SYNC_MSGS_LOADED;
 
 	constructor(public countAndItems?: ReceiverSyncMessageCountAndItems) {
 	}
@@ -27,7 +27,7 @@ export class SyncMessagesLoaded implements Action {
 
 export class ViewSyncMessage implements Action {
 
-	readonly type = SyncMessageActionType.VIEW_MSG;
+	readonly type = SyncMessageActionType.VIEW_SYNC_MSG;
 
 	constructor(public message?: ReceiverSyncMessage) {
 	}
@@ -36,7 +36,7 @@ export class ViewSyncMessage implements Action {
 
 export class ChangeView implements Action {
 
-	readonly type = SyncMessageActionType.CHANGE_VIEW;
+	readonly type = SyncMessageActionType.CHANGE_SYNC_MSG_VIEW;
 
 	constructor(public viewInfo?: ViewInfo) {
 	}
@@ -45,7 +45,7 @@ export class ChangeView implements Action {
 
 export class GroupedSyncMessagesLoaded implements Action {
 
-	readonly type = SyncMessageActionType.GROUPED_MSGS_LOADED;
+	readonly type = SyncMessageActionType.GROUPED_SYNC_MSGS_LOADED;
 
 	constructor(public countAndGroupedItems?: TotalCountAndGroupedItems) {
 	}

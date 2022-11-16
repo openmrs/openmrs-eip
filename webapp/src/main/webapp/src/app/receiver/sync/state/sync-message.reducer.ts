@@ -46,27 +46,27 @@ export function syncMessageReducer(state = {}, action: SyncMessageAction) {
 
 	switch (action.type) {
 
-		case SyncMessageActionType.MSGS_LOADED:
+		case SyncMessageActionType.SYNC_MSGS_LOADED:
 			return {
 				...state,
 				totalCount: action.countAndItems?.count,
 				syncItems: action.countAndItems?.items
 			};
 
-		case SyncMessageActionType.VIEW_MSG:
+		case SyncMessageActionType.VIEW_SYNC_MSG:
 			return {
 				...state,
 				msgToView: action.message
 			};
 
-		case SyncMessageActionType.CHANGE_VIEW:
+		case SyncMessageActionType.CHANGE_SYNC_MSG_VIEW:
 			return {
 				...state,
 				totalCount: undefined,
 				viewInfo: action.viewInfo
 			};
 
-		case SyncMessageActionType.GROUPED_MSGS_LOADED:
+		case SyncMessageActionType.GROUPED_SYNC_MSGS_LOADED:
 			return {
 				...state,
 				totalCount: action.countAndGroupedItems?.count,

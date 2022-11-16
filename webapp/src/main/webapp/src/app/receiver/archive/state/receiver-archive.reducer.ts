@@ -41,14 +41,14 @@ export function syncArchiveReducer(state = {}, action: ReceiverArchiveAction) {
 
 	switch (action.type) {
 
-		case ReceiverArchiveActionType.SYNC_ARCHIVE_LOADED:
+		case ReceiverArchiveActionType.SYNC_ARCHIVES_LOADED:
 			return {
 				...state,
 				totalCount: action.countAndItems?.count,
 				syncItems: action.countAndItems?.items
 			};
 
-		case ReceiverArchiveActionType.CHANGE_VIEW:
+		case ReceiverArchiveActionType.CHANGE_ARCHIVE_VIEW:
 			return {
 				...state,
 				totalCount: undefined,

@@ -5,9 +5,9 @@ import {TotalCountAndGroupedItems} from "../../../shared/total-count-and-grouped
 
 export enum ReceiverArchiveActionType {
 
-	SYNC_ARCHIVE_LOADED = 'SYNC_ARCHIVE_LOADED',
+	SYNC_ARCHIVES_LOADED = 'SYNC_ARCHIVES_LOADED',
 
-	CHANGE_VIEW = 'CHANGE_VIEW',
+	CHANGE_ARCHIVE_VIEW = 'CHANGE_ARCHIVE_VIEW',
 
 	GROUPED_ARCHIVES_LOADED = 'GROUPED_ARCHIVES_LOADED'
 
@@ -15,7 +15,7 @@ export enum ReceiverArchiveActionType {
 
 export class ReceiverArchiveLoaded implements Action {
 
-	readonly type = ReceiverArchiveActionType.SYNC_ARCHIVE_LOADED;
+	readonly type = ReceiverArchiveActionType.SYNC_ARCHIVES_LOADED;
 
 	constructor(public countAndItems?: ReceiverSyncArchiveCountAndItems) {
 	}
@@ -24,7 +24,7 @@ export class ReceiverArchiveLoaded implements Action {
 
 export class ChangeView implements Action {
 
-	readonly type = ReceiverArchiveActionType.CHANGE_VIEW;
+	readonly type = ReceiverArchiveActionType.CHANGE_ARCHIVE_VIEW;
 
 	constructor(public viewInfo?: ViewInfo) {
 	}
