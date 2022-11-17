@@ -86,7 +86,7 @@ public class SenderSyncArchiveController extends BaseRestController {
 		}
 		
 		if (endDate != null) {
-			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE " : " AND") + " e." + PROP_EVENT_DATE + " <= :"
+			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE" : " AND") + " e." + PROP_EVENT_DATE + " <= :"
 			        + queryParamEndDate;
 			paramAndValueMap.put(queryParamEndDate, endDate);
 		}

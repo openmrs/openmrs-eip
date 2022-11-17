@@ -12,6 +12,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+import java.util.Map;
+
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.model.PatientModel;
@@ -44,6 +48,7 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
 		builder.param(PARAM_START_DATE, "2022-10-25");
 		builder.param(PARAM_END_DATE, "2022-10-30");
+		builder.param(PARAM_GRP_PROP, "");
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
@@ -59,6 +64,7 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
 		builder.param(PARAM_START_DATE, "");
 		builder.param(PARAM_END_DATE, "2022-10-23");
+		builder.param(PARAM_GRP_PROP, "");
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
@@ -75,6 +81,7 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
 		builder.param(PARAM_START_DATE, "2022-10-23");
 		builder.param(PARAM_END_DATE, "");
+		builder.param(PARAM_GRP_PROP, "");
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
@@ -90,6 +97,8 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 	public void get_shouldGetTheArchivesGroupedBySite() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
 		builder.param(PARAM_GRP_PROP, "site.name");
+		builder.param(PARAM_START_DATE, "");
+		builder.param(PARAM_END_DATE, "");
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
@@ -106,6 +115,8 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 	public void get_shouldGetTheArchivesGroupedByEntity() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
 		builder.param(PARAM_GRP_PROP, "modelClassName");
+		builder.param(PARAM_START_DATE, "");
+		builder.param(PARAM_END_DATE, "");
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
@@ -114,6 +125,53 @@ public class ReceiverSyncArchiveControllerTest extends BaseReceiverWebTest {
 		result.andExpect(jsonPath("items.['" + VisitModel.class.getName() + "']", equalTo(3)));
 		result.andExpect(jsonPath("items.['" + PersonModel.class.getName() + "']", equalTo(1)));
 		result.andExpect(jsonPath("items.['" + PatientModel.class.getName() + "']").doesNotHaveJsonPath());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_archive.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void get_shouldReturnArchivesMatchingTheSpecifiedStartAndEndDatesWhenGrouped() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
+		builder.param(PARAM_START_DATE, "2022-10-25");
+		builder.param(PARAM_END_DATE, "2022-10-30");
+		builder.param(PARAM_GRP_PROP, "site.name");
+		ResultActions result = mockMvc.perform(builder);
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(2)));
+		result.andExpect(jsonPath("count", equalTo(1)));
+		result.andExpect(jsonPath("items.length()", equalTo(1)));
+		result.andExpect(jsonPath("items.['" + getEntity(SiteInfo.class, 1L).getName() + "']", equalTo(1)));
+		result.andExpect(jsonPath("items.['" + getEntity(SiteInfo.class, 2L).getName() + "']").doesNotHaveJsonPath());
+		result.andExpect(jsonPath("items.['" + getEntity(SiteInfo.class, 3L).getName() + "']").doesNotHaveJsonPath());
+	}
+	
+	@Test
+	public void get_shouldReturnAnEmptyListIfNoMatchesAreFoundAndGroupingIsNotSet() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
+		builder.param(PARAM_START_DATE, "");
+		builder.param(PARAM_END_DATE, "");
+		builder.param(PARAM_GRP_PROP, "");
+		ResultActions result = mockMvc.perform(builder);
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(2)));
+		result.andExpect(jsonPath("count", equalTo(0)));
+		result.andExpect(jsonPath("items.length()", equalTo(0)));
+		result.andExpect(jsonPath("items", CoreMatchers.instanceOf(List.class)));
+	}
+	
+	@Test
+	public void get_shouldReturnAndEmptyMapIfNoMatchesAreFoundAndGroupingIsSet() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_ARCHIVE);
+		builder.param(PARAM_START_DATE, "");
+		builder.param(PARAM_END_DATE, "");
+		builder.param(PARAM_GRP_PROP, "site.name");
+		ResultActions result = mockMvc.perform(builder);
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(2)));
+		result.andExpect(jsonPath("count", equalTo(0)));
+		result.andExpect(jsonPath("items.length()", equalTo(0)));
+		String s = result.andReturn().getResponse().getContentAsString();
+		result.andExpect(jsonPath("items", CoreMatchers.instanceOf(Map.class)));
 	}
 	
 }

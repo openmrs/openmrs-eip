@@ -48,13 +48,15 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 		return doGetAll();
 	}
 	
-	@GetMapping(params = { PARAM_START_DATE, PARAM_END_DATE })
-	public Map<String, Object> searchByDateReceived(@RequestParam(name = PARAM_START_DATE) String startDateStr,
-	                                                @RequestParam(name = PARAM_END_DATE) String endDateStr)
+	@GetMapping(params = { PARAM_START_DATE, PARAM_END_DATE, PARAM_GRP_PROP })
+	public Map<String, Object> getSyncArchives(@RequestParam(name = PARAM_START_DATE) String startDateStr,
+	                                           @RequestParam(name = PARAM_END_DATE) String endDateStr,
+	                                           @RequestParam(PARAM_GRP_PROP) String groupProperty)
 	    throws ParseException {
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Searching receiver sync archives by start date: " + startDateStr + ", end date: " + endDateStr);
+			log.debug("Searching receiver sync archives by start date: " + startDateStr + ", end date: " + endDateStr
+			        + ", grouped by: " + groupProperty);
 		}
 		
 		Date startDate = null;
@@ -87,7 +89,7 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 		}
 		
 		if (endDate != null) {
-			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE " : " AND") + " e." + PROP_DATE_RECEIVED + " <= :"
+			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE" : " AND") + " e." + PROP_DATE_RECEIVED + " <= :"
 			        + queryParamEndDate;
 			paramAndValueMap.put(queryParamEndDate, endDate);
 		}
@@ -96,44 +98,38 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT count(*) FROM " + getName() + " e " + whereClause, null,
 		    JPA_PARAMETERS_HEADER, paramAndValueMap, Integer.class);
 		
+		results.put(FIELD_COUNT, count);
+		boolean group = StringUtils.isNotBlank(groupProperty);
 		if (count == 0) {
-			results.put(FIELD_COUNT, 0);
-			results.put(FIELD_ITEMS, Collections.emptyList());
+			if (group) {
+				results.put(FIELD_ITEMS, Collections.emptyMap());
+			} else {
+				results.put(FIELD_ITEMS, Collections.emptyList());
+			}
+			
 			return results;
 		}
 		
-		List<Object> items = producerTemplate.requestBodyAndHeader("jpa:" + getName() + "?query=SELECT e FROM " + getName()
-		        + " e " + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT,
-		    null, JPA_PARAMETERS_HEADER, paramAndValueMap, List.class);
-		
-		results.put(FIELD_COUNT, count);
-		results.put(FIELD_ITEMS, items);
-		
-		return results;
-	}
-	
-	@GetMapping(params = PARAM_GRP_PROP)
-	public Object getGroupedArchives(@RequestParam(PARAM_GRP_PROP) String groupProperty) {
-		if (log.isDebugEnabled()) {
-			log.debug("Fetching receiver sync archives grouped by " + groupProperty);
+		String fields = "e";
+		String groupBy = "";
+		if (group) {
+			fields += ("." + groupProperty + ", count(*)");
+			groupBy += (" GROUP BY e." + groupProperty);
 		}
 		
-		Map<String, Object> results = new HashMap(2);
-		Integer count = getAllCount();
-		results.put(FIELD_COUNT, count);
+		String query = "jpa:" + getName() + "?query=SELECT " + fields + " FROM " + getName() + " e " + whereClause + groupBy;
+		List<Object> items = producerTemplate.requestBodyAndHeader(query + " &maximumResults=" + DEFAULT_MAX_COUNT, null,
+		    JPA_PARAMETERS_HEADER, paramAndValueMap, List.class);
+		results.put(FIELD_ITEMS, items);
 		
-		if (count > 0) {
-			List<Object[]> items = producerTemplate.requestBody("jpa:" + getName() + "?query=SELECT e." + groupProperty
-			        + ", count(*) FROM " + getName() + " e GROUP BY e." + groupProperty,
-			    null, List.class);
+		if (group) {
 			final Map<String, Integer> propCountMap = new HashMap();
-			items.forEach(values -> {
+			items.forEach(row -> {
+				Object[] values = (Object[]) row;
 				propCountMap.put(values[0].toString(), Integer.valueOf(values[1].toString()));
 			});
 			
 			results.put(FIELD_ITEMS, propCountMap);
-		} else {
-			results.put(FIELD_ITEMS, Collections.emptyMap());
 		}
 		
 		return results;
