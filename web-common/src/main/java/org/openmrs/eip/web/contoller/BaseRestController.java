@@ -62,7 +62,7 @@ public abstract class BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
-	public Map<String, Object> doSearchByDate(String dateProperty, String startDate, String endDate) throws ParseException {
+	public Map<String, Object> searchByDate(String dateProperty, String startDate, String endDate) throws ParseException {
 		Date start = null;
 		if (StringUtils.isNotBlank(startDate)) {
 			start = RestConstants.DATE_FORMAT.parse(startDate);
@@ -83,10 +83,10 @@ public abstract class BaseRestController {
 			log.debug("End date: " + end);
 		}
 		
-		return searchByDate(dateProperty, start, end);
+		return doSearchByDate(dateProperty, start, end);
 	}
 	
-	private Map<String, Object> searchByDate(String dateProperty, Date startDate, Date endDate) {
+	private Map<String, Object> doSearchByDate(String dateProperty, Date startDate, Date endDate) {
 		final String queryParamStartDate = "startDate";
 		final String queryParamEndDate = "endDate";
 		Map<String, Object> results = new HashMap(2);

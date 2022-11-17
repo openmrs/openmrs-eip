@@ -45,7 +45,7 @@ public class SenderSyncArchiveController extends BaseRestController {
 			log.debug("Searching sender sync archives by start date: " + startDate + ", end date: " + endDate);
 		}
 		
-		return doSearchByDate("eventDate", startDate, endDate);
+		return searchByDate("eventDate", startDate, endDate);
 	}
 	
 }

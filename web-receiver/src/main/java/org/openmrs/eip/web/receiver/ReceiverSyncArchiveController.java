@@ -51,7 +51,7 @@ public class ReceiverSyncArchiveController extends BaseRestController {
 			log.debug("Searching receiver sync archives by start date: " + startDate + ", end date: " + endDate);
 		}
 		
-		return doSearchByDate("dateReceived", startDate, endDate);
+		return searchByDate("dateReceived", startDate, endDate);
 	}
 	
 	@GetMapping(params = PARAM_GRP_PROP)
