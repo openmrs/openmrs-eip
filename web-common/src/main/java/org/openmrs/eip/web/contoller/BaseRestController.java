@@ -1,11 +1,9 @@
 package org.openmrs.eip.web.contoller;
 
-import static org.apache.camel.component.jpa.JpaConstants.JPA_PARAMETERS_HEADER;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,7 +16,6 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,66 +59,9 @@ public abstract class BaseRestController {
 		    "jpa:" + getName() + "?query=SELECT c FROM " + getName() + " c WHERE c.id = " + id, null, getClazz());
 	}
 	
-	public Map<String, Object> searchByDate(String dateProperty, String startDate, String endDate) throws ParseException {
-		Date start = null;
-		if (StringUtils.isNotBlank(startDate)) {
-			start = RestConstants.DATE_FORMAT.parse(startDate);
-		}
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Start date: " + start);
-		}
-		
-		Date end = null;
-		if (StringUtils.isNotBlank(endDate)) {
-			//Roll date to end of day so that we include all items on the same day regardless of time
-			LocalDateTime ldt = LocalDate.parse(endDate, RestConstants.DATE_FORMATTER).atTime(LocalTime.MAX);
-			end = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-		}
-		
-		if (log.isDebugEnabled()) {
-			log.debug("End date: " + end);
-		}
-		
-		return doSearchByDate(dateProperty, start, end);
-	}
-	
-	private Map<String, Object> doSearchByDate(String dateProperty, Date startDate, Date endDate) {
-		final String queryParamStartDate = "startDate";
-		final String queryParamEndDate = "endDate";
-		Map<String, Object> results = new HashMap(2);
-		String whereClause = StringUtils.EMPTY;
-		
-		Map<String, Object> paramAndValueMap = new HashMap(2);
-		if (startDate != null) {
-			whereClause = " WHERE e." + dateProperty + " >= :" + queryParamStartDate;
-			paramAndValueMap.put(queryParamStartDate, startDate);
-		}
-		
-		if (endDate != null) {
-			whereClause += (StringUtils.isBlank(whereClause) ? " WHERE " : " AND") + " e." + dateProperty + " <= :"
-			        + queryParamEndDate;
-			paramAndValueMap.put(queryParamEndDate, endDate);
-		}
-		
-		Integer count = producerTemplate.requestBodyAndHeader(
-		    "jpa:" + getName() + "?query=SELECT count(*) FROM " + getName() + " e " + whereClause, null,
-		    JPA_PARAMETERS_HEADER, paramAndValueMap, Integer.class);
-		
-		if (count == 0) {
-			results.put(FIELD_COUNT, 0);
-			results.put(FIELD_ITEMS, Collections.emptyList());
-			return results;
-		}
-		
-		List<Object> items = producerTemplate.requestBodyAndHeader("jpa:" + getName() + "?query=SELECT e FROM " + getName()
-		        + " e " + whereClause + " &maximumResults=" + DEFAULT_MAX_COUNT,
-		    null, JPA_PARAMETERS_HEADER, paramAndValueMap, List.class);
-		
-		results.put(FIELD_COUNT, count);
-		results.put(FIELD_ITEMS, items);
-		
-		return results;
+	public static Date parseAndRollToEndOfDay(String date) {
+		LocalDateTime ldt = LocalDate.parse(date, RestConstants.DATE_FORMATTER).atTime(LocalTime.MAX);
+		return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
 	}
 	
 	public String getName() {
