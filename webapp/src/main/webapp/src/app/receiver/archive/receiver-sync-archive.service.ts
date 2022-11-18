@@ -17,11 +17,11 @@ export class ReceiverSyncArchiveService extends BaseService<ReceiverSyncArchive>
 	}
 
 	searchByDateReceived(startDate: string, endDate: string): Observable<ReceiverSyncArchiveCountAndItems> {
-		return this.searchCountAndItems(RESOURCE_NAME, {startDate: startDate, endDate: endDate})
+		return this.searchCountAndItems(RESOURCE_NAME, {startDate: startDate, endDate: endDate, groupProperty: ''})
 	}
 
-	getTotalCountAndGroupedArchives(groupProperty: string): Observable<TotalCountAndGroupedItems> {
-		return this.getTotalCountAndGroupedItems(RESOURCE_NAME, groupProperty);
+	searchByDateReceivedAndGroup(startDate: string, endDate: string, groupProperty: string): Observable<TotalCountAndGroupedItems> {
+		return this.searchCountAndGroupedItems(RESOURCE_NAME, {startDate: startDate, endDate: endDate}, groupProperty);
 	}
 
 }

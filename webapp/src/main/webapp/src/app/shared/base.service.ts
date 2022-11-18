@@ -37,4 +37,11 @@ export abstract class BaseService<T extends BaseEntity> {
 			params: paramsData
 		});
 	}
+
+	searchCountAndGroupedItems(resource: string, paramsData: { [param: string]: any }, groupProperty: string): Observable<TotalCountAndGroupedItems> {
+		return this.httpClient.get<TotalCountAndGroupedItems>(environment.apiBaseUrl + resource, {
+			params: {...paramsData, groupProperty: groupProperty}
+		});
+	}
+
 }

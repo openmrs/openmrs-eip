@@ -19,7 +19,7 @@ export class ReceiverArchiveGroupViewComponent extends BaseReceiverGroupViewComp
 	}
 
 	getTotalCountAndGroupedItems(groupProperty: string): Observable<TotalCountAndGroupedItems> {
-		return this.service.getTotalCountAndGroupedArchives(groupProperty);
+		return this.service.searchByDateReceivedAndGroup('', '', groupProperty);
 	}
 
 	getSelector(): MemoizedSelector<object, Map<string, number> | undefined, DefaultProjectorFn<Map<string, number> | undefined>> {
