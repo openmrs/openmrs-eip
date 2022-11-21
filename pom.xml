@@ -5,7 +5,7 @@
     <groupId>org.openmrs.eip</groupId>
     <artifactId>openmrs-eip</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.0</version>
 
     <modules>
         <module>openmrs-watcher</module>
@@ -40,7 +40,7 @@
         <connection>scm:git:git@github.com:openmrs/openmrs-eip</connection>
         <developerConnection>scm:git:git@github.com:openmrs/openmrs-eip</developerConnection>
         <url>https://github.com/openmrs/openmrs-eip</url>
-      <tag>HEAD</tag>
+      <tag>openmrs-eip-3.1.0</tag>
   </scm>
 
     <dependencyManagement>
