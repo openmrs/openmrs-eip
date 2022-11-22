@@ -326,7 +326,13 @@
 				<target>Data da Ultima Sincronizacao</target>
 			</segment>
 		</unit>
-		<unit id="common-sync-msgs">
+		<unit id="receiver-sync-msgs">
+			<segment>
+				<source>Pending Sync Items</source>
+				<target>Eventos Pendentes</target>
+			</segment>
+		</unit>
+		<unit id="sender-sync-msgs">
 			<segment>
 				<source>Sync Items</source>
 				<target>Caixa de Saída</target>
