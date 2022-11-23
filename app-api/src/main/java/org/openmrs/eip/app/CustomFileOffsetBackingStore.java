@@ -1,6 +1,7 @@
 package org.openmrs.eip.app;
 
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
+import org.openmrs.eip.app.sender.OffsetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,22 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 		paused = false;
 		if (log.isDebugEnabled()) {
 			log.debug("Removing pause on saving of offsets");
+		}
+	}
+	
+	/**
+	 * @see FileOffsetBackingStore#start()
+	 */
+	@Override
+	public synchronized void start() {
+		super.start();
+		
+		try {
+			OffsetUtils.verifyOffsetAndResetIfInvalid(data);
+		}
+		catch (Exception e) {
+			log.error("An error occurred while verifying the existing debezium offset file data", e);
+			AppUtils.shutdown();
 		}
 	}
 	

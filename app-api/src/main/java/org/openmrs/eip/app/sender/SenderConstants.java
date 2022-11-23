@@ -8,6 +8,12 @@ public class SenderConstants {
 	
 	public static final String PROP_SENDER_ID = "db-sync.senderId";
 	
+	public static final String PROP_DBZM_SERVER_ID = "debezium.db.serverId";
+	
+	public static final String PROP_DBZM_DB_USER = "debezium.db.user";
+	
+	public static final String PROP_DBZM_DB_PASSWORD = "debezium.db.password";
+	
 	public static final String EX_PROP_EVENT = "event";
 	
 	public static final String EX_PROP_DBZM_EVENT = "dbzmEvent";
@@ -69,5 +75,13 @@ public class SenderConstants {
 	public static final String ERROR_HANDLER_REF = "outBoundErrorHandler";
 	
 	public static final String MASK = "#####";
+	
+	public static final String OFFSET_PROP_FILE = "file";
+	
+	public static final String OFFSET_PROP_POSITION = "pos";
+	
+	public static final String OFFSET_PROP_ROW = "row";
+	
+	public static final String OFFSET_PROP_EVENT = "event";
 	
 }

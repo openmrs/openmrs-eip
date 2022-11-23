@@ -28,6 +28,10 @@ public class Constants {
 	
 	public static final String PROP_OPENMRS_PASS = "openmrs.password";
 	
+	public static final String PROP_OPENMRS_DB_HOST = "openmrs.db.host";
+	
+	public static final String PROP_OPENMRS_DB_PORT = "openmrs.db.port";
+	
 	public static final String PROP_IGNORE_MISSING_HASH = "receiver.ignore.missing.hash.for.existing.entity";
 	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
