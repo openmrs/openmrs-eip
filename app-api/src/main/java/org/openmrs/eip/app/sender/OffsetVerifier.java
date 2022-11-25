@@ -69,7 +69,7 @@ public class OffsetVerifier extends BaseBinlogClient {
 	 */
 	@Override
 	public void onEvent(Event event) {
-		log.info("Received first event after binlog position " + binlogPosition + " -> " + event);
+		log.info("Received event -> " + event);
 		
 		setResult(OffsetVerificationResult.PASS);
 		disconnect();

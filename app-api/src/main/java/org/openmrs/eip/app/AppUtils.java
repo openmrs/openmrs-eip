@@ -25,6 +25,8 @@ public class AppUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(AppUtils.class);
 	
+	private static final int EXIT_CODE = 129;
+	
 	private static final Properties PROPERTIES;
 	
 	private static boolean appContextStopping = false;
@@ -143,6 +145,15 @@ public class AppUtils {
 	 * Shuts down the application
 	 */
 	public synchronized static void shutdown() {
+		shutdown(true);
+	}
+	
+	/**
+	 * Shuts down the application
+	 * 
+	 * @param async specifies if the shutdown should happen asynchronously or not
+	 */
+	public synchronized static void shutdown(boolean async) {
 		if (isShuttingDown()) {
 			return;
 		}
@@ -151,8 +162,12 @@ public class AppUtils {
 		
 		log.info("Shutting down the application...");
 		
-		//Shutdown in a new thread to ensure other background shutdown threads complete too
-		new Thread(() -> System.exit(129)).start();
+		if (async) {
+			//Shutdown in a new thread to ensure other background framework shutdown threads complete too
+			new Thread(() -> System.exit(EXIT_CODE)).start();
+		} else {
+			System.exit(EXIT_CODE);
+		}
 	}
 	
 	/**

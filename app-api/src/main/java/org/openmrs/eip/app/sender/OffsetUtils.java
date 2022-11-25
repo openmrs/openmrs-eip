@@ -47,7 +47,7 @@ public class OffsetUtils {
 		}
 		
 		if (result == OffsetVerificationResult.RESET) {
-			log.info("Resetting binlog position to start");
+			log.info("Resetting offset to start position");
 			
 			BinlogPosition newPosition = new BinlogPosition(binlogPosition.getFilename(), 4);
 			parsedOffsetData.put(SenderConstants.OFFSET_PROP_FILE, newPosition.getFilename());
@@ -59,7 +59,7 @@ public class OffsetUtils {
 			
 			log.info("Successfully reset offset to start at binlog position " + newPosition);
 		} else {
-			throw new EIPException("Failed to verify existing offset" + parsedOffsetData);
+			throw new EIPException("Failed to verify existing offset: " + parsedOffsetData);
 		}
 	}
 	

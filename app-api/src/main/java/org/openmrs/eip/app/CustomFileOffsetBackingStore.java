@@ -59,14 +59,14 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	 */
 	@Override
 	public synchronized void start() {
-		super.start();
+		doStart();
 		
 		try {
 			OffsetUtils.verifyOffsetAndResetIfInvalid(data);
 		}
 		catch (Exception e) {
 			log.error("An error occurred while verifying the existing debezium offset file data", e);
-			AppUtils.shutdown();
+			AppUtils.shutdown(false);
 		}
 	}
 	
@@ -98,6 +98,10 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	protected void doSave() {
 		super.save();
+	}
+	
+	protected void doStart() {
+		super.start();
 	}
 	
 }
