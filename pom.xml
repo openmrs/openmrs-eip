@@ -19,7 +19,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <mysqlConnectorVersion>8.0.16</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <sprintBootVersion>2.3.0.RELEASE</sprintBootVersion>
         <hibernateVersion>5.4.21.Final</hibernateVersion>
         <hibernateValidatorVersion>6.1.5.Final</hibernateValidatorVersion>
