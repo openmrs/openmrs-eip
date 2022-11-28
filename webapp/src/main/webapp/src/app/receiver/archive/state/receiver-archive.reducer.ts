@@ -2,6 +2,7 @@ import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ReceiverArchiveAction, ReceiverArchiveActionType} from "./receiver-archive.actions";
 import {ViewInfo} from "../../shared/view-info";
 import {ReceiverSyncArchive} from "../receiver-sync-archive";
+import {DateRange} from "../../../shared/date-range";
 
 export interface ReceiverArchiveState {
 
@@ -12,6 +13,8 @@ export interface ReceiverArchiveState {
 	syncItems?: ReceiverSyncArchive[];
 
 	siteCountMap?: Map<string, number>;
+
+	filterDateRange?: DateRange;
 
 }
 
@@ -37,6 +40,11 @@ export const GET_ARCHIVE_GRP_PROP_COUNT_MAP = createSelector(
 	state => state.siteCountMap
 );
 
+export const GET_ARCHIVE_FILTER_DATE_RANGE = createSelector(
+	GET_SYNC_ARCHIVE_FEATURE_STATE,
+	state => state.filterDateRange
+);
+
 export function syncArchiveReducer(state = {}, action: ReceiverArchiveAction) {
 
 	switch (action.type) {
@@ -60,6 +68,12 @@ export function syncArchiveReducer(state = {}, action: ReceiverArchiveAction) {
 				...state,
 				totalCount: action.countAndGroupedItems?.count,
 				siteCountMap: action.countAndGroupedItems?.items
+			};
+
+		case ReceiverArchiveActionType.FILTER_ARCHIVES:
+			return {
+				...state,
+				filterDateRange: action.filterDateRange
 			};
 
 		default:

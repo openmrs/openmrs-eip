@@ -2,6 +2,7 @@ import {Action} from "@ngrx/store";
 import {ReceiverSyncArchiveCountAndItems} from "../receiver-sync-archive-count-and-items";
 import {ViewInfo} from "../../shared/view-info";
 import {TotalCountAndGroupedItems} from "../../../shared/total-count-and-grouped-items";
+import {DateRange} from "../../../shared/date-range";
 
 export enum ReceiverArchiveActionType {
 
@@ -9,7 +10,9 @@ export enum ReceiverArchiveActionType {
 
 	CHANGE_ARCHIVE_VIEW = 'CHANGE_ARCHIVE_VIEW',
 
-	GROUPED_ARCHIVES_LOADED = 'GROUPED_ARCHIVES_LOADED'
+	GROUPED_ARCHIVES_LOADED = 'GROUPED_ARCHIVES_LOADED',
+
+	FILTER_ARCHIVES = 'FILTER_ARCHIVES'
 
 }
 
@@ -40,4 +43,13 @@ export class GroupedArchivesLoaded implements Action {
 
 }
 
-export type ReceiverArchiveAction = ReceiverArchiveLoaded | ChangeArchivesView | GroupedArchivesLoaded;
+export class FilterArchives implements Action {
+
+	readonly type = ReceiverArchiveActionType.FILTER_ARCHIVES;
+
+	constructor(public filterDateRange?: DateRange) {
+	}
+
+}
+
+export type ReceiverArchiveAction = ReceiverArchiveLoaded | ChangeArchivesView | GroupedArchivesLoaded | FilterArchives;
