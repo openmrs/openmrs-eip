@@ -1,25 +1,3 @@
-<div class="archives-filter">
-	<table class="text-center">
-		<tr>
-			<th></th>
-			<th i18n="@@common-from">From</th>
-			<th i18n="@@common-to">To</th>
-			<th></th>
-		</tr>
-		<tr>
-			<td class="pr-2" i18n="@@receiver-filter-by-date-received">Filter By Date Received:</td>
-			<td><input type="date" [(ngModel)]="startDate" /></td>
-			<td><input type="date" [(ngModel)]="endDate" /></td>
-			<td class="pl-2">
-				<button class="btn btn-outline-primary btn-sm" (click)="filterByDateReceived()"
-						[disabled]="(startDate == undefined || startDate == '') && (endDate == undefined || endDate == '')">
-					<span i18n="@@common-filter">Filter</span>
-				</button>
-			</td>
-		</tr>
-	</table>
-</div>
-<div class="ui-bar-spacer"></div>
 <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
 	<thead>
 	<tr>

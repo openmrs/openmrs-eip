@@ -1,9 +1,18 @@
-import {Component} from '@angular/core';
-import {DefaultProjectorFn, MemoizedSelector, Store} from '@ngrx/store';
+import {Component, ViewChild} from '@angular/core';
+import {DefaultProjectorFn, MemoizedSelector, select, Store} from '@ngrx/store';
 import {ViewInfo} from "../shared/view-info";
-import {GET_ARCHIVE_TOTAL_COUNT, GET_ARCHIVE_VIEW} from "./state/receiver-archive.reducer";
+import {
+	GET_ARCHIVE_FILTER_DATE_RANGE,
+	GET_ARCHIVE_TOTAL_COUNT,
+	GET_ARCHIVE_VIEW
+} from "./state/receiver-archive.reducer";
 import {BaseReceiverMultipleViewComponent} from "../shared/base-receiver-multiple-view.component";
-import {ChangeArchivesView} from "./state/receiver-archive.actions";
+import {ChangeArchivesView, FilterArchives} from "./state/receiver-archive.actions";
+import {DateRange} from "../../shared/date-range";
+import {Subscription} from "rxjs";
+import {ReceiverArchiveListViewComponent} from "./view/list/receiver-archive-list-view.component";
+import {ReceiverArchiveGroupViewComponent} from "./view/group/receiver-archive-group-view.component";
+import {View} from "../shared/view.enum";
 
 @Component({
 	selector: 'receiver-archives',
@@ -11,8 +20,37 @@ import {ChangeArchivesView} from "./state/receiver-archive.actions";
 })
 export class ReceiverArchiveComponent extends BaseReceiverMultipleViewComponent {
 
+	startDate?: string;
+
+	endDate?: string;
+
+	filterSubscription?: Subscription;
+
+	filterDateRange?: DateRange;
+
+	@ViewChild(ReceiverArchiveListViewComponent)
+	listView?: ReceiverArchiveListViewComponent;
+
+	@ViewChild(ReceiverArchiveGroupViewComponent)
+	groupView?: ReceiverArchiveGroupViewComponent;
+
 	constructor(store: Store) {
 		super(store);
+	}
+
+	ngOnInit() {
+		this.filterSubscription = this.store.pipe(select(GET_ARCHIVE_FILTER_DATE_RANGE)).subscribe(
+			dateRange => {
+				this.filterDateRange = dateRange;
+				if (this.viewInfo?.view == View.LIST) {
+					this.listView?.filterByDateReceived(this.filterDateRange);
+				} else {
+
+				}
+			}
+		);
+
+		super.ngOnInit();
 	}
 
 	getViewTotalCountSelector(): MemoizedSelector<object, number | undefined, DefaultProjectorFn<number | undefined>> {
@@ -25,6 +63,30 @@ export class ReceiverArchiveComponent extends BaseReceiverMultipleViewComponent 
 
 	createChangeViewAction(viewInfo: ViewInfo): ChangeArchivesView {
 		return new ChangeArchivesView(viewInfo);
+	}
+
+	reset() {
+		//Clear the filters from the state so that when the component is redrawn there is none
+		this.store.dispatch(new FilterArchives(undefined));
+	}
+
+	filterByDateReceived() {
+		let clearAction: any;
+		if (this.viewInfo?.view == View.LIST) {
+			clearAction = this.listView?.getClearAction();
+		} else {
+
+		}
+
+		//Clear table content before the filter is applied
+		this.store.dispatch(clearAction);
+		this.store.dispatch(new FilterArchives(new DateRange(this.startDate, this.endDate)));
+	}
+
+	ngOnDestroy(): void {
+		super.ngOnDestroy();
+		this.filterSubscription?.unsubscribe();
+		this.reset();
 	}
 
 }

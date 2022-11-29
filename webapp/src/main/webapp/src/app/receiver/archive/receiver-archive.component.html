@@ -12,9 +12,30 @@
 <h5>
 	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
 </h5>
+<div class="archives-filter">
+	<table class="text-center">
+		<tr>
+			<th></th>
+			<th i18n="@@common-from">From</th>
+			<th i18n="@@common-to">To</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td class="pr-2" i18n="@@receiver-filter-by-date-received">Filter By Date Received:</td>
+			<td><input type="date" [(ngModel)]="startDate" /></td>
+			<td><input type="date" [(ngModel)]="endDate" /></td>
+			<td class="pl-2">
+				<button class="btn btn-outline-primary btn-sm" (click)="filterByDateReceived()"
+						[disabled]="(!startDate || startDate == '') && (!endDate || endDate == '')">
+					<span i18n="@@common-filter">Filter</span>
+				</button>
+			</td>
+		</tr>
+	</table>
+</div>
 <div class="ui-bar-spacer"></div>
 <ng-container [ngSwitch]="viewInfo?.view">
-	<receiver-archive-list-view *ngSwitchCase="view.LIST"></receiver-archive-list-view>
+	<receiver-archive-list-view [filterDateRange]="filterDateRange" *ngSwitchCase="view.LIST"></receiver-archive-list-view>
 	<receiver-archive-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-archive-group-view>
 	<receiver-archive-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.ENTITY"></receiver-archive-group-view>
 </ng-container>

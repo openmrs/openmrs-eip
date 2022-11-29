@@ -17,7 +17,7 @@ export abstract class BaseReceiverMultipleViewComponent implements OnInit, OnDes
 
 	viewSubscription?: Subscription;
 
-	protected constructor(private store: Store) {
+	protected constructor(protected store: Store) {
 	}
 
 	ngOnInit(): void {
