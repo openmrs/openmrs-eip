@@ -41,12 +41,7 @@ export class ReceiverArchiveComponent extends BaseReceiverMultipleViewComponent 
 	ngOnInit() {
 		this.filterSubscription = this.store.pipe(select(GET_ARCHIVE_FILTER_DATE_RANGE)).subscribe(
 			dateRange => {
-				this.filterDateRange = dateRange;
-				if (this.viewInfo?.view == View.LIST) {
-					this.listView?.filterByDateReceived(this.filterDateRange);
-				} else {
-
-				}
+				this.filterByDateReceived(dateRange);
 			}
 		);
 
@@ -70,17 +65,26 @@ export class ReceiverArchiveComponent extends BaseReceiverMultipleViewComponent 
 		this.store.dispatch(new FilterArchives(undefined));
 	}
 
-	filterByDateReceived() {
+	applyDateReceivedFilter() {
 		let clearAction: any;
 		if (this.viewInfo?.view == View.LIST) {
 			clearAction = this.listView?.getClearAction();
 		} else {
-
+			clearAction = this.groupView?.getClearAction();
 		}
 
 		//Clear table content before the filter is applied
 		this.store.dispatch(clearAction);
 		this.store.dispatch(new FilterArchives(new DateRange(this.startDate, this.endDate)));
+	}
+
+	filterByDateReceived(dateRange?: DateRange) {
+		this.filterDateRange = dateRange;
+		if (this.viewInfo?.view == View.LIST) {
+			this.listView?.filterByDateReceived(this.filterDateRange);
+		} else {
+			this.groupView?.filterByDateReceived(this.filterDateRange);
+		}
 	}
 
 	ngOnDestroy(): void {

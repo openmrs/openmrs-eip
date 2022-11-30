@@ -25,7 +25,7 @@
 			<td><input type="date" [(ngModel)]="startDate" /></td>
 			<td><input type="date" [(ngModel)]="endDate" /></td>
 			<td class="pl-2">
-				<button class="btn btn-outline-primary btn-sm" (click)="filterByDateReceived()"
+				<button class="btn btn-outline-primary btn-sm" (click)="applyDateReceivedFilter()"
 						[disabled]="(!startDate || startDate == '') && (!endDate || endDate == '')">
 					<span i18n="@@common-filter">Filter</span>
 				</button>
@@ -36,6 +36,6 @@
 <div class="ui-bar-spacer"></div>
 <ng-container [ngSwitch]="viewInfo?.view">
 	<receiver-archive-list-view [filterDateRange]="filterDateRange" *ngSwitchCase="view.LIST"></receiver-archive-list-view>
-	<receiver-archive-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-archive-group-view>
-	<receiver-archive-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.ENTITY"></receiver-archive-group-view>
+	<receiver-archive-group-view [filterDateRange]="filterDateRange" [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-archive-group-view>
+	<receiver-archive-group-view [filterDateRange]="filterDateRange" [viewInfo]="viewInfo" *ngSwitchCase="view.ENTITY"></receiver-archive-group-view>
 </ng-container>

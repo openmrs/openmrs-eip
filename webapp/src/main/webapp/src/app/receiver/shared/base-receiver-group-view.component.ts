@@ -16,7 +16,7 @@ export abstract class BaseReceiverGroupViewComponent implements OnInit {
 
 	loadedSubscription?: Subscription;
 
-	protected constructor(private store: Store, private classPipe: ModelClassPipe) {
+	protected constructor(protected store: Store, private classPipe: ModelClassPipe) {
 	}
 
 	ngOnInit(): void {
