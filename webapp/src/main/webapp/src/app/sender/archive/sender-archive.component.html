@@ -1,4 +1,4 @@
-<div class="archives-filter">
+<div class="float-right">
 	<table class="text-center">
 		<tr>
 			<th></th>
@@ -19,7 +19,9 @@
 		</tr>
 	</table>
 </div>
-<h5><span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span></h5>
+<h5>
+	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
+</h5>
 <div class="ui-bar-spacer"></div>
 <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
 	<thead>

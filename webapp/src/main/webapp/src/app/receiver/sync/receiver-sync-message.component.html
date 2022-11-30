@@ -1,7 +1,7 @@
-<div class="float-right">
-	<span i18n="@@common-view">View</span>:&nbsp;
+<div class="ui-inline-menu">
+	<span class="font-weight-bold" i18n="@@common-view">View</span>&nbsp;
 	<div ngbDropdown class="d-inline-block">
-		<button class="btn btn-outline-primary" ngbDropdownToggle>{{viewInfo?.viewLabel}}</button>
+		<button class="btn btn-outline-secondary" ngbDropdownToggle>{{viewInfo?.viewLabel}}</button>
 		<div ngbDropdownMenu>
 			<button ngbDropdownItem (click)="changeToListView()" i18n="@@common-list">List</button>
 			<button ngbDropdownItem (click)="changeToSiteView()" i18n="@@common-health-facility">Health Facility</button>

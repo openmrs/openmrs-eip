@@ -1,6 +1,6 @@
 export class DateRange {
 
-	constructor(public start: string | undefined, public end: string | undefined) {
+	constructor(public start?: string, public end?: string) {
 	}
 
 }

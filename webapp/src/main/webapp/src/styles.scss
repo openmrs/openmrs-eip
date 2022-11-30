@@ -48,6 +48,14 @@ body {
 	background-color: $themeColorSecondary;
 }
 
+.ui-inline-menu {
+	@extend .pb-2;
+	@extend .mb-3;
+	border-bottom-style: double;
+	border-bottom-width: 2px !important;
+	border-bottom-color: $themeColorSecondary;
+}
+
 .ui-bar-spacer {
 	height: 10px !important; clear: both !important;
 }
@@ -140,10 +148,6 @@ body {
 
 .ui-no-wrap {
 	white-space: nowrap;
-}
-
-.archives-filter {
-	float: right !important;
 }
 
 
