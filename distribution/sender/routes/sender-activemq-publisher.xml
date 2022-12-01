@@ -41,7 +41,7 @@
             <log loggingLevel="TRACE" message="Encrypted sync payload -> ${body}" />
         </when>
 
-        <log message="Sending sync payload to sync destination: {{camel.output.endpoint}}" />
+        <log loggingLevel="DEBUG" message="Sending sync payload to sync destination: {{camel.output.endpoint}}" />
 
         <toD uri="{{camel.output.endpoint}}" />
 
