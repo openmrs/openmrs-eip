@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.spi.CamelEvent.CamelContextStartedEvent;
@@ -44,9 +45,9 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
-	private static ExecutorService siteExecutor;
+	private ExecutorService siteExecutor;
 	
-	private static ExecutorService msgExecutor;
+	private ExecutorService msgExecutor;
 	
 	@Value("${" + PROP_SITE_PARALLEL_SIZE + ":" + DEFAULT_SITE_PARALLEL_SIZE + "}")
 	private int parallelSiteSize;
@@ -67,7 +68,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				throw new EIPException("No value set for application property: " + Constants.PROP_OPENMRS_USER);
 			}
 			
-			UserLightRepository userListRepo = SyncContext.getBean(UserLightRepository.class);
 			UserRepository userRepo = SyncContext.getBean(UserRepository.class);
 			User exampleUser = new User();
 			exampleUser.setUsername(username);
@@ -78,7 +78,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				AppUtils.shutdown();
 			}
 			
-			SyncContext.setAppUser(userListRepo.findById(optional.get().getId()).get());
+			UserLightRepository userLightRepo = SyncContext.getBean(UserLightRepository.class);
+			SyncContext.setAppUser(userLightRepo.findById(optional.get().getId()).get());
 			
 			log.info("Loading OpenMRS admin user account");
 			exampleUser = new User();
@@ -90,14 +91,15 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				AppUtils.shutdown();
 			}
 			
-			SyncContext.setAdminUser(userListRepo.findById(optional.get().getId()).get());
+			SyncContext.setAdminUser(userLightRepo.findById(optional.get().getId()).get());
 			
 			log.info("Starting sync message consumer threads, one per site");
 			
-			Collection<SiteInfo> sites = ReceiverContext.getSites();
 			siteExecutor = Executors.newFixedThreadPool(parallelSiteSize);
 			msgExecutor = Executors.newFixedThreadPool(threads);
 			
+			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
+			        .collect(Collectors.toList());
 			sites.parallelStream().forEach((site) -> {
 				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
 				

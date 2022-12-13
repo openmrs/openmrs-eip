@@ -20,15 +20,14 @@ public final class ReceiverContext {
 	
 	private static Map<String, SiteInfo> siteNameAndInfoMap = null;
 	
-	private static Map<String, SiteInfo> getSiteNameAndInfoMap() {
+	protected static Map<String, SiteInfo> getSiteNameAndInfoMap() {
 		synchronized (ReceiverContext.class) {
 			if (siteNameAndInfoMap == null) {
 				log.info("Loading sites...");
 				
 				ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 				String siteClass = SiteInfo.class.getSimpleName();
-				final String siteQueryUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass
-				        + " s WHERE s.disabled = false";
+				final String siteQueryUri = "jpa:" + siteClass + " ?query=SELECT s FROM " + siteClass + " s";
 				List<SiteInfo> sites = producerTemplate.requestBody(siteQueryUri, null, List.class);
 				siteNameAndInfoMap = new HashMap(sites.size());
 				sites.stream().forEach((site) -> siteNameAndInfoMap.put(site.getIdentifier().toLowerCase(), site));
