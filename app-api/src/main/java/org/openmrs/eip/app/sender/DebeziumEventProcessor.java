@@ -33,7 +33,7 @@ public class DebeziumEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
 	
 	@Override
 	public boolean processInParallel(DebeziumEvent item) {
-		return item.getEvent().getSnapshot();
+		return true;
 	}
 	
 	@Override

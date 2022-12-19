@@ -45,10 +45,10 @@ public class SenderSyncMessageProcessorTest {
 	}
 	
 	@Test
-	public void processInParallel_shouldReturnFalseForNonSnapshotEvent() {
+	public void processInParallel_shouldReturnTrueForNonSnapshotEvent() {
 		SenderSyncMessage msg = new SenderSyncMessage();
 		msg.setSnapshot(false);
-		Assert.assertFalse(processor.processInParallel(msg));
+		Assert.assertTrue(processor.processInParallel(msg));
 	}
 	
 	@Test

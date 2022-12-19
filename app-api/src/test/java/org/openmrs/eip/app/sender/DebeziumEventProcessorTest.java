@@ -68,10 +68,10 @@ public class DebeziumEventProcessorTest {
 	}
 	
 	@Test
-	public void processInParallel_shouldReturnFalseForNonSnapshotEvent() {
+	public void processInParallel_shouldReturnTrueForNonSnapshotEvent() {
 		DebeziumEvent de = createEvent();
 		de.getEvent().setSnapshot(false);
-		Assert.assertFalse(processor.processInParallel(de));
+		Assert.assertTrue(processor.processInParallel(de));
 	}
 	
 	@Test
