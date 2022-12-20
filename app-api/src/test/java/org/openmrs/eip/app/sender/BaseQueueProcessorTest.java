@@ -2,7 +2,8 @@ package org.openmrs.eip.app.sender;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
-import static org.openmrs.eip.app.sender.SenderConstants.URI_DBZM_EVENT_PROCESSOR;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,6 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseParallelProcessor;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
@@ -32,12 +35,53 @@ import org.powermock.reflect.Whitebox;
 
 public class BaseQueueProcessorTest {
 	
-	private DebeziumEventProcessor processor;
+	private static final String MOCK_URI = "mock:uri";
+	
+	private TestEventProcessor processor;
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
 	private static ExecutorService executor;
+	
+	public class TestEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
+		
+		@Override
+		public String getProcessorName() {
+			return "test proc";
+		}
+		
+		@Override
+		public String getItemKey(DebeziumEvent item) {
+			return item.getEvent().getTableName() + "#" + item.getEvent().getPrimaryKeyId();
+		}
+		
+		@Override
+		public boolean processInParallel(DebeziumEvent item) {
+			return item.getEvent().getSnapshot();
+		}
+		
+		@Override
+		public String getQueueName() {
+			return "test-proc";
+		}
+		
+		@Override
+		public String getThreadName(DebeziumEvent event) {
+			String name = event.getEvent().getTableName() + "-" + event.getEvent().getPrimaryKeyId() + "-" + event.getId();
+			if (StringUtils.isNotBlank(event.getEvent().getIdentifier())) {
+				name += ("-" + event.getEvent().getIdentifier());
+			}
+			
+			return name;
+		}
+		
+		@Override
+		public String getDestinationUri() {
+			return MOCK_URI;
+		}
+		
+	}
 	
 	@BeforeClass
 	public static void beforeClass() {
@@ -57,8 +101,8 @@ public class BaseQueueProcessorTest {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 	}
 	
-	private DebeziumEventProcessor createProcessor(int threadCount) {
-		processor = new DebeziumEventProcessor();
+	private TestEventProcessor createProcessor(int threadCount) {
+		processor = new TestEventProcessor();
 		Whitebox.setInternalState(processor, int.class, threadCount);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		return processor;
@@ -77,7 +121,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllSnapshotEventsInParallelForSlowThreads() throws Exception {
+	public void process_shouldProcessAllEventsInParallelForSlowThreadsIfParallelismIsSupported() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -93,7 +137,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -108,13 +152,14 @@ public class BaseQueueProcessorTest {
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			Assert.assertTrue(expectedResults.contains(event.getId()));
+			assertTrue(expectedResults.contains(event.getId()));
+			assertNotEquals(originalThreadName, expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0]);
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	
 	@Test
-	public void process_shouldProcessAllSnapshotEventsInParallelForFastThreads() throws Exception {
+	public void process_shouldProcessAllEventsInParallelForFastThreadsIfParallelismIsSupported() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -129,7 +174,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -144,13 +189,14 @@ public class BaseQueueProcessorTest {
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			Assert.assertTrue(expectedResults.contains(event.getId()));
+			assertTrue(expectedResults.contains(event.getId()));
+			assertNotEquals(originalThreadName, expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0]);
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 	}
 	
 	@Test
-	public void process_shouldProcessAllNonSnapshotEventsInSerialInCurrentThread() throws Exception {
+	public void process_shouldProcessAllEventsInSerialIfParallelismIsNotSupported() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 10;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -165,7 +211,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				threadNames.add(Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -188,7 +234,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAMixOfSnapshotAndNonSnapshotEventsAndMaintainTheIndicesOfNonSnapshots()
+	public void process_shouldProcessAMixOfParallelAndNonParallelEventsAndMaintainTheIndicesOfNonParallelEvents()
 	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
@@ -217,7 +263,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -232,7 +278,7 @@ public class BaseQueueProcessorTest {
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			Assert.assertTrue(expectedResults.contains(event.getId()));
+			assertTrue(expectedResults.contains(event.getId()));
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
@@ -247,7 +293,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAMixOfEventsWithAllSnapshotAtTheStartOfTheQueue() throws Exception {
+	public void process_shouldProcessAMixOfEventsWithAllParallelEventsAtTheStartOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -263,7 +309,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		List<Integer> nonSnapshotMsgIndices = new ArrayList();
@@ -276,7 +322,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -292,7 +338,7 @@ public class BaseQueueProcessorTest {
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			Assert.assertTrue(expectedResults.contains(event.getId()));
+			assertTrue(expectedResults.contains(event.getId()));
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
@@ -307,7 +353,7 @@ public class BaseQueueProcessorTest {
 		
 		//Snapshots should all have been first synced before incremental events
 		for (int i = 0; i < size / 2; i++) {
-			Assert.assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
+			assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
@@ -316,7 +362,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAMixOfEventsWithAllSnapshotAtTheEndOfTheQueue() throws Exception {
+	public void process_shouldProcessAMixOfEventsWithAllParallelEventsAtTheEndOfTheQueue() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 50;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -333,7 +379,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
@@ -345,7 +391,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -361,11 +407,11 @@ public class BaseQueueProcessorTest {
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			Assert.assertTrue(expectedResults.contains(event.getId()));
+			assertTrue(expectedResults.contains(event.getId()));
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
 		}
 		
-		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
+		//Non-snapshot events are only processed after all snapshot events ahead of them so the order which they are
 		//processed is preserved and should have been processed in the current thread
 		for (Integer i : nonSnapshotMsgIndices) {
 			DebeziumEvent event = events.get(i);
@@ -380,12 +426,12 @@ public class BaseQueueProcessorTest {
 		}
 		
 		for (int i = (size / 2); i < size; i++) {
-			Assert.assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
+			assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
 		}
 	}
 	
 	@Test
-	public void process_shouldProcessSnapshotEventsInSerialForTheSameRow() throws Exception {
+	public void process_shouldProcessEventsInSerialForItemsWithTheSameKeyEvenIfParallelismIsSupported() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 5;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -402,7 +448,7 @@ public class BaseQueueProcessorTest {
 				expectedResults.add(arg.getId());
 				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
 				return null;
-			}).when(mockProducerTemplate).sendBody(URI_DBZM_EVENT_PROCESSOR, m);
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -417,6 +463,7 @@ public class BaseQueueProcessorTest {
 		
 		DebeziumEvent firstMsg = events.get(0);
 		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
+		assertNotEquals(originalThreadName, expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[0]);
 		assertEquals(processor.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[2]);
 		
 		//All other events for the same row are only processed in serial after first snapshot events is encountered
@@ -441,7 +488,7 @@ public class BaseQueueProcessorTest {
 		
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 		exchange.getIn().setBody(events);
-		DebeziumEventProcessor processor = createProcessor(size);
+		TestEventProcessor processor = createProcessor(size);
 		
 		processor.process(exchange);
 		
