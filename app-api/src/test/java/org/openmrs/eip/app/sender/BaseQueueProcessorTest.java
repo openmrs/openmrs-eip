@@ -433,7 +433,7 @@ public class BaseQueueProcessorTest {
 	@Test
 	public void process_shouldProcessEventsInSerialForItemsWithTheSameKeyEvenIfParallelismIsSupported() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 5;
+		final int size = 6;
 		List<DebeziumEvent> events = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
@@ -461,17 +461,18 @@ public class BaseQueueProcessorTest {
 		assertEquals(size, expectedResults.size());
 		assertEquals(size, expectedMsgIdThreadNameMap.size());
 		
-		DebeziumEvent firstMsg = events.get(0);
-		Assert.assertTrue(expectedResults.contains(firstMsg.getId()));
-		assertNotEquals(originalThreadName, expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[0]);
-		assertEquals(processor.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[2]);
-		
-		//All other events for the same row are only processed in serial after first snapshot events is encountered
-		for (int i = 1; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
+			assertTrue(expectedResults.contains(event.getId()));
 			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
+			String threadName = expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0];
+			if (i % 2 == 0) {
+				//Event was processed in parallel since there was none before it for the same item
+				assertNotEquals(originalThreadName, threadName);
+			} else {
+				//An event for the same row was processed in serial in same thread if there is another event before it
+				assertEquals(originalThreadName, threadName);
+			}
 		}
 	}
 	

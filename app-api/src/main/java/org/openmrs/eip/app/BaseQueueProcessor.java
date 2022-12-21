@@ -64,6 +64,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 					if (syncThreadFutures.size() > 0) {
 						waitForFutures(syncThreadFutures);
 						syncThreadFutures.clear();
+                        uniqueKeys.clear();
 					}
 					
 					producerTemplate.sendBody(getDestinationUri(), item);
