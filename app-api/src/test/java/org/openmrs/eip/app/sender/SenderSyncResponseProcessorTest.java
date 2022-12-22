@@ -2,7 +2,6 @@ package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 
@@ -31,11 +30,6 @@ public class SenderSyncResponseProcessorTest {
 		SenderSyncResponse msg = new SenderSyncResponse();
 		msg.setId(id);
 		assertEquals(id.toString(), processor.getItemKey(msg));
-	}
-	
-	@Test
-	public void processInParallel_shouldAlwaysReturnTrue() {
-		Assert.assertTrue(processor.processInParallel(null));
 	}
 	
 	@Test

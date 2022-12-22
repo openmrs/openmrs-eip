@@ -2,6 +2,7 @@ package org.openmrs.eip.app.sender;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +19,6 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -54,11 +54,6 @@ public class BaseQueueProcessorTest {
 		@Override
 		public String getItemKey(DebeziumEvent item) {
 			return item.getEvent().getTableName() + "#" + item.getEvent().getPrimaryKeyId();
-		}
-		
-		@Override
-		public boolean processInParallel(DebeziumEvent item) {
-			return item.getEvent().getSnapshot();
 		}
 		
 		@Override
@@ -121,7 +116,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllEventsInParallelForSlowThreadsIfParallelismIsSupported() throws Exception {
+	public void process_shouldProcessAllEventsInParallelForSlowThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -159,7 +154,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllEventsInParallelForFastThreadsIfParallelismIsSupported() throws Exception {
+	public void process_shouldProcessAllEventsInParallelForFastThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -196,252 +191,19 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllEventsInSerialIfParallelismIsNotSupported() throws Exception {
+	public void process_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKey() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 10;
-		List<DebeziumEvent> events = new ArrayList(size);
-		List<Long> expectedResults = new ArrayList(size);
-		List<String> threadNames = new ArrayList(size);
-		
-		for (int i = 0; i < size; i++) {
-			DebeziumEvent m = createDebeziumEvent(i, false);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				threadNames.add(Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
-		processor = createProcessor(size);
-		
-		processor.process(exchange);
-		
-		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, threadNames.size());
-		
-		for (int i = 0; i < size; i++) {
-			Assert.assertEquals(Long.valueOf(i), expectedResults.get(i));
-			DebeziumEvent event = events.get(i);
-			String threadName = threadNames.get(i);
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), threadName.split(":")[2]);
-		}
-	}
-	
-	@Test
-	public void process_shouldProcessAMixOfParallelAndNonParallelEventsAndMaintainTheIndicesOfNonParallelEvents()
-	    throws Exception {
-		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 100;
-		List<DebeziumEvent> events = new ArrayList(size);
-		List<Long> expectedResults = synchronizedList(new ArrayList(size));
-		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
-		
-		final int nonSnapshotMsgIndex15 = 15;
-		final int nonSnapshotMsgIndex23 = 23;
-		final int nonSnapshotMsgIndex24 = 24;
-		final int nonSnapshotMsgIndex38 = 25;
-		final int nonSnapshotMsgIndex49 = 98;
-		List<Integer> nonSnapshotMsgIndices = new ArrayList();
-		nonSnapshotMsgIndices.add(nonSnapshotMsgIndex15);
-		nonSnapshotMsgIndices.add(nonSnapshotMsgIndex23);
-		nonSnapshotMsgIndices.add(nonSnapshotMsgIndex24);
-		nonSnapshotMsgIndices.add(nonSnapshotMsgIndex38);
-		nonSnapshotMsgIndices.add(nonSnapshotMsgIndex49);
-		
-		for (int i = 0; i < size; i++) {
-			DebeziumEvent m = createDebeziumEvent(i, nonSnapshotMsgIndices.contains(i) ? false : true);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				Thread.sleep(500);
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
-		processor = createProcessor(size);
-		
-		processor.process(exchange);
-		
-		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
-		
-		for (int i = 0; i < size; i++) {
-			DebeziumEvent event = events.get(i);
-			assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-		
-		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
-		//processed is preserved and should have been processed in the current thread
-		for (Integer i : nonSnapshotMsgIndices) {
-			DebeziumEvent event = events.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-	}
-	
-	@Test
-	public void process_shouldProcessAMixOfEventsWithAllParallelEventsAtTheStartOfTheQueue() throws Exception {
-		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 50;
-		List<DebeziumEvent> events = new ArrayList(size);
-		List<Long> expectedResults = synchronizedList(new ArrayList(size));
-		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
-		
-		for (int i = 0; i < size / 2; i++) {
-			DebeziumEvent m = createDebeziumEvent(i, true);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				Thread.sleep(500);
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		List<Integer> nonSnapshotMsgIndices = new ArrayList();
-		for (int i = (size / 2); i < size; i++) {
-			nonSnapshotMsgIndices.add(i);
-			DebeziumEvent m = createDebeziumEvent(i, false);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
-		processor = createProcessor(size);
-		
-		processor.process(exchange);
-		
-		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
-		assertEquals(size / 2, nonSnapshotMsgIndices.size());
-		
-		for (int i = 0; i < size; i++) {
-			DebeziumEvent event = events.get(i);
-			assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-		
-		//Non-snapshot events are only processed after all snapshot events ahead of the so the order which they are
-		//processed is preserved and should have been processed in the current thread
-		for (Integer i : nonSnapshotMsgIndices) {
-			DebeziumEvent event = events.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-		
-		//Snapshots should all have been first synced before incremental events
-		for (int i = 0; i < size / 2; i++) {
-			assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
-		}
-		
-		for (int i = (size / 2); i < size; i++) {
-			Assert.assertFalse(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
-		}
-	}
-	
-	@Test
-	public void process_shouldProcessAMixOfEventsWithAllParallelEventsAtTheEndOfTheQueue() throws Exception {
-		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 50;
-		List<DebeziumEvent> events = new ArrayList(size);
-		List<Long> expectedResults = synchronizedList(new ArrayList(size));
-		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
-		
-		List<Integer> nonSnapshotMsgIndices = new ArrayList();
-		for (int i = 0; i < size / 2; i++) {
-			nonSnapshotMsgIndices.add(i);
-			DebeziumEvent m = createDebeziumEvent(i, false);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		for (int i = (size / 2); i < size; i++) {
-			DebeziumEvent m = createDebeziumEvent(i, true);
-			events.add(m);
-			Mockito.doAnswer(invocation -> {
-				Thread.sleep(500);
-				DebeziumEvent arg = invocation.getArgument(1);
-				expectedResults.add(arg.getId());
-				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
-				return null;
-			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
-		}
-		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
-		processor = createProcessor(size);
-		
-		processor.process(exchange);
-		
-		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
-		assertEquals(size / 2, nonSnapshotMsgIndices.size());
-		
-		for (int i = 0; i < size; i++) {
-			DebeziumEvent event = events.get(i);
-			assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-		
-		//Non-snapshot events are only processed after all snapshot events ahead of them so the order which they are
-		//processed is preserved and should have been processed in the current thread
-		for (Integer i : nonSnapshotMsgIndices) {
-			DebeziumEvent event = events.get(i);
-			String threadName = expectedMsgIdThreadNameMap.get(event.getId());
-			assertEquals(originalThreadName, threadName.split(":")[0]);
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-		}
-		
-		//Incremental events should all have been first synced before snapshot
-		for (int i = 0; i < size / 2; i++) {
-			Assert.assertFalse(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
-		}
-		
-		for (int i = (size / 2); i < size; i++) {
-			assertTrue(events.get(expectedResults.get(i).intValue()).getEvent().getSnapshot());
-		}
-	}
-	
-	@Test
-	public void process_shouldProcessEventsInSerialForItemsWithTheSameKeyEvenIfParallelismIsSupported() throws Exception {
-		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 6;
+		final int size = 20;
 		List<DebeziumEvent> events = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent m = createDebeziumEvent(i, true);
-			m.getEvent().setPrimaryKeyId("same-id");
-			m.getEvent().setIdentifier("same-uuid");
+			if (i % 4 == 0) {
+				m.getEvent().setPrimaryKeyId("same-id");
+				m.getEvent().setIdentifier("same-uuid");
+			}
 			events.add(m);
 			Mockito.doAnswer(invocation -> {
 				DebeziumEvent arg = invocation.getArgument(1);
@@ -458,20 +220,18 @@ public class BaseQueueProcessorTest {
 		processor.process(exchange);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
-		assertEquals(size, expectedResults.size());
-		assertEquals(size, expectedMsgIdThreadNameMap.size());
+		assertEquals(16, expectedResults.size());
+		assertEquals(16, expectedMsgIdThreadNameMap.size());
 		
 		for (int i = 0; i < size; i++) {
 			DebeziumEvent event = events.get(i);
-			assertTrue(expectedResults.contains(event.getId()));
-			assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
-			String threadName = expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0];
-			if (i % 2 == 0) {
-				//Event was processed in parallel since there was none before it for the same item
-				assertNotEquals(originalThreadName, threadName);
+			if (i > 0 && i % 4 == 0) {
+				assertFalse(expectedResults.contains(event.getId()));
 			} else {
-				//An event for the same row was processed in serial in same thread if there is another event before it
-				assertEquals(originalThreadName, threadName);
+				assertTrue(expectedResults.contains(event.getId()));
+				assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
+				String threadName = expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0];
+				assertNotEquals(originalThreadName, threadName);
 			}
 		}
 	}

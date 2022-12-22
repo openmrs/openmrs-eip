@@ -43,36 +43,35 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 			}
 			
 			final String key = getItemKey(item);
-			if (processInParallel(item) && !uniqueKeys.contains(key)) {
-				uniqueKeys.add(key);
-				
-				//TODO Periodically wait and reset futures to save memory
-				syncThreadFutures.add(CompletableFuture.runAsync(() -> {
-					final String originalThreadName = Thread.currentThread().getName();
-					try {
-						setThreadName(item);
-						producerTemplate.sendBody(getDestinationUri(), item);
-					}
-					finally {
-						Thread.currentThread().setName(originalThreadName);
-					}
-				}, executor));
-			} else {
+			if (uniqueKeys.contains(key)) {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(item);
-					if (syncThreadFutures.size() > 0) {
-						waitForFutures(syncThreadFutures);
-						syncThreadFutures.clear();
-                        uniqueKeys.clear();
+					if (log.isDebugEnabled()) {
+						log.debug("Postponed processing of {} because of an earlier unprocessed event for the same entity",
+						    item);
 					}
-					
+				}
+				finally {
+					Thread.currentThread().setName(originalThreadName);
+				}
+				
+				continue;
+			}
+			
+			uniqueKeys.add(key);
+			
+			//TODO Periodically wait and reset futures to save memory
+			syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+				final String originalThreadName = Thread.currentThread().getName();
+				try {
+					setThreadName(item);
 					producerTemplate.sendBody(getDestinationUri(), item);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
 				}
-			}
+			}, executor));
 		}
 		
 		if (syncThreadFutures.size() > 0) {
@@ -91,14 +90,6 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	 * @return the key
 	 */
 	public abstract String getItemKey(T item);
-	
-	/**
-	 * Checks if the item should be processed in parallel or not
-	 * 
-	 * @param item the queue item
-	 * @return true to process in parallel otherwise false
-	 */
-	public abstract boolean processInParallel(T item);
 	
 	/**
 	 * Gets the logical queue name

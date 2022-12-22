@@ -26,11 +26,6 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 	}
 	
 	@Override
-	public boolean processInParallel(SenderSyncMessage item) {
-		return true;
-	}
-	
-	@Override
 	public String getQueueName() {
 		return "sync-msg";
 	}

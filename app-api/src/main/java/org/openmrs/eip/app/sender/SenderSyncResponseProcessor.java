@@ -26,11 +26,6 @@ public class SenderSyncResponseProcessor extends BaseQueueProcessor<SenderSyncRe
 	}
 	
 	@Override
-	public boolean processInParallel(SenderSyncResponse item) {
-		return true;
-	}
-	
-	@Override
 	public String getQueueName() {
 		return "sync-response";
 	}

@@ -32,11 +32,6 @@ public class DebeziumEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
 	}
 	
 	@Override
-	public boolean processInParallel(DebeziumEvent item) {
-		return true;
-	}
-	
-	@Override
 	public String getQueueName() {
 		return "db-event";
 	}

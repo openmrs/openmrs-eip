@@ -2,7 +2,6 @@ package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
@@ -58,20 +57,6 @@ public class DebeziumEventProcessorTest {
 		de.getEvent().setIdentifier(uuid);
 		de.getEvent().setPrimaryKeyId(visitId);
 		assertEquals(table + "#" + visitId, processor.getItemKey(de));
-	}
-	
-	@Test
-	public void processInParallel_shouldReturnTrueForSnapshotEvent() {
-		DebeziumEvent de = createEvent();
-		de.getEvent().setSnapshot(true);
-		Assert.assertTrue(processor.processInParallel(de));
-	}
-	
-	@Test
-	public void processInParallel_shouldReturnTrueForNonSnapshotEvent() {
-		DebeziumEvent de = createEvent();
-		de.getEvent().setSnapshot(false);
-		Assert.assertTrue(processor.processInParallel(de));
 	}
 	
 	@Test

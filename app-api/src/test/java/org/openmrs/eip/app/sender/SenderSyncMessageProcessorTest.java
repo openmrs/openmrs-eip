@@ -2,7 +2,6 @@ package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 
@@ -35,20 +34,6 @@ public class SenderSyncMessageProcessorTest {
 		msg.setTableName(table);
 		msg.setIdentifier(uuid);
 		assertEquals(table + "#" + uuid, processor.getItemKey(msg));
-	}
-	
-	@Test
-	public void processInParallel_shouldReturnTrueForSnapshotEvent() {
-		SenderSyncMessage msg = new SenderSyncMessage();
-		msg.setSnapshot(true);
-		Assert.assertTrue(processor.processInParallel(msg));
-	}
-	
-	@Test
-	public void processInParallel_shouldReturnTrueForNonSnapshotEvent() {
-		SenderSyncMessage msg = new SenderSyncMessage();
-		msg.setSnapshot(false);
-		Assert.assertTrue(processor.processInParallel(msg));
 	}
 	
 	@Test
