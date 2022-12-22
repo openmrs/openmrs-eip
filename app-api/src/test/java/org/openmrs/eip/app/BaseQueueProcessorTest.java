@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.sender;
+package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
