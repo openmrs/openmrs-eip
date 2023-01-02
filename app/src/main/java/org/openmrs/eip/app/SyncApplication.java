@@ -19,6 +19,7 @@ import org.openmrs.eip.app.config.OpenmrsDataSourceConfig;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,9 @@ public class SyncApplication {
 	private static final long REDELIVERY_DELAY = 300000;
 	
 	private CamelContext camelContext;
+	
+	@Value("${max.reconnect.delay:1800000}")
+	private int maxReconnectDelay;
 	
 	public SyncApplication(final CamelContext camelContext) {
 		this.camelContext = camelContext;
@@ -76,7 +80,9 @@ public class SyncApplication {
 	public ConnectionFactory getConnectionFactory(Environment env) {
 		ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory();
 		String url = "tcp://" + env.getProperty("spring.artemis.host") + ":" + env.getProperty("spring.artemis.port");
-		cf.setBrokerURL(url);
+		String failoverUrl = "failover:(" + url + ")?initialReconnectDelay=60000&reconnectDelayExponent=5&maxReconnectDelay="
+		        + maxReconnectDelay + "&maxReconnectAttempts=-1&warnAfterReconnectAttempts=2";
+		cf.setBrokerURL(failoverUrl);
 		cf.setUserName(env.getProperty("spring.artemis.user"));
 		cf.setPassword(env.getProperty("spring.artemis.password"));
 		final String clientId = env.getProperty("activemq.clientId");

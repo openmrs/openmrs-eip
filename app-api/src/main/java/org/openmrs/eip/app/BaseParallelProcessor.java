@@ -43,7 +43,11 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 		
 		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 		
-		allFuture.get(WAIT_IN_SECONDS - 30, TimeUnit.SECONDS);
+		if (waitForTasksIndefinitely()) {
+			allFuture.get();
+		} else {
+			allFuture.get(WAIT_IN_SECONDS - 30, TimeUnit.SECONDS);
+		}
 		
 		if (log.isDebugEnabled()) {
 			log.debug(futures.size() + " " + getProcessorName() + " processor thread(s) have terminated");
@@ -78,6 +82,20 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 		}
 	}
 	
+	/**
+	 * Gets the logical processor name
+	 * 
+	 * @return the processor name
+	 */
 	public abstract String getProcessorName();
+	
+	/**
+	 * Specifies if the executor should wait indefinitely for executing tasks or not
+	 * 
+	 * @return true or false
+	 */
+	public boolean waitForTasksIndefinitely() {
+		return false;
+	}
 	
 }

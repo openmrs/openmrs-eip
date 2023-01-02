@@ -35,4 +35,9 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 		return SenderConstants.URI_ACTIVEMQ_PUBLISHER;
 	}
 	
+	@Override
+	public boolean waitForTasksIndefinitely() {
+		return true;
+	}
+	
 }
