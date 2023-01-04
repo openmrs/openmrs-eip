@@ -122,6 +122,7 @@ public class AppUtils {
 	 */
 	public static void setAppContextStopping() {
 		appContextStopping = true;
+		EipFailoverTransportFactory.stopTransport();
 		log.info("Application context is stopping");
 	}
 	

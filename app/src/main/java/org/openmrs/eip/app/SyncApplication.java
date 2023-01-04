@@ -80,8 +80,9 @@ public class SyncApplication {
 	public ConnectionFactory getConnectionFactory(Environment env) {
 		ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory();
 		String url = "tcp://" + env.getProperty("spring.artemis.host") + ":" + env.getProperty("spring.artemis.port");
-		String failoverUrl = "failover:(" + url + ")?initialReconnectDelay=60000&reconnectDelayExponent=5&maxReconnectDelay="
-		        + maxReconnectDelay + "&maxReconnectAttempts=-1&warnAfterReconnectAttempts=2";
+		String failoverUrl = "eip-failover:(" + url
+		        + ")?initialReconnectDelay=60000&reconnectDelayExponent=5&maxReconnectDelay=" + maxReconnectDelay
+		        + "&maxReconnectAttempts=-1&warnAfterReconnectAttempts=2";
 		cf.setBrokerURL(failoverUrl);
 		cf.setUserName(env.getProperty("spring.artemis.user"));
 		cf.setPassword(env.getProperty("spring.artemis.password"));
