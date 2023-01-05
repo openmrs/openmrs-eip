@@ -31,7 +31,7 @@ public class EipFailoverTransportFactory extends FailoverTransportFactory {
 	 * Stops the transport instance
 	 */
 	public static void stopTransport() {
-		if (activeMqTransport != null) {
+		if (activeMqTransport != null && !activeMqTransport.isConnected()) {
 			log.info("Stopping eip failover transport");
 			
 			//We need to stop the failover transport otherwise the application will fail to shut down indefinitely.
