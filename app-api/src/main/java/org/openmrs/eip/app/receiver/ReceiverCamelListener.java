@@ -2,15 +2,17 @@ package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
-import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
 import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_DELAY_IN_SECONDS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_IN_SECONDS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -100,15 +102,32 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());
-			sites.parallelStream().forEach((site) -> {
-				log.info("Starting sync message consumer for site: " + site + ", batch size: " + MAX_COUNT);
+			
+			while (!AppUtils.isAppContextStopping() && !AppUtils.isShuttingDown()) {
+				List<CompletableFuture<Void>> futures = new ArrayList(sites.size());
+				sites.stream().forEach((site) -> {
+					futures.add(CompletableFuture
+					        .runAsync(new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor), siteExecutor));
+				});
 				
-				siteExecutor.execute(new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, wait * 1000, msgExecutor));
+				CompletableFuture<Void> allFutures = CompletableFuture
+				        .allOf(futures.toArray(new CompletableFuture[futures.size()]));
 				
-				if (log.isDebugEnabled()) {
-					log.debug("Started sync message consumer for site: " + site);
+				try {
+					if (log.isDebugEnabled()) {
+						log.debug("Waiting for site message consumer threads to terminate");
+					}
+					
+					allFutures.get();
+					
+					if (log.isDebugEnabled()) {
+						log.debug("Done waiting for site message consumer threads to terminate");
+					}
 				}
-			});
+				catch (Exception e) {
+					log.warn("An error occurred while waiting for site message consumer threads to terminate", e);
+				}
+			}
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			int timeout = 15;

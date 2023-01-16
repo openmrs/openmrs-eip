@@ -70,7 +70,7 @@ public class SiteMessageConsumerTest {
 		Whitebox.setInternalState(messagePublisher, ProducerTemplate.class, mockProducerTemplate);
 		
 		executor = Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, size, 0, executor);
+		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, messagePublisher);
 	}

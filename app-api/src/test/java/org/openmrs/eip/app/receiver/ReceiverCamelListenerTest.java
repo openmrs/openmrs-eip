@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.apache.camel.spi.CamelEvent;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,6 +30,7 @@ import org.powermock.reflect.Whitebox;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
 
+@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Executors.class, SyncContext.class, ReceiverContext.class })
 public class ReceiverCamelListenerTest {

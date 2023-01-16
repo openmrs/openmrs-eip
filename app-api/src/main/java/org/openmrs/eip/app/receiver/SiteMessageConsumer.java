@@ -60,27 +60,25 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private String messageProcessorUri;
 	
-	private int delay;
-	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param threadCount the number of threads to use to sync messages in parallel
-	 * @param delay when the message queue is empty, this specifies the delay in milliseconds before the
-	 *            next read from the queue
 	 * @param msgExecutor {@link ExecutorService} instance to messages in parallel
 	 */
-	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, int delay,
-	    ExecutorService msgExecutor) {
+	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, ExecutorService msgExecutor) {
 		this.messageProcessorUri = messageProcessorUri;
 		this.site = site;
 		this.threadCount = threadCount;
 		this.msgExecutor = msgExecutor;
-		this.delay = delay;
 		failureCount = 0;
 	}
 	
 	@Override
 	public void run() {
+		if (log.isDebugEnabled()) {
+			log.debug("Starting message consumer thread for site -> " + site);
+		}
+		
 		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		messagePublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
 		
@@ -99,15 +97,7 @@ public class SiteMessageConsumer implements Runnable {
 						log.trace("No sync message found from site: " + site);
 					}
 					
-					try {
-						Thread.sleep(delay);
-					}
-					catch (InterruptedException e) {
-						//ignore
-						log.warn("Sync message consumer for site: " + site + " has been interrupted");
-					}
-					
-					continue;
+					break;
 				}
 				
 				processMessages(syncMessages);
@@ -147,7 +137,9 @@ public class SiteMessageConsumer implements Runnable {
 			
 		} while (!AppUtils.isAppContextStopping() && !errorEncountered);
 		
-		log.info("Sync message consumer for site: " + site + " has stopped");
+		if (log.isDebugEnabled()) {
+			log.debug("Sync message consumer for site: " + site + " has completed");
+		}
 		
 		if (errorEncountered) {
 			log.info("Shutting down after the sync message consumer for " + site + " encountered an error");

@@ -8,7 +8,6 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_IN_SECONDS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
 
 import java.util.List;
@@ -27,7 +26,6 @@ import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
@@ -43,9 +41,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@EndpointInject(MOCK_PROCESSOR_URI)
 	private MockEndpoint mockMsgProcessor;
 	
-	@Value("${" + PROP_DELAY_IN_SECONDS + "}")
-	private int wait;
-	
 	@Before
 	public void setup() {
 		mockMsgProcessor.reset();
@@ -54,7 +49,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Test
 	public void fetchNextSyncMessageBatch_shouldGetOnlyNewMessages() throws Exception {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
-		SiteMessageConsumer consumer = new SiteMessageConsumer(null, site, 0, wait, null);
+		SiteMessageConsumer consumer = new SiteMessageConsumer(null, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
 		
 		List<SyncMessage> syncMessages = consumer.fetchNextSyncMessageBatch();
@@ -69,7 +64,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	public void processMessage_shouldArchiveAndDeleteAProcessedMessage() throws Exception {
 		Assert.assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
-		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, wait, null);
+		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
 		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
@@ -100,7 +95,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Test
 	public void processMessage_shouldDeleteAMessageMovedToTheConflictQueue() throws Exception {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
-		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, wait, null);
+		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
 		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
@@ -119,7 +114,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Test
 	public void processMessage_shouldDeleteAMessageMovedToTheErrorQueue() throws Exception {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
-		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, wait, null);
+		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
 		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
@@ -138,7 +133,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Test
 	public void processMessage_shouldFailIfSyncOutComeIsUnknown() throws Exception {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
-		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, wait, null);
+		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
 		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
 		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
