@@ -54,8 +54,6 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ExecutorService msgExecutor;
 	
-	private int failureCount;
-	
 	private ReceiverActiveMqMessagePublisher messagePublisher;
 	
 	private String messageProcessorUri;
@@ -70,7 +68,6 @@ public class SiteMessageConsumer implements Runnable {
 		this.site = site;
 		this.threadCount = threadCount;
 		this.msgExecutor = msgExecutor;
-		failureCount = 0;
 	}
 	
 	@Override
@@ -105,46 +102,18 @@ public class SiteMessageConsumer implements Runnable {
 			}
 			catch (Throwable t) {
 				if (!AppUtils.isAppContextStopping()) {
+					errorEncountered = true;
 					log.error("Message consumer thread for site: " + site + " encountered an error", t);
-					
-					failureCount++;
-					if (failureCount < 3) {
-						//TODO Make the wait times configurable
-						long wait;
-						if (failureCount == 1) {
-							wait = 300000;
-						} else {
-							wait = 900000;
-						}
-						
-						log.info("Pausing message consumer thread for site: " + site + " for " + (wait / 60000)
-						        + " minutes after an encountered error");
-						
-						try {
-							Thread.sleep(wait);
-						}
-						catch (InterruptedException e) {
-							log.warn("Sync message consumer for site: " + site + " has been interrupted");
-						}
-					} else {
-						log.error("Stopping message consumer thread for site: " + site);
-						
-						errorEncountered = true;
-						break;
-					}
+					break;
 				}
 			}
 			
 		} while (!AppUtils.isAppContextStopping() && !errorEncountered);
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Sync message consumer for site: " + site + " has completed");
-		}
-		
-		if (errorEncountered) {
-			log.info("Shutting down after the sync message consumer for " + site + " encountered an error");
-			
-			AppUtils.shutdown();
+		if (!errorEncountered) {
+			if (log.isDebugEnabled()) {
+				log.debug("Sync message consumer for site: " + site + " has completed");
+			}
 		}
 		
 	}
