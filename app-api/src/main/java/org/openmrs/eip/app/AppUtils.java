@@ -143,6 +143,13 @@ public class AppUtils {
 	}
 	
 	/**
+	 * Checks if the application is stopping
+	 */
+	public static boolean isStopping() {
+		return isAppContextStopping() || isShuttingDown();
+	}
+	
+	/**
 	 * Shuts down the application
 	 */
 	public synchronized static void shutdown() {

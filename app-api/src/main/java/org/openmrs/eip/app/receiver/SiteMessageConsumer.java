@@ -72,12 +72,25 @@ public class SiteMessageConsumer implements Runnable {
 	
 	@Override
 	public void run() {
+		if (AppUtils.isStopping()) {
+			if (log.isDebugEnabled()) {
+				log.debug("Sync message consumer skipping execution because the application is stopping");
+			}
+			
+			return;
+		}
+		
 		if (log.isDebugEnabled()) {
 			log.debug("Starting message consumer thread for site -> " + site);
 		}
 		
-		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		messagePublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
+		if (producerTemplate == null) {
+			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+		}
+		
+		if (messagePublisher == null) {
+			messagePublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
+		}
 		
 		do {
 			Thread.currentThread().setName(site.getIdentifier());
@@ -108,7 +121,7 @@ public class SiteMessageConsumer implements Runnable {
 				}
 			}
 			
-		} while (!AppUtils.isAppContextStopping() && !errorEncountered);
+		} while (!AppUtils.isStopping() && !errorEncountered);
 		
 		if (!errorEncountered) {
 			if (log.isDebugEnabled()) {
