@@ -17,7 +17,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_COMPLEX_OBS_SYN
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_UPDATE_LAST_SYNC_DATE;
 import static org.openmrs.eip.app.route.TestUtils.getEntities;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
-import static org.openmrs.eip.app.route.receiver.ReceiverRouteTest.URI_ACTIVEMQ;
+import static org.openmrs.eip.app.route.receiver.ReceiverRouteTest.ACTIVEMQ_IN_ENDPOINT;
 import static org.openmrs.eip.app.route.receiver.ReceiverRouteTest.URI_ACTIVEMQ_RESPONSE_PREFIX;
 
 import java.time.LocalDateTime;
@@ -47,14 +47,16 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@TestPropertySource(properties = PROP_ACTIVEMQ_IN_ENDPOINT + "=" + URI_ACTIVEMQ)
+@TestPropertySource(properties = PROP_ACTIVEMQ_IN_ENDPOINT + "=" + ACTIVEMQ_IN_ENDPOINT)
 @TestPropertySource(properties = PROP_CAMEL_OUTPUT_ENDPOINT + "=" + URI_ACTIVEMQ_RESPONSE_PREFIX + "{0}")
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_RECEIVER_MAIN + "=DEBUG")
 @Sql(scripts = { "classpath:mgt_site_info.sql",
         "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class ReceiverRouteTest extends BaseReceiverRouteTest {
 	
-	protected static final String URI_ACTIVEMQ = "direct:" + ROUTE_ID_RECEIVER_MAIN;
+	protected static final String ACTIVEMQ_IN_ENDPOINT = "direct:" + ROUTE_ID_RECEIVER_MAIN;
+	
+	protected static final String URI_ACTIVEMQ = ACTIVEMQ_IN_ENDPOINT + "&asyncStartListener=true";
 	
 	public static final String URI_ACTIVEMQ_RESPONSE_PREFIX = "mock:response.";
 	
