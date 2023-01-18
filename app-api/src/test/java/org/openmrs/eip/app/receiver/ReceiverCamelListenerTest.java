@@ -1,17 +1,18 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.camel.spi.CamelEvent;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,7 +31,6 @@ import org.powermock.reflect.Whitebox;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
 
-@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Executors.class, SyncContext.class, ReceiverContext.class })
 public class ReceiverCamelListenerTest {
@@ -51,9 +51,11 @@ public class ReceiverCamelListenerTest {
 	private UserLightRepository mockUserLightRepo;
 	
 	@Mock
-	private ExecutorService mockExecutor;
+	private ScheduledExecutorService mockExecutor;
 	
 	private ReceiverCamelListener listener;
+	
+	private long mockDelay = 3;
 	
 	@Before
 	public void setup() {
@@ -71,6 +73,7 @@ public class ReceiverCamelListenerTest {
 		listener = new ReceiverCamelListener();
 		Whitebox.setInternalState(listener, "parallelSiteSize", TEST_THREAD_COUNT);
 		Whitebox.setInternalState(listener, "threads", TEST_THREAD_COUNT);
+		Whitebox.setInternalState(listener, "delay", mockDelay);
 	}
 	
 	@Test
@@ -89,7 +92,8 @@ public class ReceiverCamelListenerTest {
 		
 		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
 		
-		Mockito.verify(mockExecutor).execute(any(SiteMessageConsumer.class));
+		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SiteMessageConsumer.class), eq(2l), eq(mockDelay),
+		    eq(TimeUnit.SECONDS));
 	}
 	
 }

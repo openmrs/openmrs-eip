@@ -9,13 +9,10 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_IN_SECON
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -48,7 +45,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
-	private ExecutorService siteExecutor;
+	private ScheduledExecutorService siteExecutor;
 	
 	private ExecutorService msgExecutor;
 	
@@ -59,7 +56,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private int threads;
 	
 	@Value("${" + PROP_DELAY_IN_SECONDS + ":" + DEFAULT_DELAY_IN_SECONDS + "}")
-	private int wait;
+	private long delay;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -98,38 +95,16 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			log.info("Starting sync message consumer threads, one per site");
 			
-			Collection<SiteDelay> siteDelays = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
-			        .map(siteInfo -> new SiteDelay(siteInfo, siteInfo.getId() == 1 ? 5 : 30)).collect(Collectors.toList());
-			DelayQueue<SiteDelay> siteQueue = new DelayQueue();
-			siteDelays.forEach(siteDelay -> siteQueue.put(siteDelay));
-			
-			siteExecutor = Executors.newFixedThreadPool(parallelSiteSize);
+			siteExecutor = Executors.newScheduledThreadPool(parallelSiteSize);
 			msgExecutor = Executors.newFixedThreadPool(threads);
 			
-			new Thread(() -> {
-				while (!AppUtils.isAppContextStopping() && !AppUtils.isShuttingDown()) {
-					try {
-						SiteDelay siteDelay = siteQueue.take();
-						SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteDelay.site, threads,
-						        msgExecutor);
-						CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(consumer, siteExecutor);
-						completableFuture.thenApply(ret -> {
-							SiteDelay newDelay = new SiteDelay(siteDelay.site);
-							if (log.isDebugEnabled()) {
-								log.debug(newDelay.site + " message consumer will resume at " + new Date(newDelay.start));
-							}
-							
-							//Reschedule the consumer for the next execution
-							siteQueue.add(newDelay);
-							return null;
-						});
-					}
-					catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
-				
-			}).start();
+			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
+			        .collect(Collectors.toList());
+			
+			sites.stream().forEach(site -> {
+				SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor);
+				siteExecutor.scheduleWithFixedDelay(consumer, 2, delay, TimeUnit.SECONDS);
+			});
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			int timeout = 15;
@@ -166,39 +141,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 					log.error("An error occurred while waiting for site message consumer threads to terminate");
 				}
 			}
-		}
-		
-	}
-	
-	private class SiteDelay implements Delayed {
-		
-		private Long start = System.currentTimeMillis() + (wait * 1000);
-		
-		private SiteInfo site;
-		
-		SiteDelay(SiteInfo site) {
-			this.site = site;
-		}
-		
-		SiteDelay(SiteInfo site, int delayInSeconds) {
-			this(site);
-			this.start = System.currentTimeMillis() + (delayInSeconds * 1000);
-		}
-		
-		@Override
-		public long getDelay(TimeUnit unit) {
-			long diff = start - System.currentTimeMillis();
-			return unit.convert(diff, TimeUnit.MILLISECONDS);
-		}
-		
-		@Override
-		public int compareTo(Delayed d) {
-			return start.compareTo(((SiteDelay) d).start);
-		}
-		
-		@Override
-		public String toString() {
-			return "{site=" + site + ", start=" + new Date(start) + "}";
 		}
 		
 	}
