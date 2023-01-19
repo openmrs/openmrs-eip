@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.sender;
 
+import java.util.List;
+
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.component.SyncProfiles;
@@ -21,7 +23,7 @@ public class SenderSyncResponseProcessor extends BaseQueueProcessor<SenderSyncRe
 	}
 	
 	@Override
-	public String getItemKey(SenderSyncResponse item) {
+	public String getUniqueId(SenderSyncResponse item) {
 		return item.getId().toString();
 	}
 	
@@ -33,6 +35,16 @@ public class SenderSyncResponseProcessor extends BaseQueueProcessor<SenderSyncRe
 	@Override
 	public String getDestinationUri() {
 		return SenderConstants.URI_RESPONSE_PROCESSOR;
+	}
+	
+	@Override
+	public String getLogicalType(SenderSyncResponse item) {
+		return item.getClass().getName();
+	}
+	
+	@Override
+	public List<String> getLogicalTypeHierarchy(String logicalType) {
+		return null;
 	}
 	
 }

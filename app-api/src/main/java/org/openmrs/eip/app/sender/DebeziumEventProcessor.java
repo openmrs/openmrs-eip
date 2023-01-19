@@ -1,9 +1,12 @@
 package org.openmrs.eip.app.sender;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.Utils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +30,8 @@ public class DebeziumEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
 	}
 	
 	@Override
-	public String getItemKey(DebeziumEvent item) {
-		return item.getEvent().getTableName() + "#" + item.getEvent().getPrimaryKeyId();
+	public String getUniqueId(DebeziumEvent item) {
+		return item.getEvent().getPrimaryKeyId();
 	}
 	
 	@Override
@@ -39,6 +42,16 @@ public class DebeziumEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
 	@Override
 	public String getDestinationUri() {
 		return SenderConstants.URI_DBZM_EVENT_PROCESSOR;
+	}
+	
+	@Override
+	public String getLogicalType(DebeziumEvent item) {
+		return item.getEvent().getTableName();
+	}
+	
+	@Override
+	public List<String> getLogicalTypeHierarchy(String logicalType) {
+		return Utils.getListOfTablesInHierarchy(logicalType);
 	}
 	
 }

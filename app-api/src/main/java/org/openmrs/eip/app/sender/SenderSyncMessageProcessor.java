@@ -1,8 +1,11 @@
 package org.openmrs.eip.app.sender;
 
+import java.util.List;
+
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.Utils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +24,8 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 	}
 	
 	@Override
-	public String getItemKey(SenderSyncMessage item) {
-		return item.getTableName() + "#" + item.getIdentifier();
+	public String getUniqueId(SenderSyncMessage item) {
+		return item.getIdentifier();
 	}
 	
 	@Override
@@ -38,6 +41,16 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 	@Override
 	public boolean waitForTasksIndefinitely() {
 		return true;
+	}
+	
+	@Override
+	public String getLogicalType(SenderSyncMessage item) {
+		return item.getTableName();
+	}
+	
+	@Override
+	public List<String> getLogicalTypeHierarchy(String logicalType) {
+		return Utils.getListOfTablesInHierarchy(logicalType);
 	}
 	
 }

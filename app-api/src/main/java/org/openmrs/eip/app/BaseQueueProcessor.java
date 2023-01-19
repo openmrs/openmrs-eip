@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for processors that operate on items in a DB sync related queue and forward each item
  * to another handler camel endpoint for processing
- * 
+ *
  * @param <T>
  */
 public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor {
@@ -42,8 +42,10 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				break;
 			}
 			
-			final String key = getItemKey(item);
-			if (uniqueKeys.contains(key)) {
+			final String id = getUniqueId(item);
+			final String logicalType = getLogicalType(item);
+			final String logicalKey = logicalType + "#" + id;
+			if (uniqueKeys.contains(logicalKey)) {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(item);
@@ -59,7 +61,14 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				continue;
 			}
 			
-			uniqueKeys.add(key);
+			List<String> typesInHierarchy = getLogicalTypeHierarchy(logicalType);
+			if (typesInHierarchy == null) {
+				uniqueKeys.add(logicalKey);
+			} else {
+				for (String type : typesInHierarchy) {
+					uniqueKeys.add(type + "#" + id);
+				}
+			}
 			
 			//TODO Periodically wait and reset futures to save memory
 			syncThreadFutures.add(CompletableFuture.runAsync(() -> {
@@ -84,23 +93,23 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	}
 	
 	/**
-	 * Generate a unique key for the item
-	 * 
-	 * @param item the queue item
+	 * Gets a unique identifier for the specified item
+	 *
+	 * @param item the item
 	 * @return the key
 	 */
-	public abstract String getItemKey(T item);
+	public abstract String getUniqueId(T item);
 	
 	/**
 	 * Gets the logical queue name
-	 * 
+	 *
 	 * @return the logical name
 	 */
 	public abstract String getQueueName();
 	
 	/**
 	 * Generate a unique name for the thread that will process the item
-	 * 
+	 *
 	 * @param item the queue item
 	 * @return the thread name
 	 */
@@ -108,9 +117,26 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	
 	/**
 	 * Gets the camel URI to call to process a single item
-	 * 
+	 *
 	 * @return the camel URI
 	 */
 	public abstract String getDestinationUri();
+	
+	/**
+	 * Gets logical type name of the item
+	 *
+	 * @param item the item
+	 * @return the logical type name of the item
+	 */
+	public abstract String getLogicalType(T item);
+	
+	/**
+	 * Gets the list of logical types in the same hierarchy as the specified logical type, the method
+	 * should return null if the type has no hierarchy.
+	 *
+	 * @param logicalType logical type to match
+	 * @return list of types in the same hierarchy
+	 */
+	public abstract List<String> getLogicalTypeHierarchy(String logicalType);
 	
 }

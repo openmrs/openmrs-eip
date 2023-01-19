@@ -48,15 +48,26 @@ public class DebeziumEventProcessorTest {
 	}
 	
 	@Test
-	public void getItemKey_shouldReturnTheKeyContainingTableAndId() {
-		final String table = "visit";
+	public void getUniqueId_shouldReturnThePrimaryKeyId() {
 		final String visitId = "4";
-		final String uuid = "som-visit-uuid";
+		DebeziumEvent de = createEvent();
+		de.getEvent().setPrimaryKeyId(visitId);
+		assertEquals(visitId, processor.getUniqueId(de));
+	}
+	
+	@Test
+	public void getLogicalType_shouldReturnTheTableName() {
+		final String table = "visit";
 		DebeziumEvent de = createEvent();
 		de.getEvent().setTableName(table);
-		de.getEvent().setIdentifier(uuid);
-		de.getEvent().setPrimaryKeyId(visitId);
-		assertEquals(table + "#" + visitId, processor.getItemKey(de));
+		assertEquals(table, processor.getLogicalType(de));
+	}
+	
+	@Test
+	public void getLogicalTypeHierarchy_shouldReturnTheTablesInTheSameHierarchy() {
+		assertEquals(1, processor.getLogicalTypeHierarchy("visit").size());
+		assertEquals(2, processor.getLogicalTypeHierarchy("person").size());
+		assertEquals(3, processor.getLogicalTypeHierarchy("orders").size());
 	}
 	
 	@Test

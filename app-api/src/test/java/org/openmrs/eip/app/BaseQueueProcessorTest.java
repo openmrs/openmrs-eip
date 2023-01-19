@@ -25,12 +25,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.BaseParallelProcessor;
-import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.utils.Utils;
 import org.powermock.reflect.Whitebox;
 
 public class BaseQueueProcessorTest {
@@ -52,8 +49,8 @@ public class BaseQueueProcessorTest {
 		}
 		
 		@Override
-		public String getItemKey(DebeziumEvent item) {
-			return item.getEvent().getTableName() + "#" + item.getEvent().getPrimaryKeyId();
+		public String getUniqueId(DebeziumEvent item) {
+			return item.getEvent().getPrimaryKeyId();
 		}
 		
 		@Override
@@ -74,6 +71,16 @@ public class BaseQueueProcessorTest {
 		@Override
 		public String getDestinationUri() {
 			return MOCK_URI;
+		}
+		
+		@Override
+		public String getLogicalType(DebeziumEvent item) {
+			return item.getEvent().getTableName();
+		}
+		
+		@Override
+		public List<String> getLogicalTypeHierarchy(String logicalTypeName) {
+			return Utils.getListOfTablesInHierarchy(logicalTypeName);
 		}
 		
 	}
@@ -203,6 +210,58 @@ public class BaseQueueProcessorTest {
 			if (i % 4 == 0) {
 				m.getEvent().setPrimaryKeyId("same-id");
 				m.getEvent().setIdentifier("same-uuid");
+			}
+			events.add(m);
+			Mockito.doAnswer(invocation -> {
+				DebeziumEvent arg = invocation.getArgument(1);
+				expectedResults.add(arg.getId());
+				expectedMsgIdThreadNameMap.put(arg.getId(), Thread.currentThread().getName());
+				return null;
+			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
+		}
+		
+		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+		exchange.getIn().setBody(events);
+		processor = createProcessor(size);
+		
+		processor.process(exchange);
+		
+		assertEquals(originalThreadName, Thread.currentThread().getName());
+		assertEquals(16, expectedResults.size());
+		assertEquals(16, expectedMsgIdThreadNameMap.size());
+		
+		for (int i = 0; i < size; i++) {
+			DebeziumEvent event = events.get(i);
+			if (i > 0 && i % 4 == 0) {
+				assertFalse(expectedResults.contains(event.getId()));
+			} else {
+				assertTrue(expectedResults.contains(event.getId()));
+				assertEquals(processor.getThreadName(event), expectedMsgIdThreadNameMap.get(event.getId()).split(":")[2]);
+				String threadName = expectedMsgIdThreadNameMap.get(event.getId()).split(":")[0];
+				assertNotEquals(originalThreadName, threadName);
+			}
+		}
+	}
+	
+	@Test
+	public void process_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKeyFromDifferentTablesButSameHierarchy()
+	    throws Exception {
+		final String originalThreadName = Thread.currentThread().getName();
+		final int size = 20;
+		List<DebeziumEvent> events = new ArrayList(size);
+		List<Long> expectedResults = synchronizedList(new ArrayList(size));
+		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
+		
+		for (int i = 0; i < size; i++) {
+			DebeziumEvent m = createDebeziumEvent(i, true);
+			if (i % 4 == 0) {
+				m.getEvent().setPrimaryKeyId("same-id");
+				m.getEvent().setIdentifier("same-uuid");
+				if (i == 0) {
+					m.getEvent().setTableName("person");
+				} else {
+					m.getEvent().setTableName("patient");
+				}
 			}
 			events.add(m);
 			Mockito.doAnswer(invocation -> {

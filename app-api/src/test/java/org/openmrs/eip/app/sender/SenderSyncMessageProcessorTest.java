@@ -27,13 +27,26 @@ public class SenderSyncMessageProcessorTest {
 	}
 	
 	@Test
-	public void getItemKey_shouldReturnTheKeyContainingTableAndId() {
+	public void getUniqueId_shouldReturnTheUuid() {
+		final String visitUuid = "som-visit-uuid";
+		SenderSyncMessage msg = new SenderSyncMessage();
+		msg.setIdentifier(visitUuid);
+		assertEquals(visitUuid, processor.getUniqueId(msg));
+	}
+	
+	@Test
+	public void getLogicalType_shouldReturnTheTableName() {
 		final String table = "visit";
-		final String uuid = "som-visit-uuid";
 		SenderSyncMessage msg = new SenderSyncMessage();
 		msg.setTableName(table);
-		msg.setIdentifier(uuid);
-		assertEquals(table + "#" + uuid, processor.getItemKey(msg));
+		assertEquals(table, processor.getLogicalType(msg));
+	}
+	
+	@Test
+	public void getLogicalTypeHierarchy_shouldReturnTheTablesInTheSameHierarchy() {
+		assertEquals(1, processor.getLogicalTypeHierarchy("visit").size());
+		assertEquals(2, processor.getLogicalTypeHierarchy("person").size());
+		assertEquals(3, processor.getLogicalTypeHierarchy("orders").size());
 	}
 	
 	@Test

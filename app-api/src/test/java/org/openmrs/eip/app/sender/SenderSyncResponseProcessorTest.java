@@ -2,6 +2,7 @@ package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 
@@ -25,11 +26,21 @@ public class SenderSyncResponseProcessorTest {
 	}
 	
 	@Test
-	public void getItemKey_shouldReturnTheKeyContainingTableAndId() {
+	public void getUniqueId_shouldReturnDatabaseId() {
 		final Long id = 2L;
 		SenderSyncResponse msg = new SenderSyncResponse();
 		msg.setId(id);
-		assertEquals(id.toString(), processor.getItemKey(msg));
+		assertEquals(id.toString(), processor.getUniqueId(msg));
+	}
+	
+	@Test
+	public void getLogicalType_shouldReturnTheTableName() {
+		assertEquals(SenderSyncResponse.class.getName(), processor.getLogicalType(new SenderSyncResponse()));
+	}
+	
+	@Test
+	public void getLogicalTypeHierarchy_shouldReturnNull() {
+		Assert.assertNull(processor.getLogicalTypeHierarchy("visit"));
 	}
 	
 	@Test
