@@ -2,6 +2,8 @@ package org.openmrs.eip.component.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.openmrs.eip.component.Constants;
@@ -13,16 +15,25 @@ import org.openmrs.eip.component.model.TestOrderModel;
 
 public final class Utils {
 	
+	private static Map<String, List<String>> TABLE_HIERARCHY_MAP = new ConcurrentHashMap();
+	
+	private static Map<String, List<String>> CLASS_HIERARCHY_MAP = new ConcurrentHashMap();
+	
 	/**
 	 * Gets comma-separated list of table names surrounded with apostrophes associated to the specified
 	 * table as tables of subclass or superclass entities.
 	 *
-	 * @param tableName the tables to inspect
+	 * @param tableName the table name
 	 * @return a list of table names
 	 */
 	public static List<String> getListOfTablesInHierarchy(String tableName) {
+		List<String> tables = TABLE_HIERARCHY_MAP.get(tableName);
+		if (tables != null) {
+			return tables;
+		}
+		
 		//TODO This logic should be extensible
-		List<String> tables = new ArrayList();
+		tables = new ArrayList();
 		tables.add(tableName);
 		if ("person".equalsIgnoreCase(tableName) || "patient".equalsIgnoreCase(tableName)) {
 			tables.add("person".equalsIgnoreCase(tableName) ? "patient" : "person");
@@ -32,6 +43,8 @@ public final class Utils {
 		} else if ("test_order".equalsIgnoreCase(tableName) || "drug_order".equalsIgnoreCase(tableName)) {
 			tables.add("orders");
 		}
+		
+		TABLE_HIERARCHY_MAP.put(tableName, tables);
 		
 		return tables;
 	}
@@ -51,24 +64,31 @@ public final class Utils {
 	 * Gets comma-separated list of model class names surrounded with apostrophes that are subclasses or
 	 * superclasses of the specified class name.
 	 *
-	 * @param modelClass the model class to inspect
+	 * @param modelClass the model class name
 	 * @return a list of model class names
 	 */
 	public static List<String> getListOfModelClassHierarchy(String modelClass) {
-		//TODO This logic should be extensible
-		List<String> tables = new ArrayList();
-		tables.add(modelClass);
-		if (PersonModel.class.getName().equals(modelClass) || PatientModel.class.getName().equals(modelClass)) {
-			tables.add(
-			    PersonModel.class.getName().equals(modelClass) ? PatientModel.class.getName() : PersonModel.class.getName());
-		} else if (OrderModel.class.getName().equals(modelClass)) {
-			tables.add(TestOrderModel.class.getName());
-			tables.add(DrugOrderModel.class.getName());
-		} else if (TestOrderModel.class.getName().equals(modelClass) || DrugOrderModel.class.getName().equals(modelClass)) {
-			tables.add(OrderModel.class.getName());
+		List<String> classes = CLASS_HIERARCHY_MAP.get(modelClass);
+		if (classes != null) {
+			return classes;
 		}
 		
-		return tables;
+		//TODO This logic should be extensible
+		classes = new ArrayList();
+		classes.add(modelClass);
+		if (PersonModel.class.getName().equals(modelClass) || PatientModel.class.getName().equals(modelClass)) {
+			classes.add(
+			    PersonModel.class.getName().equals(modelClass) ? PatientModel.class.getName() : PersonModel.class.getName());
+		} else if (OrderModel.class.getName().equals(modelClass)) {
+			classes.add(TestOrderModel.class.getName());
+			classes.add(DrugOrderModel.class.getName());
+		} else if (TestOrderModel.class.getName().equals(modelClass) || DrugOrderModel.class.getName().equals(modelClass)) {
+			classes.add(OrderModel.class.getName());
+		}
+		
+		CLASS_HIERARCHY_MAP.put(modelClass, classes);
+		
+		return classes;
 	}
 	
 	/**
@@ -78,6 +98,7 @@ public final class Utils {
 	 * @return a comma-separated list of model class names
 	 */
 	public static String getModelClassesInHierarchy(String modelClass) {
+		//TODO cache the return value
 		List<String> classes = getListOfModelClassHierarchy(modelClass);
 		return String.join(",", classes.stream().map(clazz -> "'" + clazz + "'").collect(Collectors.toList()));
 	}

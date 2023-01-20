@@ -6,8 +6,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
@@ -15,8 +17,15 @@ import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.model.VisitModel;
+import org.powermock.reflect.Whitebox;
 
 public class UtilsTest {
+	
+	@Before
+	public void setup() {
+		Whitebox.setInternalState(Utils.class, "TABLE_HIERARCHY_MAP", new ConcurrentHashMap());
+		Whitebox.setInternalState(Utils.class, "CLASS_HIERARCHY_MAP", new ConcurrentHashMap());
+	}
 	
 	@Test
 	public void getListOfTablesInHierarchy_shouldReturnSubclassAndSuperClassTables() {
