@@ -76,7 +76,7 @@ public class AppUtils {
 		return tables;
 	}
 	
-	private static Map<String, String> getClassAndSimpleNameMap() {
+	public static Map<String, String> getClassAndSimpleNameMap() {
 		synchronized (AppUtils.class) {
 			if (classAndSimpleNameMap == null) {
 				log.info("Initializing class to simple name mappings...");
