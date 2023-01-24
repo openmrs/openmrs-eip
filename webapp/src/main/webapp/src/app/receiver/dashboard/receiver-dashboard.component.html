@@ -1,0 +1,117 @@
+<div class="container mw-100">
+	<div class="row">
+		<div class="col-6">
+			<div class="card">
+				<div class="card-header text-center">
+					<span class="h5" i18n="@@receiver-sync-msgs">Pending Sync Items</span>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.syncMsgs['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@common-no-sync-msg">No items, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMsgs['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
+						<div class="ml-3 mr-3">
+							<table class="text-dark">
+								<tr>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-count">Total Count</span>
+									</td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.syncMsgs['totalCount']}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMsgs['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
+						<div class="ml-3 mr-3">
+						</div>
+					</li>
+				</ul>
+
+			</div>
+		</div>
+
+		<div class="col-6">
+			<div class="card">
+				<div class="card-header text-center">
+					<span class="h5" i18n="@@receiver-conflicts">Conflicts</span>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.conflicts['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@receiver-no-conflicts">No conflicts, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.conflicts['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
+						<div class="ml-3 mr-3">
+							<table class="text-dark">
+								<tr>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-count">Total Count</span>
+									</td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.conflicts['totalCount']}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.conflicts['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
+						<div class="ml-3 mr-3">
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-4">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header text-danger text-center">
+					<span class="h5" i18n="@@common-errors">Errors</span>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item text-secondary text-center" [hidden]="dashboard">
+						<span i18n="@@common-loading">Loading</span>...
+					</li>
+					<li class="list-group-item text-center" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] > 0">
+						<i class="bi-check-circle-fill text-success"></i>&nbsp;
+						<span i18n="@@common-no-errors-msg">No errors, everything looks good!</span>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
+						<div class="ml-3 mr-3">
+							<table class="text-dark">
+								<tr>
+									<td class="ui-no-wrap">
+										<span i18n="@@common-total-count">Total Count</span>
+									</td>
+									<td class="pl-2">
+										<span class="badge border border-secondary">{{dashboard?.entries.errors['totalCount']}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
+						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
+						<div class="ml-3 mr-3">
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

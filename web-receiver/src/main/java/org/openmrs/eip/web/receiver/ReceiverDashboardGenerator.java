@@ -28,23 +28,15 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 	
 	private static final String ERROR_ENTITY_NAME = ReceiverRetryQueueItem.class.getSimpleName();
 	
+	protected static final String KEY_TOTAL_COUNT = "totalCount";
+	
+	protected static final String KEY_ENTITY_STATS = "entityStatsMap";
+	
 	protected static final String KEY_SYNC_MSGS = "syncMsgs";
-	
-	protected static final String KEY_SYNC_MSG_COUNT = "syncMsgTotalCount";
-	
-	protected static final String KEY_SYNC_MSGS_ENTITY_STATS = "syncMsgEntityStatsMap";
 	
 	protected static final String KEY_ERRORS = "errors";
 	
-	protected static final String KEY_ERROR_COUNT = "errorTotalCount";
-	
-	protected static final String KEY_ERROR_ENTITY_STATS = "errorEntityStatsMap";
-	
 	protected static final String KEY_CONFLICTS = "conflicts";
-	
-	protected static final String KEY_CONFLICT_COUNT = "conflictTotalCount";
-	
-	protected static final String KEY_CONFLICT_ENTITY_STATS = "conflictEntityStatsMap";
 	
 	protected ProducerTemplate producerTemplate;
 	
@@ -110,16 +102,16 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 		});
 		
 		Map<String, Object> syncMsgs = new ConcurrentHashMap();
-		syncMsgs.put(KEY_SYNC_MSG_COUNT, totalSyncMsgCount);
-		syncMsgs.put(KEY_SYNC_MSGS_ENTITY_STATS, syncMsgsEntityStatsMap);
+		syncMsgs.put(KEY_TOTAL_COUNT, totalSyncMsgCount);
+		syncMsgs.put(KEY_ENTITY_STATS, syncMsgsEntityStatsMap);
 		
 		Map<String, Object> errors = new ConcurrentHashMap();
-		errors.put(KEY_ERROR_COUNT, totalErrorCount);
-		errors.put(KEY_ERROR_ENTITY_STATS, errorEntityStatsMap);
+		errors.put(KEY_TOTAL_COUNT, totalErrorCount);
+		errors.put(KEY_ENTITY_STATS, errorEntityStatsMap);
 		
 		Map<String, Object> conflicts = new ConcurrentHashMap();
-		conflicts.put(KEY_CONFLICT_COUNT, totalConflictCount);
-		conflicts.put(KEY_CONFLICT_ENTITY_STATS, conflictEntityStatsMap);
+		conflicts.put(KEY_TOTAL_COUNT, totalConflictCount);
+		conflicts.put(KEY_ENTITY_STATS, conflictEntityStatsMap);
 		
 		Dashboard dashboard = new Dashboard();
 		dashboard.add(KEY_SYNC_MSGS, syncMsgs);

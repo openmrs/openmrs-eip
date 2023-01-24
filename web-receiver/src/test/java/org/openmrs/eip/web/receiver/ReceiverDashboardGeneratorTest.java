@@ -31,8 +31,8 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 		Dashboard dashboard = generator.generate();
 		Map<String, Object> syncMsgs = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_SYNC_MSGS);
 		Assert.assertEquals(2, syncMsgs.size());
-		Assert.assertEquals(4, ((AtomicInteger) syncMsgs.get(ReceiverDashboardGenerator.KEY_SYNC_MSG_COUNT)).get());
-		Map<String, Map> entityStatsMap = (Map) syncMsgs.get(ReceiverDashboardGenerator.KEY_SYNC_MSGS_ENTITY_STATS);
+		Assert.assertEquals(4, ((AtomicInteger) syncMsgs.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
+		Map<String, Map> entityStatsMap = (Map) syncMsgs.get(ReceiverDashboardGenerator.KEY_ENTITY_STATS);
 		Assert.assertEquals(1, entityStatsMap.size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).size());
 		Assert.assertEquals(3, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
@@ -41,8 +41,8 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 		
 		Map<String, Object> errors = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_ERRORS);
 		Assert.assertEquals(2, errors.size());
-		Assert.assertEquals(5, ((AtomicInteger) errors.get(ReceiverDashboardGenerator.KEY_ERROR_COUNT)).get());
-		entityStatsMap = (Map) errors.get(ReceiverDashboardGenerator.KEY_ERROR_ENTITY_STATS);
+		Assert.assertEquals(5, ((AtomicInteger) errors.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
+		entityStatsMap = (Map) errors.get(ReceiverDashboardGenerator.KEY_ENTITY_STATS);
 		Assert.assertEquals(3, entityStatsMap.size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
@@ -59,8 +59,8 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 		
 		Map<String, Object> conflicts = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_CONFLICTS);
 		Assert.assertEquals(2, conflicts.size());
-		Assert.assertEquals(5, ((AtomicInteger) conflicts.get(ReceiverDashboardGenerator.KEY_CONFLICT_COUNT)).get());
-		entityStatsMap = (Map) conflicts.get(ReceiverDashboardGenerator.KEY_CONFLICT_ENTITY_STATS);
+		Assert.assertEquals(5, ((AtomicInteger) conflicts.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
+		entityStatsMap = (Map) conflicts.get(ReceiverDashboardGenerator.KEY_ENTITY_STATS);
 		Assert.assertEquals(3, entityStatsMap.size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));

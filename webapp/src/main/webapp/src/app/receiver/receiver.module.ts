@@ -18,6 +18,7 @@ import {ReceiverSyncMessageListViewComponent} from "./sync/view/list/receiver-sy
 import {ReceiverSyncMessageGroupViewComponent} from './sync/view/group/receiver-sync-message-group-view.component'
 import {ReceiverArchiveGroupViewComponent} from "./archive/view/group/receiver-archive-group-view.component";
 import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-archive-list-view.component";
+import {ReceiverDashboardComponent} from "./dashboard/receiver-dashboard.component";
 
 @NgModule({
 	declarations: [
@@ -31,7 +32,8 @@ import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-arc
 		ReceiverSyncMessageListViewComponent,
 		ReceiverSyncMessageGroupViewComponent,
 		ReceiverArchiveListViewComponent,
-		ReceiverArchiveGroupViewComponent
+		ReceiverArchiveGroupViewComponent,
+		ReceiverDashboardComponent
 	],
 	imports: [
 		SharedModule,
