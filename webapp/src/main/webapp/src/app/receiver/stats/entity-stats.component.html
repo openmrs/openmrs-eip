@@ -2,7 +2,7 @@
 	<thead>
 		<tr class="bg-light-silver">
 			<td class="pr-1 pl-1 border border-secondary">
-				<span class="h6 text-dark" i18n="@@common-table-name">Table Name</span>
+				<span class="h6 text-dark" i18n="@@common-entity">Entity</span>
 			</td>
 			<td class="pr-1 pl-1 border border-secondary">
 				<span class="h6 text-dark" i18n="@@common-inserts">Inserts</span>
@@ -19,9 +19,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ngFor="let e of tableStatsMap | keyvalue">
+		<tr *ngFor="let e of entityStatsMap | keyvalue">
 			<td class="text-right pr-2 pl-2 border-bottom-0">
-				{{e.key}}
+				{{e.key | modelClass}}
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{e.value.c}}</span>

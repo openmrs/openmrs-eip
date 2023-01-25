@@ -31,6 +31,7 @@
 					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMsgs['totalCount'] == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
 						<div class="ml-3 mr-3">
+							<entity-stats [entityStatsMap]="dashboard?.entries.syncMsgs['entityStatsMap']"></entity-stats>
 						</div>
 					</li>
 				</ul>
@@ -69,6 +70,7 @@
 					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.conflicts['totalCount'] == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
 						<div class="ml-3 mr-3">
+							<entity-stats [entityStatsMap]="dashboard?.entries.conflicts['entityStatsMap']"></entity-stats>
 						</div>
 					</li>
 				</ul>
@@ -108,6 +110,7 @@
 					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-entity-breakdown">Entity Breakdown</div>
 						<div class="ml-3 mr-3">
+							<entity-stats [entityStatsMap]="dashboard?.entries.errors['entityStatsMap']"></entity-stats>
 						</div>
 					</li>
 				</ul>

@@ -12,13 +12,13 @@ import {ReceiverSyncMessageComponent} from './sync/receiver-sync-message.compone
 import {syncMessageReducer} from "./sync/state/sync-message.reducer";
 import {ReceiverArchiveComponent} from './archive/receiver-archive.component';
 import {syncArchiveReducer} from './archive/state/receiver-archive.reducer';
-import {ReceiverTableStatsComponent} from './stats/receiver-table-stats.component';
 import {FormsModule} from '@angular/forms';
 import {ReceiverSyncMessageListViewComponent} from "./sync/view/list/receiver-sync-message-list-view.component";
 import {ReceiverSyncMessageGroupViewComponent} from './sync/view/group/receiver-sync-message-group-view.component'
 import {ReceiverArchiveGroupViewComponent} from "./archive/view/group/receiver-archive-group-view.component";
 import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-archive-list-view.component";
 import {ReceiverDashboardComponent} from "./dashboard/receiver-dashboard.component";
+import {EntityStatsComponent} from "./stats/entity-stats.component";
 
 @NgModule({
 	declarations: [
@@ -28,7 +28,7 @@ import {ReceiverDashboardComponent} from "./dashboard/receiver-dashboard.compone
 		SiteStatusComponent,
 		ReceiverSyncMessageComponent,
 		ReceiverArchiveComponent,
-		ReceiverTableStatsComponent,
+		EntityStatsComponent,
 		ReceiverSyncMessageListViewComponent,
 		ReceiverSyncMessageGroupViewComponent,
 		ReceiverArchiveListViewComponent,
