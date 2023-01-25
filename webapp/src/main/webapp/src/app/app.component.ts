@@ -1,14 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AppService} from "./app.service";
-
-export enum SyncMode {
-	SENDER = 'SENDER',
-	RECEIVER = 'RECEIVER'
-}
-
-export class AppProperties {
-	syncMode?: SyncMode;
-}
+import {SyncMode} from "./receiver/shared/sync-mode.enum";
 
 @Component({
 	selector: 'app-root',
