@@ -1,5 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AppService} from "./app.service";
+import {PropertiesLoaded} from "./state/app.actions";
+import {Subscription} from "rxjs";
+import {GET_PROPS} from "./state/app.reducer";
+import {select, Store} from "@ngrx/store";
 import {SyncMode} from "./receiver/shared/sync-mode.enum";
 
 @Component({
@@ -7,16 +11,31 @@ import {SyncMode} from "./receiver/shared/sync-mode.enum";
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-
-	constructor(private appService: AppService) {
-	}
+export class AppComponent implements OnInit, OnDestroy {
 
 	syncMode?: SyncMode;
 
+	loadedSubscription?: Subscription;
+
+	constructor(private appService: AppService, private store: Store) {
+	}
+
 	ngOnInit(): void {
-		//TODO use nrgx by dispatching an action
-		this.appService.getAppProperties().subscribe(appProperties => this.syncMode = appProperties.syncMode)
+		this.loadedSubscription = this.store.pipe(select(GET_PROPS)).subscribe(props => {
+			this.syncMode = props.syncMode
+		});
+
+		this.loadProperties();
+	}
+
+	loadProperties(): void {
+		this.appService.getAppProperties().subscribe(props => {
+			this.store.dispatch(new PropertiesLoaded(props))
+		})
+	}
+
+	ngOnDestroy(): void {
+		this.loadedSubscription?.unsubscribe();
 	}
 
 }
