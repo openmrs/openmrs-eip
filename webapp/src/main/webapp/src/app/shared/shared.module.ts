@@ -10,6 +10,10 @@ import {ModelClassPipe} from "./pipes/model-class.pipe";
 import {GlobalErrorHandler} from "./global-error.handler";
 import {ClassNamePipe} from "./pipes/class-name.pipe";
 import {GroupViewComponent} from "./view/group/group-view.component";
+import {EffectsModule} from "@ngrx/effects";
+import {DashboardEffects} from "./state/dashboard.effects";
+import {StoreModule} from "@ngrx/store";
+import {dashboardReducer} from "./state/dashboard.reducer";
 
 
 @NgModule({
@@ -21,7 +25,9 @@ import {GroupViewComponent} from "./view/group/group-view.component";
 	],
 	imports: [
 		CommonModule,
-		DataTablesModule
+		DataTablesModule,
+		EffectsModule.forFeature([DashboardEffects]),
+		StoreModule.forFeature("dashboard", dashboardReducer)
 	],
 	exports: [
 		CommonModule,

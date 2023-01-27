@@ -5,6 +5,8 @@ import {Subscription, timer} from 'rxjs';
 import {select, Store} from "@ngrx/store";
 import {GET_PROPS} from "../state/app.reducer";
 import {SyncMode} from "../receiver/shared/sync-mode.enum";
+import {LoadDashboard} from "./state/dashboard.actions";
+import {GET_DASHBOARD} from "./state/dashboard.reducer";
 
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {
@@ -15,28 +17,29 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	propsLoaded?: Subscription;
 
+	dashboardLoaded?: Subscription;
+
 	constructor(private service: DashboardService, private store: Store) {
 	}
 
 	ngOnInit(): void {
 		this.propsLoaded = this.store.pipe(select(GET_PROPS)).subscribe(props => {
 			if (props.syncMode == this.getSyncMode()) {
+				this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
+					this.dashboard = dashboard;
+				});
+
 				this.reloadTimer = timer(0, 30000).subscribe(() => {
-					this.loadDashboard();
+					this.store.dispatch(new LoadDashboard());
 				});
 			}
-		});
-	}
-
-	loadDashboard(): void {
-		this.service.getDashboard().subscribe(dashboard => {
-			this.dashboard = dashboard;
 		});
 	}
 
 	ngOnDestroy(): void {
 		this.reloadTimer?.unsubscribe();
 		this.propsLoaded?.unsubscribe();
+		this.dashboardLoaded?.unsubscribe();
 	}
 
 	abstract getSyncMode(): SyncMode;

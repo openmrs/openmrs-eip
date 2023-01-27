@@ -8,6 +8,7 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {SenderModule} from "./sender/sender.module";
 import {appReducer} from "./state/app.reducer";
+import {EffectsModule} from "@ngrx/effects";
 
 @NgModule({
 	declarations: [
@@ -17,9 +18,11 @@ import {appReducer} from "./state/app.reducer";
 		SharedModule,
 		ReceiverModule,
 		SenderModule,
+		EffectsModule.forRoot(),
 		StoreModule.forRoot({}),
 		StoreModule.forFeature('props', appReducer),
 		StoreDevtoolsModule.instrument({
+			name: "DB Sync",
 			maxAge: 25,
 			logOnly: environment.production
 		})
