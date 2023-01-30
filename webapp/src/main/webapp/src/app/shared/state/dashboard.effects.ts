@@ -1,8 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {DashboardService} from "../dashboard.service";
-import {map, switchMap} from "rxjs/operators";
-import {DashboardActionType, DashboardLoaded} from "./dashboard.actions";
+import {catchError, map, switchMap} from "rxjs/operators";
+import {DashboardActionType, DashboardLoaded, LoadDashboardError} from "./dashboard.actions";
+import {of} from "rxjs";
 
 @Injectable()
 export class DashboardEffects {
@@ -15,7 +16,8 @@ export class DashboardEffects {
 			ofType(DashboardActionType.LOAD_DASHBOARD),
 			switchMap(() => this.dashboardService.getDashboard()
 				.pipe(
-					map(dashboard => new DashboardLoaded(dashboard))
+					map(dashboard => new DashboardLoaded(dashboard)),
+					catchError(err => of(new LoadDashboardError(err)))
 				)
 			)
 		)

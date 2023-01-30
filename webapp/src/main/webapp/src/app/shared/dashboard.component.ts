@@ -6,7 +6,8 @@ import {select, Store} from "@ngrx/store";
 import {GET_PROPS} from "../state/app.reducer";
 import {SyncMode} from "../receiver/shared/sync-mode.enum";
 import {LoadDashboard} from "./state/dashboard.actions";
-import {GET_DASHBOARD} from "./state/dashboard.reducer";
+import {GET_DASHBOARD, GET_DASHBOARD_ERROR} from "./state/dashboard.reducer";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {
@@ -19,6 +20,10 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	dashboardLoaded?: Subscription;
 
+	dashboardError?: Subscription;
+
+	showError?: boolean;
+
 	constructor(private service: DashboardService, private store: Store) {
 	}
 
@@ -29,6 +34,10 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 					this.dashboard = dashboard;
 				});
 
+				this.dashboardError = this.store.pipe(select(GET_DASHBOARD_ERROR)).subscribe(error => {
+					this.handleLoadError(error);
+				});
+
 				this.reloadTimer = timer(0, 30000).subscribe(() => {
 					this.store.dispatch(new LoadDashboard());
 				});
@@ -36,10 +45,26 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	handleLoadError(error: HttpErrorResponse): void {
+		if (error) {
+			if (error.status < 100) {
+				this.showError = true;
+				this.stopSubscriptions();
+			} else {
+				throw error;
+			}
+		}
+	}
+
 	ngOnDestroy(): void {
+		this.stopSubscriptions();
+	}
+
+	stopSubscriptions(): void {
 		this.reloadTimer?.unsubscribe();
 		this.propsLoaded?.unsubscribe();
 		this.dashboardLoaded?.unsubscribe();
+		this.dashboardError?.unsubscribe();
 	}
 
 	abstract getSyncMode(): SyncMode;

@@ -1,5 +1,6 @@
 import {Action} from "@ngrx/store";
 import {Dashboard} from "../dashboard";
+import {HttpErrorResponse} from "@angular/common/http";
 
 export enum DashboardActionType {
 
@@ -25,7 +26,11 @@ export class DashboardLoaded implements Action {
 }
 
 export class LoadDashboardError implements Action {
+
 	readonly type = DashboardActionType.LOAD_DASHBOARD_ERROR;
+
+	constructor(public error: HttpErrorResponse) {
+	}
 }
 
 export type DashboardAction = LoadDashboard | DashboardLoaded | LoadDashboardError;
