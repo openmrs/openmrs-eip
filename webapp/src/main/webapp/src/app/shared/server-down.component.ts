@@ -10,7 +10,7 @@ export class ServerDownComponent {
 	serverDown = false;
 
 	reload(): void {
-		window.location.href = "/";
+		window.location.reload();
 	}
 
 }
