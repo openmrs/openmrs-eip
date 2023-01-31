@@ -172,3 +172,17 @@
 		</div>
 	</div>
 </div>
+
+<ng-template #serverDownMsgTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-error">Error</h4>
+	</div>
+	<div class="modal-body text-center">
+		<div class="text-danger" i18n="@@common-server-down-err-msg">
+			Server appears to be down
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-primary" (click)="reload()" i18n="@@common-try-again">Try Again</button>
+	</div>
+</ng-template>
