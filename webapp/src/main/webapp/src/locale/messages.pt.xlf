@@ -482,5 +482,15 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-server-down">
+			<segment>
+				<source>Server appears to be down</source>
+			</segment>
+		</unit>
+		<unit id="common-try-again">
+			<segment>
+				<source>Try Again</source>
+			</segment>
+		</unit>
 	</file>
 </xliff>

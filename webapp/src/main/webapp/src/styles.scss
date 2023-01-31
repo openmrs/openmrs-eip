@@ -150,4 +150,15 @@ body {
 	white-space: nowrap;
 }
 
+.error-msg {
+	@extend .container;
+	@extend .text-danger;
+	@extend .text-center;
+	@extend .p-2;
+	@extend .mb-2;
+	border: 1px solid $colorDanger;
+	background-color: $colorLightPink;
+	border-radius: 5px;
+}
+
 

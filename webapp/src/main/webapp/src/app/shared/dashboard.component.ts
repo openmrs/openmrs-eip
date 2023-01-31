@@ -23,12 +23,9 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	dashboardError?: Subscription;
 
-	modalRef?: NgbModalRef;
+	serverDown = false;
 
-	@ViewChild('serverDownMsgTemplate')
-	serverDownTemplate?: ElementRef;
-
-	constructor(private service: DashboardService, private store: Store, private modalService: NgbModal) {
+	constructor(private service: DashboardService, private store: Store) {
 	}
 
 	ngOnInit(): void {
@@ -52,21 +49,12 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 	handleLoadError(error: HttpErrorResponse): void {
 		if (error) {
 			if (error.status === 0) {
+				this.serverDown = true;
 				this.stopSubscriptions();
-				this.showErrorDialog();
 			} else {
 				throw error;
 			}
 		}
-	}
-
-	showErrorDialog(): void {
-		const dialogConfig: NgbModalOptions = {
-			size: 'lg',
-			backdrop: 'static'
-		}
-
-		this.modalRef = this.modalService.open(this.serverDownTemplate, dialogConfig);
 	}
 
 	ngOnDestroy(): void {
@@ -74,7 +62,6 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 	}
 
 	reload(): void {
-		this.modalRef?.close();
 		window.location.href = "/";
 	}
 
