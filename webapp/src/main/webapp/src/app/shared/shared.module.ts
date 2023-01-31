@@ -14,6 +14,7 @@ import {EffectsModule} from "@ngrx/effects";
 import {DashboardEffects} from "./state/dashboard.effects";
 import {StoreModule} from "@ngrx/store";
 import {dashboardReducer} from "./state/dashboard.reducer";
+import {ServerDownComponent} from "./server-down.component";
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {dashboardReducer} from "./state/dashboard.reducer";
 		ConfirmDialogComponent,
 		GroupViewComponent,
 		ClassNamePipe,
-		ModelClassPipe
+		ModelClassPipe,
+		ServerDownComponent
 	],
 	imports: [
 		CommonModule,
@@ -37,7 +39,8 @@ import {dashboardReducer} from "./state/dashboard.reducer";
 		DataTablesModule,
 		GroupViewComponent,
 		ClassNamePipe,
-		ModelClassPipe
+		ModelClassPipe,
+		ServerDownComponent
 	],
 	providers: [
 		{

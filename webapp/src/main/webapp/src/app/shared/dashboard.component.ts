@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {DashboardService} from "./dashboard.service";
 import {Dashboard} from "./dashboard";
 import {Subscription, timer} from 'rxjs';
@@ -8,7 +8,6 @@ import {SyncMode} from "../receiver/shared/sync-mode.enum";
 import {LoadDashboard} from "./state/dashboard.actions";
 import {GET_DASHBOARD, GET_DASHBOARD_ERROR} from "./state/dashboard.reducer";
 import {HttpErrorResponse} from "@angular/common/http";
-import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {
@@ -59,10 +58,6 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.stopSubscriptions();
-	}
-
-	reload(): void {
-		window.location.href = "/";
 	}
 
 	stopSubscriptions(): void {

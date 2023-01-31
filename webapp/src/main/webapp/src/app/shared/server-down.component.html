@@ -1,0 +1,5 @@
+<div class="error-msg" *ngIf="serverDown">
+	<i class="bi-exclamation-octagon"></i>&nbsp;
+	<span i18n="@@common-server-down">Server appears to be down</span>&nbsp;
+	<button type="button" class="btn btn-primary" (click)="reload()" i18n="@@common-try-again">Try Again</button>
+</div>
