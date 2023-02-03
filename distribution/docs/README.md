@@ -11,8 +11,7 @@
 5. [Console](#console)
     1. [User Account Management](#user-account-management)
     2. [Open Webapp Setup](#open-webapp-setup)
-6. [Security](#security)
-7. [DB Sync Technical Overview](#db-sync-technical-overview)
+6. [DB Sync Technical Overview](#db-sync-technical-overview)
     1. [Sender Overview](#sender-overview)
     2. [Receiver Overview](#receiver-overview)
 
@@ -89,10 +88,50 @@ more changes to the sender and receiver application properties jms settings, see
 Remember to keep note of the ArtemisMQ broker port and URL to the console application, you can peek at what's going on
 inside your JMS server using the console application.
 
+The configurations instructions in this section are based on artemis version 2.6.3, if running a different version 
+please be sure to find the instructions for your specific version.
+
+The `broker.xml` is usually located in `/var/lib/artemis/etc`.
+
 #### Configuration
 - In the `broker.xml` file for artemis, set `max-disk-usage` to 100, for more details see 
   [artemis configuration reference](https://activemq.apache.org/components/artemis/documentation/latest/configuration-index.html)
 
+#### SSL Setup
+For data privacy purposes, it's highly recommended to exchange messages between remote sites and central over a secure
+connection, below is how to set up SSL between the DB sync applications and ActiveMQ, these instructions apply to both 
+sender and receiver, for more details see [artemis SSL configuration](https://activemq.apache.org/components/artemis/migration-documentation/ssl.html)
+
+**SSL configuration in ActiveMQ**
+- First you will need to obtain the SSL certificate for the artemis server, for testing purposes you can create a self 
+  signed certificate, be sure to protect your generated private key and signed certificate by saving them in a keystore 
+  with a password.
+- In the `broker.xml` file for artemis, locate the `acceptors` tag and a new acceptor by copying the existing acceptor 
+  named **artemis**. For the new acceptor, set its name attribute to a unique value, assign it a new tcp port number in 
+  the URL value and then append the line below to its URL value, 
+  ```shell
+  sslEnabled=true;keyStorePath={KEYSTORE_PATH};keyStorePassword={KEYSTORE_PASSWORD}
+  ```
+  Where `{KEYSTORE_PATH}` and `{KEYSTORE_PASSWORD}` are the path and password respectively for the keystore containing 
+  the artemis private key from the first step and the signed certificate, values are separated by a semi-colon, so be 
+  sure to include it at the start if the original value didn't have one at the end.
+- Restart artemis
+
+**SSL configuration in the DB Application**
+
+The instructions below apply to both the sender and receiver DB sync applications.
+- Add the signed certificate to the Java trust store by running the command below from the terminal,
+  ```
+  keytool -import -alias artemis -file {CERTIFICATE_PATH} -storepass {TRUSTSTORE_PASSWORD} -keystore {TRUSTSTORE_PATH}
+  ```
+  Where `{CERTIFICATE_PATH}` is the path to the signed certificate, while `{TRUSTSTORE_PATH}` and `{TRUSTSTORE_PASSWORD}` 
+  are the path and password respectively to the trust store for the JVM used to run the DB sync application, the JVM 
+  trust store is a file located at `{JAVA_INSTALL_DIR}/Contents/Home/jre/lib/security/cacerts`.
+- In the `application.properties` file for the DB sync application you will need to set the value of the 
+  `spring.artemis.port` property to match the port number you assigned to the SSL enabled acceptor in the artemis 
+  `broker.xml` file, and also set the value of the `artemis.ssl.enabled` property to true.
+- Restart the DB sync application 
+    
 **Key things to note**
 - It's VERY important to understand how JMS servers work, key concepts especially when it comes to topics vs queues
   subscription and message durability before picking one over the other.
@@ -255,39 +294,6 @@ by doing the following;
 You are all set! To access the DB sync console, click on the installed owa from the **Manage Apps** page.
 
 **WARNING!!** **DO NOT** expose the DB sync console on the public internet.
-    
-## Security
-Sync messages exchanged  between the sender and the receiver can be encrypted. For that purpose, 2 Camel processors were
-developed to encrypt and sign (`PGPEncryptService`) message on one side and verify and decrypt (`PGPDecryptService`) on 
-the other side. They simply need to be registered in the corresponding Camel route before being sent or after being 
-received.
-
-The encryption is performed by PGP. So public and private keys shall be generated for each side of the exchange.
-* To encrypt the message, the sender needs the receiver's public key
-* To sign the message, the sender needs a private key
-* To verify the message, the receiver needs the sender's private key
-* To decrypt the message, the receiver needs a private key
-
-Thus, the sender needs to hold it's own private key and the receiver's public key in a folder and the 
-`application.properties` file of the sender should be as follows:
-
-`pgp.sender.keysFolderPath=<folder_path>` The path is a relative path of the working directory of the application.
-
-`pgp.sender.userId=<private_key_user_id>`
-
-`pgp.sender.password=<private_key_password>`
-
-`pgp.sender.receiverUserId=<reveiver_user_id>`
-
-The receiver needs to hold it's private key and all the public keys of the sender's providing data in a folder and the 
-`application.properties` file of the sender should be as follows:
-
-`pgp.receiver.keysFolderPath=<folder_path>` The path is a relative path of the working directory of the application.
-
-`pgp.receiver.password=<private_key_password>`
-
-**To be detected by the program, the private keys should all end with -sec.asc and the public keys should all end with 
--pub.asc**
 
 ## DB Sync Technical Overview
 
