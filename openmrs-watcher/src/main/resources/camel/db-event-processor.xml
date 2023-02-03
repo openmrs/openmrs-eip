@@ -7,12 +7,9 @@
 
         <process ref="id-setting-event-processor" />
 
-        <when>
-            <simple>${exchangeProperty.db-event-destinations} == null</simple>
-            <setProperty name="db-event-destinations">
-                <simple>{{db-event.destinations}}</simple>
-            </setProperty>
-        </when>
+        <setProperty name="db-event-destinations">
+            <simple>${properties:db-event.destinations}</simple>
+        </setProperty>
 
         <setProperty name="dbEventDestinations">
             <spel>#{new java.util.HashSet()}</spel>
