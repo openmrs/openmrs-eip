@@ -223,6 +223,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertEquals(Exception.class.getName(), retryItem.getExceptionType());
 		final int errorItemCount = TestUtils.getEntities(ReceiverRetryQueueItem.class).size();
 		exchange.setProperty(EX_PROP_RETRY_ITEM_ID, retryItemId);
+		exchange.setProperty(EX_PROP_RETRY_ITEM, retryItem);
 		exchange.setProperty(EX_PROP_FAILED_ENTITIES, new HashSet());
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
