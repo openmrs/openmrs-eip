@@ -2,7 +2,6 @@ package org.openmrs.eip.app.sender;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,15 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.debezium.DebeziumConstants;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.support.DefaultMessage;
-import org.apache.kafka.connect.data.ConnectSchema;
-import org.apache.kafka.connect.data.Field;
-import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,11 +40,6 @@ public class ChangeEventProcessorTest {
 	
 	private static final String TABLE_VISIT = "visit";
 	
-	private ChangeEventProcessor processor;
-	
-	@Mock
-	private ProducerTemplate mockProducerTemplate;
-	
 	@Mock
 	private SnapshotSavePointStore mockStore;
 	
@@ -72,31 +58,17 @@ public class ChangeEventProcessorTest {
 	}
 	
 	private ChangeEventProcessor createProcessor(int threadCount) {
-		processor = new ChangeEventProcessor(handler);
+		ChangeEventProcessor processor = new ChangeEventProcessor(handler);
 		Whitebox.setInternalState(processor, "threadCount", threadCount);
 		executor = Executors.newFixedThreadPool(threadCount);
 		Whitebox.setInternalState(ChangeEventProcessor.class, "executor", executor);
-		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
 		Mockito.when(mockStore.getSavedRowId(ArgumentMatchers.anyString())).thenReturn(null);
 		return processor;
 	}
 	
 	private Exchange createExchange(int index, String snapshot, String table) {
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		Message message = new DefaultMessage(exchange);
-		exchange.setMessage(message);
-		final Field id = new Field(table + "_id", 0, new ConnectSchema(Schema.Type.INT32));
-		final List<Field> ids = singletonList(id);
-		final Struct primaryKey = new Struct(
-		        new ConnectSchema(Schema.Type.STRUCT, false, null, "key", null, null, null, ids, null, null));
-		primaryKey.put(table + "_id", index);
-		message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
-		Map<String, Object> sourceMetadata = new HashMap();
-		sourceMetadata.put("table", table);
-		sourceMetadata.put("snapshot", snapshot);
-		message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
-		return exchange;
+		return ApiSenderTestUtils.createExchange(index, snapshot, table);
 	}
 	
 	private Integer getId(Exchange e) {
@@ -126,7 +98,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(size);
+		ChangeEventProcessor processor = createProcessor(size);
 		for (Exchange exchange : exchanges) {
 			processor.process(exchange);
 		}
@@ -167,7 +139,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(size);
+		ChangeEventProcessor processor = createProcessor(size);
 		for (Exchange exchange : exchanges) {
 			processor.process(exchange);
 		}
@@ -209,7 +181,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(1);
+		ChangeEventProcessor processor = createProcessor(1);
 		final int batchSize = 10;
 		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", batchSize);
 		Mockito.doAnswer(invocation -> {
@@ -266,7 +238,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(false), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(size);
+		ChangeEventProcessor processor = createProcessor(size);
 		for (Exchange exchange : exchanges) {
 			processor.process(exchange);
 		}
@@ -337,7 +309,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_VISIT), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(1);
+		ChangeEventProcessor processor = createProcessor(1);
 		final int batchSize = 10;
 		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", batchSize);
 		Mockito.doAnswer(invocation -> {
@@ -428,7 +400,7 @@ public class ChangeEventProcessorTest {
 			}).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(i)), eq(true), anyMap(), eq(e));
 		}
 		
-		processor = createProcessor(size);
+		ChangeEventProcessor processor = createProcessor(size);
 		Mockito.when(mockStore.getSavedRowId(TABLE_PERSON)).thenReturn(maxRowId);
 		for (Exchange exchange : exchanges) {
 			processor.process(exchange);
@@ -460,7 +432,7 @@ public class ChangeEventProcessorTest {
 		Exchange e = createExchange(0, FALSE.toString(), TABLE_PERSON);
 		Mockito.doThrow(new NumberFormatException()).when(handler).handle(eq(TABLE_PERSON), eq(String.valueOf(0)), eq(false),
 		    anyMap(), eq(e));
-		processor = createProcessor(1);
+		ChangeEventProcessor processor = createProcessor(1);
 		Exception thrown = assertThrows(EIPException.class, () -> {
 			processor.process(e);
 		});
