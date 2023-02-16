@@ -13,10 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.springframework.beans.BeanUtils;
 
@@ -60,17 +57,9 @@ public class ReceiverSyncArchive extends AbstractEntity {
 	public ReceiverSyncArchive() {
 	}
 	
-	public ReceiverSyncArchive(SyncMessage syncMessage) {
-		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
-		setDateReceived(syncMessage.getDateCreated());
-	}
-	
-	public ReceiverSyncArchive(ReceiverRetryQueueItem retry) {
-		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
-	}
-	
-	public ReceiverSyncArchive(ConflictQueueItem conflict) {
-		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
+	public ReceiverSyncArchive(SyncedMessage processedMessage) {
+		BeanUtils.copyProperties(processedMessage, this, "id", "dateCreated");
+		setDateReceived(processedMessage.getDateCreated());
 	}
 	
 	/**

@@ -1,15 +1,21 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
@@ -57,9 +63,12 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "date_received", updatable = false)
 	private Date dateReceived;
 	
-	@NotNull
 	@Column(name = "is_itemized", nullable = false)
 	private boolean itemized;
+	
+	@OneToMany(mappedBy = "message", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@NotEmpty
+	private Collection<PostSyncAction> postSyncActions;
 	
 	public SyncedMessage() {
 	}
@@ -67,17 +76,14 @@ public class SyncedMessage extends AbstractEntity {
 	public SyncedMessage(SyncMessage syncMessage) {
 		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
 		setDateReceived(syncMessage.getDateCreated());
-		setItemized(false);
 	}
 	
 	public SyncedMessage(ReceiverRetryQueueItem retry) {
 		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
-		setItemized(false);
 	}
 	
 	public SyncedMessage(ConflictQueueItem conflict) {
 		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
-		setItemized(false);
 	}
 	
 	/**
@@ -250,12 +256,35 @@ public class SyncedMessage extends AbstractEntity {
 		this.itemized = itemized;
 	}
 	
+	/**
+	 * Gets the postSyncActions
+	 *
+	 * @return the postSyncActions
+	 */
+	public Collection<PostSyncAction> getPostSyncActions() {
+		if (postSyncActions == null) {
+			postSyncActions = new LinkedHashSet();
+		}
+		
+		return postSyncActions;
+	}
+	
+	/**
+	 * Adds the specified {@link PostSyncAction}
+	 *
+	 * @param action the {@link PostSyncAction} to add
+	 */
+	public void addPostSyncAction(PostSyncAction action) {
+		action.setMessage(this);
+		getPostSyncActions().add(action);
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + " {id=" + getId() + ", identifier=" + identifier + ", modelClassName="
 		        + modelClassName + ", operation=" + operation + ", site=" + site + ", snapshot=" + snapshot
 		        + ", messageUuid=" + messageUuid + ", dateSentBySender=" + dateSentBySender + ", dateReceived="
-		        + dateReceived + ", itemized=" + itemized + "}";
+		        + dateReceived + "}";
 	}
 	
 }

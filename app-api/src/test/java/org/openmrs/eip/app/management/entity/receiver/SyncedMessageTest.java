@@ -2,7 +2,6 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.beans.PropertyDescriptor;
@@ -44,7 +43,6 @@ public class SyncedMessageTest {
 		assertNull(msg.getId());
 		assertNull(msg.getDateCreated());
 		Assert.assertEquals(syncMessage.getDateCreated(), msg.getDateReceived());
-		assertFalse(msg.isItemized());
 		Set<String> ignored = new HashSet();
 		ignored.add("id");
 		ignored.add("class");
@@ -90,7 +88,6 @@ public class SyncedMessageTest {
 		ignored.add("message");
 		ignored.add("attemptCount");
 		ignored.add("dateChanged");
-		assertFalse(msg.isItemized());
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;
@@ -125,7 +122,6 @@ public class SyncedMessageTest {
 		ignored.add("class");
 		ignored.add("dateCreated");
 		ignored.add("resolved");
-		assertFalse(msg.isItemized());
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;
