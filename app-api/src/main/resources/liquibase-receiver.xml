@@ -1473,7 +1473,7 @@
     <changeSet author="wluyima" id="20230215-1000">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_synced_msg"/>
+                <tableExists tableName="receiver_synced_msg" />
             </not>
         </preConditions>
         <comment>Adding receiver_synced_msg table</comment>
@@ -1505,10 +1505,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="date_received" type="DATETIME(3)" />
-            <column name="date_created" type="DATETIME">
+            <column name="is_itemized" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
-            <column name="is_itemized" type="BOOLEAN">
+            <column name="date_created" type="DATETIME">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -1517,6 +1517,41 @@
                                  baseTableName="receiver_synced_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
+                                 referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230217-1000">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_post_sync_action" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_post_sync_action table</comment>
+
+        <createTable tableName="receiver_post_sync_action">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="msg_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_processed" type="DATETIME" />
+            <column name="status_msg" type="VARCHAR(1024)" />
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="receiver_post_sync_action_msg_fk"
+                                 baseTableName="receiver_post_sync_action"
+                                 baseColumnNames="msg_id"
+                                 referencedTableName="receiver_synced_msg"
                                  referencedColumnNames="id" />
     </changeSet>
 

@@ -18,10 +18,9 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
@@ -61,13 +60,11 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void processMessage_shouldArchiveAndDeleteAProcessedMessage() throws Exception {
-		Assert.assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
+	public void processMessage_shouldAddTheMessageToTheSyncedQueueAndDeleteTheProcessedMessage() throws Exception {
+		Assert.assertTrue(TestUtils.getEntities(SyncedMessage.class).isEmpty());
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
-		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
-		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
 		final Long msgId = 2L;
 		SyncMessage message = TestUtils.getEntity(SyncMessage.class, msgId);
 		mockMsgProcessor.expectedMessageCount(1);
@@ -76,20 +73,19 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		consumer.processMessage(message);
 		
 		mockMsgProcessor.assertIsSatisfied();
-		Mockito.verify(mockResponsePublisher).sendSyncResponse(message);
 		assertNull(TestUtils.getEntity(SyncMessage.class, msgId));
-		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
-		assertEquals(1, archives.size());
-		ReceiverSyncArchive archive = archives.get(0);
-		assertEquals(message.getMessageUuid(), archive.getMessageUuid());
-		assertEquals(message.getModelClassName(), archive.getModelClassName());
-		assertEquals(message.getIdentifier(), archive.getIdentifier());
-		assertEquals(message.getEntityPayload(), archive.getEntityPayload());
-		assertEquals(message.getSite(), archive.getSite());
-		assertEquals(message.getSnapshot(), archive.getSnapshot());
-		assertEquals(message.getDateSentBySender(), archive.getDateSentBySender());
-		assertEquals(message.getDateCreated(), archive.getDateReceived());
-		assertNotNull(archive.getDateCreated());
+		List<SyncedMessage> syncedMsgs = TestUtils.getEntities(SyncedMessage.class);
+		assertEquals(1, syncedMsgs.size());
+		SyncedMessage synced = syncedMsgs.get(0);
+		assertEquals(message.getMessageUuid(), synced.getMessageUuid());
+		assertEquals(message.getModelClassName(), synced.getModelClassName());
+		assertEquals(message.getIdentifier(), synced.getIdentifier());
+		assertEquals(message.getEntityPayload(), synced.getEntityPayload());
+		assertEquals(message.getSite(), synced.getSite());
+		assertEquals(message.getSnapshot(), synced.getSnapshot());
+		assertEquals(message.getDateSentBySender(), synced.getDateSentBySender());
+		assertEquals(message.getDateCreated(), synced.getDateReceived());
+		assertNotNull(synced.getDateCreated());
 	}
 	
 	@Test
@@ -97,8 +93,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
-		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
-		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
 		final Long msgId = 2L;
 		SyncMessage message = TestUtils.getEntity(SyncMessage.class, msgId);
 		mockMsgProcessor.expectedMessageCount(1);
@@ -107,7 +101,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		consumer.processMessage(message);
 		
 		mockMsgProcessor.assertIsSatisfied();
-		Mockito.verify(mockResponsePublisher).sendSyncResponse(message);
 		assertNull(TestUtils.getEntity(SyncMessage.class, msgId));
 	}
 	
@@ -116,8 +109,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
-		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
-		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
 		final Long msgId = 2L;
 		SyncMessage message = TestUtils.getEntity(SyncMessage.class, msgId);
 		mockMsgProcessor.expectedMessageCount(1);
@@ -126,7 +117,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		consumer.processMessage(message);
 		
 		mockMsgProcessor.assertIsSatisfied();
-		Mockito.verify(mockResponsePublisher).sendSyncResponse(message);
 		assertNull(TestUtils.getEntity(SyncMessage.class, msgId));
 	}
 	
@@ -135,8 +125,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
-		ReceiverActiveMqMessagePublisher mockResponsePublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
-		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockResponsePublisher);
 		final Long msgId = 2L;
 		SyncMessage message = TestUtils.getEntity(SyncMessage.class, msgId);
 		mockMsgProcessor.expectedMessageCount(1);
@@ -144,7 +132,6 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		assertEquals("Something went wrong while processing sync message with id: " + msgId, thrown.getMessage());
 		
 		mockMsgProcessor.assertIsSatisfied();
-		Mockito.verify(mockResponsePublisher).sendSyncResponse(message);
 		Assert.assertNotNull(TestUtils.getEntity(SyncMessage.class, msgId));
 	}
 	

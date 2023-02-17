@@ -8,8 +8,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
@@ -57,9 +55,6 @@ public class SiteMessageConsumerTest {
 	@Mock
 	private ExtendedCamelContext mockCamelContext;
 	
-	@Mock
-	private ReceiverActiveMqMessagePublisher mockPublisher;
-	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverContext.class);
@@ -73,7 +68,6 @@ public class SiteMessageConsumerTest {
 		executor = Executors.newFixedThreadPool(size);
 		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
-		Whitebox.setInternalState(consumer, ReceiverActiveMqMessagePublisher.class, mockPublisher);
 	}
 	
 	private SyncMessage createMessage(int index, boolean snapshot) {
@@ -113,9 +107,6 @@ public class SiteMessageConsumerTest {
 		
 		consumer.processMessages(messages);
 		
-		for (SyncMessage m : messages) {
-			verify(mockPublisher).sendSyncResponse(m);
-		}
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
 		assertEquals(size, expectedMsgIdThreadNameMap.size());
@@ -154,9 +145,6 @@ public class SiteMessageConsumerTest {
 		
 		consumer.processMessages(messages);
 		
-		for (SyncMessage m : messages) {
-			verify(mockPublisher).sendSyncResponse(m);
-		}
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
 		assertEquals(size, expectedMsgIdThreadNameMap.size());
@@ -197,9 +185,6 @@ public class SiteMessageConsumerTest {
 		
 		consumer.processMessages(messages);
 		
-		for (SyncMessage m : messages) {
-			verify(mockPublisher).sendSyncResponse(m);
-		}
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
 		assertEquals(size, expectedMsgIdThreadNameMap.size());
@@ -258,13 +243,11 @@ public class SiteMessageConsumerTest {
 				assertFalse(expectedResults.contains(msg.getId()));
 				assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 				assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-				verify(mockPublisher, never()).sendSyncResponse(msg);
 			} else {
 				assertTrue(expectedResults.contains(msg.getId()));
 				assertNotNull(expectedMsgIdThreadMap.get(msg.getId()));
 				assertNotEquals(originalThread, expectedMsgIdThreadMap.get(msg.getId()));
 				assertEquals(consumer.getThreadName(msg), expectedMsgIdThreadNameMap.get(msg.getId()).split(":")[1]);
-				verify(mockPublisher).sendSyncResponse(msg);
 			}
 		}
 	}
@@ -307,7 +290,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -315,7 +297,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	
@@ -357,7 +338,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -365,7 +345,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	
@@ -407,7 +386,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -415,7 +393,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	
@@ -457,7 +434,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -465,7 +441,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	
@@ -507,7 +482,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -515,7 +489,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	
@@ -557,7 +530,6 @@ public class SiteMessageConsumerTest {
 		assertNotNull(expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertNotEquals(originalThread, expectedMsgIdThreadMap.get(firstMsg.getId()));
 		assertEquals(consumer.getThreadName(firstMsg), expectedMsgIdThreadNameMap.get(firstMsg.getId()).split(":")[1]);
-		verify(mockPublisher).sendSyncResponse(firstMsg);
 		
 		//All other subclass messages for the same entity are skipped after first for the entity is encountered
 		for (int i = 1; i < size; i++) {
@@ -565,7 +537,6 @@ public class SiteMessageConsumerTest {
 			assertFalse(expectedResults.contains(msg.getId()));
 			assertFalse(expectedMsgIdThreadMap.containsKey(msg.getId()));
 			assertFalse(expectedMsgIdThreadNameMap.containsKey(msg.getId()));
-			verify(mockPublisher, never()).sendSyncResponse(msg);
 		}
 	}
 	

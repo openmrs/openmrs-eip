@@ -20,7 +20,7 @@ import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -197,9 +197,9 @@ public class SiteMessageConsumer implements Runnable {
 	 * @param msg the sync message to process
 	 */
 	public void processMessage(SyncMessage msg) {
-		messagePublisher.sendSyncResponse(msg);
-		
-		log.info("Submitting sync message to the processor");
+		if (log.isDebugEnabled()) {
+			log.debug("Submitting sync message to the processor");
+		}
 		
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
 		
@@ -212,18 +212,17 @@ public class SiteMessageConsumer implements Runnable {
 		final Long id = msg.getId();
 		if (msgProcessed || movedToConflict || movedToError) {
 			if (msgProcessed) {
-				log.info("Archiving the sync message");
-				
-				ReceiverSyncArchive archive = new ReceiverSyncArchive(msg);
-				archive.setDateCreated(new Date());
+				log.info("Moving the message to the synced queue");
+				SyncedMessage synced = new SyncedMessage(msg);
+				synced.setDateCreated(new Date());
 				if (log.isDebugEnabled()) {
-					log.debug("Saving sync archive");
+					log.debug("Saving synced message");
 				}
 				
-				producerTemplate.sendBody("jpa:" + ReceiverSyncArchive.class.getSimpleName(), archive);
+				producerTemplate.sendBody("jpa:" + SyncedMessage.class.getSimpleName(), synced);
 				
 				if (log.isDebugEnabled()) {
-					log.debug("Successfully saved sync archive");
+					log.debug("Successfully saved synced message");
 				}
 			}
 			

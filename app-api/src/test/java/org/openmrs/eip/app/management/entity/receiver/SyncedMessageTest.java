@@ -132,4 +132,34 @@ public class SyncedMessageTest {
 		}
 	}
 	
+	@Test
+	public void readyForArchive_shouldReturnFalseIfTheMessageIsNotItemized() {
+		Assert.assertFalse(new SyncedMessage().readyForArchive());
+	}
+	
+	@Test
+	public void readyForArchive_shouldReturnFalseIfTheMessageHasAnyInCompletePostActions() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.setItemized(true);
+		msg.addAction(new PostSyncAction());
+		PostSyncAction action = new PostSyncAction();
+		action.markAsCompleted();
+		msg.addAction(action);
+		msg.addAction(new PostSyncAction());
+		Assert.assertFalse(msg.readyForArchive());
+	}
+	
+	@Test
+	public void readyForArchive_shouldReturnTrueIfAllPostActionsAreCompleted() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.setItemized(true);
+		PostSyncAction action1 = new PostSyncAction();
+		action1.markAsCompleted();
+		PostSyncAction action2 = new PostSyncAction();
+		action2.markAsCompleted();
+		msg.addAction(action1);
+		msg.addAction(action2);
+		Assert.assertTrue(msg.readyForArchive());
+	}
+	
 }

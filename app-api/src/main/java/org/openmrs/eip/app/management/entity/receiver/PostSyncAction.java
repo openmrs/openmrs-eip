@@ -15,7 +15,9 @@ import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 @Entity
 @Table(name = "receiver_post_sync_action")
@@ -23,7 +25,7 @@ import lombok.Data;
 public class PostSyncAction extends AbstractEntity {
 	
 	public enum PostSyncActionStatus {
-		NEW, PASS, FAIL
+		NEW, SUCCESS, FAILURE
 	}
 	
 	public enum PostSyncActionType {
@@ -34,6 +36,7 @@ public class PostSyncAction extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
 	@Access(AccessType.FIELD)
+	@Setter(AccessLevel.NONE)
 	private PostSyncActionStatus status = PostSyncActionStatus.NEW;
 	
 	@NotNull
@@ -47,19 +50,46 @@ public class PostSyncAction extends AbstractEntity {
 	private SyncedMessage message;
 	
 	@Column(name = "date_processed")
+	@Setter(AccessLevel.NONE)
 	private Date dateProcessed;
 	
-	@Column(name = "date_changed")
-	private Date dateChanged;
+	@Column(name = "status_msg", length = 1024)
+	@Setter(AccessLevel.NONE)
+	private String statusMessage;
 	
-	@Column(name = "error_msg", length = 1024)
-	private String errorMessage;
+	/**
+	 * Checks if this action is completed successfully with no errors or not
+	 * 
+	 * @return true for a successfully completed action otherwise false
+	 */
+	public boolean isCompleted() {
+		return getStatus() == PostSyncActionStatus.SUCCESS;
+	}
+	
+	/**
+	 * Marks this action as successfully processed
+	 */
+	public void markAsCompleted() {
+		updateStatus(PostSyncActionStatus.SUCCESS);
+		this.statusMessage = null;
+	}
+	
+	/**
+	 * Marks this action as processed with a failure
+	 */
+	public void markAsProcessedWithError(String statusMessage) {
+		updateStatus(PostSyncActionStatus.FAILURE);
+		this.statusMessage = statusMessage;
+	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " {id=" + getId() + ", status=" + status + ", actionType=" + actionType
-		        + ", dateProcessed=" + dateProcessed + ", dateChanged=" + dateChanged + ", messageUuid="
-		        + message.getMessageUuid() + ", errorMessage=" + errorMessage + "}";
+		return "{actionType=" + actionType + ", status=" + status + "}";
+	}
+	
+	private void updateStatus(PostSyncActionStatus status) {
+		this.status = status;
+		this.dateProcessed = new Date();
 	}
 	
 }
