@@ -69,10 +69,10 @@
                                     <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true || ${exchangeProperty.org.openmrs.eip.app.receiver.sync-movedToConflictQueue} == true</simple>
                                     <when>
                                         <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true</simple>
-                                        <log message="Archiving the error item with id: ${exchangeProperty.retry-item-id}" />
+                                        <log message="Moving to synced queue the error item with id: ${exchangeProperty.retry-item-id}" />
 
                                         <setBody>
-                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive(getProperty('retry-item'))}</spel>
+                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.SyncedMessage(getProperty('retry-item'))}</spel>
                                         </setBody>
                                         <script>
                                             <spel>
@@ -80,14 +80,14 @@
                                             </spel>
                                         </script>
 
-                                        <log loggingLevel="DEBUG" message="Saving sync archive" />
+                                        <log loggingLevel="DEBUG" message="Saving synced message" />
 
-                                        <toD uri="jpa:ReceiverSyncArchive" />
+                                        <toD uri="jpa:SyncedMessage" />
 
-                                        <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
+                                        <log loggingLevel="DEBUG" message="Successfully saved synced message" />
                                     </when>
 
-                                    <log message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                    <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
                                     <toD uri="jpa:ReceiverRetryQueueItem?query=DELETE FROM ReceiverRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
 

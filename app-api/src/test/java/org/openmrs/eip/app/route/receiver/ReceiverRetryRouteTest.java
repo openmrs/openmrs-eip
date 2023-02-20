@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
@@ -179,10 +179,10 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	
 	@Test
 	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
-	public void shouldProcessARetryItemAndRemoveItFromTheErrorQueue() throws Exception {
+	public void shouldProcessARetryItemAndMoveItFromTheErrorToTheSyncedQueue() throws Exception {
 		final String uuid = "person-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
-		assertTrue(getEntities(ReceiverSyncArchive.class).isEmpty());
+		assertTrue(getEntities(SyncedMessage.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setMessageUuid("message-uuid");
 		retry.setModelClassName(PersonModel.class.getName());
@@ -215,18 +215,18 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		mockMsgProcessorEndpoint.assertIsSatisfied();
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
-		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
-		assertEquals(1, archives.size());
-		ReceiverSyncArchive archive = archives.get(0);
-		assertEquals(retry.getMessageUuid(), archive.getMessageUuid());
-		assertEquals(retry.getModelClassName(), archive.getModelClassName());
-		assertEquals(retry.getIdentifier(), archive.getIdentifier());
-		assertEquals(retry.getEntityPayload(), archive.getEntityPayload());
-		assertEquals(retry.getSite(), archive.getSite());
-		assertEquals(retry.getSnapshot(), archive.getSnapshot());
-		assertEquals(retry.getDateSentBySender(), archive.getDateSentBySender());
-		assertEquals(retry.getDateReceived(), archive.getDateReceived());
-		assertNotNull(archive.getDateCreated());
+		List<SyncedMessage> syncedMsgs = TestUtils.getEntities(SyncedMessage.class);
+		assertEquals(1, syncedMsgs.size());
+		SyncedMessage syncedMsg = syncedMsgs.get(0);
+		assertEquals(retry.getMessageUuid(), syncedMsg.getMessageUuid());
+		assertEquals(retry.getModelClassName(), syncedMsg.getModelClassName());
+		assertEquals(retry.getIdentifier(), syncedMsg.getIdentifier());
+		assertEquals(retry.getEntityPayload(), syncedMsg.getEntityPayload());
+		assertEquals(retry.getSite(), syncedMsg.getSite());
+		assertEquals(retry.getSnapshot(), syncedMsg.getSnapshot());
+		assertEquals(retry.getDateSentBySender(), syncedMsg.getDateSentBySender());
+		assertEquals(retry.getDateReceived(), syncedMsg.getDateReceived());
+		assertNotNull(syncedMsg.getDateCreated());
 	}
 	
 	@Test

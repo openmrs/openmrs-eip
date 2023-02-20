@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncOperation;
@@ -38,7 +39,6 @@ public class ReceiverSyncArchiveTest {
 		
 		Assert.assertNull(archive.getId());
 		Assert.assertNull(archive.getDateCreated());
-		Assert.assertEquals(msg.getDateCreated(), archive.getDateReceived());
 		Set<String> ignored = new HashSet();
 		ignored.add("id");
 		ignored.add("class");
@@ -50,6 +50,40 @@ public class ReceiverSyncArchiveTest {
 			
 			String getter = descriptor.getReadMethod().getName();
 			assertEquals(invokeMethod(msg, getter), invokeMethod(archive, getter));
+		}
+	}
+	
+	@Test
+	public void shouldCreateAReceiverArchiveFromAConflictQueueItem() throws Exception {
+		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(ConflictQueueItem.class);
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setId(1L);
+		conflict.setDateCreated(new Date());
+		conflict.setIdentifier("uuid");
+		conflict.setEntityPayload("payload");
+		conflict.setModelClassName(PersonModel.class.getName());
+		conflict.setSite(new SiteInfo());
+		conflict.setSnapshot(true);
+		conflict.setMessageUuid("message-uuid");
+		conflict.setDateSentBySender(LocalDateTime.now());
+		conflict.setDateReceived(new Date());
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
+		
+		Assert.assertNull(archive.getId());
+		Assert.assertNull(archive.getDateCreated());
+		Set<String> ignored = new HashSet();
+		ignored.add("id");
+		ignored.add("class");
+		ignored.add("dateCreated");
+		ignored.add("resolved");
+		for (PropertyDescriptor descriptor : descriptors) {
+			if (ignored.contains(descriptor.getName())) {
+				continue;
+			}
+			
+			String getter = descriptor.getReadMethod().getName();
+			assertEquals(invokeMethod(conflict, getter), invokeMethod(archive, getter));
 		}
 	}
 	
