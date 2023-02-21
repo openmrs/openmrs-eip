@@ -16,12 +16,13 @@ import javax.validation.constraints.NotNull;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "receiver_post_sync_action")
-@Data
+@Getter
+@Setter
 public class PostSyncAction extends AbstractEntity {
 	
 	public enum PostSyncActionStatus {

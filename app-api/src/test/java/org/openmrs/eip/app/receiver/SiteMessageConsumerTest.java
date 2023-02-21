@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
@@ -55,6 +56,9 @@ public class SiteMessageConsumerTest {
 	@Mock
 	private ExtendedCamelContext mockCamelContext;
 	
+	@Mock
+	private SyncedMessageRepository syncedMsgRepo;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverContext.class);
@@ -68,6 +72,7 @@ public class SiteMessageConsumerTest {
 		executor = Executors.newFixedThreadPool(size);
 		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, size, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
+		Whitebox.setInternalState(consumer, SyncedMessageRepository.class, syncedMsgRepo);
 	}
 	
 	private SyncMessage createMessage(int index, boolean snapshot) {

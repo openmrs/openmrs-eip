@@ -21,6 +21,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -54,9 +55,9 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ExecutorService msgExecutor;
 	
-	private ReceiverActiveMqMessagePublisher messagePublisher;
-	
 	private String messageProcessorUri;
+	
+	private SyncedMessageRepository syncedMsgRepo;
 	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
@@ -88,8 +89,8 @@ public class SiteMessageConsumer implements Runnable {
 			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		}
 		
-		if (messagePublisher == null) {
-			messagePublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
+		if (syncedMsgRepo == null) {
+			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
 		}
 		
 		do {
@@ -213,13 +214,13 @@ public class SiteMessageConsumer implements Runnable {
 		if (msgProcessed || movedToConflict || movedToError) {
 			if (msgProcessed) {
 				log.info("Moving the message to the synced queue");
-				SyncedMessage synced = new SyncedMessage(msg);
-				synced.setDateCreated(new Date());
+				SyncedMessage syncedMsg = new SyncedMessage(msg);
+				syncedMsg.setDateCreated(new Date());
 				if (log.isDebugEnabled()) {
 					log.debug("Saving synced message");
 				}
 				
-				producerTemplate.sendBody("jpa:" + SyncedMessage.class.getSimpleName(), synced);
+				syncedMsgRepo.save(syncedMsg);
 				
 				if (log.isDebugEnabled()) {
 					log.debug("Successfully saved synced message");

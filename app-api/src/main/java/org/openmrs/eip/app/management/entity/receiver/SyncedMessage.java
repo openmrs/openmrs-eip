@@ -26,13 +26,13 @@ import org.openmrs.eip.component.SyncOperation;
 import org.springframework.beans.BeanUtils;
 
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "receiver_synced_msg")
-@Data
+@Getter
+@Setter
 public class SyncedMessage extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
@@ -111,8 +111,8 @@ public class SyncedMessage extends AbstractEntity {
 	 * @param action the {@link PostSyncAction} to add
 	 */
 	public void addAction(PostSyncAction action) {
-		getActions().add(action);
 		action.setMessage(this);
+		getActions().add(action);
 	}
 	
 	/**

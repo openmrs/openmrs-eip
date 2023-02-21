@@ -13,6 +13,8 @@ public class ReceiverConstants {
 	public static final String PROP_DELAY_IN_SECONDS = "site.message.reader.delay";
 	
 	public static final int DEFAULT_DELAY_IN_SECONDS = 5 * 60;
+
+	public static final String URI_RECEIVER_UTILS = "bean:"+ReceiverUtils.class.getName()+"?methodName";
 	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
