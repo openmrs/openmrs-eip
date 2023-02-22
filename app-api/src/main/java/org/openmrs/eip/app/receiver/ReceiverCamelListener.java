@@ -45,6 +45,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
+	private static final int INITIAL_DELAY_SECONDS = 2;
+	
 	private ScheduledExecutorService siteExecutor;
 	
 	private ExecutorService msgExecutor;
@@ -101,10 +103,9 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());
 			
-			sites.stream().forEach(site -> {
-				SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor);
-				siteExecutor.scheduleWithFixedDelay(consumer, 2, delay, TimeUnit.SECONDS);
-			});
+			startMessageConsumers(sites);
+			
+			startMessageItemizers(sites);
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			int timeout = 15;
@@ -143,6 +144,20 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			}
 		}
 		
+	}
+	
+	private void startMessageConsumers(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor);
+			siteExecutor.scheduleWithFixedDelay(consumer, INITIAL_DELAY_SECONDS, delay, TimeUnit.SECONDS);
+		});
+	}
+	
+	private void startMessageItemizers(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SyncedMessageItemizer itemizer = new SyncedMessageItemizer(site);
+			siteExecutor.scheduleWithFixedDelay(itemizer, INITIAL_DELAY_SECONDS * 2, delay + 30, TimeUnit.SECONDS);
+		});
 	}
 	
 }

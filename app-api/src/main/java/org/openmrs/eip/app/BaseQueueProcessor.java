@@ -50,7 +50,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				try {
 					setThreadName(item);
 					if (log.isDebugEnabled()) {
-						log.debug("Postponed processing of {} because of an earlier unprocessed event for the same entity",
+						log.debug("Postponed processing of {} because of an earlier unprocessed item(s) for the same entity",
 						    item);
 					}
 				}

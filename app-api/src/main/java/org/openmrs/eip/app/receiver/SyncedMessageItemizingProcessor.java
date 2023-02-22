@@ -6,6 +6,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -45,12 +46,12 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public String getLogicalType(SyncedMessage item) {
-		return item.getClass().getName();
+		return item.getModelClassName();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return null;
+		return Utils.getListOfModelClassHierarchy(logicalType);
 	}
 	
 }

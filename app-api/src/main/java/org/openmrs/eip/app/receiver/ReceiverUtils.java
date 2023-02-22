@@ -16,8 +16,12 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ReceiverUtils {
+	
+	protected static final Logger log = LoggerFactory.getLogger(ReceiverUtils.class);
 	
 	public static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
@@ -52,6 +56,10 @@ public final class ReceiverUtils {
 	 * @param message {@link SyncedMessage} instance
 	 */
 	public static void generatePostSyncActions(SyncedMessage message) {
+		if (log.isDebugEnabled()) {
+			log.debug("Generating post sync actions for message -> " + message);
+		}
+		
 		Date dateCreated = new Date();
 		PostSyncAction sendResp = new PostSyncAction();
 		sendResp.setMessage(message);
@@ -75,6 +83,10 @@ public final class ReceiverUtils {
 		}
 		
 		syncedMsgRepo.save(message);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Done generating post sync actions for message");
+		}
 	}
 	
 	private static void addCacheEvictAction(SyncedMessage message, Date dateCreated) {

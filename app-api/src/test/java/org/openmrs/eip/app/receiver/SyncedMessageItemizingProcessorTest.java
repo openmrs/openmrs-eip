@@ -2,11 +2,11 @@ package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.component.model.PersonModel;
 
 public class SyncedMessageItemizingProcessorTest {
 	
@@ -45,12 +45,15 @@ public class SyncedMessageItemizingProcessorTest {
 	
 	@Test
 	public void getLogicalType_shouldReturnTheTableName() {
-		assertEquals(SyncedMessage.class.getName(), processor.getLogicalType(new SyncedMessage()));
+		final String type = PersonModel.class.getName();
+		SyncedMessage msg = new SyncedMessage();
+		msg.setModelClassName(type);
+		assertEquals(type, processor.getLogicalType(msg));
 	}
 	
 	@Test
-	public void getLogicalTypeHierarchy_shouldReturnNull() {
-		Assert.assertNull(processor.getLogicalTypeHierarchy("visit"));
+	public void getLogicalTypeHierarchy_shouldReturnTheLogicalTypeHierarchy() {
+		assertEquals(2, processor.getLogicalTypeHierarchy(PersonModel.class.getName()).size());
 	}
 	
 	@Test

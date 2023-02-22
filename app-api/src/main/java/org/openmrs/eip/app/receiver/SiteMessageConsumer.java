@@ -105,7 +105,7 @@ public class SiteMessageConsumer implements Runnable {
 				
 				if (syncMessages.isEmpty()) {
 					if (log.isTraceEnabled()) {
-						log.trace("No sync message found from site: " + site);
+						log.trace("No sync messages found from site: " + site);
 					}
 					
 					break;
