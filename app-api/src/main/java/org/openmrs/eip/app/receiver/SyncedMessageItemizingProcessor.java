@@ -25,7 +25,7 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public String getUniqueId(SyncedMessage item) {
-		return item.getId().toString();
+		return item.getIdentifier();
 	}
 	
 	@Override
@@ -35,13 +35,8 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public String getThreadName(SyncedMessage item) {
-		return item.getSite().getIdentifier() + "-" + AppUtils.getSimpleName(item.getModelClassName()) + "-"
-		        + item.getIdentifier() + "-" + item.getMessageUuid() + "-" + item.getId();
-	}
-	
-	@Override
-	public String getDestinationUri() {
-		return ReceiverConstants.URI_RECEIVER_UTILS;
+		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
 	}
 	
 	@Override
@@ -52,6 +47,11 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
 		return Utils.getListOfModelClassHierarchy(logicalType);
+	}
+	
+	@Override
+	public void processItem(SyncedMessage item) {
+		ReceiverUtils.generatePostSyncActions(item);
 	}
 	
 }

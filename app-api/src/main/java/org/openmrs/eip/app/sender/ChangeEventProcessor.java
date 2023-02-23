@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.camel.Processor;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
 import org.openmrs.eip.app.BaseParallelProcessor;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @Component("changeEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class ChangeEventProcessor extends BaseParallelProcessor {
+public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implements Processor {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
 	
@@ -45,6 +46,11 @@ public class ChangeEventProcessor extends BaseParallelProcessor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
+		processWork(exchange);
+	}
+	
+	@Override
+	public void processWork(Exchange exchange) {
 		try {
 			if (CustomFileOffsetBackingStore.isDisabled()) {
 				if (log.isDebugEnabled()) {

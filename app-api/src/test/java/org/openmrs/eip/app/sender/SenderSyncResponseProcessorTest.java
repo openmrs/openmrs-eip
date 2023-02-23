@@ -49,8 +49,8 @@ public class SenderSyncResponseProcessorTest {
 	}
 	
 	@Test
-	public void getDestinationUri_shouldReturnTheUriToSendToEventsForProcessing() {
-		assertEquals(SenderConstants.URI_RESPONSE_PROCESSOR, processor.getDestinationUri());
+	public void getEndpointUri_shouldReturnTheUriToSendToEventsForProcessing() {
+		assertEquals(SenderConstants.URI_RESPONSE_PROCESSOR, processor.getEndpointUri());
 	}
 	
 }

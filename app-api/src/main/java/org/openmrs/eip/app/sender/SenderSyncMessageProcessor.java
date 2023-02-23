@@ -2,7 +2,7 @@ package org.openmrs.eip.app.sender;
 
 import java.util.List;
 
-import org.openmrs.eip.app.BaseQueueProcessor;
+import org.openmrs.eip.app.BaseToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.Utils;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component("senderSyncMsgProcessor")
 @Profile(SyncProfiles.SENDER)
-public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMessage> {
+public class SenderSyncMessageProcessor extends BaseToCamelEndpointProcessor<SenderSyncMessage> {
 	
 	@Override
 	public String getProcessorName() {
@@ -34,7 +34,7 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 	}
 	
 	@Override
-	public String getDestinationUri() {
+	public String getEndpointUri() {
 		return SenderConstants.URI_ACTIVEMQ_PUBLISHER;
 	}
 	

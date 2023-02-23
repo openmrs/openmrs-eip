@@ -2,9 +2,6 @@ package org.openmrs.eip.app.receiver;
 
 import java.util.List;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
@@ -19,17 +16,12 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageItemizer.class);
 	
-	private ProducerTemplate producerTemplate;
-	
 	private SyncedMessageRepository syncedMsgRepo;
 	
 	private SyncedMessageItemizingProcessor processor;
 	
 	public SyncedMessageItemizer(SiteInfo site) {
 		super(site);
-		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
-		processor = SyncContext.getBean(SyncedMessageItemizingProcessor.class);
 	}
 	
 	@Override
@@ -40,12 +32,20 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	@Override
 	public boolean doRun() throws Exception {
 		//TODO Check for existence of sync messages before running
+		if (syncedMsgRepo == null) {
+			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
+		}
+		if (processor == null) {
+			processor = SyncContext.getBean(SyncedMessageItemizingProcessor.class);
+		}
+		
 		if (log.isTraceEnabled()) {
 			log.trace("Fetching next batch of messages to itemize for site: " + getSite());
 		}
 		
 		List<SyncedMessage> messages = syncedMsgRepo.findFirst1000BySiteAndItemizedOrderByDateCreatedAscIdAsc(getSite(),
 		    false);
+		
 		if (messages.isEmpty()) {
 			if (log.isTraceEnabled()) {
 				log.trace("No synced messages found from site: " + getSite());
@@ -56,9 +56,7 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 		
 		log.info("Itemizing " + messages.size() + " message(s) for site: " + getSite());
 		
-		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(messages).build();
-		
-		processor.process(exchange);
+		processor.processWork(messages);
 		
 		return false;
 	}

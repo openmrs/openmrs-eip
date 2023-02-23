@@ -55,8 +55,8 @@ public class SenderSyncMessageProcessorTest {
 	}
 	
 	@Test
-	public void getDestinationUri_shouldReturnTheUriToSendToEventsForProcessing() {
-		assertEquals(SenderConstants.URI_ACTIVEMQ_PUBLISHER, processor.getDestinationUri());
+	public void getEndpointUri_shouldReturnTheUriToSendToEventsForProcessing() {
+		assertEquals(SenderConstants.URI_ACTIVEMQ_PUBLISHER, processor.getEndpointUri());
 	}
 	
 }

@@ -13,10 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -34,14 +31,14 @@ public class BaseQueueProcessorTest {
 	
 	private static final String MOCK_URI = "mock:uri";
 	
-	private TestEventProcessor processor;
+	private BaseQueueProcessor processor;
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
 	private static ExecutorService executor;
 	
-	public class TestEventProcessor extends BaseQueueProcessor<DebeziumEvent> {
+	public class TestEventProcessor extends BaseToCamelEndpointProcessor<DebeziumEvent> {
 		
 		@Override
 		public String getProcessorName() {
@@ -69,7 +66,7 @@ public class BaseQueueProcessorTest {
 		}
 		
 		@Override
-		public String getDestinationUri() {
+		public String getEndpointUri() {
 			return MOCK_URI;
 		}
 		
@@ -103,7 +100,7 @@ public class BaseQueueProcessorTest {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
 	}
 	
-	private TestEventProcessor createProcessor(int threadCount) {
+	private BaseQueueProcessor createProcessor(int threadCount) {
 		processor = new TestEventProcessor();
 		Whitebox.setInternalState(processor, int.class, threadCount);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
@@ -123,7 +120,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllEventsInParallelForSlowThreads() throws Exception {
+	public void processWork_shouldProcessAllEventsInParallelForSlowThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -142,11 +139,9 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
 		processor = createProcessor(size);
 		
-		processor.process(exchange);
+		processor.processWork(events);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
@@ -161,7 +156,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessAllEventsInParallelForFastThreads() throws Exception {
+	public void processWork_shouldProcessAllEventsInParallelForFastThreads() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 100;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -179,11 +174,9 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
 		processor = createProcessor(size);
 		
-		processor.process(exchange);
+		processor.processWork(events);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
@@ -198,7 +191,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKey() throws Exception {
+	public void processWork_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKey() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 20;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -220,11 +213,9 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
 		processor = createProcessor(size);
 		
-		processor.process(exchange);
+		processor.processWork(events);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(16, expectedResults.size());
@@ -244,7 +235,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKeyFromDifferentTablesButSameHierarchy()
+	public void processWork_shouldProcessOneItemInCaseOfMultipleItemsWithTheSameKeyFromDifferentTablesButSameHierarchy()
 	    throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 20;
@@ -272,11 +263,9 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
 		processor = createProcessor(size);
 		
-		processor.process(exchange);
+		processor.processWork(events);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(16, expectedResults.size());
@@ -296,7 +285,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldNotProcessEventsWhenTheApplicationContextIsStopping() throws Exception {
+	public void processWork_shouldNotProcessEventsWhenTheApplicationContextIsStopping() throws Exception {
 		AppUtils.setAppContextStopping();
 		final int size = 2;
 		List<DebeziumEvent> events = new ArrayList(size);
@@ -306,11 +295,7 @@ public class BaseQueueProcessorTest {
 			events.add(m);
 		}
 		
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(events);
-		TestEventProcessor processor = createProcessor(size);
-		
-		processor.process(exchange);
+		createProcessor(size).processWork(events);
 		
 		Mockito.verifyNoInteractions(mockProducerTemplate);
 	}

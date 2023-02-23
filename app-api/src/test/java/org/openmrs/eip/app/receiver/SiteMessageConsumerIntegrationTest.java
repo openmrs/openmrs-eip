@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
@@ -36,6 +37,9 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ProducerTemplate producerTemplate;
+	
+	@Autowired
+	private SyncedMessageRepository syncedMsgRepo;
 	
 	@EndpointInject(MOCK_PROCESSOR_URI)
 	private MockEndpoint mockMsgProcessor;
@@ -65,6 +69,7 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(MOCK_PROCESSOR_URI, site, 0, null);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);
+		Whitebox.setInternalState(consumer, SyncedMessageRepository.class, syncedMsgRepo);
 		final Long msgId = 2L;
 		SyncMessage message = TestUtils.getEntity(SyncMessage.class, msgId);
 		mockMsgProcessor.expectedMessageCount(1);

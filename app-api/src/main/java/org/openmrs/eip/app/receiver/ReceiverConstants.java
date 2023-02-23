@@ -14,9 +14,6 @@ public class ReceiverConstants {
 	
 	public static final int DEFAULT_DELAY_IN_SECONDS = 5 * 60;
 	
-	public static final String URI_RECEIVER_UTILS = "bean:" + ReceiverUtils.class.getName()
-	        + "?method=generatePostSyncActions(${body})";
-	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	
 	public static final String URI_MSG_PROCESSOR = "direct:" + ROUTE_ID_MSG_PROCESSOR;

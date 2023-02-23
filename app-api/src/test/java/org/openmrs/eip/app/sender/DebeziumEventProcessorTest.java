@@ -76,8 +76,8 @@ public class DebeziumEventProcessorTest {
 	}
 	
 	@Test
-	public void getDestinationUri_shouldReturnTheUriToSendToEventsForProcessing() {
-		assertEquals(SenderConstants.URI_DBZM_EVENT_PROCESSOR, processor.getDestinationUri());
+	public void getEndpointUri_shouldReturnTheUriToSendToEventsForProcessing() {
+		assertEquals(SenderConstants.URI_DBZM_EVENT_PROCESSOR, processor.getEndpointUri());
 	}
 	
 }

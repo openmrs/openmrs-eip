@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncContext;
@@ -17,21 +16,24 @@ import org.slf4j.LoggerFactory;
  * Base class for processors that operate on items in a DB sync related queue and forward each item
  * to another handler camel endpoint for processing
  *
- * @param <T>
+ * @param <T> item type
  */
-public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor {
+public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseParallelProcessor<List<T>> {
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseQueueProcessor.class);
 	
 	@Override
-	public void process(Exchange exchange) throws Exception {
+	public void processWork(List<T> items) throws Exception {
+		if (items.isEmpty()) {
+			return;
+		}
+		
 		if (producerTemplate == null) {
 			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		}
 		
 		List<String> uniqueKeys = synchronizedList(new ArrayList(threadCount));
 		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
-		List<T> items = exchange.getIn().getBody(List.class);
 		
 		for (T item : items) {
 			if (AppUtils.isAppContextStopping()) {
@@ -50,7 +52,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				try {
 					setThreadName(item);
 					if (log.isDebugEnabled()) {
-						log.debug("Postponed processing of {} because of an earlier unprocessed item(s) for the same entity",
+						log.debug("Postponed processing of {} because of earlier unprocessed item(s) for the same entity",
 						    item);
 					}
 				}
@@ -75,7 +77,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(item);
-					producerTemplate.sendBody(getDestinationUri(), item);
+					processItem(item);
 				}
 				finally {
 					Thread.currentThread().setName(originalThreadName);
@@ -91,6 +93,13 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	private void setThreadName(T item) {
 		Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getQueueName() + ":" + getThreadName(item));
 	}
+	
+	/**
+	 * Processes the specified item
+	 *
+	 * @param item the queue item to process
+	 */
+	public abstract void processItem(T item);
 	
 	/**
 	 * Gets a unique identifier for the specified item
@@ -114,13 +123,6 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	 * @return the thread name
 	 */
 	public abstract String getThreadName(T item);
-	
-	/**
-	 * Gets the camel URI to call to process a single item
-	 *
-	 * @return the camel URI
-	 */
-	public abstract String getDestinationUri();
 	
 	/**
 	 * Gets logical type name of the item

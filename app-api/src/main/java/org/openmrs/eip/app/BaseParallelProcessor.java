@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
@@ -17,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-public abstract class BaseParallelProcessor extends EventNotifierSupport implements Processor {
+public abstract class BaseParallelProcessor<W> extends EventNotifierSupport {
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseParallelProcessor.class);
 	
@@ -81,6 +80,11 @@ public abstract class BaseParallelProcessor extends EventNotifierSupport impleme
 			}
 		}
 	}
+	
+	/**
+	 * Processes the specified work
+	 */
+	public abstract void processWork(W work) throws Exception;
 	
 	/**
 	 * Gets the logical processor name
