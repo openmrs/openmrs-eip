@@ -58,6 +58,14 @@ public class PostSyncAction extends AbstractEntity {
 	@Setter(AccessLevel.NONE)
 	private String statusMessage;
 	
+	public PostSyncAction() {
+	}
+	
+	public PostSyncAction(SyncedMessage message, PostSyncActionType actionType) {
+		this.message = message;
+		this.actionType = actionType;
+	}
+	
 	/**
 	 * Checks if this action is completed successfully with no errors or not
 	 * 

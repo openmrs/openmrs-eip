@@ -8,6 +8,8 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Processes all non itemized messages in the synced queue to generate PostSyncActions
@@ -20,8 +22,14 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	
 	private SyncedMessageItemizingProcessor processor;
 	
+	private Pageable page;
+	
 	public SyncedMessageItemizer(SiteInfo site) {
 		super(site);
+		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
+		processor = SyncContext.getBean(SyncedMessageItemizingProcessor.class);
+		//TODO Configure batch size
+		page = PageRequest.of(0, 1000);
 	}
 	
 	@Override
@@ -32,19 +40,11 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	@Override
 	public boolean doRun() throws Exception {
 		//TODO Check for existence of sync messages before running
-		if (syncedMsgRepo == null) {
-			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
-		}
-		if (processor == null) {
-			processor = SyncContext.getBean(SyncedMessageItemizingProcessor.class);
-		}
-		
 		if (log.isTraceEnabled()) {
-			log.trace("Fetching next batch of messages to itemize for site: " + getSite());
+			log.trace("Fetching next batch of " + page.getPageSize() + " messages to itemize for site: " + getSite());
 		}
 		
-		List<SyncedMessage> messages = syncedMsgRepo.findFirst1000BySiteAndItemizedOrderByDateCreatedAscIdAsc(getSite(),
-		    false);
+		List<SyncedMessage> messages = syncedMsgRepo.getBatchOfUnItemizedMessages(getSite(), page);
 		
 		if (messages.isEmpty()) {
 			if (log.isTraceEnabled()) {

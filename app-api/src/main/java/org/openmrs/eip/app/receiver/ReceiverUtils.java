@@ -2,11 +2,13 @@ package org.openmrs.eip.app.receiver;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
@@ -23,9 +25,9 @@ public final class ReceiverUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverUtils.class);
 	
-	public static final Set<String> CACHE_EVICT_CLASS_NAMES;
+	private static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
-	public static final Set<String> INDEX_UPDATE_CLASS_NAMES;
+	private static final Set<String> INDEX_UPDATE_CLASS_NAMES;
 	
 	private static SyncedMessageRepository syncedMsgRepo;
 	
@@ -89,6 +91,28 @@ public final class ReceiverUtils {
 		}
 	}
 	
+	/**
+	 * Updates the statuses of the specified post sync actions in the database
+	 * 
+	 * @param actions post sync actions to update
+	 * @param completed if true the actions are marked as completed otherwise failed
+	 * @param statusMsg optional status message in case completed is false
+	 * @return list of updates post sync actions
+	 */
+	public static List<PostSyncAction> updatePostSyncActionStatuses(List<PostSyncAction> actions, boolean completed,
+	                                                                String statusMsg) {
+		
+		actions.forEach(a -> {
+			if (completed) {
+				a.markAsCompleted();
+			} else {
+				a.markAsProcessedWithError(statusMsg);
+			}
+		});
+		
+		return SyncContext.getBean(PostSyncActionRepository.class).saveAll(actions);
+	}
+	
 	private static void addCacheEvictAction(SyncedMessage message, Date dateCreated) {
 		addPostSyncAction(message, PostSyncActionType.CACHE_EVICT, dateCreated);
 	}
@@ -98,9 +122,7 @@ public final class ReceiverUtils {
 	}
 	
 	private static void addPostSyncAction(SyncedMessage message, PostSyncActionType actionType, Date dateCreated) {
-		PostSyncAction postSyncAction = new PostSyncAction();
-		postSyncAction.setMessage(message);
-		postSyncAction.setActionType(actionType);
+		PostSyncAction postSyncAction = new PostSyncAction(message, actionType);
 		postSyncAction.setDateCreated(dateCreated);
 		message.addAction(postSyncAction);
 	}

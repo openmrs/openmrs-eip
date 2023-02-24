@@ -10,14 +10,21 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
+import org.openmrs.eip.component.SyncContext;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.springframework.data.domain.PageRequest;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SyncContext.class)
 public class SyncedMessageItemizerTest {
 	
 	@Mock
@@ -33,7 +40,7 @@ public class SyncedMessageItemizerTest {
 	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		PowerMockito.mockStatic(SyncContext.class);
 		itemizer = new SyncedMessageItemizer(mockSite);
 		Whitebox.setInternalState(itemizer, SyncedMessageRepository.class, mockRepo);
 		Whitebox.setInternalState(itemizer, SyncedMessageItemizingProcessor.class, mockProcessor);
@@ -42,7 +49,7 @@ public class SyncedMessageItemizerTest {
 	@Test
 	public void doRun_shouldLoadUnItemizedMessagesAndInvokeTheProcessor() throws Exception {
 		List<SyncedMessage> msgs = Collections.singletonList(new SyncedMessage());
-		when(mockRepo.findFirst1000BySiteAndItemizedOrderByDateCreatedAscIdAsc(mockSite, false)).thenReturn(msgs);
+		when(mockRepo.getBatchOfUnItemizedMessages(mockSite, PageRequest.of(0, 1000))).thenReturn(msgs);
 		
 		Assert.assertFalse(itemizer.doRun());
 		
@@ -51,8 +58,7 @@ public class SyncedMessageItemizerTest {
 	
 	@Test
 	public void doRun_shouldNotInvokeTheProcessorIfThereAreNoUnItemizedMessages() throws Exception {
-		when(mockRepo.findFirst1000BySiteAndItemizedOrderByDateCreatedAscIdAsc(mockSite, false))
-		        .thenReturn(Collections.emptyList());
+		when(mockRepo.getBatchOfUnItemizedMessages(mockSite, PageRequest.of(0, 1000))).thenReturn(Collections.emptyList());
 		
 		Assert.assertTrue(itemizer.doRun());
 		

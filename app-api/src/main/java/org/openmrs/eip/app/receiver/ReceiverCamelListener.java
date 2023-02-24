@@ -107,6 +107,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			startMessageItemizers(sites);
 			
+			startSyncResponseSenders(sites);
+			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			int timeout = 15;
 			if (msgExecutor != null) {
@@ -156,7 +158,14 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private void startMessageItemizers(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			SyncedMessageItemizer itemizer = new SyncedMessageItemizer(site);
-			siteExecutor.scheduleWithFixedDelay(itemizer, INITIAL_DELAY_SECONDS * 2, delay + 30, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(itemizer, INITIAL_DELAY_SECONDS * 2, delay + 5, TimeUnit.SECONDS);
+		});
+	}
+	
+	private void startSyncResponseSenders(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SyncResponseSender sender = new SyncResponseSender(site);
+			siteExecutor.scheduleWithFixedDelay(sender, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
 		});
 	}
 	
