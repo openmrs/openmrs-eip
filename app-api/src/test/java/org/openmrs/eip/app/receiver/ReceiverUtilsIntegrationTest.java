@@ -1,6 +1,8 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SiteInfo;
@@ -20,10 +23,12 @@ import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionStatus;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.EncounterModel;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
@@ -32,14 +37,20 @@ import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_synced_msg.sql",
+        "classpath:mgt_receiver_post_sync_action.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	
 	@Autowired
 	private SyncedMessageRepository syncedMsgRepo;
+	
+	@Autowired
+	private PostSyncActionRepository syncActionRepo;
 	
 	private SyncedMessage createMessage(Class<? extends BaseModel> modelClass) {
 		SyncedMessage syncedMsg = new SyncedMessage();
@@ -175,6 +186,78 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		Iterator<PostSyncAction> iterator = actions.iterator();
 		checkPostSyncAction(iterator.next(), syncedMsg, SEND_RESPONSE, dateItemized);
 		checkPostSyncAction(iterator.next(), syncedMsg, CACHE_EVICT, dateItemized);
+	}
+	
+	@Test
+	public void generatePostSyncActions_shouldGenerateOnlyResponseActionsForNonCachedAndIndexedType() {
+		SyncedMessage syncedMsg = createMessage(EncounterModel.class);
+		Date dateItemized = new Date();
+		ReceiverUtils.generatePostSyncActions(syncedMsg);
+		
+		Collection<PostSyncAction> actions = syncedMsg.getActions();
+		assertTrue(syncedMsg.isItemized());
+		assertEquals(1, actions.size());
+		Iterator<PostSyncAction> iterator = actions.iterator();
+		checkPostSyncAction(iterator.next(), syncedMsg, SEND_RESPONSE, dateItemized);
+	}
+	
+	@Test
+	public void updatePostSyncActionStatuses_shouldUpdateTheStatusesOfTheActionsToCompleted() {
+		final PostSyncActionType type = SEND_RESPONSE;
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
+		Pageable page = PageRequest.of(0, 10);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		assertEquals(2, actions.size());
+		assertEquals(PostSyncActionStatus.FAILURE, actions.get(1).getStatus());
+		assertNotNull(actions.get(1).getStatusMessage());
+		
+		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, true, null);
+		
+		assertTrue(syncActionRepo.getBatchOfPendingActions(site, type, page).isEmpty());
+		for (PostSyncAction a : actions) {
+			assertTrue(a.isCompleted());
+			assertNull(a.getStatusMessage());
+		}
+	}
+	
+	@Test
+	public void updatePostSyncActionStatuses_shouldUpdateTheStatusesOfTheActionsToFailed() {
+		final PostSyncActionType type = SEND_RESPONSE;
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
+		Pageable page = PageRequest.of(0, 10);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		assertFalse(actions.isEmpty());
+		int originalCount = actions.size();
+		final String errorMsg = "test error";
+		
+		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, false, errorMsg);
+		
+		assertEquals(originalCount, syncActionRepo.getBatchOfPendingActions(site, type, page).size());
+		for (PostSyncAction a : actions) {
+			assertEquals(PostSyncActionStatus.FAILURE, a.getStatus());
+			assertEquals(errorMsg, a.getStatusMessage());
+		}
+	}
+	
+	@Test
+	public void updatePostSyncActionStatuses_shouldRetainTheStatusMessageForFailuresIfNoNewOneIsProvided() {
+		final PostSyncActionType type = SEND_RESPONSE;
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
+		Pageable page = PageRequest.of(0, 10);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		assertFalse(actions.isEmpty());
+		int originalCount = actions.size();
+		assertEquals(2, actions.size());
+		assertEquals(PostSyncActionStatus.FAILURE, actions.get(1).getStatus());
+		final String originalErrorMsg = actions.get(1).getStatusMessage();
+		
+		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, false, null);
+		
+		assertEquals(originalCount, syncActionRepo.getBatchOfPendingActions(site, type, page).size());
+		assertEquals(PostSyncActionStatus.FAILURE, actions.get(0).getStatus());
+		assertNull(actions.get(0).getStatusMessage());
+		assertEquals(PostSyncActionStatus.FAILURE, actions.get(1).getStatus());
+		assertEquals(originalErrorMsg, actions.get(1).getStatusMessage());
 	}
 	
 }

@@ -106,7 +106,13 @@ public final class ReceiverUtils {
 			if (completed) {
 				a.markAsCompleted();
 			} else {
-				a.markAsProcessedWithError(statusMsg);
+				//There cases where the processor directly set the status on the action, don't overwrite it with null
+				String newStatusMsg = statusMsg;
+				if (newStatusMsg == null) {
+					newStatusMsg = a.getStatusMessage();
+				}
+				
+				a.markAsProcessedWithError(newStatusMsg);
 			}
 		});
 		

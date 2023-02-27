@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
+import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEND_RESPONSE;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,11 +13,10 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
+import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.DateUtils;
@@ -29,13 +30,11 @@ import org.springframework.data.domain.Pageable;
  * Reads a batch of post sync items of type PostSyncActionType.SEND_RESPONSE in the synced queue
  * that are not yet successful and sends sync responses for their associated sync messages.
  */
-public class SyncResponseSender extends BaseSiteRunnable {
+public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncResponseSender.class);
 	
 	private ConnectionFactory activeMqConnFactory;
-	
-	private PostSyncActionRepository repo;
 	
 	private String queueName;
 	
@@ -44,7 +43,6 @@ public class SyncResponseSender extends BaseSiteRunnable {
 	public SyncResponseSender(SiteInfo site) {
 		super(site);
 		activeMqConnFactory = SyncContext.getBean(ConnectionFactory.class);
-		repo = SyncContext.getBean(PostSyncActionRepository.class);
 		//TODO Configure batch size
 		page = PageRequest.of(0, 100000);
 		String endpoint = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)
@@ -57,46 +55,24 @@ public class SyncResponseSender extends BaseSiteRunnable {
 	}
 	
 	@Override
-	public String getProcessorName() {
-		return "Synced message sender";
+	public PostSyncActionType getActionType() {
+		return SEND_RESPONSE;
 	}
 	
 	@Override
-	public boolean doRun() throws Exception {
-		if (log.isTraceEnabled()) {
-			log.trace("Fetching next batch of sync response actions for site: " + getSite());
-		}
-		
-		List<PostSyncAction> respActions = repo.getBatchOfPendingResponseActions(getSite(), page);
-		
-		if (respActions.isEmpty()) {
-			if (log.isTraceEnabled()) {
-				log.trace("No sync response actions found for site: " + getSite());
-			}
-			
-			return true;
-		}
-		
-		try {
-			sendResponsesInBatch(respActions);
-			ReceiverUtils.updatePostSyncActionStatuses(respActions, true, null);
-		}
-		catch (Throwable t) {
-			log.warn("An error was encountered while sending sync responses for site: " + getSite(), t);
-			Throwable rootCause = ExceptionUtils.getRootCause(t);
-			if (rootCause != null) {
-				t = rootCause;
-			}
-			
-			String errorMsg = t.toString().trim();
-			if (errorMsg.length() > 1024) {
-				errorMsg = errorMsg.substring(0, 1024).trim();
-			}
-			
-			ReceiverUtils.updatePostSyncActionStatuses(respActions, false, errorMsg);
-		}
-		
-		return false;
+	public String getProcessorName() {
+		return "response sender";
+	}
+	
+	@Override
+	public Pageable getPageable() {
+		return page;
+	}
+	
+	@Override
+	public List<PostSyncAction> process(List<PostSyncAction> actions) throws Exception {
+		sendResponsesInBatch(actions);
+		return actions;
 	}
 	
 	/**

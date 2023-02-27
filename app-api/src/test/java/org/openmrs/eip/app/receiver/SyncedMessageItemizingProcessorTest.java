@@ -30,6 +30,7 @@ public class SyncedMessageItemizingProcessorTest {
 		final Long id = 2L;
 		final String siteUuid = "site-uuid";
 		SyncedMessage msg = new SyncedMessage();
+		msg.setModelClassName(PersonModel.class.getName());
 		msg.setId(id);
 		msg.setIdentifier(uuid);
 		msg.setMessageUuid(messageUuid);
@@ -50,7 +51,7 @@ public class SyncedMessageItemizingProcessorTest {
 	}
 	
 	@Test
-	public void getLogicalType_shouldReturnTheTableName() {
+	public void getLogicalType_shouldReturnTheModelClassName() {
 		final String type = PersonModel.class.getName();
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(type);
