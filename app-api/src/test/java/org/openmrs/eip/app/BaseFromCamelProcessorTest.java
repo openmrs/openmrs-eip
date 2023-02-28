@@ -9,9 +9,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 
-public class BaseCamelQueueProcessorTest {
+public class BaseFromCamelProcessorTest {
 	
-	public class TestProcessor extends BaseCamelQueueProcessor<SyncedMessage> {
+	public class TestProcessor extends BaseFromCamelProcessor<SyncedMessage> {
 		
 		List<SyncedMessage> processedItems;
 		

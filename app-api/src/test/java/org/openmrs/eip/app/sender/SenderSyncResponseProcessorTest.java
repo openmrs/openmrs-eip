@@ -8,7 +8,7 @@ import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 
 public class SenderSyncResponseProcessorTest {
 	
-	private SenderSyncResponseProcessor processor = new SenderSyncResponseProcessor();
+	private SenderSyncResponseProcessor processor = new SenderSyncResponseProcessor(null);
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
@@ -46,11 +46,6 @@ public class SenderSyncResponseProcessorTest {
 	@Test
 	public void getQueueName_shouldReturnTheQueueName() {
 		assertEquals("sync-response", processor.getQueueName());
-	}
-	
-	@Test
-	public void getEndpointUri_shouldReturnTheUriToSendToEventsForProcessing() {
-		assertEquals(SenderConstants.URI_RESPONSE_PROCESSOR, processor.getEndpointUri());
 	}
 	
 }

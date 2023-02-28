@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
-import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +23,11 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	@Override
 	public void processWork(List<T> items) throws Exception {
 		if (items.isEmpty()) {
+			if (log.isTraceEnabled()) {
+				log.trace("No items in the list to process");
+			}
+			
 			return;
-		}
-		
-		if (producerTemplate == null) {
-			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		}
 		
 		List<String> uniqueKeys = synchronizedList(new ArrayList(threadCount));

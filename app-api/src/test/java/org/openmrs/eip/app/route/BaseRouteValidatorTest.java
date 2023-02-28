@@ -35,7 +35,7 @@ public abstract class BaseRouteValidatorTest {
 	
 	private static XPathExpression errorHandlerExpression;
 	
-	private static final List<String> noErrorHandlerRoutes = Arrays.asList("dlc-route", "shutdown-route");
+	private static final List<String> noErrorHandlerDefinedRoutes = Arrays.asList("dlc-route", "shutdown-route");
 	
 	public abstract String getAppFolder();
 	
@@ -44,6 +44,8 @@ public abstract class BaseRouteValidatorTest {
 	public abstract Set<String> getRoutesWithRetryHandler();
 	
 	public abstract Set<String> getRoutesWithDeadLetterChannelHandler();
+	
+	public abstract Set<String> getRoutesWithNoErrorHandler();
 	
 	@BeforeClass
 	public static void setupBaseRouteValidatorTest() throws Exception {
@@ -76,12 +78,14 @@ public abstract class BaseRouteValidatorTest {
 		String routeId = routeIdExpression.evaluate(document);
 		String errorHandlerRef = errorHandlerExpression.evaluate(document);
 		final String msg = "Invalid error handler ref defined for route with id: " + routeId;
-		if (noErrorHandlerRoutes.contains(routeId)) {
+		if (noErrorHandlerDefinedRoutes.contains(routeId)) {
 			Assert.assertTrue(StringUtils.isBlank(errorHandlerRef));
 		} else if (getRoutesWithRetryHandler().contains(routeId)) {
 			assertEquals(msg, getRetryHandlerRef(), errorHandlerRef);
 		} else if (getRoutesWithDeadLetterChannelHandler().contains(routeId)) {
 			assertEquals(msg, "deadLetterChannelBuilder", errorHandlerRef);
+		} else if (getRoutesWithNoErrorHandler().contains(routeId)) {
+			assertEquals(msg, "noErrorHandler", errorHandlerRef);
 		} else {
 			assertEquals(msg, "shutdownErrorHandler", errorHandlerRef);
 		}

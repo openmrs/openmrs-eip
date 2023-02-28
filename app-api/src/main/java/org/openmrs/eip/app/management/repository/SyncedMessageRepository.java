@@ -11,10 +11,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Long> {
 	
-	String UNITEMIZED_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = false ORDER BY m.dateCreated ASC, id ASC";
+	String UNITEMIZED_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = false ORDER BY m.dateCreated ASC";
 	
 	/**
-	 * Gets a batch of un itemized synced messages for the specified site
+	 * Gets a batch of un itemized synced messages for the specified site ordered by ascending date
+	 * created.
 	 *
 	 * @param site the site to match against
 	 * @param pageable {@link Pageable} instance

@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.slf4j.Logger;
@@ -24,8 +23,6 @@ public abstract class BaseParallelProcessor<W> extends EventNotifierSupport {
 	
 	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
 	protected int threadCount;
-	
-	protected ProducerTemplate producerTemplate;
 	
 	protected static ExecutorService executor;
 	

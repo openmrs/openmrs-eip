@@ -7,18 +7,21 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.app.BaseToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.powermock.reflect.Whitebox;
 
-public class BaseToCamelEndpointProcessorTest {
+public class BaseFromCamelToCamelEndpointProcessorTest {
 	
 	private static final String MOCK_URI = "mock:uri";
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
-	public class TestProcessor extends BaseToCamelEndpointProcessor<SyncedMessage> {
+	public class TestProcessor extends BaseFromCamelToCamelEndpointProcessor<SyncedMessage> {
+		
+		public TestProcessor(String endpointUri, ProducerTemplate producerTemplate) {
+			super(endpointUri, producerTemplate);
+		}
 		
 		@Override
 		public String getProcessorName() {
@@ -49,17 +52,12 @@ public class BaseToCamelEndpointProcessorTest {
 		public List<String> getLogicalTypeHierarchy(String logicalType) {
 			return null;
 		}
-		
-		@Override
-		public String getEndpointUri() {
-			return MOCK_URI;
-		}
 	}
 	
 	@Test
 	public void processItem_shouldSendTheItemToTheEndpointUri() {
 		MockitoAnnotations.initMocks(this);
-		TestProcessor processor = new TestProcessor();
+		TestProcessor processor = new TestProcessor(MOCK_URI, mockProducerTemplate);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		SyncedMessage msg = new SyncedMessage();
 		

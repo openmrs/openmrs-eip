@@ -38,7 +38,11 @@ public class BaseQueueProcessorTest {
 	
 	private static ExecutorService executor;
 	
-	public class TestEventProcessor extends BaseToCamelEndpointProcessor<DebeziumEvent> {
+	public class TestEventProcessor extends BaseFromCamelToCamelEndpointProcessor<DebeziumEvent> {
+		
+		public TestEventProcessor(ProducerTemplate producerTemplate) {
+			super(MOCK_URI, producerTemplate);
+		}
 		
 		@Override
 		public String getProcessorName() {
@@ -63,11 +67,6 @@ public class BaseQueueProcessorTest {
 			}
 			
 			return name;
-		}
-		
-		@Override
-		public String getEndpointUri() {
-			return MOCK_URI;
 		}
 		
 		@Override
@@ -101,7 +100,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	private BaseQueueProcessor createProcessor(int threadCount) {
-		processor = new TestEventProcessor();
+		processor = new TestEventProcessor(mockProducerTemplate);
 		Whitebox.setInternalState(processor, int.class, threadCount);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		return processor;

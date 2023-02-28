@@ -2,7 +2,8 @@ package org.openmrs.eip.app.sender;
 
 import java.util.List;
 
-import org.openmrs.eip.app.BaseToCamelEndpointProcessor;
+import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.app.BaseFromCamelToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
@@ -10,7 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component("senderSyncResponseProcessor")
 @Profile(SyncProfiles.SENDER)
-public class SenderSyncResponseProcessor extends BaseToCamelEndpointProcessor<SenderSyncResponse> {
+public class SenderSyncResponseProcessor extends BaseFromCamelToCamelEndpointProcessor<SenderSyncResponse> {
+	
+	public SenderSyncResponseProcessor(ProducerTemplate producerTemplate) {
+		super(SenderConstants.URI_RESPONSE_PROCESSOR, producerTemplate);
+	}
 	
 	@Override
 	public String getProcessorName() {
@@ -30,11 +35,6 @@ public class SenderSyncResponseProcessor extends BaseToCamelEndpointProcessor<Se
 	@Override
 	public String getQueueName() {
 		return "sync-response";
-	}
-	
-	@Override
-	public String getEndpointUri() {
-		return SenderConstants.URI_RESPONSE_PROCESSOR;
 	}
 	
 	@Override

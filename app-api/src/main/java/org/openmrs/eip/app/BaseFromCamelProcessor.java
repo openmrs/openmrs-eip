@@ -16,12 +16,11 @@ import org.apache.camel.Processor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 /**
- * Superclass for queue processors that process camel exchange objects with a list of items of a
- * specific type set as the body.
+ * Superclass for queue processors that process a list of items read from a camel exchange body.
  * 
  * @param <T> type of the list items
  */
-public abstract class BaseCamelQueueProcessor<T extends AbstractEntity> extends BaseQueueProcessor<T> implements Processor {
+public abstract class BaseFromCamelProcessor<T extends AbstractEntity> extends BaseQueueProcessor<T> implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {

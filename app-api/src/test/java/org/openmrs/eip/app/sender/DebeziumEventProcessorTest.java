@@ -8,7 +8,7 @@ import org.openmrs.eip.component.entity.Event;
 
 public class DebeziumEventProcessorTest {
 	
-	private DebeziumEventProcessor processor = new DebeziumEventProcessor();
+	private DebeziumEventProcessor processor = new DebeziumEventProcessor(null);
 	
 	private DebeziumEvent createEvent() {
 		DebeziumEvent de = new DebeziumEvent();
@@ -73,11 +73,6 @@ public class DebeziumEventProcessorTest {
 	@Test
 	public void getQueueName_shouldReturnTheQueueName() {
 		assertEquals("db-event", processor.getQueueName());
-	}
-	
-	@Test
-	public void getEndpointUri_shouldReturnTheUriToSendToEventsForProcessing() {
-		assertEquals(SenderConstants.URI_DBZM_EVENT_PROCESSOR, processor.getEndpointUri());
 	}
 	
 }

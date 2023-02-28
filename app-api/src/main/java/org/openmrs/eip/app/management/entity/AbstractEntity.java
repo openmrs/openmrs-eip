@@ -1,13 +1,15 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Date;
 
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
@@ -71,7 +73,7 @@ public abstract class AbstractEntity implements Serializable {
 			return super.equals(other);
 		}
 		
-		return getId().equals(otherObj.getId());
+		return Objects.equals(getId(), otherObj.getId());
 	}
 	
 	@Override

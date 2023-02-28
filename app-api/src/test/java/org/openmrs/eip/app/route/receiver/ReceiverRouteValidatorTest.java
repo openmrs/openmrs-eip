@@ -15,8 +15,6 @@ public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
 		retryErrorHandlerRoutes.add("inbound-db-sync");
 		retryErrorHandlerRoutes.add("message-processor");
 		retryErrorHandlerRoutes.add("receiver-retry");
-		retryErrorHandlerRoutes.add("receiver-update-search-index");
-		retryErrorHandlerRoutes.add("receiver-clear-db-cache");
 	}
 	
 	@Override
@@ -37,6 +35,14 @@ public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
 	@Override
 	public Set<String> getRoutesWithDeadLetterChannelHandler() {
 		return Collections.singleton("update-site-last-sync-date");
+	}
+	
+	@Override
+	public Set<String> getRoutesWithNoErrorHandler() {
+		Set<String> set = new HashSet();
+		set.add("receiver-clear-db-cache");
+		set.add("receiver-update-search-index");
+		return set;
 	}
 	
 }

@@ -203,17 +203,16 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	
 	@Test
 	public void updatePostSyncActionStatuses_shouldUpdateTheStatusesOfTheActionsToCompleted() {
-		final PostSyncActionType type = SEND_RESPONSE;
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		Pageable page = PageRequest.of(0, 10);
-		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingResponseActions(site, page);
 		assertEquals(2, actions.size());
 		assertEquals(PostSyncActionStatus.FAILURE, actions.get(1).getStatus());
 		assertNotNull(actions.get(1).getStatusMessage());
 		
 		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, true, null);
 		
-		assertTrue(syncActionRepo.getBatchOfPendingActions(site, type, page).isEmpty());
+		assertTrue(syncActionRepo.getBatchOfPendingResponseActions(site, page).isEmpty());
 		for (PostSyncAction a : actions) {
 			assertTrue(a.isCompleted());
 			assertNull(a.getStatusMessage());
@@ -222,17 +221,16 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	
 	@Test
 	public void updatePostSyncActionStatuses_shouldUpdateTheStatusesOfTheActionsToFailed() {
-		final PostSyncActionType type = SEND_RESPONSE;
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		Pageable page = PageRequest.of(0, 10);
-		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingResponseActions(site, page);
 		assertFalse(actions.isEmpty());
 		int originalCount = actions.size();
 		final String errorMsg = "test error";
 		
 		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, false, errorMsg);
 		
-		assertEquals(originalCount, syncActionRepo.getBatchOfPendingActions(site, type, page).size());
+		assertEquals(originalCount, syncActionRepo.getBatchOfPendingResponseActions(site, page).size());
 		for (PostSyncAction a : actions) {
 			assertEquals(PostSyncActionStatus.FAILURE, a.getStatus());
 			assertEquals(errorMsg, a.getStatusMessage());
@@ -241,10 +239,9 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	
 	@Test
 	public void updatePostSyncActionStatuses_shouldRetainTheStatusMessageForFailuresIfNoNewOneIsProvided() {
-		final PostSyncActionType type = SEND_RESPONSE;
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		Pageable page = PageRequest.of(0, 10);
-		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingActions(site, type, page);
+		List<PostSyncAction> actions = syncActionRepo.getBatchOfPendingResponseActions(site, page);
 		assertFalse(actions.isEmpty());
 		int originalCount = actions.size();
 		assertEquals(2, actions.size());
@@ -253,7 +250,7 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		
 		actions = ReceiverUtils.updatePostSyncActionStatuses(actions, false, null);
 		
-		assertEquals(originalCount, syncActionRepo.getBatchOfPendingActions(site, type, page).size());
+		assertEquals(originalCount, syncActionRepo.getBatchOfPendingResponseActions(site, page).size());
 		assertEquals(PostSyncActionStatus.FAILURE, actions.get(0).getStatus());
 		assertNull(actions.get(0).getStatusMessage());
 		assertEquals(PostSyncActionStatus.FAILURE, actions.get(1).getStatus());

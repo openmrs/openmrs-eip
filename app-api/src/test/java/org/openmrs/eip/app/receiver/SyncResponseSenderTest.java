@@ -3,6 +3,8 @@ package org.openmrs.eip.app.receiver;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -26,15 +28,19 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.DateUtils;
@@ -42,8 +48,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -64,9 +68,10 @@ public class SyncResponseSenderTest {
 	@Mock
 	private ConnectionFactory mockConnFactory;
 	
-	private SyncResponseSender sender;
+	@Mock
+	private PostSyncActionRepository mockRepo;
 	
-	private Pageable page = PageRequest.of(0, 100000);
+	private SyncResponseSender sender;
 	
 	@Before
 	public void setup() {
@@ -77,6 +82,7 @@ public class SyncResponseSenderTest {
 		when(mockPublisher.getCamelOutputEndpoint(SITE_IDENTIFIER)).thenReturn("activemq:" + QUEUE_NAME);
 		sender = new SyncResponseSender(mockSite);
 		Whitebox.setInternalState(sender, ConnectionFactory.class, mockConnFactory);
+		Whitebox.setInternalState(sender, PostSyncActionRepository.class, mockRepo);
 	}
 	
 	@Test
@@ -92,25 +98,70 @@ public class SyncResponseSenderTest {
 	}
 	
 	@Test
-	public void process_shouldProcessTheSyncResponseBatch() throws Exception {
+	public void getNextBatch_shouldInvokeTheRepoToFetchTheNextBatchOfUnprocessedSyncResponseActions() {
+		sender.getNextBatch();
+		
+		verify(mockRepo).getBatchOfPendingResponseActions(mockSite, sender.pageable);
+	}
+	
+	@Test
+	public void process_shouldProcessTheActionsAndMarkThemAsCompleted() throws Exception {
+		sender = Mockito.spy(sender);
 		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
 		sender = Mockito.spy(sender);
 		doNothing().when(sender).sendResponsesInBatch(actions);
 		
-		Assert.assertEquals(actions, sender.process(actions));
+		sender.process(actions);
 		
-		verify(sender).sendResponsesInBatch(actions);
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updatePostSyncActionStatuses(actions, true, null);
+		PowerMockito.verifyStatic(ReceiverUtils.class, never());
+		ReceiverUtils.updatePostSyncActionStatuses(anyList(), ArgumentMatchers.eq(false), isNull());
 	}
 	
 	@Test
-	public void sendResponsesInBatch_shouldDoNothingIfTheGeneratedResponseListIsEmpty() throws Exception {
-		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction(new SyncedMessage(), null));
+	public void process_shouldMarkActionsAsFailedIfAnErrorOccurs() throws Exception {
 		sender = Mockito.spy(sender);
-		when(sender.generateResponses(actions)).thenReturn(Collections.emptyList());
+		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
+		final String errMsg = "Testing";
+		EIPException e = new EIPException(errMsg);
+		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
 		
-		sender.sendResponsesInBatch(actions);
+		sender.process(actions);
 		
-		verify(mockConnFactory, never()).createConnection();
+		PowerMockito.verifyStatic(ReceiverUtils.class, never());
+		ReceiverUtils.updatePostSyncActionStatuses(anyList(), ArgumentMatchers.eq(true), isNull());
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updatePostSyncActionStatuses(actions, false, e.toString());
+	}
+	
+	@Test
+	public void process_shouldSetStatusMessageToTheRootCauseIfAnErrorOccurs() throws Exception {
+		sender = Mockito.spy(sender);
+		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
+		final String rootCauseMsg = "test root error";
+		Exception root = new ActiveMQException(rootCauseMsg);
+		Exception e = new EIPException("test1", new Exception("test2", root));
+		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
+		
+		sender.process(actions);
+		
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updatePostSyncActionStatuses(actions, false, root.toString());
+	}
+	
+	@Test
+	public void process_shouldTruncateTheErrorMessageIfLongerThan1024() throws Exception {
+		sender = Mockito.spy(sender);
+		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
+		final String errMsg = RandomStringUtils.randomAscii(1025);
+		EIPException e = new EIPException(errMsg);
+		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
+		
+		sender.process(actions);
+		
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updatePostSyncActionStatuses(actions, false, e.toString().substring(0, 1024));
 	}
 	
 	@Test

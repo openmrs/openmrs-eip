@@ -5,7 +5,6 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.CACHE_EVICT;
 import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEARCH_INDEX_UPDATE;
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEND_RESPONSE;
 
 import java.util.List;
 
@@ -28,11 +27,11 @@ public class PostSyncActionRepositoryTest extends BaseReceiverTest {
 	private PostSyncActionRepository repo;
 	
 	@Test
-	public void getBatchOfPendingActions_shouldReturnABatchOfUnProcessedResponseActions() {
+	public void getBatchOfResponseActions_shouldReturnABatchOfUnProcessedResponseActions() {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		Pageable page = PageRequest.of(0, 10);
 		
-		List<PostSyncAction> actions = repo.getBatchOfPendingActions(site, SEND_RESPONSE, page);
+		List<PostSyncAction> actions = repo.getBatchOfPendingResponseActions(site, page);
 		
 		assertEquals(2, actions.size());
 		assertEquals(1l, actions.get(0).getId().longValue());
@@ -41,30 +40,30 @@ public class PostSyncActionRepositoryTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void getBatchOfPendingActions_shouldReturnABatchOfUnProcessedCacheEvictActions() {
-		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
+	public void getOrderedBatchOfPendingActions_shouldReturnABatchOfUnProcessedCacheEvictActionsOrderedByDateCreatedAndId() {
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 3L);
 		Pageable page = PageRequest.of(0, 10);
 		
-		List<PostSyncAction> actions = repo.getBatchOfPendingActions(site, CACHE_EVICT, page);
+		List<PostSyncAction> actions = repo.getOrderedBatchOfPendingActions(site, CACHE_EVICT, page);
 		
 		assertEquals(3, actions.size());
-		assertEquals(2l, actions.get(0).getId().longValue());
-		assertEquals(5l, actions.get(1).getId().longValue());
-		assertEquals(8l, actions.get(2).getId().longValue());
+		assertEquals(17l, actions.get(0).getId().longValue());
+		assertEquals(20l, actions.get(1).getId().longValue());
+		assertEquals(14l, actions.get(2).getId().longValue());
 		
 	}
 	
 	@Test
-	public void getBatchOfPendingActions_shouldReturnABatchOfUnProcessedSearchIndexUpdateActions() {
-		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
+	public void getOrderedBatchOfPendingActions_shouldReturnABatchOfUnProcessedSearchIndexUpdateActionsOrderedByDateCreatedAndId() {
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 3L);
 		Pageable page = PageRequest.of(0, 10);
 		
-		List<PostSyncAction> actions = repo.getBatchOfPendingActions(site, SEARCH_INDEX_UPDATE, page);
+		List<PostSyncAction> actions = repo.getOrderedBatchOfPendingActions(site, SEARCH_INDEX_UPDATE, page);
 		
 		assertEquals(3, actions.size());
-		assertEquals(3l, actions.get(0).getId().longValue());
-		assertEquals(6l, actions.get(1).getId().longValue());
-		assertEquals(9l, actions.get(2).getId().longValue());
+		assertEquals(18l, actions.get(0).getId().longValue());
+		assertEquals(21l, actions.get(1).getId().longValue());
+		assertEquals(15l, actions.get(2).getId().longValue());
 		
 	}
 	

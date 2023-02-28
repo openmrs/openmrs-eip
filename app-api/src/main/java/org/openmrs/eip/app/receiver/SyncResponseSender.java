@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.receiver;
 
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEND_RESPONSE;
+import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,18 +13,16 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.DateUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 /**
  * Reads a batch of post sync items of type PostSyncActionType.SEND_RESPONSE in the synced queue
@@ -38,13 +36,9 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
 	private String queueName;
 	
-	private Pageable page;
-	
 	public SyncResponseSender(SiteInfo site) {
-		super(site);
+		super(site, PostSyncActionType.SEND_RESPONSE, 100000);
 		activeMqConnFactory = SyncContext.getBean(ConnectionFactory.class);
-		//TODO Configure batch size
-		page = PageRequest.of(0, 100000);
 		String endpoint = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)
 		        .getCamelOutputEndpoint(getSite().getIdentifier());
 		if (!endpoint.startsWith("activemq:")) {
@@ -55,24 +49,36 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	}
 	
 	@Override
-	public PostSyncActionType getActionType() {
-		return SEND_RESPONSE;
-	}
-	
-	@Override
 	public String getProcessorName() {
 		return "response sender";
 	}
 	
 	@Override
-	public Pageable getPageable() {
-		return page;
+	public List<PostSyncAction> getNextBatch() {
+		return repo.getBatchOfPendingResponseActions(getSite(), pageable);
 	}
 	
 	@Override
-	public List<PostSyncAction> process(List<PostSyncAction> actions) throws Exception {
-		sendResponsesInBatch(actions);
-		return actions;
+	public void process(List<PostSyncAction> actions) throws Exception {
+		try {
+			sendResponsesInBatch(actions);
+			ReceiverUtils.updatePostSyncActionStatuses(actions, true, null);
+		}
+		catch (Throwable t) {
+			log.warn("An error occurred while sending sync responses to site: " + getSite(), t);
+			
+			Throwable rootCause = ExceptionUtils.getRootCause(t);
+			if (rootCause != null) {
+				t = rootCause;
+			}
+			
+			String errorMsg = t.toString().trim();
+			if (errorMsg.length() > 1024) {
+				errorMsg = errorMsg.substring(0, 1024).trim();
+			}
+			
+			ReceiverUtils.updatePostSyncActionStatuses(actions, false, errorMsg);
+		}
 	}
 	
 	/**
@@ -83,14 +89,9 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	 * @throws JMSException
 	 */
 	protected void sendResponsesInBatch(List<PostSyncAction> actions) throws JMSException {
-		log.info("Sending " + actions.size() + " sync response(s) for site: " + getSite());
+		log.info("Sending " + actions.size() + " sync response(s) to site: " + getSite());
 		
 		List<String> responses = generateResponses(actions);
-		if (responses.isEmpty()) {
-			log.info("No sync responses to send");
-			
-			return;
-		}
 		
 		try (Connection conn = activeMqConnFactory.createConnection();
 		        Session session = conn.createSession(true, Session.AUTO_ACKNOWLEDGE)) {
@@ -103,15 +104,17 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 			}
 			
 			if (log.isDebugEnabled()) {
-				log.debug("Sending a batch of " + responses.size() + " response(s) to site: " + getSite());
+				log.debug("Committing " + responses.size() + " response(s) to site: " + getSite());
 			}
 			
 			session.commit();
 			
 			if (log.isDebugEnabled()) {
-				log.debug("Successfully sent " + responses.size() + " response(s)");
+				log.debug("Successfully committed " + responses.size() + " response(s) to site: " + getSite());
 			}
 		}
+		
+		log.info("Successfully sent " + actions.size() + " sync responses to site: " + getSite());
 	}
 	
 	/**

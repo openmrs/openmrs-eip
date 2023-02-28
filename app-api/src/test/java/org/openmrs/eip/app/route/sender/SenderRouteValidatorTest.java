@@ -38,4 +38,9 @@ public class SenderRouteValidatorTest extends BaseRouteValidatorTest {
 		return Collections.emptySet();
 	}
 	
+	@Override
+	public Set<String> getRoutesWithNoErrorHandler() {
+		return Collections.emptySet();
+	}
+	
 }

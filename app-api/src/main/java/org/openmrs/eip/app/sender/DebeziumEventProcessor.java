@@ -2,8 +2,9 @@ package org.openmrs.eip.app.sender;
 
 import java.util.List;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.eip.app.BaseToCamelEndpointProcessor;
+import org.openmrs.eip.app.BaseFromCamelToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.Utils;
@@ -12,7 +13,11 @@ import org.springframework.stereotype.Component;
 
 @Component("debeziumEventProcessor")
 @Profile(SyncProfiles.SENDER)
-public class DebeziumEventProcessor extends BaseToCamelEndpointProcessor<DebeziumEvent> {
+public class DebeziumEventProcessor extends BaseFromCamelToCamelEndpointProcessor<DebeziumEvent> {
+	
+	public DebeziumEventProcessor(ProducerTemplate producerTemplate) {
+		super(SenderConstants.URI_DBZM_EVENT_PROCESSOR, producerTemplate);
+	}
 	
 	@Override
 	public String getProcessorName() {
@@ -37,11 +42,6 @@ public class DebeziumEventProcessor extends BaseToCamelEndpointProcessor<Debeziu
 	@Override
 	public String getQueueName() {
 		return "db-event";
-	}
-	
-	@Override
-	public String getEndpointUri() {
-		return SenderConstants.URI_DBZM_EVENT_PROCESSOR;
 	}
 	
 	@Override
