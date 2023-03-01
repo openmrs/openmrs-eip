@@ -2,7 +2,9 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyDescriptor;
 import java.time.LocalDateTime;
@@ -16,6 +18,7 @@ import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
@@ -134,7 +137,7 @@ public class SyncedMessageTest {
 	
 	@Test
 	public void readyForArchive_shouldReturnFalseIfTheMessageIsNotItemized() {
-		Assert.assertFalse(new SyncedMessage().readyForArchive());
+		assertFalse(new SyncedMessage().readyForArchive());
 	}
 	
 	@Test
@@ -146,7 +149,7 @@ public class SyncedMessageTest {
 		action.markAsCompleted();
 		msg.addAction(action);
 		msg.addAction(new PostSyncAction());
-		Assert.assertFalse(msg.readyForArchive());
+		assertFalse(msg.readyForArchive());
 	}
 	
 	@Test
@@ -159,7 +162,43 @@ public class SyncedMessageTest {
 		action2.markAsCompleted();
 		msg.addAction(action1);
 		msg.addAction(action2);
-		Assert.assertTrue(msg.readyForArchive());
+		assertTrue(msg.readyForArchive());
+	}
+	
+	@Test
+	public void requiresCacheEviction_shouldReturnTrueIfTheCacheEvictActionHasNotCompleted() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.SEND_RESPONSE));
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.CACHE_EVICT));
+		assertTrue(msg.requiresCacheEviction());
+	}
+	
+	@Test
+	public void requiresCacheEviction_shouldReturnTrueIfTheCacheEvictActionHasFailed() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.SEND_RESPONSE));
+		PostSyncAction action2 = new PostSyncAction(msg, PostSyncActionType.CACHE_EVICT);
+		action2.markAsProcessedWithError("testing");
+		msg.addAction(action2);
+		assertTrue(msg.requiresCacheEviction());
+	}
+	
+	@Test
+	public void requiresCacheEviction_shouldReturnFalseIfTheCacheEvictActionHasCompleted() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.SEND_RESPONSE));
+		PostSyncAction action2 = new PostSyncAction(msg, PostSyncActionType.CACHE_EVICT);
+		action2.markAsCompleted();
+		msg.addAction(action2);
+		assertFalse(msg.requiresCacheEviction());
+	}
+	
+	@Test
+	public void requiresCacheEviction_shouldReturnFalseIfTheMessageHasNoCacheEvictionAction() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.SEND_RESPONSE));
+		msg.addAction(new PostSyncAction(msg, PostSyncActionType.SEARCH_INDEX_UPDATE));
+		assertFalse(msg.requiresCacheEviction());
 	}
 	
 }

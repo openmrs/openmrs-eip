@@ -28,8 +28,6 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,8 +121,8 @@ public class SyncResponseSenderTest {
 	public void process_shouldMarkActionsAsFailedIfAnErrorOccurs() throws Exception {
 		sender = Mockito.spy(sender);
 		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
-		final String errMsg = "Testing";
-		EIPException e = new EIPException(errMsg);
+		EIPException e = new EIPException("Testing");
+		when(ReceiverUtils.getErrorMessage(e)).thenReturn(e.toString());
 		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
 		
 		sender.process(actions);
@@ -133,35 +131,6 @@ public class SyncResponseSenderTest {
 		ReceiverUtils.updatePostSyncActionStatuses(anyList(), ArgumentMatchers.eq(true), isNull());
 		PowerMockito.verifyStatic(ReceiverUtils.class);
 		ReceiverUtils.updatePostSyncActionStatuses(actions, false, e.toString());
-	}
-	
-	@Test
-	public void process_shouldSetStatusMessageToTheRootCauseIfAnErrorOccurs() throws Exception {
-		sender = Mockito.spy(sender);
-		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
-		final String rootCauseMsg = "test root error";
-		Exception root = new ActiveMQException(rootCauseMsg);
-		Exception e = new EIPException("test1", new Exception("test2", root));
-		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
-		
-		sender.process(actions);
-		
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.updatePostSyncActionStatuses(actions, false, root.toString());
-	}
-	
-	@Test
-	public void process_shouldTruncateTheErrorMessageIfLongerThan1024() throws Exception {
-		sender = Mockito.spy(sender);
-		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
-		final String errMsg = RandomStringUtils.randomAscii(1025);
-		EIPException e = new EIPException(errMsg);
-		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
-		
-		sender.process(actions);
-		
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.updatePostSyncActionStatuses(actions, false, e.toString().substring(0, 1024));
 	}
 	
 	@Test

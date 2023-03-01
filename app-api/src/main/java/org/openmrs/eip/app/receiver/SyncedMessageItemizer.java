@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Processes all non itemized messages in the synced queue to generate PostSyncActions
+ * Reads and processes non itemized messages in the synced queue to generate PostSyncActions
  */
 public class SyncedMessageItemizer extends BaseSiteRunnable {
 	
@@ -34,7 +34,7 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	
 	@Override
 	public String getProcessorName() {
-		return "Synced message itemizer";
+		return "msg itemizer task";
 	}
 	
 	@Override
@@ -48,13 +48,15 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 		
 		if (messages.isEmpty()) {
 			if (log.isTraceEnabled()) {
-				log.trace("No synced messages found from site: " + getSite());
+				log.trace("No synced messages for itemizing found for site: " + getSite());
 			}
 			
 			return true;
 		}
 		
-		log.info("Itemizing " + messages.size() + " message(s) for site: " + getSite());
+		if (log.isDebugEnabled()) {
+			log.debug("Itemizing " + messages.size() + " message(s) for site: " + getSite());
+		}
 		
 		processor.processWork(messages);
 		

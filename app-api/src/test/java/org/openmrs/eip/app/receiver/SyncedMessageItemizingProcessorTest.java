@@ -20,7 +20,7 @@ public class SyncedMessageItemizingProcessorTest {
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
-		assertEquals("synced msg", processor.getProcessorName());
+		assertEquals("msg itemizer", processor.getProcessorName());
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class SyncedMessageItemizingProcessorTest {
 	
 	@Test
 	public void getQueueName_shouldReturnTheQueueName() {
-		assertEquals("synced-msg", processor.getQueueName());
+		assertEquals("msg-itemizer", processor.getQueueName());
 	}
 	
 	@Test

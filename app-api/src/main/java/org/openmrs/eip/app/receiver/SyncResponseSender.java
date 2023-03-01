@@ -13,7 +13,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncResponseModel;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
@@ -25,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads a batch of post sync items of type PostSyncActionType.SEND_RESPONSE in the synced queue
- * that are not yet successful and sends sync responses for their associated sync messages.
+ * Reads a batch of post sync items of type PostSyncActionType.SEND_RESPONSE in the queue that are
+ * not yet successfully processed and sends sync responses for their associated sync messages.
  */
 public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
@@ -66,18 +65,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 		}
 		catch (Throwable t) {
 			log.warn("An error occurred while sending sync responses to site: " + getSite(), t);
-			
-			Throwable rootCause = ExceptionUtils.getRootCause(t);
-			if (rootCause != null) {
-				t = rootCause;
-			}
-			
-			String errorMsg = t.toString().trim();
-			if (errorMsg.length() > 1024) {
-				errorMsg = errorMsg.substring(0, 1024).trim();
-			}
-			
-			ReceiverUtils.updatePostSyncActionStatuses(actions, false, errorMsg);
+			ReceiverUtils.updatePostSyncActionStatuses(actions, false, ReceiverUtils.getErrorMessage(t));
 		}
 	}
 	
@@ -89,7 +77,9 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	 * @throws JMSException
 	 */
 	protected void sendResponsesInBatch(List<PostSyncAction> actions) throws JMSException {
-		log.info("Sending " + actions.size() + " sync response(s) to site: " + getSite());
+		if (log.isDebugEnabled()) {
+			log.debug("Sending " + actions.size() + " sync response(s) to site: " + getSite());
+		}
 		
 		List<String> responses = generateResponses(actions);
 		

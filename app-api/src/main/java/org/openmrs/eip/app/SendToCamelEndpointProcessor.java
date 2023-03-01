@@ -9,6 +9,8 @@
  */
 package org.openmrs.eip.app;
 
+import java.util.Collection;
+
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,15 @@ public interface SendToCamelEndpointProcessor<T> {
 	 */
 	default void send(String endpointUri, T item, ProducerTemplate producerTemplate) {
 		try {
-			producerTemplate.sendBody(endpointUri, convertBody(item));
+			Object converted = convertBody(item);
+			if (!Collection.class.isAssignableFrom(converted.getClass())) {
+				producerTemplate.sendBody(endpointUri, converted);
+			} else {
+				for (Object object : (Collection) converted) {
+					producerTemplate.sendBody(endpointUri, object);
+				}
+			}
+			
 			onSuccess(item);
 		}
 		catch (Throwable t) {

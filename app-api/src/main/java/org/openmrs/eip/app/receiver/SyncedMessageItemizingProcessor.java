@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Processes an un-itemized synced message to generate post sync items.
+ */
 @Component("syncedMsgItemizingProcessor")
 @Profile(SyncProfiles.RECEIVER)
 public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMessage> {
@@ -20,7 +23,7 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public String getProcessorName() {
-		return "synced msg";
+		return "msg itemizer";
 	}
 	
 	@Override
@@ -30,7 +33,7 @@ public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public String getQueueName() {
-		return "synced-msg";
+		return "msg-itemizer";
 	}
 	
 	@Override

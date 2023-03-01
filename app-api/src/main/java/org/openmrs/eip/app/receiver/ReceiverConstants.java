@@ -1,6 +1,10 @@
 package org.openmrs.eip.app.receiver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ReceiverConstants {
+	
+	public static final ObjectMapper MAPPER = new ObjectMapper();
 	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
 	

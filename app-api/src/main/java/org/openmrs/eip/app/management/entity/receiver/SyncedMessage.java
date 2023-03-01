@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
+import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.CACHE_EVICT;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -69,7 +71,7 @@ public class SyncedMessage extends AbstractEntity {
 	private Date dateReceived;
 	
 	@Column(name = "is_itemized", nullable = false)
-	private boolean itemized;
+	private boolean itemized = false;
 	
 	@OneToMany(mappedBy = "message", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Getter(AccessLevel.NONE)
@@ -113,6 +115,15 @@ public class SyncedMessage extends AbstractEntity {
 	public void addAction(PostSyncAction action) {
 		action.setMessage(this);
 		getActions().add(action);
+	}
+	
+	/**
+	 * Checks whether the synced entity requires cache eviction and if the action has been completed.
+	 *
+	 * @return true if the entity requires cache eviction and has not yet completed otherwise false.
+	 */
+	public boolean requiresCacheEviction() {
+		return getActions().stream().anyMatch(a -> CACHE_EVICT == a.getActionType() && !a.isCompleted());
 	}
 	
 	/**

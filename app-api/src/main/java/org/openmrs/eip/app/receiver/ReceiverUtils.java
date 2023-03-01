@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
@@ -89,6 +91,28 @@ public final class ReceiverUtils {
 		if (log.isDebugEnabled()) {
 			log.debug("Done generating post sync actions for message");
 		}
+	}
+	
+	/**
+	 * Extracts the error message from the specified {@link Throwable} by introspecting to get the root
+	 * cause and truncates the error message not to exceed 1024 characters.
+	 * 
+	 * @param throwable {@link Throwable} instance
+	 * @return the error message
+	 */
+	@Test
+	public static String getErrorMessage(Throwable throwable) {
+		Throwable rootCause = ExceptionUtils.getRootCause(throwable);
+		if (rootCause != null) {
+			throwable = rootCause;
+		}
+		
+		String errorMsg = throwable.toString().trim();
+		if (errorMsg.length() > 1024) {
+			errorMsg = errorMsg.substring(0, 1024).trim();
+		}
+		
+		return errorMsg;
 	}
 	
 	/**
