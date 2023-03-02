@@ -5,8 +5,6 @@ import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-
 /**
  * Base class for {@link Runnable} instances that process tasks for a single site
  */
@@ -14,8 +12,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseSiteRunnable.class);
 	
-	@Getter
-	private SiteInfo site;
+	protected SiteInfo site;
 	
 	private boolean errorEncountered = false;
 	
@@ -27,15 +24,14 @@ public abstract class BaseSiteRunnable implements Runnable {
 	public void run() {
 		if (AppUtils.isStopping()) {
 			if (log.isDebugEnabled()) {
-				log.debug(
-				    "Skipping " + getProcessorName() + " for site: " + getSite() + " because the application is stopping");
+				log.debug("Skipping " + getTaskName() + " for site: " + site + " because the application is stopping");
 			}
 			
 			return;
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Starting " + getProcessorName() + " for site -> " + getSite());
+			log.debug("Starting " + getTaskName() + " for site -> " + site);
 		}
 		
 		do {
@@ -48,7 +44,13 @@ public abstract class BaseSiteRunnable implements Runnable {
 			catch (Throwable t) {
 				if (!AppUtils.isAppContextStopping()) {
 					errorEncountered = true;
-					log.error(getProcessorName() + " for site: " + getSite() + " encountered an error", t);
+					String msg = getTaskName() + " for site: " + site + " encountered an error";
+					if (log.isDebugEnabled()) {
+						log.error(msg, t);
+					} else {
+						log.warn(msg);
+					}
+					
 					break;
 				}
 			}
@@ -56,17 +58,17 @@ public abstract class BaseSiteRunnable implements Runnable {
 		
 		if (!errorEncountered) {
 			if (log.isDebugEnabled()) {
-				log.debug(getProcessorName() + " for site: " + getSite() + " has completed");
+				log.debug(getTaskName() + " for site: " + site + " has completed");
 			}
 		}
 	}
 	
 	/**
-	 * Gets the logical processor name
+	 * Gets the logical task name
 	 *
-	 * @return the processor name
+	 * @return the task name
 	 */
-	public abstract String getProcessorName();
+	public abstract String getTaskName();
 	
 	/**
 	 * Subclasses should add their implementation logic in this method

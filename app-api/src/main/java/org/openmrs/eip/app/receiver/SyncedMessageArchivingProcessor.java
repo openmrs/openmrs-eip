@@ -6,55 +6,54 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes an un-itemized synced message to generate post sync items.
+ * Processes a synced message and moves it to the archives queue.
  */
-@Component("syncedMsgItemizingProcessor")
+@Component("syncedMessageArchivingProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class SyncedMessageItemizingProcessor extends BaseQueueProcessor<SyncedMessage> {
+public class SyncedMessageArchivingProcessor extends BaseQueueProcessor<SyncedMessage> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageItemizingProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageArchivingProcessor.class);
 	
 	@Override
 	public String getProcessorName() {
-		return "msg itemizer";
+		return "msg archiver";
 	}
 	
 	@Override
 	public String getUniqueId(SyncedMessage item) {
-		return item.getIdentifier();
+		return item.getId().toString();
 	}
 	
 	@Override
 	public String getQueueName() {
-		return "msg-itemizer";
+		return "msg-archiver";
 	}
 	
 	@Override
 	public String getThreadName(SyncedMessage item) {
 		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
 	}
 	
 	@Override
 	public String getLogicalType(SyncedMessage item) {
-		return item.getModelClassName();
+		return item.getClass().getName();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return Utils.getListOfModelClassHierarchy(logicalType);
+		return null;
 	}
 	
 	@Override
 	public void processItem(SyncedMessage item) {
-		ReceiverUtils.itemize(item);
+		ReceiverUtils.archiveMessage(item);
 	}
 	
 }

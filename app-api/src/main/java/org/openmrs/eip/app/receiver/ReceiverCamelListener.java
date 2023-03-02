@@ -113,6 +113,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			startSearchIndexUpdaters(sites);
 			
+			startMessageArchivers(sites);
+			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			int timeout = 15;
 			if (msgExecutor != null) {
@@ -184,6 +186,13 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 		sites.stream().forEach(site -> {
 			SearchIndexUpdater updater = new SearchIndexUpdater(site);
 			siteExecutor.scheduleWithFixedDelay(updater, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
+		});
+	}
+	
+	private void startMessageArchivers(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SyncedMessageArchiver archiver = new SyncedMessageArchiver(site);
+			siteExecutor.scheduleWithFixedDelay(archiver, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
 		});
 	}
 	

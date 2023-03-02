@@ -1,24 +1,18 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.CACHE_EVICT;
-
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.DynamicUpdate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
@@ -27,7 +21,6 @@ import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.springframework.beans.BeanUtils;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,6 +28,7 @@ import lombok.Setter;
 @Table(name = "receiver_synced_msg")
 @Getter
 @Setter
+@DynamicUpdate
 public class SyncedMessage extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
@@ -70,13 +64,23 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "date_received", updatable = false)
 	private Date dateReceived;
 	
+	@Column(name = "response_sent", nullable = false)
+	private boolean responseSent = false;
+	
 	@Column(name = "is_itemized", nullable = false)
 	private boolean itemized = false;
 	
-	@OneToMany(mappedBy = "message", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
-	private Collection<PostSyncAction> actions;
+	@Column(name = "is_cached")
+	private Boolean cached;
+	
+	@Column(name = "evicted_from_cache")
+	private Boolean evictedFromCache;
+	
+	@Column(name = "is_indexed")
+	private Boolean indexed;
+	
+	@Column(name = "search_index_updated")
+	private Boolean searchIndexUpdated;
 	
 	public SyncedMessage() {
 	}
@@ -94,53 +98,12 @@ public class SyncedMessage extends AbstractEntity {
 		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
 	}
 	
-	/**
-	 * Gets the postSyncActions
-	 *
-	 * @return the postSyncActions
-	 */
-	public Collection<PostSyncAction> getActions() {
-		if (actions == null) {
-			actions = new LinkedHashSet();
-		}
-		
-		return actions;
-	}
-	
-	/**
-	 * Adds the specified {@link PostSyncAction}
-	 *
-	 * @param action the {@link PostSyncAction} to add
-	 */
-	public void addAction(PostSyncAction action) {
-		action.setMessage(this);
-		getActions().add(action);
-	}
-	
-	/**
-	 * Checks whether the synced entity requires cache eviction and if the action has been completed.
-	 *
-	 * @return true if the entity requires cache eviction and has not yet completed otherwise false.
-	 */
-	public boolean requiresCacheEviction() {
-		return getActions().stream().anyMatch(a -> CACHE_EVICT == a.getActionType() && !a.isCompleted());
-	}
-	
-	/**
-	 * Checks whether this entity is ready for archiving i.e. it is already itemized and all its
-	 * {@link PostSyncAction} items have been processed successfully
-	 *
-	 * @return true if ready for archiving otherwise false
-	 */
-	public boolean readyForArchive() {
-		return isItemized() && getActions().stream().allMatch(a -> a.isCompleted());
-	}
-	
 	@Override
 	public String toString() {
 		return "{id=" + getId() + ", identifier=" + identifier + ", modelClassName=" + modelClassName + ", operation="
-		        + operation + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + ", itemized=" + itemized
-		        + ", actions=" + actions + "}";
+		        + operation + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + ", responseSent=" + responseSent
+		        + ", itemized=" + itemized + ", cached=" + cached + ", evictedFromCache=" + evictedFromCache + ", indexed="
+		        + indexed + ", searchIndexUpdated=" + searchIndexUpdated + "}";
 	}
 	
 }

@@ -3,9 +3,8 @@ package org.openmrs.eip.app.receiver;
 import java.util.List;
 
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,63 +12,52 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Superclass for {@link PostSyncAction} processor tasks
+ * Superclass for post sync action processor tasks
  */
 public abstract class BasePostSyncActionRunnable extends BaseSiteRunnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BasePostSyncActionRunnable.class);
 	
-	protected PostSyncActionType actionType;
-	
 	protected Pageable pageable;
 	
-	protected PostSyncActionRepository repo;
+	protected SyncedMessageRepository repo;
 	
-	public BasePostSyncActionRunnable(SiteInfo site, PostSyncActionType actionType, int batchSize) {
+	public BasePostSyncActionRunnable(SiteInfo site, int batchSize) {
 		super(site);
-		this.actionType = actionType;
 		//TODO Configure batch size
 		this.pageable = PageRequest.of(0, batchSize);
-		repo = SyncContext.getBean(PostSyncActionRepository.class);
+		repo = SyncContext.getBean(SyncedMessageRepository.class);
 	}
 	
 	@Override
 	public boolean doRun() throws Exception {
-		try {
-			List<PostSyncAction> actions = getNextBatch();
-			if (actions.isEmpty()) {
-				if (log.isTraceEnabled()) {
-					log.trace("No post sync actions of type " + actionType + " found for site: " + getSite());
-				}
-				
-				return true;
+		List<SyncedMessage> messages = getNextBatch();
+		if (messages.isEmpty()) {
+			if (log.isTraceEnabled()) {
+				log.trace("No messages found by " + getTaskName() + " for site: " + site);
 			}
 			
-			process(actions);
+			return true;
 		}
-		catch (Throwable t) {
-			log.error(
-			    "An error occurred while processing post sync actions of type " + actionType + " for site: " + getSite(), t);
-		}
+		
+		process(messages);
 		
 		return false;
 	}
 	
 	/**
-	 * Gets the next batch of PostSyncActions items to process
+	 * Gets the next batch of messages to process
 	 *
-	 * @return List of post sync actions
+	 * @return List of messages
 	 */
-	public List<PostSyncAction> getNextBatch() {
-		return repo.getOrderedBatchOfPendingActions(getSite(), actionType, pageable);
-	}
+	public abstract List<SyncedMessage> getNextBatch();
 	
 	/**
-	 * Processes the specified list of post sync action items
+	 * Processes the specified list of messages
 	 * 
-	 * @param actions list of post sync actions
+	 * @param messages list of messages
 	 * @throws Exception
 	 */
-	public abstract void process(List<PostSyncAction> actions) throws Exception;
+	public abstract void process(List<SyncedMessage> messages) throws Exception;
 	
 }

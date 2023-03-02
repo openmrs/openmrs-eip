@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
@@ -33,7 +32,7 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	
 	protected static final Logger log = LoggerFactory.getLogger(CacheEvictingProcessor.class);
 	
-	public CacheEvictingProcessor(ProducerTemplate producerTemplate, PostSyncActionRepository repo) {
+	public CacheEvictingProcessor(ProducerTemplate producerTemplate, SyncedMessageRepository repo) {
 		super(ReceiverConstants.URI_CLEAR_CACHE, producerTemplate, repo);
 	}
 	
@@ -43,8 +42,8 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	}
 	
 	@Override
-	public String getUniqueId(PostSyncAction item) {
-		return item.getMessage().getIdentifier();
+	public String getUniqueId(SyncedMessage item) {
+		return item.getIdentifier();
 	}
 	
 	@Override
@@ -53,15 +52,14 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	}
 	
 	@Override
-	public String getThreadName(PostSyncAction item) {
-		SyncedMessage m = item.getMessage();
-		return m.getSite().getIdentifier() + "-" + m.getMessageUuid() + "-" + AppUtils.getSimpleName(m.getModelClassName())
-		        + "-" + m.getIdentifier() + "-" + item.getId();
+	public String getThreadName(SyncedMessage item) {
+		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
 	}
 	
 	@Override
-	public String getLogicalType(PostSyncAction item) {
-		return item.getMessage().getModelClassName();
+	public String getLogicalType(SyncedMessage item) {
+		return item.getModelClassName();
 	}
 	
 	@Override
@@ -70,13 +68,12 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	}
 	
 	@Override
-	public Object convertBody(PostSyncAction item) {
-		SyncedMessage msg = item.getMessage();
-		String modelClass = msg.getModelClassName();
+	public Object convertBody(SyncedMessage item) {
+		String modelClass = item.getModelClassName();
 		String uuid = null;
 		//Users are not deleted, so no need to clear the cache for all users as we do for other cached entities
-		if (SyncOperation.d != msg.getOperation() || UserModel.class.getName().equals(modelClass)) {
-			uuid = msg.getIdentifier();
+		if (SyncOperation.d != item.getOperation() || UserModel.class.getName().equals(modelClass)) {
+			uuid = item.getIdentifier();
 		}
 		
 		String resource;
@@ -105,6 +102,12 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 		catch (JsonProcessingException e) {
 			throw new EIPException("Failed to generate cache evict payload", e);
 		}
+	}
+	
+	@Override
+	public void onSuccess(SyncedMessage item) {
+		item.setEvictedFromCache(true);
+		repo.save(item);
 	}
 	
 }

@@ -11,9 +11,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -40,7 +39,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	protected static final Logger log = LoggerFactory.getLogger(SearchIndexUpdatingProcessor.class);
 	
-	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate, PostSyncActionRepository repo) {
+	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate, SyncedMessageRepository repo) {
 		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, repo);
 	}
 	
@@ -50,8 +49,8 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	}
 	
 	@Override
-	public String getUniqueId(PostSyncAction item) {
-		return item.getMessage().getIdentifier();
+	public String getUniqueId(SyncedMessage item) {
+		return item.getIdentifier();
 	}
 	
 	@Override
@@ -60,15 +59,14 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	}
 	
 	@Override
-	public String getThreadName(PostSyncAction item) {
-		SyncedMessage m = item.getMessage();
-		return m.getSite().getIdentifier() + "-" + m.getMessageUuid() + "-" + AppUtils.getSimpleName(m.getModelClassName())
-		        + "-" + m.getIdentifier() + "-" + item.getId();
+	public String getThreadName(SyncedMessage item) {
+		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
 	}
 	
 	@Override
-	public String getLogicalType(PostSyncAction item) {
-		return item.getMessage().getModelClassName();
+	public String getLogicalType(SyncedMessage item) {
+		return item.getModelClassName();
 	}
 	
 	@Override
@@ -77,29 +75,19 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	}
 	
 	@Override
-	public void processItem(PostSyncAction item) {
-		//Postpone processing until the cache eviction action has been completed if required.
-		if (item.getMessage().requiresCacheEviction()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Waiting for cache eviction action to complete before updating search index for -> "
-				        + item.getMessage());
-			}
-			
-			return;
-		}
-		
-		super.processItem(item);
+	public void onSuccess(SyncedMessage item) {
+		item.setSearchIndexUpdated(true);
+		repo.save(item);
 	}
 	
 	@Override
-	public Object convertBody(PostSyncAction item) {
-		SyncedMessage msg = item.getMessage();
-		String modelClass = msg.getModelClassName();
+	public Object convertBody(SyncedMessage item) {
+		String modelClass = item.getModelClassName();
 		String uuid = null;
-		if (SyncOperation.d != msg.getOperation() || PersonModel.class.getName().equals(modelClass)
+		if (SyncOperation.d != item.getOperation() || PersonModel.class.getName().equals(modelClass)
 		        || PatientModel.class.getName().equals(modelClass)) {
 			
-			uuid = msg.getIdentifier();
+			uuid = item.getIdentifier();
 		}
 		
 		Object payload;

@@ -12,51 +12,51 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Reads and processes non itemized messages in the synced queue to determine those that requires
- * eviction from the OpenMRS cache and updating the search index
+ * Reads and processes done messages in the synced message queue and moves them to the archives
+ * queue
  */
-public class SyncedMessageItemizer extends BaseSiteRunnable {
+public class SyncedMessageArchiver extends BaseSiteRunnable {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageItemizer.class);
+	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageArchiver.class);
 	
 	private SyncedMessageRepository syncedMsgRepo;
 	
-	private SyncedMessageItemizingProcessor processor;
+	private SyncedMessageArchivingProcessor processor;
 	
 	private Pageable page;
 	
-	public SyncedMessageItemizer(SiteInfo site) {
+	public SyncedMessageArchiver(SiteInfo site) {
 		super(site);
 		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
-		processor = SyncContext.getBean(SyncedMessageItemizingProcessor.class);
+		processor = SyncContext.getBean(SyncedMessageArchivingProcessor.class);
 		//TODO Configure batch size
 		page = PageRequest.of(0, 1000);
 	}
 	
 	@Override
 	public String getTaskName() {
-		return "msg itemizer task";
+		return "msg archiver task";
 	}
 	
 	@Override
 	public boolean doRun() throws Exception {
 		//TODO Check for existence of sync messages before running
 		if (log.isTraceEnabled()) {
-			log.trace("Fetching next batch of " + page.getPageSize() + " messages to itemize for site: " + site);
+			log.trace("Fetching next batch of " + page.getPageSize() + " messages to archive for site: " + site);
 		}
 		
-		List<SyncedMessage> messages = syncedMsgRepo.getBatchOfMessagesForItemizing(site, page);
+		List<SyncedMessage> messages = syncedMsgRepo.getBatchOfMessagesForArchiving(site, page);
 		
 		if (messages.isEmpty()) {
 			if (log.isTraceEnabled()) {
-				log.trace("No synced messages for itemizing found for site: " + site);
+				log.trace("No messages for archiving found for site: " + site);
 			}
 			
 			return true;
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Itemizing " + messages.size() + " message(s) for site: " + site);
+			log.debug("Archiving " + messages.size() + " message(s) for site: " + site);
 		}
 		
 		processor.processWork(messages);

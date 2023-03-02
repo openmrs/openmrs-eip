@@ -59,6 +59,7 @@ public class ReceiverSyncArchive extends AbstractEntity {
 	}
 	
 	public ReceiverSyncArchive(SyncedMessage processedMessage) {
+		//Exclude postProcessed
 		BeanUtils.copyProperties(processedMessage, this, "id", "dateCreated");
 	}
 	
