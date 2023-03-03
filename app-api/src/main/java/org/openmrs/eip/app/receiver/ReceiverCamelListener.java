@@ -1,11 +1,24 @@
 package org.openmrs.eip.app.receiver;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_DELAY_IN_SECONDS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_IN_SECONDS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_DELAY;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_INITIAL_DELAY_SYNC;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ITEMIZER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_RESPONSE_SENDER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ARCHIVER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_CACHE_EVICTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_INDEX_UPDATER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ITEMIZER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_RESPONSE_SENDER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
@@ -45,8 +58,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
-	private static final int INITIAL_DELAY_SECONDS = 2;
-	
 	private ScheduledExecutorService siteExecutor;
 	
 	private ExecutorService msgExecutor;
@@ -57,8 +68,41 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
 	private int threads;
 	
-	@Value("${" + PROP_DELAY_IN_SECONDS + ":" + DEFAULT_DELAY_IN_SECONDS + "}")
-	private long delay;
+	@Value("${" + PROP_INITIAL_DELAY_SYNC + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
+	private long initialDelayConsumer;
+	
+	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
+	private long delayConsumer;
+	
+	@Value("${" + PROP_INITIAL_DELAY_ITEMIZER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 15000) + "}")
+	private long initialDelayItemizer;
+	
+	@Value("${" + PROP_DELAY_ITEMIZER + ":" + DEFAULT_DELAY + "}")
+	private long delayItemizer;
+	
+	@Value("${" + PROP_INITIAL_DELAY_CACHE_EVICTOR + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
+	private long initialDelayCacheEvictor;
+	
+	@Value("${" + PROP_DELAY_CACHE_EVICTOR + ":" + DEFAULT_DELAY + "}")
+	private long delayCacheEvictor;
+	
+	@Value("${" + PROP_INITIAL_DELAY_INDEX_UPDATER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
+	private long initialDelayIndexUpdater;
+	
+	@Value("${" + PROP_DELAY_INDEX_UPDATER + ":" + DEFAULT_DELAY + "}")
+	private long delayIndexUpdater;
+	
+	@Value("${" + PROP_INITIAL_DELAY_RESPONSE_SENDER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
+	private long initialDelayResponseSender;
+	
+	@Value("${" + PROP_DELAY_RESPONSE_SENDER + ":" + DEFAULT_DELAY + "}")
+	private long delayResponseSender;
+	
+	@Value("${" + PROP_INITIAL_DELAY_ARCHIVER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
+	private long initialDelayArchiver;
+	
+	@Value("${" + PROP_DELAY_ARCHIVER + ":" + DEFAULT_DELAY + "}")
+	private long delayArchiver;
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -157,42 +201,42 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private void startMessageConsumers(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor);
-			siteExecutor.scheduleWithFixedDelay(consumer, INITIAL_DELAY_SECONDS, delay, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(consumer, initialDelayConsumer, delayConsumer, MILLISECONDS);
 		});
 	}
 	
 	private void startMessageItemizers(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			SyncedMessageItemizer itemizer = new SyncedMessageItemizer(site);
-			siteExecutor.scheduleWithFixedDelay(itemizer, INITIAL_DELAY_SECONDS * 2, delay + 5, TimeUnit.SECONDS);
-		});
-	}
-	
-	private void startSyncResponseSenders(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SyncResponseSender sender = new SyncResponseSender(site);
-			siteExecutor.scheduleWithFixedDelay(sender, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(itemizer, initialDelayItemizer, delayItemizer, MILLISECONDS);
 		});
 	}
 	
 	private void startCacheEvictors(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			CacheEvictor evictor = new CacheEvictor(site);
-			siteExecutor.scheduleWithFixedDelay(evictor, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(evictor, initialDelayCacheEvictor, delayCacheEvictor, MILLISECONDS);
 		});
 	}
 	
 	private void startSearchIndexUpdaters(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			SearchIndexUpdater updater = new SearchIndexUpdater(site);
-			siteExecutor.scheduleWithFixedDelay(updater, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(updater, initialDelayIndexUpdater, delayIndexUpdater, MILLISECONDS);
+		});
+	}
+	
+	private void startSyncResponseSenders(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SyncResponseSender sender = new SyncResponseSender(site);
+			siteExecutor.scheduleWithFixedDelay(sender, initialDelayResponseSender, delayResponseSender, MILLISECONDS);
 		});
 	}
 	
 	private void startMessageArchivers(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
 			SyncedMessageArchiver archiver = new SyncedMessageArchiver(site);
-			siteExecutor.scheduleWithFixedDelay(archiver, INITIAL_DELAY_SECONDS * 2, delay + 10, TimeUnit.SECONDS);
+			siteExecutor.scheduleWithFixedDelay(archiver, initialDelayArchiver, delayArchiver, MILLISECONDS);
 		});
 	}
 	

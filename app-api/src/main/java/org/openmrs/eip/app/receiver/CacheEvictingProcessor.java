@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
- * Reads and processes post sync action items that require eviction from the OpenMRS cache.
+ * Processes synced messages that require eviction from the OpenMRS cache.
  */
 @Component("cacheEvictingProcessor")
 @Profile(SyncProfiles.RECEIVER)

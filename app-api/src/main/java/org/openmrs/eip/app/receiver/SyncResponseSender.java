@@ -31,11 +31,14 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
 	private ConnectionFactory activeMqConnFactory;
 	
+	private SyncResponseSenderProcessor processor;
+	
 	private String queueName;
 	
 	public SyncResponseSender(SiteInfo site) {
 		super(site, 100000);
 		activeMqConnFactory = SyncContext.getBean(ConnectionFactory.class);
+		processor = SyncContext.getBean(SyncResponseSenderProcessor.class);
 		String endpoint = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)
 		        .getCamelOutputEndpoint(site.getIdentifier());
 		if (!endpoint.startsWith("activemq:")) {
@@ -47,7 +50,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
 	@Override
 	public String getTaskName() {
-		return "response sender";
+		return "response sender task";
 	}
 	
 	@Override
@@ -59,10 +62,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	public void process(List<SyncedMessage> messages) throws Exception {
 		try {
 			sendResponsesInBatch(messages);
-			messages.forEach(m -> {
-				m.setResponseSent(true);
-				repo.save(m);
-			});
+			processor.processWork(messages);
 		}
 		catch (Throwable t) {
 			log.warn("An error occurred while sending sync responses to site: " + site, t);

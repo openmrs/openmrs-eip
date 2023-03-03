@@ -82,7 +82,7 @@ public final class ReceiverUtils {
 		getSyncMsgRepo().save(message);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Saving itemized message");
+			log.debug("Saving updates for itemized message");
 		}
 	}
 	

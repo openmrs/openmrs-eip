@@ -21,7 +21,7 @@ public class SearchIndexUpdater extends BasePostSyncActionRunnable {
 	
 	@Override
 	public String getTaskName() {
-		return "search index updater";
+		return "search index updater task";
 	}
 	
 	@Override

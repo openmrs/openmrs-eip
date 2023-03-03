@@ -53,7 +53,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	/**
-	 * Processes the sync message specified on the exchange, thit method is marked as synchronized
+	 * Processes the sync message specified on the exchange, this method is marked as synchronized
 	 * because we want to avoid the following from happening,
 	 * 
 	 * <pre>

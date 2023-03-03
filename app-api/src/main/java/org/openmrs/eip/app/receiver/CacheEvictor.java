@@ -21,7 +21,7 @@ public class CacheEvictor extends BasePostSyncActionRunnable {
 	
 	@Override
 	public String getTaskName() {
-		return "cache evictor";
+		return "cache evictor task";
 	}
 	
 	@Override

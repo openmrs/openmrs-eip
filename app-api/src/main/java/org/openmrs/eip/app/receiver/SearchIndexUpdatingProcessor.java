@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
- * Reads and processes post sync action items that require updating the OpenMRS search index.
+ * Processes sync messages that require updating the OpenMRS search index.
  */
 @Component("searchIndexUpdatingProcessor")
 @Profile(SyncProfiles.RECEIVER)

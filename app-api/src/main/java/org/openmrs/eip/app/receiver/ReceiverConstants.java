@@ -16,7 +16,33 @@ public class ReceiverConstants {
 	
 	public static final String PROP_DELAY_IN_SECONDS = "site.message.reader.delay";
 	
-	public static final int DEFAULT_DELAY_IN_SECONDS = 5 * 60;
+	public static final int DEFAULT_INITIAL_DELAY_SYNC = 5000;
+
+	public static final int DEFAULT_DELAY = 300000;
+	
+	public static final String PROP_INITIAL_DELAY_SYNC = "sync.initial.delay";
+	
+	public static final String PROP_DELAY_SYNC = "sync.delay";
+	
+	public static final String PROP_INITIAL_DELAY_ITEMIZER = "itemizer.initial.delay";
+	
+	public static final String PROP_DELAY_ITEMIZER = "itemizer.delay";
+	
+	public static final String PROP_INITIAL_DELAY_RESPONSE_SENDER = "response.sender.initial.delay";
+	
+	public static final String PROP_DELAY_RESPONSE_SENDER = "response.sender.delay";
+	
+	public static final String PROP_INITIAL_DELAY_CACHE_EVICTOR = "cache.evictor.initial.delay";
+	
+	public static final String PROP_DELAY_CACHE_EVICTOR = "cache.evictor.delay";
+	
+	public static final String PROP_INITIAL_DELAY_INDEX_UPDATER = "search.index.updater.initial.delay";
+	
+	public static final String PROP_DELAY_INDEX_UPDATER = "search.index.updater.delay";
+	
+	public static final String PROP_INITIAL_DELAY_ARCHIVER = "archiver.initial.delay";
+	
+	public static final String PROP_DELAY_ARCHIVER = "archiver.delay";
 	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	

@@ -71,7 +71,7 @@ public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Lo
 	List<SyncedMessage> getBatchOfMessagesForIndexing(@Param("site") SiteInfo site, Pageable pageable);
 	
 	/**
-	 * Gets a batch of post processed synced messages for the specified site
+	 * Gets a batch of post processed synced messages for archiving for the specified site
 	 *
 	 * @param site the site to match against
 	 * @param pageable {@link Pageable} instance
