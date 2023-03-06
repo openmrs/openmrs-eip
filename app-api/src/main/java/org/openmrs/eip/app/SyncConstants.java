@@ -12,6 +12,10 @@ public class SyncConstants {
 	
 	public static final String FOLDER_ROUTES = "routes";
 	
+	public static final String BEAN_NAME_SYNC_EXECUTOR = "syncExecutor";
+	
+	public static final int EXECUTOR_SHUTDOWN_TIMEOUT = 15;
+	
 	public static final int MAX_COUNT = 200;
 	
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
@@ -29,6 +33,16 @@ public class SyncConstants {
 	public static final String PROP_SITE_PARALLEL_SIZE = "sites.sync.parallel.size";
 	
 	public static final String PROP_THREAD_NUMBER = "parallel.processing.thread.number";
+	
+	public static final String PROP_PRIORITIZE_DISABLED = "sync.prioritize.disabled";
+	
+	public static final String PROP_BACKLOG_THRESHOLD = "sync.prioritize.backlog.threshold.days";
+	
+	public static final String PROP_SYNC_TIME_PER_ITEM = "sync.prioritize.time.per.item";
+	
+	public static final String PROP_PRIORITIZE_THRESHOLD = "sync.prioritize.threshold";
+	
+	public static final String PROP_COUNT_CACHE_TTL = "sync.prioritize.count.cache.ttl";
 	
 	public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
 	

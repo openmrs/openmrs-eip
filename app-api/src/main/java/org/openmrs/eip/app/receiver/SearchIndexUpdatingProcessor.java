@@ -1,11 +1,13 @@
 package org.openmrs.eip.app.receiver;
 
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.component.Constants.OPENMRS_DATASOURCE_NAME;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -25,6 +27,7 @@ import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -39,8 +42,9 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	protected static final Logger log = LoggerFactory.getLogger(SearchIndexUpdatingProcessor.class);
 	
-	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate, SyncedMessageRepository repo) {
-		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, repo);
+	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate,
+	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SyncedMessageRepository repo) {
+		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, executor, repo);
 	}
 	
 	@Override

@@ -39,6 +39,7 @@
         <tomcatVersion>9.0.17</tomcatVersion>
         <jstlVersion>1.2</jstlVersion>
         <camelActiveMqVersion>3.2.0</camelActiveMqVersion>
+        <commonsCollVersion>4.4</commonsCollVersion>
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
         <copyRenamePluginVersion>1.0.1</copyRenamePluginVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
@@ -118,6 +119,11 @@
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>${commonsBeanUtilsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commonsCollVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>

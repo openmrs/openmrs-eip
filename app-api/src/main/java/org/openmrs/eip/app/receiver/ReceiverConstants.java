@@ -6,6 +6,8 @@ public class ReceiverConstants {
 	
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 	
+	public static final String BEAN_NAME_SITE_EXECUTOR = "siteExecutor";
+	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
@@ -17,7 +19,7 @@ public class ReceiverConstants {
 	public static final String PROP_DELAY_IN_SECONDS = "site.message.reader.delay";
 	
 	public static final int DEFAULT_INITIAL_DELAY_SYNC = 5000;
-
+	
 	public static final int DEFAULT_DELAY = 300000;
 	
 	public static final String PROP_INITIAL_DELAY_SYNC = "sync.initial.delay";

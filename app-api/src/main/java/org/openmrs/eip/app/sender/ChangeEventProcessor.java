@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.sender;
 
 import static org.apache.camel.component.debezium.DebeziumConstants.HEADER_SOURCE_METADATA;
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -20,7 +22,7 @@ import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,8 @@ import org.springframework.stereotype.Component;
 public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implements Processor {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
+	
+	private ExecutorService executor;
 	
 	private List<CompletableFuture<Void>> futures;
 	
@@ -40,7 +44,8 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 	
 	private ChangeEventHandler handler;
 	
-	public ChangeEventProcessor(@Autowired ChangeEventHandler handler) {
+	public ChangeEventProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ExecutorService executor, ChangeEventHandler handler) {
+		this.executor = executor;
 		this.handler = handler;
 	}
 	

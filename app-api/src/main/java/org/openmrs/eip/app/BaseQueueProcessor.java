@@ -5,6 +5,7 @@ import static java.util.Collections.synchronizedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.slf4j.Logger;
@@ -20,6 +21,12 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseQueueProcessor.class);
 	
+	private ThreadPoolExecutor executor;
+	
+	public BaseQueueProcessor(ThreadPoolExecutor executor) {
+		this.executor = executor;
+	}
+	
 	@Override
 	public void processWork(List<T> items) throws Exception {
 		if (items.isEmpty()) {
@@ -30,8 +37,8 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 			return;
 		}
 		
-		List<String> uniqueKeys = synchronizedList(new ArrayList(threadCount));
-		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
+		List<String> uniqueKeys = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
+		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
 		
 		for (T item : items) {
 			if (AppUtils.isAppContextStopping()) {

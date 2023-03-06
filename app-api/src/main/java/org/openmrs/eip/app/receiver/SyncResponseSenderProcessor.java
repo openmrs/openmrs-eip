@@ -1,6 +1,9 @@
 package org.openmrs.eip.app.receiver;
 
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
+
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
@@ -9,6 +12,7 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +28,9 @@ public class SyncResponseSenderProcessor extends BaseQueueProcessor<SyncedMessag
 	
 	private SyncedMessageRepository repo;
 	
-	public SyncResponseSenderProcessor(SyncedMessageRepository repo) {
+	public SyncResponseSenderProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    SyncedMessageRepository repo) {
+		super(executor);
 		this.repo = repo;
 	}
 	

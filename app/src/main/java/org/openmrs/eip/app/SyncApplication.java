@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.app.config.ActiveMqConfig;
+import org.openmrs.eip.app.config.AppConfig;
 import org.openmrs.eip.app.config.CamelConfig;
 import org.openmrs.eip.app.config.JpaCamelConf;
 import org.openmrs.eip.app.config.ManagementDataSourceConfig;
@@ -18,8 +19,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
-@Import({ ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class, ActiveMqConfig.class,
-        CamelConfig.class })
+@Import({ AppConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class,
+        ActiveMqConfig.class, CamelConfig.class })
 public class SyncApplication {
 	
 	private CamelContext camelContext;

@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SendToCamelEndpointProcessor;
@@ -19,7 +21,8 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	protected SyncedMessageRepository repo;
 	
 	public BaseSendToCamelPostSyncActionProcessor(String endpointUri, ProducerTemplate producerTemplate,
-	    SyncedMessageRepository repo) {
+	    ThreadPoolExecutor executor, SyncedMessageRepository repo) {
+		super(executor);
 		this.endpointUri = endpointUri;
 		this.producerTemplate = producerTemplate;
 		this.repo = repo;

@@ -1,14 +1,20 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.CUSTOM_PROP_SOURCE_BEAN_NAME;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_INBOUND_DB_SYNC;
 import static org.openmrs.eip.component.Constants.PROP_URI_ERROR_HANDLER;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.openmrs.eip.component.SyncProfiles;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -38,6 +44,13 @@ public class ReceiverConfig {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
 		builder.setUseOriginalMessage(true);
 		return builder;
+	}
+	
+	@Bean(BEAN_NAME_SITE_EXECUTOR)
+	public ScheduledThreadPoolExecutor getSiteExecutor(@Value("${" + PROP_SITE_PARALLEL_SIZE + ":"
+	        + DEFAULT_SITE_PARALLEL_SIZE + "}") int parallelSiteSize) {
+		
+		return (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(parallelSiteSize);
 	}
 	
 }

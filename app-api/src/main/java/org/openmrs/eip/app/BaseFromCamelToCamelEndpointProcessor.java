@@ -1,5 +1,7 @@
 package org.openmrs.eip.app;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
@@ -15,7 +17,9 @@ public abstract class BaseFromCamelToCamelEndpointProcessor<T extends AbstractEn
 	
 	private ProducerTemplate producerTemplate;
 	
-	public BaseFromCamelToCamelEndpointProcessor(String endpointUri, ProducerTemplate producerTemplate) {
+	public BaseFromCamelToCamelEndpointProcessor(String endpointUri, ProducerTemplate producerTemplate,
+	    ThreadPoolExecutor executor) {
+		super(executor);
 		this.endpointUri = endpointUri;
 		this.producerTemplate = producerTemplate;
 	}

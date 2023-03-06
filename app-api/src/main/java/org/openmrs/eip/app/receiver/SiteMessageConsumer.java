@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -51,9 +52,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ProducerTemplate producerTemplate;
 	
-	private int threadCount;
-	
-	private ExecutorService msgExecutor;
+	private ThreadPoolExecutor executor;
 	
 	private String messageProcessorUri;
 	
@@ -61,14 +60,12 @@ public class SiteMessageConsumer implements Runnable {
 	
 	/**
 	 * @param site sync messages from this site will be consumed by this instance
-	 * @param threadCount the number of threads to use to sync messages in parallel
-	 * @param msgExecutor {@link ExecutorService} instance to messages in parallel
+	 * @param executor {@link ExecutorService} instance to messages in parallel
 	 */
-	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, int threadCount, ExecutorService msgExecutor) {
+	public SiteMessageConsumer(String messageProcessorUri, SiteInfo site, ThreadPoolExecutor executor) {
 		this.messageProcessorUri = messageProcessorUri;
 		this.site = site;
-		this.threadCount = threadCount;
-		this.msgExecutor = msgExecutor;
+		this.executor = executor;
 	}
 	
 	@Override
@@ -140,8 +137,8 @@ public class SiteMessageConsumer implements Runnable {
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
-		List<String> typeAndIdentifier = synchronizedList(new ArrayList(threadCount));
-		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(threadCount));
+		List<String> typeAndIdentifier = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
+		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
 		
 		for (SyncMessage msg : syncMessages) {
 			if (AppUtils.isAppContextStopping()) {
@@ -183,7 +180,7 @@ public class SiteMessageConsumer implements Runnable {
 					//be 2 snapshot events for the same entity i.e. for tables with a hierarchy
 					Thread.currentThread().setName(originalThreadName);
 				}
-			}, msgExecutor));
+			}, executor));
 			
 		}
 		

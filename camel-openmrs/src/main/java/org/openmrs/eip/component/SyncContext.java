@@ -38,6 +38,15 @@ public class SyncContext implements ApplicationContextAware {
 	}
 	
 	/**
+	 * Gets the bean matching the specified bean name from the application context
+	 *
+	 * @return an instance of the bean matching the specified name
+	 */
+	public static <T> T getBean(String name) {
+		return (T) appContext.getBean(name);
+	}
+	
+	/**
 	 * Gets the {@link SyncEntityRepository} for the entity class mapped to the specified table name
 	 *
 	 * @param tableName the name of the table

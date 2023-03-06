@@ -1,10 +1,9 @@
 package org.openmrs.eip.app.receiver;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_SITE_PARALLEL_SIZE;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_THREAD_NUMBER;
-import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
-import static org.openmrs.eip.app.SyncConstants.PROP_THREAD_NUMBER;
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
+import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_DELAY;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
@@ -23,9 +22,8 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,6 +43,7 @@ import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
@@ -58,15 +57,9 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
-	private ScheduledExecutorService siteExecutor;
+	private ScheduledThreadPoolExecutor siteExecutor;
 	
-	private ExecutorService msgExecutor;
-	
-	@Value("${" + PROP_SITE_PARALLEL_SIZE + ":" + DEFAULT_SITE_PARALLEL_SIZE + "}")
-	private int parallelSiteSize;
-	
-	@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER + "}")
-	private int threads;
+	private ThreadPoolExecutor syncExecutor;
 	
 	@Value("${" + PROP_INITIAL_DELAY_SYNC + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
 	private long initialDelayConsumer;
@@ -103,6 +96,13 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	@Value("${" + PROP_DELAY_ARCHIVER + ":" + DEFAULT_DELAY + "}")
 	private long delayArchiver;
+	
+	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
+	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
+		
+		this.siteExecutor = siteExecutor;
+		this.syncExecutor = syncExecutor;
+	}
 	
 	@Override
 	public void notify(CamelEvent event) {
@@ -141,9 +141,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			log.info("Starting sync message consumer threads, one per site");
 			
-			siteExecutor = Executors.newScheduledThreadPool(parallelSiteSize);
-			msgExecutor = Executors.newFixedThreadPool(threads);
-			
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());
 			
@@ -160,39 +157,32 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			startMessageArchivers(sites);
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
-			int timeout = 15;
-			if (msgExecutor != null) {
-				log.info("Shutting down executor for message sync threads");
-				
-				msgExecutor.shutdown();
-				
+			final int syncExecutorWait = 100;
+			while (!syncExecutor.isTerminated()) {
 				try {
-					log.info("Waiting for " + timeout + " seconds for message sync threads to terminate");
-					
-					msgExecutor.awaitTermination(timeout, TimeUnit.SECONDS);
-					
-					log.info("Done shutting down executor for message sync threads");
+					Thread.sleep(syncExecutorWait);
+					if (log.isTraceEnabled()) {
+						log.trace("Waiting for " + syncExecutorWait + "ms for sync executor to terminate");
+					}
 				}
-				catch (Exception e) {
-					log.error("An error occurred while waiting for message sync threads to terminate");
+				catch (InterruptedException e) {
+					log.error("An error occurred while waiting for sync executor to terminate", e);
 				}
 			}
 			
-			if (siteExecutor != null) {
-				log.info("Shutting down executor for site message consumer threads");
+			log.info("Shutting down site executor");
+			
+			siteExecutor.shutdownNow();
+			
+			try {
+				log.info("Waiting for " + EXECUTOR_SHUTDOWN_TIMEOUT + " seconds for site executor to terminate");
 				
-				siteExecutor.shutdown();
+				siteExecutor.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
 				
-				try {
-					log.info("Waiting for " + timeout + " seconds for site message consumer threads to terminate");
-					
-					siteExecutor.awaitTermination(timeout, TimeUnit.SECONDS);
-					
-					log.info("Done shutting down executor for site message consumer threads");
-				}
-				catch (Exception e) {
-					log.error("An error occurred while waiting for site message consumer threads to terminate");
-				}
+				log.info("Done shutting down site executor");
+			}
+			catch (Exception e) {
+				log.error("An error occurred while waiting for site executor to terminate");
 			}
 		}
 		
@@ -200,7 +190,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	private void startMessageConsumers(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
-			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, threads, msgExecutor);
+			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, syncExecutor);
 			siteExecutor.scheduleWithFixedDelay(consumer, initialDelayConsumer, delayConsumer, MILLISECONDS);
 		});
 	}

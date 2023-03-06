@@ -1,6 +1,9 @@
 package org.openmrs.eip.app.receiver;
 
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
+
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
@@ -8,6 +11,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +23,10 @@ import org.springframework.stereotype.Component;
 public class SyncedMessageArchivingProcessor extends BaseQueueProcessor<SyncedMessage> {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageArchivingProcessor.class);
+	
+	public SyncedMessageArchivingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
+		super(executor);
+	}
 	
 	@Override
 	public String getProcessorName() {
