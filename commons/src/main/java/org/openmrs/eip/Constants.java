@@ -9,6 +9,12 @@ public class Constants {
 	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
 	
+	public static final String WATCHDOG_EXECUTOR_NAME = "OpenMRS DB connection watchdog";
+	
+	public static final int WATCHDOG_EXECUTOR_SHUTDOWN_TIMEOUT = 5000;
+	
+	public static final String BEAN_OPENMRS_DS_HEALTH_INDICATOR = "watcherOpenmrsDsHealthIndicator";
+	
 	public static final String LIQUIBASE_BEAN_NAME = "springLiquibase";
 	
 	public static final String COMMON_PROP_SOURCE_BEAN_NAME = "commonPropSource";

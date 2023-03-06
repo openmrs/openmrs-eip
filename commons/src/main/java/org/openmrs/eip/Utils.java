@@ -3,11 +3,19 @@ package org.openmrs.eip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
 public class Utils {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+	
+	private static boolean shuttingDown = false;
 	
 	/**
 	 * Gets a list of all watched table names
@@ -62,9 +70,33 @@ public class Utils {
 	}
 	
 	/**
+	 * Sets the shutdown flag
+	 */
+	public static void setShuttingDown() {
+		shuttingDown = true;
+		LOGGER.info("Application shutting down notice received");
+	}
+	
+	/**
+	 * Checks if the application is shutting down
+	 */
+	public static boolean isShuttingDown() {
+		return shuttingDown;
+	}
+	
+	/**
 	 * Shuts down the application
 	 */
-	public static void shutdown() {
+	public synchronized static void shutdown() {
+		if (isShuttingDown()) {
+			LOGGER.info("Application is already shutting down");
+			return;
+		}
+		
+		setShuttingDown();
+		
+		LOGGER.info("Shutting down the application...");
+		
 		//Shutdown in a new thread to ensure other background shutdown threads complete too
 		new Thread(() -> System.exit(129)).start();
 	}
@@ -77,6 +109,30 @@ public class Utils {
 	 */
 	public static boolean isOrderTable(String tableName) {
 		return Constants.ORDER_TABLES.contains(tableName.toLowerCase());
+	}
+	
+	/**
+	 * Shuts down the specified executor
+	 * 
+	 * @param executor the {@link ExecutorService} instance
+	 * @param name executor name
+	 * @param timeout the timeout to apply when shutting down the executor
+	 */
+	public static void shutdownExecutor(ExecutorService executor, String name, int timeout) {
+		LOGGER.info("Shutting down " + name + " executor");
+		
+		executor.shutdownNow();
+		
+		try {
+			LOGGER.info("Waiting for " + timeout + " seconds for " + name + " executor to terminate");
+			
+			executor.awaitTermination(timeout, TimeUnit.SECONDS);
+			
+			LOGGER.info("Done shutting down " + name + " executor");
+		}
+		catch (Exception e) {
+			LOGGER.error("An error occurred while waiting for " + name + " executor to terminate");
+		}
 	}
 	
 }

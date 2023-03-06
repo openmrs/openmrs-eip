@@ -30,6 +30,15 @@ public class AppContext implements ApplicationContextAware {
 	}
 	
 	/**
+	 * Gets the bean matching the specified bean name from the application context
+	 *
+	 * @return an instance of the bean matching the specified name
+	 */
+	public static <T> T getBean(String name) {
+		return (T) appContext.getBean(name);
+	}
+	
+	/**
 	 * Retrieves a value from the EIP cache associated to the specified key name, the key MUST be
 	 * unique, recommended way to guarantee uniqueness is to prefix all keys with a unique route id
 	 * 

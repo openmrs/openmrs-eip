@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher.config;
 
+import static org.openmrs.eip.Constants.BEAN_OPENMRS_DS_HEALTH_INDICATOR;
 import static org.openmrs.eip.Constants.OPENMRS_DATASOURCE_NAME;
 
 import javax.sql.DataSource;
@@ -24,7 +25,7 @@ public class WatcherPrometheusConfig {
 	
 	private static final String DS_PREFIX = METER_PREFIX + "datasource_status_";
 	
-	@Bean("watcherOpenmrsDsHealthIndicator")
+	@Bean(BEAN_OPENMRS_DS_HEALTH_INDICATOR)
 	public DataSourceHealthIndicator getDataSourceHealthIndicator(@Autowired @Qualifier(OPENMRS_DATASOURCE_NAME) DataSource dataSource) {
 		return new DataSourceHealthIndicator(dataSource);
 	}

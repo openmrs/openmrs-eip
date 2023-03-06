@@ -42,7 +42,7 @@ public class DebeziumRoute extends RouteBuilder {
 		
 		RouteDefinition routeDef = from(fromUri).routeId(DEBEZIUM_ROUTE_ID);
 		
-		logger.info("Setting debezium route handler to: " + errorHandlerRef);
+		logger.info("Setting debezium route error handler to: " + errorHandlerRef);
 		
 		routeDef.setErrorHandlerRef(errorHandlerRef);
 		
