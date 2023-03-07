@@ -15,7 +15,7 @@ public class CacheEvictor extends BasePostSyncActionRunnable {
 	private CacheEvictingProcessor processor;
 	
 	public CacheEvictor(SiteInfo site) {
-		super(site, 100);
+		super(site);
 		processor = SyncContext.getBean(CacheEvictingProcessor.class);
 	}
 	
@@ -31,7 +31,7 @@ public class CacheEvictor extends BasePostSyncActionRunnable {
 	
 	@Override
 	public List<SyncedMessage> getNextBatch() {
-		return repo.getBatchOfMessagesForEviction(site, pageable);
+		return repo.getBatchOfMessagesForEviction(site, page);
 	}
 	
 }

@@ -1,6 +1,7 @@
 package org.openmrs.eip.app;
 
 import static java.util.Collections.synchronizedList;
+import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +22,25 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseQueueProcessor.class);
 	
+	private static boolean initialized = false;
+	
+	private static int taskThreshold;
+	
 	private ThreadPoolExecutor executor;
 	
 	public BaseQueueProcessor(ThreadPoolExecutor executor) {
 		this.executor = executor;
+		initIfNecessary();
+	}
+	
+	protected void initIfNecessary() {
+		synchronized (BaseQueueProcessor.class) {
+			if (!initialized) {
+				//This ensures there will only be a limited number of queued items for each thread
+				taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
+				initialized = true;
+			}
+		}
 	}
 	
 	@Override
@@ -37,8 +53,8 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 			return;
 		}
 		
-		List<String> uniqueKeys = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
-		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
+		List<String> uniqueKeys = synchronizedList(new ArrayList(taskThreshold));
+		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(taskThreshold));
 		
 		for (T item : items) {
 			if (AppUtils.isAppContextStopping()) {
@@ -77,8 +93,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 				}
 			}
 			
-			//TODO Periodically wait and reset futures to save memory
-			syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(item);
@@ -88,10 +103,14 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 					Thread.currentThread().setName(originalThreadName);
 				}
 			}, executor));
+			
+			if (futures.size() >= taskThreshold) {
+				waitForFutures(futures);
+			}
 		}
 		
-		if (syncThreadFutures.size() > 0) {
-			waitForFutures(syncThreadFutures);
+		if (futures.size() > 0) {
+			waitForFutures(futures);
 		}
 	}
 	

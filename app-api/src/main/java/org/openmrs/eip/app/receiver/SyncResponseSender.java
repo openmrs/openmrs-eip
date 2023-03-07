@@ -36,7 +36,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	private String queueName;
 	
 	public SyncResponseSender(SiteInfo site) {
-		super(site, 100000);
+		super(site);
 		activeMqConnFactory = SyncContext.getBean(ConnectionFactory.class);
 		processor = SyncContext.getBean(SyncResponseSenderProcessor.class);
 		String endpoint = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)
@@ -55,7 +55,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 	
 	@Override
 	public List<SyncedMessage> getNextBatch() {
-		return repo.getBatchOfMessagesForResponse(site, pageable);
+		return repo.getBatchOfMessagesForResponse(site, page);
 	}
 	
 	@Override

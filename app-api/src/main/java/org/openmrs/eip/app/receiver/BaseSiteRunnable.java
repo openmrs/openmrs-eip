@@ -1,11 +1,13 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
-import static org.openmrs.eip.app.SyncConstants.PROP_BACKLOG_THRESHOLD;
-import static org.openmrs.eip.app.SyncConstants.PROP_COUNT_CACHE_TTL;
-import static org.openmrs.eip.app.SyncConstants.PROP_PRIORITIZE_DISABLED;
-import static org.openmrs.eip.app.SyncConstants.PROP_PRIORITIZE_THRESHOLD;
-import static org.openmrs.eip.app.SyncConstants.PROP_SYNC_TIME_PER_ITEM;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_BACKLOG_THRESHOLD;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_COUNT_CACHE_TTL;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRIORITIZE_DISABLED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRIORITIZE_THRESHOLD;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TIME_PER_ITEM;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +24,8 @@ import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Base class for {@link Runnable} instances that process tasks for a single site
@@ -31,22 +35,14 @@ public abstract class BaseSiteRunnable implements Runnable {
 	protected static final Logger log = LoggerFactory.getLogger(BaseSiteRunnable.class);
 	
 	//Sync takes on average 3-5 seconds based on prod stats at the time of writing this
-	public static final int DEFAULT_BACK_LOG = 2;
+	private static final int DEFAULT_BACK_LOG = 2;
 	
-	public static final int DEFAULT_SYNC_TIME_PER_ITEM = 4000;
+	private static final int DEFAULT_SYNC_TIME_PER_ITEM = 4000;
 	
 	//1hr estimate is based on the time it takes to process about 1000 messages per thread
-	public static final long DEFAULT_SIZE_REFRESH_INTERVAL = 3600000;
+	private static final long DEFAULT_SIZE_REFRESH_INTERVAL = 3600000;
 	
-	protected static final String KEY_SYNC_COUNT = "sync_count";
-	
-	protected SiteInfo site;
-	
-	private boolean errorEncountered = false;
-	
-	protected SyncMessageRepository syncRepo;
-	
-	protected Environment env;
+	private static final String KEY_SYNC_COUNT = "sync_count";
 	
 	private static boolean initialized = false;
 	
@@ -56,36 +52,45 @@ public abstract class BaseSiteRunnable implements Runnable {
 	
 	private static long countCacheTtl;
 	
-	protected static Map<String, Long> countMap = null;
+	private static Map<String, Long> countMap = null;
+	
+	protected static Pageable page;
+	
+	private boolean errorEncountered = false;
+	
+	protected SiteInfo site;
+	
+	protected SyncMessageRepository syncRepo;
 	
 	public BaseSiteRunnable(SiteInfo site) {
 		this.site = site;
 		syncRepo = SyncContext.getBean(SyncMessageRepository.class);
-		env = SyncContext.getBean(Environment.class);
-		initPrioritizationIfNecessary();
+		initIfNecessary();
 	}
 	
-	private void initPrioritizationIfNecessary() {
+	protected void initIfNecessary() {
 		synchronized (BaseSiteRunnable.class) {
 			if (!initialized) {
-				syncPrioritizeDisabled = env.getProperty(PROP_PRIORITIZE_DISABLED, Boolean.class, false);
+				Environment e = SyncContext.getBean(Environment.class);
+				page = PageRequest.of(0, e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE));
+				syncPrioritizeDisabled = e.getProperty(PROP_PRIORITIZE_DISABLED, Boolean.class, false);
 				if (!syncPrioritizeDisabled) {
 					log.info("Initializing sync prioritization configuration");
 					
-					int backlogDays = env.getProperty(PROP_BACKLOG_THRESHOLD, Integer.class, DEFAULT_BACK_LOG);
+					int backlogDays = e.getProperty(PROP_BACKLOG_THRESHOLD, Integer.class, DEFAULT_BACK_LOG);
 					//TODO Replace this property by timing the sync process and use that
-					int timePerItem = env.getProperty(PROP_SYNC_TIME_PER_ITEM, int.class, DEFAULT_SYNC_TIME_PER_ITEM);
+					int timePerItem = e.getProperty(PROP_SYNC_TIME_PER_ITEM, int.class, DEFAULT_SYNC_TIME_PER_ITEM);
 					int dailySyncSizePerThread = (backlogDays * 86400000) / timePerItem;
 					log.info("Projected daily sync size per thread: " + dailySyncSizePerThread);
 					
 					//If the sync count is more than our available CPU cores can process in a determined period by 
-					//default we want message sync prioritization to kick in unless the use defined their own
+					//default we want message sync prioritization to kick in unless the user defined their own
 					ThreadPoolExecutor syncExecutor = SyncContext.getBean(BEAN_NAME_SYNC_EXECUTOR);
 					int dailySyncSize = dailySyncSizePerThread * syncExecutor.getMaximumPoolSize();
 					log.info("Projected daily sync size: " + dailySyncSize);
 					
-					syncThreshold = env.getProperty(PROP_PRIORITIZE_THRESHOLD, Integer.class, dailySyncSize);
-					countCacheTtl = env.getProperty(PROP_COUNT_CACHE_TTL, Long.class, DEFAULT_SIZE_REFRESH_INTERVAL);
+					syncThreshold = e.getProperty(PROP_PRIORITIZE_THRESHOLD, Integer.class, dailySyncSize);
+					countCacheTtl = e.getProperty(PROP_COUNT_CACHE_TTL, Long.class, DEFAULT_SIZE_REFRESH_INTERVAL);
 					
 					log.info("Sync prioritization configuration -> queue threshold: " + syncThreshold + ", count cache TTL: "
 					        + Duration.of(countCacheTtl, ChronoUnit.MILLIS).toMinutes() + " minutes");

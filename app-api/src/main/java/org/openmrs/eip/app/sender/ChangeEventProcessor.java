@@ -2,14 +2,14 @@ package org.openmrs.eip.app.sender;
 
 import static org.apache.camel.component.debezium.DebeziumConstants.HEADER_SOURCE_METADATA;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
-import static org.openmrs.eip.app.SyncConstants.DEFAULT_BATCH_SIZE;
+import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -32,7 +32,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 	
 	protected static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
 	
-	private ExecutorService executor;
+	private ThreadPoolExecutor executor;
 	
 	private List<CompletableFuture<Void>> futures;
 	
@@ -40,13 +40,17 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 	
 	private SnapshotSavePointStore savepointStore;
 	
-	private static Integer batchSize;
+	private int taskThreshold;
 	
 	private ChangeEventHandler handler;
 	
-	public ChangeEventProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ExecutorService executor, ChangeEventHandler handler) {
+	public ChangeEventProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    ChangeEventHandler handler) {
 		this.executor = executor;
 		this.handler = handler;
+		//This ensures there will only be a limited number of queued items for each thread
+		taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
+		futures = new Vector(taskThreshold);
 	}
 	
 	@Override
@@ -112,16 +116,9 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 	private void processSnapshotEvent(Exchange exchange, Map<String, Object> sourceMetadata, String id, String table,
 	                                  String snapshotStr)
 	    throws Exception {
-		if (batchSize == null) {
-			batchSize = DEFAULT_BATCH_SIZE;
-		}
-		
-		if (futures == null) {
-			futures = new Vector(batchSize);
-		}
 		
 		if (tableAndMaxRowIdsMap == null) {
-			tableAndMaxRowIdsMap = new ConcurrentHashMap(batchSize);
+			tableAndMaxRowIdsMap = new ConcurrentHashMap(taskThreshold);
 		}
 		
 		if (savepointStore == null) {
@@ -153,7 +150,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 		}, executor));
 		
 		boolean isLast = snapshotStr.equalsIgnoreCase("last");
-		if (isLast || futures.size() == batchSize) {
+		if (isLast || futures.size() >= taskThreshold) {
 			waitForFutures(futures);
 			//If the executor is already shutdown, there could be tasks for some DB events that were never processed
 			//Which leaves unprocessed rows when initial loading is resumed, so we can't persist the savepoint

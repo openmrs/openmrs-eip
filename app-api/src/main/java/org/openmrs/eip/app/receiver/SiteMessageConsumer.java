@@ -2,10 +2,12 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
-import static org.openmrs.eip.app.SyncConstants.MAX_COUNT;
+import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +31,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 
 /**
  * An instance of this class consumes sync messages for a single site and forwards them to the
@@ -42,9 +45,14 @@ public class SiteMessageConsumer implements Runnable {
 	
 	protected static final String ENTITY = SyncMessage.class.getSimpleName();
 	
-	//Order by dateCreated may be just in case the DB is migrated and id change
+	protected static int batchSize;
+	
 	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY m.dateCreated ASC, m.id ASC &maximumResults=" + MAX_COUNT;
+	        + PARAM_SITE + " ORDER BY m.dateCreated ASC &maximumResults=" + batchSize;
+	
+	private static boolean initialized = false;
+	
+	private static int taskThreshold;
 	
 	private SiteInfo site;
 	
@@ -59,6 +67,7 @@ public class SiteMessageConsumer implements Runnable {
 	private SyncedMessageRepository syncedMsgRepo;
 	
 	/**
+	 * @param messageProcessorUri the camel endpoint URI to call to process a sync message
 	 * @param site sync messages from this site will be consumed by this instance
 	 * @param executor {@link ExecutorService} instance to messages in parallel
 	 */
@@ -66,6 +75,21 @@ public class SiteMessageConsumer implements Runnable {
 		this.messageProcessorUri = messageProcessorUri;
 		this.site = site;
 		this.executor = executor;
+		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
+		initIfNecessary();
+	}
+	
+	protected void initIfNecessary() {
+		synchronized (SiteMessageConsumer.class) {
+			if (!initialized) {
+				Environment e = SyncContext.getBean(Environment.class);
+				batchSize = e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE);
+				//This ensures there will only be a limited number of queued items for each thread
+				taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
+				initialized = true;
+			}
+		}
 	}
 	
 	@Override
@@ -80,14 +104,6 @@ public class SiteMessageConsumer implements Runnable {
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Starting message consumer thread for site -> " + site);
-		}
-		
-		if (producerTemplate == null) {
-			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		}
-		
-		if (syncedMsgRepo == null) {
-			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
 		}
 		
 		do {
@@ -137,8 +153,8 @@ public class SiteMessageConsumer implements Runnable {
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
-		List<String> typeAndIdentifier = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
-		List<CompletableFuture<Void>> syncThreadFutures = synchronizedList(new ArrayList(executor.getMaximumPoolSize()));
+		List<String> typeAndIdentifier = synchronizedList(new ArrayList(taskThreshold));
+		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(taskThreshold));
 		
 		for (SyncMessage msg : syncMessages) {
 			if (AppUtils.isAppContextStopping()) {
@@ -168,8 +184,7 @@ public class SiteMessageConsumer implements Runnable {
 				typeAndIdentifier.add(modelClass + "#" + msg.getIdentifier());
 			}
 			
-			//TODO Periodically wait and reset futures to save memory
-			syncThreadFutures.add(CompletableFuture.runAsync(() -> {
+			futures.add(CompletableFuture.runAsync(() -> {
 				final String originalThreadName = Thread.currentThread().getName();
 				try {
 					setThreadName(msg);
@@ -182,10 +197,14 @@ public class SiteMessageConsumer implements Runnable {
 				}
 			}, executor));
 			
+			if (futures.size() >= taskThreshold) {
+				waitForFutures(futures);
+			}
+			
 		}
 		
-		if (syncThreadFutures.size() > 0) {
-			waitForFutures(syncThreadFutures);
+		if (futures.size() > 0) {
+			waitForFutures(futures);
 		}
 	}
 	

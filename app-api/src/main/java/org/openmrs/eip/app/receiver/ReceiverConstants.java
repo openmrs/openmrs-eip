@@ -8,6 +8,8 @@ public class ReceiverConstants {
 	
 	public static final String BEAN_NAME_SITE_EXECUTOR = "siteExecutor";
 	
+	public static final int DEFAULT_TASK_BATCH_SIZE = 1000;
+	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
@@ -16,11 +18,7 @@ public class ReceiverConstants {
 	
 	public static final String PROP_RECEIVER_ID = "db-sync.receiverId";
 	
-	public static final String PROP_DELAY_IN_SECONDS = "site.message.reader.delay";
-	
-	public static final int DEFAULT_INITIAL_DELAY_SYNC = 5000;
-	
-	public static final int DEFAULT_DELAY = 300000;
+	public static final String PROP_SYNC_TASK_BATCH_SIZE = "sync.task.batch.size";
 	
 	public static final String PROP_INITIAL_DELAY_SYNC = "sync.initial.delay";
 	
@@ -45,6 +43,16 @@ public class ReceiverConstants {
 	public static final String PROP_INITIAL_DELAY_ARCHIVER = "archiver.initial.delay";
 	
 	public static final String PROP_DELAY_ARCHIVER = "archiver.delay";
+	
+	public static final String PROP_PRIORITIZE_DISABLED = "sync.prioritize.disabled";
+	
+	public static final String PROP_BACKLOG_THRESHOLD = "sync.prioritize.backlog.threshold.days";
+	
+	public static final String PROP_SYNC_TIME_PER_ITEM = "sync.prioritize.time.per.item";
+	
+	public static final String PROP_PRIORITIZE_THRESHOLD = "sync.prioritize.threshold";
+	
+	public static final String PROP_COUNT_CACHE_TTL = "sync.prioritize.count.cache.ttl";
 	
 	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
 	

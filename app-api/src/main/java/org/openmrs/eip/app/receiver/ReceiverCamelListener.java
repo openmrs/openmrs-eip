@@ -4,8 +4,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_DELAY;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
@@ -56,6 +54,10 @@ import org.springframework.stereotype.Component;
 public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
+	
+	private static final int DEFAULT_INITIAL_DELAY_SYNC = 5000;
+	
+	private static final int DEFAULT_DELAY = 300000;
 	
 	private ScheduledThreadPoolExecutor siteExecutor;
 	

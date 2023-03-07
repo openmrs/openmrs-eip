@@ -8,8 +8,6 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 /**
  * Reads and processes done messages in the synced message queue and moves them to the archives
@@ -23,14 +21,10 @@ public class SyncedMessageArchiver extends BaseSiteRunnable {
 	
 	private SyncedMessageArchivingProcessor processor;
 	
-	private Pageable page;
-	
 	public SyncedMessageArchiver(SiteInfo site) {
 		super(site);
 		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
 		processor = SyncContext.getBean(SyncedMessageArchivingProcessor.class);
-		//TODO Configure batch size
-		page = PageRequest.of(0, 1000);
 	}
 	
 	@Override

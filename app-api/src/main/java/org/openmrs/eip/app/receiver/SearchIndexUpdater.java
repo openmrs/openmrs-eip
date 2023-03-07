@@ -15,7 +15,7 @@ public class SearchIndexUpdater extends BasePostSyncActionRunnable {
 	private SearchIndexUpdatingProcessor processor;
 	
 	public SearchIndexUpdater(SiteInfo site) {
-		super(site, 100);
+		super(site);
 		processor = SyncContext.getBean(SearchIndexUpdatingProcessor.class);
 	}
 	
@@ -31,7 +31,7 @@ public class SearchIndexUpdater extends BasePostSyncActionRunnable {
 	
 	@Override
 	public List<SyncedMessage> getNextBatch() {
-		return repo.getBatchOfMessagesForIndexing(site, pageable);
+		return repo.getBatchOfMessagesForIndexing(site, page);
 	}
 	
 }

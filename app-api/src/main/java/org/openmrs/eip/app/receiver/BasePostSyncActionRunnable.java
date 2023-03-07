@@ -8,8 +8,6 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 /**
  * Superclass for post sync action processor tasks
@@ -18,14 +16,10 @@ public abstract class BasePostSyncActionRunnable extends BaseSiteRunnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BasePostSyncActionRunnable.class);
 	
-	protected Pageable pageable;
-	
 	protected SyncedMessageRepository repo;
 	
-	public BasePostSyncActionRunnable(SiteInfo site, int batchSize) {
+	public BasePostSyncActionRunnable(SiteInfo site) {
 		super(site);
-		//TODO Configure batch size
-		this.pageable = PageRequest.of(0, batchSize);
 		repo = SyncContext.getBean(SyncedMessageRepository.class);
 	}
 	
