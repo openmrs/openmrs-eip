@@ -74,7 +74,7 @@ public class Utils {
 	 */
 	public static void setShuttingDown() {
 		shuttingDown = true;
-		LOGGER.info("Application shutting down notice received");
+		LOGGER.info("Received application shutting down event");
 	}
 	
 	/**

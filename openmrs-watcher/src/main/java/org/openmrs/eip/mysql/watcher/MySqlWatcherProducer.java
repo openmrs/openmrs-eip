@@ -14,7 +14,8 @@ public class MySqlWatcherProducer extends DefaultProducer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MySqlWatcherProducer.class);
 	
-	private static final String DEBEZIUM_FROM_URI = "debezium-mysql:extract?databaseServerId={{debezium.db.serverId}}"
+	private static final String DEBEZIUM_FROM_URI = "debezium-mysql:extract?additionalProperties.connector.class="
+	        + FailureTolerantMySqlConnector.class.getName() + "&databaseServerId={{debezium.db.serverId}}"
 	        + "&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}"
 	        + "&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}"
 	        + "&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}"

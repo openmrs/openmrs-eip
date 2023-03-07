@@ -31,6 +31,10 @@ public class WatcherConstants {
 	public static final String PROP_DBZM_OFFSET_HISTORY_CLASS = "debezium.databaseHistory";
 	
 	public static final String PROP_URI_ERROR_HANDLER = "watcher.uri.error.handler";
+
+    public static final long DEFAULT_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY = 300000;
+	
+	protected static final String PROP_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY = "openmrs.db.reconnect.watchdog.delay";
 	
 	public static final String URI_EVENT_PROCESSOR = "direct:db-event-processor";
 	
