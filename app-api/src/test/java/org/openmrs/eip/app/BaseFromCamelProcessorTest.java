@@ -2,18 +2,24 @@ package org.openmrs.eip.app;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.powermock.reflect.Whitebox;
 
 public class BaseFromCamelProcessorTest {
 	
 	public class TestProcessor extends BaseFromCamelProcessor<SyncedMessage> {
 		
 		List<SyncedMessage> processedItems;
+		
+		public TestProcessor(ThreadPoolExecutor executor) {
+			super(executor);
+		}
 		
 		@Override
 		public void processWork(List<SyncedMessage> items) {
@@ -58,7 +64,8 @@ public class BaseFromCamelProcessorTest {
 	
 	@Test
 	public void process_shouldCallProcessWork() throws Exception {
-		TestProcessor processor = new TestProcessor();
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		TestProcessor processor = new TestProcessor(null);
 		Assert.assertNull(processor.processedItems);
 		List<SyncedMessage> items = Collections.singletonList(new SyncedMessage());
 		

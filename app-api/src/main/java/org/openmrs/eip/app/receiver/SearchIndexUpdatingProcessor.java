@@ -65,7 +65,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	@Override
 	public String getThreadName(SyncedMessage item) {
 		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
 	}
 	
 	@Override

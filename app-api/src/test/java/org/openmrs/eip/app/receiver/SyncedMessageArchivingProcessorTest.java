@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,30 +18,28 @@ import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ReceiverUtils.class)
-public class SyncedMessageItemizingProcessorTest {
+public class SyncedMessageArchivingProcessorTest {
 	
-	private SyncedMessageItemizingProcessor processor;
+	private SyncedMessageArchivingProcessor processor;
 	
 	@Before
 	public void setup() {
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SyncedMessageItemizingProcessor(null);
+		processor = new SyncedMessageArchivingProcessor(null);
 	}
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
-		assertEquals("msg itemizer", processor.getProcessorName());
+		assertEquals("msg archiver", processor.getProcessorName());
 	}
 	
 	@Test
 	public void getThreadName_shouldReturnTheThreadNameContainingEventDetails() {
 		final String uuid = "uuid";
 		final String messageUuid = "message-uuid";
-		final Long id = 2L;
 		final String siteUuid = "site-uuid";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(PersonModel.class.getName());
-		msg.setId(id);
 		msg.setIdentifier(uuid);
 		msg.setMessageUuid(messageUuid);
 		SiteInfo siteInfo = new SiteInfo();
@@ -52,28 +51,25 @@ public class SyncedMessageItemizingProcessorTest {
 	
 	@Test
 	public void getUniqueId_shouldReturnDatabaseId() {
-		final String uuid = "uuid";
+		final Long id = 7L;
 		SyncedMessage msg = new SyncedMessage();
-		msg.setIdentifier(uuid);
-		assertEquals(uuid, processor.getUniqueId(msg));
+		msg.setId(id);
+		assertEquals(id.toString(), processor.getUniqueId(msg));
 	}
 	
 	@Test
 	public void getLogicalType_shouldReturnTheModelClassName() {
-		final String type = PersonModel.class.getName();
-		SyncedMessage msg = new SyncedMessage();
-		msg.setModelClassName(type);
-		assertEquals(type, processor.getLogicalType(msg));
+		assertEquals(SyncedMessage.class.getName(), processor.getLogicalType(new SyncedMessage()));
 	}
 	
 	@Test
 	public void getLogicalTypeHierarchy_shouldReturnTheLogicalTypeHierarchy() {
-		assertEquals(2, processor.getLogicalTypeHierarchy(PersonModel.class.getName()).size());
+		assertNull(processor.getLogicalTypeHierarchy(PersonModel.class.getName()));
 	}
 	
 	@Test
 	public void getQueueName_shouldReturnTheQueueName() {
-		assertEquals("msg-itemizer", processor.getQueueName());
+		assertEquals("msg-archiver", processor.getQueueName());
 	}
 	
 	@Test
@@ -84,7 +80,7 @@ public class SyncedMessageItemizingProcessorTest {
 		processor.processItem(msg);
 		
 		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.itemize(msg);
+		ReceiverUtils.archiveMessage(msg);
 	}
 	
 }

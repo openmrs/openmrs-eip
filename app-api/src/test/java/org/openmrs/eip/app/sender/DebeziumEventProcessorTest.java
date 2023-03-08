@@ -2,18 +2,27 @@ package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
+import org.powermock.reflect.Whitebox;
 
 public class DebeziumEventProcessorTest {
 	
-	private DebeziumEventProcessor processor = new DebeziumEventProcessor(null);
+	private DebeziumEventProcessor processor;
 	
 	private DebeziumEvent createEvent() {
 		DebeziumEvent de = new DebeziumEvent();
 		de.setEvent(new Event());
 		return de;
+	}
+	
+	@Before
+	public void setup() {
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		processor = new DebeziumEventProcessor(null, null);
 	}
 	
 	@Test

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 public class AppConfig {
 	
 	@Bean(BEAN_NAME_SYNC_EXECUTOR)
-	private ThreadPoolExecutor getSyncExecutor(@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER
+    public ThreadPoolExecutor getSyncExecutor(@Value("${" + PROP_THREAD_NUMBER + ":" + DEFAULT_THREAD_NUMBER
 	        + "}") int threadCount) {
 		
 		return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);

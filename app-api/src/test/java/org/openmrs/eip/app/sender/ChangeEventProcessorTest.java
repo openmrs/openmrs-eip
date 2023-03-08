@@ -10,14 +10,15 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.component.debezium.DebeziumConstants;
@@ -28,7 +29,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
 
@@ -46,22 +49,20 @@ public class ChangeEventProcessorTest {
 	@Mock
 	private ChangeEventHandler handler;
 	
-	private ExecutorService executor;
+	private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors
+	        .newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
 	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", (Integer) null);
+		setInternalState(BaseQueueProcessor.class, "initialized", true);
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "paused", false);
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		Mockito.reset(mockStore);
 	}
 	
 	private ChangeEventProcessor createProcessor(int threadCount) {
-		ChangeEventProcessor processor = new ChangeEventProcessor(handler);
-		Whitebox.setInternalState(processor, "threadCount", threadCount);
-		executor = Executors.newFixedThreadPool(threadCount);
-		Whitebox.setInternalState(ChangeEventProcessor.class, "executor", executor);
+		ChangeEventProcessor processor = new ChangeEventProcessor(executor, handler);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
 		Mockito.when(mockStore.getSavedRowId(ArgumentMatchers.anyString())).thenReturn(null);
 		return processor;
@@ -160,7 +161,7 @@ public class ChangeEventProcessorTest {
 	}
 	
 	@Test
-	public void process_UpdateTheSavePointStoreBasedOnTheBatchSize() throws Exception {
+	public void process_UpdateTheSavePointStoreBasedOnTheTAskThreshold() throws Exception {
 		final String originalThreadName = Thread.currentThread().getName();
 		final int size = 67;
 		List<Exchange> exchanges = new ArrayList(size);
@@ -182,8 +183,8 @@ public class ChangeEventProcessorTest {
 		}
 		
 		ChangeEventProcessor processor = createProcessor(1);
-		final int batchSize = 10;
-		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", batchSize);
+		final int taskThreshold = 10;
+		Whitebox.setInternalState(processor, "taskThreshold", taskThreshold);
 		Mockito.doAnswer(invocation -> {
 			storeUpdates.add(new HashMap(invocation.getArgument(0)));
 			return null;
@@ -198,14 +199,14 @@ public class ChangeEventProcessorTest {
 		assertEquals(size, expectedIdThreadNameMap.size());
 		assertFalse(CustomFileOffsetBackingStore.isPaused());
 		assertNull(Whitebox.getInternalState(processor, SnapshotSavePointStore.class));
-		final int storeUpdateCallCount = size / batchSize;
+		final int storeUpdateCallCount = size / taskThreshold;
 		Mockito.verify(mockStore, Mockito.times(storeUpdateCallCount)).update(ArgumentMatchers.anyMap());
 		Mockito.verify(mockStore).discard();
-		assertEquals(size / batchSize, storeUpdates.size());
+		assertEquals(size / taskThreshold, storeUpdates.size());
 		for (int i = 0; i < storeUpdateCallCount; i++) {
 			assertEquals(1, storeUpdates.get(i).size());
 			assertEquals(TABLE_PERSON, storeUpdates.get(i).keySet().iterator().next());
-			assertEquals(((i + 1) * batchSize) - 1, storeUpdates.get(i).values().iterator().next().intValue());
+			assertEquals(((i + 1) * taskThreshold) - 1, storeUpdates.get(i).values().iterator().next().intValue());
 		}
 		
 		for (int i = 0; i < size; i++) {
@@ -310,8 +311,8 @@ public class ChangeEventProcessorTest {
 		}
 		
 		ChangeEventProcessor processor = createProcessor(1);
-		final int batchSize = 10;
-		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", batchSize);
+		final int taskThreshold = 10;
+		Whitebox.setInternalState(processor, "taskThreshold", taskThreshold);
 		Mockito.doAnswer(invocation -> {
 			storeUpdates.add(new HashMap(invocation.getArgument(0)));
 			return null;
@@ -326,10 +327,10 @@ public class ChangeEventProcessorTest {
 		assertEquals(totalRowCount, expectedRowThreadNameMap.size());
 		assertFalse(CustomFileOffsetBackingStore.isPaused());
 		assertNull(Whitebox.getInternalState(processor, SnapshotSavePointStore.class));
-		final int storeUpdateCallCount = totalRowCount / batchSize;
+		final int storeUpdateCallCount = totalRowCount / taskThreshold;
 		Mockito.verify(mockStore, Mockito.times(storeUpdateCallCount)).update(ArgumentMatchers.anyMap());
 		Mockito.verify(mockStore).discard();
-		assertEquals(totalRowCount / batchSize, storeUpdates.size());
+		assertEquals(totalRowCount / taskThreshold, storeUpdates.size());
 		Map<String, Integer> storeUpdate1 = storeUpdates.get(0);
 		Map<String, Integer> storeUpdate2 = storeUpdates.get(1);
 		Map<String, Integer> storeUpdate3 = storeUpdates.get(2);

@@ -3,28 +3,25 @@ package org.openmrs.eip.app.receiver;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.CACHE_EVICT;
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEARCH_INDEX_UPDATE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_UPDATE_SEARCH_INDEX;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.camel.ProducerTemplate;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
+import org.powermock.reflect.Whitebox;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -40,7 +37,8 @@ public class SearchIndexUpdatingProcessorTest {
 	
 	@Before
 	public void setup() {
-		processor = new SearchIndexUpdatingProcessor(null, null);
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		processor = new SearchIndexUpdatingProcessor(null, null, null);
 	}
 	
 	@Test
@@ -61,11 +59,8 @@ public class SearchIndexUpdatingProcessorTest {
 		SiteInfo siteInfo = new SiteInfo();
 		siteInfo.setIdentifier(siteUuid);
 		msg.setSite(siteInfo);
-		PostSyncAction action = new PostSyncAction(msg, null);
-		action.setId(id);
-		assertEquals(
-		    siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid + "-" + id,
-		    processor.getThreadName(action));
+		assertEquals(siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid,
+		    processor.getThreadName(msg));
 	}
 	
 	@Test
@@ -73,7 +68,7 @@ public class SearchIndexUpdatingProcessorTest {
 		final String uuid = "uuid";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
-		assertEquals(uuid, processor.getUniqueId(new PostSyncAction(msg, null)));
+		assertEquals(uuid, processor.getUniqueId(msg));
 	}
 	
 	@Test
@@ -81,7 +76,7 @@ public class SearchIndexUpdatingProcessorTest {
 		final String type = PersonModel.class.getName();
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(type);
-		assertEquals(type, processor.getLogicalType(new PostSyncAction(msg, null)));
+		assertEquals(type, processor.getLogicalType(msg));
 	}
 	
 	@Test
@@ -95,39 +90,6 @@ public class SearchIndexUpdatingProcessorTest {
 	}
 	
 	@Test
-	public void processItem_shouldNotUpdateSearchIndexBeforeTheCacheIsCleared() {
-		SyncedMessage msg = new SyncedMessage();
-		PostSyncAction evict = new PostSyncAction(msg, CACHE_EVICT);
-		PostSyncAction update = new PostSyncAction(msg, SEARCH_INDEX_UPDATE);
-		msg.addAction(evict);
-		msg.addAction(update);
-		Assert.assertTrue(msg.requiresCacheEviction());
-		processor = Mockito.spy(processor);
-		
-		processor.processItem(update);
-		
-		Mockito.verify(processor, Mockito.never()).send(any(), any(), any());
-	}
-	
-	@Test
-	public void processItem_shouldUpdateSearchIndexIfTheCacheIsCleared() {
-		SyncedMessage msg = new SyncedMessage();
-		PostSyncAction evict = new PostSyncAction(msg, CACHE_EVICT);
-		evict.markAsCompleted();
-		PostSyncAction update = new PostSyncAction(msg, SEARCH_INDEX_UPDATE);
-		msg.addAction(evict);
-		msg.addAction(update);
-		Assert.assertFalse(msg.requiresCacheEviction());
-		ProducerTemplate mockTemplate = Mockito.mock(ProducerTemplate.class);
-		processor = Mockito.spy(new SearchIndexUpdatingProcessor(mockTemplate, null));
-		Mockito.doNothing().when(processor).send(any(), any(), any());
-		
-		processor.processItem(update);
-		
-		Mockito.verify(processor).send(URI_UPDATE_SEARCH_INDEX, update, mockTemplate);
-	}
-	
-	@Test
 	public void convertBody_shouldGenerateSearchIndexUpdateJsonForAPersonEntity() {
 		final String personUuid = "person-uuid";
 		final String nameUuid1 = "name-uuid-1";
@@ -137,12 +99,11 @@ public class SearchIndexUpdatingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(personUuid);
 		msg.setModelClassName(PersonModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		processor = Mockito.spy(processor);
 		Mockito.doReturn(Arrays.asList(nameUuid1, nameUuid2)).when(processor).getPersonNameUuids(personUuid);
 		Mockito.doReturn(Arrays.asList(idUuid1, idUuid2)).when(processor).getPatientIdentifierUuids(personUuid);
 		
-		List<String> payloads = (List) processor.convertBody(action);
+		List<String> payloads = (List) processor.convertBody(msg);
 		
 		assertEquals(4, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
@@ -171,12 +132,11 @@ public class SearchIndexUpdatingProcessorTest {
 		msg.setIdentifier(personUuid);
 		msg.setModelClassName(PersonModel.class.getName());
 		msg.setOperation(SyncOperation.d);
-		PostSyncAction action = new PostSyncAction(msg, null);
 		processor = Mockito.spy(processor);
 		Mockito.doReturn(Arrays.asList(nameUuid1, nameUuid2)).when(processor).getPersonNameUuids(personUuid);
 		Mockito.doReturn(Arrays.asList(idUuid1, idUuid2)).when(processor).getPatientIdentifierUuids(personUuid);
 		
-		List<String> payloads = (List) processor.convertBody(action);
+		List<String> payloads = (List) processor.convertBody(msg);
 		
 		assertEquals(4, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
@@ -204,12 +164,11 @@ public class SearchIndexUpdatingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(patientUuid);
 		msg.setModelClassName(PersonModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		processor = Mockito.spy(processor);
 		Mockito.doReturn(Arrays.asList(nameUuid1, nameUuid2)).when(processor).getPersonNameUuids(patientUuid);
 		Mockito.doReturn(Arrays.asList(idUuid1, idUuid2)).when(processor).getPatientIdentifierUuids(patientUuid);
 		
-		List<String> payloads = (List) processor.convertBody(action);
+		List<String> payloads = (List) processor.convertBody(msg);
 		
 		assertEquals(4, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
@@ -238,12 +197,11 @@ public class SearchIndexUpdatingProcessorTest {
 		msg.setIdentifier(patientUuid);
 		msg.setModelClassName(PersonModel.class.getName());
 		msg.setOperation(SyncOperation.d);
-		PostSyncAction action = new PostSyncAction(msg, null);
 		processor = Mockito.spy(processor);
 		Mockito.doReturn(Arrays.asList(nameUuid1, nameUuid2)).when(processor).getPersonNameUuids(patientUuid);
 		Mockito.doReturn(Arrays.asList(idUuid1, idUuid2)).when(processor).getPatientIdentifierUuids(patientUuid);
 		
-		List<String> payloads = (List) processor.convertBody(action);
+		List<String> payloads = (List) processor.convertBody(msg);
 		
 		assertEquals(4, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
@@ -267,9 +225,8 @@ public class SearchIndexUpdatingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonNameModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("person", JsonPath.read(json, "resource"));
 		assertEquals("name", JsonPath.read(json, "subResource"));
@@ -283,9 +240,8 @@ public class SearchIndexUpdatingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonNameModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -299,9 +255,8 @@ public class SearchIndexUpdatingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonAttributeModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("person", JsonPath.read(json, "resource"));
 		assertEquals("attribute", JsonPath.read(json, "subResource"));
@@ -315,9 +270,8 @@ public class SearchIndexUpdatingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonAttributeModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -331,9 +285,8 @@ public class SearchIndexUpdatingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PatientIdentifierModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("patient", JsonPath.read(json, "resource"));
 		assertEquals("identifier", JsonPath.read(json, "subResource"));
@@ -347,14 +300,26 @@ public class SearchIndexUpdatingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PatientIdentifierModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("patient", JsonPath.read(json, "resource"));
 		assertEquals("identifier", JsonPath.read(json, "subResource"));
 		assertNull(docContext.read("uuid"));
+	}
+	
+	@Test
+	public void onSuccess_shouldMarkTheMessageAsProcessed() {
+		SyncedMessage msg = new SyncedMessage();
+		assertNull(msg.getSearchIndexUpdated());
+		SyncedMessageRepository mockRepo = Mockito.mock(SyncedMessageRepository.class);
+		processor = new SearchIndexUpdatingProcessor(null, null, mockRepo);
+		
+		processor.onSuccess(msg);
+		
+		assertTrue(msg.getSearchIndexUpdated());
+		Mockito.verify(mockRepo).save(msg);
 	}
 	
 }

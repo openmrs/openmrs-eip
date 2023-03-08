@@ -5,19 +5,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
+import static org.powermock.reflect.Whitebox.getInternalState;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,23 +27,20 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.management.entity.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.utils.Utils;
-import org.powermock.reflect.Whitebox;
 
 public class BaseQueueProcessorTest {
 	
 	private static final String MOCK_URI = "mock:uri";
 	
-	private BaseQueueProcessor processor;
-	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
-	private static ExecutorService executor;
+	private ThreadPoolExecutor executor;
 	
 	public class TestEventProcessor extends BaseFromCamelToCamelEndpointProcessor<DebeziumEvent> {
 		
-		public TestEventProcessor(ProducerTemplate producerTemplate) {
-			super(MOCK_URI, producerTemplate);
+		public TestEventProcessor(ProducerTemplate producerTemplate, ThreadPoolExecutor executor) {
+			super(MOCK_URI, producerTemplate, executor);
 		}
 		
 		@Override
@@ -81,28 +80,17 @@ public class BaseQueueProcessorTest {
 		
 	}
 	
-	@BeforeClass
-	public static void beforeClass() {
-		executor = Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
-		Whitebox.setInternalState(BaseParallelProcessor.class, "executor", executor);
-	}
-	
-	@AfterClass
-	public static void afterClass() {
-		executor.shutdownNow();
-		Whitebox.setInternalState(BaseParallelProcessor.class, "executor", (Object) null);
-	}
-	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		setInternalState(AppUtils.class, "appContextStopping", false);
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
 	}
 	
-	private BaseQueueProcessor createProcessor(int threadCount) {
-		processor = new TestEventProcessor(mockProducerTemplate);
-		Whitebox.setInternalState(processor, int.class, threadCount);
-		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
+	private BaseQueueProcessor createProcessor() {
+		BaseQueueProcessor processor = new TestEventProcessor(mockProducerTemplate, executor);
+		setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		return processor;
 	}
 	
@@ -138,7 +126,7 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		processor = createProcessor(size);
+		BaseQueueProcessor processor = createProcessor();
 		
 		processor.processWork(events);
 		
@@ -173,7 +161,7 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		processor = createProcessor(size);
+		BaseQueueProcessor processor = createProcessor();
 		
 		processor.processWork(events);
 		
@@ -212,7 +200,7 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		processor = createProcessor(size);
+		BaseQueueProcessor processor = createProcessor();
 		
 		processor.processWork(events);
 		
@@ -262,7 +250,7 @@ public class BaseQueueProcessorTest {
 			}).when(mockProducerTemplate).sendBody(MOCK_URI, m);
 		}
 		
-		processor = createProcessor(size);
+		BaseQueueProcessor processor = createProcessor();
 		
 		processor.processWork(events);
 		
@@ -294,9 +282,36 @@ public class BaseQueueProcessorTest {
 			events.add(m);
 		}
 		
-		createProcessor(size).processWork(events);
+		createProcessor().processWork(events);
 		
 		Mockito.verifyNoInteractions(mockProducerTemplate);
+	}
+	
+	@Test
+	public void initIfNecessary_shouldInitializeStaticFields() {
+		BaseQueueProcessor processor = createProcessor();
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
+		setInternalState(BaseQueueProcessor.class, "taskThreshold", 0);
+		Assert.assertFalse(getInternalState(BaseQueueProcessor.class, "initialized"));
+		assertEquals(0, ((Integer) getInternalState(BaseQueueProcessor.class, "taskThreshold")).intValue());
+		
+		processor.initIfNecessary();
+		
+		Assert.assertTrue(getInternalState(BaseQueueProcessor.class, "initialized"));
+		final int expected = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
+		assertEquals(expected, ((Integer) getInternalState(BaseQueueProcessor.class, "taskThreshold")).intValue());
+	}
+	
+	@Test
+	public void initIfNecessary_shouldSkipIfAlreadyInitialized() {
+		BaseQueueProcessor processor = createProcessor();
+		setInternalState(BaseQueueProcessor.class, "taskThreshold", 0);
+		assertEquals(true, getInternalState(BaseQueueProcessor.class, "initialized"));
+		assertEquals(0, ((Integer) getInternalState(BaseQueueProcessor.class, "taskThreshold")).intValue());
+		
+		processor.initIfNecessary();
+		assertEquals(true, getInternalState(BaseQueueProcessor.class, "initialized"));
+		assertEquals(0, ((Integer) getInternalState(BaseQueueProcessor.class, "taskThreshold")).intValue());
 	}
 	
 }

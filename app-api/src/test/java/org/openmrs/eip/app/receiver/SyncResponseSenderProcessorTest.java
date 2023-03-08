@@ -1,46 +1,43 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.model.PersonModel;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ReceiverUtils.class)
-public class SyncedMessageItemizingProcessorTest {
+public class SyncResponseSenderProcessorTest {
 	
-	private SyncedMessageItemizingProcessor processor;
+	private SyncResponseSenderProcessor processor;
 	
 	@Before
 	public void setup() {
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SyncedMessageItemizingProcessor(null);
+		processor = new SyncResponseSenderProcessor(null, null);
 	}
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
-		assertEquals("msg itemizer", processor.getProcessorName());
+		assertEquals("response sender", processor.getProcessorName());
 	}
 	
 	@Test
 	public void getThreadName_shouldReturnTheThreadNameContainingEventDetails() {
 		final String uuid = "uuid";
 		final String messageUuid = "message-uuid";
-		final Long id = 2L;
 		final String siteUuid = "site-uuid";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(PersonModel.class.getName());
-		msg.setId(id);
 		msg.setIdentifier(uuid);
 		msg.setMessageUuid(messageUuid);
 		SiteInfo siteInfo = new SiteInfo();
@@ -52,39 +49,37 @@ public class SyncedMessageItemizingProcessorTest {
 	
 	@Test
 	public void getUniqueId_shouldReturnDatabaseId() {
-		final String uuid = "uuid";
+		final Long id = 7L;
 		SyncedMessage msg = new SyncedMessage();
-		msg.setIdentifier(uuid);
-		assertEquals(uuid, processor.getUniqueId(msg));
+		msg.setId(id);
+		assertEquals(id.toString(), processor.getUniqueId(msg));
 	}
 	
 	@Test
 	public void getLogicalType_shouldReturnTheModelClassName() {
-		final String type = PersonModel.class.getName();
-		SyncedMessage msg = new SyncedMessage();
-		msg.setModelClassName(type);
-		assertEquals(type, processor.getLogicalType(msg));
+		assertEquals(SyncedMessage.class.getName(), processor.getLogicalType(new SyncedMessage()));
 	}
 	
 	@Test
 	public void getLogicalTypeHierarchy_shouldReturnTheLogicalTypeHierarchy() {
-		assertEquals(2, processor.getLogicalTypeHierarchy(PersonModel.class.getName()).size());
+		assertNull(processor.getLogicalTypeHierarchy(PersonModel.class.getName()));
 	}
 	
 	@Test
 	public void getQueueName_shouldReturnTheQueueName() {
-		assertEquals("msg-itemizer", processor.getQueueName());
+		assertEquals("response-sender", processor.getQueueName());
 	}
 	
 	@Test
-	public void processItem_shouldProcessTheSpecifiedItem() {
-		PowerMockito.mockStatic(ReceiverUtils.class);
+	public void processItem_shouldMarkTheMessageThatTheResponseIsSent() {
 		SyncedMessage msg = new SyncedMessage();
+		assertFalse(msg.isResponseSent());
+		SyncedMessageRepository mockRepo = Mockito.mock(SyncedMessageRepository.class);
+		processor = new SyncResponseSenderProcessor(null, mockRepo);
 		
 		processor.processItem(msg);
 		
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.itemize(msg);
+		assertTrue(msg.isResponseSent());
+		Mockito.verify(mockRepo).save(msg);
 	}
-	
 }

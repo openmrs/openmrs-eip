@@ -20,7 +20,7 @@ public class BaseFromCamelToCamelEndpointProcessorTest {
 	public class TestProcessor extends BaseFromCamelToCamelEndpointProcessor<SyncedMessage> {
 		
 		public TestProcessor(String endpointUri, ProducerTemplate producerTemplate) {
-			super(endpointUri, producerTemplate);
+			super(endpointUri, producerTemplate, null);
 		}
 		
 		@Override
@@ -57,6 +57,7 @@ public class BaseFromCamelToCamelEndpointProcessorTest {
 	@Test
 	public void processItem_shouldSendTheItemToTheEndpointUri() {
 		MockitoAnnotations.initMocks(this);
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		TestProcessor processor = new TestProcessor(MOCK_URI, mockProducerTemplate);
 		Whitebox.setInternalState(processor, ProducerTemplate.class, mockProducerTemplate);
 		SyncedMessage msg = new SyncedMessage();

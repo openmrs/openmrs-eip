@@ -3,12 +3,16 @@ package org.openmrs.eip.app.receiver;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
@@ -16,6 +20,7 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.powermock.reflect.Whitebox;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -24,10 +29,16 @@ import com.jayway.jsonpath.ParseContext;
 
 public class CacheEvictingProcessorTest {
 	
-	private CacheEvictingProcessor processor = new CacheEvictingProcessor(null, null);
+	private CacheEvictingProcessor processor;
 	
 	private ParseContext jsonPathContext = JsonPath
 	        .using(Configuration.builder().options(DEFAULT_PATH_LEAF_TO_NULL).build());
+	
+	@Before
+	public void setup() {
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		processor = new CacheEvictingProcessor(null, null, null);
+	}
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
@@ -47,11 +58,8 @@ public class CacheEvictingProcessorTest {
 		SiteInfo siteInfo = new SiteInfo();
 		siteInfo.setIdentifier(siteUuid);
 		msg.setSite(siteInfo);
-		PostSyncAction action = new PostSyncAction(msg, null);
-		action.setId(id);
-		assertEquals(
-		    siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid + "-" + id,
-		    processor.getThreadName(action));
+		assertEquals(siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid,
+		    processor.getThreadName(msg));
 	}
 	
 	@Test
@@ -59,7 +67,7 @@ public class CacheEvictingProcessorTest {
 		final String uuid = "uuid";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
-		assertEquals(uuid, processor.getUniqueId(new PostSyncAction(msg, null)));
+		assertEquals(uuid, processor.getUniqueId(msg));
 	}
 	
 	@Test
@@ -67,7 +75,7 @@ public class CacheEvictingProcessorTest {
 		final String type = PersonModel.class.getName();
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(type);
-		assertEquals(type, processor.getLogicalType(new PostSyncAction(msg, null)));
+		assertEquals(type, processor.getLogicalType(msg));
 	}
 	
 	@Test
@@ -86,9 +94,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -103,9 +110,8 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -119,9 +125,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PatientModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -136,9 +141,8 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PatientModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -152,9 +156,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonNameModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("person", JsonPath.read(json, "resource"));
 		assertEquals("name", JsonPath.read(json, "subResource"));
@@ -168,9 +171,8 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonNameModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -184,9 +186,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonAttributeModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("person", JsonPath.read(json, "resource"));
 		assertEquals("attribute", JsonPath.read(json, "subResource"));
@@ -200,9 +201,8 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonAttributeModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -216,9 +216,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(PersonAddressModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		assertEquals("person", JsonPath.read(json, "resource"));
 		assertEquals("address", JsonPath.read(json, "subResource"));
@@ -232,9 +231,8 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(PersonAddressModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("person", JsonPath.read(json, "resource"));
@@ -248,9 +246,8 @@ public class CacheEvictingProcessorTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(uuid);
 		msg.setModelClassName(UserModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("user", JsonPath.read(json, "resource"));
@@ -265,14 +262,26 @@ public class CacheEvictingProcessorTest {
 		msg.setIdentifier(uuid);
 		msg.setOperation(SyncOperation.d);
 		msg.setModelClassName(UserModel.class.getName());
-		PostSyncAction action = new PostSyncAction(msg, null);
 		
-		String json = processor.convertBody(action).toString();
+		String json = processor.convertBody(msg).toString();
 		
 		DocumentContext docContext = jsonPathContext.parse(json);
 		assertEquals("user", JsonPath.read(json, "resource"));
 		assertEquals(uuid, JsonPath.read(json, "uuid"));
 		assertNull(docContext.read("subResource"));
+	}
+	
+	@Test
+	public void onSuccess_shouldMarkTheMessageAsProcessed() {
+		SyncedMessage msg = new SyncedMessage();
+		assertNull(msg.getEvictedFromCache());
+		SyncedMessageRepository mockRepo = Mockito.mock(SyncedMessageRepository.class);
+		processor = new CacheEvictingProcessor(null, null, mockRepo);
+		
+		processor.onSuccess(msg);
+		
+		assertTrue(msg.getEvictedFromCache());
+		Mockito.verify(mockRepo).save(msg);
 	}
 	
 }

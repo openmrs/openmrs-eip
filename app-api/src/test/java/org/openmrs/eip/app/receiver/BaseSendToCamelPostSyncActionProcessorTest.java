@@ -9,9 +9,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
-import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.app.BaseQueueProcessor;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.powermock.reflect.Whitebox;
 
 public class BaseSendToCamelPostSyncActionProcessorTest {
 	
@@ -20,45 +20,24 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 	@Mock
 	private ProducerTemplate mockTemplate;
 	
-	@Mock
-	private PostSyncActionRepository mockRepo;
-	
-	@Mock
-	private PostSyncAction mockAction;
-	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		processor = new CacheEvictingProcessor(mockTemplate, mockRepo);
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		processor = new CacheEvictingProcessor(mockTemplate, null, null);
 	}
 	
 	@Test
 	public void processItem_shouldSendTheItemToTheEndpointUri() {
 		processor = Mockito.spy(processor);
-		Mockito.doNothing().when(processor).send(URI_CLEAR_CACHE, mockAction, mockTemplate);
+		SyncedMessage msg = new SyncedMessage();
+		Mockito.doNothing().when(processor).send(URI_CLEAR_CACHE, msg, mockTemplate);
+		Mockito.doNothing().when(processor).onSuccess(msg);
 		
-		processor.processItem(mockAction);
+		processor.processItem(msg);
 		
-		verify(processor).send(URI_CLEAR_CACHE, mockAction, mockTemplate);
-	}
-	
-	@Test
-	public void onSuccess_shouldMarkTheItemAsCompletedAndSaveTheChanges() {
-		processor.onSuccess(mockAction);
-		
-		verify(mockAction).markAsCompleted();
-		verify(mockRepo).save(mockAction);
-	}
-	
-	@Test
-	public void onFailure_shouldMarkTheItemAsFailedAndSaveTheChanges() {
-		final String msg = "test";
-		Throwable t = new EIPException(msg);
-		
-		processor.onFailure(mockAction, t);
-		
-		verify(mockAction).markAsProcessedWithError(t.toString());
-		verify(mockRepo).save(mockAction);
+		verify(processor).send(URI_CLEAR_CACHE, msg, mockTemplate);
+		verify(processor).onSuccess(msg);
 	}
 	
 }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Profile(SyncProfiles.SENDER)
 public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implements Processor {
 	
-	protected static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(ChangeEventProcessor.class);
 	
 	private ThreadPoolExecutor executor;
 	

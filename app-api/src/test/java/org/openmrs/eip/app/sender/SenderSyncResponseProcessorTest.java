@@ -3,12 +3,21 @@ package org.openmrs.eip.app.sender;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SenderSyncResponse;
+import org.powermock.reflect.Whitebox;
 
 public class SenderSyncResponseProcessorTest {
 	
-	private SenderSyncResponseProcessor processor = new SenderSyncResponseProcessor(null);
+	private SenderSyncResponseProcessor processor;
+	
+	@Before
+	public void setup() {
+		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
+		processor = new SenderSyncResponseProcessor(null, null);
+	}
 	
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
@@ -18,11 +27,9 @@ public class SenderSyncResponseProcessorTest {
 	@Test
 	public void getThreadName_shouldReturnTheThreadNameContainingEventDetails() {
 		final String messageUuid = "message-uuid";
-		final Long id = 2L;
 		SenderSyncResponse msg = new SenderSyncResponse();
-		msg.setId(id);
 		msg.setMessageUuid(messageUuid);
-		assertEquals(messageUuid + "-" + id, processor.getThreadName(msg));
+		assertEquals(messageUuid, processor.getThreadName(msg));
 	}
 	
 	@Test

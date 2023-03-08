@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.anyMap;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.Exchange;
 import org.junit.Test;
@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-import org.slf4j.Logger;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CompletableFuture.class)
@@ -31,25 +30,19 @@ public class ChangeEventProcessorSpyTest {
 	private ChangeEventHandler handler;
 	
 	@Mock
-	private ExecutorService mockExecutor;
-	
-	@Mock
-	private Logger mockLogger;
+	private ThreadPoolExecutor mockExecutor;
 	
 	private ChangeEventProcessor createProcessor() {
-		ChangeEventProcessor processor = new ChangeEventProcessor(handler);
-		Whitebox.setInternalState(processor, "threadCount", 1);
+		ChangeEventProcessor processor = new ChangeEventProcessor(mockExecutor, handler);
 		return processor;
 	}
 	
 	@Test
-	public void process_shouldSkipPersistingTheSavePointForASnapshotEventIfTheExecutorIsShutdown() throws Exception {
-		Whitebox.setInternalState(ChangeEventProcessor.class, "batchSize", 1);
-		Whitebox.setInternalState(ChangeEventProcessor.class, "executor", mockExecutor);
-		Whitebox.setInternalState(ChangeEventProcessor.class, "log", mockLogger);
+	public void processWork_shouldSkipPersistingTheSavePointForASnapshotEventIfTheExecutorIsShutdown() throws Exception {
 		Exchange e = ApiSenderTestUtils.createExchange(0, TRUE.toString(), "person");
 		Mockito.when(mockStore.getSavedRowId(ArgumentMatchers.anyString())).thenReturn(null);
 		ChangeEventProcessor processor = createProcessor();
+		Whitebox.setInternalState(processor, "taskThreshold", 1);
 		Whitebox.setInternalState(processor, SnapshotSavePointStore.class, mockStore);
 		Mockito.when(mockExecutor.isShutdown()).thenReturn(true);
 		processor = Mockito.spy(processor);
@@ -60,10 +53,9 @@ public class ChangeEventProcessorSpyTest {
 			return null;
 		}).when(processor).waitForFutures(any());
 		
-		processor.process(e);
+		processor.processWork(e);
 		
 		Mockito.verify(mockStore, Mockito.never()).update(anyMap());
-		Mockito.verify(mockLogger).warn("Executor is already shutdown, can't persist snapshot save point");
 	}
 	
 }

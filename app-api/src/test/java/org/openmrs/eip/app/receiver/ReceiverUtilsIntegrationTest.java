@@ -184,13 +184,16 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	public void archiveMessage_shouldMoveAMessageFromTheSyncedToTheArchivesQueue() {
 		assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
 		SyncedMessage syncedMsg = createMessage(EncounterModel.class);
+		long timestamp = System.currentTimeMillis();
 		
 		ReceiverUtils.archiveMessage(syncedMsg);
 		
 		assertNull(TestUtils.getEntity(SyncedMessage.class, syncedMsg.getId()));
 		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
 		assertEquals(1, archives.size());
-		assertEquals(syncedMsg.getMessageUuid(), archives.get(0).getMessageUuid());
+		ReceiverSyncArchive a = archives.get(0);
+		assertEquals(syncedMsg.getMessageUuid(), a.getMessageUuid());
+		assertTrue(a.getDateCreated().getTime() > timestamp);
 	}
 	
 }

@@ -30,7 +30,7 @@ public class SenderSyncMessageProcessor extends BaseFromCamelToCamelEndpointProc
 	
 	@Override
 	public String getThreadName(SenderSyncMessage msg) {
-		return msg.getTableName() + "-" + msg.getIdentifier() + "-" + msg.getId();
+		return msg.getTableName() + "-" + msg.getIdentifier() + "-" + msg.getMessageUuid();
 	}
 	
 	@Override

@@ -29,7 +29,7 @@ public class SenderSyncResponseProcessor extends BaseFromCamelToCamelEndpointPro
 	
 	@Override
 	public String getThreadName(SenderSyncResponse response) {
-		return response.getMessageUuid() + "-" + response.getId();
+		return response.getMessageUuid();
 	}
 	
 	@Override

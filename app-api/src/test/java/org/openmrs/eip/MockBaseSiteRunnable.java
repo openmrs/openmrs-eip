@@ -15,7 +15,7 @@ public class MockBaseSiteRunnable extends BaseSiteRunnable {
 	}
 	
 	@Override
-	public String getProcessorName() {
+	public String getTaskName() {
 		return null;
 	}
 	

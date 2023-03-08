@@ -3,14 +3,13 @@ package org.openmrs.eip.app.receiver;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.openmrs.eip.app.management.entity.receiver.PostSyncAction.PostSyncActionType.SEND_RESPONSE;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -28,17 +27,15 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.PostSyncAction;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.PostSyncActionRepository;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.DateUtils;
@@ -46,6 +43,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.springframework.data.domain.Pageable;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -64,10 +62,16 @@ public class SyncResponseSenderTest {
 	private SiteInfo mockSite;
 	
 	@Mock
+	private SyncedMessageRepository mockRepo;
+	
+	@Mock
+	private Pageable mockPage;
+	
+	@Mock
 	private ConnectionFactory mockConnFactory;
 	
 	@Mock
-	private PostSyncActionRepository mockRepo;
+	private SyncResponseSenderProcessor mockProcessor;
 	
 	private SyncResponseSender sender;
 	
@@ -75,12 +79,20 @@ public class SyncResponseSenderTest {
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(ReceiverUtils.class);
+		setInternalState(BaseSiteRunnable.class, "initialized", true);
+		setInternalState(BaseSiteRunnable.class, "page", mockPage);
 		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
 		when(mockSite.getIdentifier()).thenReturn(SITE_IDENTIFIER);
 		when(mockPublisher.getCamelOutputEndpoint(SITE_IDENTIFIER)).thenReturn("activemq:" + QUEUE_NAME);
 		sender = new SyncResponseSender(mockSite);
 		Whitebox.setInternalState(sender, ConnectionFactory.class, mockConnFactory);
-		Whitebox.setInternalState(sender, PostSyncActionRepository.class, mockRepo);
+		Whitebox.setInternalState(sender, SyncResponseSenderProcessor.class, mockProcessor);
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseSiteRunnable.class, "initialized", false);
+		setInternalState(BaseSiteRunnable.class, "page", (Object) null);
 	}
 	
 	@Test
@@ -97,40 +109,36 @@ public class SyncResponseSenderTest {
 	
 	@Test
 	public void getNextBatch_shouldInvokeTheRepoToFetchTheNextBatchOfUnprocessedSyncResponseActions() {
+		setInternalState(sender, SyncedMessageRepository.class, mockRepo);
+		
 		sender.getNextBatch();
 		
-		verify(mockRepo).getBatchOfPendingResponseActions(mockSite, sender.pageable);
+		verify(mockRepo).getBatchOfMessagesForResponse(mockSite, mockPage);
 	}
 	
 	@Test
-	public void process_shouldProcessTheActionsAndMarkThemAsCompleted() throws Exception {
+	public void process_shouldSendResponsesForTheMessages() throws Exception {
 		sender = Mockito.spy(sender);
-		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
+		List<SyncedMessage> msgs = Collections.singletonList(new SyncedMessage());
 		sender = Mockito.spy(sender);
-		doNothing().when(sender).sendResponsesInBatch(actions);
+		doNothing().when(sender).sendResponsesInBatch(msgs);
 		
-		sender.process(actions);
+		sender.process(msgs);
 		
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.updatePostSyncActionStatuses(actions, true, null);
-		PowerMockito.verifyStatic(ReceiverUtils.class, never());
-		ReceiverUtils.updatePostSyncActionStatuses(anyList(), ArgumentMatchers.eq(false), isNull());
+		verify(sender).sendResponsesInBatch(msgs);
+		verify(mockProcessor).processWork(msgs);
 	}
 	
 	@Test
 	public void process_shouldMarkActionsAsFailedIfAnErrorOccurs() throws Exception {
 		sender = Mockito.spy(sender);
-		List<PostSyncAction> actions = Collections.singletonList(new PostSyncAction());
+		List<SyncedMessage> msgs = Collections.singletonList(new SyncedMessage());
 		EIPException e = new EIPException("Testing");
-		when(ReceiverUtils.getErrorMessage(e)).thenReturn(e.toString());
-		Mockito.doThrow(e).when(sender).sendResponsesInBatch(actions);
+		Mockito.doThrow(e).when(sender).sendResponsesInBatch(msgs);
 		
-		sender.process(actions);
+		sender.process(msgs);
 		
-		PowerMockito.verifyStatic(ReceiverUtils.class, never());
-		ReceiverUtils.updatePostSyncActionStatuses(anyList(), ArgumentMatchers.eq(true), isNull());
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.updatePostSyncActionStatuses(actions, false, e.toString());
+		verifyNoInteractions(mockProcessor);
 	}
 	
 	@Test
@@ -139,9 +147,9 @@ public class SyncResponseSenderTest {
 		final Session mockSession = mock(Session.class);
 		final MessageProducer mockProducer = mock(MessageProducer.class);
 		final Queue mockQueue = mock(Queue.class);
-		final PostSyncAction action1 = new PostSyncAction(new SyncedMessage(), null);
-		final PostSyncAction action2 = new PostSyncAction(new SyncedMessage(), null);
-		final List<PostSyncAction> actions = Arrays.asList(action1, action2);
+		final SyncedMessage msg1 = new SyncedMessage();
+		final SyncedMessage msg2 = new SyncedMessage();
+		final List<SyncedMessage> actions = Arrays.asList(msg1, msg2);
 		final String text1 = "response1";
 		final String text2 = "response2";
 		final TextMessage textMsg1 = mock(TextMessage.class);
@@ -152,7 +160,7 @@ public class SyncResponseSenderTest {
 		when(mockSession.createProducer(mockQueue)).thenReturn(mockProducer);
 		List<String> responses = Arrays.asList(text1, text2);
 		sender = Mockito.spy(sender);
-		when(sender.generateResponses(Arrays.asList(action1, action2))).thenReturn(responses);
+		when(sender.generateResponses(Arrays.asList(msg1, msg2))).thenReturn(responses);
 		when(mockSession.createTextMessage(text1)).thenReturn(textMsg1);
 		when(mockSession.createTextMessage(text2)).thenReturn(textMsg2);
 		
@@ -177,23 +185,21 @@ public class SyncResponseSenderTest {
 		final SyncedMessage msg2 = new SyncedMessage();
 		msg2.setIdentifier(uuid2);
 		msg2.setDateReceived(new Date());
-		final PostSyncAction action1 = new PostSyncAction(msg1, SEND_RESPONSE);
-		final PostSyncAction action2 = new PostSyncAction(msg2, SEND_RESPONSE);
-		final List<PostSyncAction> actions = Arrays.asList(action1, action2);
+		final List<SyncedMessage> actions = Arrays.asList(msg1, msg2);
 		
 		List<String> responses = sender.generateResponses(actions);
 		
 		for (int i = 0; i < responses.size(); i++) {
-			PostSyncAction a = actions.get(i);
-			assertEquals(a.getMessage().getMessageUuid(), JsonPath.read(responses.get(i), "messageUuid"));
+			SyncedMessage m = actions.get(i);
+			assertEquals(m.getMessageUuid(), JsonPath.read(responses.get(i), "messageUuid"));
 			LocalDateTime dateReceived = ZonedDateTime
 			        .parse(JsonPath.read(responses.get(i), "dateReceived"), ISO_OFFSET_DATE_TIME)
 			        .withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
-			assertEquals(DateUtils.dateToLocalDateTime(a.getMessage().getDateReceived()), dateReceived);
+			assertEquals(DateUtils.dateToLocalDateTime(m.getDateReceived()), dateReceived);
 			Instant dateSentByReceiver = ZonedDateTime
 			        .parse(JsonPath.read(responses.get(i), "dateSentByReceiver"), ISO_OFFSET_DATE_TIME)
 			        .withZoneSameInstant(ZoneId.systemDefault()).toInstant();
-			Assert.assertTrue(dateSentByReceiver.equals(date.toInstant()) || dateSentByReceiver.isAfter(date.toInstant()));
+			assertTrue(dateSentByReceiver.equals(date.toInstant()) || dateSentByReceiver.isAfter(date.toInstant()));
 		}
 	}
 	
