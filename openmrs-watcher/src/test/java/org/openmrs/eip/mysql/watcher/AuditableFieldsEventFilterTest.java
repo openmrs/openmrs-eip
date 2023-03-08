@@ -3,7 +3,6 @@ package org.openmrs.eip.mysql.watcher;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.mysql.watcher.DatabaseOperation.UPDATE;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_CHANGED_BY;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_DATE_CHANGED;
 
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+import org.openmrs.eip.DatabaseOperation;
 import org.powermock.reflect.Whitebox;
 
 public class AuditableFieldsEventFilterTest {
@@ -30,7 +30,7 @@ public class AuditableFieldsEventFilterTest {
 	private AuditableEventFilter filter = new AuditableEventFilter(Collections.singletonList(TABLE_PERSON));
 	
 	private Event createEvent(Map<String, Object> prevState, Map<String, Object> newState) {
-		Event e = WatcherTestUtils.createEvent(TABLE_PERSON, null, null, UPDATE.getRawValue());
+		Event e = WatcherTestUtils.createEvent(TABLE_PERSON, null, null, DatabaseOperation.u.name());
 		e.setPreviousState(prevState);
 		e.setCurrentState(newState);
 		return e;
@@ -52,7 +52,7 @@ public class AuditableFieldsEventFilterTest {
 	public void accept_shouldReturnTrueIfThereAreNoFilteredTables() {
 		filter = new AuditableEventFilter(Collections.emptyList());
 		Event e = new Event();
-		e.setOperation(UPDATE.getRawValue());
+		e.setOperation(DatabaseOperation.u.name());
 		assertTrue(filter.accept(e, null));
 	}
 	
@@ -60,7 +60,7 @@ public class AuditableFieldsEventFilterTest {
 	public void accept_shouldReturnTrueForANonFilteredTable() {
 		Event e = new Event();
 		e.setTableName("visit");
-		e.setOperation(UPDATE.getRawValue());
+		e.setOperation(DatabaseOperation.u.name());
 		assertTrue(filter.accept(e, null));
 	}
 	
@@ -100,7 +100,7 @@ public class AuditableFieldsEventFilterTest {
 		newState.put(COLUMN_CHANGED_BY, null);
 		newState.put(COLUMN_DATE_CHANGED, null);
 		Event e = createEvent(null, newState);
-		e.setOperation(DatabaseOperation.CREATE.getRawValue());
+		e.setOperation(DatabaseOperation.c.name());
 		assertTrue(filter.accept(e, null));
 	}
 	
@@ -112,7 +112,7 @@ public class AuditableFieldsEventFilterTest {
 		prevState.put(COLUMN_CHANGED_BY, null);
 		prevState.put(COLUMN_DATE_CHANGED, null);
 		Event e = createEvent(prevState, null);
-		e.setOperation(DatabaseOperation.DELETE.getRawValue());
+		e.setOperation(DatabaseOperation.d.name());
 		assertTrue(filter.accept(e, null));
 	}
 	
@@ -124,7 +124,7 @@ public class AuditableFieldsEventFilterTest {
 		newState.put(COLUMN_CHANGED_BY, null);
 		newState.put(COLUMN_DATE_CHANGED, null);
 		Event e = createEvent(null, newState);
-		e.setOperation(DatabaseOperation.READ.getRawValue());
+		e.setOperation(DatabaseOperation.r.name());
 		assertTrue(filter.accept(e, null));
 	}
 	
