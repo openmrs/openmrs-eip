@@ -35,12 +35,12 @@ public abstract class BaseSiteRunnable implements Runnable {
 	protected static final Logger log = LoggerFactory.getLogger(BaseSiteRunnable.class);
 	
 	//Sync takes on average 3-5 seconds based on prod stats at the time of writing this
-    protected static final int DEFAULT_BACK_LOG = 2;
-
-    protected static final int DEFAULT_SYNC_TIME_PER_ITEM = 4000;
+	protected static final int DEFAULT_BACK_LOG = 2;
+	
+	protected static final int DEFAULT_SYNC_TIME_PER_ITEM = 4000;
 	
 	//1hr estimate is based on the time it takes to process about 1000 messages per thread
-    protected static final long DEFAULT_SIZE_REFRESH_INTERVAL = 3600000;
+	protected static final long DEFAULT_SIZE_REFRESH_INTERVAL = 3600000;
 	
 	protected static final String KEY_SYNC_COUNT = "sync_count";
 	

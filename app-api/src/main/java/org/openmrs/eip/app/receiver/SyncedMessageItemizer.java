@@ -34,7 +34,6 @@ public class SyncedMessageItemizer extends BaseSiteRunnable {
 	
 	@Override
 	public boolean doRun() throws Exception {
-		//TODO Check for existence of sync messages before running
 		if (log.isTraceEnabled()) {
 			log.trace("Fetching next batch of " + page.getPageSize() + " messages to itemize for site: " + site);
 		}

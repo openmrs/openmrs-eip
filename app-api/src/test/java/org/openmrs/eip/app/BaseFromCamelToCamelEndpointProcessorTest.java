@@ -1,8 +1,11 @@
 package org.openmrs.eip.app;
 
+import static org.powermock.reflect.Whitebox.setInternalState;
+
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -52,6 +55,11 @@ public class BaseFromCamelToCamelEndpointProcessorTest {
 		public List<String> getLogicalTypeHierarchy(String logicalType) {
 			return null;
 		}
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
 	
 	@Test

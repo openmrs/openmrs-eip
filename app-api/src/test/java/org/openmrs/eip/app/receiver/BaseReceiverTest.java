@@ -7,5 +7,4 @@ import org.springframework.test.context.TestPropertySource;
 
 @ActiveProfiles(SyncProfiles.RECEIVER)
 @TestPropertySource(properties = ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT + "=")
-@TestPropertySource(properties = ReceiverConstants.PROP_DELAY_IN_SECONDS + "=0")
 public abstract class BaseReceiverTest extends BaseDbBackedCamelTest {}

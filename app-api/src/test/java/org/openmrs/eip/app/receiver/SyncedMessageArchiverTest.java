@@ -28,7 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SyncContext.class)
-public class SyncedMessageItemizerTest {
+public class SyncedMessageArchiverTest {
 	
 	@Mock
 	private SiteInfo mockSite;
@@ -37,21 +37,21 @@ public class SyncedMessageItemizerTest {
 	private SyncedMessageRepository mockRepo;
 	
 	@Mock
-	private SyncedMessageItemizingProcessor mockProcessor;
+	private SyncedMessageArchivingProcessor mockProcessor;
 	
 	@Mock
 	private Pageable mockPage;
 	
-	private SyncedMessageItemizer itemizer;
+	private SyncedMessageArchiver archiver;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		setInternalState(BaseSiteRunnable.class, "initialized", true);
 		setInternalState(BaseSiteRunnable.class, "page", mockPage);
-		itemizer = new SyncedMessageItemizer(mockSite);
-		Whitebox.setInternalState(itemizer, SyncedMessageRepository.class, mockRepo);
-		Whitebox.setInternalState(itemizer, SyncedMessageItemizingProcessor.class, mockProcessor);
+		archiver = new SyncedMessageArchiver(mockSite);
+		Whitebox.setInternalState(archiver, SyncedMessageRepository.class, mockRepo);
+		Whitebox.setInternalState(archiver, SyncedMessageArchivingProcessor.class, mockProcessor);
 	}
 	
 	@After
@@ -61,20 +61,20 @@ public class SyncedMessageItemizerTest {
 	}
 	
 	@Test
-	public void doRun_shouldLoadUnItemizedMessagesAndInvokeTheProcessor() throws Exception {
+	public void doRun_shouldLoadUnArchivedMessagesAndInvokeTheProcessor() throws Exception {
 		List<SyncedMessage> msgs = Collections.singletonList(new SyncedMessage());
-		when(mockRepo.getBatchOfMessagesForItemizing(mockSite, mockPage)).thenReturn(msgs);
+		when(mockRepo.getBatchOfMessagesForArchiving(mockSite, mockPage)).thenReturn(msgs);
 		
-		Assert.assertFalse(itemizer.doRun());
+		Assert.assertFalse(archiver.doRun());
 		
 		Mockito.verify(mockProcessor).processWork(msgs);
 	}
 	
 	@Test
-	public void doRun_shouldNotInvokeTheProcessorIfThereAreNoUnItemizedMessages() throws Exception {
-		when(mockRepo.getBatchOfMessagesForItemizing(mockSite, mockPage)).thenReturn(emptyList());
+	public void doRun_shouldNotInvokeTheProcessorIfThereAreNoUnArchivedMessages() throws Exception {
+		when(mockRepo.getBatchOfMessagesForArchiving(mockSite, mockPage)).thenReturn(emptyList());
 		
-		Assert.assertTrue(itemizer.doRun());
+		Assert.assertTrue(archiver.doRun());
 		
 		Mockito.verify(mockProcessor, never()).processWork(anyList());
 	}

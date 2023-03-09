@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.debezium.DebeziumConstants;
 import org.apache.kafka.connect.data.Struct;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -59,6 +60,11 @@ public class ChangeEventProcessorTest {
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "paused", false);
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		Mockito.reset(mockStore);
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
 	
 	private ChangeEventProcessor createProcessor(int threadCount) {

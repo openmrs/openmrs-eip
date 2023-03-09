@@ -101,7 +101,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
-		
 		this.siteExecutor = siteExecutor;
 		this.syncExecutor = syncExecutor;
 	}
@@ -150,11 +149,11 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			startMessageItemizers(sites);
 			
-			startSyncResponseSenders(sites);
-			
 			startCacheEvictors(sites);
 			
 			startSearchIndexUpdaters(sites);
+			
+			startSyncResponseSenders(sites);
 			
 			startMessageArchivers(sites);
 			

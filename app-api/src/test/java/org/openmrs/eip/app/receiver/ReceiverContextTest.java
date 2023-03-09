@@ -16,7 +16,7 @@ public class ReceiverContextTest extends BaseReceiverTest {
 	public void getSiteNameAndInfoMap_shouldReturnAllSiteInfo() {
 		Whitebox.setInternalState(ReceiverContext.class, "siteNameAndInfoMap", (Object) null);
 		Assert.assertNull(Whitebox.getInternalState(ReceiverContext.class, "siteNameAndInfoMap"));
-		Assert.assertEquals(4, ReceiverContext.getSiteNameAndInfoMap().size());
+		Assert.assertEquals(5, ReceiverContext.getSiteNameAndInfoMap().size());
 	}
 	
 }

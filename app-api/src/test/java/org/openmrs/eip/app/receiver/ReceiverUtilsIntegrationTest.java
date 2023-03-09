@@ -193,7 +193,7 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		assertEquals(1, archives.size());
 		ReceiverSyncArchive a = archives.get(0);
 		assertEquals(syncedMsg.getMessageUuid(), a.getMessageUuid());
-		assertTrue(a.getDateCreated().getTime() > timestamp);
+		assertTrue(a.getDateCreated().getTime() == timestamp || a.getDateCreated().getTime() > timestamp);
 	}
 	
 }

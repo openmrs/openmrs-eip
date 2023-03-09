@@ -1,11 +1,14 @@
 package org.openmrs.eip.app;
 
+import static org.powermock.reflect.Whitebox.setInternalState;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
@@ -60,6 +63,11 @@ public class BaseFromCamelProcessorTest {
 			return null;
 		}
 		
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
 	
 	@Test

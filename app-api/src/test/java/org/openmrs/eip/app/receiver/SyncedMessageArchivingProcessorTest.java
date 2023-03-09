@@ -2,7 +2,9 @@ package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,11 @@ public class SyncedMessageArchivingProcessorTest {
 	public void setup() {
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new SyncedMessageArchivingProcessor(null);
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
 	
 	@Test

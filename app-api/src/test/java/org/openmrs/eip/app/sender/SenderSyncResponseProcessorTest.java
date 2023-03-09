@@ -1,7 +1,9 @@
 package org.openmrs.eip.app.sender;
 
 import static org.junit.Assert.assertEquals;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +19,11 @@ public class SenderSyncResponseProcessorTest {
 	public void setup() {
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new SenderSyncResponseProcessor(null, null);
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
 	
 	@Test
