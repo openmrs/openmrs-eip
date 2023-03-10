@@ -199,6 +199,7 @@ public class SiteMessageConsumer implements Runnable {
 			
 			if (futures.size() >= taskThreshold) {
 				waitForFutures(futures);
+				futures.clear();
 			}
 			
 		}

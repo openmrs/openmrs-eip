@@ -106,6 +106,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 			
 			if (futures.size() >= taskThreshold) {
 				waitForFutures(futures);
+				futures.clear();
 			}
 		}
 		

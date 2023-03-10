@@ -152,6 +152,9 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 		boolean isLast = snapshotStr.equalsIgnoreCase("last");
 		if (isLast || futures.size() >= taskThreshold) {
 			waitForFutures(futures);
+			List<CompletableFuture<Void>> futuresCopy = new Vector(futures);
+			futures.clear();
+			
 			//If the executor is already shutdown, there could be tasks for some DB events that were never processed
 			//Which leaves unprocessed rows when initial loading is resumed, so we can't persist the savepoint
 			if (executor.isShutdown()) {
@@ -159,7 +162,7 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 				return;
 			}
 			
-			for (CompletableFuture f : futures) {
+			for (CompletableFuture f : futuresCopy) {
 				boolean stop = false;
 				if (!f.isDone()) {
 					stop = true;
@@ -178,8 +181,6 @@ public class ChangeEventProcessor extends BaseParallelProcessor<Exchange> implem
 					return;
 				}
 			}
-			
-			futures.clear();
 			
 			if (isLast) {
 				//Only save offsets if it is the last snapshot item
