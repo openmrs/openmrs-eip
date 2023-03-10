@@ -44,11 +44,6 @@ public class SenderSyncMessageProcessor extends BaseFromCamelToCamelEndpointProc
 	}
 	
 	@Override
-	public boolean waitForTasksIndefinitely() {
-		return true;
-	}
-	
-	@Override
 	public String getLogicalType(SenderSyncMessage item) {
 		return item.getTableName();
 	}

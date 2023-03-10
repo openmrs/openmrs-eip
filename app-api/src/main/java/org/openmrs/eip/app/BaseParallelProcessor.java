@@ -42,13 +42,4 @@ public abstract class BaseParallelProcessor<W> {
 	 */
 	public abstract String getProcessorName();
 	
-	/**
-	 * Specifies if the executor should wait indefinitely for executing tasks or not
-	 * 
-	 * @return true or false
-	 */
-	public boolean waitForTasksIndefinitely() {
-		return false;
-	}
-	
 }
