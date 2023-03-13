@@ -69,10 +69,13 @@
                                     <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true || ${exchangeProperty.org.openmrs.eip.app.receiver.sync-movedToConflictQueue} == true</simple>
                                     <when>
                                         <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true</simple>
-                                        <log message="Moving to synced queue the error item with id: ${exchangeProperty.retry-item-id}" />
+                                        <bean ref="retryCacheEvictingProcessor" method="process(${exchangeProperty.retry-item})" />
+                                        <bean ref="retrySearchIndexUpdatingProcessor" method="process(${exchangeProperty.retry-item})" />
+
+                                        <log message="Archiving the item associated to error item with id: ${exchangeProperty.retry-item-id}" />
 
                                         <setBody>
-                                            <method beanType="org.openmrs.eip.app.receiver.ReceiverUtils" method="createSyncedMessageFromRetry(${exchangeProperty.retry-item})" />
+                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive(getProperty('retry-item'))}</spel>
                                         </setBody>
                                         <script>
                                             <spel>
@@ -80,11 +83,11 @@
                                             </spel>
                                         </script>
 
-                                        <log loggingLevel="DEBUG" message="Saving synced message" />
+                                        <log loggingLevel="DEBUG" message="Saving sync archive" />
 
-                                        <toD uri="jpa:SyncedMessage" />
+                                        <toD uri="jpa:ReceiverSyncArchive" />
 
-                                        <log loggingLevel="DEBUG" message="Successfully saved synced message" />
+                                        <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
                                     </when>
 
                                     <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />

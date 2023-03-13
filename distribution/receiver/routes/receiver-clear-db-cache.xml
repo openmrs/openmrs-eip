@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver-clear-db-cache" errorHandlerRef="noErrorHandler">
+    <route id="receiver-clear-db-cache">
         <from uri="direct:receiver-clear-db-cache" />
 
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />

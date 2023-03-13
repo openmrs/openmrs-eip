@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes sync messages that require updating the OpenMRS search index.
+ * Processes sync messages associated to entities that require updating the OpenMRS search index.
  */
 @Component("searchIndexUpdatingProcessor")
 @Profile(SyncProfiles.RECEIVER)

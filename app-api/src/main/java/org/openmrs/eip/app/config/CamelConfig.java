@@ -1,7 +1,6 @@
 package org.openmrs.eip.app.config;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
-import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.springframework.context.annotation.Bean;
 
 public class CamelConfig {
@@ -16,11 +15,6 @@ public class CamelConfig {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
 		builder.setUseOriginalMessage(true);
 		return builder;
-	}
-	
-	@Bean("noErrorHandler")
-	public NoErrorHandlerBuilder getNoErrorHandler() {
-		return new NoErrorHandlerBuilder();
 	}
 	
 	@Bean

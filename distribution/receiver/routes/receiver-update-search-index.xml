@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver-update-search-index" errorHandlerRef="noErrorHandler">
+    <route id="receiver-update-search-index">
         <from uri="direct:receiver-update-search-index" />
 
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />

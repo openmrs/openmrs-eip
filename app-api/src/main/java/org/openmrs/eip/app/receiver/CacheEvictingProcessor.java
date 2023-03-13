@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes synced messages that require eviction from the OpenMRS cache.
+ * Processes synced messages associated to entities that require eviction from the OpenMRS cache.
  */
 @Component("cacheEvictingProcessor")
 @Profile(SyncProfiles.RECEIVER)

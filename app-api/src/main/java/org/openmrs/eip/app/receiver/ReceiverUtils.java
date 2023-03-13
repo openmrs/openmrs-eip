@@ -72,6 +72,26 @@ public final class ReceiverUtils {
 	}
 	
 	/**
+	 * Checks whether an entity of the specified model class name is cached
+	 * 
+	 * @param modelClass the model classname to check
+	 * @return true if entities of the model class are cached otherwise false
+	 */
+	public static boolean isCached(String modelClass) {
+		return CACHE_EVICT_CLASS_NAMES.contains(modelClass);
+	}
+	
+	/**
+	 * Checks whether an entity of the specified model class name is indexed
+	 *
+	 * @param modelClass the model classname to check
+	 * @return true if entities of the model class are indexed otherwise false
+	 */
+	public static boolean isIndexed(String modelClass) {
+		return INDEX_UPDATE_CLASS_NAMES.contains(modelClass);
+	}
+	
+	/**
 	 * Creates a {@link SyncedMessage} for the specified {@link SyncMessage}.
 	 *
 	 * @param syncMessage {@link org.openmrs.eip.app.management.entity.SyncMessage} object
@@ -83,11 +103,11 @@ public final class ReceiverUtils {
 		BeanUtils.copyProperties(syncMessage, syncedMessage, "id", "dateCreated");
 		syncedMessage.setDateCreated(new Date());
 		
-		if (CACHE_EVICT_CLASS_NAMES.contains(syncMessage.getModelClassName())) {
+		if (isCached(syncMessage.getModelClassName())) {
 			syncedMessage.setCached(true);
 		}
 		
-		if (INDEX_UPDATE_CLASS_NAMES.contains(syncMessage.getModelClassName())) {
+		if (isIndexed(syncMessage.getModelClassName())) {
 			syncedMessage.setIndexed(true);
 		}
 		
@@ -100,10 +120,10 @@ public final class ReceiverUtils {
 	 * Generate the cache eviction {@link OpenmrsPayload} for the entity matching the modelClass and
 	 * identifier
 	 * 
-	 * @param modelClass the model class name for the entity
+	 * @param modelClass the model classname for the entity
 	 * @param identifier the entity identifier
 	 * @param operation sync operation
-	 * @return openmrs payload
+	 * @return openmrs cache eviction payload
 	 */
 	public static Object generateEvictionPayload(String modelClass, String identifier, SyncOperation operation) {
 		String uuid = null;
@@ -144,10 +164,10 @@ public final class ReceiverUtils {
 	 * Generate the search index update {@link OpenmrsPayload} for the entity matching the modelClass
 	 * and identifier, note that this method can also return multiple payloads
 	 *
-	 * @param modelClass the model class name for the entity
+	 * @param modelClass the model classname for the entity
 	 * @param identifier the entity identifier
 	 * @param operation sync operation
-	 * @return openmrs payload(s)
+	 * @return openmrs search index payload(s)
 	 */
 	public static Object generateSearchIndexUpdatePayload(String modelClass, String identifier, SyncOperation operation) {
 		String uuid = null;
