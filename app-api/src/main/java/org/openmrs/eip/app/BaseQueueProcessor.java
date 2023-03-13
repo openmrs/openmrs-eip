@@ -13,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for processors that operate on items in a DB sync related queue and forward each item
- * to another handler camel endpoint for processing
+ * Base class for processors that support parallelism to process items in a DB sync related queue.
  *
  * @param <T> item type
  */

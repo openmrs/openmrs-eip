@@ -24,8 +24,8 @@ public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Lo
 	        + "ORDER BY m.dateCreated ASC";
 	
 	String ARCHIVE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = true AND "
-	        + "m.responseSent = true AND (m.cached = false OR m.evictedFromCache = true) AND ((m.indexed = false OR "
-	        + "m.searchIndexUpdated = true))";
+	        + "m.responseSent = true AND (m.cached = false OR m.evictedFromCache = true) AND (m.indexed = false OR "
+	        + "m.searchIndexUpdated = true)";
 	
 	/**
 	 * Gets a batch of un itemized synced messages for the specified site ordered by ascending date

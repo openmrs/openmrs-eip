@@ -215,10 +215,6 @@ public class SiteMessageConsumer implements Runnable {
 	 * @param msg the sync message to process
 	 */
 	public void processMessage(SyncMessage msg) {
-		if (log.isDebugEnabled()) {
-			log.debug("Submitting sync message to the processor");
-		}
-		
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
 		
 		CamelUtils.send(messageProcessorUri, exchange);
@@ -231,6 +227,7 @@ public class SiteMessageConsumer implements Runnable {
 		if (msgProcessed || movedToConflict || movedToError) {
 			if (msgProcessed) {
 				log.info("Moving the message to the synced queue");
+				
 				SyncedMessage syncedMsg = new SyncedMessage(msg);
 				syncedMsg.setDateCreated(new Date());
 				if (log.isDebugEnabled()) {

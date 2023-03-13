@@ -20,10 +20,12 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	public static final long serialVersionUID = 1;
 	
+	@NotNull
 	@Column(name = "model_class_name", nullable = false, updatable = false)
 	private String modelClassName;
 	
 	//Unique identifier for the entity usually a uuid or name for an entity like a privilege that has no uuid
+	@NotNull
 	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
@@ -32,9 +34,11 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	@Column(nullable = false, updatable = false, length = 1)
 	private SyncOperation operation;
 	
+	@NotNull
 	@Column(name = "is_snapshot", nullable = false, updatable = false)
 	private Boolean snapshot = false;
 	
+	@NotNull
 	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
 	private String entityPayload;
 	

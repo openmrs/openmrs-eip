@@ -22,7 +22,7 @@ public class SyncConstants {
 	
 	public static final int DEFAULT_CONN_POOL_SIZE = 50;
 	
-	public static final int THREAD_THRESHOLD_MULTIPLIER = 100;
+	public static final int THREAD_THRESHOLD_MULTIPLIER = 2;
 	
 	public static final String DEFAULT_OPENMRS_POOL_NAME = "openmrs-ds-pool";
 	

@@ -54,7 +54,7 @@ public class SendToCamelEndpointProcessorTest {
 	}
 	
 	@Test
-	public void convert_shouldreturnTheSameItem() {
+	public void convertBody_shouldReturnTheSameItem() {
 		SyncedMessage msg = new SyncedMessage();
 		
 		Assert.assertEquals(msg, processor.convertBody(msg));
