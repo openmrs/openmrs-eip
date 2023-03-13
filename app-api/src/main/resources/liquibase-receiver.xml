@@ -1505,16 +1505,24 @@
                 <constraints nullable="false" />
             </column>
             <column name="date_received" type="DATETIME(3)" />
+            <column name="sync_outcome" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
             <column name="response_sent" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false" />
             </column>
-            <column name="is_itemized" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="is_cached" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
-            <column name="is_cached" type="BOOLEAN" />
-            <column name="evicted_from_cache" type="BOOLEAN" />
-            <column name="is_indexed" type="BOOLEAN" />
-            <column name="search_index_updated" type="BOOLEAN" />
+            <column name="evicted_from_cache" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_indexed" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="search_index_updated" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
             <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>

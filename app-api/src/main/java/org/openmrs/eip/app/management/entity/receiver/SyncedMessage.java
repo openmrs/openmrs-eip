@@ -3,6 +3,8 @@ package org.openmrs.eip.app.management.entity.receiver;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +19,7 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.SyncOperation;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +31,10 @@ import lombok.Setter;
 public class SyncedMessage extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
+	
+	public enum SyncOutcome {
+		SUCCESS, ERROR, CONFLICT
+	}
 	
 	@NotNull
 	@Column(nullable = false, updatable = false)
@@ -64,6 +71,13 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "date_received", updatable = false)
 	private Date dateReceived;
 	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "sync_outcome", nullable = false, length = 50)
+	@Access(AccessType.FIELD)
+	@Setter(AccessLevel.NONE)
+	private SyncOutcome outcome;
+	
 	@Column(name = "response_sent", nullable = false)
 	private boolean responseSent = false;
 	
@@ -82,12 +96,16 @@ public class SyncedMessage extends AbstractEntity {
 	public SyncedMessage() {
 	}
 	
+	public SyncedMessage(SyncOutcome outcome) {
+		this.outcome = outcome;
+	}
+	
 	@Override
 	public String toString() {
 		return "{id=" + getId() + ", identifier=" + identifier + ", modelClassName=" + modelClassName + ", operation="
-		        + operation + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + ", responseSent=" + responseSent
-		        + ", cached=" + cached + ", evictedFromCache=" + evictedFromCache + ", indexed=" + indexed
-		        + ", searchIndexUpdated=" + searchIndexUpdated + "}";
+		        + operation + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + ", outcome=" + outcome
+		        + ", responseSent=" + responseSent + ", cached=" + cached + ", evictedFromCache=" + evictedFromCache
+		        + ", indexed=" + indexed + ", searchIndexUpdated=" + searchIndexUpdated + "}";
 	}
 	
 }

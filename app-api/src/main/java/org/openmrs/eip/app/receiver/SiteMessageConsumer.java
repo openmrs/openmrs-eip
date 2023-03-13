@@ -23,6 +23,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -224,19 +225,28 @@ public class SiteMessageConsumer implements Runnable {
 		
 		final Long id = msg.getId();
 		if (msgProcessed || movedToConflict || movedToError) {
+			SyncOutcome outcome;
 			if (msgProcessed) {
-				SyncedMessage syncedMsg = ReceiverUtils.createSyncedMessage(msg);
+				outcome = SyncOutcome.SUCCESS;
 				log.info("Moving the message to the synced queue");
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Saving synced message");
-				}
-				
-				syncedMsgRepo.save(syncedMsg);
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Successfully saved synced message");
-				}
+			} else if (movedToConflict) {
+				outcome = SyncOutcome.CONFLICT;
+				log.info("Adding the message to the synced queue with outcome as: " + outcome);
+			} else {
+				outcome = SyncOutcome.ERROR;
+				log.info("Adding the message to the synced queue with outcome as: " + outcome);
+			}
+			
+			SyncedMessage syncedMsg = ReceiverUtils.createSyncedMessage(msg, outcome);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Saving synced message");
+			}
+			
+			syncedMsgRepo.save(syncedMsg);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Successfully saved synced message");
 			}
 			
 			if (log.isDebugEnabled()) {

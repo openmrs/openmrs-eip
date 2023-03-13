@@ -13,14 +13,14 @@ public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Lo
 	
 	String RESPONSE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.responseSent = false";
 	
-	String EVICT_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
+	String EVICT_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.outcome = 'SUCCESS' AND "
 	        + "m.cached = true AND m.evictedFromCache = false ORDER BY m.dateCreated ASC";
 	
-	String INDEX_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
+	String INDEX_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.outcome = 'SUCCESS' AND "
 	        + "m.indexed = true AND m.searchIndexUpdated = false AND (m.cached = false OR m.evictedFromCache = true) "
 	        + "ORDER BY m.dateCreated ASC";
 	
-	String ARCHIVE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
+	String ARCHIVE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.outcome = 'SUCCESS' AND "
 	        + "m.responseSent = true AND (m.cached = false OR m.evictedFromCache = true) AND (m.indexed = false OR "
 	        + "m.searchIndexUpdated = true)";
 	

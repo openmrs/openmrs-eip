@@ -9,23 +9,13 @@ import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
-import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.exception.EIPException;
-import org.openmrs.eip.component.model.PatientModel;
-import org.openmrs.eip.component.model.PersonAddressModel;
-import org.openmrs.eip.component.model.PersonAttributeModel;
-import org.openmrs.eip.component.model.PersonModel;
-import org.openmrs.eip.component.model.PersonNameModel;
-import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Processes synced messages that require eviction from the OpenMRS cache.
@@ -74,39 +64,7 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	
 	@Override
 	public Object convertBody(SyncedMessage item) {
-		String modelClass = item.getModelClassName();
-		String uuid = null;
-		//Users are not deleted, so no need to clear the cache for all users as we do for other cached entities
-		if (SyncOperation.d != item.getOperation() || UserModel.class.getName().equals(modelClass)) {
-			uuid = item.getIdentifier();
-		}
-		
-		String resource;
-		String subResource = null;
-		if (PersonNameModel.class.getName().equals(modelClass)) {
-			resource = "person";
-			subResource = "name";
-		} else if (PersonAttributeModel.class.getName().equals(modelClass)) {
-			resource = "person";
-			subResource = "attribute";
-		} else if (PersonModel.class.getName().equals(modelClass) || PatientModel.class.getName().equals(modelClass)) {
-			resource = "person";
-		} else if (PersonAddressModel.class.getName().equals(modelClass)) {
-			resource = "person";
-			subResource = "address";
-		} else if (UserModel.class.getName().equals(modelClass)) {
-			//TODO Remove this clause when user and provider sync is stopped
-			resource = "user";
-		} else {
-			throw new EIPException("Don't know how to handle cache eviction for entity of type: " + modelClass);
-		}
-		
-		try {
-			return ReceiverConstants.MAPPER.writeValueAsString(new OpenmrsPayload(resource, subResource, uuid));
-		}
-		catch (JsonProcessingException e) {
-			throw new EIPException("Failed to generate cache evict payload", e);
-		}
+		return ReceiverUtils.generateEvictionPayload(item.getModelClassName(), item.getIdentifier(), item.getOperation());
 	}
 	
 	@Override
