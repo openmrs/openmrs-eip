@@ -14,12 +14,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.DynamicUpdate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncOperation;
-import org.springframework.beans.BeanUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -71,43 +67,27 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "response_sent", nullable = false)
 	private boolean responseSent = false;
 	
-	@Column(name = "is_itemized", nullable = false)
-	private boolean itemized = false;
+	@Column(name = "is_cached", nullable = false, updatable = false)
+	private boolean cached = false;
 	
-	@Column(name = "is_cached")
-	private Boolean cached;
+	@Column(name = "evicted_from_cache", nullable = false)
+	private boolean evictedFromCache = false;
 	
-	@Column(name = "evicted_from_cache")
-	private Boolean evictedFromCache;
+	@Column(name = "is_indexed", nullable = false, updatable = false)
+	private boolean indexed = false;
 	
-	@Column(name = "is_indexed")
-	private Boolean indexed;
-	
-	@Column(name = "search_index_updated")
-	private Boolean searchIndexUpdated;
+	@Column(name = "search_index_updated", nullable = false)
+	private boolean searchIndexUpdated = false;
 	
 	public SyncedMessage() {
-	}
-	
-	public SyncedMessage(SyncMessage syncMessage) {
-		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
-		setDateReceived(syncMessage.getDateCreated());
-	}
-	
-	public SyncedMessage(ReceiverRetryQueueItem retry) {
-		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
-	}
-	
-	public SyncedMessage(ConflictQueueItem conflict) {
-		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
 	}
 	
 	@Override
 	public String toString() {
 		return "{id=" + getId() + ", identifier=" + identifier + ", modelClassName=" + modelClassName + ", operation="
 		        + operation + ", snapshot=" + snapshot + ", messageUuid=" + messageUuid + ", responseSent=" + responseSent
-		        + ", itemized=" + itemized + ", cached=" + cached + ", evictedFromCache=" + evictedFromCache + ", indexed="
-		        + indexed + ", searchIndexUpdated=" + searchIndexUpdated + "}";
+		        + ", cached=" + cached + ", evictedFromCache=" + evictedFromCache + ", indexed=" + indexed
+		        + ", searchIndexUpdated=" + searchIndexUpdated + "}";
 	}
 	
 }

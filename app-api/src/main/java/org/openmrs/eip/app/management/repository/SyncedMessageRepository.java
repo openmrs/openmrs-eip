@@ -11,32 +11,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Long> {
 	
-	String UNITEMIZED_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = false ORDER BY "
-	        + "m.dateCreated ASC";
-	
 	String RESPONSE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.responseSent = false";
 	
-	String EVICT_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = true AND "
+	String EVICT_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
 	        + "m.cached = true AND m.evictedFromCache = false ORDER BY m.dateCreated ASC";
 	
-	String INDEX_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = true AND "
+	String INDEX_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
 	        + "m.indexed = true AND m.searchIndexUpdated = false AND (m.cached = false OR m.evictedFromCache = true) "
 	        + "ORDER BY m.dateCreated ASC";
 	
-	String ARCHIVE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.itemized = true AND "
+	String ARCHIVE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND "
 	        + "m.responseSent = true AND (m.cached = false OR m.evictedFromCache = true) AND (m.indexed = false OR "
 	        + "m.searchIndexUpdated = true)";
-	
-	/**
-	 * Gets a batch of un itemized synced messages for the specified site ordered by ascending date
-	 * created.
-	 *
-	 * @param site the site to match against
-	 * @param pageable {@link Pageable} instance
-	 * @return list of synced messages
-	 */
-	@Query(UNITEMIZED_QUERY)
-	List<SyncedMessage> getBatchOfMessagesForItemizing(@Param("site") SiteInfo site, Pageable pageable);
 	
 	/**
 	 * Gets a batch of messages for which responses have not yet been sent

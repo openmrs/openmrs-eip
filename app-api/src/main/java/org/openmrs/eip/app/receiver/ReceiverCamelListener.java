@@ -7,13 +7,11 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXEC
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ITEMIZER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_INDEX_UPDATER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ITEMIZER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
@@ -69,31 +67,25 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
 	private long delayConsumer;
 	
-	@Value("${" + PROP_INITIAL_DELAY_ITEMIZER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 15000) + "}")
-	private long initialDelayItemizer;
-	
-	@Value("${" + PROP_DELAY_ITEMIZER + ":" + DEFAULT_DELAY + "}")
-	private long delayItemizer;
-	
-	@Value("${" + PROP_INITIAL_DELAY_CACHE_EVICTOR + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
+	@Value("${" + PROP_INITIAL_DELAY_CACHE_EVICTOR + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 10000) + "}")
 	private long initialDelayCacheEvictor;
 	
 	@Value("${" + PROP_DELAY_CACHE_EVICTOR + ":" + DEFAULT_DELAY + "}")
 	private long delayCacheEvictor;
 	
-	@Value("${" + PROP_INITIAL_DELAY_INDEX_UPDATER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
+	@Value("${" + PROP_INITIAL_DELAY_INDEX_UPDATER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 10000) + "}")
 	private long initialDelayIndexUpdater;
 	
 	@Value("${" + PROP_DELAY_INDEX_UPDATER + ":" + DEFAULT_DELAY + "}")
 	private long delayIndexUpdater;
 	
-	@Value("${" + PROP_INITIAL_DELAY_RESPONSE_SENDER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
+	@Value("${" + PROP_INITIAL_DELAY_RESPONSE_SENDER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
 	private long initialDelayResponseSender;
 	
 	@Value("${" + PROP_DELAY_RESPONSE_SENDER + ":" + DEFAULT_DELAY + "}")
 	private long delayResponseSender;
 	
-	@Value("${" + PROP_INITIAL_DELAY_ARCHIVER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
+	@Value("${" + PROP_INITIAL_DELAY_ARCHIVER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
 	private long initialDelayArchiver;
 	
 	@Value("${" + PROP_DELAY_ARCHIVER + ":" + DEFAULT_DELAY + "}")
@@ -147,8 +139,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			startMessageConsumers(sites);
 			
-			startMessageItemizers(sites);
-			
 			startCacheEvictors(sites);
 			
 			startSearchIndexUpdaters(sites);
@@ -193,13 +183,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 		sites.stream().forEach(site -> {
 			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, syncExecutor);
 			siteExecutor.scheduleWithFixedDelay(consumer, initialDelayConsumer, delayConsumer, MILLISECONDS);
-		});
-	}
-	
-	private void startMessageItemizers(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SyncedMessageItemizer itemizer = new SyncedMessageItemizer(site);
-			siteExecutor.scheduleWithFixedDelay(itemizer, initialDelayItemizer, delayItemizer, MILLISECONDS);
 		});
 	}
 	

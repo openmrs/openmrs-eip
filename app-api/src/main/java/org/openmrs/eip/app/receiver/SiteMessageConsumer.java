@@ -10,7 +10,6 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESS
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -226,10 +225,9 @@ public class SiteMessageConsumer implements Runnable {
 		final Long id = msg.getId();
 		if (msgProcessed || movedToConflict || movedToError) {
 			if (msgProcessed) {
+				SyncedMessage syncedMsg = ReceiverUtils.createSyncedMessage(msg);
 				log.info("Moving the message to the synced queue");
 				
-				SyncedMessage syncedMsg = new SyncedMessage(msg);
-				syncedMsg.setDateCreated(new Date());
 				if (log.isDebugEnabled()) {
 					log.debug("Saving synced message");
 				}

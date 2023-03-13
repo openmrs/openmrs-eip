@@ -72,7 +72,7 @@
                                         <log message="Moving to synced queue the error item with id: ${exchangeProperty.retry-item-id}" />
 
                                         <setBody>
-                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.SyncedMessage(getProperty('retry-item'))}</spel>
+                                            <method beanType="org.openmrs.eip.app.receiver.ReceiverUtils" method="createSyncedMessageFromRetry(${exchangeProperty.retry-item})" />
                                         </setBody>
                                         <script>
                                             <spel>

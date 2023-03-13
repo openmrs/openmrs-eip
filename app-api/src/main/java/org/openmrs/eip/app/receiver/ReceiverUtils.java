@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
@@ -18,6 +21,7 @@ import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 public final class ReceiverUtils {
 	
@@ -53,37 +57,39 @@ public final class ReceiverUtils {
 	}
 	
 	/**
-	 * Itemizes the specified {@link SyncedMessage}
-	 * 
-	 * @param message {@link SyncedMessage} instance
+	 * Creates a {@link SyncedMessage} for the specified {@link SyncMessage}, if the associated entity
+	 * is neither cached nor indexed this method returns null.
+	 *
+	 * @param syncMessage {@link org.openmrs.eip.app.management.entity.SyncMessage} object
+	 * @return synced message or null
 	 */
-	public static void itemize(SyncedMessage message) {
-		if (log.isDebugEnabled()) {
-			log.debug("Itemizing message");
-		}
+	public static SyncedMessage createSyncedMessage(SyncMessage syncMessage) {
+		SyncedMessage syncedMsg = createSyncedMessage(syncMessage, syncMessage.getModelClassName());
+		syncedMsg.setDateReceived(syncMessage.getDateCreated());
 		
-		final String modelClass = message.getModelClassName();
-		if (CACHE_EVICT_CLASS_NAMES.contains(modelClass)) {
-			message.setCached(true);
-			message.setEvictedFromCache(false);
-		} else {
-			message.setCached(false);
-		}
-		
-		if (INDEX_UPDATE_CLASS_NAMES.contains(modelClass)) {
-			message.setIndexed(true);
-			message.setSearchIndexUpdated(false);
-		} else {
-			message.setIndexed(false);
-		}
-		
-		message.setItemized(true);
-		
-		getSyncMsgRepo().save(message);
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Saving updates for itemized message");
-		}
+		return syncedMsg;
+	}
+	
+	/**
+	 * Creates a {@link SyncedMessage} for the specified {@link ReceiverRetryQueueItem}, if the
+	 * associated entity is neither cached nor indexed this method returns null.
+	 *
+	 * @param retry {@link ReceiverRetryQueueItem} object
+	 * @return synced message or null
+	 */
+	public static SyncedMessage createSyncedMessageFromRetry(ReceiverRetryQueueItem retry) {
+		return createSyncedMessage(retry, retry.getModelClassName());
+	}
+	
+	/**
+	 * Creates a {@link SyncedMessage} for the specified {@link ConflictQueueItem}, if the associated
+	 * entity is neither cached nor indexed this method returns null.
+	 *
+	 * @param conflict {@link ConflictQueueItem} object
+	 * @return synced message or null
+	 */
+	public static SyncedMessage createSyncedMessageFromConflict(ConflictQueueItem conflict) {
+		return createSyncedMessage(conflict, conflict.getModelClassName());
 	}
 	
 	/**
@@ -113,6 +119,22 @@ public final class ReceiverUtils {
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed message removed from the synced queue");
 		}
+	}
+	
+	private static SyncedMessage createSyncedMessage(Object source, String modelClass) {
+		SyncedMessage syncedMessage = new SyncedMessage();
+		BeanUtils.copyProperties(source, syncedMessage, "id", "dateCreated");
+		syncedMessage.setDateCreated(new Date());
+		
+		if (CACHE_EVICT_CLASS_NAMES.contains(modelClass)) {
+			syncedMessage.setCached(true);
+		}
+		
+		if (INDEX_UPDATE_CLASS_NAMES.contains(modelClass)) {
+			syncedMessage.setIndexed(true);
+		}
+		
+		return syncedMessage;
 	}
 	
 	private static SyncedMessageRepository getSyncMsgRepo() {

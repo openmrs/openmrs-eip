@@ -24,10 +24,6 @@ public class ReceiverConstants {
 	
 	public static final String PROP_DELAY_SYNC = "sync.delay";
 	
-	public static final String PROP_INITIAL_DELAY_ITEMIZER = "itemizer.initial.delay";
-	
-	public static final String PROP_DELAY_ITEMIZER = "itemizer.delay";
-	
 	public static final String PROP_INITIAL_DELAY_RESPONSE_SENDER = "response.sender.initial.delay";
 	
 	public static final String PROP_DELAY_RESPONSE_SENDER = "response.sender.delay";
