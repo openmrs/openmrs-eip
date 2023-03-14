@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.TestConstants.URI_ERROR_HANDLER;
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
@@ -31,14 +33,14 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.model.BeanDefinition;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
@@ -60,6 +62,19 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	@EndpointInject("mock:" + ROUTE_ID_DESTINATION)
 	private MockEndpoint mockMsgProcessorEndpoint;
 	
+	private TestBean testCacheBean;
+	
+	private TestBean testIndexBean;
+	
+	public class TestBean {
+		
+		List<ReceiverRetryQueueItem> retries = new ArrayList();
+		
+		public void process(ReceiverRetryQueueItem retry) {
+			retries.add(retry);
+		}
+	}
+	
 	@Override
 	public String getTestRouteFilename() {
 		return "retry-route";
@@ -68,6 +83,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockMsgProcessorEndpoint.reset();
+		testCacheBean = new TestBean();
+		testIndexBean = new TestBean();
 		
 		advise(ROUTE_ID_RETRY, new AdviceWithRouteBuilder() {
 			
@@ -75,6 +92,10 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 			public void configure() {
 				interceptSendToEndpoint("direct:" + ROUTE_ID_DESTINATION).skipSendToOriginalEndpoint()
 				        .to(mockMsgProcessorEndpoint);
+				weaveByType(BeanDefinition.class).selectFirst().replace().bean(testCacheBean,
+				    "process(${exchangeProperty.retry-item})");
+				weaveByType(BeanDefinition.class).selectLast().replace().bean(testIndexBean,
+				    "process(${exchangeProperty.retry-item})");
 			}
 			
 		});
@@ -86,13 +107,14 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
 		
-		mockMsgProcessorEndpoint.assertIsSatisfied();
+		assertTrue(testCacheBean.retries.isEmpty());
+		assertTrue(testIndexBean.retries.isEmpty());
 		assertMessageLogged(Level.DEBUG, "No messages found in the retry queue");
 	}
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldLoadAllRetryItemsSortedByDateCreatedAndCallTheEventProcessorForEach() throws Exception {
 		final int retryCount = 5;
 		List<ReceiverRetryQueueItem> retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
@@ -133,7 +155,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldFailIfAnEntityAlreadyHasAFailedRetryItemInTheCurrentIteration() throws Exception {
 		List<ReceiverRetryQueueItem> retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
 		assertEquals(5, retries.size());
@@ -164,6 +186,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_RETRY, exchange);
 		
 		mockMsgProcessorEndpoint.assertIsSatisfied();
+		assertEquals(2, testCacheBean.retries.size());
+		assertEquals(2, testIndexBean.retries.size());
 		assertEquals(2, failedExchanges.size());
 		for (Exchange e : failedExchanges) {
 			assertEquals("Skipped because the entity had older failed message(s) in the queue", getErrorMessage(e));
@@ -178,11 +202,11 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
-	public void shouldProcessARetryItemAndMoveItFromTheErrorToTheSyncedQueue() throws Exception {
+	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldProcessARetryItemAndMoveItFromTheErrorToTheArchivesQueue() throws Exception {
 		final String uuid = "person-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
-		assertTrue(getEntities(SyncedMessage.class).isEmpty());
+		assertTrue(getEntities(ReceiverSyncArchive.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
 		retry.setMessageUuid("message-uuid");
 		retry.setModelClassName(PersonModel.class.getName());
@@ -213,20 +237,24 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
 		
 		mockMsgProcessorEndpoint.assertIsSatisfied();
+		assertEquals(1, testCacheBean.retries.size());
+		assertTrue(testCacheBean.retries.contains(retry));
+		assertEquals(1, testIndexBean.retries.size());
+		assertTrue(testIndexBean.retries.contains(retry));
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
-		List<SyncedMessage> syncedMsgs = TestUtils.getEntities(SyncedMessage.class);
-		assertEquals(1, syncedMsgs.size());
-		SyncedMessage syncedMsg = syncedMsgs.get(0);
-		assertEquals(retry.getMessageUuid(), syncedMsg.getMessageUuid());
-		assertEquals(retry.getModelClassName(), syncedMsg.getModelClassName());
-		assertEquals(retry.getIdentifier(), syncedMsg.getIdentifier());
-		assertEquals(retry.getEntityPayload(), syncedMsg.getEntityPayload());
-		assertEquals(retry.getSite(), syncedMsg.getSite());
-		assertEquals(retry.getSnapshot(), syncedMsg.getSnapshot());
-		assertEquals(retry.getDateSentBySender(), syncedMsg.getDateSentBySender());
-		assertEquals(retry.getDateReceived(), syncedMsg.getDateReceived());
-		assertNotNull(syncedMsg.getDateCreated());
+		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
+		assertEquals(1, archives.size());
+		ReceiverSyncArchive archive = archives.get(0);
+		assertEquals(retry.getMessageUuid(), archive.getMessageUuid());
+		assertEquals(retry.getModelClassName(), archive.getModelClassName());
+		assertEquals(retry.getIdentifier(), archive.getIdentifier());
+		assertEquals(retry.getEntityPayload(), archive.getEntityPayload());
+		assertEquals(retry.getSite(), archive.getSite());
+		assertEquals(retry.getSnapshot(), archive.getSnapshot());
+		assertEquals(retry.getDateSentBySender(), archive.getDateSentBySender());
+		assertEquals(retry.getDateReceived(), archive.getDateReceived());
+		assertNotNull(archive.getDateCreated());
 	}
 	
 	@Test
@@ -259,6 +287,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
 		
 		mockMsgProcessorEndpoint.assertIsSatisfied();
+		assertTrue(testCacheBean.retries.isEmpty());
+		assertTrue(testIndexBean.retries.isEmpty());
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
 	}
@@ -293,6 +323,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));
 		
+		assertTrue(testCacheBean.retries.isEmpty());
+		assertTrue(testIndexBean.retries.isEmpty());
 		assertNotNull(TestUtils.getEntity(ReceiverRetryQueueItem.class, retry.getId()));
 		assertEquals(2, attemptCountHolder.get());
 		assertEquals(1, failedExchanges.size());

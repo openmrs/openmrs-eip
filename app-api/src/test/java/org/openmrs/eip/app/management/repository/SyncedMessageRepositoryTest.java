@@ -45,8 +45,8 @@ public class SyncedMessageRepositoryTest extends BaseReceiverTest {
 		List<SyncedMessage> msgs = repo.getBatchOfMessagesForEviction(site, PageRequest.of(0, 2));
 		
 		assertEquals(2, msgs.size());
-        assertEquals(102l, msgs.get(0).getId().longValue());
-        assertEquals(103l, msgs.get(1).getId().longValue());
+		assertEquals(102l, msgs.get(0).getId().longValue());
+		assertEquals(103l, msgs.get(1).getId().longValue());
 	}
 	
 	@Test
@@ -60,7 +60,7 @@ public class SyncedMessageRepositoryTest extends BaseReceiverTest {
 		assertEquals(202l, msgs.get(0).getId().longValue());
 		assertEquals(203l, msgs.get(1).getId().longValue());
 		assertEquals(201l, msgs.get(2).getId().longValue());
-        assertEquals(204l, msgs.get(3).getId().longValue());
+		assertEquals(204l, msgs.get(3).getId().longValue());
 	}
 	
 	@Test
