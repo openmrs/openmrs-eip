@@ -47,6 +47,7 @@ import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -660,11 +661,12 @@ public class SiteMessageConsumerTest {
 		assertEquals(msg.getSnapshot(), archive.getSnapshot());
 		assertEquals(msg.getDateSentBySender(), archive.getDateSentBySender());
 		assertEquals(msg.getDateCreated(), archive.getDateReceived());
+		assertEquals(SyncOutcome.SUCCESS, archive.getOutcome());
 		assertTrue(archive.getDateCreated().getTime() == timestamp || archive.getDateCreated().getTime() > timestamp);
 	}
 	
 	@Test
-	public void processMessage_shouldDeleteAMessageMovedToTheConflictQueue() {
+	public void processMessage_shouldAddTheConflictMessageToTheSyncedQueue() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
 		final Long msgId = 2L;
@@ -678,17 +680,25 @@ public class SiteMessageConsumerTest {
 			return null;
 		});
 		
+		List<SyncedMessage> archivedMsgs = new ArrayList(1);
+		Mockito.when(syncedMsgRepo.save(any(SyncedMessage.class))).thenAnswer(invocation -> {
+			archivedMsgs.add(invocation.getArgument(0));
+			return null;
+		});
+		
 		consumer.processMessage(msg);
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verifyNoInteractions(syncedMsgRepo);
+		verify(syncedMsgRepo).save(any(SyncedMessage.class));
 		verify(mockProducerTemplate).sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msgId,
 		    null);
+		assertEquals(1, archivedMsgs.size());
+		assertEquals(SyncOutcome.CONFLICT, archivedMsgs.get(0).getOutcome());
 	}
 	
 	@Test
-	public void processMessage_shouldDeleteAMessageMovedToTheErrorQueue() {
+	public void processMessage_shouldAddTheErrorMessageToTheSyncedQueue() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
 		final Long msgId = 2L;
@@ -702,17 +712,25 @@ public class SiteMessageConsumerTest {
 			return null;
 		});
 		
+		List<SyncedMessage> archivedMsgs = new ArrayList(1);
+		Mockito.when(syncedMsgRepo.save(any(SyncedMessage.class))).thenAnswer(invocation -> {
+			archivedMsgs.add(invocation.getArgument(0));
+			return null;
+		});
+		
 		consumer.processMessage(msg);
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verifyNoInteractions(syncedMsgRepo);
+		verify(syncedMsgRepo).save(any(SyncedMessage.class));
 		verify(mockProducerTemplate).sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msgId,
 		    null);
+		assertEquals(1, archivedMsgs.size());
+		assertEquals(SyncOutcome.ERROR, archivedMsgs.get(0).getOutcome());
 	}
 	
 	@Test
-	public void processMessage_shouldFailIfSyncOutComeIsUnknown() {
+	public void processMessage_shouldFailIfTheSyncOutComeIsUnknown() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
 		final Long msgId = 2L;

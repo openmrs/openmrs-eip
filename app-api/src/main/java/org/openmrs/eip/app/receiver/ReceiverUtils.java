@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.component.Constants.OPENMRS_DATASOURCE_NAME;
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,9 +37,21 @@ import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public final class ReceiverUtils {
+public class ReceiverUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverUtils.class);
+	
+	private static final String PLACEHOLDER_QUERY = "[QUERY]";
+	
+	private static final String QUERY_URI = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + OPENMRS_DATASOURCE_NAME;
+	
+	protected static final String NAME_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
+	    "SELECT n.uuid FROM person p, person_name n WHERE p.person_id = n.person_id AND p.uuid = '" + PLACEHOLDER_UUID
+	            + "'");
+	
+	protected static final String ID_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
+	    "SELECT i.uuid FROM person p, patient_identifier i WHERE p.person_id = i.patient_id AND " + "p.uuid = '"
+	            + PLACEHOLDER_UUID + "'");
 	
 	private static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
@@ -102,6 +115,7 @@ public final class ReceiverUtils {
 		SyncedMessage syncedMessage = new SyncedMessage(outcome);
 		BeanUtils.copyProperties(syncMessage, syncedMessage, "id", "dateCreated");
 		syncedMessage.setDateCreated(new Date());
+		syncedMessage.setDateReceived(syncMessage.getDateCreated());
 		
 		if (isCached(syncMessage.getModelClassName())) {
 			syncedMessage.setCached(true);
@@ -110,8 +124,6 @@ public final class ReceiverUtils {
 		if (isIndexed(syncMessage.getModelClassName())) {
 			syncedMessage.setIndexed(true);
 		}
-		
-		syncedMessage.setDateReceived(syncMessage.getDateCreated());
 		
 		return syncedMessage;
 	}
@@ -214,17 +226,21 @@ public final class ReceiverUtils {
 	}
 	
 	protected static List<String> getPersonNameUuids(String personUuid) {
-		String q = "SELECT n.uuid FROM person p, person_name n WHERE p.person_id = n.person_id AND p.uuid = '" + personUuid
-		        + "'";
-		
-		return executeQuery(q);
+		return executeQuery(NAME_URI.replace(PLACEHOLDER_UUID, personUuid));
 	}
 	
 	protected static List<String> getPatientIdentifierUuids(String patientUuid) {
-		String q = "SELECT i.uuid FROM person p, patient_identifier i WHERE p.person_id = i.patient_id AND " + "p.uuid = '"
-		        + patientUuid + "'";
+		return executeQuery(ID_URI.replace(PLACEHOLDER_UUID, patientUuid));
+	}
+	
+	private static List<String> executeQuery(String query) {
+		Exchange exchange = ExchangeBuilder.anExchange(getProducerTemplate().getCamelContext()).build();
+		CamelUtils.send(query, exchange);
+		List<Map<String, String>> rows = exchange.getMessage().getBody(List.class);
+		List<String> uuids = new ArrayList(rows.size());
+		rows.forEach(r -> uuids.add(r.get("uuid")));
 		
-		return executeQuery(q);
+		return uuids;
 	}
 	
 	/**
@@ -254,16 +270,6 @@ public final class ReceiverUtils {
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed message removed from the synced queue");
 		}
-	}
-	
-	private static List<String> executeQuery(String query) {
-		Exchange exchange = ExchangeBuilder.anExchange(getProducerTemplate().getCamelContext()).build();
-		CamelUtils.send("sql:" + query + "?dataSource=" + OPENMRS_DATASOURCE_NAME, exchange);
-		List<Map<String, String>> rows = exchange.getMessage().getBody(List.class);
-		List<String> uuids = new ArrayList(rows.size());
-		rows.forEach(r -> uuids.add(r.get("uuid")));
-		
-		return uuids;
 	}
 	
 	private static SyncedMessageRepository getSyncMsgRepo() {

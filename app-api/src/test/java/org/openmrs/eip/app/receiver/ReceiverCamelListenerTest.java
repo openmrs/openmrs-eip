@@ -77,8 +77,6 @@ public class ReceiverCamelListenerTest {
 		setInternalState(BaseSiteRunnable.class, "initialized", true);
 		setInternalState(listener, "initialDelayConsumer", testInitialDelay);
 		setInternalState(listener, "delayConsumer", testDelay);
-		setInternalState(listener, "initialDelayItemizer", testInitialDelay);
-		setInternalState(listener, "delayItemizer", testDelay);
 		setInternalState(listener, "initialDelayCacheEvictor", testInitialDelay);
 		setInternalState(listener, "delayCacheEvictor", testDelay);
 		setInternalState(listener, "initialDelayIndexUpdater", testInitialDelay);
@@ -106,9 +104,6 @@ public class ReceiverCamelListenerTest {
 		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
 		
 		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SiteMessageConsumer.class), eq(testInitialDelay),
-		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
-		
-		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SyncedMessageItemizer.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 		
 		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(CacheEvictor.class), eq(testInitialDelay), eq(testDelay),

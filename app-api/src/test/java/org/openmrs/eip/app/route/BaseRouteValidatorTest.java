@@ -2,6 +2,7 @@ package org.openmrs.eip.app.route;
 
 import static java.io.File.separator;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.FOLDER_DIST;
 import static org.openmrs.eip.app.SyncConstants.FOLDER_ROUTES;
 
@@ -85,7 +86,7 @@ public abstract class BaseRouteValidatorTest {
 		} else if (getRoutesWithDeadLetterChannelHandler().contains(routeId)) {
 			assertEquals(msg, "deadLetterChannelBuilder", errorHandlerRef);
 		} else if (getRoutesWithNoErrorHandler().contains(routeId)) {
-			assertEquals(msg, "noErrorHandler", errorHandlerRef);
+			assertTrue(msg, StringUtils.isBlank(errorHandlerRef));
 		} else {
 			assertEquals(msg, "shutdownErrorHandler", errorHandlerRef);
 		}
