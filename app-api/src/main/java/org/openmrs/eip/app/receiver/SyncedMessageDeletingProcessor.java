@@ -5,12 +5,11 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,32 +17,35 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Updates the OpenMRS search index for entities associated to synced messages.
+ * Deletes synced messages where the responses are sent and the outcome is set to error or conflict
  */
-@Component("searchIndexUpdatingProcessor")
+@Component("syncedMsgDeletingProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionProcessor {
+public class SyncedMessageDeletingProcessor extends BaseQueueProcessor<SyncedMessage> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SearchIndexUpdatingProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageDeletingProcessor.class);
 	
-	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate,
-	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SyncedMessageRepository repo) {
-		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, executor, repo);
+	private SyncedMessageRepository repo;
+	
+	public SyncedMessageDeletingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    SyncedMessageRepository repo) {
+		super(executor);
+		this.repo = repo;
 	}
 	
 	@Override
 	public String getProcessorName() {
-		return "search index update";
+		return "msg deleter";
 	}
 	
 	@Override
 	public String getUniqueId(SyncedMessage item) {
-		return item.getIdentifier();
+		return item.getId().toString();
 	}
 	
 	@Override
 	public String getQueueName() {
-		return "search-index-update";
+		return "msg-deleter";
 	}
 	
 	@Override
@@ -54,24 +56,17 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	@Override
 	public String getLogicalType(SyncedMessage item) {
-		return item.getModelClassName();
+		return item.getClass().getName();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return Utils.getListOfModelClassHierarchy(logicalType);
+		return null;
 	}
 	
 	@Override
-	public void onSuccess(SyncedMessage item) {
-		item.setSearchIndexUpdated(true);
-		repo.save(item);
-	}
-	
-	@Override
-	public Object convertBody(SyncedMessage item) {
-		return ReceiverUtils.generateSearchIndexUpdatePayload(item.getModelClassName(), item.getIdentifier(),
-		    item.getOperation());
+	public void processItem(SyncedMessage item) {
+		repo.delete(item);
 	}
 	
 }

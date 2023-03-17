@@ -85,6 +85,8 @@ public class ReceiverCamelListenerTest {
 		setInternalState(listener, "delayResponseSender", testDelay);
 		setInternalState(listener, "initialDelayArchiver", testInitialDelay);
 		setInternalState(listener, "delayArchiver", testDelay);
+		setInternalState(listener, "initialDelayDeleter", testInitialDelay);
+		setInternalState(listener, "delayDeleter", testDelay);
 		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
 	}
 	
@@ -116,6 +118,9 @@ public class ReceiverCamelListenerTest {
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 		
 		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SyncedMessageArchiver.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		
+		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SyncedMessageDeleter.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 	}
 	

@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
@@ -124,6 +125,32 @@ public class SyncedMessageRepositoryTest extends BaseReceiverTest {
 		assertEquals(2, msgs.size());
 		assertEquals(301l, msgs.get(0).getId().longValue());
 		assertEquals(302l, msgs.get(1).getId().longValue());
+	}
+	
+	@Test
+	public void getBatchOfMessagesForDeleting_shouldReturnAOrderedBatchOfMessagesToDelete() {
+		SiteInfo site = getEntity(SiteInfo.class, 5L);
+		Pageable page = PageRequest.of(0, 10);
+		
+		List<SyncedMessage> msgs = repo.getBatchOfMessagesForDeleting(site, page);
+		
+		assertEquals(2, msgs.size());
+		assertEquals(305l, msgs.get(0).getId().longValue());
+		assertEquals(306l, msgs.get(1).getId().longValue());
+		//Site has error and confict items for which responses are not yet sent
+		site = getEntity(SiteInfo.class, 1L);
+		assertTrue(repo.getBatchOfMessagesForDeleting(site, page).isEmpty());
+	}
+	
+	@Test
+	public void getBatchOfMessagesForDeleting_shouldReturnResultsBasedOnTheBatchSize() {
+		SiteInfo site = getEntity(SiteInfo.class, 5L);
+		assertEquals(4, repo.getBatchOfMessagesForArchiving(site, Pageable.unpaged()).size());
+		
+		List<SyncedMessage> msgs = repo.getBatchOfMessagesForDeleting(site, PageRequest.of(0, 1));
+		
+		assertEquals(1, msgs.size());
+		assertEquals(305l, msgs.get(0).getId().longValue());
 	}
 	
 }

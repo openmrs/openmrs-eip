@@ -49,7 +49,6 @@ public class SearchIndexUpdatingProcessorTest {
 	public void getThreadName_shouldReturnTheThreadNameContainingTheAssociatedSyncedMessageDetails() {
 		final String uuid = "uuid";
 		final String messageUuid = "message-uuid";
-		final Long id = 2L;
 		final String siteUuid = "site-uuid";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setModelClassName(PersonModel.class.getName());

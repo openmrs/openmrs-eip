@@ -6,11 +6,13 @@ import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_DELETER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_CACHE_EVICTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_DELETER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_INDEX_UPDATER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
@@ -91,6 +93,12 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_DELAY_ARCHIVER + ":" + DEFAULT_DELAY + "}")
 	private long delayArchiver;
 	
+	@Value("${" + PROP_INITIAL_DELAY_DELETER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
+	private long initialDelayDeleter;
+	
+	@Value("${" + PROP_DELAY_DELETER + ":" + DEFAULT_DELAY + "}")
+	private long delayDeleter;
+	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
 		this.siteExecutor = siteExecutor;
@@ -146,6 +154,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			startSyncResponseSenders(sites);
 			
 			startMessageArchivers(sites);
+			
+			startMessageDeleters(sites);
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			final int syncExecutorWait = 100;
@@ -211,6 +221,13 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 		sites.stream().forEach(site -> {
 			SyncedMessageArchiver archiver = new SyncedMessageArchiver(site);
 			siteExecutor.scheduleWithFixedDelay(archiver, initialDelayArchiver, delayArchiver, MILLISECONDS);
+		});
+	}
+	
+	private void startMessageDeleters(Collection<SiteInfo> sites) {
+		sites.stream().forEach(site -> {
+			SyncedMessageDeleter deleter = new SyncedMessageDeleter(site);
+			siteExecutor.scheduleWithFixedDelay(deleter, initialDelayDeleter, delayDeleter, MILLISECONDS);
 		});
 	}
 	

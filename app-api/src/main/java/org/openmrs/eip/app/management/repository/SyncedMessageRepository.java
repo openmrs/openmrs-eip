@@ -24,6 +24,9 @@ public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Lo
 	        + "m.responseSent = true AND (m.cached = false OR m.evictedFromCache = true) AND (m.indexed = false OR "
 	        + "m.searchIndexUpdated = true)";
 	
+	String DELETE_QUERY = "SELECT m FROM SyncedMessage m WHERE m.site = :site AND m.responseSent = true AND "
+	        + "(m.outcome = 'CONFLICT' OR m.outcome = 'ERROR')";
+	
 	/**
 	 * Gets a batch of messages for which responses have not yet been sent
 	 *
@@ -65,5 +68,16 @@ public interface SyncedMessageRepository extends JpaRepository<SyncedMessage, Lo
 	 */
 	@Query(ARCHIVE_QUERY)
 	List<SyncedMessage> getBatchOfMessagesForArchiving(@Param("site") SiteInfo site, Pageable pageable);
+	
+	/**
+	 * Gets a batch of synced messages for deleting for the specified site where responses are sent and
+	 * the outcome is set to ERROR or CONFLICT
+	 *
+	 * @param site the site to match against
+	 * @param pageable {@link Pageable} instance
+	 * @return list of synced messages
+	 */
+	@Query(DELETE_QUERY)
+	List<SyncedMessage> getBatchOfMessagesForDeleting(@Param("site") SiteInfo site, Pageable pageable);
 	
 }

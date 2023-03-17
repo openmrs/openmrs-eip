@@ -40,6 +40,10 @@ public class ReceiverConstants {
 	
 	public static final String PROP_DELAY_ARCHIVER = "archiver.delay";
 	
+	public static final String PROP_INITIAL_DELAY_DELETER = "deleter.initial.delay";
+	
+	public static final String PROP_DELAY_DELETER = "deleter.delay";
+	
 	public static final String PROP_PRIORITIZE_DISABLED = "sync.prioritize.disabled";
 	
 	public static final String PROP_BACKLOG_THRESHOLD = "sync.prioritize.backlog.threshold.days";
