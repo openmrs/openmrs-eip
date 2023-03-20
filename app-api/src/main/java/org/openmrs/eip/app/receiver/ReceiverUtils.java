@@ -46,12 +46,17 @@ public class ReceiverUtils {
 	private static final String QUERY_URI = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + OPENMRS_DATASOURCE_NAME;
 	
 	protected static final String NAME_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
-	    "SELECT n.uuid FROM person p, person_name n WHERE p.person_id = n.person_id AND p.uuid = '" + PLACEHOLDER_UUID
+	    "SELECT n.uuid FROM person_name n, person p WHERE n.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
 	            + "'");
 	
 	protected static final String ID_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
-	    "SELECT i.uuid FROM person p, patient_identifier i WHERE p.person_id = i.patient_id AND " + "p.uuid = '"
+	    "SELECT i.uuid FROM patient_identifier i, person p WHERE i.patient_id = p.person_id AND " + "p.uuid = '"
 	            + PLACEHOLDER_UUID + "'");
+	
+	protected static final String ATTRIB_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
+	    "SELECT a.uuid FROM person_attribute a, person p WHERE a.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
+	            + "' AND a.person_attribute_type_id IN (SELECT person_attribute_type_id FROM person_attribute_type "
+	            + "WHERE searchable = true)");
 	
 	private static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
@@ -199,9 +204,11 @@ public class ReceiverUtils {
 		} else if (PersonModel.class.getName().equals(modelClass) || PatientModel.class.getName().equals(modelClass)) {
 			List<String> nameUuids = getPersonNameUuids(uuid);
 			List<String> idUuids = getPatientIdentifierUuids(uuid);
+			List<String> attribUuids = getPersonAttributeUuids(uuid);
 			List<OpenmrsPayload> payloadList = new ArrayList(nameUuids.size() + idUuids.size());
 			nameUuids.forEach(nameUuid -> payloadList.add(new OpenmrsPayload("person", "name", nameUuid)));
 			idUuids.forEach(idUuid -> payloadList.add(new OpenmrsPayload("patient", "identifier", idUuid)));
+			attribUuids.forEach(attribUuid -> payloadList.add(new OpenmrsPayload("person", "attribute", attribUuid)));
 			payload = payloadList;
 		} else {
 			throw new EIPException("Don't know how to handle search index update for entity of type: " + modelClass);
@@ -225,12 +232,34 @@ public class ReceiverUtils {
 		}
 	}
 	
+	/**
+	 * Should return the uuids of the names for the person with the specified uuid
+	 * 
+	 * @param personUuid the person uuid
+	 * @return list of person name uuids
+	 */
 	protected static List<String> getPersonNameUuids(String personUuid) {
 		return executeQuery(NAME_URI.replace(PLACEHOLDER_UUID, personUuid));
 	}
 	
+	/**
+	 * Should return the uuids of the identifiers for the patient with the specified uuid
+	 *
+	 * @param patientUuid the patient uuid
+	 * @return list of person name uuids
+	 */
 	protected static List<String> getPatientIdentifierUuids(String patientUuid) {
 		return executeQuery(ID_URI.replace(PLACEHOLDER_UUID, patientUuid));
+	}
+	
+	/**
+	 * Should return the uuids of the searchable attributes for the person with the specified uuid
+	 *
+	 * @param personUuid the person uuid
+	 * @return list of attribute name uuids
+	 */
+	protected static List<String> getPersonAttributeUuids(String personUuid) {
+		return executeQuery(ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid));
 	}
 	
 	private static List<String> executeQuery(String query) {

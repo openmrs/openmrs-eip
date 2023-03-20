@@ -17,10 +17,14 @@ import lombok.EqualsAndHashCode;
 public class PersonAttributeTypeLight extends RetireableLightEntity {
 	
 	@NotNull
-	@Column(name = "name")
+	@Column(nullable = false)
 	private String name;
 	
 	@Column
 	private String format;
+	
+	@NotNull
+	@Column(nullable = false)
+	private boolean searchable;
 	
 }

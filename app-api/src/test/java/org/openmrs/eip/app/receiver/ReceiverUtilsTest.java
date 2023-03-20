@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.CONFLICT;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.ERROR;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.SUCCESS;
+import static org.openmrs.eip.app.receiver.ReceiverUtils.ATTRIB_URI;
 import static org.openmrs.eip.app.receiver.ReceiverUtils.ID_URI;
 import static org.openmrs.eip.app.receiver.ReceiverUtils.NAME_URI;
 import static org.openmrs.eip.app.receiver.ReceiverUtils.generateEvictionPayload;
@@ -355,8 +356,11 @@ public class ReceiverUtilsTest {
 		final String nameUuid2 = "name-uuid-2";
 		final String idUuid1 = "id-uuid-1";
 		final String idUuid2 = "id-uuid-2";
+		final String attribUuid1 = "attrib-uuid-1";
+		final String attribUuid2 = "attrib-uuid-2";
 		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, personUuid);
 		String idUri = ID_URI.replace(PLACEHOLDER_UUID, personUuid);
+		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid);
 		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
 			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
@@ -367,10 +371,15 @@ public class ReceiverUtilsTest {
 			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
 			return exchange;
 		});
+		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
+			Exchange exchange = invocation.getArgument(1);
+			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
+			return exchange;
+		});
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PersonModel.class.getName(), personUuid, c);
 		
-		assertEquals(4, payloads.size());
+		assertEquals(6, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
 		assertEquals("name", JsonPath.read(payloads.get(0), "subResource"));
 		assertEquals(nameUuid1, JsonPath.read(payloads.get(0), "uuid"));
@@ -384,6 +393,13 @@ public class ReceiverUtilsTest {
 		assertEquals("patient", JsonPath.read(payloads.get(3), "resource"));
 		assertEquals("identifier", JsonPath.read(payloads.get(3), "subResource"));
 		assertEquals(idUuid2, JsonPath.read(payloads.get(3), "uuid"));
+		
+		assertEquals("person", JsonPath.read(payloads.get(4), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(4), "subResource"));
+		assertEquals(attribUuid1, JsonPath.read(payloads.get(4), "uuid"));
+		assertEquals("person", JsonPath.read(payloads.get(5), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(5), "subResource"));
+		assertEquals(attribUuid2, JsonPath.read(payloads.get(5), "uuid"));
 	}
 	
 	@Test
@@ -393,8 +409,11 @@ public class ReceiverUtilsTest {
 		final String nameUuid2 = "name-uuid-2";
 		final String idUuid1 = "id-uuid-1";
 		final String idUuid2 = "id-uuid-2";
+		final String attribUuid1 = "attrib-uuid-1";
+		final String attribUuid2 = "attrib-uuid-2";
 		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, personUuid);
 		String idUri = ID_URI.replace(PLACEHOLDER_UUID, personUuid);
+		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid);
 		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
 			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
@@ -405,10 +424,15 @@ public class ReceiverUtilsTest {
 			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
 			return exchange;
 		});
+		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
+			Exchange exchange = invocation.getArgument(1);
+			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
+			return exchange;
+		});
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PersonModel.class.getName(), personUuid, d);
 		
-		assertEquals(4, payloads.size());
+		assertEquals(6, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
 		assertEquals("name", JsonPath.read(payloads.get(0), "subResource"));
 		assertEquals(nameUuid1, JsonPath.read(payloads.get(0), "uuid"));
@@ -422,6 +446,13 @@ public class ReceiverUtilsTest {
 		assertEquals("patient", JsonPath.read(payloads.get(3), "resource"));
 		assertEquals("identifier", JsonPath.read(payloads.get(3), "subResource"));
 		assertEquals(idUuid2, JsonPath.read(payloads.get(3), "uuid"));
+		
+		assertEquals("person", JsonPath.read(payloads.get(4), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(4), "subResource"));
+		assertEquals(attribUuid1, JsonPath.read(payloads.get(4), "uuid"));
+		assertEquals("person", JsonPath.read(payloads.get(5), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(5), "subResource"));
+		assertEquals(attribUuid2, JsonPath.read(payloads.get(5), "uuid"));
 	}
 	
 	@Test
@@ -431,8 +462,11 @@ public class ReceiverUtilsTest {
 		final String nameUuid2 = "name-uuid-2";
 		final String idUuid1 = "id-uuid-1";
 		final String idUuid2 = "id-uuid-2";
+		final String attribUuid1 = "attrib-uuid-1";
+		final String attribUuid2 = "attrib-uuid-2";
 		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, patientUuid);
 		String idUri = ID_URI.replace(PLACEHOLDER_UUID, patientUuid);
+		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, patientUuid);
 		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
 			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
@@ -443,10 +477,15 @@ public class ReceiverUtilsTest {
 			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
 			return exchange;
 		});
+		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
+			Exchange exchange = invocation.getArgument(1);
+			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
+			return exchange;
+		});
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PatientModel.class.getName(), patientUuid, c);
 		
-		assertEquals(4, payloads.size());
+		assertEquals(6, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
 		assertEquals("name", JsonPath.read(payloads.get(0), "subResource"));
 		assertEquals(nameUuid1, JsonPath.read(payloads.get(0), "uuid"));
@@ -460,6 +499,13 @@ public class ReceiverUtilsTest {
 		assertEquals("patient", JsonPath.read(payloads.get(3), "resource"));
 		assertEquals("identifier", JsonPath.read(payloads.get(3), "subResource"));
 		assertEquals(idUuid2, JsonPath.read(payloads.get(3), "uuid"));
+		
+		assertEquals("person", JsonPath.read(payloads.get(4), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(4), "subResource"));
+		assertEquals(attribUuid1, JsonPath.read(payloads.get(4), "uuid"));
+		assertEquals("person", JsonPath.read(payloads.get(5), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(5), "subResource"));
+		assertEquals(attribUuid2, JsonPath.read(payloads.get(5), "uuid"));
 	}
 	
 	@Test
@@ -469,12 +515,15 @@ public class ReceiverUtilsTest {
 		final String nameUuid2 = "name-uuid-2";
 		final String idUuid1 = "id-uuid-1";
 		final String idUuid2 = "id-uuid-2";
+		final String attribUuid1 = "attrib-uuid-1";
+		final String attribUuid2 = "attrib-uuid-2";
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(patientUuid);
 		msg.setModelClassName(PatientModel.class.getName());
 		msg.setOperation(SyncOperation.d);
 		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, patientUuid);
 		String idUri = ID_URI.replace(PLACEHOLDER_UUID, patientUuid);
+		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, patientUuid);
 		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
 			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
@@ -485,10 +534,15 @@ public class ReceiverUtilsTest {
 			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
 			return exchange;
 		});
+		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
+			Exchange exchange = invocation.getArgument(1);
+			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
+			return exchange;
+		});
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PatientModel.class.getName(), patientUuid, d);
 		
-		assertEquals(4, payloads.size());
+		assertEquals(6, payloads.size());
 		assertEquals("person", JsonPath.read(payloads.get(0), "resource"));
 		assertEquals("name", JsonPath.read(payloads.get(0), "subResource"));
 		assertEquals(nameUuid1, JsonPath.read(payloads.get(0), "uuid"));
@@ -502,6 +556,13 @@ public class ReceiverUtilsTest {
 		assertEquals("patient", JsonPath.read(payloads.get(3), "resource"));
 		assertEquals("identifier", JsonPath.read(payloads.get(3), "subResource"));
 		assertEquals(idUuid2, JsonPath.read(payloads.get(3), "uuid"));
+		
+		assertEquals("person", JsonPath.read(payloads.get(4), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(4), "subResource"));
+		assertEquals(attribUuid1, JsonPath.read(payloads.get(4), "uuid"));
+		assertEquals("person", JsonPath.read(payloads.get(5), "resource"));
+		assertEquals("attribute", JsonPath.read(payloads.get(5), "subResource"));
+		assertEquals(attribUuid2, JsonPath.read(payloads.get(5), "uuid"));
 	}
 	
 	@Test

@@ -77,4 +77,13 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		assertTrue(nameUuids.contains("2cfd940e-32dc-491f-8038-a8f3afe3e35c"));
 	}
 	
+	@Test
+	public void getPersonAttributeUuids_shouldReturnTheUuidsOfTheSearchableAttributesOfThePersonWithTheSpecifiedUuid() {
+		List<String> attributeUuids = ReceiverUtils.getPersonAttributeUuids(PERSON_UUID);
+		
+		Assert.assertEquals(2, attributeUuids.size());
+		assertTrue(attributeUuids.contains("2efd940e-32dc-491f-8038-a8f3afe3e35f"));
+		assertTrue(attributeUuids.contains("4efd940e-32dc-491f-8038-a8f3afe3e35f"));
+	}
+	
 }
