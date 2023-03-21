@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {DashboardService} from "./dashboard.service";
 import {Dashboard} from "./dashboard";
-import {Subscription, timer} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {select, Store} from "@ngrx/store";
 import {GET_PROPS} from "../state/app.reducer";
 import {SyncMode} from "../receiver/shared/sync-mode.enum";
@@ -14,7 +14,7 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	dashboard?: Dashboard;
 
-	reloadTimer?: Subscription;
+	timeoutId?: number;
 
 	propsLoaded?: Subscription;
 
@@ -24,6 +24,8 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	serverDown = false;
 
+	reload = false;
+
 	constructor(private service: DashboardService, private store: Store) {
 	}
 
@@ -32,17 +34,28 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 			if (props.syncMode == this.getSyncMode()) {
 				this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
 					this.dashboard = dashboard;
+					if (this.reload) {
+						this.loadDashboard(30000);
+					}
 				});
 
 				this.dashboardError = this.store.pipe(select(GET_DASHBOARD_ERROR)).subscribe(error => {
 					this.handleLoadError(error);
 				});
 
-				this.reloadTimer = timer(0, 30000).subscribe(() => {
-					this.store.dispatch(new LoadDashboard());
-				});
+				this.loadDashboard(0);
 			}
 		});
+	}
+
+	loadDashboard(delay: number): void {
+		this.timeoutId = setTimeout(() => {
+			if (!this.reload) {
+				this.reload = true;
+			}
+
+			this.store.dispatch(new LoadDashboard());
+		}, delay);
 	}
 
 	handleLoadError(error: HttpErrorResponse): void {
@@ -61,7 +74,7 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 	}
 
 	stopSubscriptions(): void {
-		this.reloadTimer?.unsubscribe();
+		clearTimeout(this.timeoutId);
 		this.propsLoaded?.unsubscribe();
 		this.dashboardLoaded?.unsubscribe();
 		this.dashboardError?.unsubscribe();
