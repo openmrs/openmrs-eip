@@ -15,7 +15,6 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +42,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	@Override
 	public String getUniqueId(SyncedMessage item) {
-		return item.getIdentifier();
+		return item.getId().toString();
 	}
 	
 	@Override
@@ -54,24 +53,25 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	@Override
 	public String getThreadName(SyncedMessage item) {
 		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
 	}
 	
 	@Override
 	public String getLogicalType(SyncedMessage item) {
-		return item.getModelClassName();
+		return item.getClass().getName();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return Utils.getListOfModelClassHierarchy(logicalType);
+		return null;
 	}
 	
 	@Override
 	public void processWork(List<SyncedMessage> items) throws Exception {
 		Map<String, SyncedMessage> keyAndLatestMsgMap = new LinkedHashMap(items.size());
 		items.stream().forEach(msg -> {
-			keyAndLatestMsgMap.put(getLogicalType(msg) + "#" + getUniqueId(msg), msg);
+			//TODO Take care of class hierarchy
+			keyAndLatestMsgMap.put(msg.getModelClassName() + "#" + msg.getIdentifier(), msg);
 		});
 		
 		Collection<SyncedMessage> latest = keyAndLatestMsgMap.values();
