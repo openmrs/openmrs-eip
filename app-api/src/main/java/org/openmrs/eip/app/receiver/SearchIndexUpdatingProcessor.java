@@ -2,10 +2,15 @@ package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
@@ -49,7 +54,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	@Override
 	public String getThreadName(SyncedMessage item) {
 		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
+		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier() + "-" + item.getId();
 	}
 	
 	@Override
@@ -63,8 +68,39 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	}
 	
 	@Override
+	public void processWork(List<SyncedMessage> items) throws Exception {
+		Map<String, SyncedMessage> keyAndLatestMsgMap = new LinkedHashMap(items.size());
+		items.stream().forEach(msg -> {
+			keyAndLatestMsgMap.put(getLogicalType(msg) + "#" + getUniqueId(msg), msg);
+		});
+		
+		Collection<SyncedMessage> latest = keyAndLatestMsgMap.values();
+		
+		//If an entity has multiple events, update the search index once i.e. only for the latest event
+		doProcessWork(new ArrayList(latest));
+		
+		Collection<SyncedMessage> skipped = CollectionUtils.subtract(items, latest);
+		skipped.stream().forEach(msg -> msg.setSearchIndexUpdated(true));
+		
+		//The skipped events will only be marked as processed in the DB without processing
+		doProcessWork(new ArrayList(skipped));
+	}
+	
+	protected void doProcessWork(List<SyncedMessage> items) throws Exception {
+		super.processWork(items);
+	}
+	
+	@Override
+	public boolean skipSend(SyncedMessage item) {
+		return item.isSearchIndexUpdated();
+	}
+	
+	@Override
 	public void onSuccess(SyncedMessage item) {
-		item.setSearchIndexUpdated(true);
+		if (!item.isSearchIndexUpdated()) {
+			item.setSearchIndexUpdated(true);
+		}
+		
 		repo.save(item);
 	}
 	

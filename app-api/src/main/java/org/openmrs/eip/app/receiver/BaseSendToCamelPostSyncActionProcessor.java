@@ -30,9 +30,20 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	
 	@Override
 	public void processItem(SyncedMessage item) {
-		send(endpointUri, item, producerTemplate);
+		if (!skipSend(item)) {
+			send(endpointUri, item, producerTemplate);
+		}
+		
 		onSuccess(item);
 	}
+	
+	/**
+	 * Checks if the specified item should not be sent to the camel endpoint
+	 * 
+	 * @param item the item to check
+	 * @return true if the item should not be sent otherwise false
+	 */
+	public abstract boolean skipSend(SyncedMessage item);
 	
 	/**
 	 * Post-processes the message upon success
