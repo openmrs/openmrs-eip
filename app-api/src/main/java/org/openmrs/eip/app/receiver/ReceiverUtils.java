@@ -31,6 +31,8 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -299,6 +301,34 @@ public class ReceiverUtils {
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed message removed from the synced queue");
 		}
+	}
+	
+	/**
+	 * Checks if the specified model class name is for a subclass
+	 *
+	 * @param modelClassName the model class name to check
+	 * @return true for a subclass otherwise false
+	 */
+	public static boolean isSubclass(String modelClassName) {
+		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
+		return Utils.isSubclassTable(tableToSyncEnum.name());
+	}
+	
+	/**
+	 * Gets the immediate parent model class name for the specified model class name
+	 * 
+	 * @param modelClassName the model class name
+	 * @return model class name for parent model class
+	 */
+	public static String getParentModelClassName(String modelClassName) {
+		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
+		for (TableToSyncEnum candidate : TableToSyncEnum.values()) {
+			if (candidate.getModelClass().isAssignableFrom(tableToSyncEnum.getModelClass())) {
+				return candidate.getModelClass().getName();
+			}
+		}
+		
+		throw new EIPException("No parent class found for model class: " + modelClassName);
 	}
 	
 	private static SyncedMessageRepository getSyncMsgRepo() {

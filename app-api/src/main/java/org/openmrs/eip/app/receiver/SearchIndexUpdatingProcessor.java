@@ -58,31 +58,49 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	@Override
 	public String getLogicalType(SyncedMessage item) {
+		//Since we squash msgs for the same entity so need to worry about parallel msg processing for the same entity 
 		return item.getClass().getName();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
+		//Since we squash events for the same entity so need to worry about parallel msg processing for the same entity
 		return null;
 	}
 	
 	@Override
 	public void processWork(List<SyncedMessage> items) throws Exception {
+		//Squash events for the same entity to the latest, this ensures exactly one message for the same entity in case 
+		//of multiple in this run in an effort to reduce calls to OpenMRS endpoints
 		Map<String, SyncedMessage> keyAndLatestMsgMap = new LinkedHashMap(items.size());
 		items.stream().forEach(msg -> {
-			//TODO Take care of class hierarchy
-			keyAndLatestMsgMap.put(msg.getModelClassName() + "#" + msg.getIdentifier(), msg);
+			String modelClass = msg.getModelClassName();
+			if (ReceiverUtils.isSubclass(modelClass)) {
+				if (log.isTraceEnabled()) {
+					log.trace("Getting parent model class for " + modelClass);
+				}
+				
+				String parentClass = ReceiverUtils.getParentModelClassName(modelClass);
+				
+				if (log.isTraceEnabled()) {
+					log.trace("Parent model class name for " + modelClass + " is " + parentClass);
+				}
+				
+				modelClass = parentClass;
+			}
+			
+			keyAndLatestMsgMap.put(modelClass + "#" + msg.getIdentifier(), msg);
 		});
 		
 		Collection<SyncedMessage> latest = keyAndLatestMsgMap.values();
 		
-		//If an entity has multiple events, update the search index once i.e. only for the latest event
+		//Update the search index for the latest events for each entity
 		doProcessWork(new ArrayList(latest));
 		
 		Collection<SyncedMessage> skipped = CollectionUtils.subtract(items, latest);
 		skipped.stream().forEach(msg -> msg.setSearchIndexUpdated(true));
 		
-		//The skipped events will only be marked as processed in the DB without processing
+		//Earlier events for each entity get marked as processed in the DB without calling OpenMRS endpoints
 		doProcessWork(new ArrayList(skipped));
 	}
 	
