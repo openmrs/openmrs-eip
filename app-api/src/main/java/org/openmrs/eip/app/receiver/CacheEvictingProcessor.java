@@ -2,15 +2,12 @@ package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,29 +34,8 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	}
 	
 	@Override
-	public String getUniqueId(SyncedMessage item) {
-		return item.getIdentifier();
-	}
-	
-	@Override
 	public String getQueueName() {
 		return "cache-evict";
-	}
-	
-	@Override
-	public String getThreadName(SyncedMessage item) {
-		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
-	}
-	
-	@Override
-	public String getLogicalType(SyncedMessage item) {
-		return item.getModelClassName();
-	}
-	
-	@Override
-	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return Utils.getListOfModelClassHierarchy(logicalType);
 	}
 	
 	@Override
@@ -69,8 +45,21 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	
 	@Override
 	public void onSuccess(SyncedMessage item) {
-		item.setEvictedFromCache(true);
+		if (!item.isEvictedFromCache()) {
+			item.setEvictedFromCache(true);
+		}
+		
 		repo.save(item);
+	}
+	
+	@Override
+	public boolean skipSend(SyncedMessage item) {
+		return item.isEvictedFromCache();
+	}
+	
+	@Override
+	public void updateSquashedMessage(SyncedMessage item) {
+		item.setEvictedFromCache(true);
 	}
 	
 }
