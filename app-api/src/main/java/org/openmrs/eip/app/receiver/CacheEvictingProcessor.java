@@ -53,7 +53,7 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	}
 	
 	@Override
-	public boolean skipSend(SyncedMessage item) {
+	public boolean isSquashed(SyncedMessage item) {
 		return item.isEvictedFromCache();
 	}
 	

@@ -54,7 +54,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	}
 	
 	@Override
-	public boolean skipSend(SyncedMessage item) {
+	public boolean isSquashed(SyncedMessage item) {
 		return item.isSearchIndexUpdated();
 	}
 	

@@ -87,11 +87,11 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 		//Call the endpoint only for the latest events for each entity
 		doProcessWork(new ArrayList(latest));
 		
-		Collection<SyncedMessage> skipped = CollectionUtils.subtract(items, latest);
-		skipped.stream().forEach(msg -> updateSquashedMessage(msg));
+		//Squashed events for each entity get marked as processed in the DB without calling OpenMRS endpoints
+		Collection<SyncedMessage> squashed = CollectionUtils.subtract(items, latest);
+		squashed.stream().forEach(msg -> updateSquashedMessage(msg));
 		
-		//Earlier events for each entity get marked as processed in the DB without calling OpenMRS endpoints
-		doProcessWork(new ArrayList(skipped));
+		doProcessWork(new ArrayList(squashed));
 	}
 	
 	protected void doProcessWork(List<SyncedMessage> items) throws Exception {
@@ -100,7 +100,7 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	
 	@Override
 	public void processItem(SyncedMessage item) {
-		if (!skipSend(item)) {
+		if (!isSquashed(item)) {
 			send(endpointUri, item, producerTemplate);
 		}
 		
@@ -115,12 +115,12 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	public abstract void onSuccess(SyncedMessage item);
 	
 	/**
-	 * Checks if the specified item should not be sent to the camel endpoint
+	 * Checks if the specified item is squashed
 	 *
 	 * @param item the item to check
-	 * @return true if the item should not be sent otherwise false
+	 * @return true if the item is squashed otherwise false
 	 */
-	public abstract boolean skipSend(SyncedMessage item);
+	public abstract boolean isSquashed(SyncedMessage item);
 	
 	/**
 	 * Processes the specified squashed {@link SyncedMessage}

@@ -323,7 +323,9 @@ public class ReceiverUtils {
 	public static String getParentModelClassName(String modelClassName) {
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
 		for (TableToSyncEnum candidate : TableToSyncEnum.values()) {
-			if (candidate.getModelClass().isAssignableFrom(tableToSyncEnum.getModelClass())) {
+			if (!candidate.getModelClass().equals(tableToSyncEnum.getModelClass())
+			        && candidate.getModelClass().isAssignableFrom(tableToSyncEnum.getModelClass())) {
+				
 				return candidate.getModelClass().getName();
 			}
 		}

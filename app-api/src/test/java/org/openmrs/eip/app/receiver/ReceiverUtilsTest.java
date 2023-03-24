@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
@@ -50,6 +52,7 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -632,6 +635,36 @@ public class ReceiverUtilsTest {
 		assertEquals("patient", JsonPath.read(json, "resource"));
 		assertEquals("identifier", JsonPath.read(json, "subResource"));
 		assertNull(docContext.read("uuid"));
+	}
+	
+	@Test
+	public void isSubclass_shouldReturnTrueForAModelClassNameForASubclass() {
+		assertTrue(ReceiverUtils.isSubclass(PatientModel.class.getName()));
+	}
+	
+	@Test
+	public void isSubclass_shouldReturnFalseForAModelClassNameForANonSubclass() {
+		assertFalse(ReceiverUtils.isSubclass(PersonModel.class.getName()));
+		assertFalse(ReceiverUtils.isSubclass(VisitModel.class.getName()));
+	}
+	
+	@Test
+	public void getParentModelClassName_shouldReturnForAParentClassName() {
+		assertEquals(PersonModel.class.getName(), ReceiverUtils.getParentModelClassName(PatientModel.class.getName()));
+	}
+	
+	@Test
+	public void getParentModelClassName_shouldFailForAClassNameWithNoParent() {
+		final String modelClass = VisitModel.class.getName();
+		Exception thrown = Assert.assertThrows(EIPException.class, () -> ReceiverUtils.getParentModelClassName(modelClass));
+		assertEquals("No parent class found for model class: " + modelClass, thrown.getMessage());
+	}
+	
+	@Test
+	public void getParentModelClassName_shouldFailForAClassNameWithNoParentWithSubclasses() {
+		final String modelClass = PersonModel.class.getName();
+		Exception thrown = Assert.assertThrows(EIPException.class, () -> ReceiverUtils.getParentModelClassName(modelClass));
+		assertEquals("No parent class found for model class: " + modelClass, thrown.getMessage());
 	}
 	
 }

@@ -10,9 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
@@ -43,43 +41,6 @@ public class CacheEvictingProcessorTest {
 	@Test
 	public void getProcessorName_shouldReturnTheProcessorName() {
 		assertEquals("cache evict", processor.getProcessorName());
-	}
-	
-	@Test
-	public void getThreadName_shouldReturnTheThreadNameContainingTheAssociatedSyncedMessageDetails() {
-		final String uuid = "uuid";
-		final String messageUuid = "message-uuid";
-		final String siteUuid = "site-uuid";
-		SyncedMessage msg = new SyncedMessage();
-		msg.setModelClassName(PersonModel.class.getName());
-		msg.setIdentifier(uuid);
-		msg.setMessageUuid(messageUuid);
-		SiteInfo siteInfo = new SiteInfo();
-		siteInfo.setIdentifier(siteUuid);
-		msg.setSite(siteInfo);
-		assertEquals(siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid,
-		    processor.getThreadName(msg));
-	}
-	
-	@Test
-	public void getUniqueId_shouldReturnEntityIdentifier() {
-		final String uuid = "uuid";
-		SyncedMessage msg = new SyncedMessage();
-		msg.setIdentifier(uuid);
-		assertEquals(uuid, processor.getUniqueId(msg));
-	}
-	
-	@Test
-	public void getLogicalType_shouldReturnTheModelClassNameOfTheAssociatedSyncedMessage() {
-		final String type = PersonModel.class.getName();
-		SyncedMessage msg = new SyncedMessage();
-		msg.setModelClassName(type);
-		assertEquals(type, processor.getLogicalType(msg));
-	}
-	
-	@Test
-	public void getLogicalTypeHierarchy_shouldReturnTheLogicalTypeHierarchy() {
-		assertEquals(2, processor.getLogicalTypeHierarchy(PersonModel.class.getName()).size());
 	}
 	
 	@Test
@@ -114,6 +75,28 @@ public class CacheEvictingProcessorTest {
 		
 		PowerMockito.verifyStatic(ReceiverUtils.class);
 		ReceiverUtils.generateEvictionPayload(modelClass, uuid, op);
+	}
+	
+	@Test
+	public void isSquashed_shouldReturnTrueForAMessageMarkedAsCached() {
+		SyncedMessage msg = new SyncedMessage();
+		msg.setEvictedFromCache(true);
+		assertTrue(processor.isSquashed(msg));
+	}
+	
+	@Test
+	public void isSquashed_shouldReturnFalseForAMessageMarkedAsCached() {
+		assertFalse(processor.isSquashed(new SyncedMessage()));
+	}
+	
+	@Test
+	public void updateSquashedMessage_shouldMarkedTheMessageAsCached() {
+		SyncedMessage msg = new SyncedMessage();
+		assertFalse(msg.isEvictedFromCache());
+		
+		processor.updateSquashedMessage(msg);
+		
+		assertTrue(msg.isEvictedFromCache());
 	}
 	
 }
