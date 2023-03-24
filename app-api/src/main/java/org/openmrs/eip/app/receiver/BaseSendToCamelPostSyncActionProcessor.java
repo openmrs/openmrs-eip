@@ -1,19 +1,18 @@
 package org.openmrs.eip.app.receiver;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SendToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
+import org.openmrs.eip.component.SyncOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +63,11 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	
 	@Override
 	public void processWork(List<SyncedMessage> items) throws Exception {
-		//Squash events for the same entity to the latest, this ensures exactly one message for the same entity in case 
-		//of multiple in this run in an effort to reduce calls to OpenMRS endpoints
-		Map<String, SyncedMessage> keyAndLatestMsgMap = new LinkedHashMap(items.size());
+		//Squash events for the same entity so that exactly one message is processed in case of multiple in this run in 
+		//an effort to reduce calls to OpenMRS endpoints. Delete being a terminal event, squash for a single entity will
+		//stop at the last event before a delete event to ensure we don't re-process a non-existent entity
+		Map<String, SyncedMessage> keyAndEarliestMsgMap = new HashMap(items.size());
+		List<SyncedMessage> squashedMsgs = new ArrayList();
 		items.stream().forEach(msg -> {
 			String modelClass = msg.getModelClassName();
 			if (ReceiverUtils.isSubclass(modelClass)) {
@@ -79,19 +80,32 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 				modelClass = parentClass;
 			}
 			
-			keyAndLatestMsgMap.put(modelClass + "#" + msg.getIdentifier(), msg);
+			String key = modelClass + "#" + msg.getIdentifier();
+			if (!keyAndEarliestMsgMap.containsKey(key)) {
+				keyAndEarliestMsgMap.put(key, msg);
+			} else {
+				if (msg.getOperation() != SyncOperation.d) {
+					squashedMsgs.add(msg);
+					
+					if (log.isTraceEnabled()) {
+						log.trace("Squashing entity msg -> " + msg);
+					}
+				} else {
+					if (log.isTraceEnabled()) {
+						log.trace("Entity msg squash stopping, skipping delete msg -> " + msg);
+					}
+				}
+			}
 		});
 		
-		Collection<SyncedMessage> latest = keyAndLatestMsgMap.values();
+		//Call the endpoint only for the earliest events for each entity
+		doProcessWork(new ArrayList(keyAndEarliestMsgMap.values()));
 		
-		//Call the endpoint only for the latest events for each entity
-		doProcessWork(new ArrayList(latest));
+		//TODO Delegate to a separate processor for squashed messages to avoid the hacky logic below
+		//Squashed events get marked as processed without calling OpenMRS endpoints
+		squashedMsgs.stream().forEach(msg -> updateSquashedMessage(msg));
 		
-		//Squashed events for each entity get marked as processed in the DB without calling OpenMRS endpoints
-		Collection<SyncedMessage> squashed = CollectionUtils.subtract(items, latest);
-		squashed.stream().forEach(msg -> updateSquashedMessage(msg));
-		
-		doProcessWork(new ArrayList(squashed));
+		doProcessWork(squashedMsgs);
 	}
 	
 	protected void doProcessWork(List<SyncedMessage> items) throws Exception {

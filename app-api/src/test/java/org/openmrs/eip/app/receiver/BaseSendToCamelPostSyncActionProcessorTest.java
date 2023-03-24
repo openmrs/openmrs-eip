@@ -27,6 +27,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.reflect.Whitebox;
@@ -145,7 +146,7 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		
 		SyncedMessage msg7 = new SyncedMessage();
 		msg7.setId(7L);
-		msg7.setModelClassName(PersonModel.class.getName());
+		msg7.setModelClassName(personClass);
 		msg7.setIdentifier(entityUuid1);
 		
 		SyncedMessage msg8 = new SyncedMessage();
@@ -153,8 +154,29 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		msg8.setModelClassName(VisitModel.class.getName());
 		msg8.setIdentifier(entityUuid1);
 		
+		final String entityUuid4 = "uuid-4";
+		SyncedMessage msg9 = new SyncedMessage();
+		msg9.setId(9L);
+		msg9.setModelClassName(personClass);
+		msg9.setIdentifier(entityUuid4);
+		SyncedMessage msg10 = new SyncedMessage();
+		msg10.setId(10L);
+		msg10.setModelClassName(personClass);
+		msg10.setIdentifier(entityUuid4);
+		SyncedMessage msg11 = new SyncedMessage();
+		msg11.setId(11L);
+		msg11.setModelClassName(personClass);
+		msg11.setIdentifier(entityUuid4);
+		msg11.setOperation(SyncOperation.d);
+		
+		SyncedMessage msg12 = new SyncedMessage();
+		msg12.setId(12L);
+		msg12.setModelClassName(personClass);
+		msg12.setIdentifier("uuid-12");
+		msg12.setOperation(SyncOperation.d);
+		
 		processor = Mockito.spy(processor);
-		List<SyncedMessage> msgs = asList(msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8);
+		List<SyncedMessage> msgs = asList(msg1, msg2, msg3, msg4, msg5, msg6, msg9, msg10, msg11, msg7, msg8, msg12);
 		List<SyncedMessage> sentMsgs = new ArrayList();
 		List<SyncedMessage> squashedMsgs = new ArrayList();
 		Mockito.doAnswer(invocation -> {
@@ -173,8 +195,8 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		processor.processWork(msgs);
 		
 		Mockito.verify(processor, times(2)).doProcessWork(anyList());
-		assertTrue(isEqualCollection(asList(msg5, msg6, msg7, msg8), sentMsgs));
-		assertTrue(isEqualCollection(asList(msg1, msg2, msg3, msg4), squashedMsgs));
+		assertTrue(isEqualCollection(asList(msg1, msg4, msg6, msg8, msg9, msg12), sentMsgs));
+		assertTrue(isEqualCollection(asList(msg2, msg3, msg5, msg7, msg10), squashedMsgs));
 	}
 	
 }
