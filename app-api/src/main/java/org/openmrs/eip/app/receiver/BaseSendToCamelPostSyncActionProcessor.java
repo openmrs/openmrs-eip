@@ -101,6 +101,9 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 		//Call the endpoint only for the earliest events for each entity
 		doProcessWork(new ArrayList(keyAndEarliestMsgMap.values()));
 		
+		//We are not worried about the index and cache tasks updating the state for the same entity at the same time
+		//because they never process the same item in parallel since indexer only processes evicted sync messages
+		
 		//TODO Delegate to a separate processor for squashed messages to avoid the hacky logic below
 		//Squashed events get marked as processed without calling OpenMRS endpoints
 		squashedMsgs.stream().forEach(msg -> updateSquashedMessage(msg));
