@@ -1,11 +1,13 @@
 package org.openmrs.eip.app.receiver;
 
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.component.Constants.OPENMRS_DATASOURCE_NAME;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +47,17 @@ public class ReceiverUtils {
 	
 	private static final String PLACEHOLDER_QUERY = "[QUERY]";
 	
+	private static final String PLACEHOLDER_TABLE = "[TABLE]";
+	
+	private static final String PLACEHOLDER_COLUMN = "[COLUMN]";
+	
+	private static final String QUERY_PARAM_VALUE = "columnValue";
+	
+	private static final String QUERY_PARAM_ID = "rowId";
+	
 	private static final String QUERY_URI = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + OPENMRS_DATASOURCE_NAME;
+	
+	private static final String QUERY_URI_MGT = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + MGT_DATASOURCE_NAME;
 	
 	protected static final String NAME_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
 	    "SELECT n.uuid FROM person_name n, person p WHERE n.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
@@ -59,6 +71,9 @@ public class ReceiverUtils {
 	    "SELECT a.uuid FROM person_attribute a, person p WHERE a.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
 	            + "' AND a.person_attribute_type_id IN (SELECT person_attribute_type_id FROM person_attribute_type "
 	            + "WHERE searchable = true)");
+	
+	protected static final String UPDATE_URI = QUERY_URI_MGT.replace(PLACEHOLDER_QUERY, "UPDATE " + PLACEHOLDER_TABLE
+	        + " SET " + PLACEHOLDER_COLUMN + "=:#" + QUERY_PARAM_VALUE + " WHERE id=:#" + QUERY_PARAM_ID);
 	
 	private static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
@@ -331,6 +346,24 @@ public class ReceiverUtils {
 		}
 		
 		throw new EIPException("No parent class found for model class: " + modelClassName);
+	}
+	
+	/**
+	 * Updates the value of a table column to the specified value in the management database
+	 * 
+	 * @param tableName the table entity containing the column
+	 * @param columnName the column to update
+	 * @param entityId the primary key id of the row to update
+	 * @param newValue the new column value to set
+	 */
+	public static void updateColumn(String tableName, String columnName, Long entityId, Object newValue) {
+		String query = UPDATE_URI.replace(PLACEHOLDER_TABLE, tableName).replace(PLACEHOLDER_COLUMN, columnName);
+		Map<String, Object> parameterValues = new HashMap(2);
+		parameterValues.put(QUERY_PARAM_VALUE, newValue);
+		parameterValues.put(QUERY_PARAM_ID, entityId);
+		Exchange exchange = ExchangeBuilder.anExchange(getProducerTemplate().getCamelContext()).build();
+		exchange.getIn().setBody(parameterValues);
+		CamelUtils.send(query, exchange);
 	}
 	
 	private static SyncedMessageRepository getSyncMsgRepo() {

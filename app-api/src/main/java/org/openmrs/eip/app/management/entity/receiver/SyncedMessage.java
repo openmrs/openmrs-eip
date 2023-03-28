@@ -27,7 +27,6 @@ import lombok.Setter;
 @Table(name = "receiver_synced_msg")
 @Getter
 @Setter
-@DynamicUpdate
 public class SyncedMessage extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;

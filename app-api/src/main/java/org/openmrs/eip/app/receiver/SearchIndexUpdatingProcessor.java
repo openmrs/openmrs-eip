@@ -6,7 +6,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +23,8 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	protected static final Logger log = LoggerFactory.getLogger(SearchIndexUpdatingProcessor.class);
 	
 	public SearchIndexUpdatingProcessor(ProducerTemplate producerTemplate,
-	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SyncedMessageRepository repo) {
-		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, executor, repo);
+	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
+		super(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, producerTemplate, executor);
 	}
 	
 	@Override
@@ -40,11 +39,7 @@ public class SearchIndexUpdatingProcessor extends BaseSendToCamelPostSyncActionP
 	
 	@Override
 	public void onSuccess(SyncedMessage item) {
-		if (!item.isSearchIndexUpdated()) {
-			item.setSearchIndexUpdated(true);
-		}
-		
-		repo.save(item);
+		ReceiverUtils.updateColumn("receiver_synced_msg", "search_index_updated", item.getId(), true);
 	}
 	
 	@Override

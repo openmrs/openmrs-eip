@@ -6,7 +6,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +23,8 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	protected static final Logger log = LoggerFactory.getLogger(CacheEvictingProcessor.class);
 	
 	public CacheEvictingProcessor(ProducerTemplate producerTemplate,
-	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SyncedMessageRepository repo) {
-		super(ReceiverConstants.URI_CLEAR_CACHE, producerTemplate, executor, repo);
+	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
+		super(ReceiverConstants.URI_CLEAR_CACHE, producerTemplate, executor);
 	}
 	
 	@Override
@@ -45,11 +44,7 @@ public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcess
 	
 	@Override
 	public void onSuccess(SyncedMessage item) {
-		if (!item.isEvictedFromCache()) {
-			item.setEvictedFromCache(true);
-		}
-		
-		repo.save(item);
+		ReceiverUtils.updateColumn("receiver_synced_msg", "evicted_from_cache", item.getId(), true);
 	}
 	
 	@Override

@@ -8,7 +8,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +25,8 @@ public class SyncResponseSenderProcessor extends BaseQueueProcessor<SyncedMessag
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncResponseSenderProcessor.class);
 	
-	private SyncedMessageRepository repo;
-	
-	public SyncResponseSenderProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    SyncedMessageRepository repo) {
+	public SyncResponseSenderProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
 		super(executor);
-		this.repo = repo;
 	}
 	
 	@Override
@@ -67,8 +62,7 @@ public class SyncResponseSenderProcessor extends BaseQueueProcessor<SyncedMessag
 	
 	@Override
 	public void processItem(SyncedMessage item) {
-		item.setResponseSent(true);
-		repo.save(item);
+		ReceiverUtils.updateColumn("receiver_synced_msg", "response_sent", item.getId(), true);
 	}
 	
 }

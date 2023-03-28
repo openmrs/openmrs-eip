@@ -11,7 +11,6 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SendToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +27,11 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	
 	protected ProducerTemplate producerTemplate;
 	
-	protected SyncedMessageRepository repo;
-	
 	public BaseSendToCamelPostSyncActionProcessor(String endpointUri, ProducerTemplate producerTemplate,
-	    ThreadPoolExecutor executor, SyncedMessageRepository repo) {
+	    ThreadPoolExecutor executor) {
 		super(executor);
 		this.endpointUri = endpointUri;
 		this.producerTemplate = producerTemplate;
-		this.repo = repo;
 	}
 	
 	@Override
