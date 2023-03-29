@@ -5,6 +5,7 @@ import static org.openmrs.eip.component.Constants.OPENMRS_DATASOURCE_NAME;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,6 +86,10 @@ public class ReceiverUtils {
 	
 	private static ProducerTemplate producerTemplate;
 	
+	private static Set<String> subclassModelClassNames;
+	
+	private static Map<String, String> modelClassNameParentMap;
+	
 	static {
 		//TODO instead define the cache and search index requirements on the TableToSyncEnum
 		CACHE_EVICT_CLASS_NAMES = new HashSet();
@@ -104,6 +109,21 @@ public class ReceiverUtils {
 		INDEX_UPDATE_CLASS_NAMES.add(PersonModel.class.getName());
 		//We need to update the  search index for the associated patient identifiers
 		INDEX_UPDATE_CLASS_NAMES.add(PatientModel.class.getName());
+		
+		subclassModelClassNames = new HashSet();
+		modelClassNameParentMap = new HashMap();
+		Arrays.stream(TableToSyncEnum.values()).forEach(e -> {
+			if (Utils.isSubclassTable(e.name())) {
+				subclassModelClassNames.add(e.getModelClass().getName());
+				
+				Arrays.stream(TableToSyncEnum.values()).forEach(candidate -> {
+					if (!candidate.getModelClass().equals(e.getModelClass())
+					        && candidate.getModelClass().isAssignableFrom(e.getModelClass())) {
+						modelClassNameParentMap.put(e.getModelClass().getName(), candidate.getModelClass().getName());
+					}
+				});
+			}
+		});
 	}
 	
 	/**
@@ -325,9 +345,7 @@ public class ReceiverUtils {
 	 * @return true for a subclass otherwise false
 	 */
 	public static boolean isSubclass(String modelClassName) {
-		//TODO Cache the subclasses
-		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
-		return Utils.isSubclassTable(tableToSyncEnum.name());
+		return subclassModelClassNames.contains(modelClassName);
 	}
 	
 	/**
@@ -337,18 +355,13 @@ public class ReceiverUtils {
 	 * @return model class name for parent model class
 	 */
 	public static String getParentModelClassName(String modelClassName) {
-		//TODO Cache the class and parent mappings
-		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
-		for (TableToSyncEnum candidate : TableToSyncEnum.values()) {
-			if (!candidate.getModelClass().equals(tableToSyncEnum.getModelClass())
-			        && candidate.getModelClass().isAssignableFrom(tableToSyncEnum.getModelClass())) {
-				
-				if (log.isTraceEnabled()) {
-					log.trace("Parent class for " + modelClassName + " is " + candidate.getModelClass().getName());
-				}
-				
-				return candidate.getModelClass().getName();
+		String parent = modelClassNameParentMap.get(modelClassName);
+		if (parent != null) {
+			if (log.isTraceEnabled()) {
+				log.trace("Parent class for " + modelClassName + " is " + parent);
 			}
+			
+			return parent;
 		}
 		
 		throw new EIPException("No parent class found for model class: " + modelClassName);

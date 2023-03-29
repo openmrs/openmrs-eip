@@ -45,12 +45,15 @@ import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.model.DrugOrderModel;
+import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonAddressModel;
 import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
+import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.api.mockito.PowerMockito;
@@ -640,17 +643,22 @@ public class ReceiverUtilsTest {
 	@Test
 	public void isSubclass_shouldReturnTrueForAModelClassNameForASubclass() {
 		assertTrue(ReceiverUtils.isSubclass(PatientModel.class.getName()));
+		assertTrue(ReceiverUtils.isSubclass(DrugOrderModel.class.getName()));
+		assertTrue(ReceiverUtils.isSubclass(TestOrderModel.class.getName()));
 	}
 	
 	@Test
 	public void isSubclass_shouldReturnFalseForAModelClassNameForANonSubclass() {
 		assertFalse(ReceiverUtils.isSubclass(PersonModel.class.getName()));
+		assertFalse(ReceiverUtils.isSubclass(OrderModel.class.getName()));
 		assertFalse(ReceiverUtils.isSubclass(VisitModel.class.getName()));
 	}
 	
 	@Test
 	public void getParentModelClassName_shouldReturnForAParentClassName() {
 		assertEquals(PersonModel.class.getName(), ReceiverUtils.getParentModelClassName(PatientModel.class.getName()));
+		assertEquals(OrderModel.class.getName(), ReceiverUtils.getParentModelClassName(DrugOrderModel.class.getName()));
+		assertEquals(OrderModel.class.getName(), ReceiverUtils.getParentModelClassName(TestOrderModel.class.getName()));
 	}
 	
 	@Test
