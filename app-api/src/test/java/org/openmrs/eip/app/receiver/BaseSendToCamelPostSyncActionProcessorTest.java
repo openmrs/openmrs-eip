@@ -43,7 +43,7 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new CacheEvictingProcessor(mockTemplate, null, null);
+		processor = new CacheEvictingProcessor(mockTemplate, null);
 	}
 	
 	@After

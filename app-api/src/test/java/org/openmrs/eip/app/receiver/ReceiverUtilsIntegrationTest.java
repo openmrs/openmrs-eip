@@ -63,7 +63,7 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	public void getPersonNameUuids_shouldReturnTheUuidsOfTheNamesOfThePersonWithTheSpecifiedUuid() {
 		List<String> nameUuids = ReceiverUtils.getPersonNameUuids(PERSON_UUID);
 		
-		Assert.assertEquals(2, nameUuids.size());
+		assertEquals(2, nameUuids.size());
 		assertTrue(nameUuids.contains("1bfd940e-32dc-491f-8038-a8f3afe3e35a"));
 		assertTrue(nameUuids.contains("2bfd940e-32dc-491f-8038-a8f3afe3e35a"));
 	}
@@ -72,7 +72,7 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	public void getPatientIdentifierUuids_shouldReturnTheUuidsOfTheIdentifiersOfThePatientWithTheSpecifiedUuid() {
 		List<String> nameUuids = ReceiverUtils.getPatientIdentifierUuids(PERSON_UUID);
 		
-		Assert.assertEquals(2, nameUuids.size());
+		assertEquals(2, nameUuids.size());
 		assertTrue(nameUuids.contains("1cfd940e-32dc-491f-8038-a8f3afe3e35c"));
 		assertTrue(nameUuids.contains("2cfd940e-32dc-491f-8038-a8f3afe3e35c"));
 	}
@@ -81,9 +81,20 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	public void getPersonAttributeUuids_shouldReturnTheUuidsOfTheSearchableAttributesOfThePersonWithTheSpecifiedUuid() {
 		List<String> attributeUuids = ReceiverUtils.getPersonAttributeUuids(PERSON_UUID);
 		
-		Assert.assertEquals(2, attributeUuids.size());
+		assertEquals(2, attributeUuids.size());
 		assertTrue(attributeUuids.contains("2efd940e-32dc-491f-8038-a8f3afe3e35f"));
 		assertTrue(attributeUuids.contains("4efd940e-32dc-491f-8038-a8f3afe3e35f"));
+	}
+	
+	@Test
+	public void updateColumn_shouldUpdateTheColumnValueInTheDatabase() {
+		final Long id = 1L;
+		SiteInfo site = TestUtils.getEntity(SiteInfo.class, id);
+		Assert.assertFalse(site.getDisabled());
+		
+		ReceiverUtils.updateColumn("site_info", "sync_disabled", id, true);
+		
+		assertTrue(TestUtils.getEntity(SiteInfo.class, id).getDisabled());
 	}
 	
 }

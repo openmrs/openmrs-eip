@@ -3,29 +3,33 @@ package org.openmrs.eip.app.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.model.PersonModel;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(ReceiverUtils.class)
 public class SyncResponseSenderProcessorTest {
 	
 	private SyncResponseSenderProcessor processor;
 	
 	@Before
 	public void setup() {
+		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SyncResponseSenderProcessor(null, null);
+		processor = new SyncResponseSenderProcessor(null);
 	}
 	
 	@After
@@ -79,14 +83,15 @@ public class SyncResponseSenderProcessorTest {
 	
 	@Test
 	public void processItem_shouldMarkTheMessageThatTheResponseIsSent() {
+		final Long id = 2L;
 		SyncedMessage msg = new SyncedMessage();
+		msg.setId(id);
 		assertFalse(msg.isResponseSent());
-		SyncedMessageRepository mockRepo = Mockito.mock(SyncedMessageRepository.class);
-		processor = new SyncResponseSenderProcessor(null, mockRepo);
+		processor = new SyncResponseSenderProcessor(null);
 		
 		processor.processItem(msg);
 		
-		assertTrue(msg.isResponseSent());
-		Mockito.verify(mockRepo).save(msg);
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updateColumn("receiver_synced_msg", "response_sent", id, true);
 	}
 }

@@ -9,10 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PersonModel;
 import org.powermock.api.mockito.PowerMockito;
@@ -30,7 +28,7 @@ public class SearchIndexUpdatingProcessorTest {
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SearchIndexUpdatingProcessor(null, null, null);
+		processor = new SearchIndexUpdatingProcessor(null, null);
 	}
 	
 	@After
@@ -50,15 +48,14 @@ public class SearchIndexUpdatingProcessorTest {
 	
 	@Test
 	public void onSuccess_shouldMarkTheMessageAsProcessed() {
+		final Long id = 2L;
 		SyncedMessage msg = new SyncedMessage();
-		assertFalse(msg.isSearchIndexUpdated());
-		SyncedMessageRepository mockRepo = Mockito.mock(SyncedMessageRepository.class);
-		processor = new SearchIndexUpdatingProcessor(null, null, mockRepo);
+		msg.setId(id);
 		
 		processor.onSuccess(msg);
 		
-		assertTrue(msg.isSearchIndexUpdated());
-		Mockito.verify(mockRepo).save(msg);
+		PowerMockito.verifyStatic(ReceiverUtils.class);
+		ReceiverUtils.updateColumn("receiver_synced_msg", "search_index_updated", id, true);
 	}
 	
 	@Test
