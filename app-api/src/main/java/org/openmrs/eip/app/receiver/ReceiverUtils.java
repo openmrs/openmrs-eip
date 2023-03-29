@@ -325,6 +325,7 @@ public class ReceiverUtils {
 	 * @return true for a subclass otherwise false
 	 */
 	public static boolean isSubclass(String modelClassName) {
+		//TODO Cache the subclasses
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
 		return Utils.isSubclassTable(tableToSyncEnum.name());
 	}
@@ -336,10 +337,15 @@ public class ReceiverUtils {
 	 * @return model class name for parent model class
 	 */
 	public static String getParentModelClassName(String modelClassName) {
+		//TODO Cache the class and parent mappings
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassName);
 		for (TableToSyncEnum candidate : TableToSyncEnum.values()) {
 			if (!candidate.getModelClass().equals(tableToSyncEnum.getModelClass())
 			        && candidate.getModelClass().isAssignableFrom(tableToSyncEnum.getModelClass())) {
+				
+				if (log.isTraceEnabled()) {
+					log.trace("Parent class for " + modelClassName + " is " + candidate.getModelClass().getName());
+				}
 				
 				return candidate.getModelClass().getName();
 			}

@@ -28,6 +28,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncOperation;
+import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.reflect.Whitebox;
@@ -113,9 +114,10 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 	}
 	
 	@Test
-	public void processWork_shouldSquashEventsForTheSameEntityAndSendOnlyTheTheLastInTheList() throws Exception {
+	public void processWork_shouldSquashEventsForTheSameEntityAndSendOnlyTheTheFirst() throws Exception {
 		final String entityUuid1 = "uuid-1";
 		final String personClass = PersonModel.class.getName();
+		final String patientClass = PatientModel.class.getName();
 		SyncedMessage msg1 = new SyncedMessage();
 		msg1.setId(1L);
 		msg1.setModelClassName(personClass);
@@ -126,7 +128,7 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		msg2.setIdentifier(entityUuid1);
 		SyncedMessage msg3 = new SyncedMessage();
 		msg3.setId(3L);
-		msg3.setModelClassName(personClass);
+		msg3.setModelClassName(patientClass);
 		msg3.setIdentifier(entityUuid1);
 		
 		SyncedMessage msg4 = new SyncedMessage();
@@ -175,8 +177,28 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		msg12.setIdentifier("uuid-12");
 		msg12.setOperation(SyncOperation.d);
 		
+		SyncedMessage msg13 = new SyncedMessage();
+		msg13.setId(13L);
+		msg13.setModelClassName(personClass);
+		msg13.setIdentifier("uuid-13");
+		msg13.setOperation(SyncOperation.d);
+		
+		final String entityUuid14 = "uuid-14";
+		SyncedMessage msg14 = new SyncedMessage();
+		msg14.setId(14L);
+		msg14.setModelClassName(patientClass);
+		msg14.setIdentifier(entityUuid14);
+		msg14.setOperation(SyncOperation.d);
+		
+		SyncedMessage msg15 = new SyncedMessage();
+		msg15.setId(15L);
+		msg15.setModelClassName(VisitModel.class.getName());
+		msg15.setIdentifier(entityUuid14);
+		msg15.setOperation(SyncOperation.d);
+		
 		processor = Mockito.spy(processor);
-		List<SyncedMessage> msgs = asList(msg1, msg2, msg3, msg4, msg5, msg6, msg9, msg10, msg11, msg7, msg8, msg12);
+		List<SyncedMessage> msgs = asList(msg1, msg2, msg3, msg4, msg5, msg6, msg9, msg10, msg11, msg12, msg7, msg8, msg13,
+		    msg14, msg15);
 		List<SyncedMessage> sentMsgs = new ArrayList();
 		List<SyncedMessage> squashedMsgs = new ArrayList();
 		Mockito.doAnswer(invocation -> {
@@ -195,8 +217,8 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 		processor.processWork(msgs);
 		
 		Mockito.verify(processor, times(2)).doProcessWork(anyList());
-		assertTrue(isEqualCollection(asList(msg1, msg4, msg6, msg8, msg9, msg12), sentMsgs));
-		assertTrue(isEqualCollection(asList(msg2, msg3, msg5, msg7, msg10), squashedMsgs));
+		assertTrue(isEqualCollection(asList(msg1, msg4, msg6, msg8, msg9, msg12, msg15), sentMsgs));
+		assertTrue(isEqualCollection(asList(msg2, msg3, msg5, msg7, msg10, msg13, msg14), squashedMsgs));
 	}
 	
 }
