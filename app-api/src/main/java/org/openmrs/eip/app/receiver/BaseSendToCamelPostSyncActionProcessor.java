@@ -84,7 +84,7 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 					}
 				} else {
 					if (log.isTraceEnabled()) {
-						log.trace("Entity msg squash stopping, skipping delete msg -> " + msg);
+						log.trace("Squashing stopped for " + key + ", postponing processing of delete msg -> " + msg);
 					}
 				}
 			}
@@ -97,6 +97,9 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 		entityKeyAndEarliestMsgMap.values().stream().forEach(msg -> {
 			if (msg.getOperation() != SyncOperation.d) {
 				msgsToProcess.add(msg);
+				if (log.isTraceEnabled()) {
+					log.trace("Queuing for processing -> " + msg);
+				}
 			} else {
 				String modelClass = msg.getModelClassName();
 				if (ReceiverUtils.isSubclass(modelClass)) {
