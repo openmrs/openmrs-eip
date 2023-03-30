@@ -28,7 +28,7 @@ public class SenderSyncMessage extends AbstractEntity {
 	private String tableName;
 	
 	@NotNull
-	@Column(length = 255, nullable = false, updatable = false)
+	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
 	@NotNull

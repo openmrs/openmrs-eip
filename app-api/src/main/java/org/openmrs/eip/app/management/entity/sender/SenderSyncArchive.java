@@ -23,7 +23,7 @@ public class SenderSyncArchive extends AbstractEntity {
 	private String tableName;
 	
 	@NotNull
-	@Column(length = 255, nullable = false, updatable = false)
+	@Column(nullable = false, updatable = false)
 	private String identifier;
 	
 	@NotNull
@@ -41,7 +41,7 @@ public class SenderSyncArchive extends AbstractEntity {
 	@Column(nullable = false, updatable = false)
 	private boolean snapshot;
 	
-	@Column(name = "sync_data", columnDefinition = "text")
+	@Column(name = "sync_data", columnDefinition = "text", nullable = false)
 	private String data;
 	
 	@NotNull

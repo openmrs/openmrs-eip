@@ -411,5 +411,14 @@
             <column name="event_date" type="DATETIME(3)" />
         </addColumn>
     </changeSet>
+
+    <changeSet author="wluyima" id="20230330-1101">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="sync_data" tableName="sender_sync_archive" />
+        </preConditions>
+        <comment>Adding not null constraint to sender_sync_archive.sync_data</comment>
+
+        <addNotNullConstraint tableName="sender_sync_archive" columnName="sync_data" columnDataType="TEXT" />
+    </changeSet>
     
 </databaseChangeLog>
