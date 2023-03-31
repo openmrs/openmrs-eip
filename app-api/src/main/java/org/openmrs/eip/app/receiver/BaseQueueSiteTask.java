@@ -17,15 +17,15 @@ import org.springframework.data.domain.Pageable;
  * @param <T> the queue entity type
  * @param <P> the processor type
  */
-public abstract class BaseQueueTask<T extends AbstractEntity, P extends BaseQueueProcessor<T>> extends BaseSiteRunnable {
+public abstract class BaseQueueSiteTask<T extends AbstractEntity, P extends BaseQueueProcessor<T>> extends BaseSiteRunnable {
 	
-	protected static final Logger log = LoggerFactory.getLogger(BaseQueueTask.class);
+	protected static final Logger log = LoggerFactory.getLogger(BaseQueueSiteTask.class);
 	
 	private final P processor;
 	
 	private Pageable page;
 	
-	public BaseQueueTask(SiteInfo site, P processor, Pageable page) {
+	public BaseQueueSiteTask(SiteInfo site, P processor, Pageable page) {
 		super(site);
 		this.processor = processor;
 		this.page = page;
