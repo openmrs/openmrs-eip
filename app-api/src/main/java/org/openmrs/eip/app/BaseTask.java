@@ -1,0 +1,81 @@
+package org.openmrs.eip.app;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Base class for tasks
+ */
+public abstract class BaseTask implements Runnable {
+	
+	protected static final Logger log = LoggerFactory.getLogger(BaseTask.class);
+	
+	private boolean errorEncountered = false;
+	
+	@Override
+	public void run() {
+		final String originalThreadName = Thread.currentThread().getName();
+		
+		try {
+			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getTaskName());
+			if (AppUtils.isStopping()) {
+				if (log.isDebugEnabled()) {
+					log.debug("Skipping run because the application is stopping");
+				}
+				
+				return;
+			}
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Starting");
+			}
+			
+			do {
+				try {
+					boolean stop = doRun();
+					if (stop) {
+						break;
+					}
+				}
+				catch (Throwable t) {
+					if (!AppUtils.isAppContextStopping()) {
+						errorEncountered = true;
+						String msg = "An error has been encountered";
+						if (log.isDebugEnabled()) {
+							log.error(msg, t);
+						} else {
+							log.warn(msg);
+						}
+						
+						break;
+					}
+				}
+			} while (!AppUtils.isStopping() && !errorEncountered);
+			
+			if (!errorEncountered) {
+				if (log.isDebugEnabled()) {
+					log.debug("Completed");
+				}
+			}
+		}
+		finally {
+			Thread.currentThread().setName(originalThreadName);
+		}
+	}
+	
+	/**
+	 * Gets the logical task name
+	 *
+	 * @return the task name
+	 */
+	public abstract String getTaskName();
+	
+	/**
+	 * Subclasses should add their implementation logic in this method
+	 * 
+	 * @return true if this runnable should stop otherwise false
+	 * @throws Exception
+	 */
+	public abstract boolean doRun() throws Exception;
+	
+}
