@@ -107,48 +107,56 @@ public abstract class BaseSiteRunnable implements Runnable {
 	
 	@Override
 	public void run() {
-		if (AppUtils.isStopping()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Skipping " + getTaskName() + " for site: " + site + " because the application is stopping");
+		final String originalThreadName = Thread.currentThread().getName();
+		
+		try {
+			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getTaskName() + ":" + site.getName());
+			if (AppUtils.isStopping()) {
+				if (log.isDebugEnabled()) {
+					log.debug("Skipping run because the application is stopping");
+				}
+				
+				return;
 			}
 			
-			return;
-		}
-		
-		if (!syncPrioritizeDisabled && isSyncSizeThresholdExceeded()) {
-			return;
-		}
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Starting " + getTaskName() + " for site -> " + site);
-		}
-		
-		do {
-			try {
-				boolean stop = doRun();
-				if (stop) {
-					break;
-				}
+			if (!syncPrioritizeDisabled && isSyncSizeThresholdExceeded()) {
+				return;
 			}
-			catch (Throwable t) {
-				if (!AppUtils.isAppContextStopping()) {
-					errorEncountered = true;
-					String msg = getTaskName() + " for site: " + site + " encountered an error";
-					if (log.isDebugEnabled()) {
-						log.error(msg, t);
-					} else {
-						log.warn(msg);
-					}
-					
-					break;
-				}
-			}
-		} while (!AppUtils.isStopping() && !errorEncountered);
-		
-		if (!errorEncountered) {
+			
 			if (log.isDebugEnabled()) {
-				log.debug(getTaskName() + " for site: " + site + " has completed");
+				log.debug("Starting");
 			}
+			
+			do {
+				try {
+					boolean stop = doRun();
+					if (stop) {
+						break;
+					}
+				}
+				catch (Throwable t) {
+					if (!AppUtils.isAppContextStopping()) {
+						errorEncountered = true;
+						String msg = "An error has been encountered";
+						if (log.isDebugEnabled()) {
+							log.error(msg, t);
+						} else {
+							log.warn(msg);
+						}
+						
+						break;
+					}
+				}
+			} while (!AppUtils.isStopping() && !errorEncountered);
+			
+			if (!errorEncountered) {
+				if (log.isDebugEnabled()) {
+					log.debug("Completed");
+				}
+			}
+		}
+		finally {
+			Thread.currentThread().setName(originalThreadName);
 		}
 	}
 	
@@ -162,8 +170,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 		boolean exceeded = c.intValue() > syncThreshold;
 		if (exceeded) {
 			if (log.isTraceEnabled()) {
-				log.trace("Skipping " + getTaskName() + " to prioritize sync task which has more than " + syncThreshold
-				        + " items to process");
+				log.trace("Skipping run to prioritize sync task which has more than " + syncThreshold + " items to process");
 			}
 		}
 		
