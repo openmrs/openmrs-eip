@@ -4,6 +4,7 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.service.ReceiverArchiveService;
 import org.openmrs.eip.component.SyncProfiles;

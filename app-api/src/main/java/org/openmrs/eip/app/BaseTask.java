@@ -6,11 +6,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for tasks
  */
-public abstract class BaseTask implements Runnable {
+public abstract class BaseTask implements Task {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseTask.class);
 	
 	private boolean errorEncountered = false;
+	
+	@Override
+	public boolean skip() {
+		return false;
+	}
 	
 	@Override
 	public void run() {
@@ -18,6 +23,14 @@ public abstract class BaseTask implements Runnable {
 		
 		try {
 			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getTaskName());
+			if (skip()) {
+				if (log.isTraceEnabled()) {
+					log.trace("Skipping");
+				}
+				
+				return;
+			}
+			
 			if (AppUtils.isStopping()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Skipping run because the application is stopping");

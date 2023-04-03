@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;

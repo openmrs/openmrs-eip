@@ -15,7 +15,9 @@ import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
-import org.openmrs.eip.app.BaseTask;
+import org.openmrs.eip.app.BaseDelegatingQueueTask;
+import org.openmrs.eip.app.BaseQueueProcessor;
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ import org.springframework.core.env.Environment;
  * Base class for receiver tasks that that will not execute if the sync queue size is larger than a
  * certain threshold.
  */
-public abstract class BaseReceiverSyncPrioritizingTask extends BaseTask {
+public abstract class BaseReceiverSyncPrioritizingTask<T extends AbstractEntity, P extends BaseQueueProcessor<T>> extends BaseDelegatingQueueTask<T, P> {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseReceiverSyncPrioritizingTask.class);
 	
@@ -52,7 +54,8 @@ public abstract class BaseReceiverSyncPrioritizingTask extends BaseTask {
 	
 	protected SyncMessageRepository syncRepo;
 	
-	public BaseReceiverSyncPrioritizingTask() {
+	public BaseReceiverSyncPrioritizingTask(P processor) {
+		super(processor);
 		syncRepo = SyncContext.getBean(SyncMessageRepository.class);
 		initIfNecessary();
 	}
@@ -94,12 +97,8 @@ public abstract class BaseReceiverSyncPrioritizingTask extends BaseTask {
 	}
 	
 	@Override
-	public boolean doRun() throws Exception {
-		if (!syncPrioritizeDisabled && isSyncSizeThresholdExceeded()) {
-			return doRunInternal();
-		}
-		
-		return false;
+	public boolean skip() {
+		return !syncPrioritizeDisabled && isSyncSizeThresholdExceeded();
 	}
 	
 	/**
@@ -142,13 +141,5 @@ public abstract class BaseReceiverSyncPrioritizingTask extends BaseTask {
 		
 		return count;
 	}
-	
-	/**
-	 * Subclasses should add their implementation logic in this method
-	 * 
-	 * @return true if this runnable should stop otherwise false
-	 * @throws Exception
-	 */
-	public abstract boolean doRunInternal() throws Exception;
 	
 }

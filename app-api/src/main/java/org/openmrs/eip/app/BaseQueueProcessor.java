@@ -13,7 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for processors that support parallelism to process items in a DB sync related queue.
+ * Base class for processors that support parallelism to process items read from a DB sync related
+ * queue.
  *
  * @param <T> item type
  */
