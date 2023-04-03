@@ -43,6 +43,12 @@ public class ReceiverConstants {
 	public static final String PROP_INITIAL_DELAY_DELETER = "deleter.initial.delay";
 	
 	public static final String PROP_DELAY_DELETER = "deleter.delay";
+
+    public static final String PROP_INITIAL_DELAY_PRUNER = "pruner.initial.delay";
+
+    public static final String PROP_PRUNER_ENABLED = "pruner.enabled";
+
+	public static final String PROP_ARCHIVES_MAX_AGE_DAYS = "archives.max.age.days";
 	
 	public static final String PROP_PRIORITIZE_DISABLED = "sync.prioritize.disabled";
 	

@@ -3,6 +3,8 @@ package org.openmrs.eip.app;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_BUILD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_FILE;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_VERSION;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,10 +18,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 public class AppUtils {
 	
@@ -29,14 +35,16 @@ public class AppUtils {
 	
 	private static final Properties PROPERTIES;
 	
-	private static boolean appContextStopping = false;
-	
-	private static boolean shuttingDown = false;
-	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
 	
 	private final static List<String> SUBCLASS_TABLES = Collections.unmodifiableList(
 	    Arrays.asList(TableToSyncEnum.PATIENT.name(), TableToSyncEnum.DRUG_ORDER.name(), TableToSyncEnum.TEST_ORDER.name()));
+	
+	private static boolean appContextStopping = false;
+	
+	private static boolean shuttingDown = false;
+	
+	private static Pageable taskPage;
 	
 	static {
 		IGNORE_TABLES = new HashSet();
@@ -204,6 +212,20 @@ public class AppUtils {
 		}
 		
 		return build;
+	}
+	
+	/**
+	 * Gets the {@link Pageable} object to be used by queue tasks
+	 * 
+	 * @return Pageable
+	 */
+	public static Pageable getTaskPage() {
+		if (taskPage == null) {
+			Environment e = SyncContext.getBean(Environment.class);
+			taskPage = PageRequest.of(0, e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE));
+		}
+		
+		return taskPage;
 	}
 	
 }
