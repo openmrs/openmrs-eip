@@ -13,13 +13,13 @@ import org.openmrs.eip.component.utils.DateUtils;
  * Reads a batch of sync archives that are older than a specific age in days and forwards them to
  * the {@link ReceiverArchivePruningProcessor}.
  */
-public class ReceiverArchivePrunerTask extends BaseReceiverSyncPrioritizingTask<ReceiverSyncArchive, ReceiverArchivePruningProcessor> {
+public class ReceiverArchivePruningTask extends BaseReceiverSyncPrioritizingTask<ReceiverSyncArchive, ReceiverArchivePruningProcessor> {
 	
 	private ReceiverSyncArchiveRepository repo;
 	
 	private int maxAgeDays;
 	
-	public ReceiverArchivePrunerTask(int maxAgeDays) {
+	public ReceiverArchivePruningTask(int maxAgeDays) {
 		super(SyncContext.getBean(ReceiverArchivePruningProcessor.class));
 		this.maxAgeDays = maxAgeDays;
 		this.repo = SyncContext.getBean(ReceiverSyncArchiveRepository.class);
