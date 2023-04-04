@@ -261,7 +261,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	}
 	
 	private void startPrunerTask() {
-		ReceiverArchivePruningTask pruner = new ReceiverArchivePruningTask(archivesMaxAgeInDays);
+		ReceiverArchivePrunerTask pruner = new ReceiverArchivePrunerTask(archivesMaxAgeInDays);
 		siteExecutor.scheduleWithFixedDelay(pruner, initialDelayPruner, delayPruner, MILLISECONDS);
 	}
 	
