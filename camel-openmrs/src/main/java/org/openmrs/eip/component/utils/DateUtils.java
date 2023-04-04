@@ -3,6 +3,7 @@ package org.openmrs.eip.component.utils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -66,6 +67,20 @@ public final class DateUtils {
 		
 		return null;
 		
+	}
+	
+	/**
+	 * Subtracts the specified days from the specified the date
+	 *
+	 * @param date date to subtract from
+	 * @param days the number of days to subtract
+	 * @return Date
+	 */
+	public static Date subtractDays(Date date, int days) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_YEAR, -days);
+		return calendar.getTime();
 	}
 	
 }

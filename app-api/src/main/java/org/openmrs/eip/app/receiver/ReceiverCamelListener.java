@@ -8,14 +8,17 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_DELETER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_PRUNER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_DELETER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_INDEX_UPDATER;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_PRUNER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
@@ -59,6 +62,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	private static final int DEFAULT_DELAY = 300000;
 	
+	private static final int DEFAULT_DELAY_PRUNER = 86400000;
+	
 	private ScheduledThreadPoolExecutor siteExecutor;
 	
 	private ThreadPoolExecutor syncExecutor;
@@ -98,6 +103,15 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	@Value("${" + PROP_DELAY_DELETER + ":" + DEFAULT_DELAY + "}")
 	private long delayDeleter;
+	
+	@Value("${" + PROP_INITIAL_DELAY_PRUNER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
+	private long initialDelayPruner;
+	
+	@Value("${" + PROP_DELAY_PRUNER + ":" + DEFAULT_DELAY_PRUNER + "}")
+	private long delayPruner;
+	
+	@Value("${" + PROP_PRUNER_ENABLED + ":false}")
+	private boolean prunerEnabled;
 	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
@@ -156,6 +170,10 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			startMessageArchivers(sites);
 			
 			startMessageDeleters(sites);
+			
+			if (prunerEnabled) {
+				startPrunerTask();
+			}
 			
 		} else if (event instanceof CamelContextStoppingEvent) {
 			final int syncExecutorWait = 100;
@@ -229,6 +247,11 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			SyncedMessageDeleter deleter = new SyncedMessageDeleter(site);
 			siteExecutor.scheduleWithFixedDelay(deleter, initialDelayDeleter, delayDeleter, MILLISECONDS);
 		});
+	}
+	
+	private void startPrunerTask() {
+		ReceiverArchivePruningTask pruner = new ReceiverArchivePruningTask();
+		siteExecutor.scheduleWithFixedDelay(pruner, initialDelayPruner, delayPruner, MILLISECONDS);
 	}
 	
 }

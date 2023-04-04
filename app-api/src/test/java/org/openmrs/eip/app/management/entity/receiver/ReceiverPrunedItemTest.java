@@ -34,7 +34,7 @@ public class ReceiverPrunedItemTest {
 		archive.setMessageUuid("message-uuid");
 		archive.setDateSentBySender(LocalDateTime.now());
 		archive.setOperation(SyncOperation.c);
-        archive.setDateReceived(new Date());
+		archive.setDateReceived(new Date());
 		long timestamp = System.currentTimeMillis();
 		
 		ReceiverPrunedItem prune = new ReceiverPrunedItem(archive);
