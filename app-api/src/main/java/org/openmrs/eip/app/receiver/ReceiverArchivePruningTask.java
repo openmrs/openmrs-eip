@@ -1,8 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
-
 import java.util.Date;
 import java.util.List;
 
@@ -10,27 +7,22 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.component.SyncContext;
-import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.DateUtils;
-import org.springframework.core.env.Environment;
 
+/**
+ * Reads a batch of sync archives that are older than a specific age in days and forwards them to
+ * the {@link ReceiverArchivePruningProcessor}.
+ */
 public class ReceiverArchivePruningTask extends BaseReceiverSyncPrioritizingTask<ReceiverSyncArchive, ReceiverArchivePruningProcessor> {
 	
 	private ReceiverSyncArchiveRepository repo;
 	
-	private static Integer maxAgeDays;
+	private int maxAgeDays;
 	
-	public ReceiverArchivePruningTask() {
+	public ReceiverArchivePruningTask(int maxAgeDays) {
 		super(SyncContext.getBean(ReceiverArchivePruningProcessor.class));
+		this.maxAgeDays = maxAgeDays;
 		this.repo = SyncContext.getBean(ReceiverSyncArchiveRepository.class);
-		Environment e = SyncContext.getBean(Environment.class);
-		maxAgeDays = e.getProperty(PROP_ARCHIVES_MAX_AGE_DAYS, Integer.class);
-		if (maxAgeDays == null) {
-			throw new EIPException(
-			        PROP_ARCHIVES_MAX_AGE_DAYS + " is required when " + PROP_PRUNER_ENABLED + "is set to true");
-		}
-		
-		log.info("Pruning sync archives older than " + maxAgeDays + " days");
 	}
 	
 	@Override

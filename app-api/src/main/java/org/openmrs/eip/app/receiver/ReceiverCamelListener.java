@@ -4,6 +4,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_DELETER;
@@ -113,6 +114,9 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_PRUNER_ENABLED + ":false}")
 	private boolean prunerEnabled;
 	
+	@Value("${" + PROP_ARCHIVES_MAX_AGE_DAYS + ":}")
+	private Integer archivesMaxAgeInDays;
+	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
 		this.siteExecutor = siteExecutor;
@@ -172,6 +176,13 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			startMessageDeleters(sites);
 			
 			if (prunerEnabled) {
+				if (archivesMaxAgeInDays == null) {
+					log.error(PROP_ARCHIVES_MAX_AGE_DAYS + " is required when " + PROP_PRUNER_ENABLED + " is set to true");
+					AppUtils.shutdown();
+				}
+				
+				log.info("Pruning sync archives older than " + archivesMaxAgeInDays + " days");
+				
 				startPrunerTask();
 			}
 			
@@ -250,7 +261,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	}
 	
 	private void startPrunerTask() {
-		ReceiverArchivePruningTask pruner = new ReceiverArchivePruningTask();
+		ReceiverArchivePruningTask pruner = new ReceiverArchivePruningTask(archivesMaxAgeInDays);
 		siteExecutor.scheduleWithFixedDelay(pruner, initialDelayPruner, delayPruner, MILLISECONDS);
 	}
 	

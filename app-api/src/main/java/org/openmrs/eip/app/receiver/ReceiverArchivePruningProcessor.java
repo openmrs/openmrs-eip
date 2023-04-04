@@ -25,8 +25,10 @@ public class ReceiverArchivePruningProcessor extends BasePureParallelQueueProces
 	
 	private ReceiverArchiveService service;
 	
-	public ReceiverArchivePruningProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
+	public ReceiverArchivePruningProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    ReceiverArchiveService service) {
 		super(executor);
+		this.service = service;
 	}
 	
 	@Override
