@@ -1,17 +1,20 @@
 package org.openmrs.eip.component.utils;
 
-import org.junit.Test;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 import static java.time.LocalDateTime.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.component.utils.DateUtils.containsLatestDate;
+import static org.openmrs.eip.component.utils.DateUtils.stringToDate;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Test;
 
 public class DateUtilsTest {
 	
@@ -120,6 +123,16 @@ public class DateUtilsTest {
 		//first list contains the earliest and latest
 		dates1 = asList(of(YY, MM, DD, H, M, S), of(YY, MM, DD, H, M, S + 1), of(YY, MM, DD, H, M, S - 1));
 		assertTrue(containsLatestDate(dates1, dates2));
+	}
+	
+	@Test
+	public void subtractDays_shouldReturnTheResultDate() {
+		Date asOfDate = Date.from(stringToDate("2023-01-02 15:33:27").atZone(systemDefault()).toInstant());
+		Date expectedDate = Date.from(stringToDate("2023-01-01 15:33:27").atZone(systemDefault()).toInstant());
+		assertEquals(expectedDate, DateUtils.subtractDays(asOfDate, 1));
+		
+		expectedDate = Date.from(stringToDate("2022-12-31 15:33:27").atZone(systemDefault()).toInstant());
+		assertEquals(expectedDate, DateUtils.subtractDays(asOfDate, 2));
 	}
 	
 }

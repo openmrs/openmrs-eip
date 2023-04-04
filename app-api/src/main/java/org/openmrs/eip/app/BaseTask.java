@@ -51,7 +51,7 @@ public abstract class BaseTask implements Task {
 					}
 				}
 				catch (Throwable t) {
-					if (!AppUtils.isAppContextStopping()) {
+					if (!AppUtils.isStopping()) {
 						errorEncountered = true;
 						String msg = "An error has been encountered";
 						if (log.isDebugEnabled()) {
