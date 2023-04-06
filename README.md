@@ -12,8 +12,10 @@
 7. [Logging](#logging)
 8. [Management Database](#management-database)
 9. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-10. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
-11. [Developer Guide](#developer-guide)
+10. [Sync Prioritization](#sync-prioritization)
+11. [Sync Archive Pruning](#sync-archive-pruning)
+12. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
+13. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
