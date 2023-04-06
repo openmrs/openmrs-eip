@@ -26,7 +26,9 @@ public class ReceiverArchiveServiceImpl extends BaseService implements ReceiverA
 	
 	@Override
 	public void prune(ReceiverSyncArchive archive) {
-		log.info("Pruning sync archive");
+		if (log.isDebugEnabled()) {
+			log.debug("Pruning sync archive");
+		}
 		
 		ReceiverPrunedItem pruned = new ReceiverPrunedItem(archive);
 		if (log.isDebugEnabled()) {

@@ -80,16 +80,16 @@ public abstract class BaseSiteRunnable implements Runnable {
 					int backlogDays = e.getProperty(PROP_BACKLOG_THRESHOLD, Integer.class, DEFAULT_BACK_LOG);
 					//TODO Replace this property by timing the sync process and use that
 					int timePerItem = e.getProperty(PROP_SYNC_TIME_PER_ITEM, int.class, DEFAULT_SYNC_TIME_PER_ITEM);
-					int dailySyncSizePerThread = (backlogDays * 86400000) / timePerItem;
-					log.info("Projected daily sync size per thread: " + dailySyncSizePerThread);
+					int syncThresholdPerThread = (backlogDays * 86400000) / timePerItem;
+					log.info("Projected default sync threshold per thread: " + syncThresholdPerThread);
 					
 					//If the sync count is more than our available CPU cores can process in a determined period by 
 					//default we want message sync prioritization to kick in unless the user defined their own
 					ThreadPoolExecutor syncExecutor = SyncContext.getBean(BEAN_NAME_SYNC_EXECUTOR);
-					int dailySyncSize = dailySyncSizePerThread * syncExecutor.getMaximumPoolSize();
-					log.info("Projected daily sync size: " + dailySyncSize);
+					int defaultSyncThreshold = syncThresholdPerThread * syncExecutor.getMaximumPoolSize();
+					log.info("Projected default sync threshold: " + defaultSyncThreshold);
 					
-					syncThreshold = e.getProperty(PROP_PRIORITIZE_THRESHOLD, Integer.class, dailySyncSize);
+					syncThreshold = e.getProperty(PROP_PRIORITIZE_THRESHOLD, Integer.class, defaultSyncThreshold);
 					countCacheTtl = e.getProperty(PROP_COUNT_CACHE_TTL, Long.class, DEFAULT_SIZE_REFRESH_INTERVAL);
 					
 					log.info("Sync prioritization configuration -> queue threshold: " + syncThreshold + ", count cache TTL: "

@@ -33,9 +33,7 @@ public class ReceiverArchivePruningTask extends BaseReceiverSyncPrioritizingTask
 	@Override
 	public List<ReceiverSyncArchive> getNextBatch() {
 		Date maxDateCreated = DateUtils.subtractDays(new Date(), maxAgeDays);
-		if (log.isDebugEnabled()) {
-			log.info("Pruning sync archives created on or before: " + maxDateCreated);
-		}
+		log.info("Pruning sync archives created on or before: " + maxDateCreated);
 		
 		return repo.findByDateCreatedLessThanEqual(maxDateCreated, AppUtils.getTaskPage());
 	}
