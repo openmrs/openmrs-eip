@@ -18,8 +18,6 @@ public class SyncConstants {
 	
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 6;
 	
-	public static final int DEFAULT_THREAD_NUMBER = 10;
-	
 	public static final int DEFAULT_CONN_POOL_SIZE = 50;
 	
 	public static final int THREAD_THRESHOLD_MULTIPLIER = 2;

@@ -85,7 +85,7 @@ public class BaseQueueProcessorTest {
 		MockitoAnnotations.initMocks(this);
 		setInternalState(AppUtils.class, "appContextStopping", false);
 		setInternalState(BaseQueueProcessor.class, "initialized", false);
-		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
 	
 	private BaseQueueProcessor createProcessor() {

@@ -32,7 +32,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
-import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
 
@@ -51,7 +50,7 @@ public class ChangeEventProcessorTest {
 	private ChangeEventHandler handler;
 	
 	private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors
-	        .newFixedThreadPool(SyncConstants.DEFAULT_THREAD_NUMBER);
+	        .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
 	@Before
 	public void setup() {
