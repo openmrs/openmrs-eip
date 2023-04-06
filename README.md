@@ -234,6 +234,34 @@ the retry queue should run, please refer to the [configuration](#configuration) 
 The DB sync receiver application uses a table named `receiver_retry_queue` to store failed incoming DB sync messages, 
 please refer to the [configuration](#configuration) section.
 
+# Sync Prioritization
+When the receiver DB sync server is overwhelmed with a high volume of items waiting in the sync queue, this can have
+negative implications to the centralization ecosystem e.g. the MPI data will be lagging behind remote sites since the 
+integration mechanism depends on patient details to be synced first to the central database to get picked up implying 
+patient lookups in the MPI would be searching against data that is not yet updated or still missing records. Therefore, 
+it is important to process items from the sync queue as soon as possible which is why we have the sync prioritization 
+feature in the receiver that allows the sync queue processor task to get as much CPU time as possible when the count of 
+items in the sync queue is high, as opposed to always sharing CPU time with other less important tasks like response 
+sender, archiver etc.
+
+Sync prioritization feature is enabled by default but can be disabled, when enabled the application uses some smart 
+logic to determine an optimal threshold size of items in the sync queue beyond which the prioritization kicks in, the 
+optimal threshold size is based on available sync threads and the average time it takes to process a single sync item 
+which is hard coded at 4 seconds.
+
+To disable or customize the sync prioritization feature, please refer to the **Sync Prioritization** section in the 
+[receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties)
+
+# Sync Archive Pruning
+The DB sync receiver application maintains an archive of each and every sync item sent it receives it in a database 
+table, you can guess that after a long period of time, this table can grow extremely large which would slow down the 
+queries against it when loading the receiver dashboard and DDL operations for the table would be very slow during 
+upgrades. Therefore, a pruner task was added to periodically delete all archives older than a configured age.
+
+The pruning task is disabled by default but can be enabled and customized, please refer to the **Sync Archives Pruning** 
+section in the [receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties)
+
+
 # Requesting An Entity To Be Synced
 The application has a mechanism that allows the receiver to request for an entity to be synced from a specific remote 
 site to central, this is done by inserting a row in the `receiver_sync_request` table with the following columns that 
