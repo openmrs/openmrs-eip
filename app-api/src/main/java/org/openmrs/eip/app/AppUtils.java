@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.SyncContext;
@@ -226,6 +227,27 @@ public class AppUtils {
 		}
 		
 		return taskPage;
+	}
+	
+	/**
+	 * Wait for all the Future instances in the specified list to terminate
+	 *
+	 * @param futures the list of Futures instance to wait for
+	 * @param name the name of the task
+	 * @throws Exception
+	 */
+	public static void waitForFutures(List<CompletableFuture<Void>> futures, String name) throws Exception {
+		if (log.isDebugEnabled()) {
+			log.debug("Waiting for " + futures.size() + " " + name + " thread(s) to terminate");
+		}
+		
+		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		
+		allFuture.get();
+		
+		if (log.isDebugEnabled()) {
+			log.debug(futures.size() + " " + name + " thread(s) have terminated");
+		}
 	}
 	
 }

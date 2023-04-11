@@ -5,22 +5,11 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_ARCHIVER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_CACHE_EVICTOR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_DELETER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_INDEX_UPDATER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_ARCHIVER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_CACHE_EVICTOR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_DELETER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_INDEX_UPDATER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_RESPONSE_SENDER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -70,40 +59,28 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private ThreadPoolExecutor syncExecutor;
 	
 	@Value("${" + PROP_INITIAL_DELAY_SYNC + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
-	private long initialDelayConsumer;
+	private long siteTaskInitialDelay;
 	
 	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
-	private long delayConsumer;
+	private long siteTaskDelay;
 	
-	@Value("${" + PROP_INITIAL_DELAY_CACHE_EVICTOR + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 10000) + "}")
-	private long initialDelayCacheEvictor;
+	//@Value("${" + PROP_DELAY_SYNC + ":false}")
+	private long consumerEnabled;
 	
-	@Value("${" + PROP_DELAY_CACHE_EVICTOR + ":" + DEFAULT_DELAY + "}")
-	private long delayCacheEvictor;
+	//@Value("${" + PROP_DELAY_CACHE_EVICTOR + ":false}")
+	private boolean evictorEnabled;
 	
-	@Value("${" + PROP_INITIAL_DELAY_INDEX_UPDATER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 10000) + "}")
-	private long initialDelayIndexUpdater;
+	//@Value("${" + PROP_DELAY_INDEX_UPDATER + ":false}")
+	private boolean updaterEnabled;
 	
-	@Value("${" + PROP_DELAY_INDEX_UPDATER + ":" + DEFAULT_DELAY + "}")
-	private long delayIndexUpdater;
+	//@Value("${" + PROP_DELAY_RESPONSE_SENDER + ":false}")
+	private boolean responseSenderEnabled;
 	
-	@Value("${" + PROP_INITIAL_DELAY_RESPONSE_SENDER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 25000) + "}")
-	private long initialDelayResponseSender;
+	//@Value("${" + PROP_DELAY_ARCHIVER + ":false}")
+	private boolean archiverEnabled;
 	
-	@Value("${" + PROP_DELAY_RESPONSE_SENDER + ":" + DEFAULT_DELAY + "}")
-	private long delayResponseSender;
-	
-	@Value("${" + PROP_INITIAL_DELAY_ARCHIVER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
-	private long initialDelayArchiver;
-	
-	@Value("${" + PROP_DELAY_ARCHIVER + ":" + DEFAULT_DELAY + "}")
-	private long delayArchiver;
-	
-	@Value("${" + PROP_INITIAL_DELAY_DELETER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 40000) + "}")
-	private long initialDelayDeleter;
-	
-	@Value("${" + PROP_DELAY_DELETER + ":" + DEFAULT_DELAY + "}")
-	private long delayDeleter;
+	//@Value("${" + PROP_DELAY_DELETER + ":false}")
+	private boolean deleterEnabled;
 	
 	@Value("${" + PROP_INITIAL_DELAY_PRUNER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
 	private long initialDelayPruner;
@@ -163,17 +140,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());
 			
-			startMessageConsumers(sites);
-			
-			startCacheEvictors(sites);
-			
-			startSearchIndexUpdaters(sites);
-			
-			startSyncResponseSenders(sites);
-			
-			startMessageArchivers(sites);
-			
-			startMessageDeleters(sites);
+			startExecutorTasks(sites);
 			
 			if (prunerEnabled) {
 				if (archivesMaxAgeInDays == null) {
@@ -218,45 +185,10 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 		
 	}
 	
-	private void startMessageConsumers(Collection<SiteInfo> sites) {
+	private void startExecutorTasks(Collection<SiteInfo> sites) {
 		sites.stream().forEach(site -> {
-			SiteMessageConsumer consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, site, syncExecutor);
-			siteExecutor.scheduleWithFixedDelay(consumer, initialDelayConsumer, delayConsumer, MILLISECONDS);
-		});
-	}
-	
-	private void startCacheEvictors(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			CacheEvictor evictor = new CacheEvictor(site);
-			siteExecutor.scheduleWithFixedDelay(evictor, initialDelayCacheEvictor, delayCacheEvictor, MILLISECONDS);
-		});
-	}
-	
-	private void startSearchIndexUpdaters(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SearchIndexUpdater updater = new SearchIndexUpdater(site);
-			siteExecutor.scheduleWithFixedDelay(updater, initialDelayIndexUpdater, delayIndexUpdater, MILLISECONDS);
-		});
-	}
-	
-	private void startSyncResponseSenders(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SyncResponseSender sender = new SyncResponseSender(site);
-			siteExecutor.scheduleWithFixedDelay(sender, initialDelayResponseSender, delayResponseSender, MILLISECONDS);
-		});
-	}
-	
-	private void startMessageArchivers(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SyncedMessageArchiver archiver = new SyncedMessageArchiver(site);
-			siteExecutor.scheduleWithFixedDelay(archiver, initialDelayArchiver, delayArchiver, MILLISECONDS);
-		});
-	}
-	
-	private void startMessageDeleters(Collection<SiteInfo> sites) {
-		sites.stream().forEach(site -> {
-			SyncedMessageDeleter deleter = new SyncedMessageDeleter(site);
-			siteExecutor.scheduleWithFixedDelay(deleter, initialDelayDeleter, delayDeleter, MILLISECONDS);
+			SiteExecutorTask task = new SiteExecutorTask(site, syncExecutor);
+			siteExecutor.scheduleWithFixedDelay(task, siteTaskInitialDelay, siteTaskDelay, MILLISECONDS);
 		});
 	}
 	
