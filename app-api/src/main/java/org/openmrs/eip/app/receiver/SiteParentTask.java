@@ -18,13 +18,15 @@ import org.slf4j.LoggerFactory;
 import lombok.Getter;
 
 /**
- * Executes all the tasks for the associated site once in each run.
+ * Parent site executor that executes all the child tasks once per run.
  */
-public class SiteExecutorTask extends BaseTask {
+public class SiteParentTask extends BaseTask {
 	
-	protected static final Logger log = LoggerFactory.getLogger(SiteExecutorTask.class);
+	protected static final Logger log = LoggerFactory.getLogger(SiteParentTask.class);
 	
-	private static final String TASK_NAME = "site executor task";
+	private static final String PARENT_TASK_NAME = "parent task";
+	
+	private static final String CHILD_TASK_NAME = "child task";
 	
 	private static final int TASK_COUNT = 6;
 	
@@ -43,9 +45,9 @@ public class SiteExecutorTask extends BaseTask {
 	
 	private final SyncedMessageDeleter deleter;
 	
-	private final ExecutorService taskExecutor = Executors.newFixedThreadPool(TASK_COUNT);
+	private final ExecutorService childExecutor = Executors.newFixedThreadPool(TASK_COUNT);
 	
-	public SiteExecutorTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor) {
+	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor) {
 		this.siteInfo = siteInfo;
 		synchronizer = new SiteMessageConsumer(ReceiverConstants.URI_MSG_PROCESSOR, siteInfo, syncExecutor);
 		evictor = new CacheEvictor(siteInfo);
@@ -57,7 +59,7 @@ public class SiteExecutorTask extends BaseTask {
 	
 	@Override
 	public String getTaskName() {
-		return getSiteInfo().getName() + TASK_NAME;
+		return getSiteInfo().getName() + " " + PARENT_TASK_NAME;
 	}
 	
 	@Override
@@ -68,14 +70,14 @@ public class SiteExecutorTask extends BaseTask {
 		
 		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(TASK_COUNT));
 		
-		futures.add(CompletableFuture.runAsync(synchronizer, taskExecutor));
-		futures.add(CompletableFuture.runAsync(evictor, taskExecutor));
-		futures.add(CompletableFuture.runAsync(updater, taskExecutor));
-		futures.add(CompletableFuture.runAsync(responseSender, taskExecutor));
-		futures.add(CompletableFuture.runAsync(archiver, taskExecutor));
-		futures.add(CompletableFuture.runAsync(deleter, taskExecutor));
+		futures.add(CompletableFuture.runAsync(synchronizer, childExecutor));
+		futures.add(CompletableFuture.runAsync(evictor, childExecutor));
+		futures.add(CompletableFuture.runAsync(updater, childExecutor));
+		futures.add(CompletableFuture.runAsync(responseSender, childExecutor));
+		futures.add(CompletableFuture.runAsync(archiver, childExecutor));
+		futures.add(CompletableFuture.runAsync(deleter, childExecutor));
 		
-		AppUtils.waitForFutures(futures, TASK_NAME);
+		AppUtils.waitForFutures(futures, CHILD_TASK_NAME);
 		
 		if (log.isTraceEnabled()) {
 			log.trace("Stop");
@@ -83,4 +85,12 @@ public class SiteExecutorTask extends BaseTask {
 		
 		return true;
 	}
+	
+	/**
+	 * Shuts down the child task executor
+	 */
+	public void shutdownChildExecutor() {
+		AppUtils.shutdownExecutor(childExecutor, getSiteInfo().getName() + " " + CHILD_TASK_NAME, true);
+	}
+	
 }

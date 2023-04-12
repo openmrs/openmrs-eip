@@ -3,6 +3,7 @@ package org.openmrs.eip.app;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_BUILD_NUMBER;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_FILE;
 import static org.openmrs.eip.app.SyncConstants.DBSYNC_PROP_VERSION;
+import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.component.SyncContext;
@@ -247,6 +250,49 @@ public class AppUtils {
 		
 		if (log.isDebugEnabled()) {
 			log.debug(futures.size() + " " + name + " thread(s) have terminated");
+		}
+	}
+	
+	/**
+	 * Shuts down the specified {@link ExecutorService}
+	 *
+	 * @param executor the executor to shut down
+	 * @param name the name of the executor
+	 * @param debug specifies whether to log messages at debug level or not
+	 */
+	public static void shutdownExecutor(ExecutorService executor, String name, boolean debug) {
+		if (debug) {
+			if (log.isDebugEnabled()) {
+				log.debug("Shutting down " + name + " executor");
+			}
+		} else {
+			log.info("Shutting down " + name + " executor");
+		}
+		
+		executor.shutdownNow();
+		
+		try {
+			if (debug) {
+				if (log.isDebugEnabled()) {
+					log.debug(
+					    "Waiting for " + EXECUTOR_SHUTDOWN_TIMEOUT + " seconds for " + name + " executor to terminate");
+				}
+			} else {
+				log.info("Waiting for " + EXECUTOR_SHUTDOWN_TIMEOUT + " seconds for " + name + " executor to terminate");
+			}
+			
+			executor.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+			
+			if (debug) {
+				if (log.isDebugEnabled()) {
+					log.debug("Done shutting down " + name + " executor");
+				}
+			} else {
+				log.info("Done shutting down " + name + " executor");
+			}
+		}
+		catch (Exception e) {
+			log.error("An error occurred while waiting for " + name + " executor to terminate");
 		}
 	}
 	

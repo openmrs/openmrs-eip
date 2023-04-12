@@ -2,7 +2,6 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
-import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_PRUNER;
@@ -11,11 +10,12 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.camel.spi.CamelEvent;
@@ -94,6 +94,8 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_ARCHIVES_MAX_AGE_DAYS + ":}")
 	private Integer archivesMaxAgeInDays;
 	
+	private static List<SiteParentTask> siteTasks;
+	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
 		this.siteExecutor = siteExecutor;
@@ -167,28 +169,21 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				}
 			}
 			
-			log.info("Shutting down site executor");
-			
-			siteExecutor.shutdownNow();
-			
-			try {
-				log.info("Waiting for " + EXECUTOR_SHUTDOWN_TIMEOUT + " seconds for site executor to terminate");
-				
-				siteExecutor.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
-				
-				log.info("Done shutting down site executor");
+			if (siteTasks != null) {
+				siteTasks.forEach(task -> task.shutdownChildExecutor());
 			}
-			catch (Exception e) {
-				log.error("An error occurred while waiting for site executor to terminate");
-			}
+			
+			AppUtils.shutdownExecutor(siteExecutor, "site parent task", false);
 		}
 		
 	}
 	
 	private void startExecutorTasks(Collection<SiteInfo> sites) {
+		siteTasks = new ArrayList(sites.size());
 		sites.stream().forEach(site -> {
-			SiteExecutorTask task = new SiteExecutorTask(site, syncExecutor);
+			SiteParentTask task = new SiteParentTask(site, syncExecutor);
 			siteExecutor.scheduleWithFixedDelay(task, siteTaskInitialDelay, siteTaskDelay, MILLISECONDS);
+			siteTasks.add(task);
 		});
 	}
 	
