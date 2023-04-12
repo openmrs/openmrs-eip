@@ -24,11 +24,9 @@ public class SiteParentTask extends BaseTask {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SiteParentTask.class);
 	
-	private static final String PARENT_TASK_NAME = "parent task";
-	
-	private static final String CHILD_TASK_NAME = "child task";
-	
 	private static final int TASK_COUNT = 6;
+	
+	protected static final String PARENT_TASK_NAME = "parent task";
 	
 	@Getter
 	private final SiteInfo siteInfo;
@@ -45,6 +43,7 @@ public class SiteParentTask extends BaseTask {
 	
 	private final SyncedMessageDeleter deleter;
 	
+	@Getter
 	private final ExecutorService childExecutor = Executors.newFixedThreadPool(TASK_COUNT);
 	
 	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor) {
@@ -77,20 +76,13 @@ public class SiteParentTask extends BaseTask {
 		futures.add(CompletableFuture.runAsync(archiver, childExecutor));
 		futures.add(CompletableFuture.runAsync(deleter, childExecutor));
 		
-		AppUtils.waitForFutures(futures, CHILD_TASK_NAME);
+		AppUtils.waitForFutures(futures, ReceiverConstants.CHILD_TASK_NAME);
 		
 		if (log.isTraceEnabled()) {
 			log.trace("Stop");
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Shuts down the child task executor
-	 */
-	public void shutdownChildExecutor() {
-		AppUtils.shutdownExecutor(childExecutor, getSiteInfo().getName() + " " + CHILD_TASK_NAME, true);
 	}
 	
 }

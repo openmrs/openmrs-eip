@@ -64,22 +64,22 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
 	private long siteTaskDelay;
 	
-	//@Value("${" + PROP_DELAY_SYNC + ":false}")
-	private long consumerEnabled;
+	//@Value("${" + PROP_DELAY_SYNC_ENABLED + ":false}")
+	private long syncEnabled;
 	
-	//@Value("${" + PROP_DELAY_CACHE_EVICTOR + ":false}")
+	//@Value("${" + PROP_CACHE_EVICTOR_ENABLED + ":false}")
 	private boolean evictorEnabled;
 	
-	//@Value("${" + PROP_DELAY_INDEX_UPDATER + ":false}")
+	//@Value("${" + PROP_INDEX_UPDATER_ENABLED + ":false}")
 	private boolean updaterEnabled;
 	
-	//@Value("${" + PROP_DELAY_RESPONSE_SENDER + ":false}")
+	//@Value("${" + PROP_RESPONSE_SENDER_ENABLED + ":false}")
 	private boolean responseSenderEnabled;
 	
-	//@Value("${" + PROP_DELAY_ARCHIVER + ":false}")
+	//@Value("${" + PROP_ARCHIVER_ENABLED + ":false}")
 	private boolean archiverEnabled;
 	
-	//@Value("${" + PROP_DELAY_DELETER + ":false}")
+	//@Value("${" + PROP_DELETER_ENABLED + ":false}")
 	private boolean deleterEnabled;
 	
 	@Value("${" + PROP_INITIAL_DELAY_PRUNER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
@@ -170,7 +170,10 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			}
 			
 			if (siteTasks != null) {
-				siteTasks.forEach(task -> task.shutdownChildExecutor());
+				siteTasks.forEach(task -> {
+					AppUtils.shutdownExecutor(task.getChildExecutor(),
+					    task.getSiteInfo().getName() + " " + ReceiverConstants.CHILD_TASK_NAME, true);
+				});
 			}
 			
 			AppUtils.shutdownExecutor(siteExecutor, "site parent task", false);
