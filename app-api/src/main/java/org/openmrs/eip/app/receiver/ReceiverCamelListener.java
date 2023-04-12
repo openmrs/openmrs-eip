@@ -5,10 +5,11 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_DISABLED_TASKS;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_DELAY;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_INITIAL_DELAY;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,29 +59,14 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	private ThreadPoolExecutor syncExecutor;
 	
-	@Value("${" + PROP_INITIAL_DELAY_SYNC + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
+	@Value("${" + PROP_SITE_TASK_INITIAL_DELAY + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
 	private long siteTaskInitialDelay;
 	
-	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
+	@Value("${" + PROP_SITE_TASK_DELAY + ":" + DEFAULT_DELAY + "}")
 	private long siteTaskDelay;
 	
-	//@Value("${" + PROP_DELAY_SYNC_ENABLED + ":false}")
-	private long syncEnabled;
-	
-	//@Value("${" + PROP_CACHE_EVICTOR_ENABLED + ":false}")
-	private boolean evictorEnabled;
-	
-	//@Value("${" + PROP_INDEX_UPDATER_ENABLED + ":false}")
-	private boolean updaterEnabled;
-	
-	//@Value("${" + PROP_RESPONSE_SENDER_ENABLED + ":false}")
-	private boolean responseSenderEnabled;
-	
-	//@Value("${" + PROP_ARCHIVER_ENABLED + ":false}")
-	private boolean archiverEnabled;
-	
-	//@Value("${" + PROP_DELETER_ENABLED + ":false}")
-	private boolean deleterEnabled;
+	@Value("${" + PROP_SITE_DISABLED_TASKS + ":}")
+	private List<SiteChildTaskType> disabledTaskTypes;
 	
 	@Value("${" + PROP_INITIAL_DELAY_PRUNER + ":" + (DEFAULT_INITIAL_DELAY_SYNC + 55000) + "}")
 	private long initialDelayPruner;
@@ -182,9 +168,13 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	}
 	
 	private void startExecutorTasks(Collection<SiteInfo> sites) {
+		List<Class<? extends Runnable>> disabledTaskClasses = disabledTaskTypes.stream().map(t -> t.getTaskClass())
+		        .collect(Collectors.toList());
+		
 		siteTasks = new ArrayList(sites.size());
+		
 		sites.stream().forEach(site -> {
-			SiteParentTask task = new SiteParentTask(site, syncExecutor);
+			SiteParentTask task = new SiteParentTask(site, syncExecutor, disabledTaskClasses);
 			siteExecutor.scheduleWithFixedDelay(task, siteTaskInitialDelay, siteTaskDelay, MILLISECONDS);
 			siteTasks.add(task);
 		});

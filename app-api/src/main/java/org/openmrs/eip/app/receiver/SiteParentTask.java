@@ -31,29 +31,48 @@ public class SiteParentTask extends BaseTask {
 	@Getter
 	private final SiteInfo siteInfo;
 	
-	private final SiteMessageConsumer synchronizer;
+	private SiteMessageConsumer synchronizer;
 	
-	private final CacheEvictor evictor;
+	private CacheEvictor evictor;
 	
-	private final SearchIndexUpdater updater;
+	private SearchIndexUpdater updater;
 	
-	private final SyncResponseSender responseSender;
+	private SyncResponseSender responseSender;
 	
-	private final SyncedMessageArchiver archiver;
+	private SyncedMessageArchiver archiver;
 	
-	private final SyncedMessageDeleter deleter;
+	private SyncedMessageDeleter deleter;
 	
 	@Getter
 	private final ExecutorService childExecutor = Executors.newFixedThreadPool(TASK_COUNT);
 	
-	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor) {
+	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor,
+	    List<Class<? extends Runnable>> disabledTaskClasses) {
 		this.siteInfo = siteInfo;
-		synchronizer = new SiteMessageConsumer(ReceiverConstants.URI_MSG_PROCESSOR, siteInfo, syncExecutor);
-		evictor = new CacheEvictor(siteInfo);
-		updater = new SearchIndexUpdater(siteInfo);
-		responseSender = new SyncResponseSender(siteInfo);
-		archiver = new SyncedMessageArchiver(siteInfo);
-		deleter = new SyncedMessageDeleter(siteInfo);
+		
+		if (!disabledTaskClasses.contains(SiteMessageConsumer.class)) {
+			synchronizer = new SiteMessageConsumer(ReceiverConstants.URI_MSG_PROCESSOR, siteInfo, syncExecutor);
+		}
+		
+		if (!disabledTaskClasses.contains(CacheEvictor.class)) {
+			evictor = new CacheEvictor(siteInfo);
+		}
+		
+		if (!disabledTaskClasses.contains(SearchIndexUpdater.class)) {
+			updater = new SearchIndexUpdater(siteInfo);
+		}
+		
+		if (!disabledTaskClasses.contains(SyncResponseSender.class)) {
+			responseSender = new SyncResponseSender(siteInfo);
+		}
+		
+		if (!disabledTaskClasses.contains(SyncedMessageArchiver.class)) {
+			archiver = new SyncedMessageArchiver(siteInfo);
+		}
+		
+		if (!disabledTaskClasses.contains(SyncedMessageDeleter.class)) {
+			deleter = new SyncedMessageDeleter(siteInfo);
+		}
 	}
 	
 	@Override
@@ -69,12 +88,29 @@ public class SiteParentTask extends BaseTask {
 		
 		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(TASK_COUNT));
 		
-		futures.add(CompletableFuture.runAsync(synchronizer, childExecutor));
-		futures.add(CompletableFuture.runAsync(evictor, childExecutor));
-		futures.add(CompletableFuture.runAsync(updater, childExecutor));
-		futures.add(CompletableFuture.runAsync(responseSender, childExecutor));
-		futures.add(CompletableFuture.runAsync(archiver, childExecutor));
-		futures.add(CompletableFuture.runAsync(deleter, childExecutor));
+		if (synchronizer != null) {
+			futures.add(CompletableFuture.runAsync(synchronizer, childExecutor));
+		}
+		
+		if (evictor != null) {
+			futures.add(CompletableFuture.runAsync(evictor, childExecutor));
+		}
+		
+		if (updater != null) {
+			futures.add(CompletableFuture.runAsync(updater, childExecutor));
+		}
+		
+		if (responseSender != null) {
+			futures.add(CompletableFuture.runAsync(responseSender, childExecutor));
+		}
+		
+		if (archiver != null) {
+			futures.add(CompletableFuture.runAsync(archiver, childExecutor));
+		}
+		
+		if (deleter != null) {
+			futures.add(CompletableFuture.runAsync(deleter, childExecutor));
+		}
 		
 		AppUtils.waitForFutures(futures, ReceiverConstants.CHILD_TASK_NAME);
 		
@@ -82,7 +118,7 @@ public class SiteParentTask extends BaseTask {
 			log.trace("Stop");
 		}
 		
-		return true;
+		return false;
 	}
 	
 }

@@ -12,6 +12,8 @@ public class ReceiverConstants {
 	
 	public static final int DEFAULT_TASK_BATCH_SIZE = 1000;
 	
+	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
+	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
@@ -22,29 +24,11 @@ public class ReceiverConstants {
 	
 	public static final String PROP_SYNC_TASK_BATCH_SIZE = "sync.task.batch.size";
 	
-	public static final String PROP_INITIAL_DELAY_SYNC = "sync.initial.delay";
+	public static final String PROP_SITE_TASK_INITIAL_DELAY = "site.task.initial.delay";
 	
-	public static final String PROP_DELAY_SYNC = "sync.delay";
+	public static final String PROP_SITE_TASK_DELAY = "site.task.delay";
 	
-	public static final String PROP_INITIAL_DELAY_RESPONSE_SENDER = "response.sender.initial.delay";
-	
-	public static final String PROP_DELAY_RESPONSE_SENDER = "response.sender.delay";
-	
-	public static final String PROP_INITIAL_DELAY_CACHE_EVICTOR = "cache.evictor.initial.delay";
-	
-	public static final String PROP_DELAY_CACHE_EVICTOR = "cache.evictor.delay";
-	
-	public static final String PROP_INITIAL_DELAY_INDEX_UPDATER = "search.index.updater.initial.delay";
-	
-	public static final String PROP_DELAY_INDEX_UPDATER = "search.index.updater.delay";
-	
-	public static final String PROP_INITIAL_DELAY_ARCHIVER = "archiver.initial.delay";
-	
-	public static final String PROP_DELAY_ARCHIVER = "archiver.delay";
-	
-	public static final String PROP_INITIAL_DELAY_DELETER = "deleter.initial.delay";
-	
-	public static final String PROP_DELAY_DELETER = "deleter.delay";
+	public static final String PROP_SITE_DISABLED_TASKS = "site.disabled.tasks";
 	
 	public static final String PROP_PRUNER_ENABLED = "archives.pruner.task.enabled";
 	
