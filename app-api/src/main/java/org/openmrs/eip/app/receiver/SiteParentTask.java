@@ -48,6 +48,7 @@ public class SiteParentTask extends BaseTask {
 	
 	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor,
 	    List<Class<? extends Runnable>> disabledTaskClasses) {
+		
 		this.siteInfo = siteInfo;
 		
 		if (!disabledTaskClasses.contains(SiteMessageConsumer.class)) {
@@ -86,31 +87,13 @@ public class SiteParentTask extends BaseTask {
 			log.trace("Start");
 		}
 		
-		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(TASK_COUNT));
-		
-		if (synchronizer != null) {
-			futures.add(CompletableFuture.runAsync(synchronizer, childExecutor));
-		}
-		
-		if (evictor != null) {
-			futures.add(CompletableFuture.runAsync(evictor, childExecutor));
-		}
-		
-		if (updater != null) {
-			futures.add(CompletableFuture.runAsync(updater, childExecutor));
-		}
-		
-		if (responseSender != null) {
-			futures.add(CompletableFuture.runAsync(responseSender, childExecutor));
-		}
-		
-		if (archiver != null) {
-			futures.add(CompletableFuture.runAsync(archiver, childExecutor));
-		}
-		
-		if (deleter != null) {
-			futures.add(CompletableFuture.runAsync(deleter, childExecutor));
-		}
+		final List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(TASK_COUNT));
+		runTask(synchronizer, futures);
+		runTask(evictor, futures);
+		runTask(updater, futures);
+		runTask(responseSender, futures);
+		runTask(archiver, futures);
+		runTask(deleter, futures);
 		
 		AppUtils.waitForFutures(futures, ReceiverConstants.CHILD_TASK_NAME);
 		
@@ -118,7 +101,13 @@ public class SiteParentTask extends BaseTask {
 			log.trace("Stop");
 		}
 		
-		return false;
+		return true;
+	}
+	
+	private void runTask(Runnable task, List<CompletableFuture<Void>> futures) {
+		if (task != null) {
+			futures.add(CompletableFuture.runAsync(task, childExecutor));
+		}
 	}
 	
 }

@@ -110,7 +110,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 		final String originalThreadName = Thread.currentThread().getName();
 		
 		try {
-			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + getTaskName() + ":" + site.getName());
+			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + site.getName() + ":" + getTaskName());
 			if (AppUtils.isStopping()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Skipping run because the application is stopping");
