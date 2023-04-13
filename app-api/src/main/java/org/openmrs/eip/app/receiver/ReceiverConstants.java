@@ -6,6 +6,8 @@ public class ReceiverConstants {
 	
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 	
+	public static final String PARENT_TASK_NAME = "site parent task";
+	
 	public static final String CHILD_TASK_NAME = "child task";
 	
 	public static final String BEAN_NAME_SITE_EXECUTOR = "siteExecutor";

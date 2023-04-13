@@ -128,7 +128,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());
 			
-			startExecutorTasks(sites);
+			startSiteParentTasks(sites);
 			
 			if (prunerEnabled) {
 				if (archivesMaxAgeInDays == null) {
@@ -162,12 +162,12 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 				});
 			}
 			
-			AppUtils.shutdownExecutor(siteExecutor, "site parent task", false);
+			AppUtils.shutdownExecutor(siteExecutor, ReceiverConstants.PARENT_TASK_NAME, false);
 		}
 		
 	}
 	
-	private void startExecutorTasks(Collection<SiteInfo> sites) {
+	private void startSiteParentTasks(Collection<SiteInfo> sites) {
 		List<Class<? extends Runnable>> disabledTaskClasses = disabledTaskTypes.stream().map(t -> t.getTaskClass())
 		        .collect(Collectors.toList());
 		
