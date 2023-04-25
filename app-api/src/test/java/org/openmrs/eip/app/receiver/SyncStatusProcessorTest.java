@@ -51,53 +51,6 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void shouldInsertASyncStatusRowForTheSiteIfItDoesNotExist() {
-		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
-		SyncMetadata metadata = new SyncMetadata();
-		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
-		metadata.setSourceIdentifier(siteInfo.getIdentifier());
-		SyncModel syncModel = new SyncModel();
-		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
-		Date timestamp = new Date();
-		
-		processor.process(exchange);
-		
-		List<ReceiverSyncStatus> statuses = TestUtils.getEntities(ReceiverSyncStatus.class);
-		assertEquals(1, statuses.size());
-		assertEquals(siteInfo, statuses.get(0).getSiteInfo());
-		assertTrue(statuses.get(0).getLastSyncDate().getTime() >= timestamp.getTime());
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_sync_status.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldUpdateASyncStatusRowForTheSiteIfItExists() {
-		assertEquals(2, TestUtils.getEntities(ReceiverSyncStatus.class).size());
-		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
-		ReceiverSyncStatus syncStatus = TestUtils.getEntity(ReceiverSyncStatus.class, 1L);
-		Date existingLastSyncDate = syncStatus.getLastSyncDate();
-		Date dateCreated = syncStatus.getDateCreated();
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setSourceIdentifier(siteInfo.getIdentifier());
-		SyncModel syncModel = new SyncModel();
-		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
-		
-		processor.process(exchange);
-		
-		assertEquals(2, TestUtils.getEntities(ReceiverSyncStatus.class).size());
-		syncStatus = TestUtils.getEntity(ReceiverSyncStatus.class, syncStatus.getId());
-		assertTrue(syncStatus.getLastSyncDate().getTime() > existingLastSyncDate.getTime());
-		assertEquals(siteInfo, syncStatus.getSiteInfo());
-		assertEquals(dateCreated, syncStatus.getDateCreated());
-	}
-	
-	@Test
 	public void shouldUpdateTheSyncStatusForAFileSyncMessage() {
 		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
 		SyncMetadata metadata = new SyncMetadata();

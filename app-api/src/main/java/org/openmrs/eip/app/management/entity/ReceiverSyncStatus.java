@@ -2,7 +2,6 @@ package org.openmrs.eip.app.management.entity;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -15,7 +14,7 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	
 	public static final long serialVersionUID = 1;
 	
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
+	@OneToOne(optional = false)
 	@JoinColumn(name = "site_info_id", nullable = false, updatable = false, unique = true)
 	private SiteInfo siteInfo;
 	
@@ -23,7 +22,6 @@ public class ReceiverSyncStatus extends AbstractEntity {
 	private Date lastSyncDate;
 	
 	public ReceiverSyncStatus() {
-		
 	}
 	
 	public ReceiverSyncStatus(SiteInfo siteInfo, Date lastSyncDate) {

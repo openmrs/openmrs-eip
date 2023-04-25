@@ -12,17 +12,23 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.EncounterModel;
+import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 @Sql({ "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 @Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -32,6 +38,12 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	
 	@Autowired
 	private SyncedMessageRepository syncedMsgRepo;
+	
+	@Autowired
+	private SiteSyncStatusRepository statusRepo;
+	
+	@Autowired
+	private SiteRepository siteRepo;
 	
 	@Test
 	public void archiveMessage_shouldMoveAMessageFromTheSyncedToTheArchivesQueue() {
@@ -95,6 +107,46 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		ReceiverUtils.updateColumn("site_info", "sync_disabled", id, true);
 		
 		assertTrue(TestUtils.getEntity(SiteInfo.class, id).getDisabled());
+	}
+	
+	@Test
+	public void getParentModelClassName_shouldFailForAClassNameWithNoParentWithSubclasses() {
+		final String modelClass = PersonModel.class.getName();
+		Exception thrown = Assert.assertThrows(EIPException.class, () -> ReceiverUtils.getParentModelClassName(modelClass));
+		assertEquals("No parent class found for model class: " + modelClass, thrown.getMessage());
+	}
+	
+	@Test
+	@Transactional
+	public void saveLastSyncDate_shouldInsertASyncStatusForTheSiteIfItDoesNotExist() {
+		assertTrue(statusRepo.findAll().isEmpty());
+		SiteInfo site = siteRepo.getOne(1L);
+		Date date = new Date();
+		
+		ReceiverUtils.saveLastSyncDate(site, date);
+		
+		assertEquals(date, statusRepo.findBySiteInfo(site).getLastSyncDate());
+		assertEquals(1, statusRepo.findAll().size());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_status.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void saveLastSyncDate_shouldUpdateTheExistingSyncStatusForTheSite() {
+		assertEquals(2, statusRepo.findAll().size());
+		SiteInfo siteInfo = siteRepo.findById(1L).get();
+		ReceiverSyncStatus syncStatus = statusRepo.findBySiteInfo(siteInfo);
+		Date existingLastSyncDate = syncStatus.getLastSyncDate();
+		Date dateCreated = syncStatus.getDateCreated();
+		Date date = new Date();
+		
+		ReceiverUtils.saveLastSyncDate(siteInfo, date);
+		
+		assertEquals(2, statusRepo.findAll().size());
+		syncStatus = statusRepo.findById(syncStatus.getId()).get();
+		assertTrue(syncStatus.getLastSyncDate().getTime() > existingLastSyncDate.getTime());
+		assertEquals(siteInfo, syncStatus.getSiteInfo());
+		assertEquals(dateCreated, syncStatus.getDateCreated());
 	}
 	
 }
