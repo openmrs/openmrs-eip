@@ -22,6 +22,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATC
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 import static org.openmrs.eip.app.receiver.SiteMessageConsumer.ENTITY;
+import static org.openmrs.eip.app.receiver.SiteMessageConsumer.JPA_URI_PREFIX;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
@@ -102,7 +103,7 @@ public class SiteMessageConsumerTest {
 	@After
 	public void tearDown() {
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
-		setInternalState(SiteMessageConsumer.class, "batchSize", 0);
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
 	}
 	
 	private void setupConsumer(final int size) {
@@ -110,7 +111,7 @@ public class SiteMessageConsumerTest {
 		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
 		Whitebox.setInternalState(consumer, SyncedMessageRepository.class, syncedMsgRepo);
-		setInternalState(SiteMessageConsumer.class, "batchSize", DEFAULT_TASK_BATCH_SIZE);
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
 	}
 	
 	private SyncMessage createMessage(int index, boolean snapshot) {
@@ -128,7 +129,7 @@ public class SiteMessageConsumerTest {
 		setupConsumer(1);
 		setInternalState(SiteMessageConsumer.class, "initialized", false);
 		setInternalState(SiteMessageConsumer.class, "taskThreshold", 0);
-		setInternalState(SiteMessageConsumer.class, "batchSize", 0);
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
 		final int batchSize = 4;
 		Mockito.when(mockEnv.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE))
 		        .thenReturn(batchSize);
@@ -138,7 +139,7 @@ public class SiteMessageConsumerTest {
 		Assert.assertTrue(getInternalState(SiteMessageConsumer.class, "initialized"));
 		final int expected = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
 		assertEquals(expected, ((Integer) getInternalState(SiteMessageConsumer.class, "taskThreshold")).intValue());
-		assertEquals(batchSize, ((Integer) getInternalState(SiteMessageConsumer.class, "batchSize")).intValue());
+		assertEquals(JPA_URI_PREFIX + batchSize, getInternalState(SiteMessageConsumer.class, "GET_JPA_URI"));
 		
 	}
 	
@@ -146,16 +147,16 @@ public class SiteMessageConsumerTest {
 	public void initIfNecessary_shouldSkipIfAlreadyInitialized() {
 		setupConsumer(1);
 		setInternalState(SiteMessageConsumer.class, "taskThreshold", 0);
-		setInternalState(SiteMessageConsumer.class, "batchSize", 0);
+		final String jpaUrl = JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE;
 		assertEquals(true, getInternalState(SiteMessageConsumer.class, "initialized"));
 		assertEquals(0, ((Integer) getInternalState(SiteMessageConsumer.class, "taskThreshold")).intValue());
-		assertEquals(0, ((Integer) getInternalState(SiteMessageConsumer.class, "batchSize")).intValue());
+		assertEquals(jpaUrl, getInternalState(SiteMessageConsumer.class, "GET_JPA_URI"));
 		
 		consumer.initIfNecessary();
 		
 		assertEquals(true, getInternalState(SiteMessageConsumer.class, "initialized"));
 		assertEquals(0, ((Integer) getInternalState(SiteMessageConsumer.class, "taskThreshold")).intValue());
-		assertEquals(0, ((Integer) getInternalState(SiteMessageConsumer.class, "batchSize")).intValue());
+		assertEquals(jpaUrl, getInternalState(SiteMessageConsumer.class, "GET_JPA_URI"));
 	}
 	
 	@Test

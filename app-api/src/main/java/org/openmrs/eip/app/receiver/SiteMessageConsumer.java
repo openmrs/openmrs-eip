@@ -45,10 +45,10 @@ public class SiteMessageConsumer implements Runnable {
 	
 	protected static final String ENTITY = SyncMessage.class.getSimpleName();
 	
-	protected static int batchSize;
+	protected static final String JPA_URI_PREFIX = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
+	        + PARAM_SITE + " ORDER BY m.dateCreated ASC &maximumResults=";
 	
-	private static final String GET_JPA_URI = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY m.dateCreated ASC &maximumResults=" + batchSize;
+	private static String GET_JPA_URI;
 	
 	private static boolean initialized = false;
 	
@@ -84,7 +84,8 @@ public class SiteMessageConsumer implements Runnable {
 		synchronized (SiteMessageConsumer.class) {
 			if (!initialized) {
 				Environment e = SyncContext.getBean(Environment.class);
-				batchSize = e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE);
+				int batchSize = e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE);
+				GET_JPA_URI = JPA_URI_PREFIX + batchSize;
 				//This ensures there will only be a limited number of queued items for each thread
 				taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
 				initialized = true;
