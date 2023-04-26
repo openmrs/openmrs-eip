@@ -20,19 +20,21 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 import ch.qos.logback.classic.Level;
 
 @Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+@TestPropertySource(properties = "logging.level.org.openmrs.eip.app.receiver.SyncStatusProcessor=TRACE")
 public class SyncStatusProcessorTest extends BaseReceiverTest {
 	
 	@Autowired
 	private SyncStatusProcessor processor;
 	
 	@Test
-	public void shouldSkipUpdatingSyncStatusIfNoSiteIsFoundMatchingTheSiteIdentifier() {
+	public void process_shouldSkipUpdatingSyncStatusIfNoSiteIsFoundMatchingTheSiteIdentifier() {
 		final String siteIdentifier = "bad-identifier";
 		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
 		SyncMetadata metadata = new SyncMetadata();
@@ -41,7 +43,8 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 		syncModel.setMetadata(metadata);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
+		exchange.setProperty(EX_PROP_IS_FILE, true);
+		exchange.setProperty(EX_PROP_METADATA, JsonUtils.marshall(metadata));
 		
 		processor.process(exchange);
 		
@@ -51,7 +54,7 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void shouldUpdateTheSyncStatusForAFileSyncMessage() {
+	public void process_shouldUpdateTheSyncStatusForAFileSyncMessage() {
 		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
 		SyncMetadata metadata = new SyncMetadata();
 		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
@@ -67,6 +70,24 @@ public class SyncStatusProcessorTest extends BaseReceiverTest {
 		assertEquals(1, statuses.size());
 		assertEquals(siteInfo, statuses.get(0).getSiteInfo());
 		assertTrue(statuses.get(0).getLastSyncDate().getTime() >= timestamp.getTime());
+	}
+	
+	@Test
+	public void process_shouldSkipUpdatingSyncStatusIfTheMessageIsNotForAComplexObs() {
+		final String siteIdentifier = "bad-identifier";
+		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteIdentifier);
+		SyncModel syncModel = new SyncModel();
+		syncModel.setMetadata(metadata);
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.getIn().setBody(syncModel);
+		exchange.setProperty(EX_PROP_IS_FILE, false);
+		
+		processor.process(exchange);
+		
+		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
+		assertMessageLogged(Level.TRACE, "Skipping updating site last sync date for a non complex obs message");
 	}
 	
 }

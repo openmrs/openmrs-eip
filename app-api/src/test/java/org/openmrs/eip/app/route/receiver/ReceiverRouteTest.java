@@ -79,8 +79,8 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 			
 			@Override
 			public void configure() {
-				interceptSendToEndpoint(URI_UPDATE_LAST_SYNC_DATE + "?size=65536&blockWhenFull=true")
-				        .skipSendToOriginalEndpoint().to(mockUpdateSyncStatusEndpoint);
+				interceptSendToEndpoint(URI_UPDATE_LAST_SYNC_DATE).skipSendToOriginalEndpoint()
+				        .to(mockUpdateSyncStatusEndpoint);
 				interceptSendToEndpoint(URI_COMPLEX_OBS_SYNC).skipSendToOriginalEndpoint().to(mockComplexObsSyncEndpoint);
 			}
 			
@@ -114,8 +114,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		syncModel.setMetadata(metadata);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);
 		
@@ -189,8 +188,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		syncModel.setMetadata(metadata);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);
 		
@@ -222,8 +220,7 @@ public class ReceiverRouteTest extends BaseReceiverRouteTest {
 		syncModel.setMetadata(metadata);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(JsonUtils.marshall(syncModel));
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(EX_PROP_IS_FILE, false);
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(0);
 		mockActiveMqResponseEndpoint.expectedMessageCount(1);
 		
 		producerTemplate.send(URI_ACTIVEMQ, exchange);

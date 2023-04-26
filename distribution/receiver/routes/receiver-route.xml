@@ -39,7 +39,7 @@
 
                 <!-- Complex Obs can be too large to store in the DB, for now process in serial -->
                 <!-- TODO Find a smart way to store them so they can also be processed in parallel -->
-                <to uri="seda:update-site-last-sync-date?size=65536&amp;blockWhenFull=true" />
+                <to uri="direct:update-site-last-sync-date" />
 
                 <to uri="direct:inbound-complex-obs-sync" />
 
@@ -57,12 +57,6 @@
                 <setProperty name="sync-model">
                     <simple>${body}</simple>
                 </setProperty>
-
-                <log loggingLevel="DEBUG" message="Queuing update of last sync date for sending site" />
-
-                <to uri="seda:update-site-last-sync-date?size=65536&amp;blockWhenFull=true" />
-
-                <log loggingLevel="DEBUG" message="Successfully queued update of last sync date for sending site" />
 
                 <!-- If this sync message is a response to a sync request, update the request -->
                 <when>

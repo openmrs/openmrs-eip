@@ -96,7 +96,7 @@ public class ReceiverConstants {
 	
 	public static final String ROUTE_ID_UPDATE_LAST_SYNC_DATE = "update-site-last-sync-date";
 	
-	public static final String URI_UPDATE_LAST_SYNC_DATE = "seda:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE;
+	public static final String URI_UPDATE_LAST_SYNC_DATE = "direct:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE;
 	
 	public static final String ROUTE_ID_COMPLEX_OBS_SYNC = "inbound-complex-obs-sync";
 	
