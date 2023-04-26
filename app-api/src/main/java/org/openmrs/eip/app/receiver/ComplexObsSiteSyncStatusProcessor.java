@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 /**
  * Sets the last sync date for a site when a message for a complex obs is received
  */
-@Component("syncStatusProcessor")
+@Component("complexObsSiteSyncStatusProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class SyncStatusProcessor implements Processor {
+public class ComplexObsSiteSyncStatusProcessor implements Processor {
 	
-	private static final Logger logger = LoggerFactory.getLogger(SyncStatusProcessor.class);
+	private static final Logger logger = LoggerFactory.getLogger(ComplexObsSiteSyncStatusProcessor.class);
 	
 	@Override
 	public void process(Exchange exchange) {

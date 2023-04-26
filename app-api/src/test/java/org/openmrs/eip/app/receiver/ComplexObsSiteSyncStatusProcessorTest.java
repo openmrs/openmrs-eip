@@ -27,11 +27,11 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import ch.qos.logback.classic.Level;
 
 @Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-@TestPropertySource(properties = "logging.level.org.openmrs.eip.app.receiver.SyncStatusProcessor=TRACE")
-public class SyncStatusProcessorTest extends BaseReceiverTest {
+@TestPropertySource(properties = "logging.level.org.openmrs.eip.app.receiver.ComplexObsSiteSyncStatusProcessor=TRACE")
+public class ComplexObsSiteSyncStatusProcessorTest extends BaseReceiverTest {
 	
 	@Autowired
-	private SyncStatusProcessor processor;
+	private ComplexObsSiteSyncStatusProcessor processor;
 	
 	@Test
 	public void process_shouldSkipUpdatingSyncStatusIfNoSiteIsFoundMatchingTheSiteIdentifier() {

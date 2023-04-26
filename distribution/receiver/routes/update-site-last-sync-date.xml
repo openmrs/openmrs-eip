@@ -4,7 +4,7 @@
 
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />
 
-        <process ref="syncStatusProcessor" />
+        <process ref="complexObsSiteSyncStatusProcessor" />
 
         <log loggingLevel="DEBUG" message="End: ${routeId}" />
     </route>
