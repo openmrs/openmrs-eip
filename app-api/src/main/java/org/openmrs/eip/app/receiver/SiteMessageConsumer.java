@@ -154,6 +154,8 @@ public class SiteMessageConsumer implements Runnable {
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
 		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
 		
+		ReceiverUtils.saveLastSyncDate(site, syncMessages.get(syncMessages.size() - 1).getDateCreated());
+		
 		List<String> typeAndIdentifier = synchronizedList(new ArrayList(taskThreshold));
 		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(taskThreshold));
 		
