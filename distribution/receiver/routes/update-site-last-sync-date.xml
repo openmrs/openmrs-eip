@@ -1,10 +1,10 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="update-site-last-sync-date" errorHandlerRef="deadLetterChannelBuilder">
-        <from uri="seda:update-site-last-sync-date" />
+        <from uri="direct:update-site-last-sync-date" />
 
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />
 
-        <process ref="complexObsSiteSyncStatusProcessor" />
+        <process ref="syncStatusProcessor" />
 
         <log loggingLevel="DEBUG" message="End: ${routeId}" />
     </route>

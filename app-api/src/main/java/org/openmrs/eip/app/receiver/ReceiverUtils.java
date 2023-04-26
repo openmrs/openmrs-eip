@@ -17,14 +17,11 @@ import java.util.Set;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
-import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
-import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncOperation;
@@ -86,8 +83,6 @@ public class ReceiverUtils {
 	private static SyncedMessageRepository syncedMsgRepo;
 	
 	private static ReceiverSyncArchiveRepository archiveRepo;
-	
-	private static SiteSyncStatusRepository statusRepo;
 	
 	private static ProducerTemplate producerTemplate;
 	
@@ -390,34 +385,6 @@ public class ReceiverUtils {
 		CamelUtils.send(query, exchange);
 	}
 	
-	/**
-	 * Sets and saves the last sync date for the specified site
-	 * 
-	 * @param site the site to update
-	 * @param lastSyncDate the last sync date to set
-	 */
-	public static void saveLastSyncDate(SiteInfo site, Date lastSyncDate) {
-		ReceiverSyncStatus status = getStatusRepo().findBySiteInfo(site);
-		if (status == null) {
-			status = new ReceiverSyncStatus(site, lastSyncDate);
-			status.setDateCreated(new Date());
-			if (log.isTraceEnabled()) {
-				log.trace("Inserting initial sync status for " + site + " as " + status.getLastSyncDate());
-			}
-		} else {
-			status.setLastSyncDate(lastSyncDate);
-			if (log.isTraceEnabled()) {
-				log.trace("Updating last sync date for " + site + " to " + status.getLastSyncDate());
-			}
-		}
-		
-		getStatusRepo().save(status);
-		
-		if (log.isTraceEnabled()) {
-			log.trace("Successfully saved sync status for: " + site + " -> " + status);
-		}
-	}
-	
 	private static SyncedMessageRepository getSyncMsgRepo() {
 		if (syncedMsgRepo == null) {
 			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
@@ -432,14 +399,6 @@ public class ReceiverUtils {
 		}
 		
 		return archiveRepo;
-	}
-	
-	private static SiteSyncStatusRepository getStatusRepo() {
-		if (statusRepo == null) {
-			statusRepo = SyncContext.getBean(SiteSyncStatusRepository.class);
-		}
-		
-		return statusRepo;
 	}
 	
 	private static ProducerTemplate getProducerTemplate() {

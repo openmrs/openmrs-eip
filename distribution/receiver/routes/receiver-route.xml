@@ -58,6 +58,8 @@
                     <simple>${body}</simple>
                 </setProperty>
 
+                <to uri="direct:update-site-last-sync-date" />
+
                 <!-- If this sync message is a response to a sync request, update the request -->
                 <when>
                     <simple>${exchangeProperty.sync-model.metadata.operation} == 'r'</simple>

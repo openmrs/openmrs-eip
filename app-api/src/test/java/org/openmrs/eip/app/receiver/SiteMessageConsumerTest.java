@@ -45,12 +45,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
-import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -88,9 +86,6 @@ public class SiteMessageConsumerTest {
 	private SyncedMessageRepository syncedMsgRepo;
 	
 	@Mock
-	private SiteSyncStatusRepository mockStatusRepo;
-	
-	@Mock
 	private Environment mockEnv;
 	
 	@Before
@@ -99,7 +94,6 @@ public class SiteMessageConsumerTest {
 		PowerMockito.mockStatic(ReceiverContext.class);
 		PowerMockito.mockStatic(CamelUtils.class);
 		setInternalState(SiteMessageConsumer.class, "initialized", true);
-		setInternalState(ReceiverUtils.class, "statusRepo", mockStatusRepo);
 		siteInfo = new SiteInfo();
 		siteInfo.setIdentifier("testSite");
 		Mockito.when(mockProducerTemplate.getCamelContext()).thenReturn(mockCamelContext);
@@ -109,7 +103,6 @@ public class SiteMessageConsumerTest {
 	@After
 	public void tearDown() {
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
-		setInternalState(ReceiverUtils.class, "statusRepo", (Object) null);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
 	}
 	
@@ -216,12 +209,8 @@ public class SiteMessageConsumerTest {
 		Map<Long, Thread> expectedMsgIdThreadMap = new ConcurrentHashMap(size);
 		Map<Long, String> expectedMsgIdThreadNameMap = new ConcurrentHashMap(size);
 		
-		Date expectedSiteLastSyncDate = new Date();
 		for (int i = 0; i < size; i++) {
 			SyncMessage m = createMessage(i, true);
-			if (i == (size - 1)) {
-				m.setDateCreated(expectedSiteLastSyncDate);
-			}
 			messages.add(m);
 			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
 				Exchange exchange = invocation.getArgument(1);
@@ -233,18 +222,11 @@ public class SiteMessageConsumerTest {
 			});
 		}
 		
-		List<ReceiverSyncStatus> siteStatuses = new ArrayList(1);
-		Mockito.when(mockStatusRepo.save(any(ReceiverSyncStatus.class))).thenAnswer(invocation -> {
-			siteStatuses.add(invocation.getArgument(0));
-			return null;
-		});
-		
 		consumer.processMessages(messages);
 		
 		assertEquals(originalThreadName, Thread.currentThread().getName());
 		assertEquals(size, expectedResults.size());
 		assertEquals(size, expectedMsgIdThreadNameMap.size());
-		assertEquals(expectedSiteLastSyncDate, siteStatuses.get(0).getLastSyncDate());
 		
 		for (int i = 0; i < size; i++) {
 			SyncMessage msg = messages.get(i);
