@@ -6,12 +6,14 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_FILE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_METADATA;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.Date;
 import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultExchange;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
 import org.openmrs.eip.app.management.entity.SiteInfo;
@@ -27,6 +29,11 @@ import ch.qos.logback.classic.Level;
 
 @Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class SyncStatusProcessorIntegrationTest extends BaseReceiverTest {
+	
+	@Before
+	public void tearDown() {
+		setInternalState(SyncStatusProcessor.class, "siteIdAndStatusMap", (Object) null);
+	}
 	
 	@Autowired
 	private SyncStatusProcessor processor;

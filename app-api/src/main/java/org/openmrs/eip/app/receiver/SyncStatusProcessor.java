@@ -13,6 +13,7 @@ import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -26,6 +27,8 @@ public class SyncStatusProcessor implements Processor {
 	
 	private static Map<String, ReceiverSyncStatus> siteIdAndStatusMap;
 	
+	protected static final long FLUSH_INTERVAL = 60000;
+	
 	private SiteSyncStatusRepository statusRepo;
 	
 	public SyncStatusProcessor(SiteSyncStatusRepository statusRepo) {
@@ -34,6 +37,7 @@ public class SyncStatusProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) {
+		Date dateReceived = new Date();
 		SiteInfo site = null;
 		try {
 			SyncMetadata metadata;
@@ -56,38 +60,50 @@ public class SyncStatusProcessor implements Processor {
 			}
 			
 			ReceiverSyncStatus status = siteIdAndStatusMap.get(metadata.getSourceIdentifier());
-			boolean cacheStatus = false;
+			boolean isStatusCached = false;
+			boolean flushIntervalElapsed = false;
 			if (status == null) {
-				cacheStatus = true;
 				status = statusRepo.findBySiteInfo(site);
-			}
-			
-			//TODO Use exchange.getCreated
-			Date lastSyncDate = new Date();
-			if (status == null) {
-				status = new ReceiverSyncStatus(site, lastSyncDate);
-				status.setDateCreated(lastSyncDate);
-				if (logger.isTraceEnabled()) {
-					logger.trace("Inserting initial sync status for " + site + " as " + status.getLastSyncDate());
-				}
 			} else {
-				status.setLastSyncDate(lastSyncDate);
+				isStatusCached = true;
+				flushIntervalElapsed = Utils.getMillisElapsed(status.getLastSyncDate(), dateReceived) > FLUSH_INTERVAL;
+			}
+			
+			boolean saveChanges = false;
+			if (status == null) {
+				status = new ReceiverSyncStatus(site, dateReceived);
+				status.setDateCreated(dateReceived);
+				saveChanges = true;
 				if (logger.isTraceEnabled()) {
-					logger.trace("Updating last sync date for " + site + " to " + status.getLastSyncDate());
+					logger.trace("Inserting site sync status -> " + status);
+				}
+			} else if (!isStatusCached || flushIntervalElapsed) {
+				//A status that was read from the DB, or if the date we have in the cache is older than a minute, this 
+				//ensures that if we get multiple messages from the same site within a short negligible time interval, 
+				//this acts as a throttle to avoid multiple database updatessaveChanges = true;
+				status.setLastSyncDate(dateReceived);
+				saveChanges = true;
+				if (logger.isTraceEnabled()) {
+					logger.trace("Updating site last sync date to -> " + status);
 				}
 			}
 			
-			statusRepo.save(status);
-			if (cacheStatus) {
-				siteIdAndStatusMap.put(metadata.getSourceIdentifier(), status);
+			if (saveChanges) {
+				statusRepo.save(status);
+				if (logger.isTraceEnabled()) {
+					logger.trace("Successfully saved site sync status -> " + status);
+				}
 			}
 			
-			if (logger.isTraceEnabled()) {
-				logger.trace("Successfully saved sync status for: " + site + " -> " + status);
+			if (!isStatusCached) {
+				siteIdAndStatusMap.put(metadata.getSourceIdentifier(), status);
+				if (logger.isTraceEnabled()) {
+					logger.trace("Added to cache site sync status -> " + status);
+				}
 			}
 		}
 		catch (Throwable t) {
-			logger.error("Failed to update sync status for: " + site, t);
+			logger.error("Failed to update site sync status for: " + site, t);
 		}
 	}
 }

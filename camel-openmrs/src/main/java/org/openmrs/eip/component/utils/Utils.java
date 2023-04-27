@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.utils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -111,6 +112,17 @@ public final class Utils {
 	 */
 	public static boolean isSubclassTable(String tableName) {
 		return Constants.SUBCLASS_TABLES.contains(tableName.toLowerCase());
+	}
+	
+	/**
+	 * Gets the time that has elapsed in milliseconds between the two specified dates.
+	 * 
+	 * @param start start date
+	 * @param end end date
+	 * @return time elapsed
+	 */
+	public static long getMillisElapsed(Date start, Date end) {
+		return end.getTime() - start.getTime();
 	}
 	
 }

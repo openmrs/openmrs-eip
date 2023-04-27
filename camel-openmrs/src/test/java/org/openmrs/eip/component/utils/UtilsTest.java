@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -194,6 +196,12 @@ public class UtilsTest {
 	public void isSubclassTable_shouldReturnFalseForANonSubclassTable() {
 		assertFalse(Utils.isSubclassTable("person"));
 		assertFalse(Utils.isSubclassTable("orders"));
+	}
+	
+	@Test
+	public void getMillisElapsed_shouldGetTheTimeDifferenceInMilliseconds() throws Exception {
+		final DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		assertEquals(3000, Utils.getMillisElapsed(f.parse("2023-04-27 12:00:00"), f.parse("2023-04-27 12:00:03")));
 	}
 	
 }
