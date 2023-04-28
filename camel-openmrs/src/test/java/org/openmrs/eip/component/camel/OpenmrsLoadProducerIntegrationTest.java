@@ -13,7 +13,11 @@ import static org.openmrs.eip.component.Constants.QUERY_GET_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -28,14 +32,20 @@ import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.Provider;
 import org.openmrs.eip.component.entity.User;
+import org.openmrs.eip.component.entity.light.PersonLight;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.management.hash.entity.ProviderHash;
 import org.openmrs.eip.component.management.hash.entity.UserHash;
+import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.repository.PersonNameRepository;
+import org.openmrs.eip.component.repository.PersonRepository;
 import org.openmrs.eip.component.repository.UserRepository;
+import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.AbstractEntityService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +76,15 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private UserLightRepository userLightRepo;
+	
+	@Autowired
+	private PersonRepository personRepo;
+	
+	@Autowired
+	private PersonNameRepository nameRepo;
 	
 	@BeforeClass
 	public static void beforeClass() {
@@ -384,6 +403,69 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		producer.process(exchange);
 		
 		assertNull(userService.getModel(DAEMON_USER_UUID));
+	}
+	
+	@Test
+	public void process_shouldNotDuplicateANewEntityReferencedByEntitiesBeingProcessedInParallel() throws Exception {
+		final String siteId = "site-uuid";
+		final String personUuid = "person-uuid";
+		assertNull(personRepo.findByUuid(personUuid));
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncContext.setAppUser(userLightRepo.findById(1L).get());
+		
+		final long initialPersonCount = personRepo.count();
+		final long initialNameCount = nameRepo.count();
+		int size = 50;
+		ExecutorService executor = Executors.newFixedThreadPool(size);
+		List<CompletableFuture<Void>> futures = new ArrayList(size);
+		for (int i = 0; i < size; i++) {
+			final String nameUuid = "name-uuid-" + i;
+			assertNull(nameRepo.findByUuid(personUuid));
+			PersonNameModel name = new PersonNameModel();
+			name.setUuid(nameUuid);
+			name.setPersonUuid(PersonLight.class.getName() + "(" + personUuid + ")");
+			SyncModel syncModel = new SyncModel(name.getClass(), name, metadata);
+			Exchange ex = new DefaultExchange(new DefaultCamelContext());
+			ex.getIn().setBody(syncModel);
+			futures.add(CompletableFuture.runAsync(() -> {
+				producer.process(ex);
+			}, executor));
+		}
+		
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
+		
+		assertEquals(initialPersonCount + 1, personRepo.count());
+		assertEquals(initialNameCount + size, nameRepo.count());
+	}
+	
+	@Test
+	public void process_shouldNotDuplicateANewEntityBeingProcessedInParallelFromDifferentSites() throws Exception {
+		final String siteId = "site-uuid";
+		final String personUuid = "person-uuid";
+		assertNull(nameRepo.findByUuid(personUuid));
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setSourceIdentifier(siteId);
+		SyncContext.setAppUser(userLightRepo.findById(1L).get());
+		
+		final long initialPersonCount = personRepo.count();
+		int size = 50;
+		ExecutorService executor = Executors.newFixedThreadPool(size);
+		List<CompletableFuture<Void>> futures = new ArrayList(size);
+		for (int i = 0; i < size; i++) {
+			PersonModel person = new PersonModel();
+			person.setUuid(personUuid);
+			SyncModel syncModel = new SyncModel(person.getClass(), person, metadata);
+			Exchange ex = new DefaultExchange(new DefaultCamelContext());
+			ex.getIn().setBody(syncModel);
+			futures.add(CompletableFuture.runAsync(() -> {
+				producer.process(ex);
+			}, executor));
+		}
+		
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
+		
+		assertEquals(initialPersonCount + 1, personRepo.count());
 	}
 	
 }
