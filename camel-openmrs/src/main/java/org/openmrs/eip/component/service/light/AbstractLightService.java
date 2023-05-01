@@ -63,7 +63,14 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 		return getOrInit(getPlaceholderUuid());
 	}
 	
-	private E getOrInit(final String uuid) {
+	/**
+	 * This method is marked as synchronized because we want to avoid duplicating a record when the same
+	 * new record is being synced by 2 different sites in parallel
+	 * 
+	 * @param uuid
+	 * @return
+	 */
+	private synchronized E getOrInit(final String uuid) {
 		if (uuid == null) {
 			return null;
 		}

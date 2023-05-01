@@ -53,15 +53,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	}
 	
 	/**
-	 * Processes the sync message specified on the exchange, this method is marked as synchronized
-	 * because we want to avoid the following from happening,
-	 * 
-	 * <pre>
-	 * 1. Duplicating a record when the same new record is being synced by 2 different sites in parallel
-	 * 2. Duplicating records because they are referenced by multiple entities being processed in parallel
-	 * </pre>
+	 * Processes the sync message specified on the exchange.
 	 */
-	private synchronized static void doProcess(Exchange exchange) {
+	private static void doProcess(Exchange exchange) {
 		EntityServiceFacade serviceFacade = (EntityServiceFacade) appContext.getBean("entityServiceFacade");
 		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -49,6 +50,7 @@ import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.AbstractEntityService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.test.context.TestPropertySource;
@@ -452,6 +454,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		int size = 50;
 		ExecutorService executor = Executors.newFixedThreadPool(size);
 		List<CompletableFuture<Void>> futures = new ArrayList(size);
+		AtomicInteger passCount = new AtomicInteger();
+		AtomicInteger failureCount = new AtomicInteger();
 		for (int i = 0; i < size; i++) {
 			PersonModel person = new PersonModel();
 			person.setUuid(personUuid);
@@ -459,13 +463,20 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 			Exchange ex = new DefaultExchange(new DefaultCamelContext());
 			ex.getIn().setBody(syncModel);
 			futures.add(CompletableFuture.runAsync(() -> {
-				producer.process(ex);
+				try {
+					producer.process(ex);
+					passCount.incrementAndGet();
+				}
+				catch (DataIntegrityViolationException e) {
+					failureCount.incrementAndGet();
+				}
 			}, executor));
 		}
 		
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
 		
 		assertEquals(initialPersonCount + 1, personRepo.count());
+		assertEquals(size - passCount.get(), failureCount.get());
 	}
 	
 }
