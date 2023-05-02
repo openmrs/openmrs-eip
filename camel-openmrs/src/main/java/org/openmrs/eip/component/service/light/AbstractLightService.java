@@ -65,7 +65,8 @@ public abstract class AbstractLightService<E extends LightEntity> implements Lig
 	
 	/**
 	 * This method is marked as synchronized because we want to avoid duplicating a record when the same
-	 * new record is being synced by 2 different sites in parallel
+	 * new record is being referenced by multiple other entities being synced in parallel e.g. 2 person
+	 * name rows belonging to the same person
 	 * 
 	 * @param uuid
 	 * @return
