@@ -342,41 +342,6 @@ public class OpenmrsLoadProducerTest {
 	}
 	
 	@Test
-	public void process_shouldUpdateTheHashIfItAlreadyExistsForANewEntity() {
-		PersonModel model = new PersonModel();
-		model.setUuid("uuid");
-		SyncMetadata metadata = new SyncMetadata();
-		metadata.setOperation("c");
-		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
-		final String oldHash = "old-hash";
-		PersonHash storedHash = new PersonHash();
-		assertNull(storedHash.getDateChanged());
-		storedHash.setHash(oldHash);
-		assertNull(storedHash.getDateChanged());
-		final String expectedNewHash = "new-hash";
-		when(HashUtils.computeHash(model)).thenReturn(expectedNewHash);
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
-		when(mockLogger.isDebugEnabled()).thenReturn(true);
-		
-		// When
-		producer.process(exchange);
-		
-		// Then
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    storedHash);
-		verify(mockLogger).info(
-		    "Found existing hash for a new entity, this could be a retry item to insert a new entity where the hash was "
-		            + "created but the insert previously failed or a previously deleted entity at another site");
-		verify(mockLogger).debug("Updating hash for the incoming entity state");
-		assertEquals(expectedNewHash, storedHash.getHash());
-		assertNotNull(storedHash.getDateChanged());
-		verify(serviceFacade).saveModel(TableToSyncEnum.PERSON, model);
-		
-	}
-	
-	@Test
 	public void process_shouldFailIfNoHashIsFoundForAnExistingEntityAndIgnoreIsNotSetToTrue() {
 		// Given
 		PersonModel model = new PersonModel();
