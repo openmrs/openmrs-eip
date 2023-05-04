@@ -81,6 +81,26 @@ The Management DB has been tested with MySQL and H2, you should be able to use a
 by hibernate, it is highly recommended that the management DB resides on the same physical machine as the application to 
 eliminate any possibility of being unreachable and lower latency hence better performance.
 
+# MySQL 8 Support
+
+## Public Key Retrieval
+the property `allowPublicKeyRetrieval` should be set to true to avoid the issue `Unable to connect: Public Key Retrieval is not allowed`.
+this property should be added to these properties:
+- `debezium.extraParameters` ( extra parameters given to Debezium)
+- `spring.openmrs-datasource.jdbcUrl`
+- `spring.mngt-datasource.jdbcUrl` ( only if you use MySQL 8 for management database)
+
+Please, see the file [example-app/application.properties](example-app/application.properties) for examples.
+
+## Authentication protocol
+
+For some users (debezium user), the connection could fail with the error `AuthenticationException: Client does not support authentication protocol`
+To fix this, use this following command to create a user compatible with MySQL 8 ( use `WITH mysql_native_password`):
+
+```sql
+CREATE USER '${DEBEZIUM_USERNAME}'@'%' IDENTIFIED WITH mysql_native_password BY '${DEBEZIUM_PASSWORD}';
+```
+
 # Error Handling And Retry Mechanism
 The `openmrs-watcher` module has a built-in error handling and retry mechanism in case something goes wrong when the 
 sender is processing a DB event, this also applies to any custom application built on top of the openmrs-watcher, the 
