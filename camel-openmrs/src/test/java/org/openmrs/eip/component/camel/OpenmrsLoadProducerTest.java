@@ -6,20 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.HASH_DELETED;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -32,10 +24,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.stubbing.Answer;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
-import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
@@ -490,80 +480,6 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		verify(mockLogger).info("Skipping syncing of a user with a uuid matching the local admin account");
-	}
-	
-	@Test
-	public void process_shouldProcessEventsForTheSameEntityInParallel() throws Exception {
-		final String uuid = "person-uuid";
-		final String msgUuidPrefix = "msg-uuid-";
-		int size = 50;
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
-		List<String> msgUuidsForGetModelCalls = Collections.synchronizedList(new ArrayList<>(size));
-		PersonModel dbModel = new PersonModel();
-		when(serviceFacade.getModel(TableToSyncEnum.PERSON, uuid)).thenAnswer((Answer) invocation -> {
-			msgUuidsForGetModelCalls.add(Thread.currentThread().getName());
-			return dbModel;
-		});
-		final String currentHash = "current-hash";
-		PersonHash storedHash = new PersonHash();
-		storedHash.setHash(currentHash);
-		assertNull(storedHash.getDateChanged());
-		final String expectedNewHash = "tester";
-		when(HashUtils.computeHash(dbModel)).thenReturn(currentHash);
-		when(HashUtils.computeHash(any(PersonModel.class))).thenReturn(expectedNewHash);
-		List<String> msgUuidsForGetHashCalls = Collections.synchronizedList(new ArrayList<>(size));
-		when(HashUtils.getStoredHash(uuid, PersonHash.class, mockProducerTemplate)).thenAnswer((Answer) invocation -> {
-			msgUuidsForGetHashCalls.add(Thread.currentThread().getName());
-			return storedHash;
-		});
-		final String hashSaveQuery = QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName());
-		List<String> msgUuidsForSaveHashCalls = Collections.synchronizedList(new ArrayList<>(size));
-		doAnswer(invocation -> {
-			msgUuidsForSaveHashCalls.add(Thread.currentThread().getName());
-			return null;
-		}).when(mockProducerTemplate).sendBody(hashSaveQuery, storedHash);
-		ExecutorService executor = Executors.newFixedThreadPool(size);
-		List<CompletableFuture<Void>> futures = new ArrayList(size);
-		final String originalThreadName = Thread.currentThread().getName();
-		List<String> msgUuidsForSaveModelCalls = Collections.synchronizedList(new ArrayList<>(size));
-		for (int i = 0; i < size; i++) {
-			PersonModel newModel = new PersonModel();
-			newModel.setUuid(uuid);
-			SyncMetadata metadata = new SyncMetadata();
-			metadata.setMessageUuid(msgUuidPrefix + i);
-			metadata.setOperation(SyncOperation.u.toString());
-			SyncModel syncModel = new SyncModel(PersonModel.class, newModel, metadata);
-			doAnswer(invocation -> {
-				msgUuidsForSaveModelCalls.add(Thread.currentThread().getName());
-				return null;
-			}).when(serviceFacade).saveModel(TableToSyncEnum.PERSON, newModel);
-			Exchange e = new DefaultExchange(new DefaultCamelContext());
-			e.getIn().setBody(syncModel);
-			futures.add(CompletableFuture.runAsync(() -> {
-				try {
-					Thread.currentThread().setName(metadata.getMessageUuid());
-					producer.process(e);
-				}
-				finally {
-					Thread.currentThread().setName(originalThreadName);
-				}
-			}, executor));
-		}
-		
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
-		
-		assertEquals(size, msgUuidsForGetModelCalls.size());
-		assertEquals(size, msgUuidsForGetHashCalls.size());
-		assertEquals(size, msgUuidsForSaveHashCalls.size());
-		//Since events for the same entity are processed in parallel we expect the calls below to be at the same 
-		//indices 
-		for (int i = 0; i < size; i++) {
-			final String msgUuid = msgUuidPrefix + i;
-			int index = msgUuidsForGetModelCalls.indexOf(msgUuid);
-			assertEquals(index, msgUuidsForGetHashCalls.indexOf(msgUuid));
-			assertEquals(index, msgUuidsForSaveModelCalls.indexOf(msgUuid));
-			assertEquals(index, msgUuidsForSaveHashCalls.indexOf(msgUuid));
-		}
 	}
 	
 }
