@@ -8,7 +8,10 @@ import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAU
 import static org.springframework.data.domain.ExampleMatcher.matching;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
@@ -44,9 +47,14 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	
 	private static final Logger log = LoggerFactory.getLogger(OpenmrsLoadProducer.class);
 	
+	//Used to temporarily store the entities being processed at any point in time across all sites
+	private static Set<String> PROCESSING_MSG_QUEUE;
+	
 	public OpenmrsLoadProducer(final OpenmrsEndpoint endpoint, final ApplicationContext applicationContext,
 	    final ProducerParams params) {
 		super(endpoint, applicationContext, params);
+		//TODO capacity should be thread pool size
+		PROCESSING_MSG_QUEUE = Collections.synchronizedSet(new HashSet<>(50));
 	}
 	
 	@Override
@@ -78,19 +86,37 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		boolean delete = isDeleteOperation && !isUser && !isProvider;
 		Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(syncModel.getModel());
 		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
-		BaseHashEntity storedHash = null;
-		if (dbModel != null || delete) {
-			storedHash = HashUtils.getStoredHash(syncModel.getModel().getUuid(), hashClass, producerTemplate);
+		final String uuid = syncModel.getModel().getUuid();
+		final String uniqueId = syncModel.getTableToSyncModelClass().getName() + uuid;
+		try {
+			//Process events for the same entity in serial to avoid false conflicts, this will ONLY be necessary for events
+			//for the same entity originating from different sites
+			while (!PROCESSING_MSG_QUEUE.add(uniqueId)) {
+				try {
+					Thread.sleep(500);
+				}
+				catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+			BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, uuid);
+			BaseHashEntity storedHash = null;
+			if (dbModel != null || delete) {
+				storedHash = HashUtils.getStoredHash(uuid, hashClass, producerTemplate);
+			}
+			
+			//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
+			//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
+			if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
+				delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum, producerTemplate);
+			} else {
+				save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
+				    isDeleteOperation);
+			}
 		}
-		
-		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
-		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
-		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
-			delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum, producerTemplate);
-		} else {
-			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
-			    isDeleteOperation);
+		finally {
+			PROCESSING_MSG_QUEUE.remove(uniqueId);
 		}
 	}
 	
@@ -379,7 +405,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	
 	/**
 	 * Saves the specified hash object to the database
-	 * 
+	 *
 	 * @param object hash object to save
 	 * @param template {@link ProducerTemplate} object
 	 * @param handleDuplicateHash specifies if a unique key constraint violation exception should be
@@ -400,7 +426,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	/**
 	 * Checks if the exception is due to an attempt to insert a duplicate hash row for the same entity,
 	 * and if it is the case it updates the existing hash row instead.
-	 * 
+	 *
 	 * @param cause the immediate cause of the thrown exception
 	 * @param object the hash entity that was being inserted
 	 * @param template ProducerTemplate object
