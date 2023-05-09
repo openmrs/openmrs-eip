@@ -10,7 +10,10 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESS
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,6 +57,9 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private static int taskThreshold;
 	
+	//Used to temporarily store the entities being processed at any point in time across all sites
+	private static Set<String> PROCESSING_MSG_QUEUE;
+	
 	private SiteInfo site;
 	
 	private boolean errorEncountered = false;
@@ -88,6 +94,7 @@ public class SiteMessageConsumer implements Runnable {
 				GET_JPA_URI = JPA_URI_PREFIX + batchSize;
 				//This ensures there will only be a limited number of queued items for each thread
 				taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
+				PROCESSING_MSG_QUEUE = Collections.synchronizedSet(new HashSet<>(executor.getMaximumPoolSize()));
 				initialized = true;
 			}
 		}
@@ -217,8 +224,22 @@ public class SiteMessageConsumer implements Runnable {
 	 */
 	public void processMessage(SyncMessage msg) {
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
-		
-		CamelUtils.send(messageProcessorUri, exchange);
+		final String uniqueId = msg.getModelClassName() + "#" + msg.getIdentifier();
+		boolean removeId = false;
+		try {
+			if (!PROCESSING_MSG_QUEUE.add(uniqueId)) {
+				log.info("Postponed sync of {} because another site is processing an event for the same entity", msg);
+				return;
+			}
+			
+			removeId = true;
+			CamelUtils.send(messageProcessorUri, exchange);
+		}
+		finally {
+			if (removeId) {
+				PROCESSING_MSG_QUEUE.remove(uniqueId);
+			}
+		}
 		
 		boolean movedToConflict = exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, false, Boolean.class);
 		boolean movedToError = exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, false, Boolean.class);

@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
 import static java.util.Collections.synchronizedList;
+import static java.util.Collections.synchronizedSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -29,9 +30,13 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -98,20 +103,27 @@ public class SiteMessageConsumerTest {
 		siteInfo.setIdentifier("testSite");
 		Mockito.when(mockProducerTemplate.getCamelContext()).thenReturn(mockCamelContext);
 		Mockito.when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
+		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", synchronizedSet(new HashSet<>()));
 	}
 	
 	@After
 	public void tearDown() {
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
+		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", synchronizedSet(new HashSet<>()));
 	}
 	
 	private void setupConsumer(final int size) {
+		consumer = createConsumer(size);
+	}
+	
+	private SiteMessageConsumer createConsumer(final int size) {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(size);
-		consumer = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
-		Whitebox.setInternalState(consumer, ProducerTemplate.class, mockProducerTemplate);
-		Whitebox.setInternalState(consumer, SyncedMessageRepository.class, syncedMsgRepo);
+		SiteMessageConsumer c = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
+		Whitebox.setInternalState(c, ProducerTemplate.class, mockProducerTemplate);
+		Whitebox.setInternalState(c, SyncedMessageRepository.class, syncedMsgRepo);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
+		return c;
 	}
 	
 	private SyncMessage createMessage(int index, boolean snapshot) {
@@ -750,6 +762,61 @@ public class SiteMessageConsumerTest {
 		assertEquals(msg, processedMsgs.get(0));
 		verifyNoInteractions(syncedMsgRepo);
 		verify(mockProducerTemplate, never()).sendBody(anyString(), isNull());
+	}
+	
+	@Test
+	public void processMessages_shouldSkipAMessageIfAnotherSiteThreadIsProcessingAnEventForTheSameEntity() throws Exception {
+		final String uuid = "same-uuid";
+		final int siteCount = 5;
+		List<SyncMessage> allSiteMsgs = new ArrayList(siteCount);
+		List<Long> expectedResults = synchronizedList(new ArrayList(siteCount));
+		List<SyncMessage> sameEntityMessages = new ArrayList();
+		final int multiplesOf = 2;
+		final int expectedProcessedMsgCount = 3;
+		ExecutorService executor = Executors.newFixedThreadPool(siteCount);
+		List<CompletableFuture<Void>> futures = new ArrayList(siteCount);
+		Set<String> processingMsgQueue = synchronizedSet(new HashSet<>(siteCount));
+		final String uniqueIdentifier = PersonModel.class.getName() + "#" + uuid;
+		processingMsgQueue.add(uniqueIdentifier);
+		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", processingMsgQueue);
+		for (int i = 0; i < siteCount; i++) {
+			SyncMessage m = createMessage(i, false);
+			if (i > 0 && i % multiplesOf == 0) {
+				m.setIdentifier(uuid);
+				sameEntityMessages.add(m);
+			}
+			allSiteMsgs.add(m);
+			Mockito.when(CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class))).thenAnswer(invocation -> {
+				Exchange exchange = invocation.getArgument(1);
+				SyncMessage procMsg = exchange.getIn().getBody(SyncMessage.class);
+				expectedResults.add(procMsg.getId());
+				assertTrue(processingMsgQueue.contains(PersonModel.class.getName() + "#" + procMsg.getIdentifier()));
+				exchange.setProperty(EX_PROP_MSG_PROCESSED, true);
+				return null;
+			});
+			futures.add(CompletableFuture.runAsync(() -> {
+				try {
+					createConsumer(1).processMessage(m);
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}, executor));
+		}
+		
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
+		assertEquals(expectedProcessedMsgCount, expectedResults.size());
+		for (int i = 0; i < siteCount; i++) {
+			SyncMessage msg = allSiteMsgs.get(i);
+			//All messages for the same entity are skipped if another site thread is processing events for same entity
+			if (i > 0 && i % multiplesOf == 0) {
+				assertFalse(expectedResults.contains(msg.getId()));
+			} else {
+				assertTrue(expectedResults.contains(msg.getId()));
+			}
+		}
+		assertEquals(1, processingMsgQueue.size());
+		assertEquals(uniqueIdentifier, processingMsgQueue.iterator().next());
 	}
 	
 }
