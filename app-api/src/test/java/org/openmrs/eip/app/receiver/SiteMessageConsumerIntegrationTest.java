@@ -24,9 +24,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	
 	@Autowired
-	private ProducerTemplate producerTemplate;
-	
-	@Autowired
 	@Qualifier(BEAN_NAME_SYNC_EXECUTOR)
 	private ThreadPoolExecutor syncExecutor;
 	

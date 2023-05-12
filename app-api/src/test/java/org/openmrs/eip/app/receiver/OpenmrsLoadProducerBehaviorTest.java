@@ -58,9 +58,6 @@ public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
 	@Autowired
 	private PersonNameRepository nameRepo;
 	
-	@Autowired
-	private SiteRepository siteRepo;
-	
 	@Before
 	public void setup() {
 		SyncContext.setAppUser(userLightRepo.findById(1L).get());

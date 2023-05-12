@@ -110,8 +110,8 @@ public class SiteMessageConsumer implements Runnable {
 			return;
 		}
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Starting message consumer thread for site -> " + site);
+		if (log.isTraceEnabled()) {
+			log.trace("Starting message consumer thread for site -> " + site);
 		}
 		
 		do {
@@ -146,8 +146,8 @@ public class SiteMessageConsumer implements Runnable {
 		} while (!AppUtils.isStopping() && !errorEncountered);
 		
 		if (!errorEncountered) {
-			if (log.isDebugEnabled()) {
-				log.debug("Sync message consumer for site: " + site + " has completed");
+			if (log.isTraceEnabled()) {
+				log.trace("Sync message consumer for site: " + site + " has completed");
 			}
 		}
 		
@@ -228,7 +228,10 @@ public class SiteMessageConsumer implements Runnable {
 		boolean removeId = false;
 		try {
 			if (!PROCESSING_MSG_QUEUE.add(uniqueId)) {
-				log.info("Postponed sync of {} because another site is processing an event for the same entity", msg);
+				if (log.isDebugEnabled()) {
+					log.debug("Postponed sync of {} because another site is processing an event for the same entity", msg);
+				}
+				
 				return;
 			}
 			
