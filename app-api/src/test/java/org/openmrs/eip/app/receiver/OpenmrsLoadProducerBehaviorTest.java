@@ -7,6 +7,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.component.utils.HashUtils.computeHash;
 import static org.openmrs.eip.component.utils.HashUtils.getStoredHash;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.CamelExecutionException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
-import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.OpenmrsLoadProducer;
 import org.openmrs.eip.component.entity.light.PersonLight;
@@ -38,7 +37,6 @@ import org.openmrs.eip.component.repository.PersonNameRepository;
 import org.openmrs.eip.component.repository.PersonRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
@@ -136,11 +134,8 @@ public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
 					producerTemplate.sendBody(URI_LOAD, syncModel);
 					passCount.incrementAndGet();
 				}
-				catch (DataIntegrityViolationException e) {
-					failureCount.incrementAndGet();
-				}
 				catch (CamelExecutionException e) {
-					if (ExceptionUtils.getRootCause(e) instanceof JdbcSQLIntegrityConstraintViolationException) {
+					if (ExceptionUtils.getRootCause(e) instanceof SQLIntegrityConstraintViolationException) {
 						failureCount.incrementAndGet();
 					}
 				}

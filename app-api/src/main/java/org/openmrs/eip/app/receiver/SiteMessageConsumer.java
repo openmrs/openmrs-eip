@@ -159,7 +159,9 @@ public class SiteMessageConsumer implements Runnable {
 	}
 	
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
-		log.info("Processing " + syncMessages.size() + " message(s) from site: " + site);
+		if (log.isTraceEnabled()) {
+			log.trace("Processing " + syncMessages.size() + " message(s) from site: " + site);
+		}
 		
 		List<String> typeAndIdentifier = synchronizedList(new ArrayList(taskThreshold));
 		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(taskThreshold));
@@ -224,9 +226,19 @@ public class SiteMessageConsumer implements Runnable {
 	 */
 	public void processMessage(SyncMessage msg) {
 		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
-		final String uniqueId = msg.getModelClassName() + "#" + msg.getIdentifier();
+		//TODO Move this logic that ensures no threads process events for the same entity to message-processor route
+		String modelClass = msg.getModelClassName();
+		if (ReceiverUtils.isSubclass(modelClass)) {
+			modelClass = ReceiverUtils.getParentModelClassName(modelClass);
+		}
+		
+		final String uniqueId = modelClass + "#" + msg.getIdentifier();
 		boolean removeId = false;
 		try {
+			//We could ignore inserts because we don't expect any events for the entity from other sites yet BUT in a 
+			//very rare case, this could be a message we previously processed but was never removed from the queue 
+			//and it is just getting re-processed so the entity could have been already been imported by other sites 
+			//and then we actually have events for the same entity from other sites
 			if (!PROCESSING_MSG_QUEUE.add(uniqueId)) {
 				if (log.isDebugEnabled()) {
 					log.debug("Postponed sync of {} because another site is processing an event for the same entity", msg);
@@ -297,16 +309,16 @@ public class SiteMessageConsumer implements Runnable {
 	 * @throws Exception
 	 */
 	public void waitForFutures(List<CompletableFuture<Void>> futures) throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("Waiting for " + futures.size() + " sync message processor thread(s) to terminate");
+		if (log.isTraceEnabled()) {
+			log.trace("Waiting for " + futures.size() + " sync message processor thread(s) to terminate");
 		}
 		
 		CompletableFuture<Void> allFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 		
 		allFuture.get();
 		
-		if (log.isDebugEnabled()) {
-			log.debug(futures.size() + " sync message processor thread(s) have terminated");
+		if (log.isTraceEnabled()) {
+			log.trace(futures.size() + " sync message processor thread(s) have terminated");
 		}
 	}
 	

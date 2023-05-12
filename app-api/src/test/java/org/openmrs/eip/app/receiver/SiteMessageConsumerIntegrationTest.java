@@ -4,11 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
+import org.junit.After;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
@@ -27,8 +29,14 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Qualifier(BEAN_NAME_SYNC_EXECUTOR)
 	private ThreadPoolExecutor syncExecutor;
 	
+	@After
+	public void tearDown() {
+		setInternalState(BaseSiteRunnable.class, "initialized", false);
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
+	}
+	
 	@Test
-	public void fetchNextSyncMessageBatch_shouldGetOnlyNewMessages() throws Exception {
+	public void fetchNextSyncMessageBatch_shouldGetAllMessagesForTheSiteOrderedByDateCreated() throws Exception {
 		SiteInfo site = TestUtils.getEntity(SiteInfo.class, 1L);
 		SiteMessageConsumer consumer = new SiteMessageConsumer(null, site, syncExecutor);
 		Whitebox.setInternalState(consumer, ProducerTemplate.class, producerTemplate);

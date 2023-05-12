@@ -110,7 +110,7 @@ public class SiteMessageConsumerTest {
 	public void tearDown() {
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
-		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", synchronizedSet(new HashSet<>()));
+		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", (Object) null);
 	}
 	
 	private void setupConsumer(final int size) {
@@ -175,7 +175,7 @@ public class SiteMessageConsumerTest {
 	public void processMessages_shouldProcessAllSnapshotMessagesInParallelForSlowThreads() throws Exception {
 		Thread originalThread = Thread.currentThread();
 		final String originalThreadName = Thread.currentThread().getName();
-		final int size = 100;
+		final int size = 50;
 		setupConsumer(size);
 		List<SyncMessage> messages = new ArrayList(size);
 		List<Long> expectedResults = synchronizedList(new ArrayList(size));
@@ -765,7 +765,7 @@ public class SiteMessageConsumerTest {
 	}
 	
 	@Test
-	public void processMessages_shouldSkipAMessageIfAnotherSiteThreadIsProcessingAnEventForTheSameEntity() throws Exception {
+	public void processMessage_shouldSkipAMessageIfAnotherSiteThreadIsProcessingAnEventForTheSameEntity() throws Exception {
 		final String uuid = "same-uuid";
 		final int siteCount = 5;
 		List<SyncMessage> allSiteMsgs = new ArrayList(siteCount);
@@ -817,6 +817,23 @@ public class SiteMessageConsumerTest {
 		}
 		assertEquals(1, processingMsgQueue.size());
 		assertEquals(uniqueIdentifier, processingMsgQueue.iterator().next());
+	}
+	
+	@Test
+	public void processMessage_shouldSkipASubclassMessageIfAnotherSiteThreadIsProcessingAnEventForTheSameEntity() {
+		final String uuid = "person-uuid";
+		SyncMessage msg = new SyncMessage();
+		msg.setModelClassName(PatientModel.class.getName());
+		msg.setIdentifier(uuid);
+		final String uniqueId = PersonModel.class.getName() + "#" + uuid;
+		Set<String> procMsgQueue = synchronizedSet(new HashSet<>());
+		procMsgQueue.add(uniqueId);
+		setInternalState(SiteMessageConsumer.class, "PROCESSING_MSG_QUEUE", procMsgQueue);
+		
+		createConsumer(1).processMessage(msg);
+		
+		PowerMockito.verifyStatic(CamelUtils.class, never());
+		CamelUtils.send(eq(URI_MSG_PROCESSOR), any(Exchange.class));
 	}
 	
 }

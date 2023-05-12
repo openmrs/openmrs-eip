@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -46,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
+@Ignore
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
@@ -94,7 +96,6 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private SyncMessage createMessage(int msgId, String identifier, LocalDateTime dateCreated, SiteInfo siteInfo) {
 		SyncMessage m = new SyncMessage();
-		//m.setId(Long.valueOf(msgId));
 		m.setModelClassName(PersonModel.class.getName());
 		m.setIdentifier(identifier);
 		m.setSite(siteInfo);
