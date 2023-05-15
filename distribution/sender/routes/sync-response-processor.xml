@@ -40,10 +40,10 @@
 
                 <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = '${exchangeProperty.syncResponse.messageUuid}'" />
 
-                <log loggingLevel="INFO" message="Successfully removed Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                <log loggingLevel="DEBUG" message="Successfully removed sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
             </when>
             <otherwise>
-                <log loggingLevel="INFO" message="No Sender sync message was found with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                <log message="No sync message was found with uuid ${exchangeProperty.syncResponse.messageUuid}" />
             </otherwise>
         </choice>
 

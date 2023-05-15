@@ -42,7 +42,7 @@
         
                 <to uri="jpa:SenderSyncRequest" />
         
-                <log message="Successfully saved sync request" />
+                <log loggingLevel="DEBUG" message="Successfully saved sync request" />
             </when>
             
             <when>
@@ -72,7 +72,7 @@
         
                 <to uri="jpa:SenderSyncResponse" />
         
-                <log message="Successfully saved sync response" />
+                <log loggingLevel="DEBUG" message="Successfully saved sync response" />
             </when>
             
             <otherwise>

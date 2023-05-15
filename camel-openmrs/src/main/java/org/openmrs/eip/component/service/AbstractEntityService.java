@@ -1,6 +1,5 @@
 package org.openmrs.eip.component.service;
 
-import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 import static org.openmrs.eip.component.utils.ModelUtils.decomposeUuid;
 
 import java.time.LocalDateTime;
@@ -13,10 +12,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 import org.openmrs.eip.component.SyncContext;
-import org.openmrs.eip.component.entity.BaseDataEntity;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
@@ -124,16 +121,10 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 		}
 		
 		M modelToReturn;
-		boolean isEtyInDbPlaceHolder = false;
-		if (etyInDb != null && etyInDb instanceof BaseDataEntity) {
-			BaseDataEntity bde = (BaseDataEntity) etyInDb;
-			isEtyInDbPlaceHolder = bde.isVoided() && DEFAULT_VOID_REASON.equals(bde.getVoidReason());
-		}
-		
 		if (etyInDb == null) {
 			modelToReturn = saveEntity(ety);
 			log.info(getMsg(ety, model.getUuid(), " inserted"));
-		} else if (isEtyInDbPlaceHolder || hasSelfReference || !etyInDb.wasModifiedAfter(ety)) {
+		} else {
 			ety.setId(etyInDb.getId());
 			modelToReturn = saveEntity(ety);
 			if (hasSelfReference) {
@@ -141,8 +132,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 			} else {
 				log.info(getMsg(ety, model.getUuid(), " updated"));
 			}
-		} else {
-			throw new ConflictsFoundException();
 		}
 		
 		return modelToReturn;
