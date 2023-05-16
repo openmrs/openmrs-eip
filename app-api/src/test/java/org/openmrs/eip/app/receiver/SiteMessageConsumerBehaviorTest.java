@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -41,18 +40,21 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.impl.PersonService;
+import org.openmrs.eip.component.utils.DateUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
-@Ignore
+@TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
+@TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
 	
-	private static final int MSG_COUNT = 5;
+	private static final int MSG_COUNT = 150;
 	
 	private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(MSG_COUNT);
 	
@@ -116,11 +118,11 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void processMessage_shouldProcessUpdateEventsFromDifferentSitesForTheSameEntitySeriallyWithNoConflictsReported()
+	public void run_shouldProcessUpdateEventsFromDifferentSitesForTheSameEntitySeriallyWithNoConflictsReported()
 	    throws Exception {
 		assertEquals(0, syncedMsgRepo.count());
 		final String personUuid = "person-uuid";
-		final LocalDateTime dateCreated = LocalDateTime.now();
+		final LocalDateTime dateCreated = DateUtils.stringToDate("2023-05-16 10:00:00");
 		PersonModel person = createPersonModel(personUuid, dateCreated);
 		personService.save(person);
 		PersonHash existingHash = new PersonHash();
