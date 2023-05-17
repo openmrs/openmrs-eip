@@ -9,10 +9,11 @@
 5. [Metrics](#metrics)   
 6. [Management Database](#management-database)
 7. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-8. [Developer Guide](#developer-guide)
+8. [MySQL 8 Support](#mysql-8-support)
+9. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
-9. [Building Custom Applications](docs/custom/README.md)
+10. [Building Custom Applications](docs/custom/README.md)
 
 # Introduction
 This project aims at providing a mechanism to track low-level changes in an OpenMRS database based on [Debezium](https://debezium.io) and 
