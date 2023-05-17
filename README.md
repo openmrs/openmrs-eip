@@ -93,8 +93,8 @@ Please, see the file [example-app/application.properties](example-app/applicatio
 
 ## Authentication protocol
 
-For some users (debezium user), the connection could fail with the error `AuthenticationException: Client does not support authentication protocol`
-To fix this, use this following command to create a user compatible with MySQL 8 ( use `WITH mysql_native_password`):
+For some users (debezium user), the connection could fail with the error `AuthenticationException: Client does not support authentication protocol`.
+To fix this, use this following command to create a user compatible with MySQL 8 ( notice the use of `WITH mysql_native_password`);
 
 ```sql
 CREATE USER '${DEBEZIUM_USERNAME}'@'%' IDENTIFIED WITH mysql_native_password BY '${DEBEZIUM_PASSWORD}';
