@@ -84,8 +84,7 @@ eliminate any possibility of being unreachable and lower latency hence better pe
 # MySQL 8 Support
 
 ## Public Key Retrieval
-the property `allowPublicKeyRetrieval` should be set to true to avoid the issue `Unable to connect: Public Key Retrieval is not allowed`.
-this property should be added to these properties:
+To avoid the known issue `Unable to connect: Public Key Retrieval is not allowed` with an OpenMRS MySQL 8 database, set the MySQL URL parameter `allowPublicKeyRetrieval` to `true`. This parameter should be added to the following application properties:
 - `debezium.extraParameters` ( extra parameters given to Debezium)
 - `spring.openmrs-datasource.jdbcUrl`
 - `spring.mngt-datasource.jdbcUrl` ( only if you use MySQL 8 for management database)
