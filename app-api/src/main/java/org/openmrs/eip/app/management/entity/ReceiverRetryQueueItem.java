@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.component.SyncOperation;
+import org.openmrs.eip.component.exception.ConflictsFoundException;
+import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "receiver_retry_queue")
@@ -55,6 +57,15 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Column(name = "date_received", updatable = false)
 	private Date dateReceived;
+	
+	public ReceiverRetryQueueItem() {
+	}
+	
+	public ReceiverRetryQueueItem(ConflictQueueItem conflict) {
+		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
+		setDateCreated(new Date());
+		setExceptionType(ConflictsFoundException.class.getName());
+	}
 	
 	/**
 	 * Gets the modelClassName

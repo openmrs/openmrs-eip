@@ -53,7 +53,7 @@ public class ConflictServiceImplTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(HashUtils.class);
-		service = new ConflictServiceImpl(mockRepo, mockServiceFacade, mockProducerTemplate);
+		service = new ConflictServiceImpl(mockRepo, null, mockServiceFacade, mockProducerTemplate);
 		Whitebox.setInternalState(ConflictServiceImpl.class, Logger.class, mockLogger);
 	}
 	

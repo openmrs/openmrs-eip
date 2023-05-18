@@ -110,6 +110,8 @@ public class ReceiverSyncArchiveTest {
 		conflict.setMessageUuid("message-uuid");
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setDateReceived(new Date());
+		conflict.setOperation(SyncOperation.u);
+		conflict.setResolved(true);
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
 		

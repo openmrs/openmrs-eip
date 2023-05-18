@@ -3,9 +3,13 @@ package org.openmrs.eip.app.management.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
@@ -22,22 +26,26 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	private static final Logger log = LoggerFactory.getLogger(ConflictServiceImpl.class);
 	
-	private ConflictRepository repo;
+	private ConflictRepository conflictRepo;
+	
+	private ReceiverRetryRepository retryRepo;
 	
 	private ProducerTemplate producerTemplate;
 	
 	private EntityServiceFacade serviceFacade;
 	
-	public ConflictServiceImpl(ConflictRepository repo, EntityServiceFacade serviceFacade,
-	    ProducerTemplate producerTemplate) {
-		this.repo = repo;
+	public ConflictServiceImpl(ConflictRepository conflictRepo, ReceiverRetryRepository retryRepo,
+	    EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
+		
+		this.conflictRepo = conflictRepo;
+		this.retryRepo = retryRepo;
 		this.serviceFacade = serviceFacade;
 		this.producerTemplate = producerTemplate;
 	}
 	
 	@Override
 	public List<ConflictQueueItem> getBadConflicts() {
-		List<ConflictQueueItem> conflicts = repo.findByResolvedIsFalse();
+		List<ConflictQueueItem> conflicts = conflictRepo.findByResolvedIsFalse();
 		if (log.isDebugEnabled()) {
 			log.debug("Conflict count: " + conflicts.size());
 		}
@@ -55,6 +63,34 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			
 			return false;
 		}).collect(Collectors.toList());
+	}
+	
+	@Override
+	@Transactional
+	public ReceiverRetryQueueItem moveToRetryQueue(ConflictQueueItem conflict, String reason) {
+		if (log.isDebugEnabled()) {
+			log.debug("Moving to retry queue the conflict item with id: " + conflict.getId());
+		}
+		
+		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem(conflict);
+		retry.setMessage(reason);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving retry item");
+		}
+		
+		retry = retryRepo.save(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved retry item, removing item from the conflict queue");
+		}
+		
+		conflictRepo.delete(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item removed from the conflict queue");
+		}
+		
+		return retry;
 	}
 	
 }

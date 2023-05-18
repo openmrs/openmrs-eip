@@ -115,7 +115,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldLoadAllRetryItemsSortedByDateCreatedAndCallTheEventProcessorForEach() throws Exception {
+	public void shouldLoadAllRetryItemsSortedByDateReceivedAndCallTheEventProcessorForEach() throws Exception {
 		final int retryCount = 5;
 		List<ReceiverRetryQueueItem> retries = TestUtils.getEntities(ReceiverRetryQueueItem.class);
 		for (ReceiverRetryQueueItem retry : retries) {
