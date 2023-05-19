@@ -19,12 +19,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <mysqlConnectorVersion>8.0.16</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
         <sprintBootVersion>2.3.0.RELEASE</sprintBootVersion>
         <hibernateVersion>5.4.21.Final</hibernateVersion>
         <hibernateValidatorVersion>6.1.5.Final</hibernateValidatorVersion>
         <camelVersion>3.3.0</camelVersion>
-        <liquibaseVersion>4.2.0</liquibaseVersion>
+        <liquibaseVersion>4.21.1</liquibaseVersion>
         <h2Version>1.4.200</h2Version>
         <guava.version>29.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>

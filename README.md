@@ -9,10 +9,11 @@
 5. [Metrics](#metrics)   
 6. [Management Database](#management-database)
 7. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-8. [Developer Guide](#developer-guide)
+8. [MySQL 8 Support](#mysql-8-support)
+9. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
-9. [Building Custom Applications](docs/custom/README.md)
+10. [Building Custom Applications](docs/custom/README.md)
 
 # Introduction
 This project aims at providing a mechanism to track low-level changes in an OpenMRS database based on [Debezium](https://debezium.io) and 
@@ -80,6 +81,25 @@ The `openmrs-watcher` requires configuration of a management database where it s
 The Management DB has been tested with MySQL and H2, you should be able to use any other relational database supported 
 by hibernate, it is highly recommended that the management DB resides on the same physical machine as the application to 
 eliminate any possibility of being unreachable and lower latency hence better performance.
+
+# MySQL 8 Support
+
+## Public Key Retrieval
+To avoid the known issue `Unable to connect: Public Key Retrieval is not allowed` with an OpenMRS MySQL 8 database, set the MySQL URL parameter `allowPublicKeyRetrieval` to `true`. This parameter should be added to the following application properties:
+- `debezium.extraParameters` ( extra parameters given to Debezium)
+- `spring.openmrs-datasource.jdbcUrl`
+- `spring.mngt-datasource.jdbcUrl` ( only if you use MySQL 8 for management database)
+
+Please, see the file [example-app/application.properties](example-app/application.properties) for examples.
+
+## Authentication protocol
+
+For some users (debezium user), the connection could fail with the error `AuthenticationException: Client does not support authentication protocol`.
+To fix this, use this following command to create a user compatible with MySQL 8 ( notice the use of `WITH mysql_native_password`);
+
+```sql
+CREATE USER '${DEBEZIUM_USERNAME}'@'%' IDENTIFIED WITH mysql_native_password BY '${DEBEZIUM_PASSWORD}';
+```
 
 # Error Handling And Retry Mechanism
 The `openmrs-watcher` module has a built-in error handling and retry mechanism in case something goes wrong when the 
