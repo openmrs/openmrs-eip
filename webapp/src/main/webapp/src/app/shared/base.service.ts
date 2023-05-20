@@ -11,7 +11,7 @@ import {TotalCountAndGroupedItems} from "./total-count-and-grouped-items";
 })
 export abstract class BaseService<T extends BaseEntity> {
 
-	protected constructor(private httpClient: HttpClient) {
+	protected constructor(protected httpClient: HttpClient) {
 	}
 
 	getCountAndItems(resource: string): Observable<BaseCountAndItems<T>> {

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +43,9 @@ public class ConflictController extends BaseRestController {
 	
 	@Autowired
 	private EntityServiceFacade entityServiceFacade;
+	
+	@Autowired
+	private ConflictService service;
 	
 	@Override
 	public Class<?> getClazz() {
@@ -83,7 +88,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@PatchMapping("/{id}")
-	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Long id) throws Exception {
+	public Object update(@RequestBody Map<String, Object> payload, @PathVariable("id") Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Updating conflict with id: " + id);
 		}
@@ -123,6 +128,32 @@ public class ConflictController extends BaseRestController {
 		log.info("Successfully saved new hash for the entity");
 		
 		return conflict;
+	}
+	
+	@GetMapping("/verify")
+	public int verify() {
+		if (log.isDebugEnabled()) {
+			log.debug("Getting count conflicts where the entity hashes are valid");
+		}
+		
+		return service.getBadConflicts().size();
+	}
+	
+	@PostMapping("/clean")
+	public int clean() {
+		if (log.isDebugEnabled()) {
+			log.debug("Cleaning conflicts");
+		}
+		
+		List<ConflictQueueItem> conflicts = service.getBadConflicts();
+		
+		log.info("Moving " + conflicts.size() + " conflict(s) where the entity hashes are valid");
+		
+		for (ConflictQueueItem c : conflicts) {
+			service.moveToRetryQueue(c, "Moved from conflict queue because the hash on file is valid");
+		}
+		
+		return conflicts.size();
 	}
 	
 }

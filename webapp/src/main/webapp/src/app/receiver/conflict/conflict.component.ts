@@ -26,8 +26,18 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	parsedEntityPayLoad?: any;
 
+	toCleanCount: number = 0;
+
+	cleanedCount: number = 0;
+
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
+
+	@ViewChild('verifyConflictsTemplate')
+	verifyDetailsRef?: ElementRef;
+
+	@ViewChild('cleanedConflictsTemplate')
+	cleanedDetailsRef?: ElementRef;
 
 	viewSubscription?: Subscription;
 
@@ -70,6 +80,23 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	loadConflicts(): void {
 		this.service.getConflictCountAndItems().subscribe(countAndItems => {
 			this.store.dispatch(new ConflictsLoaded(countAndItems));
+		});
+	}
+
+	verifyConflicts(): void {
+		this.service.verifyConflicts().subscribe(count => {
+			this.toCleanCount = count;
+			if(this.toCleanCount > 0) {
+				this.showVerifyDialog();
+			}
+		});
+	}
+
+	cleanFalseConflicts(): void {
+		this.closeDetailsDialog();
+		this.service.cleanConflicts().subscribe(count => {
+			this.cleanedCount = count;
+			this.showCleanDialog();
 		});
 	}
 
@@ -119,6 +146,22 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	getSimpleClassName(className?: string) {
 		return className?.substring(className.lastIndexOf('.') + 1, className.lastIndexOf('Model'));
+	}
+
+	showVerifyDialog(): void {
+		const dialogConfig: NgbModalOptions = {
+			backdrop: 'static',
+		}
+
+		this.modalRef = this.modalService.open(this.verifyDetailsRef, dialogConfig);
+	}
+
+	showCleanDialog(): void {
+		const dialogConfig: NgbModalOptions = {
+			backdrop: 'static',
+		}
+
+		this.modalRef = this.modalService.open(this.cleanedDetailsRef, dialogConfig);
 	}
 
 }
