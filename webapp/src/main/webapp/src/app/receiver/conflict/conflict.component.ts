@@ -2,8 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild,} from '@angular/core';
 import {ConflictService} from "./conflict.service";
 import {Conflict} from "./conflict";
 import {select, Store} from "@ngrx/store";
-import {CONFLICT_TO_VIEW, GET_CONFLICTS} from "./state/conflict.reducer";
-import {ConflictsLoaded, ViewConflict} from "./state/conflict.actions";
+import {CONFLICT_TO_VIEW, GET_CONFLICTS, GET_FALSE_CONFLICTS} from "./state/conflict.reducer";
+import {ConflictsLoaded, ConflictsVerified, ViewConflict} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ConfirmDialogComponent} from "../../shared/dialogs/confirm.component";
@@ -26,7 +26,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	parsedEntityPayLoad?: any;
 
-	toCleanCount: number = 0;
+	falseConflicts?: number;
 
 	cleanedCount: number = 0;
 
@@ -42,6 +42,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	viewSubscription?: Subscription;
 
 	loadedSubscription?: Subscription;
+
+	verifiedSubscription?: Subscription;
 
 	constructor(
 		private service: ConflictService,
@@ -74,6 +76,15 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 			}
 		);
 
+		this.verifiedSubscription = this.store.pipe(select(GET_FALSE_CONFLICTS)).subscribe(
+			count => {
+				this.falseConflicts = count;
+				if (this.falseConflicts) {
+					this.showVerifyDialog();
+				}
+			}
+		);
+
 		this.loadConflicts();
 	}
 
@@ -85,14 +96,11 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	verifyConflicts(): void {
 		this.service.verifyConflicts().subscribe(count => {
-			this.toCleanCount = count;
-			if(this.toCleanCount > 0) {
-				this.showVerifyDialog();
-			}
+			this.store.dispatch(new ConflictsVerified(count));
 		});
 	}
 
-	cleanFalseConflicts(): void {
+	cleanConflicts(): void {
 		this.closeDetailsDialog();
 		this.service.cleanConflicts().subscribe(count => {
 			this.cleanedCount = count;
@@ -141,6 +149,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	ngOnDestroy(): void {
 		this.viewSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
+		this.verifiedSubscription?.unsubscribe();
 		super.ngOnDestroy();
 	}
 
@@ -154,6 +163,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		}
 
 		this.modalRef = this.modalService.open(this.verifyDetailsRef, dialogConfig);
+		this.modalRef.closed.subscribe(() => {
+			this.store.dispatch(new ConflictsVerified());
+		});
 	}
 
 	showCleanDialog(): void {
@@ -162,6 +174,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		}
 
 		this.modalRef = this.modalService.open(this.cleanedDetailsRef, dialogConfig);
+		this.modalRef.closed.subscribe(() => {
+			this.loadConflicts();
+		});
 	}
 
 }
