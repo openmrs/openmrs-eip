@@ -1584,6 +1584,22 @@
 
     <changeSet author="wluyima" id="20230523-1001">
         <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM receiver_synced_msg WHERE date_received IS NULL
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Setting receiver_synced_msg.date_received where it is null</comment>
+
+        <update tableName="receiver_synced_msg">
+            <column name="date_received" valueComputed="date_created" />
+            <where>date_received IS NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1002">
+        <preConditions onFail="MARK_RAN">
             <columnExists columnName="date_received" tableName="receiver_synced_msg" />
         </preConditions>
         <comment>Adding not null constraint to receiver_synced_msg.date_received</comment>
@@ -1591,22 +1607,20 @@
         <addNotNullConstraint tableName="receiver_synced_msg" columnName="date_received" columnDataType="DATETIME(3)" />
     </changeSet>
 
-    <changeSet author="wluyima" id="20230523-1002">
-        <preConditions onFail="MARK_RAN">
-            <columnExists columnName="date_received" tableName="receiver_sync_archive" />
-        </preConditions>
-        <comment>Adding not null constraint to receiver_sync_archive.date_received</comment>
-
-        <addNotNullConstraint tableName="receiver_sync_archive" columnName="date_received" columnDataType="DATETIME(3)" />
-    </changeSet>
-
     <changeSet author="wluyima" id="20230523-1003">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="date_received" tableName="receiver_pruned_item" />
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM receiver_retry_queue WHERE date_received IS NULL
+                </sqlCheck>
+            </not>
         </preConditions>
-        <comment>Adding not null constraint to receiver_pruned_item.date_received</comment>
+        <comment>Setting receiver_retry_queue.date_received where it is null</comment>
 
-        <addNotNullConstraint tableName="receiver_pruned_item" columnName="date_received" columnDataType="DATETIME(3)" />
+        <update tableName="receiver_retry_queue">
+            <column name="date_received" valueComputed="date_created" />
+            <where>date_received IS NULL</where>
+        </update>
     </changeSet>
 
     <changeSet author="wluyima" id="20230523-1004">
@@ -1619,6 +1633,22 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20230523-1005">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM receiver_conflict_queue WHERE date_received IS NULL
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Setting receiver_conflict_queue.date_received where it is null</comment>
+
+        <update tableName="receiver_conflict_queue">
+            <column name="date_received" valueComputed="date_created" />
+            <where>date_received IS NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1006">
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="date_received" tableName="receiver_conflict_queue" />
         </preConditions>
