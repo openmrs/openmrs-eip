@@ -1582,4 +1582,49 @@
                                  referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20230523-1001">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_received" tableName="receiver_synced_msg" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_synced_msg.date_received</comment>
+
+        <addNotNullConstraint tableName="receiver_synced_msg" columnName="date_received" columnDataType="DATETIME(3)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1002">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_received" tableName="receiver_sync_archive" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_sync_archive.date_received</comment>
+
+        <addNotNullConstraint tableName="receiver_sync_archive" columnName="date_received" columnDataType="DATETIME(3)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1003">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_received" tableName="receiver_pruned_item" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_pruned_item.date_received</comment>
+
+        <addNotNullConstraint tableName="receiver_pruned_item" columnName="date_received" columnDataType="DATETIME(3)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1004">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_received" tableName="receiver_retry_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_retry_queue.date_received</comment>
+
+        <addNotNullConstraint tableName="receiver_retry_queue" columnName="date_received" columnDataType="DATETIME(3)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230523-1005">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_received" tableName="receiver_conflict_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_conflict_queue.date_received</comment>
+
+        <addNotNullConstraint tableName="receiver_conflict_queue" columnName="date_received" columnDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
