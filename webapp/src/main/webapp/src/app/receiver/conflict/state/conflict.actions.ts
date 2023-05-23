@@ -5,7 +5,8 @@ import {ConflictCountAndItems} from "../confict-count-and-items";
 export enum ConflictActionType {
 	CONFLICTS_LOADED = 'CONFLICTS_LOADED',
 	VIEW_CONFLICT = 'VIEW_CONFLICT',
-	CONFLICTS_VERIFIED = 'CONFLICTS_VERIFIED'
+	CONFLICTS_VERIFIED = 'CONFLICTS_VERIFIED',
+	CONFLICTS_CLEANED = 'CONFLICTS_CLEANED'
 }
 
 export class ConflictsLoaded implements Action {
@@ -35,4 +36,13 @@ export class ConflictsVerified implements Action {
 
 }
 
-export type ConflictAction = ConflictsLoaded | ViewConflict | ConflictsVerified;
+export class ConflictsCleaned implements Action {
+
+	readonly type = ConflictActionType.CONFLICTS_CLEANED;
+
+	constructor(public cleanedConflicts?: number) {
+	}
+
+}
+
+export type ConflictAction = ConflictsLoaded | ViewConflict | ConflictsVerified | ConflictsCleaned;

@@ -7,6 +7,7 @@ export interface ConflictState {
 	countAndItems: ConflictCountAndItems;
 	conflictToView?: Conflict;
 	falseConflicts?: number;
+	cleanedConflicts?: number;
 }
 
 const GET_CONFLICTS_FEATURE_STATE = createFeatureSelector<ConflictState>('conflictQueue');
@@ -24,6 +25,11 @@ export const CONFLICT_TO_VIEW = createSelector(
 export const GET_FALSE_CONFLICTS = createSelector(
 	GET_CONFLICTS_FEATURE_STATE,
 	state => state.falseConflicts
+);
+
+export const GET_CLEANED_CONFLICTS = createSelector(
+	GET_CONFLICTS_FEATURE_STATE,
+	state => state.cleanedConflicts
 );
 
 const initialState: ConflictState = {
@@ -50,6 +56,12 @@ export function conflictReducer(state = initialState, action: ConflictAction) {
 			return {
 				...state,
 				falseConflicts: action.falseConflicts
+			};
+
+		case ConflictActionType.CONFLICTS_CLEANED:
+			return {
+				...state,
+				cleanedConflicts: action.cleanedConflicts
 			};
 
 		default:

@@ -2,7 +2,7 @@
 	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
 </h5>
 <div>
-	<button type="button" class="btn btn-outline-primary btn-sm" (click)="verifyConflicts()" [ngbTooltip]="verifyMsgTemplate" [openDelay]="1000" i18n="@@receiver-conflict-verify">Verify</button>
+	<button type="button" class="btn btn-outline-primary btn-sm" (click)="verifyConflicts()" i18n="@@receiver-conflict-verify">Verify</button>
 </div>
 <div class="ui-bar-spacer"></div>
 <div class="ui-bar-spacer"></div>
@@ -54,9 +54,6 @@
 <ng-template #viewDetailsTemplate>
 	<span i18n="@@common-view-details">View Details</span>
 </ng-template>
-<ng-template #verifyMsgTemplate>
-	<span i18n="@@receiver-conflict-verify-tooltip">Check for false conflicts</span>
-</ng-template>
 
 <ng-template #detailsTemplate>
 	<div class="modal-header">
@@ -82,7 +79,7 @@
 
 <ng-template #verifyConflictsTemplate>
 	<div class="modal-header">
-		<h4 class="modal-title" i18n="@@@receiver-conflict-title">Conflicts</h4>
+		<h4 class="modal-title" i18n="@@receiver-conflict-title">Conflicts</h4>
 		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
 			<span aria-hidden="true">&times;</span>
 		</button>
@@ -115,7 +112,7 @@
 		</button>
 	</div>
 	<div class="modal-body">
-		<span i18n="@@receiver-conflict-cleaned-msg">Cleaned conflict(s)</span>: {{cleanedCount}}
+		<span i18n="@@receiver-conflict-cleaned-msg">Cleaned conflict(s)</span>: {{cleanedConflicts}}
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
