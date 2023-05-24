@@ -96,7 +96,7 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 		
 		producerTemplate.send(URI_RESPONSE_PROCESSOR, exchange);
 		
-		assertMessageLogged(Level.INFO, "No Sender sync message was found with uuid " + msgUuid);
+		assertMessageLogged(Level.INFO, "No sync message was found with uuid " + msgUuid);
 		assertTrue(getEntities(SenderSyncResponse.class).isEmpty());
 		assertTrue(TestUtils.getEntities(SenderSyncArchive.class).isEmpty());
 	}

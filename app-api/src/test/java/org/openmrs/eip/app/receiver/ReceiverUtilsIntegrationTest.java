@@ -43,6 +43,7 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 		syncedMsg.setSnapshot(false);
 		syncedMsg.setOperation(SyncOperation.c);
 		syncedMsg.setDateSentBySender(LocalDateTime.now());
+		syncedMsg.setDateReceived(new Date());
 		syncedMsg.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncedMsg.setEntityPayload("{}");
 		syncedMsg.setDateCreated(new Date());

@@ -270,6 +270,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setEntityPayload("{}");
 		retry.setExceptionType(EIPException.class.getName());
 		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
 		TestUtils.saveEntity(retry);
 		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
 		mockMsgProcessorEndpoint.expectedMessageCount(1);
@@ -306,6 +307,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setEntityPayload("{}");
 		retry.setExceptionType(EIPException.class.getName());
 		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
 		TestUtils.saveEntity(retry);
 		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
 		final AtomicInteger attemptCountHolder = new AtomicInteger();

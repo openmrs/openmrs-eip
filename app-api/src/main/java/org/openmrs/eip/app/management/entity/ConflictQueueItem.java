@@ -57,7 +57,7 @@ public class ConflictQueueItem extends AbstractEntity {
 	@Column(name = "message_uuid", length = 38, updatable = false)
 	private String messageUuid;
 	
-	@Column(name = "date_received", updatable = false)
+	@Column(name = "date_received", nullable = false, updatable = false)
 	private Date dateReceived;
 	
 	/**

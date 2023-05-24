@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyDescriptor;
@@ -45,7 +46,7 @@ public class ReceiverRetryQueueItemTest {
 		Assert.assertNull(retry.getId());
 		assertTrue(retry.getDateCreated().getTime() == timestamp || retry.getDateCreated().getTime() > timestamp);
 		assertEquals(ConflictsFoundException.class.getName(), retry.getExceptionType());
-		assertEquals("", retry.getMessage());
+		assertNull(retry.getMessage());
 		Set<String> ignored = new HashSet();
 		ignored.add("id");
 		ignored.add("class");

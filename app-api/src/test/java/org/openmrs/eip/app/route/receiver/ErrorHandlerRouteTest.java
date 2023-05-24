@@ -143,6 +143,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncMessage.setDateSentBySender(LocalDateTime.now());
+		syncMessage.setDateCreated(new Date());
 		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
@@ -199,6 +200,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		syncMessage.setDateSentBySender(LocalDateTime.now());
+		syncMessage.setDateCreated(new Date());
 		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);

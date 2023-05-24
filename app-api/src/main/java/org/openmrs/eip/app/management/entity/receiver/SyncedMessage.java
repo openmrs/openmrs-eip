@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.DynamicUpdate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.SyncOperation;
@@ -67,7 +66,7 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
 	private LocalDateTime dateSentBySender;
 	
-	@Column(name = "date_received", updatable = false)
+	@Column(name = "date_received", nullable = false, updatable = false)
 	private Date dateReceived;
 	
 	@NotNull

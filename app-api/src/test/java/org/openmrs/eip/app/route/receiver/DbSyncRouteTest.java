@@ -222,6 +222,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		retry.setSnapshot(true);
 		retry.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
