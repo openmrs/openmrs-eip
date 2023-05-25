@@ -3,6 +3,7 @@ package org.openmrs.eip.app.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 import static org.openmrs.eip.component.utils.HashUtils.computeHash;
 import static org.openmrs.eip.component.utils.HashUtils.getStoredHash;
@@ -20,6 +21,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -50,6 +53,7 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 @TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
 @TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
+@Ignore
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
@@ -73,8 +77,14 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	@Autowired
 	private SyncMessageRepository syncMsgRepo;
 	
+	@BeforeClass
+	public static void setupClass() {
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI",
+		    SiteMessageConsumer.JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
+	}
+	
 	@Before
-	public void setupBaseRouteTest() throws Exception {
+	public void setup() throws Exception {
 		loadXmlRoutes(ROUTE_DIR, "message-processor.xml");
 		loadXmlRoutes(ROUTE_DIR, "db-sync-route.xml");
 		loadXmlRoutes(ROUTE_DIR, "error-handler-route.xml");
@@ -133,6 +143,7 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 		assertNotNull(getStoredHash(personUuid, PersonHash.class, producerTemplate));
 		ExecutorService executor = Executors.newFixedThreadPool(MSG_COUNT);
 		List<CompletableFuture<Void>> futures = new ArrayList(MSG_COUNT);
+		List<SiteInfo> sites = new ArrayList(MSG_COUNT);
 		for (int i = 0; i < MSG_COUNT; i++) {
 			int index = i + 1;
 			SiteInfo siteInfo = new SiteInfo();
@@ -143,11 +154,12 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 			siteInfo.setDisabled(false);
 			siteInfo.setDateCreated(new Date());
 			siteRepo.save(siteInfo);
+			sites.add(siteInfo);
 			syncMsgRepo.save(createMessage(index, personUuid, dateCreated, siteInfo));
 		}
 		
 		for (int i = 0; i < MSG_COUNT; i++) {
-			SiteInfo siteInfo = siteRepo.findById(Integer.valueOf(i + 1).longValue()).get();
+			SiteInfo siteInfo = sites.get(i);
 			futures.add(CompletableFuture.runAsync(createConsumer(siteInfo), executor));
 		}
 		

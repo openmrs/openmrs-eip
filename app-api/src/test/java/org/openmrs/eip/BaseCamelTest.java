@@ -3,6 +3,7 @@ package org.openmrs.eip;
 import static java.io.File.separator;
 import static org.openmrs.eip.app.SyncConstants.FOLDER_DIST;
 import static org.openmrs.eip.app.SyncConstants.FOLDER_ROUTES;
+import static org.powermock.reflect.Whitebox.setInternalState;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 import java.io.File;
@@ -22,7 +23,9 @@ import org.apache.camel.test.spring.CamelSpringRunner;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.openmrs.eip.app.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +84,12 @@ public abstract class BaseCamelTest {
 	
 	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
 		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);
+	}
+	
+	@BeforeClass
+	public static void beforeBaseCamelTestClass() {
+		//Reset in case previous tests set this to true
+		setInternalState(AppUtils.class, "appContextStopping", false);
 	}
 	
 	@Before

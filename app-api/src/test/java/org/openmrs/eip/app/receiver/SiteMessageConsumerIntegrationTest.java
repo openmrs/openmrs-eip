@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
@@ -28,6 +30,12 @@ public class SiteMessageConsumerIntegrationTest extends BaseReceiverTest {
 	@Autowired
 	@Qualifier(BEAN_NAME_SYNC_EXECUTOR)
 	private ThreadPoolExecutor syncExecutor;
+	
+	@BeforeClass
+	public static void setupClass() {
+		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI",
+		    SiteMessageConsumer.JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
+	}
 	
 	@After
 	public void tearDown() {
