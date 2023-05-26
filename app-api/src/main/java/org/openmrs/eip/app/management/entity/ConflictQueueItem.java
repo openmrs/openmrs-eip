@@ -42,10 +42,6 @@ public class ConflictQueueItem extends AbstractEntity {
 	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
 	private String entityPayload;
 	
-	@NotNull
-	@Column(name = "is_resolved", nullable = false)
-	private Boolean resolved = false;
-	
 	@ManyToOne
 	@JoinColumn(name = "site_id", updatable = false)
 	private SiteInfo site;
@@ -148,24 +144,6 @@ public class ConflictQueueItem extends AbstractEntity {
 	 */
 	public void setEntityPayload(String entityPayload) {
 		this.entityPayload = entityPayload;
-	}
-	
-	/**
-	 * Gets the resolved
-	 *
-	 * @return the resolved
-	 */
-	public Boolean getResolved() {
-		return resolved;
-	}
-	
-	/**
-	 * Sets the resolved
-	 *
-	 * @param resolved the resolved to set
-	 */
-	public void setResolved(Boolean resolved) {
-		this.resolved = resolved;
 	}
 	
 	/**

@@ -87,7 +87,7 @@ public class ConflictServiceImplTest {
 		conflict5.setIdentifier("uuid-5");
 		conflict5.setModelClassName(VisitModel.class.getName());
 		List<ConflictQueueItem> conflicts = Arrays.asList(conflict1, conflict2, conflict3, conflict4, conflict5);
-		when(mockRepo.findByResolvedIsFalse()).thenReturn(conflicts);
+		when(mockRepo.findAll()).thenReturn(conflicts);
 		when(mockServiceFacade.getModel(TableToSyncEnum.PERSON, uuid1)).thenReturn(model1);
 		when(mockServiceFacade.getModel(TableToSyncEnum.PERSON_NAME, uuid2)).thenReturn(model2);
 		when(mockServiceFacade.getModel(TableToSyncEnum.PERSON_ADDRESS, uuid3)).thenReturn(model3);

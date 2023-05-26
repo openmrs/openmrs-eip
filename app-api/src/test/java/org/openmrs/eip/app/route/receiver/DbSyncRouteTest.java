@@ -1,7 +1,6 @@
 package org.openmrs.eip.app.route.receiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -125,33 +124,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldPassIfTheEntityHasResolvedItemsInTheConflictQueue() throws Exception {
-		final Class<? extends BaseModel> modelClass = PersonModel.class;
-		final String uuid = "uuid-2";
-		ConflictQueueItem conflict = TestUtils.getEntity(ConflictQueueItem.class, 4L);
-		assertEquals(modelClass.getName(), conflict.getModelClassName());
-		assertEquals(uuid, conflict.getIdentifier());
-		assertTrue(conflict.getResolved());
-		PersonModel model = new PersonModel();
-		model.setUuid(uuid);
-		SyncModel syncModel = new SyncModel();
-		syncModel.setTableToSyncModelClass(modelClass);
-		syncModel.setModel(model);
-		syncModel.setMetadata(new SyncMetadata());
-		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.getIn().setBody(syncModel);
-		mockLoadEndpoint.expectedBodiesReceived(syncModel);
-		
-		producerTemplate.send(URI_DBSYNC, exchange);
-		
-		mockLoadEndpoint.assertIsSatisfied();
-	}
-	
-	@Test
 	public void shouldAddTheMessageToTheConflictQueueIfAConflictIsDetected() throws Exception {
 		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
 		final Class<? extends BaseModel> modelClass = UserModel.class;
@@ -196,7 +168,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertEquals(syncMessage.getMessageUuid(), conflict.getMessageUuid());
 		assertEquals(syncMessage.getSnapshot(), conflict.getSnapshot());
 		assertEquals(syncMessage.getDateCreated(), conflict.getDateReceived());
-		assertFalse(conflict.getResolved());
 		assertNotNull(conflict.getDateCreated());
 		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
@@ -248,7 +219,6 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertEquals(retry.getSnapshot(), conflict.getSnapshot());
 		assertEquals(retry.getDateReceived(), conflict.getDateReceived());
 		assertEquals(retry.getSite(), conflict.getSite());
-		assertFalse(conflict.getResolved());
 		assertNotNull(conflict.getDateCreated());
 		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));

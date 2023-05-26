@@ -23,8 +23,7 @@ public final class ReceiverTestUtils {
 		ProducerTemplate template = SyncContext.getBean(ProducerTemplate.class);
 		final String type = ConflictQueueItem.class.getSimpleName();
 		String query = "jpa:" + type + "?query=SELECT c FROM " + type + " c WHERE c.modelClassName IN ("
-		        + Utils.getModelClassesInHierarchy(modelClass.getName()) + ") AND c.identifier='" + uuid
-		        + "' AND c.resolved = false";
+		        + Utils.getModelClassesInHierarchy(modelClass.getName()) + ") AND c.identifier='" + uuid + "'";
 		return template.requestBody(query, null, List.class).size() > 0;
 	}
 	

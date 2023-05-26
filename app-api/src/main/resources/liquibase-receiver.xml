@@ -1657,4 +1657,28 @@
         <addNotNullConstraint tableName="receiver_conflict_queue" columnName="date_received" columnDataType="DATETIME(3)" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20230526-1001">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM receiver_conflict_queue WHERE is_resolved = true
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Deleting resolved conflicts</comment>
+
+        <delete tableName="receiver_conflict_queue">
+            <where>is_resolved = true</where>
+        </delete>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20230526-1002">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="is_resolved" tableName="receiver_conflict_queue" />
+        </preConditions>
+        <comment>Drop receiver_conflict_queue.is_resolved column</comment>
+
+        <dropColumn tableName="receiver_conflict_queue" columnName="is_resolved" />
+    </changeSet>
+
 </databaseChangeLog>

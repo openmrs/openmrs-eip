@@ -38,7 +38,6 @@ public class ReceiverRetryQueueItemTest {
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setOperation(SyncOperation.u);
 		conflict.setDateReceived(new Date());
-		conflict.setResolved(true);
 		long timestamp = System.currentTimeMillis();
 		
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem(conflict);
@@ -51,7 +50,6 @@ public class ReceiverRetryQueueItemTest {
 		ignored.add("id");
 		ignored.add("class");
 		ignored.add("dateCreated");
-		ignored.add("resolved");
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;

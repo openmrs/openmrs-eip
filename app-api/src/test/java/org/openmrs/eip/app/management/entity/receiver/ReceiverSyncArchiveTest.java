@@ -111,7 +111,6 @@ public class ReceiverSyncArchiveTest {
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setDateReceived(new Date());
 		conflict.setOperation(SyncOperation.u);
-		conflict.setResolved(true);
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
 		
@@ -121,7 +120,6 @@ public class ReceiverSyncArchiveTest {
 		ignored.add("id");
 		ignored.add("class");
 		ignored.add("dateCreated");
-		ignored.add("resolved");
 		for (PropertyDescriptor descriptor : descriptors) {
 			if (ignored.contains(descriptor.getName())) {
 				continue;

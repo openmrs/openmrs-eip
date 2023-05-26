@@ -45,7 +45,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	@Override
 	public List<ConflictQueueItem> getBadConflicts() {
-		List<ConflictQueueItem> conflicts = conflictRepo.findByResolvedIsFalse();
+		List<ConflictQueueItem> conflicts = conflictRepo.findAll();
 		if (log.isDebugEnabled()) {
 			log.debug("Conflict count: " + conflicts.size());
 		}
