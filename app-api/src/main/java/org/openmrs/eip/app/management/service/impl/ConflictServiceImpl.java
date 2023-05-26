@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,8 +9,10 @@ import javax.transaction.Transactional;
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
@@ -30,15 +33,17 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	private ReceiverRetryRepository retryRepo;
 	
+	private ReceiverSyncArchiveRepository archiveRepo;
+	
 	private ProducerTemplate producerTemplate;
 	
 	private EntityServiceFacade serviceFacade;
 	
 	public ConflictServiceImpl(ConflictRepository conflictRepo, ReceiverRetryRepository retryRepo,
-	    EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
-		
+	    ReceiverSyncArchiveRepository archiveRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
 		this.conflictRepo = conflictRepo;
 		this.retryRepo = retryRepo;
+		this.archiveRepo = archiveRepo;
 		this.serviceFacade = serviceFacade;
 		this.producerTemplate = producerTemplate;
 	}
@@ -91,6 +96,34 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		}
 		
 		return retry;
+	}
+	
+	@Override
+	@Transactional
+	public ReceiverSyncArchive moveToArchiveQueue(ConflictQueueItem conflict) {
+		if (log.isDebugEnabled()) {
+			log.debug("Moving to archive queue the conflict item with id: " + conflict.getId());
+		}
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
+		archive.setDateCreated(new Date());
+		if (log.isDebugEnabled()) {
+			log.debug("Saving archive item");
+		}
+		
+		archive = archiveRepo.save(archive);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved archive item, removing item from the conflict queue");
+		}
+		
+		conflictRepo.delete(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item removed from the conflict queue");
+		}
+		
+		return archive;
 	}
 	
 }
