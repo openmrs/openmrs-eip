@@ -44,7 +44,7 @@ public class ReceiverArchiveServiceImpl extends BaseService implements ReceiverA
 		archiveRepo.delete(archive);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed item removed from the archive queue");
+			log.debug("Successfully removed item from the archive queue");
 		}
 	}
 	

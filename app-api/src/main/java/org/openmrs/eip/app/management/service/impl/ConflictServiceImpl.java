@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
+import org.openmrs.eip.component.camel.OpenmrsLoadProducer;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -92,7 +94,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		conflictRepo.delete(conflict);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed item removed from the conflict queue");
+			log.debug("Successfully removed item from the conflict queue");
 		}
 		
 		return retry;
@@ -117,10 +119,24 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			log.debug("Successfully saved archive item, removing item from the conflict queue");
 		}
 		
+		String uuid = conflict.getIdentifier();
+		String modelClassname = conflict.getModelClassName();
 		conflictRepo.delete(conflict);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed item removed from the conflict queue");
+			log.debug("Successfully removed item from the conflict queue, updating entity hash to match the current "
+			        + "state in the receiver database");
+		}
+		
+		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassname);
+		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, uuid);
+		BaseHashEntity storedHash = HashUtils.getStoredHash(uuid, tableToSyncEnum.getHashClass(), producerTemplate);
+		storedHash.setHash(HashUtils.computeHash(dbModel));
+		storedHash.setDateChanged(LocalDateTime.now());
+		OpenmrsLoadProducer.saveHash(storedHash, producerTemplate, false);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved new hash for the entity");
 		}
 		
 		return archive;
