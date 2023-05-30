@@ -116,18 +116,11 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		archive = archiveRepo.save(archive);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully saved archive item, removing item from the conflict queue");
+			log.debug("Successfully saved archive item, updating entity hash to match the current state in the database");
 		}
 		
 		String uuid = conflict.getIdentifier();
 		String modelClassname = conflict.getModelClassName();
-		conflictRepo.delete(conflict);
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed item from the conflict queue, updating entity hash to match the current "
-			        + "state in the receiver database");
-		}
-		
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassname);
 		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, uuid);
 		BaseHashEntity storedHash = HashUtils.getStoredHash(uuid, tableToSyncEnum.getHashClass(), producerTemplate);
@@ -136,7 +129,13 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		OpenmrsLoadProducer.saveHash(storedHash, producerTemplate, false);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully saved new hash for the entity");
+			log.debug("Successfully saved new hash for the entity, removing item from the conflict queue");
+		}
+		
+		conflictRepo.delete(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item from the conflict queue");
 		}
 		
 		return archive;

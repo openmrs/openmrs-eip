@@ -1,8 +1,8 @@
 package org.openmrs.eip.web.receiver;
 
-import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
@@ -15,9 +15,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
@@ -47,14 +47,17 @@ public class ConflictControllerTest extends BaseReceiverTest {
 	private ReceiverRetryRepository retryRepo;
 	
 	@Autowired
+	private ReceiverSyncArchiveRepository archiveRepo;
+	
+	@Autowired
 	private PersonService personService;
 	
 	@Test
 	public void shouldGetAllUnResolvedMessagesInTheConflictQueue() {
 		Map result = controller.getAll();
 		assertEquals(2, result.size());
-		assertEquals(4, result.get("count"));
-		assertEquals(4, ((List) result.get("items")).size());
+		assertEquals(5, result.get("count"));
+		assertEquals(5, ((List) result.get("items")).size());
 	}
 	
 	@Test
@@ -65,9 +68,10 @@ public class ConflictControllerTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void shouldCopyTheConflictMessageToTheArchiveQueueAndMarkItAsResolved() {
+	public void delete_shouldMoveTheConflictToTheArchiveQueue() {
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
-		Assert.assertTrue(TestUtils.getEntities(ReceiverSyncArchive.class).isEmpty());
+		assertTrue(conflictRepo.findAll().isEmpty());
+		assertTrue(archiveRepo.findAll().isEmpty());
 		ConflictQueueItem conflict = new ConflictQueueItem();
 		conflict.setMessageUuid("message-uuid");
 		conflict.setModelClassName(PatientModel.class.getName());
@@ -78,38 +82,20 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
 		conflict.setDateSentBySender(LocalDateTime.now());
-		conflict.setSnapshot(true);
+		conflict.setSnapshot(false);
 		conflict.setDateCreated(new Date());
-		Assert.assertFalse(conflict.getResolved());
-		TestUtils.saveEntity(conflict);
+		conflictRepo.save(conflict);
 		
 		BaseHashEntity hashEntity = new PatientHash();
 		hashEntity.setIdentifier(uuid);
-		final String currentHash = "current-hash";
-		hashEntity.setHash(currentHash);
+		hashEntity.setHash("current-hash");
 		hashEntity.setDateCreated(LocalDateTime.now());
 		OpenmrsLoadProducer.saveHash(hashEntity, producerTemplate, false);
-		Assert.assertNull(hashEntity.getDateChanged());
 		
-		controller.update(singletonMap("resolved", "true"), conflict.getId());
+		controller.delete(conflict.getId());
 		
-		conflict = TestUtils.getEntity(ConflictQueueItem.class, conflict.getId());
-		Assert.assertTrue(conflict.getResolved());
-		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class, producerTemplate);
-		Assert.assertNotEquals(currentHash, hashEntity.getHash());
-		Assert.assertNotNull(hashEntity.getDateChanged());
-		List<ReceiverSyncArchive> archives = TestUtils.getEntities(ReceiverSyncArchive.class);
-		assertEquals(1, archives.size());
-		ReceiverSyncArchive archive = archives.get(0);
-		assertEquals(conflict.getMessageUuid(), archive.getMessageUuid());
-		assertEquals(conflict.getModelClassName(), archive.getModelClassName());
-		assertEquals(conflict.getIdentifier(), archive.getIdentifier());
-		assertEquals(conflict.getEntityPayload(), archive.getEntityPayload());
-		assertEquals(conflict.getSite(), archive.getSite());
-		assertEquals(conflict.getSnapshot(), archive.getSnapshot());
-		assertEquals(conflict.getDateSentBySender(), archive.getDateSentBySender());
-		assertEquals(conflict.getDateReceived(), archive.getDateReceived());
-		assertNotNull(archive.getDateCreated());
+		assertFalse(conflictRepo.findById(conflict.getId()).isPresent());
+		assertEquals(1, archiveRepo.count());
 	}
 	
 	@Test
@@ -132,7 +118,6 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setSnapshot(true);
 		conflict.setDateCreated(new Date());
-		Assert.assertFalse(conflict.getResolved());
 		TestUtils.saveEntity(conflict);
 		Assert.assertEquals(1, conflictRepo.count());
 		
@@ -166,7 +151,6 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setSnapshot(true);
 		conflict.setDateCreated(new Date());
-		Assert.assertFalse(conflict.getResolved());
 		TestUtils.saveEntity(conflict);
 		Assert.assertEquals(1, conflictRepo.count());
 		

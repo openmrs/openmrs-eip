@@ -128,7 +128,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		modelRef.componentInstance.message = $localize`:@@receiver-conflict-confirm-resolve-message:Are you sure you want to mark the conflict as resolved?`;
 
 		modelRef.closed.subscribe(() => {
-			this.service.updateConflict({...conflict, resolved: true}).subscribe(
+			this.service.deleteConflict(conflict).subscribe(
 				() => {
 					this.loadConflicts();
 				}

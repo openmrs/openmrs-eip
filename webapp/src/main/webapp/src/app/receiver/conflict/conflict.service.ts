@@ -16,8 +16,8 @@ export class ConflictService extends BaseService<Conflict> {
 		return this.getCountAndItems(RESOURCE_NAME);
 	}
 
-	updateConflict(conflict: Conflict): Observable<Conflict> {
-		return this.update(RESOURCE_NAME, conflict);
+	deleteConflict(conflict: Conflict): Observable<Conflict> {
+		return this.delete(RESOURCE_NAME, conflict);
 	}
 
 	verifyConflicts(): Observable<number> {
