@@ -68,19 +68,6 @@ public class ConflictServiceTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void moveToArchiveQueue_shouldMoveTheConflictToTheArchiveQueue() {
-		final Long id = 1L;
-		ConflictQueueItem conflict = conflictRepo.findById(id).get();
-		assertEquals(0, archiveRepo.count());
-		
-		ReceiverSyncArchive archive = service.moveToArchiveQueue(conflict);
-		
-		assertFalse(conflictRepo.findById(id).isPresent());
-		assertEquals(conflict.getMessageUuid(), archive.getMessageUuid());
-		assertEquals(1, archiveRepo.count());
-	}
-	
-	@Test
 	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	public void moveToArchiveQueue_shouldMoveTheConflictToTheArchiveQueueAndUpdateTheHash() {

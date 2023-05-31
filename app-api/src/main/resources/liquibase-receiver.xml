@@ -1659,11 +1659,7 @@
 
     <changeSet author="wluyima" id="20230526-1001">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM receiver_conflict_queue WHERE is_resolved = true
-                </sqlCheck>
-            </not>
+            <columnExists columnName="is_resolved" tableName="receiver_conflict_queue" />
         </preConditions>
         <comment>Deleting resolved conflicts</comment>
 
