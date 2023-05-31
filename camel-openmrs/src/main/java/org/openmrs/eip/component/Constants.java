@@ -7,6 +7,10 @@ import java.util.List;
 
 public class Constants {
 	
+	public final static String MGT_ENTITY_MGR = "mngtEntityManager";
+	
+	public final static String MGT_TX_MGR = "mngtTransactionManager";
+	
 	public static final String PLACEHOLDER_CLASS = "[class]";
 	
 	public static final String QUERY_SAVE_HASH = "jpa:" + PLACEHOLDER_CLASS;
