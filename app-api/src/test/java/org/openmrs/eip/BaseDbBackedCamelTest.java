@@ -1,5 +1,6 @@
 package org.openmrs.eip;
 
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
 import java.util.stream.Stream;
@@ -18,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.lifecycle.Startables;
@@ -26,9 +28,10 @@ import org.testcontainers.lifecycle.Startables;
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
 @Import({ TestDBConfig.class })
-@Transactional
+@Transactional(transactionManager = MGT_TX_MGR)
 @DirtiesContext
-@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
+@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
+        TransactionalTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")
 @TestPropertySource(properties = "spring.mngt-datasource.jdbcUrl=jdbc:h2:mem:test;DB_CLOSE_DELAY=30;LOCK_TIMEOUT=10000")

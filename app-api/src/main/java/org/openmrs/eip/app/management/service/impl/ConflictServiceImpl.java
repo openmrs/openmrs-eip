@@ -1,11 +1,11 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -25,6 +25,7 @@ import org.openmrs.eip.component.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("conflictService")
 public class ConflictServiceImpl extends BaseService implements ConflictService {
@@ -73,7 +74,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public ReceiverRetryQueueItem moveToRetryQueue(ConflictQueueItem conflict, String reason) {
 		if (log.isDebugEnabled()) {
 			log.debug("Moving to retry queue the conflict item with id: " + conflict.getId());
@@ -101,7 +102,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public ReceiverSyncArchive moveToArchiveQueue(ConflictQueueItem conflict) {
 		if (log.isDebugEnabled()) {
 			log.debug("Moving to archive queue the conflict item with id: " + conflict.getId());

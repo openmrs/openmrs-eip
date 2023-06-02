@@ -25,6 +25,8 @@ public class JpaCamelConf {
 		JpaComponent comp = new JpaComponent();
 		comp.setEntityManagerFactory(entityManagerFactory);
 		comp.setTransactionManager(transactionManager);
+		comp.setSharedEntityManager(true);
+		comp.setJoinTransaction(false);
 		return comp;
 	}
 }

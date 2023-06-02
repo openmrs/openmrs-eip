@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
@@ -9,6 +11,7 @@ import org.openmrs.eip.app.management.service.ReceiverArchiveService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("receiverArchiveService")
 public class ReceiverArchiveServiceImpl extends BaseService implements ReceiverArchiveService {
@@ -25,6 +28,7 @@ public class ReceiverArchiveServiceImpl extends BaseService implements ReceiverA
 	}
 	
 	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public void prune(ReceiverSyncArchive archive) {
 		if (log.isDebugEnabled()) {
 			log.debug("Pruning sync archive");
