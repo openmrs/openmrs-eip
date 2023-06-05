@@ -1,8 +1,10 @@
 package org.openmrs.eip.app.route;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncContext;
 
@@ -40,6 +42,18 @@ public final class TestUtils {
 		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
 		final String classname = clazz.getSimpleName();
 		t.sendBody("jpa:" + classname + "?query=DELETE FROM " + classname, null);
+	}
+	
+	public static Map getRowById(String tableName, Long id) {
+		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
+		List<Map> matches = t.requestBody(
+		    "sql:SELECT * FROM " + tableName + " WHERE id = " + id + "?dataSource=" + SyncConstants.MGT_DATASOURCE_NAME,
+		    null, List.class);
+		if (matches.isEmpty()) {
+			return null;
+		}
+		
+		return matches.get(0);
 	}
 	
 }

@@ -38,6 +38,8 @@ import org.openmrs.eip.component.repository.PersonRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
@@ -150,6 +152,7 @@ public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
 	}
 	
 	@Test
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void process_shouldUpdateTheStoredHashIfItAlreadyExistsForAnEntityBeingInserted() {
 		final String personUuid = "person-uuid";
 		assertNull(personRepo.findByUuid(personUuid));

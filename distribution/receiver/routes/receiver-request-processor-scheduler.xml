@@ -1,0 +1,10 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="receiver-request-processor-scheduler" errorHandlerRef="shutdownErrorHandler">
+        <!-- TODO Make the delay configurable -->
+        <from uri="scheduler:receiver-request-processor?initialDelay=15000&amp;delay=1800000" />
+
+        <to uri="direct:receiver-request-processor" />
+    </route>
+
+</routes>

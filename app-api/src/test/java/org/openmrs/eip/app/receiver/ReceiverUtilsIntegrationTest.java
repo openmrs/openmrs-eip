@@ -90,12 +90,13 @@ public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
 	@Test
 	public void updateColumn_shouldUpdateTheColumnValueInTheDatabase() {
 		final Long id = 1L;
-		SiteInfo site = TestUtils.getEntity(SiteInfo.class, id);
-		Assert.assertFalse(site.getDisabled());
+		final String tableName = "site_info";
+		final String columnName = "sync_disabled";
+		Assert.assertEquals(false, TestUtils.getRowById(tableName, id).get(columnName));
 		
-		ReceiverUtils.updateColumn("site_info", "sync_disabled", id, true);
+		ReceiverUtils.updateColumn(tableName, columnName, id, true);
 		
-		assertTrue(TestUtils.getEntity(SiteInfo.class, id).getDisabled());
+		Assert.assertEquals(true, TestUtils.getRowById(tableName, id).get(columnName));
 	}
 	
 }
