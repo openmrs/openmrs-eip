@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -49,11 +48,12 @@ import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 @TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
 @TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
-@Ignore
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
@@ -128,6 +128,7 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	}
 	
 	@Test
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void run_shouldProcessUpdateEventsFromDifferentSitesForTheSameEntitySeriallyWithNoConflictsReported()
 	    throws Exception {
 		assertEquals(0, syncedMsgRepo.count());

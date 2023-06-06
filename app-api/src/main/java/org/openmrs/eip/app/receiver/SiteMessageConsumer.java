@@ -27,6 +27,7 @@ import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -70,6 +71,8 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private String messageProcessorUri;
 	
+	private SyncMessageRepository syncMsgRepo;
+	
 	private SyncedMessageRepository syncedMsgRepo;
 	
 	/**
@@ -82,6 +85,7 @@ public class SiteMessageConsumer implements Runnable {
 		this.site = site;
 		this.executor = executor;
 		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
+		syncMsgRepo = SyncContext.getBean(SyncMessageRepository.class);
 		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
 		initIfNecessary();
 	}
@@ -260,7 +264,6 @@ public class SiteMessageConsumer implements Runnable {
 		boolean movedToError = exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, false, Boolean.class);
 		boolean msgProcessed = exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class);
 		
-		final Long id = msg.getId();
 		if (msgProcessed || movedToConflict || movedToError) {
 			SyncOutcome outcome;
 			if (msgProcessed) {
@@ -283,20 +286,16 @@ public class SiteMessageConsumer implements Runnable {
 			syncedMsgRepo.save(syncedMsg);
 			
 			if (log.isDebugEnabled()) {
-				log.debug("Successfully saved synced message");
+				log.debug("Successfully saved synced message, removing the sync item from the queue");
 			}
 			
-			if (log.isDebugEnabled()) {
-				log.debug("Removing from the sync message queue an item with id: " + id);
-			}
-			
-			producerTemplate.sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + id, null);
+			syncMsgRepo.delete(msg);
 			
 			if (log.isDebugEnabled()) {
-				log.debug("Successfully removed from sync message queue an item with id: " + id);
+				log.debug("Successfully removed the sync item from the queue");
 			}
 		} else {
-			throw new EIPException("Something went wrong while processing sync message with id: " + id);
+			throw new EIPException("Something went wrong while processing sync message -> " + msg);
 		}
 		
 		log.info("Done processing message");

@@ -22,7 +22,6 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESS
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
-import static org.openmrs.eip.app.receiver.SiteMessageConsumer.ENTITY;
 import static org.openmrs.eip.app.receiver.SiteMessageConsumer.JPA_URI_PREFIX;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
@@ -54,6 +53,7 @@ import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -86,6 +86,9 @@ public class SiteMessageConsumerTest {
 	
 	@Mock
 	private ExtendedCamelContext mockCamelContext;
+	
+	@Mock
+	private SyncMessageRepository syncMsgRepo;
 	
 	@Mock
 	private SyncedMessageRepository syncedMsgRepo;
@@ -121,6 +124,7 @@ public class SiteMessageConsumerTest {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(size);
 		SiteMessageConsumer c = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
 		Whitebox.setInternalState(c, ProducerTemplate.class, mockProducerTemplate);
+		Whitebox.setInternalState(c, SyncMessageRepository.class, syncMsgRepo);
 		Whitebox.setInternalState(c, SyncedMessageRepository.class, syncedMsgRepo);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
 		return c;
@@ -635,8 +639,7 @@ public class SiteMessageConsumerTest {
 	public void processMessage_shouldAddTheMessageToTheSyncedQueueAndDeleteTheProcessedMessage() throws Exception {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
-		final int msgId = 1;
-		SyncMessage msg = createMessage(msgId, false);
+		SyncMessage msg = createMessage(1, false);
 		msg.setMessageUuid("msg-uuid");
 		msg.setEntityPayload("{}");
 		msg.setDateSentBySender(LocalDateTime.now());
@@ -662,8 +665,7 @@ public class SiteMessageConsumerTest {
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
 		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(mockProducerTemplate).sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msgId,
-		    null);
+		verify(syncMsgRepo).delete(msg);
 		assertEquals(1, archivedMsgs.size());
 		SyncedMessage archive = archivedMsgs.get(0);
 		assertEquals(msg.getMessageUuid(), archive.getMessageUuid());
@@ -682,9 +684,7 @@ public class SiteMessageConsumerTest {
 	public void processMessage_shouldAddTheConflictMessageToTheSyncedQueue() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
-		final Long msgId = 2L;
 		SyncMessage msg = new SyncMessage();
-		msg.setId(msgId);
 		List<SyncMessage> processedMsgs = new ArrayList(1);
 		Mockito.when(CamelUtils.send(eq(MOCK_PROCESSOR_URI), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
@@ -704,8 +704,7 @@ public class SiteMessageConsumerTest {
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
 		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(mockProducerTemplate).sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msgId,
-		    null);
+		verify(syncMsgRepo).delete(msg);
 		assertEquals(1, archivedMsgs.size());
 		assertEquals(SyncOutcome.CONFLICT, archivedMsgs.get(0).getOutcome());
 	}
@@ -714,9 +713,7 @@ public class SiteMessageConsumerTest {
 	public void processMessage_shouldAddTheErrorMessageToTheSyncedQueue() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
-		final Long msgId = 2L;
 		SyncMessage msg = new SyncMessage();
-		msg.setId(msgId);
 		List<SyncMessage> processedMsgs = new ArrayList(1);
 		Mockito.when(CamelUtils.send(eq(MOCK_PROCESSOR_URI), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
@@ -736,8 +733,7 @@ public class SiteMessageConsumerTest {
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
 		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(mockProducerTemplate).sendBody("jpa:" + ENTITY + "?query=DELETE FROM " + ENTITY + " WHERE id = " + msgId,
-		    null);
+		verify(syncMsgRepo).delete(msg);
 		assertEquals(1, archivedMsgs.size());
 		assertEquals(SyncOutcome.ERROR, archivedMsgs.get(0).getOutcome());
 	}
@@ -746,9 +742,7 @@ public class SiteMessageConsumerTest {
 	public void processMessage_shouldFailIfTheSyncOutComeIsUnknown() {
 		setupConsumer(1);
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
-		final Long msgId = 2L;
 		SyncMessage msg = new SyncMessage();
-		msg.setId(msgId);
 		List<SyncMessage> processedMsgs = new ArrayList(1);
 		Mockito.when(CamelUtils.send(eq(MOCK_PROCESSOR_URI), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
@@ -757,7 +751,7 @@ public class SiteMessageConsumerTest {
 		});
 		
 		Exception thrown = Assert.assertThrows(EIPException.class, () -> consumer.processMessage(msg));
-		assertEquals("Something went wrong while processing sync message with id: " + msgId, thrown.getMessage());
+		assertEquals("Something went wrong while processing sync message -> " + msg, thrown.getMessage());
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
 		verifyNoInteractions(syncedMsgRepo);

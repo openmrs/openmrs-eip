@@ -38,20 +38,20 @@
 
                 <log loggingLevel="DEBUG" message="Removing Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
 
-                <toD uri="jpa:SenderSyncMessage?query=DELETE FROM SenderSyncMessage WHERE messageUuid = '${exchangeProperty.syncResponse.messageUuid}'" />
+                <bean ref="senderSyncMessageRepository" method="deleteByMessageUuid(${exchangeProperty.syncResponse.messageUuid})" />
 
                 <log loggingLevel="DEBUG" message="Successfully removed sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
             </when>
             <otherwise>
-                <log message="No sync message was found with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                <log message="No sync message was found with message uuid ${exchangeProperty.syncResponse.messageUuid}" />
             </otherwise>
         </choice>
 
-        <log loggingLevel="DEBUG" message="Removing processed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+        <log loggingLevel="DEBUG" message="Removing processed sender sync response with id: ${exchangeProperty.syncResponse.id}" />
 
-        <toD uri="jpa:SenderSyncResponse?query=DELETE FROM SenderSyncResponse WHERE id = ${exchangeProperty.syncResponse.id}" />
+        <bean ref="senderSyncResponseRepository" method="delete(${exchangeProperty.syncResponse})" />
 
-        <log loggingLevel="DEBUG" message="Successfully removed sender sync response with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+        <log loggingLevel="DEBUG" message="Successfully removed sender sync response with id: ${exchangeProperty.syncResponse.id}" />
 
         <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
         
