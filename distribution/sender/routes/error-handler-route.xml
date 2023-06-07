@@ -97,7 +97,7 @@
 
                         <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
 
-                        <toD uri="jpa:DebeziumEvent?query=DELETE FROM DebeziumEvent WHERE id = ${exchangeProperty.dbzmEvent.id}" />
+                        <bean ref="debeziumEventRepository" method="delete(${exchangeProperty.dbzmEvent})" />
 
                         <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue since it has been moved to the error queue" />
                     </when>

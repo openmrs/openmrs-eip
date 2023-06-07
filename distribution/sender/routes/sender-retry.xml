@@ -60,7 +60,7 @@
 
                             <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
-                            <toD uri="jpa:SenderRetryQueueItem?query=DELETE FROM SenderRetryQueueItem WHERE id = ${exchangeProperty.retry-item-id}" />
+                            <bean ref="senderRetryRepository" method="delete(${exchangeProperty.retry-item})" />
 
                             <log message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
                         </otherwise>
