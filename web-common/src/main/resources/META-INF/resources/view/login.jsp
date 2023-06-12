@@ -19,10 +19,7 @@
 <body>
 <%@ include file="header.jsp" %>
 <div id="loginContainer" class="container">
-    <div class="alert alert-dark text-center text-danger font-weight-bold confidential-message" role="alert" >
-        <div class="h2" >
-            <spring:message code="login.confidential.type" />
-        </div>
+    <div class="alert alert-warning text-center text-dark font-weight-bold confidential-message" role="alert" >
         <div>
             <spring:message code="login.confidential.message" />
         </div>

@@ -455,91 +455,91 @@
 		<unit id="common-view">
 			<segment>
 				<source>View</source>
-				<target></target>
+				<target>Visualizar</target>
 			</segment>
 		</unit>
 		<unit id="common-list">
 			<segment>
 				<source>List</source>
-				<target></target>
+				<target>Listar</target>
 			</segment>
 		</unit>
 		<unit id="common-count">
 			<segment>
 				<source>Count</source>
-				<target></target>
+				<target>Quantidade</target>
 			</segment>
 		</unit>
 		<unit id="common-entity-breakdown">
 			<segment>
 				<source>Entity Breakdown</source>
-				<target></target>
+				<target>Detalhes da entidade</target>
 			</segment>
 		</unit>
 		<unit id="receiver-no-conflicts">
 			<segment>
 				<source>No conflicts, everything looks good!</source>
-				<target></target>
+				<target>Sem conflitos, tudo parece estar bem!</target>
 			</segment>
 		</unit>
 		<unit id="common-server-down">
 			<segment>
 				<source>Server appears to be down</source>
-				<target></target>
+				<target>Servidor parece estar fora do ar</target>
 			</segment>
 		</unit>
 		<unit id="common-try-again">
 			<segment>
 				<source>Try Again</source>
-				<target></target>
+				<target>Tente novamente</target>
 			</segment>
 		</unit>
 		<unit id="common-yes">
 			<segment>
 				<source>Yes</source>
-				<target></target>
+				<target>Sim</target>
 			</segment>
 		</unit>
 		<unit id="common-no">
 			<segment>
 				<source>No</source>
-				<target></target>
+				<target>Não</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-verify">
 			<segment>
 				<source>Verify</source>
-				<target></target>
+				<target>Verificar</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-title">
 			<segment>
 				<source>Conflicts</source>
-				<target></target>
+				<target>Conflitos</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-false-msg">
 			<segment>
 				<source>False conflict(s)</source>
-				<target></target>
+				<target>Falso(s) conflito(s)</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-no-false-msg">
 			<segment>
 				<source>No false conflicts found</source>
-				<target></target>
+				<target>Nenhum conflito falso encontrado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-clean">
 			<segment>
 				<source>Do you want to clean them?</source>
-				<target></target>
+				<target>Você quer Apagá-los?</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-cleaned-msg">
 			<segment>
 				<source>Cleaned conflict(s)</source>
-				<target></target>
+				<target>Conflito(s) Apagado(s)</target>
 			</segment>
 		</unit>
 	</file>
