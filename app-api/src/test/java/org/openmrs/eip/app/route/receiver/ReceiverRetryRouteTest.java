@@ -92,9 +92,9 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 			public void configure() {
 				interceptSendToEndpoint("direct:" + ROUTE_ID_DESTINATION).skipSendToOriginalEndpoint()
 				        .to(mockMsgProcessorEndpoint);
-				weaveByType(BeanDefinition.class).selectFirst().replace().bean(testCacheBean,
+				weaveByType(BeanDefinition.class).selectIndex(0).replace().bean(testCacheBean,
 				    "process(${exchangeProperty.retry-item})");
-				weaveByType(BeanDefinition.class).selectLast().replace().bean(testIndexBean,
+				weaveByType(BeanDefinition.class).selectIndex(1).replace().bean(testIndexBean,
 				    "process(${exchangeProperty.retry-item})");
 			}
 			

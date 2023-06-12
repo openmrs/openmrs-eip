@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -54,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 @TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
 @TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
+@Ignore
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";

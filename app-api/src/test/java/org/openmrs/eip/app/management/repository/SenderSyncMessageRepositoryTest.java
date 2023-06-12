@@ -20,12 +20,13 @@ public class SenderSyncMessageRepositoryTest extends BaseSenderTest {
 	@Test
 	public void deleteByMessageUuid_shouldDeleteTheMessageWithTheGivenMessageUuid() {
 		final String msgUuid = "46beb8bd-287c-47f2-9786-a7b98c933c04";
-		SenderSyncMessage msg = repo.findById(4L).get();
+		final Long id = 4L;
+		SenderSyncMessage msg = repo.findById(id).get();
 		Assert.assertEquals(msgUuid, msg.getMessageUuid());
 		
 		repo.deleteByMessageUuid(msgUuid);
 		
-		Assert.assertFalse(repo.findById(1L).isPresent());
+		Assert.assertFalse(repo.findById(id).isPresent());
 	}
 	
 }
