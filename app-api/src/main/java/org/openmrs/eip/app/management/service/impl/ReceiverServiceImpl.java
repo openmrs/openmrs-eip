@@ -7,22 +7,22 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
-import org.openmrs.eip.app.management.service.ReceiverArchiveService;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service("receiverArchiveService")
-public class ReceiverArchiveServiceImpl extends BaseService implements ReceiverArchiveService {
+@Service("receiverService")
+public class ReceiverServiceImpl extends BaseService implements ReceiverService {
 	
-	private static final Logger log = LoggerFactory.getLogger(ReceiverArchiveServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ReceiverServiceImpl.class);
 	
 	private ReceiverSyncArchiveRepository archiveRepo;
 	
 	private ReceiverPrunedItemRepository prunedRepo;
 	
-	public ReceiverArchiveServiceImpl(ReceiverSyncArchiveRepository archiveRepo, ReceiverPrunedItemRepository prunedRepo) {
+	public ReceiverServiceImpl(ReceiverSyncArchiveRepository archiveRepo, ReceiverPrunedItemRepository prunedRepo) {
 		this.archiveRepo = archiveRepo;
 		this.prunedRepo = prunedRepo;
 	}

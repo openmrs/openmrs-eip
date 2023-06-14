@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-public class ReceiverArchiveServiceTest extends BaseReceiverTest {
+public class ReceiverServiceTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ReceiverSyncArchiveRepository repo;
@@ -25,7 +25,7 @@ public class ReceiverArchiveServiceTest extends BaseReceiverTest {
 	private ReceiverPrunedItemRepository prunedRepo;
 	
 	@Autowired
-	private ReceiverArchiveService service;
+	private ReceiverService service;
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",

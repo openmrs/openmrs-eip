@@ -3,9 +3,9 @@ package org.openmrs.eip.app.management.service;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 
 /**
- * Contains methods for managing the receiver sync archives
+ * Contains methods for managing receiver items
  */
-public interface ReceiverArchiveService extends Service {
+public interface ReceiverService extends Service {
 	
 	/**
 	 * Prunes the specified sync archive i.e. moves it from the archives queue to the pruned queue

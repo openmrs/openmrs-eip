@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
-import org.openmrs.eip.app.management.service.ReceiverArchiveService;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.powermock.reflect.Whitebox;
 
 public class ReceiverArchivePruningProcessorTest {
@@ -19,7 +19,7 @@ public class ReceiverArchivePruningProcessorTest {
 	private ReceiverArchivePruningProcessor processor;
 	
 	@Mock
-	private ReceiverArchiveService mockService;
+	private ReceiverService mockService;
 	
 	@Before
 	public void setup() {

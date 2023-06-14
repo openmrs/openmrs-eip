@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
-import org.openmrs.eip.app.management.service.ReceiverArchiveService;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +23,10 @@ public class ReceiverArchivePruningProcessor extends BasePureParallelQueueProces
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverArchivePruningProcessor.class);
 	
-	private ReceiverArchiveService service;
+	private ReceiverService service;
 	
 	public ReceiverArchivePruningProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReceiverArchiveService service) {
+	    ReceiverService service) {
 		super(executor);
 		this.service = service;
 	}
