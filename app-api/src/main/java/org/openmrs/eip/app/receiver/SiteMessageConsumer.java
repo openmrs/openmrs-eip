@@ -25,10 +25,8 @@ import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
-import org.openmrs.eip.app.management.repository.SyncMessageRepository;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -71,9 +69,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private String messageProcessorUri;
 	
-	private SyncMessageRepository syncMsgRepo;
-	
-	private SyncedMessageRepository syncedMsgRepo;
+	private ReceiverService service;
 	
 	/**
 	 * @param messageProcessorUri the camel endpoint URI to call to process a sync message
@@ -85,8 +81,7 @@ public class SiteMessageConsumer implements Runnable {
 		this.site = site;
 		this.executor = executor;
 		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		syncMsgRepo = SyncContext.getBean(SyncMessageRepository.class);
-		syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
+		service = SyncContext.getBean(ReceiverService.class);
 		initIfNecessary();
 	}
 	
@@ -268,32 +263,15 @@ public class SiteMessageConsumer implements Runnable {
 			SyncOutcome outcome;
 			if (msgProcessed) {
 				outcome = SyncOutcome.SUCCESS;
-				log.info("Moving the message to the synced queue");
 			} else if (movedToConflict) {
 				outcome = SyncOutcome.CONFLICT;
-				log.info("Adding the message to the synced queue with outcome as: " + outcome);
 			} else {
 				outcome = SyncOutcome.ERROR;
-				log.info("Adding the message to the synced queue with outcome as: " + outcome);
 			}
 			
-			SyncedMessage syncedMsg = ReceiverUtils.createSyncedMessage(msg, outcome);
+			log.info("Moving the item to the synced queue with outcome as: " + outcome);
 			
-			if (log.isDebugEnabled()) {
-				log.debug("Saving synced message");
-			}
-			
-			syncedMsgRepo.save(syncedMsg);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully saved synced message, removing the sync item from the queue");
-			}
-			
-			syncMsgRepo.delete(msg);
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully removed the sync item from the queue");
-			}
+			service.moveToSyncedQueue(msg, outcome);
 		} else {
 			throw new EIPException("Something went wrong while processing sync message -> " + msg);
 		}

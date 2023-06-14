@@ -51,10 +51,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
-import org.openmrs.eip.app.management.repository.SyncMessageRepository;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -88,10 +86,7 @@ public class SiteMessageConsumerTest {
 	private ExtendedCamelContext mockCamelContext;
 	
 	@Mock
-	private SyncMessageRepository syncMsgRepo;
-	
-	@Mock
-	private SyncedMessageRepository syncedMsgRepo;
+	private ReceiverService mockService;
 	
 	@Mock
 	private Environment mockEnv;
@@ -124,8 +119,7 @@ public class SiteMessageConsumerTest {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(size);
 		SiteMessageConsumer c = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
 		Whitebox.setInternalState(c, ProducerTemplate.class, mockProducerTemplate);
-		Whitebox.setInternalState(c, SyncMessageRepository.class, syncMsgRepo);
-		Whitebox.setInternalState(c, SyncedMessageRepository.class, syncedMsgRepo);
+		Whitebox.setInternalState(c, ReceiverService.class, mockService);
 		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
 		return c;
 	}
@@ -644,7 +638,6 @@ public class SiteMessageConsumerTest {
 		msg.setEntityPayload("{}");
 		msg.setDateSentBySender(LocalDateTime.now());
 		msg.setDateCreated(new Date());
-		long timestamp = System.currentTimeMillis();
 		
 		List<SyncMessage> processedMsgs = new ArrayList(1);
 		Mockito.when(CamelUtils.send(eq(MOCK_PROCESSOR_URI), any(Exchange.class))).thenAnswer(invocation -> {
@@ -654,30 +647,11 @@ public class SiteMessageConsumerTest {
 			return null;
 		});
 		
-		List<SyncedMessage> archivedMsgs = new ArrayList(1);
-		Mockito.when(syncedMsgRepo.save(any(SyncedMessage.class))).thenAnswer(invocation -> {
-			archivedMsgs.add(invocation.getArgument(0));
-			return null;
-		});
-		
 		consumer.processMessage(msg);
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(syncMsgRepo).delete(msg);
-		assertEquals(1, archivedMsgs.size());
-		SyncedMessage archive = archivedMsgs.get(0);
-		assertEquals(msg.getMessageUuid(), archive.getMessageUuid());
-		assertEquals(msg.getModelClassName(), archive.getModelClassName());
-		assertEquals(msg.getIdentifier(), archive.getIdentifier());
-		assertEquals(msg.getEntityPayload(), archive.getEntityPayload());
-		assertEquals(msg.getSite(), archive.getSite());
-		assertEquals(msg.getSnapshot(), archive.getSnapshot());
-		assertEquals(msg.getDateSentBySender(), archive.getDateSentBySender());
-		assertEquals(msg.getDateCreated(), archive.getDateReceived());
-		assertEquals(SyncOutcome.SUCCESS, archive.getOutcome());
-		assertTrue(archive.getDateCreated().getTime() == timestamp || archive.getDateCreated().getTime() > timestamp);
+		verify(mockService).moveToSyncedQueue(msg, SyncOutcome.SUCCESS);
 	}
 	
 	@Test
@@ -693,20 +667,11 @@ public class SiteMessageConsumerTest {
 			return null;
 		});
 		
-		List<SyncedMessage> archivedMsgs = new ArrayList(1);
-		Mockito.when(syncedMsgRepo.save(any(SyncedMessage.class))).thenAnswer(invocation -> {
-			archivedMsgs.add(invocation.getArgument(0));
-			return null;
-		});
-		
 		consumer.processMessage(msg);
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(syncMsgRepo).delete(msg);
-		assertEquals(1, archivedMsgs.size());
-		assertEquals(SyncOutcome.CONFLICT, archivedMsgs.get(0).getOutcome());
+		verify(mockService).moveToSyncedQueue(msg, SyncOutcome.CONFLICT);
 	}
 	
 	@Test
@@ -722,20 +687,11 @@ public class SiteMessageConsumerTest {
 			return null;
 		});
 		
-		List<SyncedMessage> archivedMsgs = new ArrayList(1);
-		Mockito.when(syncedMsgRepo.save(any(SyncedMessage.class))).thenAnswer(invocation -> {
-			archivedMsgs.add(invocation.getArgument(0));
-			return null;
-		});
-		
 		consumer.processMessage(msg);
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verify(syncedMsgRepo).save(any(SyncedMessage.class));
-		verify(syncMsgRepo).delete(msg);
-		assertEquals(1, archivedMsgs.size());
-		assertEquals(SyncOutcome.ERROR, archivedMsgs.get(0).getOutcome());
+		verify(mockService).moveToSyncedQueue(msg, SyncOutcome.ERROR);
 	}
 	
 	@Test
@@ -754,7 +710,7 @@ public class SiteMessageConsumerTest {
 		assertEquals("Something went wrong while processing sync message -> " + msg, thrown.getMessage());
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verifyNoInteractions(syncedMsgRepo);
+		verifyNoInteractions(mockService);
 		verify(mockProducerTemplate, never()).sendBody(anyString(), isNull());
 	}
 	
