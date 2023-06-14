@@ -81,7 +81,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.verifiedSubscription = this.store.pipe(select(GET_FALSE_CONFLICTS)).subscribe(
 			count => {
 				this.falseConflicts = count;
-				if (this.falseConflicts) {
+				if (this.falseConflicts != undefined) {
 					this.showVerifyDialog();
 				}
 			}
@@ -90,7 +90,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.cleanedSubscription = this.store.pipe(select(GET_CLEANED_CONFLICTS)).subscribe(
 			count => {
 				this.cleanedConflicts = count;
-				if (this.cleanedConflicts) {
+				if (this.cleanedConflicts != undefined) {
 					this.showCleanDialog();
 				}
 			}
