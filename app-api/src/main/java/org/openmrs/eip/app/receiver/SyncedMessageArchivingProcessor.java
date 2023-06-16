@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,12 @@ public class SyncedMessageArchivingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	protected static final Logger log = LoggerFactory.getLogger(SyncedMessageArchivingProcessor.class);
 	
-	public SyncedMessageArchivingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
+	private ReceiverService service;
+	
+	public SyncedMessageArchivingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    ReceiverService service) {
 		super(executor);
+		this.service = service;
 	}
 	
 	@Override
@@ -61,7 +66,7 @@ public class SyncedMessageArchivingProcessor extends BaseQueueProcessor<SyncedMe
 	
 	@Override
 	public void processItem(SyncedMessage item) {
-		ReceiverUtils.archiveMessage(item);
+		service.archiveSyncedMessage(item);
 	}
 	
 }

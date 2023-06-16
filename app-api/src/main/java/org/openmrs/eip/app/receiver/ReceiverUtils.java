@@ -18,7 +18,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.openmrs.eip.app.management.entity.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
@@ -307,35 +306,6 @@ public class ReceiverUtils {
 		rows.forEach(r -> uuids.add(r.get("uuid")));
 		
 		return uuids;
-	}
-	
-	/**
-	 * Moves the specified {@link SyncedMessage} to the archives queue if all the post sync actions have
-	 * been successfully processed
-	 * 
-	 * @param message the message to archive
-	 */
-	public static void archiveMessage(SyncedMessage message) {
-		//TODO Check first if an archive with same message uuid does not exist yet
-		log.info("Moving message to the archives queue");
-		
-		ReceiverSyncArchive archive = new ReceiverSyncArchive(message);
-		archive.setDateCreated(new Date());
-		if (log.isDebugEnabled()) {
-			log.debug("Saving archive");
-		}
-		
-		getArchiveRepo().save(archive);
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Successfully saved archive, removing message from the synced queue");
-		}
-		
-		getSyncMsgRepo().delete(message);
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed message removed from the synced queue");
-		}
 	}
 	
 	/**

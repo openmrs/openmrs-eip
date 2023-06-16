@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service;
 
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 
 /**
@@ -18,7 +19,14 @@ public interface ReceiverService extends Service {
 	void moveToSyncedQueue(SyncMessage message, SyncOutcome outcome);
 	
 	/**
-	 * Prunes the specified sync archive i.e. moves it from the archives queue to the pruned queue
+	 * Moves the specified {@link SyncedMessage} to the archive queue
+	 *
+	 * @param message the message to archive
+	 */
+	void archiveSyncedMessage(SyncedMessage message);
+	
+	/**
+	 * Prunes the specified sync archive i.e. moves it from the archive queue to the pruned queue
 	 * 
 	 * @param archive the archive to prune
 	 */

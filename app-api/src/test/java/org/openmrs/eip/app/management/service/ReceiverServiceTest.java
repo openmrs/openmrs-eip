@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
@@ -70,6 +71,25 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(1, syncedItems.size());
 		assertEquals(msg.getMessageUuid(), syncedItems.get(0).getMessageUuid());
 		assertEquals(SyncOutcome.SUCCESS, syncedItems.get(0).getOutcome());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_synced_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToSyncedQueue_shouldMoveTheSyncedMessageToTheArchiveQueue() {
+		final Long id = 1L;
+		SyncedMessage msg = syncedMsgRepo.findById(id).get();
+		assertEquals(0, archiveRepo.count());
+		long timestamp = System.currentTimeMillis();
+		
+		service.archiveSyncedMessage(msg);
+		
+		assertFalse(syncedMsgRepo.findById(id).isPresent());
+		List<ReceiverSyncArchive> archives = archiveRepo.findAll();
+		assertEquals(1, archives.size());
+		ReceiverSyncArchive a = archives.get(0);
+		assertEquals(msg.getMessageUuid(), a.getMessageUuid());
+		assertTrue(a.getDateCreated().getTime() == timestamp || a.getDateCreated().getTime() > timestamp);
 	}
 	
 }

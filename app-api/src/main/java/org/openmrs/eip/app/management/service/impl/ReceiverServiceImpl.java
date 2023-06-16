@@ -2,6 +2,8 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.util.Date;
+
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
@@ -58,6 +60,31 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed the sync item from the queue");
+		}
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void archiveSyncedMessage(SyncedMessage message) {
+		//TODO Check first if an archive with same message uuid does not exist yet
+		log.info("Moving message to the archives queue");
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(message);
+		archive.setDateCreated(new Date());
+		if (log.isDebugEnabled()) {
+			log.debug("Saving archive");
+		}
+		
+		archiveRepo.save(archive);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved archive, removing message from the synced queue");
+		}
+		
+		syncedMsgRepo.delete(message);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed message removed from the synced queue");
 		}
 	}
 	

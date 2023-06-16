@@ -7,27 +7,29 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.model.PersonModel;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ReceiverUtils.class)
 public class SyncedMessageArchivingProcessorTest {
 	
 	private SyncedMessageArchivingProcessor processor;
 	
+	@Mock
+	private ReceiverService mockService;
+	
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SyncedMessageArchivingProcessor(null);
+		processor = new SyncedMessageArchivingProcessor(null, mockService);
 	}
 	
 	@After
@@ -81,13 +83,11 @@ public class SyncedMessageArchivingProcessorTest {
 	
 	@Test
 	public void processItem_shouldProcessTheSpecifiedItem() {
-		PowerMockito.mockStatic(ReceiverUtils.class);
 		SyncedMessage msg = new SyncedMessage();
 		
 		processor.processItem(msg);
 		
-		PowerMockito.verifyStatic(ReceiverUtils.class);
-		ReceiverUtils.archiveMessage(msg);
+		Mockito.verify(mockService).archiveSyncedMessage(msg);
 	}
 	
 }
