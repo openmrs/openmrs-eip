@@ -4,12 +4,14 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.util.Date;
 
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
@@ -32,13 +34,17 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	private ReceiverSyncArchiveRepository archiveRepo;
 	
+	private ReceiverRetryRepository retryRepo;
+	
 	private ReceiverPrunedItemRepository prunedRepo;
 	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
-	    ReceiverSyncArchiveRepository archiveRepo, ReceiverPrunedItemRepository prunedRepo) {
+	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo,
+	    ReceiverPrunedItemRepository prunedRepo) {
 		this.syncMsgRepo = syncMsgRepo;
 		this.syncedMsgRepo = syncedMsgRepo;
 		this.archiveRepo = archiveRepo;
+		this.retryRepo = retryRepo;
 		this.prunedRepo = prunedRepo;
 	}
 	
@@ -85,6 +91,30 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed message removed from the synced queue");
+		}
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void archiveRetry(ReceiverRetryQueueItem retry) {
+		log.info("Archiving retry item with id: " + retry.getId());
+		
+		ReceiverSyncArchive archive = new ReceiverSyncArchive(retry);
+		archive.setDateCreated(new Date());
+		if (log.isDebugEnabled()) {
+			log.debug("Saving archive");
+		}
+		
+		archiveRepo.save(archive);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved archive, removing item from the retry queue");
+		}
+		
+		retryRepo.delete(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item removed from the retry queue");
 		}
 	}
 	

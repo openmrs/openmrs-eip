@@ -71,30 +71,15 @@
                                         <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true</simple>
                                         <bean ref="retryCacheEvictingProcessor" method="process(${exchangeProperty.retry-item})" />
                                         <bean ref="retrySearchIndexUpdatingProcessor" method="process(${exchangeProperty.retry-item})" />
-
-                                        <log message="Archiving the item associated to error item with id: ${exchangeProperty.retry-item-id}" />
-
-                                        <setBody>
-                                            <spel>#{new org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive(getProperty('retry-item'))}</spel>
-                                        </setBody>
-                                        <script>
-                                            <spel>
-                                                #{body.setDateCreated(new java.util.Date())}
-                                            </spel>
-                                        </script>
-
-                                        <log loggingLevel="DEBUG" message="Saving sync archive" />
-
-                                        <toD uri="jpa:ReceiverSyncArchive" />
-
-                                        <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
+                                        <bean ref="receiverService" method="archiveRetry(${exchangeProperty.retry-item})" />
                                     </when>
+                                    <otherwise>
+                                        <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
 
-                                    <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                        <bean ref="receiverRetryRepository" method="delete(${exchangeProperty.retry-item})" />
 
-                                    <bean ref="receiverRetryRepository" method="delete(${exchangeProperty.retry-item})" />
-
-                                    <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                        <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                    </otherwise>
                                 </when>
                                 <otherwise>
                                     <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="Something went wrong while processing sync message with id: ${exchangeProperty.retry-item-id}" />

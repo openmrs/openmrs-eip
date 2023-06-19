@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.service;
 
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
@@ -24,6 +25,13 @@ public interface ReceiverService extends Service {
 	 * @param message the message to archive
 	 */
 	void archiveSyncedMessage(SyncedMessage message);
+	
+	/**
+	 * Moves the specified {@link ReceiverRetryQueueItem} to the archive queue
+	 *
+	 * @param retry the retry to archive
+	 */
+	void archiveRetry(ReceiverRetryQueueItem retry);
 	
 	/**
 	 * Prunes the specified sync archive i.e. moves it from the archive queue to the pruned queue

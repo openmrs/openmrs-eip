@@ -9,12 +9,14 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import java.util.List;
 
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
@@ -33,6 +35,9 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ReceiverSyncArchiveRepository archiveRepo;
+	
+	@Autowired
+	private ReceiverRetryRepository retryRepo;
 	
 	@Autowired
 	private ReceiverPrunedItemRepository prunedRepo;
@@ -89,6 +94,25 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(1, archives.size());
 		ReceiverSyncArchive a = archives.get(0);
 		assertEquals(msg.getMessageUuid(), a.getMessageUuid());
+		assertTrue(a.getDateCreated().getTime() == timestamp || a.getDateCreated().getTime() > timestamp);
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void archiveRetry_shouldMoveTheSyncedMessageToTheArchiveQueue() {
+		final Long id = 1L;
+		ReceiverRetryQueueItem retry = retryRepo.findById(id).get();
+		assertEquals(0, archiveRepo.count());
+		long timestamp = System.currentTimeMillis();
+		
+		service.archiveRetry(retry);
+		
+		assertFalse(retryRepo.findById(id).isPresent());
+		List<ReceiverSyncArchive> archives = archiveRepo.findAll();
+		assertEquals(1, archives.size());
+		ReceiverSyncArchive a = archives.get(0);
+		assertEquals(retry.getMessageUuid(), a.getMessageUuid());
 		assertTrue(a.getDateCreated().getTime() == timestamp || a.getDateCreated().getTime() > timestamp);
 	}
 	
