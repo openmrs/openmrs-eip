@@ -542,5 +542,11 @@
 				<target>Conflito(s) Apagado(s)</target>
 			</segment>
 		</unit>
+		<unit id="receiver-synced-msgs">
+			<segment>
+				<source>Synced Items</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

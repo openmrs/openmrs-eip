@@ -14,6 +14,8 @@ public final class RestConstants {
 	
 	public static final String PATH_RECEIVER_SYNC_MSG = SUB_PATH_RECEIVER + "sync";
 	
+	public static final String PATH_RECEIVER_SYNCED_MSG = SUB_PATH_RECEIVER + "synced";
+	
 	public static final String PATH_RECEIVER_ARCHIVE = SUB_PATH_RECEIVER + "archive";
 	
 	public static final String PATH_VAR = "id";
