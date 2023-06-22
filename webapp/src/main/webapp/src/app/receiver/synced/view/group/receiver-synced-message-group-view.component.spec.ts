@@ -2,7 +2,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReceiverSyncedMessageGroupViewComponent} from "./receiver-synced-message-group-view.component";
 
 
-describe('ReceiverSyncMessageGroupViewComponent', () => {
+describe('ReceiverSyncedMessageGroupViewComponent', () => {
 	let component: ReceiverSyncedMessageGroupViewComponent;
 	let fixture: ComponentFixture<ReceiverSyncedMessageGroupViewComponent>;
 
