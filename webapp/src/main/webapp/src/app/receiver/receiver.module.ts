@@ -19,6 +19,10 @@ import {ReceiverArchiveGroupViewComponent} from "./archive/view/group/receiver-a
 import {ReceiverArchiveListViewComponent} from "./archive/view/list/receiver-archive-list-view.component";
 import {ReceiverDashboardComponent} from "./dashboard/receiver-dashboard.component";
 import {EntityStatsComponent} from "./stats/entity-stats.component";
+import {ReceiverSyncedMessageComponent} from "./synced/receiver-synced-message.component";
+import {ReceiverSyncedMessageListViewComponent} from "./synced/view/list/receiver-synced-message-list-view.component";
+import {ReceiverSyncedMessageGroupViewComponent} from "./synced/view/group/receiver-synced-message-group-view.component";
+import {syncedMessageReducer} from "./synced/state/synced-message.reducer";
 
 @NgModule({
 	declarations: [
@@ -27,10 +31,13 @@ import {EntityStatsComponent} from "./stats/entity-stats.component";
 		ConflictComponent,
 		SiteStatusComponent,
 		ReceiverSyncMessageComponent,
+		ReceiverSyncedMessageComponent,
 		ReceiverArchiveComponent,
 		EntityStatsComponent,
 		ReceiverSyncMessageListViewComponent,
 		ReceiverSyncMessageGroupViewComponent,
+		ReceiverSyncedMessageListViewComponent,
+		ReceiverSyncedMessageGroupViewComponent,
 		ReceiverArchiveListViewComponent,
 		ReceiverArchiveGroupViewComponent,
 		ReceiverDashboardComponent
@@ -41,6 +48,7 @@ import {EntityStatsComponent} from "./stats/entity-stats.component";
 		StoreModule.forFeature('receiverErrorQueue', receiverErrorReducer),
 		StoreModule.forFeature('siteStatuses', siteStatusReducer),
 		StoreModule.forFeature('syncMsgQueue', syncMessageReducer),
+		StoreModule.forFeature('syncedMsgQueue', syncedMessageReducer),
 		StoreModule.forFeature('receiverArchiveQueue', syncArchiveReducer),
 		FormsModule
 	], exports: [ReceiverComponent]

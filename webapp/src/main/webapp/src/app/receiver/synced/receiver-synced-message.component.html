@@ -1,0 +1,20 @@
+<div class="ui-inline-menu">
+	<span class="font-weight-bold" i18n="@@common-view">View</span>&nbsp;
+	<div ngbDropdown class="d-inline-block">
+		<button class="btn btn-outline-secondary" ngbDropdownToggle>{{viewInfo?.viewLabel}}</button>
+		<div ngbDropdownMenu>
+			<button ngbDropdownItem (click)="changeToListView()" i18n="@@common-list">List</button>
+			<button ngbDropdownItem (click)="changeToSiteView()" i18n="@@common-health-facility">Health Facility</button>
+			<button ngbDropdownItem (click)="changeToEntityView()" i18n="@common-entity">Entity</button>
+		</div>
+	</div>
+</div>
+<h5>
+	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
+</h5>
+<div class="ui-bar-spacer"></div>
+<ng-container [ngSwitch]="viewInfo?.view">
+	<receiver-synced-msg-list-view *ngSwitchCase="view.LIST"></receiver-synced-msg-list-view>
+	<receiver-synced-msg-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.SITE"></receiver-synced-msg-group-view>
+	<receiver-synced-msg-group-view [viewInfo]="viewInfo" *ngSwitchCase="view.ENTITY"></receiver-synced-msg-group-view>
+</ng-container>

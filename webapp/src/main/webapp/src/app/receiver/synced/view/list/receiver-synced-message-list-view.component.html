@@ -1,0 +1,64 @@
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-striped text-center">
+	<thead>
+	<tr>
+		<th i18n="@@common-entity">Entity</th>
+		<th i18n="@@common-identifier">Identifier</th>
+		<th i18n="@@common-health-facility">Health Facility</th>
+		<th i18n="@@common-district">District</th>
+		<th i18n="@@common-operation">Operation</th>
+		<th i18n="@@common-message-id">Message Id</th>
+		<th i18n="@@common-date-sent">Date Sent</th>
+		<th i18n="@@common-date-received">Date Received</th>
+		<th i18n="@@common-action">Action</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let m of syncedMessages" class="ui-row-highlight">
+		<td>{{m.modelClassName | modelClass}}</td>
+		<td>{{m.identifier}}</td>
+		<td>{{m.site?.name}}</td>
+		<td>{{m.site?.siteDistrict}}</td>
+		<td>
+			<span class="text-success" [hidden]="m.operation != 'c'" i18n="@@common-insert">Insert</span>
+			<span [hidden]="m.operation != 'u'" i18n="@@common-update">Update</span>
+			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
+		</td>
+		<td>{{m.messageUuid}}</td>
+		<td container="body" ngbTooltip="{{m.dateSentBySender | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{m.dateSentBySender| date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{m.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{m.dateReceived | date:'MMM dd, y'}}</td>
+		<td>
+			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSyncedMessage(m)"></i>
+		</td>
+	</tr>
+	</tbody>
+</table>
+
+<ng-template #viewDetailsTemplate>
+	<span i18n="@@common-view-details">View Details</span>
+</ng-template>
+
+<ng-template #detailsTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-details">Details</h4>
+		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<div *ngIf="parsedEntityPayLoad.metadata.operation === 'd'" class="text-danger font-italic">
+			*<span i18n="@@common-deleted">Deleted Entity</span>
+		</div>
+		<table *ngIf="parsedEntityPayLoad.metadata.operation !== 'd'" border="1" width="100%" class="table-striped ui-display-table">
+			<tbody>
+			<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
+				<th class="text-right align-text-top">{{entry.key}}</th>
+				<td class="text-left">{{entry.value}}</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
+	</div>
+</ng-template>
