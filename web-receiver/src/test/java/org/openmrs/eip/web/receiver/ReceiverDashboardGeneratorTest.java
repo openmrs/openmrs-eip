@@ -25,7 +25,7 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_sync_msg.sql",
-	        "classpath:mgt_receiver_retry_queue.sql",
+	        "classpath:mgt_receiver_synced_msg.sql", "classpath:mgt_receiver_retry_queue.sql",
 	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldGenerateTheDashboard() {
 		Dashboard dashboard = generator.generate();
@@ -38,6 +38,20 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 		Assert.assertEquals(3, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
 		Assert.assertEquals(1, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.u));
 		Assert.assertNull(entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.d));
+		
+		Map<String, Object> syncedMsgs = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_SYNCED_MSGS);
+		Assert.assertEquals(2, syncedMsgs.size());
+		Assert.assertEquals(35, ((AtomicInteger) syncedMsgs.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
+		entityStatsMap = (Map) syncedMsgs.get(ReceiverDashboardGenerator.KEY_ENTITY_STATS);
+		Assert.assertEquals(2, entityStatsMap.size());
+		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).size());
+		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
+		Assert.assertEquals(3, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.u));
+		Assert.assertNull(entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.d));
+		Assert.assertEquals(1, entityStatsMap.get(PatientModel.class.getName()).size());
+		Assert.assertEquals(30, entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.c));
+		Assert.assertNull(entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.u));
+		Assert.assertNull(entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.d));
 		
 		Map<String, Object> errors = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_ERRORS);
 		Assert.assertEquals(2, errors.size());
