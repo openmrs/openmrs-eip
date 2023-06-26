@@ -18,7 +18,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr *ngFor="let m of syncedMessages" [ngClass]="{'ui-row-highlight': m.outcome == 'SUCCESS', 'ui-bg-conflict': m.outcome == 'CONFLICT', 'ui-bg-error': m.outcome == 'ERROR'}">
+	<tr *ngFor="let m of syncedMessages" [ngClass]="{'ui-row-highlight': m.outcome == 'SUCCESS', 'ui-bg-conflict': m.outcome == 'CONFLICT', 'ui-bg-error': m.outcome == 'ERROR'}" ngbTooltip="{{getPostSyncStatus(m)}}" [openDelay]="1000">
 		<td>{{m.modelClassName | modelClass}}</td>
 		<td>{{m.identifier}}</td>
 		<td>{{m.site?.name}}</td>

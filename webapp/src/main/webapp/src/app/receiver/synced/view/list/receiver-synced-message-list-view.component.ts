@@ -7,6 +7,7 @@ import {SyncedMessagesLoaded, ViewSyncedMessage} from "../../state/synced-messag
 import {BaseListingComponent} from "../../../../shared/base-listing.component";
 import {ReceiverSyncedMessage} from "../../receiver-synced-message";
 import {ReceiverSyncedMessageService} from "../../receiver-synced-message.service";
+import {Outcome} from "../../outcome.enum";
 
 @Component({
 	selector: 'receiver-synced-msg-list-view',
@@ -25,6 +26,16 @@ export class ReceiverSyncedMessageListViewComponent extends BaseListingComponent
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
 
+	responseSentLabel?: string;
+
+	evictedLabel?: string;
+
+	indexedLabel?: string;
+
+	yesLabel?: string;
+
+	noLabel?: string;
+
 	viewSubscription?: Subscription;
 
 	loadedSubscription?: Subscription;
@@ -39,6 +50,12 @@ export class ReceiverSyncedMessageListViewComponent extends BaseListingComponent
 
 	ngOnInit(): void {
 		this.init();
+		this.responseSentLabel = $localize`:@@receiver-response-sent:Response sent`;
+		this.evictedLabel = $localize`:@@receiver-evicted-from-cache:Evicted from cache`;
+		this.indexedLabel = $localize`:@@receiver-search-index-updated:Search index updated`;
+		this.yesLabel = $localize`:@@common-yes:Yes`;
+		this.noLabel = $localize`:@@common-no:No`;
+
 		this.loadedSubscription = this.store.pipe(select(GET_SYNCED_MSGS)).subscribe(
 			syncedItems => {
 				this.syncedMessages = syncedItems;
@@ -86,6 +103,20 @@ export class ReceiverSyncedMessageListViewComponent extends BaseListingComponent
 
 	closeDetailsDialog(): void {
 		this.modalRef?.close();
+	}
+
+	getPostSyncStatus(msg: ReceiverSyncedMessage): string {
+		let statusMsg = this.responseSentLabel + '=' + (msg.responseSent ? this.yesLabel : this.noLabel);
+		if (msg.outcome == Outcome.SUCCESS) {
+			if (msg.cached) {
+				statusMsg += (', ' + this.evictedLabel + '=' + (msg.evictedFromCache ? this.yesLabel : this.noLabel));
+			}
+			if (msg.indexed) {
+				statusMsg += (', ' + this.indexedLabel + '=' + (msg.searchIndexUpdated ? this.yesLabel : this.noLabel));
+			}
+		}
+
+		return statusMsg;
 	}
 
 	ngOnDestroy(): void {
