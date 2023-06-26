@@ -13,8 +13,6 @@ export class Conflict extends BaseEntity {
 
 	site?: Site;
 
-	resolved: boolean = false;
-
 	messageUuid?: string;
 
 	dateSentBySender?: string;

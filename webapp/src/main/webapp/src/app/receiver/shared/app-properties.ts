@@ -1,4 +1,4 @@
-import {SyncMode} from "./sync-mode.enum";
+import {SyncMode} from "../../shared/sync-mode.enum";
 
 export class AppProperties {
 	syncMode?: SyncMode;

@@ -4,7 +4,7 @@ import {PropertiesLoaded} from "./state/app.actions";
 import {Subscription} from "rxjs";
 import {GET_PROPS} from "./state/app.reducer";
 import {select, Store} from "@ngrx/store";
-import {SyncMode} from "./receiver/shared/sync-mode.enum";
+import {SyncMode} from "./shared/sync-mode.enum";
 
 @Component({
 	selector: 'app-root',

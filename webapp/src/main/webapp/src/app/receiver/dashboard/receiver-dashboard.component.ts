@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {DashboardComponent} from "../../shared/dashboard.component";
-import {SyncMode} from "../shared/sync-mode.enum";
+import {SyncMode} from "../../shared/sync-mode.enum";
 
 @Component({
 	selector: 'receiver-dashboard',
