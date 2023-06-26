@@ -132,6 +132,23 @@ body {
 	background-color: $colorLightSilver;
 }
 
+.ui-color-key {
+	@extend .badge;
+	@extend .border;
+	width: 30px !important;
+	height: 15px !important;
+}
+
+.ui-bg-error {
+	@extend .ui-row-highlight;
+	background-color: $colorLightPink;
+}
+
+.ui-bg-conflict {
+	@extend .ui-row-highlight;
+	background-color: $colorConflict;
+}
+
 #app-container .nav-link.active {
 	border-top: 3px solid $colorPrimary;
 	border-top-left-radius: 5px;

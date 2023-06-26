@@ -1,5 +1,6 @@
 import {Site} from "../site";
 import {BaseEntity} from "../../shared/base-entity";
+import {Outcome} from "./outcome.enum";
 
 export class ReceiverSyncedMessage extends BaseEntity {
 
@@ -19,16 +20,16 @@ export class ReceiverSyncedMessage extends BaseEntity {
 
 	dateReceived?: string;
 
-	outcome?: string;
+	outcome?: Outcome;
 
 	responseSent?: boolean;
 
 	cached?: boolean;
 
-	evictedFromCache?: string;
+	evictedFromCache?: boolean;
 
 	indexed?: boolean;
 
-	searchIndexUpdated?: string;
+	searchIndexUpdated?: boolean;
 
 }
