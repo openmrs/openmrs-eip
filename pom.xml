@@ -25,7 +25,7 @@
         <hibernateValidatorVersion>6.1.5.Final</hibernateValidatorVersion>
         <camelVersion>3.3.0</camelVersion>
         <liquibaseVersion>4.21.1</liquibaseVersion>
-        <h2Version>1.4.200</h2Version>
+        <h2Version>2.2.220</h2Version>
         <guava.version>29.0-jre</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
         <micrometerVersion>1.7.2</micrometerVersion>
