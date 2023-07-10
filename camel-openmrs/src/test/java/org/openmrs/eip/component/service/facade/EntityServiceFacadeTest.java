@@ -1,24 +1,20 @@
 package org.openmrs.eip.component.service.facade;
 
-import org.openmrs.eip.component.entity.Patient;
-import org.openmrs.eip.component.entity.Person;
-import org.openmrs.eip.component.model.BaseModel;
-import org.openmrs.eip.component.model.PatientModel;
-import org.openmrs.eip.component.model.PersonModel;
-import org.openmrs.eip.component.service.AbstractEntityService;
-import org.openmrs.eip.component.service.TableToSyncEnum;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.openmrs.eip.component.entity.Patient;
+import org.openmrs.eip.component.entity.Person;
+import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.service.AbstractEntityService;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 
 public class EntityServiceFacadeTest {
 	
@@ -71,38 +67,6 @@ public class EntityServiceFacadeTest {
 		
 		// Then
 		verify(personService).getModel(1L);
-	}
-	
-	@Test
-	public void getModelsAfterDate_should_return_models() {
-		// Given
-		PersonModel personModel1 = new PersonModel();
-		PersonModel personModel2 = new PersonModel();
-		LocalDateTime lastSyncDate = LocalDateTime.now();
-		when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
-		when(patientService.getTableToSync()).thenReturn(TableToSyncEnum.VISIT);
-		when(personService.getModels(lastSyncDate)).thenReturn(Arrays.asList(personModel1, personModel2));
-		
-		// When
-		List<? extends BaseModel> result = facade.getModelsAfterDate(TableToSyncEnum.PERSON, lastSyncDate);
-		
-		// Then
-		assertEquals(2, result.size());
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void getModels_unknown_service() {
-		// Given
-		LocalDateTime lastSyncDate = LocalDateTime.now();
-		facade = new EntityServiceFacade(Collections.singletonList(personService));
-		when(personService.getTableToSync()).thenReturn(TableToSyncEnum.PERSON);
-		when(patientService.getTableToSync()).thenReturn(TableToSyncEnum.VISIT);
-		
-		// When
-		facade.getModelsAfterDate(TableToSyncEnum.VISIT, lastSyncDate);
-		
-		// Then
-		// BOOM
 	}
 	
 	@Test

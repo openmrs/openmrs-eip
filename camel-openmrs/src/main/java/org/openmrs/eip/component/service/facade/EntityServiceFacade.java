@@ -1,14 +1,14 @@
 package org.openmrs.eip.component.service.facade;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.AbstractEntityService;
 import org.openmrs.eip.component.service.TableToSyncEnum;
-import org.openmrs.eip.component.entity.BaseEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component("entityServiceFacade")
@@ -29,19 +29,6 @@ public class EntityServiceFacade {
 	 */
 	public <M extends BaseModel> List<M> getAllModels(final TableToSyncEnum tableToSyncEnum) {
 		return (List<M>) getService(tableToSyncEnum).getAllModels();
-	}
-	
-	/**
-	 * get all models of type in parameter after the last sync date
-	 *
-	 * @param tableToSyncEnum the type of entities to get
-	 * @param lastSyncDate the last sync date
-	 * @param <M>
-	 * @return the entities
-	 */
-	public <M extends BaseModel> List<M> getModelsAfterDate(final TableToSyncEnum tableToSyncEnum,
-	                                                        final LocalDateTime lastSyncDate) {
-		return (List<M>) getService(tableToSyncEnum).getModels(lastSyncDate);
 	}
 	
 	/**

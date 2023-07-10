@@ -2,19 +2,13 @@ package org.openmrs.eip.component.service;
 
 import static org.openmrs.eip.component.utils.ModelUtils.decomposeUuid;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.EntityToModelMapper;
 import org.openmrs.eip.component.mapper.ModelToEntityMapper;
 import org.openmrs.eip.component.mapper.operations.DecomposedUuid;
@@ -24,7 +18,6 @@ import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.service.impl.AbstractSubclassEntityService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,21 +29,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 	protected EntityToModelMapper<E, M> entityToModelMapper;
 	
 	protected ModelToEntityMapper<M, E> modelToEntityMapper;
-	
-	private static final String INSERT_PATIENT = "insert into patient (patient_id,creator,date_created,voided) "
-	        + "values (?, ?, ?, ?)";
-	
-	private static final String INSERT_TEST_ORDER = "insert into test_order (order_id) values (?)";
-	
-	private static final String INSERT_DRUG_ORDER = "insert into drug_order (order_id,dispense_as_written) values (?, ?)";
-	
-	private static final String GET_ORDER_ID = "select order_id from orders where uuid = (?)";
-	
-	@Autowired
-	private EntityManagerFactory entityManagerFactory;
-	
-	@Autowired
-	private UserLightRepository userLightRepository;
 	
 	public AbstractEntityService(final SyncEntityRepository<E> repository,
 	    final EntityToModelMapper<E, M> entityToModelMapper, final ModelToEntityMapper<M, E> modelToEntityMapper) {
@@ -147,13 +125,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 	}
 	
 	@Override
-	public List<M> getModels(final LocalDateTime lastSyncDate) {
-		List<E> entities = repository.findModelsChangedAfterDate(lastSyncDate);
-		
-		return mapEntities(entities);
-	}
-	
-	@Override
 	public M getModel(final String uuid) {
 		E entity = repository.findByUuid(uuid);
 		return entity != null ? entityToModelMapper.apply(entity) : null;
@@ -182,28 +153,6 @@ public abstract class AbstractEntityService<E extends BaseEntity, M extends Base
 	
 	private String getMsg(final E ety, final String uuid, final String s) {
 		return "Entity of type " + ety.getClass().getName() + " with uuid " + uuid + s;
-	}
-	
-	private Long getOrderId(BaseModel model) {
-		EntityManager em = entityManagerFactory.createEntityManager();
-		try {
-			Query query = em.createNativeQuery(INSERT_TEST_ORDER);
-			query.setParameter(1, model.getUuid());
-			List<Object> matches = query.getResultList();
-			if (matches != null && matches.size() == 1) {
-				return (Long) matches.get(0);
-			} else {
-				throw new EIPException("Found multiple orders with uuid: " + model.getUuid());
-			}
-		}
-		catch (Exception e) {
-			throw new EIPException("Failed to get order id for order: " + model);
-		}
-		finally {
-			if (em != null) {
-				em.close();
-			}
-		}
 	}
 	
 }

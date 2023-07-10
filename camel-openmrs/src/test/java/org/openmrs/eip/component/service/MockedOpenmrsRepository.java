@@ -5,6 +5,4 @@ import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
-public interface MockedOpenmrsRepository extends SyncEntityRepository<MockedEntity> {
-	
-}
+public interface MockedOpenmrsRepository extends SyncEntityRepository<MockedEntity> {}
