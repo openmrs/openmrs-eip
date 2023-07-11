@@ -188,8 +188,11 @@ public class UtilsTest {
 	@Test
 	public void isSubclassTable_shouldReturnTrueForASubclassTable() {
 		assertTrue(Utils.isSubclassTable("patient"));
+		assertTrue(Utils.isSubclassTable("PATIENT"));
 		assertTrue(Utils.isSubclassTable("drug_order"));
+		assertTrue(Utils.isSubclassTable("DRUG_ORDER"));
 		assertTrue(Utils.isSubclassTable("test_order"));
+		assertTrue(Utils.isSubclassTable("TEST_ORDER"));
 	}
 	
 	@Test

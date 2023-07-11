@@ -1,8 +1,6 @@
 package org.openmrs.eip.app;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
@@ -40,33 +38,21 @@ public class AppUtilsTest {
 	}
 	
 	@Test
-	public void shouldReturnTrueForASubclassTable() {
-		assertTrue(AppUtils.isSubclassTable("patient"));
-		assertTrue(AppUtils.isSubclassTable("PATIENT"));
-		assertTrue(AppUtils.isSubclassTable("test_order"));
-		assertTrue(AppUtils.isSubclassTable("TEST_ORDER"));
-		assertTrue(AppUtils.isSubclassTable("drug_order"));
-		assertTrue(AppUtils.isSubclassTable("DRUG_ORDER"));
-	}
-	
-	@Test
-	public void shouldReturnFalseForANonSubclassTable() {
-		assertFalse(AppUtils.isSubclassTable("person"));
-		assertFalse(AppUtils.isSubclassTable("orders"));
-	}
-	
-	@Test
-	public void getVersion_shouldReturnTheVersion() {
+	public void getVersion_shouldReturnTheVersion() throws Exception {
 		Properties props = new Properties();
 		props.setProperty(SyncConstants.DBSYNC_PROP_VERSION, TEST_VERSION);
+		//Ensures the static block is already executed
+		AppUtils.class.getDeclaredField("PROPERTIES").getType();
 		Whitebox.setInternalState(AppUtils.class, "PROPERTIES", props);
 		assertEquals(TEST_VERSION, AppUtils.getVersion());
 	}
 	
 	@Test
-	public void getBuild_shouldReturnTheBuildNumber() {
+	public void getBuild_shouldReturnTheBuildNumber() throws Exception {
 		Properties props = new Properties();
 		props.setProperty(SyncConstants.DBSYNC_PROP_BUILD_NUMBER, TEST_BUILD_NO);
+		//Ensures the static block is already executed
+		AppUtils.class.getDeclaredField("PROPERTIES").getType();
 		Whitebox.setInternalState(AppUtils.class, "PROPERTIES", props);
 		assertEquals(TEST_BUILD_NO, AppUtils.getBuildNumber());
 	}

@@ -10,7 +10,6 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATC
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +39,6 @@ public class AppUtils {
 	private static final Properties PROPERTIES;
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
-	
-	private final static List<String> SUBCLASS_TABLES = Collections.unmodifiableList(
-	    Arrays.asList(TableToSyncEnum.PATIENT.name(), TableToSyncEnum.DRUG_ORDER.name(), TableToSyncEnum.TEST_ORDER.name()));
 	
 	private static boolean appContextStopping = false;
 	
@@ -116,16 +112,6 @@ public class AppUtils {
 	 */
 	public static String getSimpleName(String modelClassName) {
 		return getClassAndSimpleNameMap().get(modelClassName);
-	}
-	
-	/**
-	 * Checks if the specified table is for a subclass or not
-	 * 
-	 * @param tableName the name of the table to check
-	 * @return true for a subclass table otherwise false
-	 */
-	public static boolean isSubclassTable(String tableName) {
-		return SUBCLASS_TABLES.contains(tableName.toUpperCase());
 	}
 	
 	/**
