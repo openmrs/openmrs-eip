@@ -135,7 +135,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 					}
 				}
 				catch (Throwable t) {
-					if (!AppUtils.isAppContextStopping()) {
+					if (!AppUtils.isShuttingDown()) {
 						errorEncountered = true;
 						String msg = "An error has been encountered";
 						if (log.isDebugEnabled()) {

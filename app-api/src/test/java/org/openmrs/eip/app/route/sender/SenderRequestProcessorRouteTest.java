@@ -54,7 +54,7 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 	public void setup() throws Exception {
 		mockSaveEventListener.reset();
 		mockUpdateReqListener.reset();
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", false);
 	}
 	
 	@Override
@@ -196,7 +196,7 @@ public class SenderRequestProcessorRouteTest extends BaseSenderRouteTest {
 			
 		});
 		
-		AppUtils.setAppContextStopping();
+		AppUtils.handleAppContextStopping();
 		mockSaveEventListener.expectedMessageCount(0);
 		mockUpdateReqListener.expectedMessageCount(0);
 		

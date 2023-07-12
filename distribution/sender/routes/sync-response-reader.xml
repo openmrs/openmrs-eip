@@ -8,7 +8,7 @@
         </setProperty>
 
         <loop doWhile="true">
-            <spel>#{!getProperty('sync-response-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isAppContextStopping()}</spel>
+            <spel>#{!getProperty('sync-response-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isShuttingDown()}</spel>
 
             <log loggingLevel="DEBUG" message="Fetching next 500 sync responses" />
 

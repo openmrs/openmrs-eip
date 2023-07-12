@@ -57,7 +57,7 @@ public abstract class BaseQueueProcessor<T extends AbstractEntity> extends BaseP
 		List<CompletableFuture<Void>> futures = synchronizedList(new ArrayList(taskThreshold));
 		
 		for (T item : items) {
-			if (AppUtils.isAppContextStopping()) {
+			if (AppUtils.isShuttingDown()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Stopping item processing because application context is stopping");
 				}

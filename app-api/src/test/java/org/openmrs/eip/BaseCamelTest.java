@@ -89,7 +89,7 @@ public abstract class BaseCamelTest {
 	@BeforeClass
 	public static void beforeBaseCamelTestClass() {
 		//Reset in case previous tests set this to true
-		setInternalState(AppUtils.class, "appContextStopping", false);
+		setInternalState(AppUtils.class, "shuttingDown", false);
 	}
 	
 	@Before

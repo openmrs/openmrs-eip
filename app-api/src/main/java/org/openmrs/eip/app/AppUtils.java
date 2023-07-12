@@ -40,8 +40,6 @@ public class AppUtils {
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
 	
-	private static boolean appContextStopping = false;
-	
 	private static boolean shuttingDown = false;
 	
 	private static Pageable taskPage;
@@ -118,26 +116,17 @@ public class AppUtils {
 	 * Turn on a flag which is monitored by processor threads to allow them to gracefully stop
 	 * processing before the application is stopped.
 	 */
-	public static void setAppContextStopping() {
-		appContextStopping = true;
-		EipFailoverTransportFactory.stopTransport();
+	public static void handleAppContextStopping() {
+		shuttingDown = true;
 		log.info("Application context is stopping");
-	}
-	
-	/**
-	 * Checks if the application context is stopping
-	 *
-	 * @return true if the application context is stopping
-	 */
-	public static boolean isAppContextStopping() {
-		return appContextStopping;
+		EipFailoverTransportFactory.stopTransport();
 	}
 	
 	/**
 	 * Checks if the application is shutting down
 	 */
 	public static boolean isShuttingDown() {
-		return shuttingDown || isAppContextStopping();
+		return shuttingDown;
 	}
 	
 	/**

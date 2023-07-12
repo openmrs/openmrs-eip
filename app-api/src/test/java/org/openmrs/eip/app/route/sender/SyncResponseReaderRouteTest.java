@@ -44,7 +44,7 @@ public class SyncResponseReaderRouteTest extends BaseSenderRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockProcessor.reset();
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", false);
 		advise(ROUTE_ID_RESPONSE_READER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -97,7 +97,7 @@ public class SyncResponseReaderRouteTest extends BaseSenderRouteTest {
 	@Test
 	@Sql(scripts = "classpath:mgt_sender_sync_response.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldNotReadAnyResponsesIfTheApplicationIsStopping() throws Exception {
-		AppUtils.setAppContextStopping();
+		AppUtils.handleAppContextStopping();
 		mockProcessor.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_RESPONSE_READER, new DefaultExchange(camelContext));

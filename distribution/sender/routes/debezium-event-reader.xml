@@ -7,7 +7,7 @@
         </setProperty>
 
         <loop doWhile="true">
-            <spel>#{!getProperty('debezium-event-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isAppContextStopping()}</spel>
+            <spel>#{!getProperty('debezium-event-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isShuttingDown()}</spel>
 
             <log loggingLevel="DEBUG" message="Fetching next 1000 events in the debezium event queue" />
 

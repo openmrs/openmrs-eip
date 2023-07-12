@@ -83,7 +83,7 @@ public class BaseQueueProcessorTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		setInternalState(AppUtils.class, "appContextStopping", false);
+		setInternalState(AppUtils.class, "shuttingDown", false);
 		setInternalState(BaseQueueProcessor.class, "initialized", false);
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
@@ -273,7 +273,7 @@ public class BaseQueueProcessorTest {
 	
 	@Test
 	public void processWork_shouldNotProcessEventsWhenTheApplicationIsStopping() throws Exception {
-		AppUtils.setAppContextStopping();
+		AppUtils.handleAppContextStopping();
 		final int size = 2;
 		List<DebeziumEvent> events = new ArrayList(size);
 		

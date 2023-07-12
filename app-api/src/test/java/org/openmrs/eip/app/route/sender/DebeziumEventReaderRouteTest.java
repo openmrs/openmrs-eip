@@ -44,7 +44,7 @@ public class DebeziumEventReaderRouteTest extends BaseSenderRouteTest {
 	@Before
 	public void setup() throws Exception {
 		mockEventProcessor.reset();
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", false);
 		advise(ROUTE_ID_DBZM_EVENT_READER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -94,7 +94,7 @@ public class DebeziumEventReaderRouteTest extends BaseSenderRouteTest {
 	@Test
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = SyncConstants.MGT_DATASOURCE_NAME, transactionManager = SyncConstants.MGT_TX_MGR))
 	public void shouldNotReadAnyEventsIfTheApplicationIsStopping() throws Exception {
-		AppUtils.setAppContextStopping();
+		AppUtils.handleAppContextStopping();
 		mockEventProcessor.expectedMessageCount(0);
 		
 		producerTemplate.send(URI_DBZM_EVENT_READER, new DefaultExchange(camelContext));

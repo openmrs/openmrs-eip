@@ -44,7 +44,6 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	public void setup() throws Exception {
 		setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
-		setInternalState(AppUtils.class, "appContextStopping", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
 		
@@ -89,7 +88,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldSkipIfTheApplicationIsStopping() throws Exception {
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);
 		

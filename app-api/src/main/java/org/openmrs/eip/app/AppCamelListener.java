@@ -30,7 +30,7 @@ public class AppCamelListener extends EventNotifierSupport {
 	@Override
 	public void notify(CamelEvent event) throws Exception {
 		if (event instanceof CamelEvent.CamelContextStoppingEvent) {
-			AppUtils.setAppContextStopping();
+			AppUtils.handleAppContextStopping();
 			
 			log.info("Shutting down sync executor");
 			

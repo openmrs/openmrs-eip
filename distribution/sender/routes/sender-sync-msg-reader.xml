@@ -9,7 +9,7 @@
         </setProperty>
 
         <loop doWhile="true">
-            <spel>#{!getProperty('sender-sync-msg-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isAppContextStopping()}</spel>
+            <spel>#{!getProperty('sender-sync-msg-reader-endLoop') &amp;&amp; !T(org.openmrs.eip.app.AppUtils).isShuttingDown()}</spel>
 
             <log loggingLevel="DEBUG" message="Fetching next 500 sender sync messages" />
 

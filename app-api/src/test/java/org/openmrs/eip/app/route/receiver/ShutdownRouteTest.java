@@ -40,7 +40,6 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
-		setInternalState(AppUtils.class, "appContextStopping", false);
 		setInternalState(AppUtils.class, "shuttingDown", false);
 		mockEmailNoticeProcessor.reset();
 		mockShutdownBean.reset();
@@ -58,7 +57,7 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	
 	@Test
 	public void shouldSkipIfTheApplicationIsStopping() throws Exception {
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);
 		

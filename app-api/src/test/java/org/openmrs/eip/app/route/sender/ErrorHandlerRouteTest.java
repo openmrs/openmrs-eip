@@ -52,7 +52,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 	
 	@Before
 	public void setup() throws Exception {
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", false);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", false);
 		advise(ROUTE_ID_ERROR_HANDLER, new AdviceWithRouteBuilder() {
 			
 			@Override
@@ -213,7 +213,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 	
 	@Test
 	public void shouldSkipIfTheApplicationIsStopping() {
-		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
+		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
 		final int errorCount = TestUtils.getEntities(SenderRetryQueueItem.class).size();
 		
 		producerTemplate.send(URI_ERROR_HANDLER, new DefaultExchange(camelContext));
