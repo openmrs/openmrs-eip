@@ -80,7 +80,7 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, new DefaultExchange(camelContext));
 		
-		assertMessageLogged(Level.INFO, "Ignoring the error because the application context is stopping");
+		assertMessageLogged(Level.INFO, "Ignoring the error because the application is shutting down");
 		assertEquals(errorCount, TestUtils.getEntities(ReceiverRetryQueueItem.class).size());
 	}
 	

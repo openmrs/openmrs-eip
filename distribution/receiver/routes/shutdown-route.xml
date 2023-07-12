@@ -5,10 +5,6 @@
         <choice>
             <when>
                 <method beanType="org.openmrs.eip.app.AppUtils" method="isShuttingDown()" />
-                <log loggingLevel="DEBUG" message="The application context is already stopping" />
-            </when>
-            <when>
-                <method beanType="org.openmrs.eip.app.AppUtils" method="isShuttingDown()" />
                 <log loggingLevel="DEBUG" message="The application is already shutting down" />
             </when>
             <otherwise>

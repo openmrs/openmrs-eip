@@ -56,19 +56,6 @@ public class ShutdownRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldSkipIfTheApplicationIsStopping() throws Exception {
-		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
-		mockEmailNoticeProcessor.expectedMessageCount(0);
-		mockShutdownBean.expectedMessageCount(0);
-		
-		producerTemplate.send(URI_SHUTDOWN, new DefaultExchange(camelContext));
-		
-		mockEmailNoticeProcessor.assertIsSatisfied();
-		mockShutdownBean.assertIsSatisfied();
-		assertMessageLogged(Level.DEBUG, "The application context is already stopping");
-	}
-	
-	@Test
 	public void shouldSkipProcessingIfTheReceiverIsAlreadyShuttingDown() throws Exception {
 		Whitebox.setInternalState(AppUtils.class, "shuttingDown", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);

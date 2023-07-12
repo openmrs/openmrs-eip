@@ -8,7 +8,7 @@
         <choice>
             <when>
                 <method beanType="org.openmrs.eip.app.AppUtils" method="isShuttingDown()" />
-                <log message="Ignoring the error because the application context is stopping" />
+                <log message="Ignoring the error because the application is shutting down" />
             </when>
             <otherwise>
                 <when>
