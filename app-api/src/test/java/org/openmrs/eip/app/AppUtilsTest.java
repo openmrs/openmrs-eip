@@ -7,6 +7,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATC
 
 import java.util.Properties;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,23 +38,24 @@ public class AppUtilsTest {
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 	}
 	
+	@After
+	public void tearDown() {
+		Whitebox.setInternalState(AppUtils.class, "props", (Object) null);
+	}
+	
 	@Test
-	public void getVersion_shouldReturnTheVersion() throws Exception {
+	public void getVersion_shouldReturnTheVersion() {
 		Properties props = new Properties();
 		props.setProperty(SyncConstants.DBSYNC_PROP_VERSION, TEST_VERSION);
-		//Ensures the static block is already executed
-		AppUtils.class.getDeclaredField("PROPERTIES").getType();
-		Whitebox.setInternalState(AppUtils.class, "PROPERTIES", props);
+		Whitebox.setInternalState(AppUtils.class, "props", props);
 		assertEquals(TEST_VERSION, AppUtils.getVersion());
 	}
 	
 	@Test
-	public void getBuild_shouldReturnTheBuildNumber() throws Exception {
+	public void getBuild_shouldReturnTheBuildNumber() {
 		Properties props = new Properties();
 		props.setProperty(SyncConstants.DBSYNC_PROP_BUILD_NUMBER, TEST_BUILD_NO);
-		//Ensures the static block is already executed
-		AppUtils.class.getDeclaredField("PROPERTIES").getType();
-		Whitebox.setInternalState(AppUtils.class, "PROPERTIES", props);
+		Whitebox.setInternalState(AppUtils.class, "props", props);
 		assertEquals(TEST_BUILD_NO, AppUtils.getBuildNumber());
 	}
 	

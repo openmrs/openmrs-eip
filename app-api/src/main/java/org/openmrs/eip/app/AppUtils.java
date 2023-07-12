@@ -36,7 +36,7 @@ public class AppUtils {
 	
 	private static final int EXIT_CODE = 129;
 	
-	private static final Properties PROPERTIES;
+	private static Properties props;
 	
 	private final static Set<TableToSyncEnum> IGNORE_TABLES;
 	
@@ -51,14 +51,6 @@ public class AppUtils {
 		IGNORE_TABLES.add(TableToSyncEnum.PROVIDER_ATTRIBUTE);
 		IGNORE_TABLES.add(TableToSyncEnum.CONCEPT);
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
-		
-		try (InputStream file = SyncConstants.class.getClassLoader().getResourceAsStream(DBSYNC_PROP_FILE)) {
-			PROPERTIES = new Properties();
-			PROPERTIES.load(file);
-		}
-		catch (IOException e) {
-			throw new EIPException("Failed to load the dbsync properties file: ", e);
-		}
 	}
 	
 	private static Map<String, String> classAndSimpleNameMap = null;
@@ -164,7 +156,7 @@ public class AppUtils {
 	 * @return application version
 	 */
 	public static String getVersion() {
-		String version = PROPERTIES.getProperty(DBSYNC_PROP_VERSION);
+		String version = getProperties().getProperty(DBSYNC_PROP_VERSION);
 		if (StringUtils.isBlank(version)) {
 			log.warn("Failed to determine the application version");
 		}
@@ -178,7 +170,7 @@ public class AppUtils {
 	 * @return application version
 	 */
 	public static String getBuildNumber() {
-		String build = PROPERTIES.getProperty(DBSYNC_PROP_BUILD_NUMBER);
+		String build = getProperties().getProperty(DBSYNC_PROP_BUILD_NUMBER);
 		if (StringUtils.isBlank(build)) {
 			log.warn("Failed to determine the application's build number");
 		}
@@ -262,6 +254,21 @@ public class AppUtils {
 		catch (Exception e) {
 			log.error("An error occurred while waiting for " + name + " executor to terminate");
 		}
+	}
+	
+	private static Properties getProperties() {
+		if (props == null) {
+			try (InputStream file = AppUtils.class.getClassLoader().getResourceAsStream(DBSYNC_PROP_FILE)) {
+				Properties propsTemp = new Properties();
+				propsTemp.load(file);
+				props = propsTemp;
+			}
+			catch (IOException e) {
+				throw new EIPException("Failed to load the dbsync properties file", e);
+			}
+		}
+		
+		return props;
 	}
 	
 }
