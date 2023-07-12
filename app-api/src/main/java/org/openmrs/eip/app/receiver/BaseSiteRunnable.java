@@ -111,7 +111,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 		
 		try {
 			Thread.currentThread().setName(Thread.currentThread().getName() + ":" + site.getName() + ":" + getTaskName());
-			if (AppUtils.isStopping()) {
+			if (AppUtils.isShuttingDown()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Skipping run because the application is stopping");
 				}
@@ -147,7 +147,7 @@ public abstract class BaseSiteRunnable implements Runnable {
 						break;
 					}
 				}
-			} while (!AppUtils.isStopping() && !errorEncountered);
+			} while (!AppUtils.isShuttingDown() && !errorEncountered);
 			
 			if (!errorEncountered) {
 				if (log.isDebugEnabled()) {

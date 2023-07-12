@@ -182,7 +182,7 @@ public class BaseSiteRunnableTest {
 	
 	@Test
 	public void run_shouldSkipRunningIfTheApplicationIsStopping() {
-		when(AppUtils.isStopping()).thenReturn(true);
+		when(AppUtils.isShuttingDown()).thenReturn(true);
 		
 		runnable.run();
 		

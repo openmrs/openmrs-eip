@@ -31,7 +31,7 @@ public abstract class BaseTask implements Task {
 				return;
 			}
 			
-			if (AppUtils.isStopping()) {
+			if (AppUtils.isShuttingDown()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Skipping run because the application is stopping");
 				}
@@ -51,7 +51,7 @@ public abstract class BaseTask implements Task {
 					}
 				}
 				catch (Throwable t) {
-					if (!AppUtils.isStopping()) {
+					if (!AppUtils.isShuttingDown()) {
 						errorEncountered = true;
 						String msg = "An error has been encountered";
 						if (log.isDebugEnabled()) {
@@ -63,7 +63,7 @@ public abstract class BaseTask implements Task {
 						break;
 					}
 				}
-			} while (!AppUtils.isStopping() && !errorEncountered);
+			} while (!AppUtils.isShuttingDown() && !errorEncountered);
 			
 			if (!errorEncountered) {
 				if (log.isDebugEnabled()) {

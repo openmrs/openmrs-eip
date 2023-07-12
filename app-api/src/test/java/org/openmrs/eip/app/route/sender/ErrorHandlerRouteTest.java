@@ -212,7 +212,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldSkipIfTheApplicationContextIsStopping() {
+	public void shouldSkipIfTheApplicationIsStopping() {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		final int errorCount = TestUtils.getEntities(SenderRetryQueueItem.class).size();
 		

@@ -88,7 +88,7 @@ public class ShutdownRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldSkipIfTheApplicationContextIsStopping() throws Exception {
+	public void shouldSkipIfTheApplicationIsStopping() throws Exception {
 		Whitebox.setInternalState(AppUtils.class, "appContextStopping", true);
 		mockEmailNoticeProcessor.expectedMessageCount(0);
 		mockShutdownBean.expectedMessageCount(0);

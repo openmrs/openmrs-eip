@@ -137,14 +137,7 @@ public class AppUtils {
 	 * Checks if the application is shutting down
 	 */
 	public static boolean isShuttingDown() {
-		return shuttingDown;
-	}
-	
-	/**
-	 * Checks if the application is stopping
-	 */
-	public static boolean isStopping() {
-		return isAppContextStopping() || isShuttingDown();
+		return shuttingDown || isAppContextStopping();
 	}
 	
 	/**

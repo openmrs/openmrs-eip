@@ -272,7 +272,7 @@ public class BaseQueueProcessorTest {
 	}
 	
 	@Test
-	public void processWork_shouldNotProcessEventsWhenTheApplicationContextIsStopping() throws Exception {
+	public void processWork_shouldNotProcessEventsWhenTheApplicationIsStopping() throws Exception {
 		AppUtils.setAppContextStopping();
 		final int size = 2;
 		List<DebeziumEvent> events = new ArrayList(size);

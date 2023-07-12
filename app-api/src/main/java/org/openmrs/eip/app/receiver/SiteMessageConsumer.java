@@ -101,7 +101,7 @@ public class SiteMessageConsumer implements Runnable {
 	
 	@Override
 	public void run() {
-		if (AppUtils.isStopping()) {
+		if (AppUtils.isShuttingDown()) {
 			if (log.isDebugEnabled()) {
 				log.debug("Sync message consumer skipping execution because the application is stopping");
 			}
@@ -142,7 +142,7 @@ public class SiteMessageConsumer implements Runnable {
 				}
 			}
 			
-		} while (!AppUtils.isStopping() && !errorEncountered);
+		} while (!AppUtils.isShuttingDown() && !errorEncountered);
 		
 		if (!errorEncountered) {
 			if (log.isTraceEnabled()) {

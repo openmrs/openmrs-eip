@@ -45,7 +45,7 @@ public class BaseTaskTest {
 	@Test
 	public void run_shouldNotRunIfAppIsStopping() throws Exception {
 		task = Mockito.spy(task);
-		when(AppUtils.isStopping()).thenReturn(true);
+		when(AppUtils.isShuttingDown()).thenReturn(true);
 		
 		task.run();
 		
@@ -78,7 +78,7 @@ public class BaseTaskTest {
 		final AtomicInteger callCount = new AtomicInteger(0);
 		when(task.doRun()).thenAnswer((Answer) invocationOnMock -> {
 			if (callCount.get() == 1) {
-				when(AppUtils.isStopping()).thenReturn(true);
+				when(AppUtils.isShuttingDown()).thenReturn(true);
 			}
 			callCount.incrementAndGet();
 			return false;
