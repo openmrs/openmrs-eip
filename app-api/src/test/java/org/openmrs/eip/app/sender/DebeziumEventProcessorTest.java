@@ -48,7 +48,7 @@ public class DebeziumEventProcessorTest {
 		de.getEvent().setTableName(table);
 		de.getEvent().setIdentifier(uuid);
 		de.getEvent().setPrimaryKeyId(visitId);
-		assertEquals(table + "-" + visitId + "-" + id + "-" + uuid, processor.getThreadName(de));
+		assertEquals(table + "-" + visitId + "-" + uuid, processor.getThreadName(de));
 	}
 	
 	@Test
@@ -60,7 +60,7 @@ public class DebeziumEventProcessorTest {
 		de.setId(id);
 		de.getEvent().setTableName(table);
 		de.getEvent().setPrimaryKeyId(visitId);
-		assertEquals(table + "-" + visitId + "-" + id, processor.getThreadName(de));
+		assertEquals(table + "-" + visitId, processor.getThreadName(de));
 	}
 	
 	@Test

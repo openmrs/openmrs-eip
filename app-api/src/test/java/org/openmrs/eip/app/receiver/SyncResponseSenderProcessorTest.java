@@ -54,7 +54,7 @@ public class SyncResponseSenderProcessorTest {
 		SiteInfo siteInfo = new SiteInfo();
 		siteInfo.setIdentifier(siteUuid);
 		msg.setSite(siteInfo);
-		assertEquals(siteUuid + "-" + messageUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid,
+		assertEquals(siteUuid + "-" + AppUtils.getSimpleName(msg.getModelClassName()) + "-" + uuid + "-" + messageUuid,
 		    processor.getThreadName(msg));
 	}
 	

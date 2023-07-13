@@ -31,7 +31,7 @@ public class DebeziumEventProcessor extends BaseFromCamelToCamelEndpointProcesso
 	
 	@Override
 	public String getThreadName(DebeziumEvent event) {
-		String name = event.getEvent().getTableName() + "-" + event.getEvent().getPrimaryKeyId() + "-" + event.getId();
+		String name = event.getEvent().getTableName() + "-" + event.getEvent().getPrimaryKeyId();
 		if (StringUtils.isNotBlank(event.getEvent().getIdentifier())) {
 			name += ("-" + event.getEvent().getIdentifier());
 		}

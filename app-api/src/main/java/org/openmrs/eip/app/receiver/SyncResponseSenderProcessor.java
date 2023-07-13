@@ -46,8 +46,8 @@ public class SyncResponseSenderProcessor extends BaseQueueProcessor<SyncedMessag
 	
 	@Override
 	public String getThreadName(SyncedMessage item) {
-		return item.getSite().getIdentifier() + "-" + item.getMessageUuid() + "-"
-		        + AppUtils.getSimpleName(item.getModelClassName()) + "-" + item.getIdentifier();
+		return item.getSite().getIdentifier() + "-" + AppUtils.getSimpleName(item.getModelClassName()) + "-"
+		        + item.getIdentifier() + "-" + item.getMessageUuid();
 	}
 	
 	@Override
