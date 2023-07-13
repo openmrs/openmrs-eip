@@ -1,10 +1,8 @@
 package org.openmrs.eip.app;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
-import static org.openmrs.eip.app.SyncConstants.EXECUTOR_SHUTDOWN_TIMEOUT;
 
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
@@ -31,21 +29,7 @@ public class AppCamelListener extends EventNotifierSupport {
 	public void notify(CamelEvent event) throws Exception {
 		if (event instanceof CamelEvent.CamelContextStoppingEvent) {
 			AppUtils.handleAppContextStopping();
-			
-			log.info("Shutting down sync executor");
-			
-			syncExecutor.shutdownNow();
-			
-			try {
-				log.info("Waiting for " + EXECUTOR_SHUTDOWN_TIMEOUT + " seconds for sync executor to terminate");
-				
-				syncExecutor.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
-				
-				log.info("Done shutting down sync executor");
-			}
-			catch (Exception e) {
-				log.error("An error occurred while waiting for sync executor to terminate");
-			}
+			AppUtils.shutdownExecutor(syncExecutor, "sync", false);
 		}
 	}
 	
