@@ -39,7 +39,7 @@ public class ConflictQueueItem extends AbstractEntity {
 	private Boolean snapshot = false;
 	
 	@NotNull
-	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
+	@Column(name = "entity_payload", columnDefinition = "text", nullable = false, updatable = false)
 	private String entityPayload;
 	
 	@ManyToOne

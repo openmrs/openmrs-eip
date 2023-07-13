@@ -39,7 +39,7 @@ public class SyncedMessage extends AbstractEntity {
 	private String identifier;
 	
 	@NotNull
-	@Column(name = "entity_payload", columnDefinition = "text", nullable = false)
+	@Column(name = "entity_payload", columnDefinition = "text", nullable = false, updatable = false)
 	private String entityPayload;
 	
 	@NotNull
