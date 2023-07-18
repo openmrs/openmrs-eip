@@ -3,6 +3,8 @@ package org.openmrs.eip.app.receiver;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseTask;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
@@ -44,6 +46,9 @@ public class ConflictVerifyingTask extends BaseTask {
 				} else {
 					log.info("Verifying " + ids.size() + " conflict(s)");
 					
+					StopWatch stopWatch = new StopWatch();
+					stopWatch.start();
+					
 					int pageSize = AppUtils.getTaskPage().getPageSize();
 					List<Long> idsBatch = new ArrayList(pageSize);
 					Long lastId = ids.get(ids.size() - 1);
@@ -58,6 +63,11 @@ public class ConflictVerifyingTask extends BaseTask {
 							}
 						}
 					}
+					
+					stopWatch.stop();
+					String timeTaken = DurationFormatUtils.formatDuration(stopWatch.getTime(), "HH:mm:ss", true);
+					
+					log.info("Conflict verification task took: " + timeTaken);
 				}
 			}
 			finally {
