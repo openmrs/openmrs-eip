@@ -3,4 +3,4 @@ VALUES  (1, 'org.openmrs.eip.component.model.PersonModel', 'uuid-1', 'c', '{}', 
         (2, 'org.openmrs.eip.component.model.PersonModel', 'uuid-1', 'u', '{}', 0, 1, '2022-06-16 00:00:00', '2cfd940e-32dc-491f-8038-a8f3afe3e36d', '2022-06-16 00:00:05', '2022-06-16 00:00:10'),
         (3, 'org.openmrs.eip.component.model.PatientModel', 'uuid-1', 'c', '{}', 0, 1, '2022-06-16 00:00:00', '3cfd940e-32dc-491f-8038-a8f3afe3e36d', '2022-06-16 00:00:05', '2022-06-16 00:00:10'),
         (4, 'org.openmrs.eip.component.model.PersonModel', 'uuid-2', 'c', '{}', 0, 1, '2022-06-16 00:00:00', '4cfd940e-32dc-491f-8038-a8f3afe3e36d', '2022-06-16 00:00:05', '2022-06-16 00:00:10'),
-        (5, 'org.openmrs.eip.component.model.OrderModel', 'uuid-1', 'c', '{}', 0, 1, '2022-06-16 00:00:00', '5cfd940e-32dc-491f-8038-a8f3afe3e36d', '2022-06-16 00:00:05', '2022-06-16 00:00:10');
+        (5, 'org.openmrs.eip.component.model.OrderModel', 'uuid-1', 'c', '{}', 0, 1, '2022-06-16 00:00:00', '5cfd940e-32dc-491f-8038-a8f3afe3e36d', '2022-06-16 00:00:04', '2022-06-16 00:00:10');

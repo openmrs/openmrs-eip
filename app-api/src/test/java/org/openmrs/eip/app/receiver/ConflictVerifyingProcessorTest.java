@@ -61,7 +61,7 @@ public class ConflictVerifyingProcessorTest {
 	}
 	
 	@Test
-	public void processItem_shouldNotMoveTheConflictIfTheHashOnFileIsInvalid() {
+	public void processItem_shouldNotMoveTheConflictIfTheHashOnFileDoesNotMatchThatOfTheDbState() {
 		ConflictQueueItem c = new ConflictQueueItem();
 		c.setModelClassName(PersonModel.class.getName());
 		final Long id = 3L;
@@ -84,12 +84,9 @@ public class ConflictVerifyingProcessorTest {
 	public void processItem_shouldNotMoveTheConflictIfNoHashIsFoundOnFile() {
 		ConflictQueueItem c = new ConflictQueueItem();
 		c.setModelClassName(PersonModel.class.getName());
-		final Long id = 3L;
 		final String uuid = "test-uuid";
-		c.setId(id);
 		c.setIdentifier(uuid);
-		BaseModel model = new PersonModel();
-		when(mockEntityService.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(model);
+		when(mockEntityService.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(new PersonModel());
 		
 		processor.processItem(c);
 		
@@ -100,9 +97,7 @@ public class ConflictVerifyingProcessorTest {
 	public void processItem_shouldMoveTheConflictToTheRetryQueueIfTheHashOnFileIsInvalid() {
 		ConflictQueueItem c = new ConflictQueueItem();
 		c.setModelClassName(PersonModel.class.getName());
-		final Long id = 3L;
 		final String uuid = "test-uuid";
-		c.setId(id);
 		c.setIdentifier(uuid);
 		BaseModel model = new PersonModel();
 		when(mockEntityService.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(model);
