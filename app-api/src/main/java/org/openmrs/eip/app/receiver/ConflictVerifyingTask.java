@@ -19,13 +19,23 @@ public class ConflictVerifyingTask extends BaseTask {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ConflictVerifyingTask.class);
 	
+	private static class ConflictVerifyingTaskHolder {
+		
+		private static ConflictVerifyingTask INSTANCE = new ConflictVerifyingTask();
+		
+	}
+	
+	public static ConflictVerifyingTask getInstance() {
+		return ConflictVerifyingTaskHolder.INSTANCE;
+	}
+	
 	public static boolean isExecuting = false;
 	
 	private ConflictVerifyingProcessor processor;
 	
 	private ConflictRepository repo;
 	
-	public ConflictVerifyingTask() {
+	private ConflictVerifyingTask() {
 		processor = SyncContext.getBean(ConflictVerifyingProcessor.class);
 		repo = SyncContext.getBean(ConflictRepository.class);
 	}

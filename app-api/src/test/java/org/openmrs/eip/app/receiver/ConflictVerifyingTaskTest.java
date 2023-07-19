@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -32,10 +34,25 @@ public class ConflictVerifyingTaskTest {
 	
 	private ConflictVerifyingTask task;
 	
+	private ConflictRepository originalRepo;
+	
+	private ConflictVerifyingProcessor originalProcessor;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(AppUtils.class);
+		task = ConflictVerifyingTask.getInstance();
+		originalRepo = Whitebox.getInternalState(task, ConflictRepository.class);
+		originalProcessor = Whitebox.getInternalState(task, ConflictVerifyingProcessor.class);
+		setInternalState(task, ConflictRepository.class, mockRepo);
+		setInternalState(task, ConflictVerifyingProcessor.class, mockProcessor);
+	}
+	
+	@After
+	public void tearDown() {
+		setInternalState(task, ConflictRepository.class, originalRepo);
+		setInternalState(task, ConflictVerifyingProcessor.class, originalProcessor);
 	}
 	
 	@Test
@@ -61,9 +78,6 @@ public class ConflictVerifyingTaskTest {
 		when(mockRepo.findAllById(asList(3L, 4L))).thenReturn(asList(c3, c4));
 		when(mockRepo.findAllById(asList(5L, 6L))).thenReturn(asList(c5, c6));
 		when(mockRepo.findAllById(asList(7L))).thenReturn(asList(c7));
-		task = new ConflictVerifyingTask();
-		setInternalState(task, ConflictRepository.class, mockRepo);
-		setInternalState(task, ConflictVerifyingProcessor.class, mockProcessor);
 		
 		Assert.assertTrue(task.doRun());
 		
