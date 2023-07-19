@@ -46,9 +46,9 @@ public class ConflictVerifyingTask extends BaseTask {
 	}
 	
 	/**
-	 * Gets the isExecuting
+	 * Gets the started
 	 *
-	 * @return the isExecuting
+	 * @return true if started otherwise false
 	 */
 	public boolean isStarted() {
 		return started;

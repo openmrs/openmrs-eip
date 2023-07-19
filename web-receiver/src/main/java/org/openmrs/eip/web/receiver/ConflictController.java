@@ -89,7 +89,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@PostMapping("/verify/start")
-	public void startTask() {
+	public void startVerifyTask() {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing request to start " + ConflictVerifyingTask.getInstance().getTaskName());
 		}
@@ -99,7 +99,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@GetMapping("/verify/status")
-	public boolean getTaskStatus() {
+	public boolean getVerifyTaskStatus() {
 		if (log.isDebugEnabled()) {
 			log.debug("Getting status of " + ConflictVerifyingTask.getInstance().getTaskName());
 		}

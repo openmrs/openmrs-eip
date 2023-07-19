@@ -2,8 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild,} from '@angular/core';
 import {ConflictService} from "./conflict.service";
 import {Conflict} from "./conflict";
 import {select, Store} from "@ngrx/store";
-import {CONFLICT_TO_VIEW, GET_CLEANED_CONFLICTS, GET_CONFLICTS, GET_FALSE_CONFLICTS} from "./state/conflict.reducer";
-import {ConflictsCleaned, ConflictsLoaded, ConflictsVerified, ViewConflict} from "./state/conflict.actions";
+import {CONFLICT_TO_VIEW, GET_CONFLICTS} from "./state/conflict.reducer";
+import {ConflictsLoaded, ViewConflict} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ConfirmDialogComponent} from "../../shared/dialogs/confirm.component";
@@ -33,19 +33,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
 
-	@ViewChild('verifyConflictsTemplate')
-	verifyDetailsRef?: ElementRef;
-
-	@ViewChild('cleanedConflictsTemplate')
-	cleanedDetailsRef?: ElementRef;
-
 	viewSubscription?: Subscription;
 
 	loadedSubscription?: Subscription;
-
-	verifiedSubscription?: Subscription;
-
-	cleanedSubscription?: Subscription;
 
 	constructor(
 		private service: ConflictService,
@@ -78,24 +68,6 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 			}
 		);
 
-		this.verifiedSubscription = this.store.pipe(select(GET_FALSE_CONFLICTS)).subscribe(
-			count => {
-				this.falseConflicts = count;
-				if (this.falseConflicts != undefined) {
-					this.showVerifyDialog();
-				}
-			}
-		);
-
-		this.cleanedSubscription = this.store.pipe(select(GET_CLEANED_CONFLICTS)).subscribe(
-			count => {
-				this.cleanedConflicts = count;
-				if (this.cleanedConflicts != undefined) {
-					this.showCleanDialog();
-				}
-			}
-		);
-
 		this.loadConflicts();
 	}
 
@@ -105,16 +77,15 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		});
 	}
 
-	verifyConflicts(): void {
-		this.service.verifyConflicts().subscribe(count => {
-			this.store.dispatch(new ConflictsVerified(count));
+	startVerifyTask(): void {
+		this.service.startVerifyTask().subscribe(() => {
+			//TODO update store state
 		});
 	}
 
-	cleanConflicts(): void {
-		this.closeDetailsDialog();
-		this.service.cleanConflicts().subscribe(count => {
-			this.store.dispatch(new ConflictsCleaned(count));
+	getVerifyTaskStatus(): void {
+		this.service.getVerifyTaskStatus().subscribe(started => {
+			//TODO update store state
 		});
 	}
 
@@ -159,36 +130,11 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	ngOnDestroy(): void {
 		this.viewSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
-		this.verifiedSubscription?.unsubscribe();
-		this.cleanedSubscription?.unsubscribe();
 		super.ngOnDestroy();
 	}
 
 	getSimpleClassName(className?: string) {
 		return className?.substring(className.lastIndexOf('.') + 1, className.lastIndexOf('Model'));
-	}
-
-	showVerifyDialog(): void {
-		const dialogConfig: NgbModalOptions = {
-			backdrop: 'static',
-		}
-
-		this.modalRef = this.modalService.open(this.verifyDetailsRef, dialogConfig);
-		this.modalRef.closed.subscribe(() => {
-			this.store.dispatch(new ConflictsVerified());
-		});
-	}
-
-	showCleanDialog(): void {
-		const dialogConfig: NgbModalOptions = {
-			backdrop: 'static',
-		}
-
-		this.modalRef = this.modalService.open(this.cleanedDetailsRef, dialogConfig);
-		this.modalRef.closed.subscribe(() => {
-			this.store.dispatch(new ConflictsCleaned());
-			this.loadConflicts();
-		});
 	}
 
 }

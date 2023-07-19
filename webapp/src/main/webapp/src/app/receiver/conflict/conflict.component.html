@@ -2,7 +2,7 @@
 	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
 </h5>
 <div>
-	<button type="button" class="btn btn-outline-primary btn-sm" (click)="verifyConflicts()" i18n="@@receiver-conflict-verify">Verify</button>
+	<button type="button" class="btn btn-outline-primary btn-sm" (click)="startVerifyTask()" i18n="@@receiver-conflict-verify">Verify</button>
 </div>
 <div class="ui-bar-spacer"></div>
 <div class="ui-bar-spacer"></div>
@@ -71,48 +71,6 @@
 				</tr>
 			</tbody>
 		</table>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
-	</div>
-</ng-template>
-
-<ng-template #verifyConflictsTemplate>
-	<div class="modal-header">
-		<h4 class="modal-title" i18n="@@receiver-conflict-title">Conflicts</h4>
-		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
-			<span aria-hidden="true">&times;</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<div [hidden]="falseConflicts == 0">
-			<div>
-				<span i18n="@@receiver-conflict-false-msg">False conflict(s)</span>: {{falseConflicts}}
-			</div>
-			<div>
-				<span i18n="@@receiver-conflict-clean">Do you want to clean them?</span>
-			</div>
-		</div>
-		<div [hidden]="falseConflicts && falseConflicts > 0">
-			<span i18n="@@receiver-conflict-no-false-msg">No false conflicts found</span>
-		</div>
-	</div>
-	<div class="modal-footer">
-		<button [hidden]="falseConflicts == 0" type="button" class="btn btn-outline-danger" (click)="closeDetailsDialog()" i18n="@@common-no">No</button>
-		<button [hidden]="falseConflicts == 0" type="button" class="btn btn-outline-primary" (click)="cleanConflicts()" i18n="@@common-yes">Yes</button>
-		<button [hidden]="falseConflicts && falseConflicts > 0" type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
-	</div>
-</ng-template>
-
-<ng-template #cleanedConflictsTemplate>
-	<div class="modal-header">
-		<h4 class="modal-title" i18n="@@receiver-conflict-title">Conflicts</h4>
-		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
-			<span aria-hidden="true">&times;</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<span i18n="@@receiver-conflict-cleaned-msg">Cleaned conflict(s)</span>: {{cleanedConflicts}}
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>

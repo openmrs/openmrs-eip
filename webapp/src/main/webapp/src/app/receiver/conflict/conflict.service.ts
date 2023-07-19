@@ -16,16 +16,16 @@ export class ConflictService extends BaseService<Conflict> {
 		return this.getCountAndItems(RESOURCE_NAME);
 	}
 
-	deleteConflict(conflict: Conflict): Observable<Conflict> {
+	deleteConflict(conflict: Conflict): Observable<void> {
 		return this.delete(RESOURCE_NAME, conflict);
 	}
 
-	verifyConflicts(): Observable<number> {
-		return this.httpClient.get<number>(environment.apiBaseUrl + RESOURCE_NAME + "/verify");
+	startVerifyTask(): Observable<void> {
+		return this.httpClient.post<void>(environment.apiBaseUrl + RESOURCE_NAME + "/verify/start", null);
 	}
 
-	cleanConflicts(): Observable<number> {
-		return this.httpClient.post<number>(environment.apiBaseUrl + RESOURCE_NAME + "/clean", null);
+	getVerifyTaskStatus(): Observable<boolean> {
+		return this.httpClient.get<boolean>(environment.apiBaseUrl + RESOURCE_NAME + "/verify/status");
 	}
 
 }
