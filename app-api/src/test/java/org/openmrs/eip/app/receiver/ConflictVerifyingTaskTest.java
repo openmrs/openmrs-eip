@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
@@ -53,10 +54,11 @@ public class ConflictVerifyingTaskTest {
 	public void tearDown() {
 		setInternalState(task, ConflictRepository.class, originalRepo);
 		setInternalState(task, ConflictVerifyingProcessor.class, originalProcessor);
+		setInternalState(task, "started", false);
 	}
 	
 	@Test
-	public void getConflictIds_shouldGetTheIdsOfAllTheConflicts() throws Exception {
+	public void doRun_shouldInvokeTheProcessorToVerifyTheConflicts() throws Exception {
 		Pageable pageable = PageRequest.of(0, 2);
 		when(AppUtils.getTaskPage()).thenReturn(pageable);
 		when(mockRepo.getConflictIds()).thenReturn(asList(1L, 2L, 3L, 4L, 5L, 6L, 7L));
@@ -86,6 +88,15 @@ public class ConflictVerifyingTaskTest {
 		verify(mockProcessor).processWork(asList(c5, c6));
 		verify(mockProcessor).processWork(asList(c7));
 		
+	}
+	
+	@Test
+	public void doRun_shouldDoNothingIfAlreadyStarted() throws Exception {
+		setInternalState(task, "started", true);
+		
+		Assert.assertTrue(task.doRun());
+		
+		Mockito.verifyNoInteractions(mockRepo);
 	}
 	
 }

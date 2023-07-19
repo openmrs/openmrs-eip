@@ -4,8 +4,6 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
@@ -49,28 +47,6 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		this.archiveRepo = archiveRepo;
 		this.serviceFacade = serviceFacade;
 		this.producerTemplate = producerTemplate;
-	}
-	
-	@Override
-	public List<ConflictQueueItem> getBadConflicts() {
-		List<ConflictQueueItem> conflicts = conflictRepo.findAll();
-		if (log.isDebugEnabled()) {
-			log.debug("Conflict count: " + conflicts.size());
-		}
-		
-		return conflicts.stream().filter(c -> {
-			TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(c.getModelClassName());
-			BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, c.getIdentifier());
-			if (dbModel != null) {
-				Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(dbModel);
-				BaseHashEntity storedHash = HashUtils.getStoredHash(c.getIdentifier(), hashClass, producerTemplate);
-				return storedHash != null && HashUtils.computeHash(dbModel).equals(storedHash.getHash());
-			}
-			
-			log.warn("No entity found in the database associated to conflict item with id: " + c.getId());
-			
-			return false;
-		}).collect(Collectors.toList());
 	}
 	
 	@Override

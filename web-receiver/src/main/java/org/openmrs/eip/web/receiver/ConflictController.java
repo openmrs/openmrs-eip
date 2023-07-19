@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
@@ -9,9 +10,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.openmrs.eip.app.management.entity.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
+import org.openmrs.eip.app.receiver.ConflictVerifyingTask;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.web.RestConstants;
 import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
@@ -84,30 +88,23 @@ public class ConflictController extends BaseRestController {
 		service.moveToArchiveQueue((ConflictQueueItem) doGet(id));
 	}
 	
-	@GetMapping("/verify")
-	public int verify() {
+	@PostMapping("/verify/start")
+	public void startTask() {
 		if (log.isDebugEnabled()) {
-			log.debug("Getting count conflicts where the entity hashes are valid");
+			log.debug("Processing request to start " + ConflictVerifyingTask.getInstance().getTaskName());
 		}
 		
-		return service.getBadConflicts().size();
+		ExecutorService executor = SyncContext.getBean(BEAN_NAME_SYNC_EXECUTOR);
+		executor.execute(ConflictVerifyingTask.getInstance());
 	}
 	
-	@PostMapping("/clean")
-	public int clean() {
+	@GetMapping("/verify/status")
+	public boolean getTaskStatus() {
 		if (log.isDebugEnabled()) {
-			log.debug("Cleaning conflicts");
+			log.debug("Getting status of " + ConflictVerifyingTask.getInstance().getTaskName());
 		}
 		
-		List<ConflictQueueItem> conflicts = service.getBadConflicts();
-		
-		log.info("Moving " + conflicts.size() + " conflict(s) where the entity hashes are valid");
-		
-		for (ConflictQueueItem c : conflicts) {
-			service.moveToRetryQueue(c, "Moved from conflict queue because the hash on file is valid");
-		}
-		
-		return conflicts.size();
+		return ConflictVerifyingTask.getInstance().isStarted();
 	}
 	
 }

@@ -29,7 +29,7 @@ public class ConflictVerifyingTask extends BaseTask {
 		return ConflictVerifyingTaskHolder.INSTANCE;
 	}
 	
-	public static boolean isExecuting = false;
+	private boolean started = false;
 	
 	private ConflictVerifyingProcessor processor;
 	
@@ -45,11 +45,22 @@ public class ConflictVerifyingTask extends BaseTask {
 		return "conflict verifier task";
 	}
 	
+	/**
+	 * Gets the isExecuting
+	 *
+	 * @return the isExecuting
+	 */
+	public boolean isStarted() {
+		return started;
+	}
+	
 	@Override
 	public boolean doRun() throws Exception {
-		if (!isExecuting) {
+		if (!started) {
+			log.info("Starting " + ConflictVerifyingTask.getInstance().getTaskName());
+			
 			try {
-				isExecuting = true;
+				started = true;
 				List<Long> ids = repo.getConflictIds();
 				if (ids.isEmpty()) {
 					log.info("No conflicts found to verify");
@@ -81,10 +92,10 @@ public class ConflictVerifyingTask extends BaseTask {
 				}
 			}
 			finally {
-				isExecuting = false;
+				started = false;
 			}
 		} else {
-			log.info(getTaskName() + " is already running");
+			log.info(getTaskName() + " is already started");
 		}
 		
 		return true;
