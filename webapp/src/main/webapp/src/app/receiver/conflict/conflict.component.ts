@@ -26,9 +26,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	parsedEntityPayLoad?: any;
 
-	falseConflicts?: number;
+	verifyTaskStarted?: boolean;
 
-	cleanedConflicts?: number;
+	verifyTaskTimeoutId?: number;
 
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
@@ -79,14 +79,21 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	startVerifyTask(): void {
 		this.service.startVerifyTask().subscribe(() => {
-			//TODO update store state
+			this.verifyTaskStarted = true;
+			this.getVerifyTaskStatus();
 		});
 	}
 
 	getVerifyTaskStatus(): void {
-		this.service.getVerifyTaskStatus().subscribe(started => {
-			//TODO update store state
-		});
+		this.verifyTaskTimeoutId = setTimeout(() => {
+			this.service.getVerifyTaskStatus().subscribe(started => {
+				this.verifyTaskStarted = started;
+				if (this.verifyTaskStarted) {
+					this.getVerifyTaskStatus();
+				}
+			});
+
+		}, 5000);
 	}
 
 	confirmDialog(conflict: Conflict): void {
@@ -130,6 +137,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	ngOnDestroy(): void {
 		this.viewSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
+		clearTimeout(this.verifyTaskTimeoutId);
 		super.ngOnDestroy();
 	}
 

@@ -2,7 +2,8 @@
 	<span class="badge badge-dark" i18n="@@common-total-count">Total Count</span>&nbsp;<span class="badge border border-secondary">{{count}}</span>
 </h5>
 <div>
-	<button type="button" class="btn btn-outline-primary btn-sm" (click)="startVerifyTask()" i18n="@@receiver-conflict-verify">Verify</button>
+	<button [hidden]="verifyTaskStarted" type="button" class="btn btn-outline-primary btn-sm" (click)="startVerifyTask()" i18n="@@receiver-conflict-verify">Verify</button>
+	<span class="badge badge-success" [hidden]="!verifyTaskStarted" i18n="@@receiver-conflict-verify-running">Verify task is running</span>
 </div>
 <div class="ui-bar-spacer"></div>
 <div class="ui-bar-spacer"></div>

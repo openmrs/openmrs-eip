@@ -512,36 +512,6 @@
 				<target>Verificar</target>
 			</segment>
 		</unit>
-		<unit id="receiver-conflict-title">
-			<segment>
-				<source>Conflicts</source>
-				<target>Conflitos</target>
-			</segment>
-		</unit>
-		<unit id="receiver-conflict-false-msg">
-			<segment>
-				<source>False conflict(s)</source>
-				<target>Falso(s) conflito(s)</target>
-			</segment>
-		</unit>
-		<unit id="receiver-conflict-no-false-msg">
-			<segment>
-				<source>No false conflicts found</source>
-				<target>Nenhum conflito falso encontrado</target>
-			</segment>
-		</unit>
-		<unit id="receiver-conflict-clean">
-			<segment>
-				<source>Do you want to clean them?</source>
-				<target>Você quer Apagá-los?</target>
-			</segment>
-		</unit>
-		<unit id="receiver-conflict-cleaned-msg">
-			<segment>
-				<source>Cleaned conflict(s)</source>
-				<target>Conflito(s) Apagado(s)</target>
-			</segment>
-		</unit>
 		<unit id="receiver-synced-msgs">
 			<segment>
 				<source>Synced Items</source>
@@ -575,6 +545,12 @@
 		<unit id="receiver-search-index-updated">
 			<segment>
 				<source>Search index updated</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-verify-running">
+			<segment>
+				<source>Verify task is running</source>
 				<target></target>
 			</segment>
 		</unit>
