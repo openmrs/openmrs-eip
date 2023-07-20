@@ -90,6 +90,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 				this.verifyTaskStarted = started;
 				if (this.verifyTaskStarted) {
 					this.getVerifyTaskStatus();
+				} else {
+					this.loadConflicts();
 				}
 			});
 
