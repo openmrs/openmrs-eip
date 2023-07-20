@@ -2,12 +2,13 @@ import {Component, ElementRef, OnInit, ViewChild,} from '@angular/core';
 import {ConflictService} from "./conflict.service";
 import {Conflict} from "./conflict";
 import {select, Store} from "@ngrx/store";
-import {CONFLICT_TO_VIEW, GET_CONFLICTS} from "./state/conflict.reducer";
-import {ConflictsLoaded, ViewConflict} from "./state/conflict.actions";
+import {CONFLICT_TO_VIEW, GET_CONFLICTS, GET_VERIFY_TASK_STATUS} from "./state/conflict.reducer";
+import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewConflict} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ConfirmDialogComponent} from "../../shared/dialogs/confirm.component";
 import {Subscription} from "rxjs";
+import {VerifyTaskStatus} from "./verify-task-status";
 
 @Component({
 	selector: 'receiver-conflicts',
@@ -26,7 +27,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	parsedEntityPayLoad?: any;
 
-	verifyTaskStarted?: boolean;
+	verifyTaskStatus?: VerifyTaskStatus;
 
 	verifyTaskTimeoutId?: number;
 
@@ -36,6 +37,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	viewSubscription?: Subscription;
 
 	loadedSubscription?: Subscription;
+
+	verifyStatusSubscription?: Subscription;
 
 	constructor(
 		private service: ConflictService,
@@ -68,7 +71,23 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 			}
 		);
 
+		this.verifyStatusSubscription = this.store.pipe(select(GET_VERIFY_TASK_STATUS)).subscribe(status => {
+				if (status != undefined) {
+					let completed = this.verifyTaskStatus?.running && !status.running;
+					this.verifyTaskStatus = status;
+					if (this.verifyTaskStatus.running) {
+						this.getVerifyTaskStatus(5000);
+					}
+
+					if (this.verifyTaskStatus.running || completed) {
+						this.loadConflicts();
+					}
+				}
+			}
+		);
+
 		this.loadConflicts();
+		this.getVerifyTaskStatus(0);
 	}
 
 	loadConflicts(): void {
@@ -79,23 +98,17 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	startVerifyTask(): void {
 		this.service.startVerifyTask().subscribe(() => {
-			this.verifyTaskStarted = true;
-			this.getVerifyTaskStatus();
+			this.store.dispatch(new VerifyTaskStatusUpdated(new VerifyTaskStatus(true, new Date())));
 		});
 	}
 
-	getVerifyTaskStatus(): void {
+	getVerifyTaskStatus(delay: number): void {
 		this.verifyTaskTimeoutId = setTimeout(() => {
-			this.service.getVerifyTaskStatus().subscribe(started => {
-				this.verifyTaskStarted = started;
-				if (this.verifyTaskStarted) {
-					this.getVerifyTaskStatus();
-				} else {
-					this.loadConflicts();
-				}
+			this.service.getVerifyTaskStatus().subscribe(running => {
+				this.store.dispatch(new VerifyTaskStatusUpdated(new VerifyTaskStatus(running, new Date())));
 			});
 
-		}, 5000);
+		}, delay);
 	}
 
 	confirmDialog(conflict: Conflict): void {
@@ -140,6 +153,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.viewSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
 		clearTimeout(this.verifyTaskTimeoutId);
+		this.verifyStatusSubscription?.unsubscribe();
 		super.ngOnDestroy();
 	}
 

@@ -2,10 +2,12 @@ import {ConflictAction, ConflictActionType} from "./conflict.actions";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {Conflict} from "../conflict";
 import {ConflictCountAndItems} from "../confict-count-and-items";
+import {VerifyTaskStatus} from "../verify-task-status";
 
 export interface ConflictState {
 	countAndItems: ConflictCountAndItems;
 	conflictToView?: Conflict;
+	verifyTaskStatus?: VerifyTaskStatus;
 }
 
 const GET_CONFLICTS_FEATURE_STATE = createFeatureSelector<ConflictState>('conflictQueue');
@@ -18,6 +20,11 @@ export const GET_CONFLICTS = createSelector(
 export const CONFLICT_TO_VIEW = createSelector(
 	GET_CONFLICTS_FEATURE_STATE,
 	state => state.conflictToView
+);
+
+export const GET_VERIFY_TASK_STATUS = createSelector(
+	GET_CONFLICTS_FEATURE_STATE,
+	state => state.verifyTaskStatus
 );
 
 const initialState: ConflictState = {
@@ -38,6 +45,13 @@ export function conflictReducer(state = initialState, action: ConflictAction) {
 			return {
 				...state,
 				conflictToView: action.conflictToView
+			};
+
+		case ConflictActionType.VERIFY_TASK_STATUS_UPDATED:
+			return {
+				...state,
+				verifyTaskStatus: action.verifyTaskStatus,
+
 			};
 
 		default:
