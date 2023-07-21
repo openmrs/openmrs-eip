@@ -31,6 +31,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	verifyTaskTimeoutId?: number;
 
+	lastReloadMillis?: number;
+
 	@ViewChild('detailsTemplate')
 	detailsRef?: ElementRef;
 
@@ -72,14 +74,23 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		);
 
 		this.verifyStatusSubscription = this.store.pipe(select(GET_VERIFY_TASK_STATUS)).subscribe(status => {
-				if (status != undefined) {
+				if (status == undefined) {
+					this.getVerifyTaskStatus(0);
+				} else {
 					let completed = this.verifyTaskStatus?.running && !status.running;
 					this.verifyTaskStatus = status;
 					if (this.verifyTaskStatus.running) {
 						this.getVerifyTaskStatus(5000);
 					}
 
-					if (this.verifyTaskStatus.running || completed) {
+					let millis = status.lastUpdated?.getTime();
+					if (!this.lastReloadMillis) {
+						this.lastReloadMillis = millis;
+					}
+
+					//Refresh the conflicts when the task is done or every 30 seconds
+					if (completed || (millis && this.lastReloadMillis && (millis - this.lastReloadMillis) >= 30000)) {
+						this.lastReloadMillis = millis;
 						this.loadConflicts();
 					}
 				}
@@ -87,7 +98,6 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		);
 
 		this.loadConflicts();
-		this.getVerifyTaskStatus(0);
 	}
 
 	loadConflicts(): void {
@@ -152,8 +162,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	ngOnDestroy(): void {
 		this.viewSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
-		clearTimeout(this.verifyTaskTimeoutId);
 		this.verifyStatusSubscription?.unsubscribe();
+		clearTimeout(this.verifyTaskTimeoutId);
 		super.ngOnDestroy();
 	}
 

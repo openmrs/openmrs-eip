@@ -1,13 +1,10 @@
-import {BaseEntity} from "../../shared/base-entity";
-
-export class VerifyTaskStatus extends BaseEntity {
+export class VerifyTaskStatus {
 
 	running: boolean = false;
 
 	lastUpdated?: Date;
 
 	constructor(running: boolean, lastUpdated: Date) {
-		super();
 		this.running = running;
 		this.lastUpdated = lastUpdated;
 	}
