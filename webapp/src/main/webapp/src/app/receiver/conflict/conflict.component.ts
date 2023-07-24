@@ -74,9 +74,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		);
 
 		this.verifyStatusSubscription = this.store.pipe(select(GET_VERIFY_TASK_STATUS)).subscribe(status => {
-				if (status == undefined) {
-					this.getVerifyTaskStatus(0);
-				} else {
+				if (status) {
 					let completed = this.verifyTaskStatus?.running && !status.running;
 					this.verifyTaskStatus = status;
 					if (this.verifyTaskStatus.running) {
@@ -98,6 +96,11 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		);
 
 		this.loadConflicts();
+		if (this.verifyTaskTimeoutId) {
+			clearTimeout(this.verifyTaskTimeoutId);
+		}
+
+		this.getVerifyTaskStatus(0);
 	}
 
 	loadConflicts(): void {
