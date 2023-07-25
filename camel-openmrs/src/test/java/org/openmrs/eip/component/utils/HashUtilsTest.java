@@ -5,15 +5,25 @@ import static java.time.ZonedDateTime.parse;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
+import static org.openmrs.eip.component.Constants.QUERY_GET_HASH;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.PersistenceException;
+
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -97,6 +107,24 @@ public class HashUtilsTest {
 		HashUtils.saveHash(h, mockTemplate, false);
 		
 		verify(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, h.getClass().getSimpleName()), h);
+	}
+	
+	@Test
+	public void saveHash_shouldGracefullyHandleExceptionIfEntityHashAlreadyExists() {
+		final String className = PersonHash.class.getSimpleName();
+		final String uuid = "test-uuid";
+		PersonHash newHash = new PersonHash();
+		newHash.setIdentifier(uuid);
+		ConstraintViolationException cause = new ConstraintViolationException("test", null, "constraint-name");
+		CamelExecutionException e = new CamelExecutionException("test", null, new PersistenceException(cause));
+		doThrow(e).when(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), newHash);
+		PersonHash existingHash = new PersonHash();
+		when(mockTemplate.requestBody(QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, className).replace(PLACEHOLDER_UUID, uuid),
+		    null, List.class)).thenReturn(Collections.singletonList(existingHash));
+		
+		HashUtils.saveHash(newHash, mockTemplate, true);
+		
+		verify(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), existingHash);
 	}
 	
 }
