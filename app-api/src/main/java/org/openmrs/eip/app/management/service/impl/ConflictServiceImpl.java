@@ -14,7 +14,6 @@ import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
-import org.openmrs.eip.component.camel.OpenmrsLoadProducer;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -103,7 +102,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		BaseHashEntity storedHash = HashUtils.getStoredHash(uuid, tableToSyncEnum.getHashClass(), producerTemplate);
 		storedHash.setHash(HashUtils.computeHash(dbModel));
 		storedHash.setDateChanged(LocalDateTime.now());
-		OpenmrsLoadProducer.saveHash(storedHash, producerTemplate, false);
+		HashUtils.saveHash(storedHash, producerTemplate, false);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved new hash for the entity, removing item from the conflict queue");

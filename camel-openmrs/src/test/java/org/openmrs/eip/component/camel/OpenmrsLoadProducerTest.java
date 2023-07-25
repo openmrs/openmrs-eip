@@ -9,8 +9,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.HASH_DELETED;
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
-import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 
 import org.apache.camel.Exchange;
@@ -112,8 +110,8 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		// Then
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    personHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(personHash, mockProducerTemplate, true);
 		verify(mockLogger).debug("Inserting new hash for the incoming entity state");
 		assertEquals(model.getUuid(), personHash.getIdentifier());
 		assertEquals(expectedHash, personHash.getHash());
@@ -179,8 +177,8 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    storedHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
 		verify(mockLogger).debug("Updating hash for the deleted entity");
 		assertEquals(HASH_DELETED, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
@@ -211,8 +209,8 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		// Then
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    personHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(personHash, mockProducerTemplate, false);
 		verify(mockLogger).info("Inserting new hash for the deleted entity with no existing hash");
 		verify(mockLogger).debug("Saving new hash for the deleted entity");
 		verify(mockLogger).debug("Successfully saved the new hash for the deleted entity");
@@ -278,8 +276,8 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    storedHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
 		verify(mockLogger).info(
 		    "Found existing hash for a missing entity, this could be a retry item to delete an entity but the hash was never updated to the terminal value");
 		verify(mockLogger).debug("Updating hash for the deleted entity");
@@ -386,8 +384,8 @@ public class OpenmrsLoadProducerTest {
 		producer.process(exchange);
 		
 		// Then
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    personHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(personHash, mockProducerTemplate, false);
 		verify(mockLogger).debug("Inserting new hash for existing entity with missing hash");
 		verify(mockLogger).debug("Ignoring existing entity with missing hash when checking for conflicts");
 		verify(mockLogger).debug("Saving new hash for the entity");
@@ -425,8 +423,8 @@ public class OpenmrsLoadProducerTest {
 		
 		producer.process(exchange);
 		
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    personHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(personHash, mockProducerTemplate, false);
 		verify(mockLogger).debug("Inserting new hash for existing placeholder entity");
 		verify(mockLogger).debug("Saving new hash for the entity");
 		verify(mockLogger).debug("Successfully saved new hash for the entity");
@@ -457,8 +455,8 @@ public class OpenmrsLoadProducerTest {
 		
 		producer.process(exchange);
 		
-		verify(mockProducerTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, PersonHash.class.getSimpleName()),
-		    storedHash);
+		PowerMockito.verifyStatic(HashUtils.class);
+		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
 		verify(mockLogger).info("Stored hash differs from that of the state in the DB, ignoring this because the "
 		        + "incoming and DB states match");
 		verify(mockLogger).debug("Updating hash for the incoming entity state");

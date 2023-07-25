@@ -1,5 +1,8 @@
 package org.openmrs.eip.component.utils;
 
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
+import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -13,9 +16,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
@@ -138,6 +143,60 @@ public class HashUtils {
 		}
 		
 		return hash;
+	}
+	
+	/**
+	 * Saves the specified hash object to the database
+	 *
+	 * @param object hash object to save
+	 * @param template {@link ProducerTemplate} object
+	 * @param handleDuplicateHash specifies if a unique key constraint violation exception should be
+	 *            handled or not in the event we attempted to insert a duplicate hash row for the same
+	 *            entity.
+	 */
+	public static void saveHash(BaseHashEntity object, ProducerTemplate template, boolean handleDuplicateHash) {
+		try {
+			template.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, object.getClass().getSimpleName()), object);
+		}
+		catch (CamelExecutionException e) {
+			if (!handleDuplicateHash || !updateHashIfRowExists(e.getCause(), object, template)) {
+				throw e;
+			}
+		}
+	}
+	
+	/**
+	 * Checks if the exception is due to an attempt to insert a duplicate hash row for the same entity,
+	 * and if it is the case it updates the existing hash row instead.
+	 *
+	 * @param cause the immediate cause of the thrown exception
+	 * @param object the hash entity that was being inserted
+	 * @param template ProducerTemplate object
+	 * @return true if a duplicate hash row was found and updated otherwise false
+	 */
+	protected static boolean updateHashIfRowExists(Throwable cause, BaseHashEntity object, ProducerTemplate template) {
+		if (cause != null && cause.getCause() instanceof ConstraintViolationException) {
+			BaseHashEntity existing = getStoredHash(object.getIdentifier(), object.getClass(), template);
+			if (existing != null) {
+				//This will typically happen if we inserted the hash but something went wrong before or during
+				//insert of the entity and the event comes back as a retry item
+				log.info("Found existing hash for a new entity, this could be a retry item to insert a new entity "
+				        + "where the hash was created but the insert previously failed or a previously deleted entity "
+				        + "by another site");
+				
+				existing.setHash(object.getHash());
+				existing.setDateChanged(object.getDateCreated());
+				
+				if (log.isDebugEnabled()) {
+					log.debug("Updating hash with that of the incoming entity state");
+				}
+				
+				saveHash(existing, template, false);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 }

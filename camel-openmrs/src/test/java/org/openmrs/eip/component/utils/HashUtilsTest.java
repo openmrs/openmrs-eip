@@ -5,14 +5,20 @@ import static java.time.ZonedDateTime.parse;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
+import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.openmrs.eip.component.entity.light.UserLight;
+import org.openmrs.eip.component.management.hash.entity.PersonHash;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -29,6 +35,9 @@ public class HashUtilsTest {
 	private final String GENDER = "F";
 	
 	private final String UUID = "818b4ee6-8d68-4849-975d-80ab98016677";
+	
+	@Mock
+	private ProducerTemplate mockTemplate;
 	
 	@Test
 	public void computeHash_shouldReturnTheMd5HashOfTheEntityPayload() {
@@ -79,6 +88,15 @@ public class HashUtilsTest {
 		model.setDateVoided(dateVoided);
 		
 		assertEquals("93c36578eb50437b9a856a57e12c05cc", HashUtils.computeHash(model));
+	}
+	
+	@Test
+	public void saveHash_shouldSaveTheEntityHash() {
+		PersonHash h = new PersonHash();
+		
+		HashUtils.saveHash(h, mockTemplate, false);
+		
+		verify(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, h.getClass().getSimpleName()), h);
 	}
 	
 }

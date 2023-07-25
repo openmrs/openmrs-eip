@@ -1,8 +1,6 @@
 package org.openmrs.eip.component.camel;
 
 import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
-import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 import static org.springframework.data.domain.ExampleMatcher.matching;
@@ -10,10 +8,8 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.hibernate.exception.ConstraintViolationException;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.User;
@@ -222,7 +218,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 			}
 			
-			saveHash(storedHash, producerTemplate, false);
+			HashUtils.saveHash(storedHash, producerTemplate, false);
 			
 			if (log.isDebugEnabled()) {
 				if (isNewHash) {
@@ -258,7 +254,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		storedHash.setHash(HashUtils.computeHash(modelToSave));
-		saveHash(storedHash, producerTemplate, true);
+		HashUtils.saveHash(storedHash, producerTemplate, true);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved the hash for the incoming entity state");
@@ -350,7 +346,7 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 			}
 		}
 		
-		saveHash(storedHash, producerTemplate, false);
+		HashUtils.saveHash(storedHash, producerTemplate, false);
 		
 		if (log.isDebugEnabled()) {
 			if (isNewHashInstance) {
@@ -375,60 +371,6 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 		
 		return entity.getId();
-	}
-	
-	/**
-	 * Saves the specified hash object to the database
-	 * 
-	 * @param object hash object to save
-	 * @param template {@link ProducerTemplate} object
-	 * @param handleDuplicateHash specifies if a unique key constraint violation exception should be
-	 *            handled or not in the event we attempted to insert a duplicate hash row for the same
-	 *            entity.
-	 */
-	public static void saveHash(BaseHashEntity object, ProducerTemplate template, boolean handleDuplicateHash) {
-		try {
-			template.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, object.getClass().getSimpleName()), object);
-		}
-		catch (CamelExecutionException e) {
-			if (!handleDuplicateHash || !updateHashIfRowExists(e.getCause(), object, template)) {
-				throw e;
-			}
-		}
-	}
-	
-	/**
-	 * Checks if the exception is due to an attempt to insert a duplicate hash row for the same entity,
-	 * and if it is the case it updates the existing hash row instead.
-	 * 
-	 * @param cause the immediate cause of the thrown exception
-	 * @param object the hash entity that was being inserted
-	 * @param template ProducerTemplate object
-	 * @return true if a duplicate hash row was found and updated otherwise false
-	 */
-	private static boolean updateHashIfRowExists(Throwable cause, BaseHashEntity object, ProducerTemplate template) {
-		if (cause != null && cause.getCause() instanceof ConstraintViolationException) {
-			BaseHashEntity existing = HashUtils.getStoredHash(object.getIdentifier(), object.getClass(), template);
-			if (existing != null) {
-				//This will typically happen if we inserted the hash but something went wrong before or during
-				//insert of the entity and the event comes back as a retry item
-				log.info("Found existing hash for a new entity, this could be a retry item to insert a new entity "
-				        + "where the hash was created but the insert previously failed or a previously deleted entity "
-				        + "by another site");
-				
-				existing.setHash(object.getHash());
-				existing.setDateChanged(object.getDateCreated());
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Updating hash with that of the incoming entity state");
-				}
-				
-				saveHash(existing, template, false);
-				return true;
-			}
-		}
-		
-		return false;
 	}
 	
 }

@@ -23,7 +23,6 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.component.camel.OpenmrsLoadProducer;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
@@ -95,7 +94,7 @@ public class ConflictServiceTest extends BaseReceiverTest {
 		assertNotEquals(currentHash, expectedNewHash);
 		hashEntity.setHash(currentHash);
 		hashEntity.setDateCreated(LocalDateTime.now());
-		OpenmrsLoadProducer.saveHash(hashEntity, producerTemplate, false);
+		HashUtils.saveHash(hashEntity, producerTemplate, false);
 		Assert.assertNull(hashEntity.getDateChanged());
 		final long timestamp = System.currentTimeMillis();
 		

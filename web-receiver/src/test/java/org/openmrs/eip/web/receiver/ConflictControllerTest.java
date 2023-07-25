@@ -19,10 +19,10 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.component.camel.OpenmrsLoadProducer;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -78,7 +78,7 @@ public class ConflictControllerTest extends BaseReceiverTest {
 		hashEntity.setIdentifier(uuid);
 		hashEntity.setHash("current-hash");
 		hashEntity.setDateCreated(LocalDateTime.now());
-		OpenmrsLoadProducer.saveHash(hashEntity, producerTemplate, false);
+		HashUtils.saveHash(hashEntity, producerTemplate, false);
 		
 		controller.delete(conflict.getId());
 		
