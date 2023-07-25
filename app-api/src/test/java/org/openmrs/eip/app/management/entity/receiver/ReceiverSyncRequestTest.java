@@ -1,9 +1,10 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.receiver;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.SyncRequestModel;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.ReceiverRequestStatus;
 
