@@ -2,7 +2,7 @@ package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus.NEW;
+import static org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus.NEW;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_SYNC_MSG_READER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_SYNC_MSG_READER;
 
@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;

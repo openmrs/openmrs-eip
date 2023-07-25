@@ -73,7 +73,7 @@
                         <log message="Adding new item to retry queue" />
                         <setProperty name="retry-item">
                             <spel>
-                                #{new org.openmrs.eip.app.management.entity.SenderRetryQueueItem()}
+                                #{new org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem()}
                             </spel>
                         </setProperty>
                         <script>

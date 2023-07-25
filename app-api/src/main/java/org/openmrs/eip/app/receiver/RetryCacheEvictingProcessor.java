@@ -2,7 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.SendToCamelEndpointProcessor;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

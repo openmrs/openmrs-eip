@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;

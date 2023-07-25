@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.SyncConstants;
-import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
+import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.app.sender.SenderConstants;
 import org.openmrs.eip.component.entity.Event;

@@ -3,8 +3,6 @@ package org.openmrs.eip.app.management.entity.receiver;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
 import org.springframework.beans.BeanUtils;
 
 @Entity

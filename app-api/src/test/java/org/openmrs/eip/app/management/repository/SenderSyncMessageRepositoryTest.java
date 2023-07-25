@@ -5,7 +5,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.sender.BaseSenderTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;

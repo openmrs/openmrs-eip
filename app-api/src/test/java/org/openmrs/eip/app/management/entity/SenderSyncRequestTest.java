@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SenderSyncRequest.SenderRequestStatus;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncRequest;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncRequest.SenderRequestStatus;
 
 public class SenderSyncRequestTest {
 	

@@ -2,7 +2,7 @@ package org.openmrs.eip.app.management.repository;
 
 import java.util.List;
 
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

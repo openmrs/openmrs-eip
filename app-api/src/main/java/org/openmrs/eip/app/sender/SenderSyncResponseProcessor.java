@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.BaseFromCamelToCamelEndpointProcessor;
-import org.openmrs.eip.app.management.entity.SenderSyncResponse;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncResponse;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;

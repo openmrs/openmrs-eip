@@ -1,7 +1,7 @@
 package org.openmrs.eip.app.management.service;
 
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;

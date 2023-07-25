@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.springframework.beans.BeanUtils;
 
 public class SenderSyncArchiveTest {

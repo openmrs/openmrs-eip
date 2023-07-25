@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

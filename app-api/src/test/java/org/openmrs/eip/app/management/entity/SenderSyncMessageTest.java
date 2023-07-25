@@ -5,7 +5,8 @@ import java.time.ZoneId;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus;
 
 public class SenderSyncMessageTest {
 	

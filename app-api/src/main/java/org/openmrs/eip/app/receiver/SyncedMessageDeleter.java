@@ -2,7 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import java.util.List;
 
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncContext;
 

@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseTask;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

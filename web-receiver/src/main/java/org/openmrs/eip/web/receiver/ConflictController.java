@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.receiver.ConflictVerifyingTask;
 import org.openmrs.eip.component.SyncContext;

@@ -3,7 +3,7 @@ package org.openmrs.eip.app.route.sender;
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
+import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.utils.Utils;
 

@@ -17,7 +17,7 @@ import java.util.Set;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
@@ -148,7 +148,7 @@ public class ReceiverUtils {
 	/**
 	 * Creates a {@link SyncedMessage} for the specified {@link SyncMessage}.
 	 *
-	 * @param syncMessage {@link org.openmrs.eip.app.management.entity.SyncMessage} object
+	 * @param syncMessage {@link SyncMessage} object
 	 * @param outcome {@link SyncOutcome}
 	 * @return synced message
 	 */

@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
 import org.powermock.reflect.Whitebox;
 

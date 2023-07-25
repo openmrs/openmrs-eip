@@ -3,8 +3,8 @@ package org.openmrs.eip.app.route.receiver;
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.utils.Utils;

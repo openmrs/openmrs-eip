@@ -38,7 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.MockBaseSiteRunnable;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;

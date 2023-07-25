@@ -2,7 +2,7 @@ package org.openmrs.eip.web.receiver;
 
 import java.util.Map;
 
-import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncStatus;
 import org.openmrs.eip.web.RestConstants;
 import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;

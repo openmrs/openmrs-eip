@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;

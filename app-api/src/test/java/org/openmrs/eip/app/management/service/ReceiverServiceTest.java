@@ -9,8 +9,8 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import java.util.List;
 
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;

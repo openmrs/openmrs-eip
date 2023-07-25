@@ -56,7 +56,7 @@
                         </choice>
 
                         <setProperty name="debeziumEvent">
-                            <spel>#{new org.openmrs.eip.app.management.entity.DebeziumEvent()}</spel>
+                            <spel>#{new org.openmrs.eip.app.management.entity.sender.DebeziumEvent()}</spel>
                         </setProperty>
                         <script>
                             <spel>

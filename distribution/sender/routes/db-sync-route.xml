@@ -86,7 +86,7 @@
                     <simple>${body}</simple>
                 </setProperty>
                 <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncMessage()}</spel>
+                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncMessage()}</spel>
                 </setBody>
                 <script>
                     <spel>

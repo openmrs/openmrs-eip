@@ -12,9 +12,9 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.ReceiverSyncRequest;
-import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 

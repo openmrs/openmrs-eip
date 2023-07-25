@@ -21,7 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.utils.Utils;
 import org.springframework.test.context.TestPropertySource;

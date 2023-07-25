@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncOperation;
 
 @Entity

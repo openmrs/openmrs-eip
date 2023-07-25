@@ -9,7 +9,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
 import org.springframework.beans.BeanUtils;
 
 @Entity

@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncStatus;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.SyncMetadata;

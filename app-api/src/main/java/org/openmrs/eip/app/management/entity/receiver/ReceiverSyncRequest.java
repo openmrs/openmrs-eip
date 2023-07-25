@@ -1,4 +1,7 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.receiver;
+
+import org.openmrs.eip.app.management.entity.BaseSyncRequest;
+import org.openmrs.eip.app.management.entity.SyncRequestModel;
 
 import java.util.Date;
 

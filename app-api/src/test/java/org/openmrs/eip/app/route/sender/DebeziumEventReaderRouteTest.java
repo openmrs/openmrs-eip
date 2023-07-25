@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;

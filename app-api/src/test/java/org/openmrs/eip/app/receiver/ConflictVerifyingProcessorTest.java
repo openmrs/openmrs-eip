@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.management.hash.entity.PersonHash;
 import org.openmrs.eip.component.model.BaseModel;

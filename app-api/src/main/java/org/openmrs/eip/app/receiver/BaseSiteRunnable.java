@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;

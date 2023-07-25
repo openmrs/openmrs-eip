@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.sender;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -6,6 +6,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.entity.Event;
 
 @Entity

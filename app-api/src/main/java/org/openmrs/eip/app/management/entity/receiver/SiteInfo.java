@@ -1,4 +1,6 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.receiver;
+
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,7 +1,7 @@
 package org.openmrs.eip.app.management.repository;
 
-import org.openmrs.eip.app.management.entity.ReceiverSyncStatus;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncStatus;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SiteSyncStatusRepository extends JpaRepository<ReceiverSyncStatus, Long> {

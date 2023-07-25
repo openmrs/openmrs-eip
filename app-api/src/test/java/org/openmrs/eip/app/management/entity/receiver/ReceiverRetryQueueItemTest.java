@@ -13,9 +13,6 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.model.PersonModel;

@@ -25,7 +25,7 @@ import org.apache.camel.spi.CamelEvent.CamelContextStoppingEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.AppUtils;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;

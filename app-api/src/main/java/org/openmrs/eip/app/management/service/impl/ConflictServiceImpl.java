@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.apache.camel.ProducerTemplate;
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;

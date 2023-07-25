@@ -2,7 +2,7 @@ package org.openmrs.eip.web.sender;
 
 import java.util.Map;
 
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.web.RestConstants;
 import org.openmrs.eip.web.contoller.BaseRestController;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.route.sender;
 
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.route.BaseRouteTest;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.entity.Event;

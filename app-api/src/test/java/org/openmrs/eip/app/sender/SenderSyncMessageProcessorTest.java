@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.powermock.reflect.Whitebox;
 
 public class SenderSyncMessageProcessorTest {

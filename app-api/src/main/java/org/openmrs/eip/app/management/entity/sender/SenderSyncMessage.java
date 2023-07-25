@@ -1,4 +1,6 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.sender;
+
+import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -106,7 +106,7 @@
 
                         <setProperty name="messageToSave">
                             <spel>
-                                #{new org.openmrs.eip.app.management.entity.SyncMessage()}
+                                #{new org.openmrs.eip.app.management.entity.receiver.SyncMessage()}
                             </spel>
                         </setProperty>
                         <script>

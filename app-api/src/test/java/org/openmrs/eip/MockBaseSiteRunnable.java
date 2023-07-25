@@ -1,6 +1,6 @@
 package org.openmrs.eip;
 
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.receiver.BaseSiteRunnable;
 
 import lombok.Getter;

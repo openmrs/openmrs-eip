@@ -12,8 +12,6 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SiteInfo;
-import org.openmrs.eip.app.management.entity.SyncMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.beans.BeanUtils;

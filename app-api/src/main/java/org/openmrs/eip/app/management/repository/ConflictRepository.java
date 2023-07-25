@@ -2,7 +2,7 @@ package org.openmrs.eip.app.management.repository;
 
 import java.util.List;
 
-import org.openmrs.eip.app.management.entity.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

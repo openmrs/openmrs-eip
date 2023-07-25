@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity;
+package org.openmrs.eip.app.management.entity.sender;
 
 import java.util.Date;
 
@@ -8,6 +8,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.openmrs.eip.app.management.entity.BaseRetryQueueItem;
 import org.openmrs.eip.component.entity.Event;
 
 @Entity

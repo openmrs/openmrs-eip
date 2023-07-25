@@ -23,7 +23,7 @@
                 </setProperty>
                 <setProperty name="requestToSave">
                     <spel>
-                        #{new org.openmrs.eip.app.management.entity.SenderSyncRequest()}
+                        #{new org.openmrs.eip.app.management.entity.sender.SenderSyncRequest()}
                     </spel>
                 </setProperty>
                 <script>
@@ -57,7 +57,7 @@
                 </setProperty>
                 
                 <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.SenderSyncResponse()}</spel>
+                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncResponse()}</spel>
                 </setBody>
                 <script>
                     <spel>

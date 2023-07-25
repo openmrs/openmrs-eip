@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
-import org.openmrs.eip.app.management.entity.SenderRetryQueueItem;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage;
-import org.openmrs.eip.app.management.entity.SenderSyncMessage.SenderSyncMessageStatus;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;

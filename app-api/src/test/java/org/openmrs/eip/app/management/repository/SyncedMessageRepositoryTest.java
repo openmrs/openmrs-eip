@@ -9,7 +9,7 @@ import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import java.util.List;
 
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.springframework.beans.factory.annotation.Autowired;

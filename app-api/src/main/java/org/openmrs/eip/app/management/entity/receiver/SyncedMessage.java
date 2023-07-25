@@ -15,7 +15,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
-import org.openmrs.eip.app.management.entity.SiteInfo;
 import org.openmrs.eip.component.SyncOperation;
 
 import lombok.AccessLevel;

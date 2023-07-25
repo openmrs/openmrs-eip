@@ -38,7 +38,7 @@
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
                         <setBody>
                             <spel>
-                                #{new org.openmrs.eip.app.management.entity.ConflictQueueItem()}
+                                #{new org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem()}
                             </spel>
                         </setBody>
 

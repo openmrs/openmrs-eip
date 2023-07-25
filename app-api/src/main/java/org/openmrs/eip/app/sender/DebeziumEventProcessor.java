@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BaseFromCamelToCamelEndpointProcessor;
-import org.openmrs.eip.app.management.entity.DebeziumEvent;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.Utils;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -2,7 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openmrs.eip.app.management.entity.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PersonModel;
 import org.powermock.api.mockito.PowerMockito;
