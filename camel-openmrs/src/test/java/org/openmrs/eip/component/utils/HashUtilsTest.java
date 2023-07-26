@@ -4,8 +4,12 @@ import static java.time.ZoneId.systemDefault;
 import static java.time.ZonedDateTime.parse;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
@@ -24,6 +28,7 @@ import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -114,17 +119,58 @@ public class HashUtilsTest {
 		final String className = PersonHash.class.getSimpleName();
 		final String uuid = "test-uuid";
 		PersonHash newHash = new PersonHash();
+		final String newHashString = "new-hash";
 		newHash.setIdentifier(uuid);
+		newHash.setHash(newHashString);
+		newHash.setDateCreated(LocalDateTime.now());
 		ConstraintViolationException cause = new ConstraintViolationException("test", null, "constraint-name");
 		CamelExecutionException e = new CamelExecutionException("test", null, new PersistenceException(cause));
 		doThrow(e).when(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), newHash);
 		PersonHash existingHash = new PersonHash();
+		existingHash.setHash("old-hash");
+		Assert.assertNull(existingHash.getDateChanged());
 		when(mockTemplate.requestBody(QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, className).replace(PLACEHOLDER_UUID, uuid),
 		    null, List.class)).thenReturn(Collections.singletonList(existingHash));
 		
 		HashUtils.saveHash(newHash, mockTemplate, true);
 		
+		assertEquals(newHashString, existingHash.getHash());
+		assertEquals(newHash.getDateCreated(), existingHash.getDateChanged());
 		verify(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), existingHash);
+	}
+	
+	@Test
+	public void saveHash_shouldFailForAConstraintViolationAndNoExistingHashIsFound() {
+		final String className = PersonHash.class.getSimpleName();
+		final String uuid = "test-uuid";
+		PersonHash newHash = new PersonHash();
+		newHash.setIdentifier(uuid);
+		ConstraintViolationException cause = new ConstraintViolationException("test", null, "constraint-name");
+		CamelExecutionException e = new CamelExecutionException("test", null, new PersistenceException(cause));
+		doThrow(e).when(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), newHash);
+		
+		Throwable t = assertThrows(CamelExecutionException.class, () -> HashUtils.saveHash(newHash, mockTemplate, true));
+		
+		assertEquals(e.getMessage(), t.getMessage());
+		verify(mockTemplate).sendBody(eq(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className)), any());
+	}
+	
+	@Test
+	public void saveHash_shouldFailForADuplicateHash() {
+		final String className = PersonHash.class.getSimpleName();
+		final String uuid = "test-uuid";
+		PersonHash h = new PersonHash();
+		h.setIdentifier(uuid);
+		
+		ConstraintViolationException cause = new ConstraintViolationException("test", null, "constraint-name");
+		CamelExecutionException e = new CamelExecutionException("test", null, new PersistenceException(cause));
+		doThrow(e).when(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), h);
+		
+		Throwable t = assertThrows(CamelExecutionException.class, () -> HashUtils.saveHash(h, mockTemplate, false));
+		
+		assertEquals(e.getMessage(), t.getMessage());
+		verify(mockTemplate, never()).requestBody(
+		    QUERY_GET_HASH.replace(PLACEHOLDER_CLASS, className).replace(PLACEHOLDER_UUID, uuid), null, List.class);
 	}
 	
 }
