@@ -105,7 +105,7 @@ public class SyncStatusProcessorIntegrationTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void shouldUpdateTheSyncStatusForAFileSyncMessage() {
+	public void shouldInsertTheSyncStatusForAFileSyncMessage() {
 		assertTrue(TestUtils.getEntities(ReceiverSyncStatus.class).isEmpty());
 		SyncMetadata metadata = new SyncMetadata();
 		SiteInfo siteInfo = TestUtils.getEntity(SiteInfo.class, 1L);
