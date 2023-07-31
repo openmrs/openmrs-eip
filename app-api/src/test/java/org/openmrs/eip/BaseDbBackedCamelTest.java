@@ -8,7 +8,6 @@ import org.openmrs.eip.app.SyncConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Import({ TestDBConfig.class })
 @Transactional(transactionManager = MGT_TX_MGR)
-@DirtiesContext
 @TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
         TransactionalTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")

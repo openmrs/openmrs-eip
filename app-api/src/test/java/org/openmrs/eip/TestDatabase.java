@@ -19,7 +19,7 @@ public final class TestDatabase {
 	
 	private static final PathMatchingResourcePatternResolver RESOLVER = new PathMatchingResourcePatternResolver();
 	
-	private MySQLContainer MYSQL_CONTAINER;
+	private MySQLContainer MYSQL_CONTAINER = new MySQLContainer("mysql:5.7.31");;
 	
 	public String getJdbcUrl() {
 		return MYSQL_CONTAINER.getJdbcUrl();
@@ -38,7 +38,6 @@ public final class TestDatabase {
 	}
 	
 	public void start() throws Exception {
-		MYSQL_CONTAINER = new MySQLContainer("mysql:5.7.31");
 		MYSQL_CONTAINER.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		MYSQL_CONTAINER.withDatabaseName("openmrs");
 		MYSQL_CONTAINER.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
@@ -57,7 +56,6 @@ public final class TestDatabase {
 	
 	public void shutdown() {
 		MYSQL_CONTAINER.stop();
-		MYSQL_CONTAINER = null;
 	}
 	
 }
