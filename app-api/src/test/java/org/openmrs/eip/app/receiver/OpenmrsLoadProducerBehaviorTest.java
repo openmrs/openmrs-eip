@@ -37,10 +37,12 @@ import org.openmrs.eip.component.repository.PersonRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
 	

@@ -10,9 +10,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.route.TestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql({ "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 @Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class ReceiverUtilsIntegrationTest extends BaseReceiverTest {
