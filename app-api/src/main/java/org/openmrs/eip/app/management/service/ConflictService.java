@@ -26,4 +26,27 @@ public interface ConflictService extends Service {
 	 */
 	ReceiverSyncArchive moveToArchiveQueue(ConflictQueueItem conflict);
 	
+	/**
+	 * Resolves the specified conflict with the winning state being that in the receiver database, i.e.
+	 * the incoming state is ignored and the item is just moved to the archives.
+	 * 
+	 * @param conflict the conflict to resolve
+	 */
+	void resolveWithDatabaseState(ConflictQueueItem conflict);
+	
+	/**
+	 * Resolves the specified conflict with the winning state being that from the remote site
+	 * 
+	 * @param conflict the conflict to resolve
+	 */
+	void resolveWithRemoteState(ConflictQueueItem conflict);
+	
+	/**
+	 * Resolves the specified conflict with the winning state being the specified merged state
+	 * 
+	 * @param conflict the conflict to resolve
+	 * @param mergedState the effective merged state
+	 */
+	void resolveWithMerge(ConflictQueueItem conflict, Object mergedState);
+	
 }

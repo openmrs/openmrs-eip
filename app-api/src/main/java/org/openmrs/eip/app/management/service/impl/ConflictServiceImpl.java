@@ -117,4 +117,23 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		return archive;
 	}
 	
+	@Override
+	public void resolveWithDatabaseState(ConflictQueueItem conflict) {
+		if (log.isDebugEnabled()) {
+			log.info("Resolving conflict with database state as the winner");
+		}
+		
+		moveToArchiveQueue(conflict);
+	}
+	
+	@Override
+	public void resolveWithRemoteState(ConflictQueueItem conflict) {
+		
+	}
+	
+	@Override
+	public void resolveWithMerge(ConflictQueueItem conflict, Object mergedState) {
+		
+	}
+	
 }
