@@ -17,7 +17,7 @@ public class ConflictServiceImplTest {
 	
 	@Before
 	public void setup() {
-		service = new ConflictServiceImpl(null, null, null, null, null);
+		service = new ConflictServiceImpl(null, null, null, null);
 	}
 	
 	@Test

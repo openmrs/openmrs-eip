@@ -35,11 +35,12 @@ public interface ConflictService extends Service {
 	void resolveWithDatabaseState(ConflictQueueItem conflict);
 	
 	/**
-	 * Resolves the specified conflict with the winning state being that from the remote site
+	 * Resolves the specified conflict with the winning state being incoming one from the remote site,
+	 * i.e. do regular sync of incoming state to overwrite the database state.
 	 * 
 	 * @param conflict the conflict to resolve
 	 */
-	void resolveWithRemoteState(ConflictQueueItem conflict);
+	void resolveWithIncomingState(ConflictQueueItem conflict);
 	
 	/**
 	 * Resolves the specified conflict with the winning state being the specified merged state

@@ -1,8 +1,8 @@
 package org.openmrs.eip.app.management.service;
 
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 
@@ -39,5 +39,13 @@ public interface ReceiverService extends Service {
 	 * @param archive the archive to prune
 	 */
 	void prune(ReceiverSyncArchive archive);
+	
+	/**
+	 * Updates the entity hash to match the current state in the database
+	 * 
+	 * @param modelClassname the model classname of the entity
+	 * @param identifier the entity unique identifier
+	 */
+	void updateHash(String modelClassname, String identifier);
 	
 }
