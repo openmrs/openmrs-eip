@@ -107,12 +107,19 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			log.info("Resolving conflict with the database state as the winner");
 		}
 		
+		//TODO should we track the conflict resolution log?
 		moveToArchiveQueue(conflict);
 	}
 	
 	@Override
 	public void resolveWithIncomingState(ConflictQueueItem conflict) {
+		if (log.isDebugEnabled()) {
+			log.info("Resolving conflict with incoming state as the winner");
+		}
 		
+		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
+		
+		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 	}
 	
 	@Override
