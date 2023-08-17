@@ -15,17 +15,28 @@ import org.openmrs.eip.component.exception.EIPException;
 public class ConflictResolutionTest {
 	
 	@Test
-	public void addPropertyDecision_shouldFailIfDecisionIsIgnoreNew() {
+	public void ignoreProperty_shouldFailIfDecisionIsIgnoreNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
 		    () -> new ConflictResolution(new ConflictQueueItem(), IGNORE_NEW).ignoreProperty("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
 	}
 	
 	@Test
-	public void addPropertyDecision_shouldFailIfDecisionIsSyncNew() {
+	public void ignoreProperty_shouldFailIfDecisionIsSyncNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
 		    () -> new ConflictResolution(new ConflictQueueItem(), SYNC_NEW).ignoreProperty("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
+	}
+	
+	@Test
+	public void ignoreProperty_shouldAddThePropertyToTheListOfIgnoredProperties() {
+		final String PROPERTY_NAME = "test";
+		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
+		assertFalse(resolution.isIgnored(PROPERTY_NAME));
+		
+		resolution.ignoreProperty(PROPERTY_NAME);
+		
+		assertTrue(resolution.isIgnored(PROPERTY_NAME));
 	}
 	
 	@Test
@@ -41,17 +52,6 @@ public class ConflictResolutionTest {
 		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
 		assertTrue(resolution.getIgnoredProperties().add("test"));
 		assertFalse(resolution.isIgnored("other"));
-	}
-	
-	@Test
-	public void ignoreProperty_shouldAddThePropertyToTheListOfIgnoredProperties() {
-		final String PROPERTY_NAME = "test";
-		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
-		assertFalse(resolution.isIgnored(PROPERTY_NAME));
-		
-		resolution.ignoreProperty(PROPERTY_NAME);
-		
-		assertTrue(resolution.isIgnored(PROPERTY_NAME));
 	}
 	
 }
