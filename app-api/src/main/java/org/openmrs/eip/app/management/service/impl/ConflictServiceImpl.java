@@ -106,9 +106,9 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	@Override
 	public void resolve(ConflictResolution resolution) {
 		if (resolution.getConflict() == null) {
-			throw new EIPException("");
+			throw new EIPException("Conflict is required");
 		} else if (resolution.getDecision() == null) {
-			throw new EIPException("");
+			throw new EIPException("Resolution is required");
 		}
 		
 		log.info("Resolving conflict with decision: " + resolution.getDecision());

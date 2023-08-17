@@ -1,7 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.component.exception.EIPException;
@@ -45,7 +45,7 @@ public class ConflictResolution {
 	private ResolutionDecision decision;
 	
 	@Getter
-	private List<PropertyResolutionDecision> propertyResolutions = new ArrayList<>();
+	private Set<String> ignoredProperties = new HashSet<>();
 	
 	public ConflictResolution(ConflictQueueItem conflict, ResolutionDecision decision) {
 		this.conflict = conflict;
@@ -53,17 +53,25 @@ public class ConflictResolution {
 	}
 	
 	/**
-	 * Adds a resolution decision for a single property
+	 * Sets the resolution for the specified property to ignore
 	 * 
-	 * @param propertyName the name of the property
-	 * @param ignoreNewValue Specifies if the new value should be ignored or synced
+	 * @param propertyName the name of the property to ignore
 	 */
-	public void addPropertyDecision(String propertyName, boolean ignoreNewValue) {
+	public void ignoreProperty(String propertyName) {
 		if (decision == ResolutionDecision.MERGE) {
-			propertyResolutions.add(new PropertyResolutionDecision(propertyName, ignoreNewValue));
+			ignoredProperties.add(propertyName);
 		} else {
 			throw new EIPException("Only merge resolution decision supports property level decisions");
 		}
+	}
+	
+	/**
+	 * Sets the resolution for the specified property to ignore
+	 *
+	 * @param propertyName the name of the property to ignore
+	 */
+	public boolean isIgnored(String propertyName) {
+		return ignoredProperties.contains(propertyName);
 	}
 	
 }

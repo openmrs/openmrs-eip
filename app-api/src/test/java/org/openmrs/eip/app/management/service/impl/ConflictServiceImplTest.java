@@ -1,9 +1,12 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
 
 import javax.xml.ws.Holder;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +16,7 @@ import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -30,6 +34,20 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
+	public void resolve_shouldFailIfConflictIsNull() {
+		Throwable thrown = Assert.assertThrows(EIPException.class,
+		    () -> service.resolve(new ConflictResolution(null, IGNORE_NEW)));
+		assertEquals("Conflict is required", thrown.getMessage());
+	}
+	
+	@Test
+	public void resolve_shouldFailIfResolutionIsNull() {
+		Throwable thrown = Assert.assertThrows(EIPException.class,
+		    () -> service.resolve(new ConflictResolution(new ConflictQueueItem(), null)));
+		assertEquals("Resolution is required", thrown.getMessage());
+	}
+	
+	@Test
 	public void resolve_shouldMoveTheItemToTheArchivesIfDecisionIsSetToIgnoreNew() {
 		service = Mockito.spy(service);
 		ConflictQueueItem conflict = new ConflictQueueItem();
@@ -39,7 +57,7 @@ public class ConflictServiceImplTest {
 			return null;
 		}).when(service).moveToArchiveQueue(conflict);
 		
-		service.resolve(new ConflictResolution(conflict, ResolutionDecision.IGNORE_NEW));
+		service.resolve(new ConflictResolution(conflict, IGNORE_NEW));
 		
 		assertTrue(holder.value);
 	}
