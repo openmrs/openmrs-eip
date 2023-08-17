@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ConflictResolution;
+import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.component.model.PersonModel;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -28,7 +30,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolveWithDatabaseState_shouldMoveTheItemToTheArchives() {
+	public void resolve_shouldMoveTheItemToTheArchivesIfDecisionIsSetToIgnoreNew() {
 		service = Mockito.spy(service);
 		ConflictQueueItem conflict = new ConflictQueueItem();
 		Holder<Boolean> holder = new Holder();
@@ -37,13 +39,13 @@ public class ConflictServiceImplTest {
 			return null;
 		}).when(service).moveToArchiveQueue(conflict);
 		
-		service.resolveWithDatabaseState(conflict);
+		service.resolve(new ConflictResolution(conflict, ResolutionDecision.IGNORE_NEW));
 		
 		assertTrue(holder.value);
 	}
 	
 	@Test
-	public void resolveWithNewState_shouldUpdateTheHashAndMoveTheItemToTheRetryQueue() {
+	public void resolve_shouldUpdateTheHashAndMoveTheItemToTheRetryQueueIfDecisionIsSetToSyncNew() {
 		final String modelClassName = PersonModel.class.getName();
 		final String uuid = "person-uuid";
 		service = Mockito.spy(service);
@@ -56,7 +58,7 @@ public class ConflictServiceImplTest {
 			return null;
 		}).when(service).moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 		
-		service.resolveWithNewState(conflict);
+		service.resolve(new ConflictResolution(conflict, ResolutionDecision.SYNC_NEW));
 		
 		Mockito.verify(mockReceiverService).updateHash(modelClassName, uuid);
 		assertTrue(holder.value);

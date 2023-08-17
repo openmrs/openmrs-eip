@@ -13,7 +13,8 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.receiver.EntityConflictResolution;
+import org.openmrs.eip.app.receiver.ConflictResolution;
+import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -103,28 +104,38 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	public void resolveWithDatabaseState(ConflictQueueItem conflict) {
-		if (log.isDebugEnabled()) {
-			log.info("Resolving conflict with the database state as the winner");
+	public void resolve(ConflictResolution resolution) {
+		if (resolution.getConflict() == null) {
+			throw new EIPException("");
+		} else if (resolution.getDecision() == null) {
+			throw new EIPException("");
 		}
+		
+		log.info("Resolving conflict with decision: " + resolution.getDecision());
 		
 		//TODO should we track the conflict resolution log?
-		moveToArchiveQueue(conflict);
+		
+		switch (resolution.getDecision()) {
+			case IGNORE_NEW:
+				moveToArchiveQueue(resolution.getConflict());
+				break;
+			case SYNC_NEW:
+				resolveWithNewState(resolution);
+				break;
+			case MERGE:
+				resolveAsMerge(resolution);
+				break;
+		}
 	}
 	
-	@Override
-	public void resolveWithNewState(ConflictQueueItem conflict) {
-		if (log.isDebugEnabled()) {
-			log.info("Resolving conflict with incoming state as the winner");
-		}
-		
+	private void resolveWithNewState(ConflictResolution resolution) {
+		ConflictQueueItem conflict = resolution.getConflict();
 		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
 		
 		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 	}
 	
-	@Override
-	public void resolveWithMerge(ConflictQueueItem conflict, EntityConflictResolution resolution) {
+	private void resolveAsMerge(ConflictResolution resolution) {
 		
 	}
 	

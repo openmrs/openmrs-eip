@@ -3,9 +3,9 @@ package org.openmrs.eip.app.receiver;
 import lombok.Getter;
 
 /**
- * Encapsulates conflict resolutions details for a single field for an entity
+ * Encapsulates conflict resolutions details for a single property for an entity
  */
-public class PropertyConflictResolution {
+public class PropertyResolutionDecision {
 	
 	/**
 	 * The name of the property associated to this resolution
@@ -19,7 +19,7 @@ public class PropertyConflictResolution {
 	@Getter
 	private boolean ignoreNewValue;
 	
-	public PropertyConflictResolution(String propertyName, boolean ignoreNewValue) {
+	public PropertyResolutionDecision(String propertyName, boolean ignoreNewValue) {
 		this.propertyName = propertyName;
 		this.ignoreNewValue = ignoreNewValue;
 	}
