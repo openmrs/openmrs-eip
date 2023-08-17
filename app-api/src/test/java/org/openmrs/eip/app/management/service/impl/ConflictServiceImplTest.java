@@ -43,7 +43,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolveWithIncomingState_shouldUpdateTheHashAndMoveTheItemToTheRetryQueue() {
+	public void resolveWithNewState_shouldUpdateTheHashAndMoveTheItemToTheRetryQueue() {
 		final String modelClassName = PersonModel.class.getName();
 		final String uuid = "person-uuid";
 		service = Mockito.spy(service);
@@ -56,7 +56,7 @@ public class ConflictServiceImplTest {
 			return null;
 		}).when(service).moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 		
-		service.resolveWithIncomingState(conflict);
+		service.resolveWithNewState(conflict);
 		
 		Mockito.verify(mockReceiverService).updateHash(modelClassName, uuid);
 		assertTrue(holder.value);

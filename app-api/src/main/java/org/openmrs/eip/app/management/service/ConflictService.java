@@ -3,6 +3,7 @@ package org.openmrs.eip.app.management.service;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.receiver.EntityConflictResolution;
 
 /**
  * Contains methods for managing conflicts
@@ -35,19 +36,20 @@ public interface ConflictService extends Service {
 	void resolveWithDatabaseState(ConflictQueueItem conflict);
 	
 	/**
-	 * Resolves the specified conflict with the winning state being incoming one from the remote site,
-	 * i.e. do regular sync of incoming state to overwrite the database state.
+	 * Resolves the specified conflict with the winning state being new one from the remote site, i.e.
+	 * do regular sync of new state to overwrite the database state.
 	 * 
 	 * @param conflict the conflict to resolve
 	 */
-	void resolveWithIncomingState(ConflictQueueItem conflict);
+	void resolveWithNewState(ConflictQueueItem conflict);
 	
 	/**
-	 * Resolves the specified conflict with the winning state being the specified merged state
-	 * 
+	 * Resolves the specified conflict with the winning state being the specified merged resolution
+	 * typically a merge of the database and new state from the remote site.
+	 *
 	 * @param conflict the conflict to resolve
-	 * @param mergedState the effective merged state
+	 * @param resolution the resolution
 	 */
-	void resolveWithMerge(ConflictQueueItem conflict, Object mergedState);
+	void resolveWithMerge(ConflictQueueItem conflict, EntityConflictResolution resolution);
 	
 }

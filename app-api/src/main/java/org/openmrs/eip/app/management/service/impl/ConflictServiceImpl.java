@@ -13,6 +13,7 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.EntityConflictResolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -112,7 +113,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	public void resolveWithIncomingState(ConflictQueueItem conflict) {
+	public void resolveWithNewState(ConflictQueueItem conflict) {
 		if (log.isDebugEnabled()) {
 			log.info("Resolving conflict with incoming state as the winner");
 		}
@@ -123,7 +124,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	public void resolveWithMerge(ConflictQueueItem conflict, Object mergedState) {
+	public void resolveWithMerge(ConflictQueueItem conflict, EntityConflictResolution resolution) {
 		
 	}
 	
