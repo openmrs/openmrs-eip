@@ -84,10 +84,10 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolve_shouldFailForAMergeResolutionAndNoIgnoredPropertiesSpecified() {
+	public void resolve_shouldFailForAMergeResolutionAndNoSyncedPropertiesSpecified() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
 		    () -> service.resolve(new ConflictResolution(new ConflictQueueItem(), MERGE)));
-		assertEquals("No ignored properties found for merge resolution decision", thrown.getMessage());
+		assertEquals("No properties to sync specified for merge resolution decision", thrown.getMessage());
 	}
 	
 }

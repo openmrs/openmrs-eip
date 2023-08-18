@@ -45,7 +45,7 @@ public class ConflictResolution {
 	private ResolutionDecision decision;
 	
 	@Getter
-	private Set<String> ignoredProperties = new HashSet<>();
+	private Set<String> syncedProperties = new HashSet<>();
 	
 	public ConflictResolution(ConflictQueueItem conflict, ResolutionDecision decision) {
 		this.conflict = conflict;
@@ -53,25 +53,25 @@ public class ConflictResolution {
 	}
 	
 	/**
-	 * Sets the resolution for the specified property to ignore
+	 * Sets the resolution for the specified property to sync
 	 * 
-	 * @param propertyName the name of the property to ignore
+	 * @param propertyName the name of the property to sync
 	 */
-	public void ignoreProperty(String propertyName) {
+	public void syncProperty(String propertyName) {
 		if (decision == ResolutionDecision.MERGE) {
-			ignoredProperties.add(propertyName);
+			syncedProperties.add(propertyName);
 		} else {
 			throw new EIPException("Only merge resolution decision supports property level decisions");
 		}
 	}
 	
 	/**
-	 * Sets the resolution for the specified property to ignore
+	 * Sets the resolution for the specified property to sync
 	 *
-	 * @param propertyName the name of the property to ignore
+	 * @param propertyName the name of the property to sync
 	 */
-	public boolean isIgnored(String propertyName) {
-		return ignoredProperties.contains(propertyName);
+	public boolean isSynced(String propertyName) {
+		return syncedProperties.contains(propertyName);
 	}
 	
 }

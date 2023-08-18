@@ -15,43 +15,43 @@ import org.openmrs.eip.component.exception.EIPException;
 public class ConflictResolutionTest {
 	
 	@Test
-	public void ignoreProperty_shouldFailIfDecisionIsIgnoreNew() {
+	public void syncProperty_shouldFailIfDecisionIsIgnoreNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
-		    () -> new ConflictResolution(new ConflictQueueItem(), IGNORE_NEW).ignoreProperty("test"));
+		    () -> new ConflictResolution(new ConflictQueueItem(), IGNORE_NEW).isSynced("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
 	}
 	
 	@Test
-	public void ignoreProperty_shouldFailIfDecisionIsSyncNew() {
+	public void syncProperty_shouldFailIfDecisionIsSyncNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
-		    () -> new ConflictResolution(new ConflictQueueItem(), SYNC_NEW).ignoreProperty("test"));
+		    () -> new ConflictResolution(new ConflictQueueItem(), SYNC_NEW).isSynced("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
 	}
 	
 	@Test
-	public void ignoreProperty_shouldAddThePropertyToTheListOfIgnoredProperties() {
+	public void syncProperty_shouldAddThePropertyToTheListOfSyncedProperties() {
 		final String PROPERTY_NAME = "test";
 		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
-		assertFalse(resolution.isIgnored(PROPERTY_NAME));
+		assertFalse(resolution.isSynced(PROPERTY_NAME));
 		
-		resolution.ignoreProperty(PROPERTY_NAME);
+		resolution.syncProperty(PROPERTY_NAME);
 		
-		assertTrue(resolution.isIgnored(PROPERTY_NAME));
+		assertTrue(resolution.isSynced(PROPERTY_NAME));
 	}
 	
 	@Test
-	public void isIgnored_shouldReturnTrueForAnIgnoredProperty() {
+	public void isSynced_shouldReturnTrueForAnSyncedProperty() {
 		final String PROPERTY_NAME = "test";
 		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
-		assertTrue(resolution.getIgnoredProperties().add(PROPERTY_NAME));
-		assertTrue(resolution.isIgnored(PROPERTY_NAME));
+		assertTrue(resolution.getSyncedProperties().add(PROPERTY_NAME));
+		assertTrue(resolution.isSynced(PROPERTY_NAME));
 	}
 	
 	@Test
-	public void isIgnored_shouldReturnFalseForANoneIgnoredProperty() {
+	public void isSynced_shouldReturnFalseForANoneSyncedProperty() {
 		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
-		assertTrue(resolution.getIgnoredProperties().add("test"));
-		assertFalse(resolution.isIgnored("other"));
+		assertTrue(resolution.getSyncedProperties().add("test"));
+		assertFalse(resolution.isSynced("other"));
 	}
 	
 }

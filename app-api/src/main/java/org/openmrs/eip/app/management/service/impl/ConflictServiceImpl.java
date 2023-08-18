@@ -157,8 +157,8 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	private void resolveAsMerge(ConflictResolution resolution) {
-		if (resolution.getIgnoredProperties().isEmpty()) {
-			throw new EIPException("No ignored properties found for merge resolution decision");
+		if (resolution.getSyncedProperties().isEmpty()) {
+			throw new EIPException("No properties to sync specified for merge resolution decision");
 		}
 		
 		ConflictQueueItem conflict = resolution.getConflict();
@@ -166,18 +166,18 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		BaseModel newModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload()).getModel();
 		TableToSyncEnum syncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
 		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getMessageUuid());
-		for (String propertyName : resolution.getIgnoredProperties()) {
+		for (String propertyName : resolution.getSyncedProperties()) {
 			try {
-				BeanUtils.copyProperty(newModel, propertyName, BeanUtils.getProperty(dbModel, propertyName));
+				BeanUtils.copyProperty(dbModel, propertyName, BeanUtils.getProperty(newModel, propertyName));
 			}
 			catch (ReflectiveOperationException e) {
-				throw new EIPException("Failed to set current value on the new state", e);
+				throw new EIPException("Failed to set the value for property: " + propertyName, e);
 			}
 		}
 		
 		//TODO changeBy and dateChanged should be based on latest state. 
 		
-		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(newModel)
+		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(dbModel)
 		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
 		        .withProperty(ReceiverConstants.EX_PROP_ENTITY_ID, conflict.getIdentifier()).build();
 		
