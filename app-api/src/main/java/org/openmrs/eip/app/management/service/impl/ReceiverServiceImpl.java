@@ -166,6 +166,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassname);
 		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, identifier);
 		BaseHashEntity storedHash = HashUtils.getStoredHash(identifier, tableToSyncEnum.getHashClass(), producerTemplate);
+		//TODO If hash does not exist, Should we insert one?
 		storedHash.setHash(HashUtils.computeHash(dbModel));
 		storedHash.setDateChanged(LocalDateTime.now());
 		HashUtils.saveHash(storedHash, producerTemplate, false);

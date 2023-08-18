@@ -3,6 +3,7 @@ package org.openmrs.eip.app.management.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
+import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
 
 import javax.xml.ws.Holder;
 
@@ -30,7 +31,7 @@ public class ConflictServiceImplTest {
 	
 	@Before
 	public void setup() {
-		service = new ConflictServiceImpl(null, null, null, mockReceiverService);
+		service = new ConflictServiceImpl(null, null, null, mockReceiverService, null, null);
 	}
 	
 	@Test
@@ -80,6 +81,13 @@ public class ConflictServiceImplTest {
 		
 		Mockito.verify(mockReceiverService).updateHash(modelClassName, uuid);
 		assertTrue(holder.value);
+	}
+	
+	@Test
+	public void resolve_shouldFailForAMergeResolutionAndNoIgnoredPropertiesSpecified() {
+		Throwable thrown = Assert.assertThrows(EIPException.class,
+		    () -> service.resolve(new ConflictResolution(new ConflictQueueItem(), MERGE)));
+		assertEquals("No ignored properties found for merge resolution decision", thrown.getMessage());
 	}
 	
 }

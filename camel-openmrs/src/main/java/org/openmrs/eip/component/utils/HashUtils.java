@@ -42,7 +42,7 @@ public class HashUtils {
 	 *
 	 * <pre>
 	 * 	  - It is case sensitive
-	 * 	  - Field value changes from null to an empty string or what space characters and vice versa are ignored
+	 * 	  - Field value changes from null to an empty string or whitespace characters and vice versa are ignored
 	 * </pre>
 	 *
 	 * @param model the BaseModel object
