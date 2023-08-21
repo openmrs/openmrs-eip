@@ -7,9 +7,9 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PersonModel;
 
-public class RetrySearchIndexUpdatingProcessorTest {
+public class RetryPostSyncProcessorTest {
 	
-	private RetrySearchIndexUpdatingProcessor processor = new RetrySearchIndexUpdatingProcessor(null);
+	private RetryPostSyncProcessor processor = new RetryCacheEvictingProcessor(null);
 	
 	@Test
 	public void getModelClassName_shouldReturnTheModelClassname() {
