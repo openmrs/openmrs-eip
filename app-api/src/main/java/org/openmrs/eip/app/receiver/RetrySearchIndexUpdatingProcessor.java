@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes retry items associated to entities that require updating the OpenMRS search index.
  */
-@Component("retrySearchIndexUpdatingProcessor")
+@Component("retrySearchIndexUpdateProcessor")
 @Profile(SyncProfiles.RECEIVER)
 public class RetrySearchIndexUpdatingProcessor extends BaseSearchIndexUpdatingProcessor<ReceiverRetryQueueItem> implements RetryPostSyncProcessor {
 	

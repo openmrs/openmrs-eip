@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes retry items associated to entities that require eviction from the OpenMRS cache.
  */
-@Component("retryCacheEvictingProcessor")
+@Component("retryCacheEvictProcessor")
 @Profile(SyncProfiles.RECEIVER)
 public class RetryCacheEvictingProcessor extends BaseCacheEvictingProcessor<ReceiverRetryQueueItem> implements RetryPostSyncProcessor {
 	

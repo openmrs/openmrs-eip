@@ -18,7 +18,9 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
+import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -48,9 +50,14 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	private CamelContext camelContext;
 	
+	private ConflictCacheEvictingProcessor cacheEvictProcessor;
+	
+	private ConflictSearchIndexUpdatingProcessor indexUpdateProcessor;
+	
 	public ConflictServiceImpl(ConflictRepository conflictRepo, ReceiverRetryRepository retryRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverService receiverService, CamelContext camelContext,
-	    EntityServiceFacade serviceFacade) {
+	    EntityServiceFacade serviceFacade, ConflictCacheEvictingProcessor cacheEvictProcessor,
+	    ConflictSearchIndexUpdatingProcessor indexUpdateProcessor) {
 		
 		this.conflictRepo = conflictRepo;
 		this.retryRepo = retryRepo;
@@ -58,6 +65,8 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		this.receiverService = receiverService;
 		this.camelContext = camelContext;
 		this.serviceFacade = serviceFacade;
+		this.cacheEvictProcessor = cacheEvictProcessor;
+		this.indexUpdateProcessor = indexUpdateProcessor;
 	}
 	
 	@Override
@@ -165,7 +174,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
 		BaseModel newModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload()).getModel();
 		TableToSyncEnum syncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
-		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getMessageUuid());
+		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getIdentifier());
 		for (String propertyName : resolution.getSyncedProperties()) {
 			try {
 				BeanUtils.copyProperty(dbModel, propertyName, BeanUtils.getProperty(newModel, propertyName));
@@ -175,7 +184,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			}
 		}
 		
-		//TODO changeBy and dateChanged should be based on latest state. 
+		//TODO changeBy and dateChanged should be based on latest state.
 		
 		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(dbModel)
 		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
@@ -185,7 +194,8 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		
 		//TODO What should we do in case a new conflict or error is encountered
 		if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
-			//Clear cache and rebuild the search index
+			cacheEvictProcessor.process(conflict);
+			indexUpdateProcessor.process(conflict);
 			moveToArchiveQueue(conflict);
 		} else {
 			throw new EIPException("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid());
