@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.utils;
 
 import static java.time.LocalDateTime.of;
+import static java.time.Month.AUGUST;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.component.utils.DateUtils.containsLatestDate;
+import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 import static org.openmrs.eip.component.utils.DateUtils.stringToDate;
 
 import java.time.LocalDateTime;
@@ -133,6 +135,36 @@ public class DateUtilsTest {
 		
 		expectedDate = Date.from(stringToDate("2022-12-31 15:33:27").atZone(systemDefault()).toInstant());
 		assertEquals(expectedDate, DateUtils.subtractDays(asOfDate, 2));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnFalseIfBothDatesAreNull() {
+		assertFalse(isDateAfterOrEqual(null, null));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnTrueIfDateIsNotNullOtherIsNull() {
+		assertTrue(isDateAfterOrEqual(of(2023, AUGUST, 18, 00, 00, 00), null));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnFalseIfDateIsNullAndOtherIsNotNull() {
+		assertFalse(isDateAfterOrEqual(null, of(2023, AUGUST, 18, 00, 00, 00)));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnTrueIfDateIsAfterOther() {
+		assertTrue(isDateAfterOrEqual(of(2023, AUGUST, 18, 00, 00, 01), of(2023, AUGUST, 18, 00, 00, 00)));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnFalseIfDateIsBeforeOther() {
+		assertFalse(isDateAfterOrEqual(of(2023, AUGUST, 18, 00, 00, 00), of(2023, AUGUST, 18, 00, 00, 01)));
+	}
+	
+	@Test
+	public void isDateAfterOrEqual_shouldReturnTrueIfTheDatesMatch() {
+		assertTrue(isDateAfterOrEqual(of(2023, AUGUST, 18, 00, 00, 00), of(2023, AUGUST, 18, 00, 00, 00)));
 	}
 	
 }

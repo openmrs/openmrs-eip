@@ -36,7 +36,7 @@ public final class DateUtils {
 	 *
 	 * @param dates1 Collection of dates
 	 * @param dates2 Collection of dates
-	 * @return returns true ONLY if dates1 contains the latest non null date instance otherwise false
+	 * @return true ONLY if dates1 contains the latest non null date instance otherwise false
 	 */
 	public static boolean containsLatestDate(Collection<LocalDateTime> dates1, Collection<LocalDateTime> dates2) {
 		//The algorithm is:
@@ -81,6 +81,21 @@ public final class DateUtils {
 		calendar.setTime(date);
 		calendar.add(Calendar.DAY_OF_YEAR, -days);
 		return calendar.getTime();
+	}
+	
+	/**
+	 * Checks if a date comes after another date with null being the earliest date
+	 *
+	 * @param date the date to check
+	 * @param other the other date to check against
+	 * @return true ONLY if date is not null and is the same or comes after other date otherwise false
+	 */
+	public static boolean isDateAfterOrEqual(LocalDateTime date, LocalDateTime other) {
+		if (date == null) {
+			return false;
+		}
+		
+		return other == null || date.isAfter(other) || date.equals(other);
 	}
 	
 }

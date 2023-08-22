@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
+import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 
 import java.util.Date;
 
@@ -24,6 +25,8 @@ import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.model.BaseChangeableDataModel;
+import org.openmrs.eip.component.model.BaseChangeableMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
@@ -199,6 +202,32 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			moveToArchiveQueue(conflict);
 		} else {
 			throw new EIPException("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid());
+		}
+	}
+	
+	/**
+	 * Merges the audit fields i.e. changedByUuid and dateChanged properties based on the state that has
+	 * the latest date changed value.
+	 * 
+	 * @param dbModel the database model
+	 * @param newModel the new model
+	 */
+	protected void mergeAuditProperties(BaseModel dbModel, BaseModel newModel) {
+		if (newModel instanceof BaseChangeableDataModel) {
+			BaseChangeableDataModel dataDbModel = (BaseChangeableDataModel) dbModel;
+			BaseChangeableDataModel dataNewModel = (BaseChangeableDataModel) newModel;
+			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy takes priority 
+			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
+				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
+				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
+			}
+		} else if (newModel instanceof BaseChangeableMetadataModel) {
+			BaseChangeableMetadataModel dataDbModel = (BaseChangeableMetadataModel) dbModel;
+			BaseChangeableMetadataModel dataNewModel = (BaseChangeableMetadataModel) newModel;
+			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
+				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
+				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
+			}
 		}
 	}
 	
