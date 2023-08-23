@@ -138,8 +138,8 @@ public class DateUtilsTest {
 	}
 	
 	@Test
-	public void isDateAfterOrEqual_shouldReturnFalseIfBothDatesAreNull() {
-		assertFalse(isDateAfterOrEqual(null, null));
+	public void isDateAfterOrEqual_shouldReturnTrueIfBothDatesAreNull() {
+		assertTrue(isDateAfterOrEqual(null, null));
 	}
 	
 	@Test

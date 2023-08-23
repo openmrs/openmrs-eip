@@ -118,4 +118,8 @@ public class ReceiverConstants {
 	
 	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
 	
+	public static final String FIELD_VOIDED = "voided";
+	
+	public static final String FIELD_RETIRED = "retired";
+	
 }

@@ -1,9 +1,21 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static java.time.LocalDateTime.of;
+import static java.time.Month.AUGUST;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_RETIRED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.ws.Holder;
 
@@ -15,10 +27,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
+import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.model.BaseDataModel;
+import org.openmrs.eip.component.model.BaseMetadataModel;
+import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -29,9 +47,16 @@ public class ConflictServiceImplTest {
 	@Mock
 	private ReceiverService mockReceiverService;
 	
+	@Mock
+	private ConflictCacheEvictingProcessor evictProcessor;
+	
+	@Mock
+	private ConflictSearchIndexUpdatingProcessor indexUpdateProcessor;
+	
 	@Before
 	public void setup() {
-		service = new ConflictServiceImpl(null, null, null, mockReceiverService, null, null);
+		service = new ConflictServiceImpl(null, null, null, mockReceiverService, null, null, evictProcessor,
+		        indexUpdateProcessor);
 	}
 	
 	@Test
@@ -88,6 +113,115 @@ public class ConflictServiceImplTest {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
 		    () -> service.resolve(new ConflictResolution(new ConflictQueueItem(), MERGE)));
 		assertEquals("No properties to sync specified for merge resolution decision", thrown.getMessage());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldSkipIfVoidedFieldIsNotSynced() {
+		BaseDataModel dbModel = Mockito.mock(BaseDataModel.class);
+		BaseDataModel newModel = Mockito.mock(BaseDataModel.class);
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, Collections.emptySet());
+		
+		verifyNoInteractions(dbModel);
+		verifyNoInteractions(newModel);
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldSkipIfRetiredFieldIsNotSynced() {
+		BaseMetadataModel dbModel = Mockito.mock(BaseMetadataModel.class);
+		BaseMetadataModel newModel = Mockito.mock(BaseMetadataModel.class);
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, Collections.emptySet());
+		
+		verifyNoInteractions(dbModel);
+		verifyNoInteractions(newModel);
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldSkipForAModelThatIsNeitherDataNorMetadata() {
+		BaseModel dbModel = Mockito.mock(BaseModel.class);
+		BaseModel newModel = Mockito.mock(BaseModel.class);
+		Set<String> syncedProps = new HashSet<>();
+		syncedProps.add(FIELD_VOIDED);
+		syncedProps.add(FIELD_RETIRED);
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, syncedProps);
+		
+		verifyNoInteractions(dbModel);
+		verifyNoInteractions(newModel);
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldReplaceDbFieldsIfTheNewStateIsVoidedAndDbStateIsNot() {
+		final String newUser = "User(user-uuid)";
+		final LocalDateTime newDate = LocalDateTime.now();
+		final String newReason = "test";
+		VisitModel dbModel = new VisitModel();
+		VisitModel newModel = new VisitModel();
+		newModel.setVoided(true);
+		newModel.setVoidedByUuid(newUser);
+		newModel.setDateVoided(newDate);
+		newModel.setVoidReason(newReason);
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
+		
+		assertEquals(newUser, dbModel.getVoidedByUuid());
+		assertEquals(newDate, dbModel.getDateVoided());
+		assertEquals(newReason, dbModel.getVoidReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldNotReplaceVoidFieldsWithEmptyData() {
+		final String dbUser = "db-User(user-uuid)";
+		final String dbReason = "db-test";
+		VisitModel dbModel = new VisitModel();
+		dbModel.setVoidedByUuid(dbUser);
+		dbModel.setVoidReason(dbReason);
+		VisitModel newModel = new VisitModel();
+		newModel.setVoided(true);
+		newModel.setVoidReason(" ");
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
+		
+		assertEquals(dbUser, dbModel.getVoidedByUuid());
+		assertEquals(dbReason, dbModel.getVoidReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldSkipIfTheNewStateIsVoidedButDateVoidedIsBeforeThatFromTheDb() {
+		final String dbUser = "db-User(user-uuid)";
+		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
+		final String dbReason = "db-test";
+		VisitModel dbModel = new VisitModel();
+		dbModel.setVoidedByUuid(dbUser);
+		dbModel.setDateVoided(dbDate);
+		dbModel.setVoidReason(dbReason);
+		VisitModel newModel = new VisitModel();
+		newModel.setVoided(true);
+		newModel.setVoidedByUuid("User(user-uuid)");
+		newModel.setDateVoided(of(2023, AUGUST, 23, 00, 00, 00));
+		newModel.setVoidReason("test");
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
+		
+		assertEquals(dbUser, dbModel.getVoidedByUuid());
+		assertEquals(dbDate, dbModel.getDateVoided());
+		assertEquals(dbReason, dbModel.getVoidReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldClearDbFieldsIfTheNewStateIsNotVoided() {
+		VisitModel dbModel = new VisitModel();
+		dbModel.setVoidedByUuid("db-User(user-uuid)");
+		dbModel.setDateVoided(of(2023, AUGUST, 23, 00, 00, 00));
+		dbModel.setVoidReason("db-test");
+		VisitModel newModel = new VisitModel();
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
+		
+		assertNull(dbModel.getVoidedByUuid());
+		assertNull(dbModel.getDateVoided());
+		assertNull(dbModel.getVoidReason());
 	}
 	
 }

@@ -92,7 +92,7 @@ public final class DateUtils {
 	 */
 	public static boolean isDateAfterOrEqual(LocalDateTime date, LocalDateTime other) {
 		if (date == null) {
-			return false;
+			return other == null;
 		}
 		
 		return other == null || date.isAfter(other) || date.equals(other);

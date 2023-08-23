@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
 import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
@@ -217,17 +219,25 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	 * @param syncedProps set of properties to sync from the new model
 	 */
 	protected void mergeVoidOrRetireProperties(BaseModel dbModel, BaseModel newModel, Set<String> syncedProps) {
-		if (syncedProps.contains("voided") || syncedProps.contains("retired")) {
+		if (syncedProps.contains(FIELD_VOIDED) || syncedProps.contains("retired")) {
 			if (newModel instanceof BaseDataModel) {
 				BaseDataModel dataDbModel = (BaseDataModel) dbModel;
 				BaseDataModel dataNewModel = (BaseDataModel) newModel;
 				if (dataNewModel.isVoided()) {
 					//Since we're bringing in data from remote, if dateVoided matches, remote info is latest
-					if (!dataDbModel.isVoided()
-					        || isDateAfterOrEqual(dataNewModel.getDateVoided(), dataDbModel.getDateVoided())) {
-						dataDbModel.setVoidedByUuid(dataNewModel.getVoidedByUuid());
+					if (isDateAfterOrEqual(dataNewModel.getDateVoided(), dataDbModel.getDateVoided())) {
+						//No need to check for null because at this point the new dateVoided can't be null 
+						//otherwise both dates are null
 						dataDbModel.setDateVoided(dataNewModel.getDateVoided());
-						dataDbModel.setVoidReason(dataNewModel.getVoidReason());
+						
+						//Do not wipe out any data
+						if (StringUtils.isNotBlank(dataNewModel.getVoidedByUuid())) {
+							dataDbModel.setVoidedByUuid(dataNewModel.getVoidedByUuid());
+						}
+						
+						if (StringUtils.isNotBlank(dataNewModel.getVoidReason())) {
+							dataDbModel.setVoidReason(dataNewModel.getVoidReason());
+						}
 					}
 				} else {
 					dataDbModel.setVoidedByUuid(null);
@@ -239,11 +249,18 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 				BaseMetadataModel dataNewModel = (BaseMetadataModel) newModel;
 				if (dataNewModel.isRetired()) {
 					//Since we're bringing in data from remote, if dateRetired matches, remote info is latest 
-					if (!dataDbModel.isRetired()
-					        || isDateAfterOrEqual(dataNewModel.getDateRetired(), dataDbModel.getDateRetired())) {
-						dataDbModel.setRetiredByUuid(dataNewModel.getRetiredByUuid());
+					if (isDateAfterOrEqual(dataNewModel.getDateRetired(), dataDbModel.getDateRetired())) {
+						//No need to check for null because at this point the new dateRetired can't be null 
+						//otherwise both dates are null
 						dataDbModel.setDateRetired(dataNewModel.getDateRetired());
-						dataDbModel.setRetireReason(dataNewModel.getRetireReason());
+						
+						if (StringUtils.isNotBlank(dataNewModel.getRetiredByUuid())) {
+							dataDbModel.setRetiredByUuid(dataNewModel.getRetiredByUuid());
+						}
+						
+						if (StringUtils.isNotBlank(dataNewModel.getRetireReason())) {
+							dataDbModel.setRetireReason(dataNewModel.getRetireReason());
+						}
 					}
 				} else {
 					dataDbModel.setRetiredByUuid(null);
