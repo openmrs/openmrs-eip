@@ -5,6 +5,7 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESS
 import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -27,6 +28,8 @@ import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseChangeableDataModel;
 import org.openmrs.eip.component.model.BaseChangeableMetadataModel;
+import org.openmrs.eip.component.model.BaseDataModel;
+import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
@@ -187,7 +190,8 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			}
 		}
 		
-		//TODO changeBy and dateChanged should be based on latest state.
+		mergeVoidOrRetireProperties(dbModel, newModel, resolution.getSyncedProperties());
+		mergeAuditProperties(dbModel, newModel);
 		
 		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(dbModel)
 		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
@@ -206,6 +210,51 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	/**
+	 * Merges void or retire fields
+	 * 
+	 * @param dbModel the database model
+	 * @param newModel the new model
+	 * @param syncedProps set of properties to sync from the new model
+	 */
+	protected void mergeVoidOrRetireProperties(BaseModel dbModel, BaseModel newModel, Set<String> syncedProps) {
+		if (syncedProps.contains("voided") || syncedProps.contains("retired")) {
+			if (newModel instanceof BaseDataModel) {
+				BaseDataModel dataDbModel = (BaseDataModel) dbModel;
+				BaseDataModel dataNewModel = (BaseDataModel) newModel;
+				if (dataNewModel.isVoided()) {
+					//Since we're bringing in data from remote, if dateVoided matches, remote info is latest
+					if (!dataDbModel.isVoided()
+					        || isDateAfterOrEqual(dataNewModel.getDateVoided(), dataDbModel.getDateVoided())) {
+						dataDbModel.setVoidedByUuid(dataNewModel.getVoidedByUuid());
+						dataDbModel.setDateVoided(dataNewModel.getDateVoided());
+						dataDbModel.setVoidReason(dataNewModel.getVoidReason());
+					}
+				} else {
+					dataDbModel.setVoidedByUuid(null);
+					dataDbModel.setDateVoided(null);
+					dataDbModel.setVoidReason(null);
+				}
+			} else if (newModel instanceof BaseMetadataModel) {
+				BaseMetadataModel dataDbModel = (BaseMetadataModel) dbModel;
+				BaseMetadataModel dataNewModel = (BaseMetadataModel) newModel;
+				if (dataNewModel.isRetired()) {
+					//Since we're bringing in data from remote, if dateRetired matches, remote info is latest 
+					if (!dataDbModel.isRetired()
+					        || isDateAfterOrEqual(dataNewModel.getDateRetired(), dataDbModel.getDateRetired())) {
+						dataDbModel.setRetiredByUuid(dataNewModel.getRetiredByUuid());
+						dataDbModel.setDateRetired(dataNewModel.getDateRetired());
+						dataDbModel.setRetireReason(dataNewModel.getRetireReason());
+					}
+				} else {
+					dataDbModel.setRetiredByUuid(null);
+					dataDbModel.setDateRetired(null);
+					dataDbModel.setRetireReason(null);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Merges the audit fields i.e. changedByUuid and dateChanged properties based on the state that has
 	 * the latest date changed value.
 	 * 
@@ -216,7 +265,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		if (newModel instanceof BaseChangeableDataModel) {
 			BaseChangeableDataModel dataDbModel = (BaseChangeableDataModel) dbModel;
 			BaseChangeableDataModel dataNewModel = (BaseChangeableDataModel) newModel;
-			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy takes priority 
+			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
 			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
 				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
 				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
@@ -224,6 +273,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		} else if (newModel instanceof BaseChangeableMetadataModel) {
 			BaseChangeableMetadataModel dataDbModel = (BaseChangeableMetadataModel) dbModel;
 			BaseChangeableMetadataModel dataNewModel = (BaseChangeableMetadataModel) newModel;
+			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
 			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
 				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
 				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
