@@ -36,6 +36,7 @@ import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -222,6 +223,79 @@ public class ConflictServiceImplTest {
 		assertNull(dbModel.getVoidedByUuid());
 		assertNull(dbModel.getDateVoided());
 		assertNull(dbModel.getVoidReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldReplaceDbFieldsIfTheNewStateIsRetiredAndDbStateIsNot() {
+		final String newUser = "User(user-uuid)";
+		final LocalDateTime newDate = LocalDateTime.now();
+		final String newReason = "test";
+		ProviderModel dbModel = new ProviderModel();
+		ProviderModel newModel = new ProviderModel();
+		newModel.setRetired(true);
+		newModel.setRetiredByUuid(newUser);
+		newModel.setDateRetired(newDate);
+		newModel.setRetireReason(newReason);
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_RETIRED));
+		
+		assertEquals(newUser, dbModel.getRetiredByUuid());
+		assertEquals(newDate, dbModel.getDateRetired());
+		assertEquals(newReason, dbModel.getRetireReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldNotReplaceRetireFieldsWithEmptyData() {
+		final String dbUser = "db-User(user-uuid)";
+		final String dbReason = "db-test";
+		ProviderModel dbModel = new ProviderModel();
+		dbModel.setRetiredByUuid(dbUser);
+		dbModel.setRetireReason(dbReason);
+		ProviderModel newModel = new ProviderModel();
+		newModel.setRetired(true);
+		newModel.setRetireReason(" ");
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_RETIRED));
+		
+		assertEquals(dbUser, dbModel.getRetiredByUuid());
+		assertEquals(dbReason, dbModel.getRetireReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldSkipIfTheNewStateIsRetiredButDateRetiredIsBeforeThatFromTheDb() {
+		final String dbUser = "db-User(user-uuid)";
+		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
+		final String dbReason = "db-test";
+		ProviderModel dbModel = new ProviderModel();
+		dbModel.setRetiredByUuid(dbUser);
+		dbModel.setDateRetired(dbDate);
+		dbModel.setRetireReason(dbReason);
+		ProviderModel newModel = new ProviderModel();
+		newModel.setRetired(true);
+		newModel.setRetiredByUuid("User(user-uuid)");
+		newModel.setDateRetired(of(2023, AUGUST, 23, 00, 00, 00));
+		newModel.setRetireReason("test");
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_RETIRED));
+		
+		assertEquals(dbUser, dbModel.getRetiredByUuid());
+		assertEquals(dbDate, dbModel.getDateRetired());
+		assertEquals(dbReason, dbModel.getRetireReason());
+	}
+	
+	@Test
+	public void mergeVoidOrRetireProperties_shouldClearDbFieldsIfTheNewStateIsNotRetired() {
+		ProviderModel dbModel = new ProviderModel();
+		dbModel.setRetiredByUuid("db-User(user-uuid)");
+		dbModel.setDateRetired(of(2023, AUGUST, 23, 00, 00, 00));
+		dbModel.setRetireReason("db-test");
+		ProviderModel newModel = new ProviderModel();
+		
+		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_RETIRED));
+		
+		assertNull(dbModel.getRetiredByUuid());
+		assertNull(dbModel.getDateRetired());
+		assertNull(dbModel.getRetireReason());
 	}
 	
 }
