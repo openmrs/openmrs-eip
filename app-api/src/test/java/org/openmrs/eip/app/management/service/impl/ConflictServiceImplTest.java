@@ -35,6 +35,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.ObservationModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.VisitModel;
@@ -296,6 +297,107 @@ public class ConflictServiceImplTest {
 		assertNull(dbModel.getRetiredByUuid());
 		assertNull(dbModel.getDateRetired());
 		assertNull(dbModel.getRetireReason());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldSkipForAModelThatIsNotAuditable() {
+		ObservationModel dbModel = Mockito.mock(ObservationModel.class);
+		ObservationModel newModel = Mockito.mock(ObservationModel.class);
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		verifyNoInteractions(dbModel);
+		verifyNoInteractions(newModel);
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldReplaceDbFieldsWithTheNewStateForData() {
+		final String newUser = "User(user-uuid)";
+		final LocalDateTime newDate = LocalDateTime.now();
+		VisitModel dbModel = new VisitModel();
+		VisitModel newModel = new VisitModel();
+		newModel.setChangedByUuid(newUser);
+		newModel.setDateChanged(newDate);
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(newUser, dbModel.getChangedByUuid());
+		assertEquals(newDate, dbModel.getDateChanged());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldSkipIfTheNewDateChangedIsBeforeThatFromTheDbForData() {
+		final String dbUser = "db-User(user-uuid)";
+		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
+		VisitModel dbModel = new VisitModel();
+		dbModel.setChangedByUuid(dbUser);
+		dbModel.setDateChanged(dbDate);
+		VisitModel newModel = new VisitModel();
+		newModel.setChangedByUuid("User(user-uuid)");
+		newModel.setDateChanged(of(2023, AUGUST, 23, 00, 00, 00));
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(dbUser, dbModel.getChangedByUuid());
+		assertEquals(dbDate, dbModel.getDateChanged());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldNotReplaceChangedByWithEmptyDataForData() {
+		final String dbUser = "db-User(user-uuid)";
+		VisitModel dbModel = new VisitModel();
+		dbModel.setChangedByUuid(dbUser);
+		VisitModel newModel = new VisitModel();
+		newModel.setChangedByUuid(" ");
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(dbUser, dbModel.getChangedByUuid());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldReplaceDbFieldsWithTheNewStateMetadata() {
+		final String newUser = "User(user-uuid)";
+		final LocalDateTime newDate = LocalDateTime.now();
+		ProviderModel dbModel = new ProviderModel();
+		ProviderModel newModel = new ProviderModel();
+		newModel.setChangedByUuid(newUser);
+		newModel.setDateChanged(newDate);
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(newUser, dbModel.getChangedByUuid());
+		assertEquals(newDate, dbModel.getDateChanged());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldSkipIfTheNewDateChangedIsBeforeThatFromTheDbForMetadata() {
+		final String dbUser = "db-User(user-uuid)";
+		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
+		ProviderModel dbModel = new ProviderModel();
+		dbModel.setChangedByUuid(dbUser);
+		dbModel.setDateChanged(dbDate);
+		ProviderModel newModel = new ProviderModel();
+		newModel.setChangedByUuid("User(user-uuid)");
+		newModel.setDateChanged(of(2023, AUGUST, 23, 00, 00, 00));
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(dbUser, dbModel.getChangedByUuid());
+		assertEquals(dbDate, dbModel.getDateChanged());
+	}
+	
+	@Test
+	public void mergeAuditProperties_shouldNotReplaceChangedByWithEmptyDataForMetadata() {
+		final String dbUser = "db-User(user-uuid)";
+		ProviderModel dbModel = new ProviderModel();
+		dbModel.setChangedByUuid(dbUser);
+		ProviderModel newModel = new ProviderModel();
+		newModel.setChangedByUuid(" ");
+		
+		service.mergeAuditProperties(dbModel, newModel);
+		
+		assertEquals(dbUser, dbModel.getChangedByUuid());
 	}
 	
 }

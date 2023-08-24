@@ -279,21 +279,33 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	 * @param newModel the new model
 	 */
 	protected void mergeAuditProperties(BaseModel dbModel, BaseModel newModel) {
-		if (newModel instanceof BaseChangeableDataModel) {
-			BaseChangeableDataModel dataDbModel = (BaseChangeableDataModel) dbModel;
-			BaseChangeableDataModel dataNewModel = (BaseChangeableDataModel) newModel;
-			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
-			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
-				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
-				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
-			}
-		} else if (newModel instanceof BaseChangeableMetadataModel) {
-			BaseChangeableMetadataModel dataDbModel = (BaseChangeableMetadataModel) dbModel;
-			BaseChangeableMetadataModel dataNewModel = (BaseChangeableMetadataModel) newModel;
-			//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
-			if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
-				dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
-				dataDbModel.setDateChanged(dataNewModel.getDateChanged());
+		if (newModel instanceof BaseChangeableDataModel || newModel instanceof BaseChangeableMetadataModel) {
+			if (newModel instanceof BaseChangeableDataModel) {
+				BaseChangeableDataModel dataDbModel = (BaseChangeableDataModel) dbModel;
+				BaseChangeableDataModel dataNewModel = (BaseChangeableDataModel) newModel;
+				//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
+				if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
+					//No need to check for null because at this point the new dateChanged can't be null
+					//otherwise both dates are null
+					dataDbModel.setDateChanged(dataNewModel.getDateChanged());
+					
+					if (StringUtils.isNotBlank(dataNewModel.getChangedByUuid())) {
+						dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
+					}
+				}
+			} else {
+				BaseChangeableMetadataModel dataDbModel = (BaseChangeableMetadataModel) dbModel;
+				BaseChangeableMetadataModel dataNewModel = (BaseChangeableMetadataModel) newModel;
+				//Since we're bringing in details from remote, if dateChanged matches, remote changedBy is latest 
+				if (isDateAfterOrEqual(dataNewModel.getDateChanged(), dataDbModel.getDateChanged())) {
+					//No need to check for null because at this point the new dateChanged can't be null
+					//otherwise both dates are null
+					dataDbModel.setDateChanged(dataNewModel.getDateChanged());
+					
+					if (StringUtils.isNotBlank(dataNewModel.getChangedByUuid())) {
+						dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
+					}
+				}
 			}
 		}
 	}
