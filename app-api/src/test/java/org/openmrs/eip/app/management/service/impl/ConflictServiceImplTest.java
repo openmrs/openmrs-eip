@@ -11,6 +11,7 @@ import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_RETIRED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.MERGE_EXCLUDE_FIELDS;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -115,6 +116,15 @@ public class ConflictServiceImplTest {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
 		    () -> service.resolve(new ConflictResolution(new ConflictQueueItem(), MERGE)));
 		assertEquals("No properties to sync specified for merge resolution decision", thrown.getMessage());
+	}
+	
+	@Test
+	public void resolve_shouldFailForAMergeResolutionAndSyncedPropertiesContainsAnyDisallowedProperty() {
+		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
+		resolution.syncProperty("dateChanged");
+		Throwable thrown = Assert.assertThrows(EIPException.class, () -> service.resolve(resolution));
+		assertEquals("Found invalid properties for a merge conflict resolution, please exclude: " + MERGE_EXCLUDE_FIELDS,
+		    thrown.getMessage());
 	}
 	
 	@Test

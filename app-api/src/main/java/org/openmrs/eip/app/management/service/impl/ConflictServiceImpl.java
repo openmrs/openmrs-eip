@@ -1,17 +1,20 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.apache.commons.beanutils.PropertyUtils.getProperty;
+import static org.apache.commons.beanutils.PropertyUtils.setProperty;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.MERGE_EXCLUDE_FIELDS;
 import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
@@ -33,6 +36,7 @@ import org.openmrs.eip.component.model.BaseChangeableMetadataModel;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -176,18 +180,22 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	private void resolveAsMerge(ConflictResolution resolution) {
 		if (resolution.getSyncedProperties().isEmpty()) {
 			throw new EIPException("No properties to sync specified for merge resolution decision");
+		} else if (!Collections.disjoint(resolution.getSyncedProperties(), MERGE_EXCLUDE_FIELDS)) {
+			throw new EIPException(
+			        "Found invalid properties for a merge conflict resolution, please exclude: " + MERGE_EXCLUDE_FIELDS);
 		}
 		
 		ConflictQueueItem conflict = resolution.getConflict();
 		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
-		BaseModel newModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload()).getModel();
+		SyncModel syncModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload());
+		BaseModel newModel = syncModel.getModel();
 		TableToSyncEnum syncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
 		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getIdentifier());
 		for (String propertyName : resolution.getSyncedProperties()) {
 			try {
-				BeanUtils.copyProperty(dbModel, propertyName, BeanUtils.getProperty(newModel, propertyName));
+				setProperty(dbModel, propertyName, getProperty(newModel, propertyName));
 			}
-			catch (ReflectiveOperationException e) {
+			catch (Exception e) {
 				throw new EIPException("Failed to set the value for property: " + propertyName, e);
 			}
 		}
@@ -195,7 +203,8 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		mergeVoidOrRetireProperties(dbModel, newModel, resolution.getSyncedProperties());
 		mergeAuditProperties(dbModel, newModel);
 		
-		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(dbModel)
+		syncModel.setModel(dbModel);
+		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(syncModel)
 		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
 		        .withProperty(ReceiverConstants.EX_PROP_ENTITY_ID, conflict.getIdentifier()).build();
 		

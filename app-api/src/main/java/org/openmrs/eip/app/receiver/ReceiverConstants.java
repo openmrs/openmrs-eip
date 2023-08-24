@@ -1,5 +1,10 @@
 package org.openmrs.eip.app.receiver;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ReceiverConstants {
@@ -121,5 +126,8 @@ public class ReceiverConstants {
 	public static final String FIELD_VOIDED = "voided";
 	
 	public static final String FIELD_RETIRED = "retired";
+	
+	public static final List<String> MERGE_EXCLUDE_FIELDS = unmodifiableList(asList("changedByUuid", "dateChanged",
+	    "voidedByUuid", "dateVoided", "voidReason", "retiredByUuid", "dateRetired", "retireReason"));
 	
 }
