@@ -3,16 +3,27 @@ package org.openmrs.eip.app.management.service.impl;
 import static java.time.LocalDateTime.of;
 import static java.time.Month.AUGUST;
 import static java.util.Collections.singleton;
+import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_RETIRED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.MERGE_EXCLUDE_FIELDS;
 
+import java.beans.PropertyDescriptor;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,6 +31,10 @@ import java.util.Set;
 
 import javax.xml.ws.Holder;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.ExtendedCamelContext;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,11 +42,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
@@ -39,10 +57,17 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.ObservationModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.ProviderModel;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.VisitModel;
+import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.openmrs.eip.component.service.facade.EntityServiceFacade;
+import org.openmrs.eip.component.utils.JsonUtils;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(CamelUtils.class)
 public class ConflictServiceImplTest {
 	
 	private ConflictServiceImpl service;
@@ -56,10 +81,17 @@ public class ConflictServiceImplTest {
 	@Mock
 	private ConflictSearchIndexUpdatingProcessor indexUpdateProcessor;
 	
+	@Mock
+	private EntityServiceFacade mockServiceFacade;
+	
+	@Mock
+	private ExtendedCamelContext mockContext;
+	
 	@Before
 	public void setup() {
-		service = new ConflictServiceImpl(null, null, null, mockReceiverService, null, null, evictProcessor,
-		        indexUpdateProcessor);
+		PowerMockito.mockStatic(CamelUtils.class);
+		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade,
+		        evictProcessor, indexUpdateProcessor);
 	}
 	
 	@Test
@@ -408,6 +440,100 @@ public class ConflictServiceImplTest {
 		service.mergeAuditProperties(dbModel, newModel);
 		
 		assertEquals(dbUser, dbModel.getChangedByUuid());
+	}
+	
+	@Test
+	public void resolve_shouldSyncTheMergedStateBasedOnTheSpecifiedSyncedProperties() throws Exception {
+		final String modelClassName = PersonModel.class.getName();
+		final String uuid = "person-uuid";
+		final String newGender = "F";
+		final LocalDate newBirthDate = LocalDate.of(2023, AUGUST, 1);
+		final String newVoidedBy = "User(void-user-uuid)";
+		final LocalDateTime newDateVoided = of(2023, AUGUST, 23, 00, 00, 00);
+		final String newVoidReason = "test";
+		final String newChangedBy = "User(change-user-uuid)";
+		final LocalDateTime newDateChanged = of(2023, AUGUST, 24, 00, 00, 00);
+		PersonModel newModel = new PersonModel();
+		newModel.setUuid(uuid);
+		newModel.setGender(newGender);
+		newModel.setBirthdate(newBirthDate);
+		newModel.setVoided(true);
+		newModel.setVoidedByUuid(newVoidedBy);
+		newModel.setDateVoided(newDateVoided);
+		newModel.setVoidReason(newVoidReason);
+		newModel.setChangedByUuid(newChangedBy);
+		newModel.setDateChanged(newDateChanged);
+		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PersonModel.class).model(newModel).build();
+		PersonModel originalDbModel = new PersonModel();
+		PersonModel dbModel = (PersonModel) BeanUtils.cloneBean(originalDbModel);
+		when(mockServiceFacade.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(dbModel);
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setIdentifier(uuid);
+		conflict.setModelClassName(modelClassName);
+		conflict.setEntityPayload(JsonUtils.marshall(syncModel));
+		ConflictResolution resolution = new ConflictResolution(conflict, MERGE);
+		resolution.syncProperty("gender");
+		resolution.syncProperty("birthdate");
+		resolution.syncProperty(FIELD_VOIDED);
+		Holder<Exchange> exchangeHolder = new Holder<>();
+		when(CamelUtils.send(eq(ReceiverConstants.URI_INBOUND_DB_SYNC), any(Exchange.class))).thenAnswer(invocation -> {
+			Exchange exchange = invocation.getArgument(1);
+			exchangeHolder.value = exchange;
+			exchange.setProperty(ReceiverConstants.EX_PROP_MSG_PROCESSED, true);
+			return exchange;
+		});
+		service = spy(service);
+		ReceiverSyncArchive mockArchive = Mockito.mock(ReceiverSyncArchive.class);
+		doReturn(mockArchive).when(service).moveToArchiveQueue(conflict);
+		
+		service.resolve(resolution);
+		
+		verify(mockReceiverService).updateHash(modelClassName, uuid);
+		verify(evictProcessor).process(conflict);
+		verify(indexUpdateProcessor).process(conflict);
+		verify(service).moveToArchiveQueue(conflict);
+		Exchange exchange = exchangeHolder.value;
+		assertEquals(mockContext, exchange.getContext());
+		assertEquals(modelClassName, exchange.getProperty(EX_PROP_MODEL_CLASS));
+		assertEquals(uuid, exchange.getProperty(EX_PROP_ENTITY_ID));
+		SyncModel processedSyncModel = exchange.getIn().getBody(SyncModel.class);
+		assertEquals(PersonModel.class, processedSyncModel.getTableToSyncModelClass());
+		assertEquals(dbModel, processedSyncModel.getModel());
+		assertEquals(newGender, dbModel.getGender());
+		assertEquals(newBirthDate, dbModel.getBirthdate());
+		assertTrue(dbModel.isVoided());
+		assertEquals(newVoidedBy, dbModel.getVoidedByUuid());
+		assertEquals(newDateVoided, dbModel.getDateVoided());
+		assertEquals(newVoidReason, dbModel.getVoidReason());
+		assertEquals(newChangedBy, dbModel.getChangedByUuid());
+		assertEquals(newDateChanged, dbModel.getDateChanged());
+		for (PropertyDescriptor d : PropertyUtils.getPropertyDescriptors(PersonModel.class)) {
+			if (!resolution.getSyncedProperties().contains(d.getName()) && !MERGE_EXCLUDE_FIELDS.contains(d.getName())) {
+				String getter = d.getReadMethod().getName();
+				assertEquals(invokeMethod(originalDbModel, getter), invokeMethod(dbModel, getter));
+			}
+		}
+	}
+	
+	@Test
+	public void resolve_shouldFailIfTheSyncOutcomeIsUnknown() throws Exception {
+		final String modelClassName = PersonModel.class.getName();
+		final String uuid = "person-uuid";
+		PersonModel newModel = new PersonModel();
+		newModel.setUuid(uuid);
+		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PersonModel.class).model(newModel).build();
+		PersonModel originalDbModel = new PersonModel();
+		PersonModel dbModel = (PersonModel) BeanUtils.cloneBean(originalDbModel);
+		when(mockServiceFacade.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(dbModel);
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setIdentifier(uuid);
+		conflict.setModelClassName(modelClassName);
+		conflict.setEntityPayload(JsonUtils.marshall(syncModel));
+		ConflictResolution resolution = new ConflictResolution(conflict, MERGE);
+		resolution.syncProperty("gender");
+		
+		Throwable thrown = Assert.assertThrows(EIPException.class, () -> service.resolve(resolution));
+		assertEquals("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid(), thrown.getMessage());
 	}
 	
 }
