@@ -69,8 +69,8 @@
                                     <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true || ${exchangeProperty.org.openmrs.eip.app.receiver.sync-movedToConflictQueue} == true</simple>
                                     <when>
                                         <simple>${exchangeProperty.org.openmrs.eip.app.receiver.sync-msgProcessed} == true</simple>
-                                        <bean ref="retryCacheEvictingProcessor" method="process(${exchangeProperty.retry-item})" />
-                                        <bean ref="retrySearchIndexUpdatingProcessor" method="process(${exchangeProperty.retry-item})" />
+                                        <bean ref="retryCacheEvictProcessor" method="process(${exchangeProperty.retry-item})" />
+                                        <bean ref="retrySearchIndexUpdateProcessor" method="process(${exchangeProperty.retry-item})" />
                                         <bean ref="receiverService" method="archiveRetry(${exchangeProperty.retry-item})" />
                                     </when>
                                     <otherwise>

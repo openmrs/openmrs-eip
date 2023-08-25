@@ -17,14 +17,14 @@ public class ConflictResolutionTest {
 	@Test
 	public void syncProperty_shouldFailIfDecisionIsIgnoreNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
-		    () -> new ConflictResolution(new ConflictQueueItem(), IGNORE_NEW).isSynced("test"));
+		    () -> new ConflictResolution(new ConflictQueueItem(), IGNORE_NEW).syncProperty("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
 	}
 	
 	@Test
 	public void syncProperty_shouldFailIfDecisionIsSyncNew() {
 		Throwable thrown = Assert.assertThrows(EIPException.class,
-		    () -> new ConflictResolution(new ConflictQueueItem(), SYNC_NEW).isSynced("test"));
+		    () -> new ConflictResolution(new ConflictQueueItem(), SYNC_NEW).syncProperty("test"));
 		assertEquals("Only merge resolution decision supports property level decisions", thrown.getMessage());
 	}
 	
