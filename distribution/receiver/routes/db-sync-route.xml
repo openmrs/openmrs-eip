@@ -15,10 +15,10 @@
 
         <choice>
             <when>
-                <simple>${body.size()} > 0</simple>
-                <log message="Moving the message to the failure queue because the entity has ${body.size()} message(s) in the DB sync conflict queue" />
+                <simple>${body.size()} > 0 &amp;&amp; ${exchangeProperty.original-msg-body.metadata.messageUuid} != ${body.get(0).messageUuid}</simple>
+                <log message="Moving the message to the failure queue because the entity has ${body.size()} message(s) in the conflict queue" />
                 <setProperty name="err-message">
-                    <simple>Cannot process the message because the entity has ${body.size()} message(s) in the DB sync conflict queue</simple>
+                    <simple>Cannot process the message because the entity has ${body.size()} message(s) in the conflict queue</simple>
                 </setProperty>
                 <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="${exchangeProperty.err-message}" />
             </when>

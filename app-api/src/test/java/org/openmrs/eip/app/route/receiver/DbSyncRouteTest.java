@@ -34,8 +34,6 @@ import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.component.entity.light.PatientLight;
-import org.openmrs.eip.component.entity.light.VisitTypeLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
@@ -81,12 +79,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		final String uuid = "visit-uuid";
 		VisitModel model = new VisitModel();
 		model.setUuid(uuid);
-		model.setPatientUuid(PatientLight.class.getName() + "(some-patient-uuid)");
-		model.setVisitTypeUuid(VisitTypeLight.class.getName() + "(some-visit-type-uuid)");
-		SyncModel syncModel = new SyncModel();
-		syncModel.setTableToSyncModelClass(modelClass);
-		syncModel.setModel(model);
-		syncModel.setMetadata(new SyncMetadata());
+		SyncModel syncModel = SyncModel.builder().metadata(new SyncMetadata()).build();
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
@@ -115,10 +108,36 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
-		assertEquals("Cannot process the message because the entity has 3 message(s) in the DB sync conflict queue",
+		assertEquals("Cannot process the message because the entity has 3 message(s) in the conflict queue",
 		    getErrorMessage(exchange));
 		mockLoadEndpoint.assertIsSatisfied();
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldPassIfTheFoundConflictHasAMatchingMessageUuid() throws Exception {
+		final Class<? extends BaseModel> modelClass = PersonModel.class;
+		final String uuid = "uuid-1";
+		VisitModel model = new VisitModel();
+		model.setUuid(uuid);
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setMessageUuid("1cfd940e-32dc-491f-8038-a8f3afe3e36d");
+		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(modelClass).model(model).metadata(metadata).build();
+		assertTrue(ReceiverTestUtils.hasConflict(modelClass, uuid));
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
+		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
+		exchange.getIn().setBody(syncModel);
+		mockLoadEndpoint.expectedBodiesReceived(syncModel);
+		
+		producerTemplate.send(URI_DBSYNC, exchange);
+		
+		mockLoadEndpoint.assertIsSatisfied();
+		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
 		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
 	}

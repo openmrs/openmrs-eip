@@ -144,6 +144,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
+    @Transactional(transactionManager = MGT_TX_MGR)
 	public void resolve(ConflictResolution resolution) {
 		if (resolution.getConflict() == null) {
 			throw new EIPException("Conflict is required");

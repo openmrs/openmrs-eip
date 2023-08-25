@@ -26,10 +26,10 @@ public class ReceiverClearDbCacheRouteTest extends BaseReceiverRouteTest {
 	
 	protected static final String OPENMRS_PASS = "test";
 	
-	protected static final String SEARCH_INDEX_URL = OPENMRS_URL + "/ws/rest/v1/cleardbcache?authMethod=Basic&authUsername="
+	protected static final String CACHE_EVICT_URL = OPENMRS_URL + "/ws/rest/v1/cleardbcache?authMethod=Basic&authUsername="
 	        + OPENMRS_USER + "&authPassword=" + OPENMRS_PASS;
 	
-	@EndpointInject(SEARCH_INDEX_URL)
+	@EndpointInject(CACHE_EVICT_URL)
 	private MockEndpoint mockClearCacheEndpoint;
 	
 	@Override
