@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.apache.commons.beanutils.PropertyUtils.getProperty;
 import static org.apache.commons.beanutils.PropertyUtils.setProperty;
+import static org.openmrs.eip.app.SyncConstants.CHAINED_TX_MGR;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
@@ -147,7 +148,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	@Transactional(transactionManager = MGT_TX_MGR)
+	@Transactional(transactionManager = CHAINED_TX_MGR)
 	public void resolve(ConflictResolution resolution) {
 		if (resolution.getConflict() == null) {
 			throw new EIPException("Conflict is required");
