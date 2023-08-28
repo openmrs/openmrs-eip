@@ -29,6 +29,7 @@ import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseChangeableDataModel;
@@ -42,10 +43,12 @@ import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("conflictService")
+@Profile(SyncProfiles.RECEIVER)
 public class ConflictServiceImpl extends BaseService implements ConflictService {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConflictServiceImpl.class);
@@ -144,7 +147,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-    @Transactional(transactionManager = MGT_TX_MGR)
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public void resolve(ConflictResolution resolution) {
 		if (resolution.getConflict() == null) {
 			throw new EIPException("Conflict is required");

@@ -3,15 +3,18 @@ package org.openmrs.eip.web.receiver;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncStatus;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.RestConstants;
 import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Profile(SyncProfiles.RECEIVER)
 @RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/status")
 public class ReceiverSyncStatusController extends BaseRestController {
 	

@@ -20,6 +20,7 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -27,10 +28,12 @@ import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("receiverService")
+@Profile(SyncProfiles.RECEIVER)
 public class ReceiverServiceImpl extends BaseService implements ReceiverService {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverServiceImpl.class);
