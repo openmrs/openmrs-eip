@@ -45,6 +45,6 @@ public interface ConflictService extends Service {
 	 * @param conflict the conflict to resolve
 	 * @param propertiesToSync the properties to sync from the new incoming state
 	 */
-	void resolveAsMerge(ConflictQueueItem conflict, Set<String> propertiesToSync);
+	void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync);
 	
 }

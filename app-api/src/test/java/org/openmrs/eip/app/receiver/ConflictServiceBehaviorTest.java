@@ -101,7 +101,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	@Transactional(SyncConstants.CHAINED_TX_MGR)
 	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void resolveAsMerge_shouldMergeSyncAndArchiveTheConflict() throws Exception {
+	public void resolveWithMerge_shouldMergeSyncAndArchiveTheConflict() throws Exception {
 		final String msgUuid = "message-uuid";
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String newGender = "F";
@@ -148,7 +148,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		expectedUpdatedModel.setBirthdate(newBirthDate);
 		final String expectedNewHash = HashUtils.computeHash(expectedUpdatedModel);
 		
-		service.resolveAsMerge(conflict, propsToSync);
+		service.resolveWithMerge(conflict, propsToSync);
 		
 		existingPatient = patientService.getModel(uuid);
 		assertEquals(newGender, existingPatient.getGender());

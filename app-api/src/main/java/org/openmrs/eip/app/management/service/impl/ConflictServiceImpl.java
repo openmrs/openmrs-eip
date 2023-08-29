@@ -158,7 +158,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		}
 		
 		ConflictQueueItem c = resolution.getConflict();
-		log.info("Resolving conflict for item with uuid:" + c.getMessageUuid() + " with decision as: "
+		log.info("Resolving conflict for item with uuid: " + c.getMessageUuid() + " with decision as: "
 		        + resolution.getDecision());
 		
 		//TODO should we track the conflict resolution log?
@@ -171,19 +171,17 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 				resolveWithNewState(resolution);
 				break;
 			case MERGE:
-				//We need to call the method on a proxy for the transaction AOP to work
-				SyncContext.getBean(ConflictService.class).resolveAsMerge(resolution.getConflict(),
-				    resolution.getPropertiesToSync());
+				resolveWithMerge(resolution);
 				break;
 		}
 	}
 	
 	@Override
 	@Transactional(transactionManager = CHAINED_TX_MGR)
-	public void resolveAsMerge(ConflictQueueItem conflict, Set<String> syncedProperties) {
-		if (syncedProperties.isEmpty()) {
+	public void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync) {
+		if (propertiesToSync.isEmpty()) {
 			throw new EIPException("No properties to sync specified for merge resolution decision");
-		} else if (!Collections.disjoint(syncedProperties, MERGE_EXCLUDE_FIELDS)) {
+		} else if (!Collections.disjoint(propertiesToSync, MERGE_EXCLUDE_FIELDS)) {
 			throw new EIPException(
 			        "Found invalid properties for a merge conflict resolution, please exclude: " + MERGE_EXCLUDE_FIELDS);
 		}
@@ -193,7 +191,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		BaseModel newModel = syncModel.getModel();
 		TableToSyncEnum syncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
 		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getIdentifier());
-		for (String propertyName : syncedProperties) {
+		for (String propertyName : propertiesToSync) {
 			try {
 				setProperty(dbModel, propertyName, getProperty(newModel, propertyName));
 			}
@@ -202,7 +200,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			}
 		}
 		
-		mergeVoidOrRetireProperties(dbModel, newModel, syncedProperties);
+		mergeVoidOrRetireProperties(dbModel, newModel, propertiesToSync);
 		mergeAuditProperties(dbModel, newModel);
 		
 		syncModel.setModel(dbModel);
@@ -326,6 +324,11 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
 		
 		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
+	}
+	
+	private void resolveWithMerge(ConflictResolution r) {
+		//We need to call the method on a proxy for the transaction AOP to work
+		SyncContext.getBean(ConflictService.class).resolveWithMerge(r.getConflict(), r.getPropertiesToSync());
 	}
 	
 }
