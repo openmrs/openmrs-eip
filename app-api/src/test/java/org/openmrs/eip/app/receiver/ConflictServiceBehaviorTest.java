@@ -17,7 +17,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -31,7 +33,6 @@ import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.service.ConflictService;
-import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncOperation;
@@ -100,7 +101,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	@Transactional(SyncConstants.CHAINED_TX_MGR)
 	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	public void resolve_shouldMergeSyncAndArchiveTheConflict() throws Exception {
+	public void resolveAsMerge_shouldMergeSyncAndArchiveTheConflict() throws Exception {
 		final String msgUuid = "message-uuid";
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String newGender = "F";
@@ -139,15 +140,15 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		assertNotEquals(newGender, existingPatient.getGender());
 		assertNotEquals(newBirthDate, existingPatient.getBirthdate());
 		assertFalse(existingPatient.isDead());
-		ConflictResolution resolution = new ConflictResolution(conflict, ResolutionDecision.MERGE);
-		resolution.syncProperty("gender");
-		resolution.syncProperty("birthdate");
+		Set<String> syncedProps = new HashSet<>();
+		syncedProps.add("gender");
+		syncedProps.add("birthdate");
 		PatientModel expectedUpdatedModel = (PatientModel) BeanUtils.cloneBean(patientService.getModel(uuid));
 		expectedUpdatedModel.setGender(newGender);
 		expectedUpdatedModel.setBirthdate(newBirthDate);
 		final String expectedNewHash = HashUtils.computeHash(expectedUpdatedModel);
 		
-		service.resolve(resolution);
+		service.resolveAsMerge(conflict, syncedProps);
 		
 		existingPatient = patientService.getModel(uuid);
 		assertEquals(newGender, existingPatient.getGender());
