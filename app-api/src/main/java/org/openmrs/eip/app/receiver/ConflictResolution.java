@@ -45,7 +45,7 @@ public class ConflictResolution {
 	private ResolutionDecision decision;
 	
 	@Getter
-	private Set<String> syncedProperties = new HashSet<>();
+	private Set<String> propertiesToSync = new HashSet<>();
 	
 	public ConflictResolution(ConflictQueueItem conflict, ResolutionDecision decision) {
 		this.conflict = conflict;
@@ -53,25 +53,25 @@ public class ConflictResolution {
 	}
 	
 	/**
-	 * Sets the resolution for the specified property to sync
+	 * Adds the property to the collection of properties to sync from the new state.
 	 * 
 	 * @param propertyName the name of the property to sync
 	 */
-	public void syncProperty(String propertyName) {
+	public void addPropertyToSync(String propertyName) {
 		if (decision == ResolutionDecision.MERGE) {
-			syncedProperties.add(propertyName);
+			propertiesToSync.add(propertyName);
 		} else {
 			throw new EIPException("Only merge resolution decision supports property level decisions");
 		}
 	}
 	
 	/**
-	 * Sets the resolution for the specified property to sync
+	 * Checks whether the specified property needs to be synced
 	 *
-	 * @param propertyName the name of the property to sync
+	 * @param propertyName the name of the property to check
 	 */
 	public boolean isSynced(String propertyName) {
-		return syncedProperties.contains(propertyName);
+		return propertiesToSync.contains(propertyName);
 	}
 	
 }

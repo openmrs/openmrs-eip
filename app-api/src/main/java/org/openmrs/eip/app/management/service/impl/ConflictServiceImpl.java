@@ -173,7 +173,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			case MERGE:
 				//We need to call the method on a proxy for the transaction AOP to work
 				SyncContext.getBean(ConflictService.class).resolveAsMerge(resolution.getConflict(),
-				    resolution.getSyncedProperties());
+				    resolution.getPropertiesToSync());
 				break;
 		}
 	}
@@ -227,10 +227,10 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	 * 
 	 * @param dbModel the database model
 	 * @param newModel the new model
-	 * @param syncedProps set of properties to sync from the new model
+	 * @param propsToSync set of properties to sync from the new model
 	 */
-	protected void mergeVoidOrRetireProperties(BaseModel dbModel, BaseModel newModel, Set<String> syncedProps) {
-		if (syncedProps.contains(FIELD_VOIDED) || syncedProps.contains("retired")) {
+	protected void mergeVoidOrRetireProperties(BaseModel dbModel, BaseModel newModel, Set<String> propsToSync) {
+		if (propsToSync.contains(FIELD_VOIDED) || propsToSync.contains("retired")) {
 			if (newModel instanceof BaseDataModel) {
 				BaseDataModel dataDbModel = (BaseDataModel) dbModel;
 				BaseDataModel dataNewModel = (BaseDataModel) newModel;

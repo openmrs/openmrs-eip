@@ -140,15 +140,15 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		assertNotEquals(newGender, existingPatient.getGender());
 		assertNotEquals(newBirthDate, existingPatient.getBirthdate());
 		assertFalse(existingPatient.isDead());
-		Set<String> syncedProps = new HashSet<>();
-		syncedProps.add("gender");
-		syncedProps.add("birthdate");
+		Set<String> propsToSync = new HashSet<>();
+		propsToSync.add("gender");
+		propsToSync.add("birthdate");
 		PatientModel expectedUpdatedModel = (PatientModel) BeanUtils.cloneBean(patientService.getModel(uuid));
 		expectedUpdatedModel.setGender(newGender);
 		expectedUpdatedModel.setBirthdate(newBirthDate);
 		final String expectedNewHash = HashUtils.computeHash(expectedUpdatedModel);
 		
-		service.resolveAsMerge(conflict, syncedProps);
+		service.resolveAsMerge(conflict, propsToSync);
 		
 		existingPatient = patientService.getModel(uuid);
 		assertEquals(newGender, existingPatient.getGender());

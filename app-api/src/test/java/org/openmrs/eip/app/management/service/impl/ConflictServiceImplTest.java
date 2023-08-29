@@ -157,7 +157,7 @@ public class ConflictServiceImplTest {
 	@Test
 	public void resolve_shouldFailForAMergeResolutionAndSyncedPropertiesContainsAnyDisallowedProperty() {
 		ConflictResolution resolution = new ConflictResolution(new ConflictQueueItem(), MERGE);
-		resolution.syncProperty("dateChanged");
+		resolution.addPropertyToSync("dateChanged");
 		Throwable thrown = Assert.assertThrows(EIPException.class, () -> service.resolve(resolution));
 		assertEquals("Found invalid properties for a merge conflict resolution, please exclude: " + MERGE_EXCLUDE_FIELDS,
 		    thrown.getMessage());
@@ -189,11 +189,11 @@ public class ConflictServiceImplTest {
 	public void mergeVoidOrRetireProperties_shouldSkipForAModelThatIsNeitherDataNorMetadata() {
 		BaseModel dbModel = Mockito.mock(BaseModel.class);
 		BaseModel newModel = Mockito.mock(BaseModel.class);
-		Set<String> syncedProps = new HashSet<>();
-		syncedProps.add(FIELD_VOIDED);
-		syncedProps.add(FIELD_RETIRED);
+		Set<String> propsToSync = new HashSet<>();
+		propsToSync.add(FIELD_VOIDED);
+		propsToSync.add(FIELD_RETIRED);
 		
-		service.mergeVoidOrRetireProperties(dbModel, newModel, syncedProps);
+		service.mergeVoidOrRetireProperties(dbModel, newModel, propsToSync);
 		
 		verifyNoInteractions(dbModel);
 		verifyNoInteractions(newModel);
@@ -476,9 +476,9 @@ public class ConflictServiceImplTest {
 		conflict.setModelClassName(modelClassName);
 		conflict.setEntityPayload(JsonUtils.marshall(syncModel));
 		ConflictResolution resolution = new ConflictResolution(conflict, MERGE);
-		resolution.syncProperty("gender");
-		resolution.syncProperty("birthdate");
-		resolution.syncProperty(FIELD_VOIDED);
+		resolution.addPropertyToSync("gender");
+		resolution.addPropertyToSync("birthdate");
+		resolution.addPropertyToSync(FIELD_VOIDED);
 		Holder<Exchange> exchangeHolder = new Holder<>();
 		when(CamelUtils.send(eq(ReceiverConstants.URI_INBOUND_DB_SYNC), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
@@ -513,7 +513,7 @@ public class ConflictServiceImplTest {
 		assertEquals(newChangedBy, dbModel.getChangedByUuid());
 		assertEquals(newDateChanged, dbModel.getDateChanged());
 		for (PropertyDescriptor d : PropertyUtils.getPropertyDescriptors(PersonModel.class)) {
-			if (!resolution.getSyncedProperties().contains(d.getName()) && !MERGE_EXCLUDE_FIELDS.contains(d.getName())) {
+			if (!resolution.getPropertiesToSync().contains(d.getName()) && !MERGE_EXCLUDE_FIELDS.contains(d.getName())) {
 				String getter = d.getReadMethod().getName();
 				assertEquals(invokeMethod(originalDbModel, getter), invokeMethod(dbModel, getter));
 			}
@@ -535,7 +535,7 @@ public class ConflictServiceImplTest {
 		conflict.setModelClassName(modelClassName);
 		conflict.setEntityPayload(JsonUtils.marshall(syncModel));
 		ConflictResolution resolution = new ConflictResolution(conflict, MERGE);
-		resolution.syncProperty("gender");
+		resolution.addPropertyToSync("gender");
 		
 		Throwable thrown = Assert.assertThrows(EIPException.class, () -> service.resolve(resolution));
 		assertEquals("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid(), thrown.getMessage());
