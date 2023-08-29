@@ -43,12 +43,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseDataModel;
@@ -67,7 +69,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(CamelUtils.class)
+@PrepareForTest({ SyncContext.class, CamelUtils.class })
 public class ConflictServiceImplTest {
 	
 	private ConflictServiceImpl service;
@@ -90,8 +92,10 @@ public class ConflictServiceImplTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(CamelUtils.class);
+		PowerMockito.mockStatic(SyncContext.class);
 		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade,
 		        evictProcessor, indexUpdateProcessor);
+		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
 	}
 	
 	@Test
@@ -485,6 +489,7 @@ public class ConflictServiceImplTest {
 		service = spy(service);
 		ReceiverSyncArchive mockArchive = Mockito.mock(ReceiverSyncArchive.class);
 		doReturn(mockArchive).when(service).moveToArchiveQueue(conflict);
+		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
 		
 		service.resolve(resolution);
 		
@@ -516,7 +521,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolve_shouldFailIfTheSyncOutcomeIsUnknown() throws Exception {
+	public void resolve_shouldFailIfTheSyncOutcomeIsUnknownForAMergeResolution() throws Exception {
 		final String modelClassName = PersonModel.class.getName();
 		final String uuid = "person-uuid";
 		PersonModel newModel = new PersonModel();

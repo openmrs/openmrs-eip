@@ -30,6 +30,7 @@ import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -148,7 +149,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	}
 	
 	@Override
-	@Transactional(transactionManager = CHAINED_TX_MGR)
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public void resolve(ConflictResolution resolution) {
 		if (resolution.getConflict() == null) {
 			throw new EIPException("Conflict is required");
@@ -170,33 +171,29 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 				resolveWithNewState(resolution);
 				break;
 			case MERGE:
-				resolveAsMerge(resolution);
+				//We need to call the method on a proxy for the transaction AOP to work
+				SyncContext.getBean(ConflictService.class).resolveAsMerge(resolution.getConflict(),
+				    resolution.getSyncedProperties());
 				break;
 		}
 	}
 	
-	private void resolveWithNewState(ConflictResolution resolution) {
-		ConflictQueueItem conflict = resolution.getConflict();
-		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
-		
-		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
-	}
-	
-	private void resolveAsMerge(ConflictResolution resolution) {
-		if (resolution.getSyncedProperties().isEmpty()) {
+	@Override
+	@Transactional(transactionManager = CHAINED_TX_MGR)
+	public void resolveAsMerge(ConflictQueueItem conflict, Set<String> syncedProperties) {
+		if (syncedProperties.isEmpty()) {
 			throw new EIPException("No properties to sync specified for merge resolution decision");
-		} else if (!Collections.disjoint(resolution.getSyncedProperties(), MERGE_EXCLUDE_FIELDS)) {
+		} else if (!Collections.disjoint(syncedProperties, MERGE_EXCLUDE_FIELDS)) {
 			throw new EIPException(
 			        "Found invalid properties for a merge conflict resolution, please exclude: " + MERGE_EXCLUDE_FIELDS);
 		}
 		
-		ConflictQueueItem conflict = resolution.getConflict();
 		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
 		SyncModel syncModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload());
 		BaseModel newModel = syncModel.getModel();
 		TableToSyncEnum syncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(conflict.getModelClassName());
 		BaseModel dbModel = serviceFacade.getModel(syncEnum, conflict.getIdentifier());
-		for (String propertyName : resolution.getSyncedProperties()) {
+		for (String propertyName : syncedProperties) {
 			try {
 				setProperty(dbModel, propertyName, getProperty(newModel, propertyName));
 			}
@@ -205,7 +202,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 			}
 		}
 		
-		mergeVoidOrRetireProperties(dbModel, newModel, resolution.getSyncedProperties());
+		mergeVoidOrRetireProperties(dbModel, newModel, syncedProperties);
 		mergeAuditProperties(dbModel, newModel);
 		
 		syncModel.setModel(dbModel);
@@ -322,6 +319,13 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 				}
 			}
 		}
+	}
+	
+	private void resolveWithNewState(ConflictResolution resolution) {
+		ConflictQueueItem conflict = resolution.getConflict();
+		receiverService.updateHash(conflict.getModelClassName(), conflict.getIdentifier());
+		
+		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 	}
 	
 }
