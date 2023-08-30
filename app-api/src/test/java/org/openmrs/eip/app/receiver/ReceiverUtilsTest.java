@@ -155,7 +155,7 @@ public class ReceiverUtilsTest {
 	}
 	
 	@Test
-	public void createSyncedMessage_shouldCreateASyncedMessageForACachedButNotIndexedEntity() {
+	public void createSyncedMessage_shouldCreateASyncedMessageFromASyncMessageForACachedButNotIndexedEntity() {
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setModelClassName(PersonAddressModel.class.getName());
 		
@@ -169,7 +169,7 @@ public class ReceiverUtilsTest {
 	}
 	
 	@Test
-	public void createSyncedMessage_shouldCreateASyncedMessageForAnIndexedButNotCachedEntity() {
+	public void createSyncedMessage_shouldCreateASyncedMessageFromASyncMessageForAnIndexedButNotCachedEntity() {
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setModelClassName(PatientIdentifierModel.class.getName());
 		
@@ -183,7 +183,7 @@ public class ReceiverUtilsTest {
 	}
 	
 	@Test
-	public void createSyncedMessage_shouldCreateASyncedMessageForAFailedItem() {
+	public void createSyncedMessage_shouldCreateASyncedMessageFromASyncMessageForAFailedItem() {
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setModelClassName(PersonModel.class.getName());
 		
@@ -197,7 +197,7 @@ public class ReceiverUtilsTest {
 	}
 	
 	@Test
-	public void createSyncedMessage_shouldCreateASyncedMessageFromForAConflictedItem() {
+	public void createSyncedMessage_shouldCreateASyncedMessageFromASyncMessageForAConflictedItem() {
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setModelClassName(PersonModel.class.getName());
 		

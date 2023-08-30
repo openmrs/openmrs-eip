@@ -17,6 +17,7 @@ import java.util.Set;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
@@ -163,6 +164,29 @@ public class ReceiverUtils {
 		}
 		
 		if (isIndexed(syncMessage.getModelClassName())) {
+			syncedMessage.setIndexed(true);
+		}
+		
+		return syncedMessage;
+	}
+	
+	/**
+	 * Creates a {@link SyncedMessage} for the specified {@link ConflictQueueItem}
+	 *
+	 * @param conflict the conflict item
+	 * @return synced message
+	 */
+	public static SyncedMessage createSyncedMessage(ConflictQueueItem conflict) {
+		SyncedMessage syncedMessage = new SyncedMessage(SyncOutcome.SUCCESS);
+		BeanUtils.copyProperties(conflict, syncedMessage, "id", "dateCreated");
+		syncedMessage.setDateCreated(new Date());
+		syncedMessage.setResponseSent(true);
+		
+		if (isCached(conflict.getModelClassName())) {
+			syncedMessage.setCached(true);
+		}
+		
+		if (isIndexed(conflict.getModelClassName())) {
 			syncedMessage.setIndexed(true);
 		}
 		

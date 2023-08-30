@@ -20,16 +20,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
+import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
-import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -61,20 +62,17 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	private ReceiverSyncArchiveRepository archiveRepo;
 	
+	private SyncedMessageRepository syncedMsgRepo;
+	
 	private ReceiverService receiverService;
 	
 	private EntityServiceFacade serviceFacade;
 	
 	private CamelContext camelContext;
 	
-	private ConflictCacheEvictingProcessor cacheEvictProcessor;
-	
-	private ConflictSearchIndexUpdatingProcessor indexUpdateProcessor;
-	
 	public ConflictServiceImpl(ConflictRepository conflictRepo, ReceiverRetryRepository retryRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverService receiverService, CamelContext camelContext,
-	    EntityServiceFacade serviceFacade, ConflictCacheEvictingProcessor cacheEvictProcessor,
-	    ConflictSearchIndexUpdatingProcessor indexUpdateProcessor) {
+	    EntityServiceFacade serviceFacade, SyncedMessageRepository syncedMsgRepo) {
 		
 		this.conflictRepo = conflictRepo;
 		this.retryRepo = retryRepo;
@@ -82,15 +80,14 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		this.receiverService = receiverService;
 		this.camelContext = camelContext;
 		this.serviceFacade = serviceFacade;
-		this.cacheEvictProcessor = cacheEvictProcessor;
-		this.indexUpdateProcessor = indexUpdateProcessor;
+		this.syncedMsgRepo = syncedMsgRepo;
 	}
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public ReceiverRetryQueueItem moveToRetryQueue(ConflictQueueItem conflict, String reason) {
 		if (log.isDebugEnabled()) {
-			log.debug("Moving to retry queue the conflict item with id: " + conflict.getId());
+			log.debug("Moving to retry queue the conflict item with uuid: " + conflict.getMessageUuid());
 		}
 		
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem(conflict);
@@ -118,7 +115,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public ReceiverSyncArchive moveToArchiveQueue(ConflictQueueItem conflict) {
 		if (log.isDebugEnabled()) {
-			log.debug("Moving to archive queue the conflict item with id: " + conflict.getId());
+			log.debug("Moving to archive queue the conflict item with uuid: " + conflict.getMessageUuid());
 		}
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(conflict);
@@ -146,6 +143,29 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		}
 		
 		return archive;
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void moveToSyncedQueue(ConflictQueueItem conflict) {
+		log.info("Moving to synced queue the conflict item with uuid: " + conflict.getMessageUuid());
+		
+		SyncedMessage syncedMsg = ReceiverUtils.createSyncedMessage(conflict);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving synced message");
+		}
+		
+		syncedMsgRepo.save(syncedMsg);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved synced message, removing item from the conflict queue");
+		}
+		
+		conflictRepo.delete(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed the item from the conflict queue");
+		}
 	}
 	
 	@Override
@@ -212,9 +232,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		
 		//TODO What should we do in case a new conflict or error is encountered
 		if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
-			cacheEvictProcessor.process(conflict);
-			indexUpdateProcessor.process(conflict);
-			moveToArchiveQueue(conflict);
+			moveToSyncedQueue(conflict);
 		} else {
 			throw new EIPException("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid());
 		}

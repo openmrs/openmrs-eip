@@ -66,7 +66,15 @@ public class SyncedMessageDeletingProcessor extends BaseQueueProcessor<SyncedMes
 	
 	@Override
 	public void processItem(SyncedMessage item) {
+		if (log.isDebugEnabled()) {
+			log.debug("Deleting synced message with outcome: " + item.getOutcome());
+		}
+		
 		repo.delete(item);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully deleted synced message");
+		}
 	}
 	
 }

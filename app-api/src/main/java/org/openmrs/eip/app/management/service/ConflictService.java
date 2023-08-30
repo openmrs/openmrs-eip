@@ -30,6 +30,13 @@ public interface ConflictService extends Service {
 	ReceiverSyncArchive moveToArchiveQueue(ConflictQueueItem conflict);
 	
 	/**
+	 * Moves a {@link ConflictQueueItem} to the synced queue
+	 *
+	 * @param conflict the conflict to move
+	 */
+	void moveToSyncedQueue(ConflictQueueItem conflict);
+	
+	/**
 	 * Processes a {@link ConflictResolution}
 	 *
 	 * @param resolution the conflict resolution to process

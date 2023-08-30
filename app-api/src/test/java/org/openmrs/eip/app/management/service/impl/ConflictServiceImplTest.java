@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -42,13 +42,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.receiver.ConflictCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
-import org.openmrs.eip.app.receiver.ConflictSearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -78,12 +75,6 @@ public class ConflictServiceImplTest {
 	private ReceiverService mockReceiverService;
 	
 	@Mock
-	private ConflictCacheEvictingProcessor evictProcessor;
-	
-	@Mock
-	private ConflictSearchIndexUpdatingProcessor indexUpdateProcessor;
-	
-	@Mock
 	private EntityServiceFacade mockServiceFacade;
 	
 	@Mock
@@ -93,8 +84,7 @@ public class ConflictServiceImplTest {
 	public void setup() {
 		PowerMockito.mockStatic(CamelUtils.class);
 		PowerMockito.mockStatic(SyncContext.class);
-		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade,
-		        evictProcessor, indexUpdateProcessor);
+		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade, null);
 		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
 	}
 	
@@ -447,7 +437,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolve_shouldSyncTheMergedStateBasedOnTheSpecifiedSyncedProperties() throws Exception {
+	public void resolve_shouldSyncTheMergedStateBasedOnTheSpecifiedPropertiesToSync() throws Exception {
 		final String modelClassName = PersonModel.class.getName();
 		final String uuid = "person-uuid";
 		final String newGender = "F";
@@ -487,16 +477,13 @@ public class ConflictServiceImplTest {
 			return exchange;
 		});
 		service = spy(service);
-		ReceiverSyncArchive mockArchive = Mockito.mock(ReceiverSyncArchive.class);
-		doReturn(mockArchive).when(service).moveToArchiveQueue(conflict);
+		doNothing().when(service).moveToSyncedQueue(conflict);
 		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
 		
 		service.resolve(resolution);
 		
 		verify(mockReceiverService).updateHash(modelClassName, uuid);
-		verify(evictProcessor).process(conflict);
-		verify(indexUpdateProcessor).process(conflict);
-		verify(service).moveToArchiveQueue(conflict);
+		verify(service).moveToSyncedQueue(conflict);
 		Exchange exchange = exchangeHolder.value;
 		assertEquals(mockContext, exchange.getContext());
 		assertEquals(modelClassName, exchange.getProperty(EX_PROP_MODEL_CLASS));
