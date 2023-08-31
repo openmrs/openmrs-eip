@@ -89,6 +89,8 @@ public class ReceiverConstants {
 	
 	public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToErrorQueue";
 	
+	public static final String EX_PROP_IS_CONFLICT = "org.openmrs.eip.app.receiver.isConflictSync";
+	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	
 	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;

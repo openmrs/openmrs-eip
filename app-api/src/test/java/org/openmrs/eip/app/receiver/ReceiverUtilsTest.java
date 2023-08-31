@@ -3,7 +3,6 @@ package org.openmrs.eip.app.receiver;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
-import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -23,12 +22,7 @@ import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 import static org.openmrs.eip.component.SyncOperation.c;
 import static org.openmrs.eip.component.SyncOperation.d;
 
-import java.beans.PropertyDescriptor;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -38,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncContext;
@@ -67,7 +61,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ SyncContext.class, CamelUtils.class })
+@PrepareForTest({ SyncContext.class, CamelUtils.class, BeanUtils.class })
 public class ReceiverUtilsTest {
 	
 	@Mock
@@ -80,6 +74,7 @@ public class ReceiverUtilsTest {
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(CamelUtils.class);
+		PowerMockito.mockStatic(BeanUtils.class);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockTemplate);
 		when(mockTemplate.getCamelContext()).thenReturn(new DefaultCamelContext());
 	}
@@ -115,18 +110,8 @@ public class ReceiverUtilsTest {
 	
 	@Test
 	public void createSyncedMessage_shouldCreateASyncedMessageFromASyncMessageForACachedAndIndexedEntity() throws Exception {
-		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(SyncMessage.class);
 		SyncMessage syncMessage = new SyncMessage();
-		syncMessage.setId(1L);
-		syncMessage.setDateCreated(new Date());
-		syncMessage.setIdentifier("uuid");
-		syncMessage.setEntityPayload("payload");
 		syncMessage.setModelClassName(PersonModel.class.getName());
-		syncMessage.setSite(new SiteInfo());
-		syncMessage.setSnapshot(true);
-		syncMessage.setMessageUuid("message-uuid");
-		syncMessage.setDateSentBySender(LocalDateTime.now());
-		syncMessage.setOperation(c);
 		long timestamp = System.currentTimeMillis();
 		
 		SyncedMessage msg = ReceiverUtils.createSyncedMessage(syncMessage, SUCCESS);
@@ -140,18 +125,8 @@ public class ReceiverUtilsTest {
 		assertTrue(msg.isIndexed());
 		assertFalse(msg.isSearchIndexUpdated());
 		assertEquals(SUCCESS, msg.getOutcome());
-		Set<String> ignored = new HashSet();
-		ignored.add("id");
-		ignored.add("class");
-		ignored.add("dateCreated");
-		for (PropertyDescriptor descriptor : descriptors) {
-			if (ignored.contains(descriptor.getName())) {
-				continue;
-			}
-			
-			String getter = descriptor.getReadMethod().getName();
-			assertEquals(invokeMethod(syncMessage, getter), invokeMethod(msg, getter));
-		}
+		PowerMockito.verifyStatic(BeanUtils.class);
+		BeanUtils.copyProperties(syncMessage, msg, "id", "dateCreated");
 	}
 	
 	@Test
@@ -673,6 +648,56 @@ public class ReceiverUtilsTest {
 		final String modelClass = PersonModel.class.getName();
 		Exception thrown = Assert.assertThrows(EIPException.class, () -> ReceiverUtils.getParentModelClassName(modelClass));
 		assertEquals("No parent class found for model class: " + modelClass, thrown.getMessage());
+	}
+	
+	@Test
+	public void createSyncedMessage_shouldCreateASyncedMessageFromAConflictForACachedAndIndexedEntity() throws Exception {
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setModelClassName(PersonModel.class.getName());
+		conflict.setMessageUuid("message-uuid");
+		long timestamp = System.currentTimeMillis();
+		
+		SyncedMessage msg = ReceiverUtils.createSyncedMessage(conflict);
+		
+		assertNull(msg.getId());
+		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
+		assertEquals(conflict.getDateCreated(), msg.getDateReceived());
+		assertTrue(msg.isResponseSent());
+		assertTrue(msg.isCached());
+		assertFalse(msg.isEvictedFromCache());
+		assertTrue(msg.isIndexed());
+		assertFalse(msg.isSearchIndexUpdated());
+		assertEquals(SUCCESS, msg.getOutcome());
+		PowerMockito.verifyStatic(BeanUtils.class);
+		BeanUtils.copyProperties(conflict, msg, "id", "dateCreated");
+	}
+	
+	@Test
+	public void createSyncedMessage_shouldCreateASyncedMessageFromAConflictForACachedButNotIndexedEntity() {
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setModelClassName(PersonAddressModel.class.getName());
+		
+		SyncedMessage msg = ReceiverUtils.createSyncedMessage(conflict);
+		
+		assertEquals(SUCCESS, msg.getOutcome());
+		assertTrue(msg.isCached());
+		assertFalse(msg.isEvictedFromCache());
+		assertFalse(msg.isIndexed());
+		assertFalse(msg.isSearchIndexUpdated());
+	}
+	
+	@Test
+	public void createSyncedMessage_shouldCreateASyncedMessageFromAConflictForAnIndexedButNotCachedEntity() {
+		ConflictQueueItem conflict = new ConflictQueueItem();
+		conflict.setModelClassName(PatientIdentifierModel.class.getName());
+		
+		SyncedMessage msg = ReceiverUtils.createSyncedMessage(conflict);
+		
+		assertEquals(SUCCESS, msg.getOutcome());
+		assertTrue(msg.isIndexed());
+		assertFalse(msg.isSearchIndexUpdated());
+		assertFalse(msg.isCached());
+		assertFalse(msg.isEvictedFromCache());
 	}
 	
 }

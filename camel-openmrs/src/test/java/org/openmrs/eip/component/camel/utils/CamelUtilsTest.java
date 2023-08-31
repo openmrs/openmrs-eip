@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.openmrs.eip.component.Constants.EX_PROP_EXCEPTION;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -49,6 +50,18 @@ public class CamelUtilsTest {
 		Exchange exchange = Mockito.mock(Exchange.class);
 		when(mockTemplate.send(URI, exchange)).thenReturn(exchange);
 		when(exchange.getException()).thenReturn(new Exception());
+		Exception thrown = assertThrows(EIPException.class, () -> {
+			CamelUtils.send(URI, exchange);
+		});
+		
+		assertEquals("An error occurred while calling endpoint: " + URI, thrown.getMessage());
+	}
+	
+	@Test
+	public void send_shouldFailIfAnEnErrorExistsOnTheExchangeAsAProperty() {
+		Exchange exchange = Mockito.mock(Exchange.class);
+		when(mockTemplate.send(URI, exchange)).thenReturn(exchange);
+		when(exchange.getProperty(EX_PROP_EXCEPTION, Throwable.class)).thenReturn(new Exception());
 		Exception thrown = assertThrows(EIPException.class, () -> {
 			CamelUtils.send(URI, exchange);
 		});

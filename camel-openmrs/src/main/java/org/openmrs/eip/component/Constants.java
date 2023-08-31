@@ -38,6 +38,8 @@ public class Constants {
 	
 	public static final String PROP_IGNORE_MISSING_HASH = "receiver.ignore.missing.hash.for.existing.entity";
 	
+	public static final String EX_PROP_EXCEPTION = "org.openmrs.eip.exception";
+	
 	public static final String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
 	
 	public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";

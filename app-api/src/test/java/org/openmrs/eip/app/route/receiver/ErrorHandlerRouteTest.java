@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,7 +37,9 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.route.TestUtils;
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseModel;
@@ -235,6 +238,21 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		assertNotNull(retryItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), retryItem.getExceptionType());
 		assertEquals(newErrorMsg, retryItem.getMessage());
+	}
+	
+	@Test
+	public void shouldSkipIfTheErrorWasEncounteredWhileSyncingAConflictItem() {
+		final int errorCount = TestUtils.getEntities(ReceiverRetryQueueItem.class).size();
+		final Exception exception = new EIPException("test");
+		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty(ReceiverConstants.EX_PROP_IS_CONFLICT, true);
+		exchange.setException(exception);
+		
+		producerTemplate.send(URI_ERROR_HANDLER, exchange);
+		
+		assertMessageLogged(Level.DEBUG, "An error was encountered while syncing a conflict item");
+		assertEquals(exception, exchange.getProperty(Constants.EX_PROP_EXCEPTION));
+		assertEquals(errorCount, TestUtils.getEntities(ReceiverRetryQueueItem.class).size());
 	}
 	
 }

@@ -10,6 +10,14 @@
                 <method beanType="org.openmrs.eip.app.AppUtils" method="isShuttingDown()" />
                 <log message="Ignoring the error because the application is shutting down" />
             </when>
+            <when>
+                <simple>${exchangeProperty[org.openmrs.eip.app.receiver.isConflictSync]}</simple>
+                <log loggingLevel="DEBUG" message="An error was encountered while syncing a conflict item" />
+
+                <setProperty name="org.openmrs.eip.exception">
+                    <simple>${exception}</simple>
+                </setProperty>
+            </when>
             <otherwise>
                 <when>
                     <simple>${exchangeProperty.retry-item-id} != null</simple>

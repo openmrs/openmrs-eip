@@ -170,7 +170,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void resolve(ConflictResolution resolution) {
+	public void resolve(ConflictResolution resolution) throws Exception {
 		if (resolution.getConflict() == null) {
 			throw new EIPException("Conflict is required");
 		} else if (resolution.getDecision() == null) {
@@ -198,7 +198,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	@Override
 	@Transactional(transactionManager = CHAINED_TX_MGR)
-	public void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync) {
+	public void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync) throws Exception {
 		if (propertiesToSync.isEmpty()) {
 			throw new EIPException("No properties to sync specified for merge resolution decision");
 		} else if (!Collections.disjoint(propertiesToSync, MERGE_EXCLUDE_FIELDS)) {
@@ -226,11 +226,12 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		syncModel.setModel(dbModel);
 		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(syncModel)
 		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
-		        .withProperty(ReceiverConstants.EX_PROP_ENTITY_ID, conflict.getIdentifier()).build();
+		        .withProperty(ReceiverConstants.EX_PROP_ENTITY_ID, conflict.getIdentifier())
+		        .withProperty(ReceiverConstants.EX_PROP_IS_CONFLICT, true).build();
 		
 		CamelUtils.send(ReceiverConstants.URI_INBOUND_DB_SYNC, exchange);
 		
-		//TODO What should we do in case a new conflict or error is encountered
+		//TODO What should we do in case a new conflict is encountered, is it even possible anyways?
 		if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
 			moveToSyncedQueue(conflict);
 		} else {
@@ -344,7 +345,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		moveToRetryQueue(conflict, "Moved from conflict queue after conflict resolution");
 	}
 	
-	private void resolveWithMerge(ConflictResolution r) {
+	private void resolveWithMerge(ConflictResolution r) throws Exception {
 		//We need to call the method on a proxy for the transaction AOP to work
 		SyncContext.getBean(ConflictService.class).resolveWithMerge(r.getConflict(), r.getPropertiesToSync());
 	}

@@ -40,8 +40,9 @@ public interface ConflictService extends Service {
 	 * Processes a {@link ConflictResolution}
 	 *
 	 * @param resolution the conflict resolution to process
+	 * @throws Exception
 	 */
-	void resolve(ConflictResolution resolution);
+	void resolve(ConflictResolution resolution) throws Exception;
 	
 	/**
 	 * Resolves a conflict as a merge, this method should not be called directly, it's called internally
@@ -51,7 +52,8 @@ public interface ConflictService extends Service {
 	 * 
 	 * @param conflict the conflict to resolve
 	 * @param propertiesToSync the properties to sync from the new incoming state
+	 * @throws Exception
 	 */
-	void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync);
+	void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync) throws Exception;
 	
 }

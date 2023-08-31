@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_RETIRED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
@@ -103,7 +104,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolve_shouldMoveTheItemToTheArchivesIfDecisionIsSetToIgnoreNew() {
+	public void resolve_shouldMoveTheItemToTheArchivesIfDecisionIsSetToIgnoreNew() throws Exception {
 		service = Mockito.spy(service);
 		ConflictQueueItem conflict = new ConflictQueueItem();
 		Holder<Boolean> holder = new Holder();
@@ -118,7 +119,7 @@ public class ConflictServiceImplTest {
 	}
 	
 	@Test
-	public void resolve_shouldUpdateTheHashAndMoveTheItemToTheRetryQueueIfDecisionIsSetToSyncNew() {
+	public void resolve_shouldUpdateTheHashAndMoveTheItemToTheRetryQueueIfDecisionIsSetToSyncNew() throws Exception {
 		final String modelClassName = PersonModel.class.getName();
 		final String uuid = "person-uuid";
 		service = Mockito.spy(service);
@@ -488,6 +489,7 @@ public class ConflictServiceImplTest {
 		assertEquals(mockContext, exchange.getContext());
 		assertEquals(modelClassName, exchange.getProperty(EX_PROP_MODEL_CLASS));
 		assertEquals(uuid, exchange.getProperty(EX_PROP_ENTITY_ID));
+		assertTrue(exchange.getProperty(EX_PROP_IS_CONFLICT, Boolean.class));
 		SyncModel processedSyncModel = exchange.getIn().getBody(SyncModel.class);
 		assertEquals(PersonModel.class, processedSyncModel.getTableToSyncModelClass());
 		assertEquals(dbModel, processedSyncModel.getModel());

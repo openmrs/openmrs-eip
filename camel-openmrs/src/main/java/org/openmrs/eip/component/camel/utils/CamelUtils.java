@@ -1,5 +1,7 @@
 package org.openmrs.eip.component.camel.utils;
 
+import static org.openmrs.eip.component.Constants.EX_PROP_EXCEPTION;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
@@ -19,8 +21,15 @@ public class CamelUtils {
 	 */
 	public static Exchange send(String endpointUri, Exchange exchange) {
 		exchange = getProducerTemplate().send(endpointUri, exchange);
-		if (exchange.getException() != null) {
-			throw new EIPException("An error occurred while calling endpoint: " + endpointUri, exchange.getException());
+		Throwable throwable = exchange.getException();
+		if (throwable == null) {
+			//If a route has an error handler, the exception is swallowed, check if the error handler set it on the 
+			//exchange as a property
+			throwable = exchange.getProperty(EX_PROP_EXCEPTION, Throwable.class);
+		}
+		
+		if (throwable != null) {
+			throw new EIPException("An error occurred while calling endpoint: " + endpointUri, throwable);
 		}
 		
 		return exchange;
