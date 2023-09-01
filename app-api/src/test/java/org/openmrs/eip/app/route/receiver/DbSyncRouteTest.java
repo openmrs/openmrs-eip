@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
@@ -119,7 +120,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldPassIfTheFoundConflictHasAMatchingMessageUuid() throws Exception {
+	public void shouldPassIfTheFoundConflictWhileSyncingAConflictItem() throws Exception {
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		final String uuid = "uuid-1";
 		VisitModel model = new VisitModel();
@@ -131,6 +132,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
 		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
+		exchange.setProperty(EX_PROP_IS_CONFLICT, true);
 		exchange.getIn().setBody(syncModel);
 		mockLoadEndpoint.expectedBodiesReceived(syncModel);
 		
