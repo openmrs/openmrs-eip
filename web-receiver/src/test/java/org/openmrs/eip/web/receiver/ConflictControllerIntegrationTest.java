@@ -29,7 +29,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 @Sql(scripts = { "classpath:mgt_site_info.sql",
         "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-public class ConflictControllerTest extends BaseReceiverTest {
+public class ConflictControllerIntegrationTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ConflictController controller;
