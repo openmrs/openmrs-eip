@@ -6,7 +6,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import static org.openmrs.eip.web.RestConstants.PARAM_GRP_PROP;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_SYNCED_MSG;
-import static org.openmrs.eip.web.RestConstants.PATH_VAR;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,7 +40,7 @@ public class ReceiverSyncedMessageControllerTest extends BaseReceiverWebTest {
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_synced_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void get_shouldGetTheSyncedMessageMatchingTheSpecifiedId() throws Exception {
-		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNCED_MSG + "/{" + PATH_VAR + "}", 2L);
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_SYNCED_MSG + "/{" + PATH_VAR_ID + "}", 2L);
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("messageUuid", equalTo("47beb8bd-287c-47f2-9786-a7b98c933c05")));

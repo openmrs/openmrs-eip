@@ -21,12 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.ConflictService;
-import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
@@ -49,6 +48,9 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	
 	@Autowired
 	private SyncedMessageRepository syncedMsgRepo;
+	
+	@Autowired
+	private SiteRepository siteRepo;
 	
 	@Autowired
 	private PatientService patientService;
@@ -89,7 +91,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		conflict.setEntityPayload(JsonUtils.marshall(syncModel));
 		conflict.setDateReceived(new Date());
 		conflict.setDateSentBySender(LocalDateTime.now());
-		conflict.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
+		conflict.setSite(siteRepo.getOne(1L));
 		conflict.setDateSentBySender(LocalDateTime.now());
 		conflict.setSnapshot(false);
 		conflict.setDateCreated(new Date());

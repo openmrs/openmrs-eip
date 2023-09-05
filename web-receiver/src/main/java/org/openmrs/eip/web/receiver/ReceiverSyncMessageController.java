@@ -3,7 +3,7 @@ package org.openmrs.eip.web.receiver;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
 import static org.openmrs.eip.web.RestConstants.PARAM_GRP_PROP;
-import static org.openmrs.eip.web.RestConstants.PATH_VAR;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR_ID;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,8 +44,8 @@ public class ReceiverSyncMessageController extends BaseRestController {
 		return doGetAll();
 	}
 	
-	@GetMapping("/{" + PATH_VAR + "}")
-	public Object get(@PathVariable(PATH_VAR) Long id) {
+	@GetMapping("/{" + PATH_VAR_ID + "}")
+	public Object get(@PathVariable(PATH_VAR_ID) Long id) {
 		if (log.isDebugEnabled()) {
 			log.debug("Fetching receiver sync messages with id: " + id);
 		}

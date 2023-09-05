@@ -10,7 +10,9 @@ public final class RestConstants {
 	
 	public static final String PATH_LOGIN = "/login";
 	
-	public static final String SUB_PATH_RECEIVER = API_PATH + "/dbsync/receiver/";
+	public static final String PATH_VAR_ID = "id";
+	
+	public static final String SUB_PATH_RECEIVER = API_PATH + "dbsync/receiver/";
 	
 	public static final String PATH_RECEIVER_SYNC_MSG = SUB_PATH_RECEIVER + "sync";
 	
@@ -18,7 +20,11 @@ public final class RestConstants {
 	
 	public static final String PATH_RECEIVER_ARCHIVE = SUB_PATH_RECEIVER + "archive";
 	
-	public static final String PATH_VAR = "id";
+	public static final String RES_RECEIVER_CONFLICT = SUB_PATH_RECEIVER + "conflict";
+	
+	public static final String ACTION_DIFF = "/{" + PATH_VAR_ID + "}/diff";
+	
+	public static final String PATH_RECEIVER_CONFLICT_DIFF = RES_RECEIVER_CONFLICT + ACTION_DIFF;
 	
 	public static final String PARAM_GRP_PROP = "groupProperty";
 	
