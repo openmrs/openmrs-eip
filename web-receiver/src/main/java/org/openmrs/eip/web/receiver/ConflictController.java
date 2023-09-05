@@ -3,6 +3,7 @@ package org.openmrs.eip.web.receiver;
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.web.RestConstants.ACTION_DIFF;
+import static org.openmrs.eip.web.RestConstants.ACTION_RESOLVE;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_ITEMS;
@@ -16,6 +17,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
+import org.openmrs.eip.app.receiver.ConflictResolution;
+import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.app.receiver.ConflictVerifyingTask;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -28,10 +31,12 @@ import org.openmrs.eip.web.contoller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,6 +46,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConflictController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConflictController.class);
+	
+	protected static final String FIELD_DECISION = "decision";
+	
+	protected static final String FIELD_PROPS_TO_SYNC = "propsToSync";
 	
 	private ConflictService service;
 	
@@ -131,6 +140,24 @@ public class ConflictController extends BaseRestController {
 		BaseModel newModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload()).getModel();
 		
 		return Diff.createInstance(currentModel, newModel);
+	}
+	
+	@PostMapping(value = ACTION_RESOLVE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public void resolve(@PathVariable(PATH_VAR_ID) Long id, @RequestBody Map<String, Object> payload) throws Exception {
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Resolving conflict with id: " + id);
+		}
+		
+		ResolutionDecision resolutionDecision = ResolutionDecision.valueOf(payload.get(FIELD_DECISION).toString());
+		ConflictQueueItem conflict = (ConflictQueueItem) doGet(id);
+		ConflictResolution resolution = new ConflictResolution(conflict, resolutionDecision);
+		if (resolutionDecision == ResolutionDecision.MERGE) {
+			List<String> propsToSync = (List) payload.get(FIELD_PROPS_TO_SYNC);
+			propsToSync.forEach(prop -> resolution.addPropertyToSync(prop));
+		}
+		
+		service.resolve(resolution);
 	}
 	
 }

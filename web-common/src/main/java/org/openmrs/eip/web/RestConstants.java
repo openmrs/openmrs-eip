@@ -26,6 +26,10 @@ public final class RestConstants {
 	
 	public static final String PATH_RECEIVER_CONFLICT_DIFF = RES_RECEIVER_CONFLICT + ACTION_DIFF;
 	
+	public static final String ACTION_RESOLVE = "/{" + PATH_VAR_ID + "}/resolve";
+	
+	public static final String PATH_RECEIVER_CONFLICT_RESOLVE = RES_RECEIVER_CONFLICT + ACTION_RESOLVE;
+	
 	public static final String PARAM_GRP_PROP = "groupProperty";
 	
 	public static final String PARAM_START_DATE = "startDate";
