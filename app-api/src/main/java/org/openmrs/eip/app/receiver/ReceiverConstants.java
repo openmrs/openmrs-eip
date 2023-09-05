@@ -130,6 +130,7 @@ public class ReceiverConstants {
 	public static final String FIELD_RETIRED = "retired";
 	
 	public static final List<String> MERGE_EXCLUDE_FIELDS = unmodifiableList(asList("changedByUuid", "dateChanged",
-	    "voidedByUuid", "dateVoided", "voidReason", "retiredByUuid", "dateRetired", "retireReason"));
+	    "patientChangedByUuid", "patientDateChanged", "voidedByUuid", "dateVoided", "voidReason", "patientVoidedByUuid",
+	    "patientDateVoided", "patientVoidReason", "retiredByUuid", "dateRetired", "retireReason"));
 	
 }

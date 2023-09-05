@@ -55,10 +55,10 @@ import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.ObservationModel;
+import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.model.VisitModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -195,35 +195,53 @@ public class ConflictServiceImplTest {
 		final String newUser = "User(user-uuid)";
 		final LocalDateTime newDate = LocalDateTime.now();
 		final String newReason = "test";
-		VisitModel dbModel = new VisitModel();
-		VisitModel newModel = new VisitModel();
+		final String newPatientUser = "User(patient-user-uuid)";
+		final LocalDateTime newPatientDate = LocalDateTime.now();
+		final String newPatientReason = "patient-test";
+		PatientModel dbModel = new PatientModel();
+		PatientModel newModel = new PatientModel();
 		newModel.setVoided(true);
 		newModel.setVoidedByUuid(newUser);
 		newModel.setDateVoided(newDate);
 		newModel.setVoidReason(newReason);
+		newModel.setPatientVoided(true);
+		newModel.setPatientVoidedByUuid(newPatientUser);
+		newModel.setPatientDateVoided(newPatientDate);
+		newModel.setPatientVoidReason(newPatientReason);
 		
 		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
 		
 		assertEquals(newUser, dbModel.getVoidedByUuid());
 		assertEquals(newDate, dbModel.getDateVoided());
 		assertEquals(newReason, dbModel.getVoidReason());
+		assertEquals(newPatientUser, dbModel.getPatientVoidedByUuid());
+		assertEquals(newPatientDate, dbModel.getPatientDateVoided());
+		assertEquals(newPatientReason, dbModel.getPatientVoidReason());
 	}
 	
 	@Test
 	public void mergeVoidOrRetireProperties_shouldNotReplaceVoidFieldsWithEmptyData() {
 		final String dbUser = "db-User(user-uuid)";
 		final String dbReason = "db-test";
-		VisitModel dbModel = new VisitModel();
+		final String dbPatientUser = "db-User(patient-user-uuid)";
+		final String dbPatientReason = "patient-db-test";
+		PatientModel dbModel = new PatientModel();
 		dbModel.setVoidedByUuid(dbUser);
 		dbModel.setVoidReason(dbReason);
-		VisitModel newModel = new VisitModel();
+		dbModel.setPatientVoidedByUuid(dbPatientUser);
+		dbModel.setPatientVoidReason(dbPatientReason);
+		PatientModel newModel = new PatientModel();
 		newModel.setVoided(true);
 		newModel.setVoidReason(" ");
+		newModel.setPatientVoided(true);
+		newModel.setPatientVoidReason(" ");
 		
 		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
 		
 		assertEquals(dbUser, dbModel.getVoidedByUuid());
 		assertEquals(dbReason, dbModel.getVoidReason());
+		assertEquals(dbPatientUser, dbModel.getPatientVoidedByUuid());
+		assertEquals(dbPatientReason, dbModel.getPatientVoidReason());
 	}
 	
 	@Test
@@ -231,36 +249,55 @@ public class ConflictServiceImplTest {
 		final String dbUser = "db-User(user-uuid)";
 		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
 		final String dbReason = "db-test";
-		VisitModel dbModel = new VisitModel();
+		final String dbPatientUser = "db-User(patient-user-uuid)";
+		final LocalDateTime dbPatientDate = of(2023, AUGUST, 24, 00, 00, 01);
+		final String dbPatientReason = "patient-db-test";
+		PatientModel dbModel = new PatientModel();
 		dbModel.setVoidedByUuid(dbUser);
 		dbModel.setDateVoided(dbDate);
 		dbModel.setVoidReason(dbReason);
-		VisitModel newModel = new VisitModel();
+		dbModel.setPatientVoidedByUuid(dbPatientUser);
+		dbModel.setPatientDateVoided(dbPatientDate);
+		dbModel.setPatientVoidReason(dbPatientReason);
+		PatientModel newModel = new PatientModel();
 		newModel.setVoided(true);
 		newModel.setVoidedByUuid("User(user-uuid)");
 		newModel.setDateVoided(of(2023, AUGUST, 23, 00, 00, 00));
 		newModel.setVoidReason("test");
+		newModel.setPatientVoided(true);
+		newModel.setPatientVoidedByUuid("User(patient-user-uuid)");
+		newModel.setPatientDateVoided(of(2023, AUGUST, 24, 00, 00, 00));
+		newModel.setPatientVoidReason("patient-test");
 		
 		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
 		
 		assertEquals(dbUser, dbModel.getVoidedByUuid());
 		assertEquals(dbDate, dbModel.getDateVoided());
 		assertEquals(dbReason, dbModel.getVoidReason());
+		assertEquals(dbPatientUser, dbModel.getPatientVoidedByUuid());
+		assertEquals(dbPatientDate, dbModel.getPatientDateVoided());
+		assertEquals(dbPatientReason, dbModel.getPatientVoidReason());
 	}
 	
 	@Test
 	public void mergeVoidOrRetireProperties_shouldClearDbFieldsIfTheNewStateIsNotVoided() {
-		VisitModel dbModel = new VisitModel();
+		PatientModel dbModel = new PatientModel();
 		dbModel.setVoidedByUuid("db-User(user-uuid)");
 		dbModel.setDateVoided(of(2023, AUGUST, 23, 00, 00, 00));
 		dbModel.setVoidReason("db-test");
-		VisitModel newModel = new VisitModel();
+		dbModel.setPatientVoidedByUuid("db-User(user-uuid)");
+		dbModel.setPatientDateVoided(of(2023, AUGUST, 23, 00, 00, 00));
+		dbModel.setPatientVoidReason("db-test");
+		PatientModel newModel = new PatientModel();
 		
 		service.mergeVoidOrRetireProperties(dbModel, newModel, singleton(FIELD_VOIDED));
 		
 		assertNull(dbModel.getVoidedByUuid());
 		assertNull(dbModel.getDateVoided());
 		assertNull(dbModel.getVoidReason());
+		assertNull(dbModel.getPatientVoidedByUuid());
+		assertNull(dbModel.getPatientDateVoided());
+		assertNull(dbModel.getPatientVoidReason());
 	}
 	
 	@Test
@@ -351,45 +388,63 @@ public class ConflictServiceImplTest {
 	public void mergeAuditProperties_shouldReplaceDbFieldsWithTheNewStateForData() {
 		final String newUser = "User(user-uuid)";
 		final LocalDateTime newDate = LocalDateTime.now();
-		VisitModel dbModel = new VisitModel();
-		VisitModel newModel = new VisitModel();
+		final String newPatientUser = "User(patient-user-uuid)";
+		final LocalDateTime newPatientDate = LocalDateTime.now();
+		PatientModel dbModel = new PatientModel();
+		PatientModel newModel = new PatientModel();
 		newModel.setChangedByUuid(newUser);
 		newModel.setDateChanged(newDate);
+		newModel.setPatientChangedByUuid(newPatientUser);
+		newModel.setPatientDateChanged(newPatientDate);
 		
 		service.mergeAuditProperties(dbModel, newModel);
 		
 		assertEquals(newUser, dbModel.getChangedByUuid());
 		assertEquals(newDate, dbModel.getDateChanged());
+		assertEquals(newPatientUser, dbModel.getPatientChangedByUuid());
+		assertEquals(newPatientDate, dbModel.getPatientDateChanged());
 	}
 	
 	@Test
 	public void mergeAuditProperties_shouldSkipIfTheNewDateChangedIsBeforeThatFromTheDbForData() {
 		final String dbUser = "db-User(user-uuid)";
 		final LocalDateTime dbDate = of(2023, AUGUST, 23, 00, 00, 01);
-		VisitModel dbModel = new VisitModel();
+		final String dbPatientUser = "User(patient-user-uuid)";
+		final LocalDateTime dbPatientDate = of(2023, AUGUST, 24, 00, 00, 01);
+		PatientModel dbModel = new PatientModel();
 		dbModel.setChangedByUuid(dbUser);
 		dbModel.setDateChanged(dbDate);
-		VisitModel newModel = new VisitModel();
+		dbModel.setPatientChangedByUuid(dbPatientUser);
+		dbModel.setPatientDateChanged(dbPatientDate);
+		PatientModel newModel = new PatientModel();
 		newModel.setChangedByUuid("User(user-uuid)");
 		newModel.setDateChanged(of(2023, AUGUST, 23, 00, 00, 00));
+		newModel.setPatientChangedByUuid("User(user-uuid)");
+		newModel.setPatientDateChanged(of(2023, AUGUST, 24, 00, 00, 00));
 		
 		service.mergeAuditProperties(dbModel, newModel);
 		
 		assertEquals(dbUser, dbModel.getChangedByUuid());
 		assertEquals(dbDate, dbModel.getDateChanged());
+		assertEquals(dbPatientUser, dbModel.getPatientChangedByUuid());
+		assertEquals(dbPatientDate, dbModel.getPatientDateChanged());
 	}
 	
 	@Test
 	public void mergeAuditProperties_shouldNotReplaceChangedByWithEmptyDataForData() {
-		final String dbUser = "db-User(user-uuid)";
-		VisitModel dbModel = new VisitModel();
+		final String dbUser = "db-User(patient-user-uuid)";
+		final String dbPatientUser = "db-User(user-uuid)";
+		PatientModel dbModel = new PatientModel();
 		dbModel.setChangedByUuid(dbUser);
-		VisitModel newModel = new VisitModel();
+		dbModel.setPatientChangedByUuid(dbPatientUser);
+		PatientModel newModel = new PatientModel();
 		newModel.setChangedByUuid(" ");
+		newModel.setPatientChangedByUuid(" ");
 		
 		service.mergeAuditProperties(dbModel, newModel);
 		
 		assertEquals(dbUser, dbModel.getChangedByUuid());
+		assertEquals(dbPatientUser, dbModel.getPatientChangedByUuid());
 	}
 	
 	@Test

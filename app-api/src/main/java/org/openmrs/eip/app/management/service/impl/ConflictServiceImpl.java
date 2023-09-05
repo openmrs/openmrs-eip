@@ -40,6 +40,7 @@ import org.openmrs.eip.component.model.BaseChangeableMetadataModel;
 import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
@@ -272,6 +273,27 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 					dataDbModel.setDateVoided(null);
 					dataDbModel.setVoidReason(null);
 				}
+				
+				if (newModel instanceof PatientModel) {
+					PatientModel dbPatient = (PatientModel) dataDbModel;
+					PatientModel newPatient = (PatientModel) dataNewModel;
+					if (newPatient.isPatientVoided()) {
+						if (isDateAfterOrEqual(newPatient.getPatientDateVoided(), dbPatient.getPatientDateVoided())) {
+							dbPatient.setPatientDateVoided(newPatient.getPatientDateVoided());
+							if (StringUtils.isNotBlank(newPatient.getPatientVoidedByUuid())) {
+								dbPatient.setPatientVoidedByUuid(newPatient.getPatientVoidedByUuid());
+							}
+							
+							if (StringUtils.isNotBlank(newPatient.getPatientVoidReason())) {
+								dbPatient.setPatientVoidReason(newPatient.getPatientVoidReason());
+							}
+						}
+					} else {
+						dbPatient.setPatientVoidedByUuid(null);
+						dbPatient.setPatientDateVoided(null);
+						dbPatient.setPatientVoidReason(null);
+					}
+				}
 			} else if (newModel instanceof BaseMetadataModel) {
 				BaseMetadataModel dataDbModel = (BaseMetadataModel) dbModel;
 				BaseMetadataModel dataNewModel = (BaseMetadataModel) newModel;
@@ -332,6 +354,18 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 					
 					if (StringUtils.isNotBlank(dataNewModel.getChangedByUuid())) {
 						dataDbModel.setChangedByUuid(dataNewModel.getChangedByUuid());
+					}
+				}
+			}
+			
+			if (newModel instanceof PatientModel) {
+				PatientModel dbPatient = (PatientModel) dbModel;
+				PatientModel newPatient = (PatientModel) newModel;
+				if (isDateAfterOrEqual(newPatient.getPatientDateChanged(), dbPatient.getPatientDateChanged())) {
+					dbPatient.setPatientDateChanged(newPatient.getPatientDateChanged());
+					
+					if (StringUtils.isNotBlank(newPatient.getPatientChangedByUuid())) {
+						dbPatient.setPatientChangedByUuid(newPatient.getPatientChangedByUuid());
 					}
 				}
 			}
