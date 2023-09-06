@@ -1,8 +1,14 @@
+import {Conflict} from "./conflict";
+
 export class Diff {
 
-	currentState?: object;
+	conflict?: Conflict;
 
-	newState?: object;
+	currentState?: any;
+
+	newState?: any;
+
+	properties?: string[];
 
 	additions?: string[];
 

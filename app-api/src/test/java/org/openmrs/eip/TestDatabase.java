@@ -19,7 +19,7 @@ public final class TestDatabase {
 	
 	private static final PathMatchingResourcePatternResolver RESOLVER = new PathMatchingResourcePatternResolver();
 	
-	private MySQLContainer MYSQL_CONTAINER = new MySQLContainer("mysql:5.7.31");;
+	private MySQLContainer MYSQL_CONTAINER = new MySQLContainer("mysql:5.7.31");
 	
 	public String getJdbcUrl() {
 		return MYSQL_CONTAINER.getJdbcUrl();

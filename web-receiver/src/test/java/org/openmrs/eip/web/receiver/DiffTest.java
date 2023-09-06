@@ -34,6 +34,8 @@ public class DiffTest {
 		
 		Diff diff = Diff.createInstance(currentState, newState);
 		
+		assertEquals(18, diff.getProperties().size());
+		
 		Set<String> added = diff.getAdditions();
 		assertEquals(2, added.size());
 		assertTrue(added.contains("changedByUuid"));

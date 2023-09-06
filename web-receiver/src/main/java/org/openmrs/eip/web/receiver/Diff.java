@@ -25,6 +25,9 @@ public class Diff {
 	private BaseModel newState;
 	
 	@Getter
+	private Set<String> properties;
+	
+	@Getter
 	private Set<String> additions;
 	
 	@Getter
@@ -33,10 +36,11 @@ public class Diff {
 	@Getter
 	private Set<String> removals;
 	
-	private Diff(BaseModel currentState, BaseModel newState, Set<String> additions, Set<String> modifications,
-	    Set<String> removals) {
+	private Diff(BaseModel currentState, BaseModel newState, Set<String> properties, Set<String> additions,
+	    Set<String> modifications, Set<String> removals) {
 		this.currentState = currentState;
 		this.newState = newState;
+		this.properties = properties;
 		this.additions = additions;
 		this.modifications = modifications;
 		this.removals = removals;
@@ -51,12 +55,18 @@ public class Diff {
 	 * @throws Exception
 	 */
 	public static Diff createInstance(BaseModel currentModel, BaseModel newModel) throws Exception {
+		Set<String> properties = new HashSet<>();
 		Set<String> additions = new HashSet<>();
 		Set<String> modifications = new HashSet<>();
 		Set<String> removals = new HashSet<>();
 		
 		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(newModel.getClass());
 		for (PropertyDescriptor descriptor : descriptors) {
+			if (descriptor.getName().equals("class")) {
+				continue;
+			}
+			
+			properties.add(descriptor.getName());
 			Object currentValue = PropertyUtils.getProperty(currentModel, descriptor.getName());
 			Object newValue = PropertyUtils.getProperty(newModel, descriptor.getName());
 			if (currentValue == null && newValue != null) {
@@ -68,7 +78,7 @@ public class Diff {
 			}
 		}
 		
-		return new Diff(currentModel, newModel, additions, modifications, removals);
+		return new Diff(currentModel, newModel, properties, additions, modifications, removals);
 	}
 	
 }
