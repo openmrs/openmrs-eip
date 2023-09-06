@@ -2,13 +2,15 @@ import {Component, ElementRef, OnInit, ViewChild,} from '@angular/core';
 import {ConflictService} from "./conflict.service";
 import {Conflict} from "./conflict";
 import {select, Store} from "@ngrx/store";
-import {CONFLICT_TO_VIEW, GET_CONFLICTS, GET_VERIFY_TASK_STATUS} from "./state/conflict.reducer";
-import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewConflict} from "./state/conflict.actions";
+import {GET_CONFLICTS, GET_DIFF, GET_VERIFY_TASK_STATUS} from "./state/conflict.reducer";
+import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewDiff} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ConfirmDialogComponent} from "../../shared/dialogs/confirm.component";
 import {Subscription} from "rxjs";
 import {VerifyTaskStatus} from "./verify-task-status";
+import {Decision} from "./decision.enum";
+import {Diff} from "./diff";
 
 @Component({
 	selector: 'receiver-conflicts',
@@ -21,11 +23,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	conflicts?: Conflict[];
 
-	conflictToView?: Conflict;
+	diff?: Diff;
 
 	modalRef?: NgbModalRef;
-
-	parsedEntityPayLoad?: any;
 
 	verifyTaskStatus?: VerifyTaskStatus;
 
@@ -33,10 +33,10 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	lastReloadMillis?: number;
 
-	@ViewChild('detailsTemplate')
-	detailsRef?: ElementRef;
+	@ViewChild('diffTemplate')
+	diffRef?: ElementRef;
 
-	viewSubscription?: Subscription;
+	diffSubscription?: Subscription;
 
 	loadedSubscription?: Subscription;
 
@@ -60,15 +60,11 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 			}
 		);
 
-		this.viewSubscription = this.store.pipe(select(CONFLICT_TO_VIEW)).subscribe(
-			conflict => {
-				this.conflictToView = conflict;
-				if (this.conflictToView) {
-					if (this.conflictToView.entityPayload) {
-						this.parsedEntityPayLoad = JSON.parse(this.conflictToView.entityPayload);
-					}
-
-					this.showDetailsDialog();
+		this.diffSubscription = this.store.pipe(select(GET_DIFF)).subscribe(
+			diff => {
+				this.diff = diff;
+				if (this.diff) {
+					this.showDiffDialog();
 				}
 			}
 		);
@@ -134,7 +130,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		modelRef.componentInstance.message = $localize`:@@receiver-conflict-confirm-resolve-message:Are you sure you want to mark the conflict as resolved?`;
 
 		modelRef.closed.subscribe(() => {
-			this.service.deleteConflict(conflict).subscribe(
+			let data = {'decision': Decision.SYNC_NEW, 'propsToSync': []};
+			this.service.resolveConflict(conflict, data).subscribe(
 				() => {
 					this.loadConflicts();
 				}
@@ -142,19 +139,21 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		});
 	}
 
-	viewConflict(conflict: Conflict): void {
-		this.store.dispatch(new ViewConflict(conflict));
+	viewDiff(conflict: Conflict): void {
+		this.service.getDiff(conflict).subscribe(diff => {
+			this.store.dispatch(new ViewDiff(diff));
+		});
 	}
 
-	showDetailsDialog(): void {
+	showDiffDialog(): void {
 		const dialogConfig: NgbModalOptions = {
 			size: 'xl',
 			scrollable: true
 		}
 
-		this.modalRef = this.modalService.open(this.detailsRef, dialogConfig);
+		this.modalRef = this.modalService.open(this.diffRef, dialogConfig);
 		this.modalRef.closed.subscribe(() => {
-			this.store.dispatch(new ViewConflict());
+			this.store.dispatch(new ViewDiff());
 		});
 	}
 
@@ -163,15 +162,11 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	}
 
 	ngOnDestroy(): void {
-		this.viewSubscription?.unsubscribe();
+		this.diffSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
 		this.verifyStatusSubscription?.unsubscribe();
 		clearTimeout(this.verifyTaskTimeoutId);
 		super.ngOnDestroy();
-	}
-
-	getSimpleClassName(className?: string) {
-		return className?.substring(className.lastIndexOf('.') + 1, className.lastIndexOf('Model'));
 	}
 
 }

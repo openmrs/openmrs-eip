@@ -1,11 +1,11 @@
-import {Conflict} from "../conflict";
 import {Action} from "@ngrx/store";
 import {ConflictCountAndItems} from "../confict-count-and-items";
 import {VerifyTaskStatus} from "../verify-task-status";
+import {Diff} from "../diff";
 
 export enum ConflictActionType {
 	CONFLICTS_LOADED = 'CONFLICTS_LOADED',
-	VIEW_CONFLICT = 'VIEW_CONFLICT',
+	VIEW_DIFF = 'VIEW_DIFF',
 	VERIFY_TASK_STATUS_UPDATED = 'VERIFY_TASK_STATUS_UPDATED'
 }
 
@@ -18,11 +18,11 @@ export class ConflictsLoaded implements Action {
 
 }
 
-export class ViewConflict implements Action {
+export class ViewDiff implements Action {
 
-	readonly type = ConflictActionType.VIEW_CONFLICT;
+	readonly type = ConflictActionType.VIEW_DIFF;
 
-	constructor(public conflictToView?: Conflict) {
+	constructor(public diff?: Diff) {
 	}
 
 }
@@ -36,4 +36,4 @@ export class VerifyTaskStatusUpdated implements Action {
 
 }
 
-export type ConflictAction = ConflictsLoaded | ViewConflict | VerifyTaskStatusUpdated;
+export type ConflictAction = ConflictsLoaded | ViewDiff | VerifyTaskStatusUpdated;
