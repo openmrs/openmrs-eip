@@ -6,11 +6,11 @@ import {GET_CONFLICTS, GET_DIFF, GET_VERIFY_TASK_STATUS} from "./state/conflict.
 import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewDiff} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
-import {ConfirmDialogComponent} from "../../shared/dialogs/confirm.component";
 import {Subscription} from "rxjs";
 import {VerifyTaskStatus} from "./verify-task-status";
 import {Decision} from "./decision.enum";
 import {Diff} from "./diff";
+import {MessageDialogComponent} from "../../shared/dialogs/message.component";
 
 @Component({
 	selector: 'receiver-conflicts',
@@ -34,6 +34,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	lastReloadMillis?: number;
 
 	decision?: Decision;
+
+	propsToSync?: any[];
 
 	@ViewChild('diffTemplate')
 	diffRef?: ElementRef;
@@ -65,7 +67,14 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.diffSubscription = this.store.pipe(select(GET_DIFF)).subscribe(
 			diff => {
 				this.diff = diff;
+				this.decision = undefined;
+				this.propsToSync = undefined;
 				if (this.diff) {
+					this.propsToSync = [];
+					this.diff?.properties?.forEach(p => {
+						this.propsToSync?.push({'name': p, 'checked': false});
+					});
+
 					this.showDiffDialog();
 				}
 			}
@@ -123,26 +132,20 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	}
 
 	resolve(): void {
-		const dialogConfig: NgbModalOptions = {
-			backdrop: 'static',
+		let props = this.propsToSync?.filter(p => p.checked).map(p => p.name);
+		let data = {'decision': this.decision, 'propsToSync': props};
+		let conflict: Conflict | undefined = this.diff?.conflict;
+		if (conflict) {
+			this.service.resolveConflict(conflict, data).subscribe(
+				() => {
+					this.showResolutionResultDialog($localize`:@@receiver-conflict-resolve-success:Resolved successfully`, 'success');
+				},
+
+				(e) => {
+					this.showResolutionResultDialog($localize`:@@receiver-conflict-resolve-fail:An error occurred while resolving the conflict`, 'danger');
+				}
+			);
 		}
-
-		const dialogRef = this.modalService.open(ConfirmDialogComponent, dialogConfig);
-		dialogRef.componentInstance.title = $localize`:@@receiver-conflict-confirm-resolve-title:Confirm Resolution`;
-		dialogRef.componentInstance.message = $localize`:@@receiver-conflict-confirm-resolve-message:Are you sure you want to resolve the conflict?`;
-
-		dialogRef.closed.subscribe(() => {
-			let conflict: Conflict | undefined = this.diff?.conflict;
-			if (conflict) {
-				this.diff = undefined;
-				let data = {'decision': this.decision, 'propsToSync': []};
-				this.service.resolveConflict(conflict, data).subscribe(
-					() => {
-						this.loadConflicts();
-					}
-				);
-			}
-		});
 	}
 
 	viewDiff(conflict: Conflict): void {
@@ -164,7 +167,23 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		});
 	}
 
-	closeDialog(): void {
+	showResolutionResultDialog(msg: string, colorCode: string): void {
+		const dialogConfig: NgbModalOptions = {
+			backdrop: 'static',
+			centered: true
+		}
+
+		const dialogRef = this.modalService.open(MessageDialogComponent, dialogConfig);
+		dialogRef.componentInstance.colorCode = colorCode;
+		dialogRef.componentInstance.message = msg;
+
+		dialogRef.closed.subscribe(() => {
+			this.closeResolutionDialog();
+			this.loadConflicts();
+		});
+	}
+
+	closeResolutionDialog(): void {
 		this.modalRef?.close();
 	}
 

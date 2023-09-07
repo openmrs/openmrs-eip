@@ -54,7 +54,7 @@
 	<form #resolutionForm="ngForm">
 		<div class="modal-header">
 			<h4 class="modal-title" id="modal-basic-title" i18n="@@receiver-conflict-resolution">Conflict Resolution</h4>
-			<button type="button" class="close" aria-label="Close" (click)="closeDialog()">
+			<button type="button" class="close" aria-label="Close" (click)="closeResolutionDialog()">
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
@@ -81,17 +81,19 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let prop of diff?.properties">
-						<td class="text-right align-text-top font-weight-bold">{{prop}}</td>
-						<td class="text-left align-text-top">{{diff?.currentState[prop]}}</td>
-						<td class="text-left align-text-top">{{diff?.newState[prop]}}</td>
-						<td class="text-center"></td>
+					<tr *ngFor="let prop of propsToSync">
+						<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
+						<td class="text-left align-text-top">{{diff?.currentState[prop.name]}}</td>
+						<td class="text-left align-text-top">{{diff?.newState[prop.name]}}</td>
+						<td class="text-center">
+							<input [(ngModel)]="prop.checked" type="checkbox" name="{{prop.name}}" value="{{prop.checked}}" />
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 		<div class="modal-footer">
-			<button type="button" class="btn btn-outline-danger" (click)="closeDialog()" i18n="@@common-close">Cancel</button>
+			<button type="button" class="btn btn-outline-danger" (click)="closeResolutionDialog()" i18n="@@common-close">Cancel</button>
 			<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid" i18n="@@common-submit">Submit</button>
 		</div>
 	</form>

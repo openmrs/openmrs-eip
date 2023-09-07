@@ -15,11 +15,13 @@ import {DashboardEffects} from "./state/dashboard.effects";
 import {StoreModule} from "@ngrx/store";
 import {dashboardReducer} from "./state/dashboard.reducer";
 import {ServerDownComponent} from "./server-down.component";
+import {MessageDialogComponent} from "./dialogs/message.component";
 
 
 @NgModule({
 	declarations: [
 		ConfirmDialogComponent,
+		MessageDialogComponent,
 		GroupViewComponent,
 		ClassNamePipe,
 		ModelClassPipe,

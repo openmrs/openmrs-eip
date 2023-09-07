@@ -614,5 +614,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="receiver-conflict-resolve-success">
+			<segment>
+				<source>Resolved successfully</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-resolve-fail">
+			<segment>
+				<source>An error occurred while resolving the conflict</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-ok">
+			<segment>
+				<source>Ok</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
