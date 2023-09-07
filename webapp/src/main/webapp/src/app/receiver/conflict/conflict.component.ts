@@ -33,6 +33,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	lastReloadMillis?: number;
 
+	decision?: Decision;
+
 	@ViewChild('diffTemplate')
 	diffRef?: ElementRef;
 
@@ -120,27 +122,32 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		}, delay);
 	}
 
-	confirmDialog(conflict: Conflict): void {
+	resolve(): void {
 		const dialogConfig: NgbModalOptions = {
 			backdrop: 'static',
 		}
 
-		const modelRef = this.modalService.open(ConfirmDialogComponent, dialogConfig);
-		modelRef.componentInstance.title = $localize`:@@receiver-conflict-confirm-resolve-title:Confirm Resolution`;
-		modelRef.componentInstance.message = $localize`:@@receiver-conflict-confirm-resolve-message:Are you sure you want to mark the conflict as resolved?`;
+		const dialogRef = this.modalService.open(ConfirmDialogComponent, dialogConfig);
+		dialogRef.componentInstance.title = $localize`:@@receiver-conflict-confirm-resolve-title:Confirm Resolution`;
+		dialogRef.componentInstance.message = $localize`:@@receiver-conflict-confirm-resolve-message:Are you sure you want to resolve the conflict?`;
 
-		modelRef.closed.subscribe(() => {
-			let data = {'decision': Decision.SYNC_NEW, 'propsToSync': []};
-			this.service.resolveConflict(conflict, data).subscribe(
-				() => {
-					this.loadConflicts();
-				}
-			);
+		dialogRef.closed.subscribe(() => {
+			let conflict: Conflict | undefined = this.diff?.conflict;
+			if (conflict) {
+				this.diff = undefined;
+				let data = {'decision': this.decision, 'propsToSync': []};
+				this.service.resolveConflict(conflict, data).subscribe(
+					() => {
+						this.loadConflicts();
+					}
+				);
+			}
 		});
 	}
 
 	viewDiff(conflict: Conflict): void {
 		this.service.getDiff(conflict).subscribe(diff => {
+			diff.conflict = conflict;
 			this.store.dispatch(new ViewDiff(diff));
 		});
 	}
@@ -157,7 +164,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		});
 	}
 
-	closeDetailsDialog(): void {
+	closeDialog(): void {
 		this.modalRef?.close();
 	}
 

@@ -39,42 +39,61 @@
 			<td container="body" ngbTooltip="{{c.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateReceived | date:'MMM dd, y'}}</td>
 			<td container="body" ngbTooltip="{{c.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateCreated | date:'MMM dd, y'}}</td>
 			<td>
-				<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewConflict(c)"></i>
-				&nbsp;
-				<i class="bi bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="markResolvedTemplate" [openDelay]="1000" (click)="confirmDialog(c)"></i>
+				<i class="bi bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="resolveMsgTemplate" [openDelay]="1000" (click)="viewDiff(c)"></i>
 			</td>
 		</tr>
 	</tbody>
 </table>
 
 <!-- Templates -->
-<ng-template #markResolvedTemplate>
-	<span i18n="@@receiver-conflict-mark-resolved">Mark As Resolved</span>
+<ng-template #resolveMsgTemplate>
+	<span i18n="@@receiver-conflict-resolve">Resolve</span>
 </ng-template>
 
-<ng-template #viewDetailsTemplate>
-	<span i18n="@@common-view-details">View Details</span>
-</ng-template>
-
-<ng-template #detailsTemplate>
-	<div class="modal-header">
-		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-details">Details</h4>
-		<button type="button" class="close" aria-label="Close" (click)="closeDetailsDialog()">
-			<span aria-hidden="true">&times;</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<table border="1" width="100%" class="table-striped ui-display-table">
-			<tbody>
-				<tr *ngFor="let entry of parsedEntityPayLoad.model | keyvalue">
-					<th class="text-right align-text-top">{{entry.key}}</th>
-					<td class="text-left">{{entry.value}}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-outline-primary" (click)="closeDetailsDialog()" i18n="@@common-close">Close</button>
-	</div>
+<ng-template #diffTemplate>
+	<form #resolutionForm="ngForm">
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title" i18n="@@receiver-conflict-resolution">Conflict Resolution</h4>
+			<button type="button" class="close" aria-label="Close" (click)="closeDialog()">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<p>
+				<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision:</span>&nbsp;
+				<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="field-errors">
+					<span *ngIf="decisionInput.errors?.required" i18n="@@receiver-conflict-decision-required">Decision is required</span>
+				</span>
+				<input [(ngModel)]="decision" type="radio" name="decision" value="MERGE" required #decisionInput="ngModel" />
+				&nbsp;<span i18n="@@receiver-conflict-merge">Merge</span>&nbsp;
+				<input [(ngModel)]="decision" type="radio" name="decision" value="SYNC_NEW" required #decisionInput="ngModel" />
+				&nbsp;<span i18n="@@receiver-conflict-sync-new">Sync New State</span>&nbsp;
+				<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
+				&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
+			</p>
+			<table border="1" width="100%" class="table-striped ui-display-table">
+				<thead>
+					<tr class="text-center table-header">
+						<th i18n="@@receiver-conflict-prop-name">Property Name</th>
+						<th i18n="@@receiver-conflict-current-value">Current Value</th>
+						<th i18n="@@receiver-conflict-new-value">New Value</th>
+						<th i18n="@@receiver-conflict-sync-qn">Sync?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let prop of diff?.properties">
+						<td class="text-right align-text-top font-weight-bold">{{prop}}</td>
+						<td class="text-left align-text-top">{{diff?.currentState[prop]}}</td>
+						<td class="text-left align-text-top">{{diff?.newState[prop]}}</td>
+						<td class="text-center"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-danger" (click)="closeDialog()" i18n="@@common-close">Cancel</button>
+			<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid" i18n="@@common-submit">Submit</button>
+		</div>
+	</form>
 </ng-template>
 

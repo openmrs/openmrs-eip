@@ -178,4 +178,11 @@ body {
 	border-radius: 5px;
 }
 
+.table-header {
+	color: $colorMaroon;
+}
+
+.field-errors {
+	@extend .text-danger;
+}
 

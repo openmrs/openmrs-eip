@@ -43,12 +43,6 @@
 				<target>Acção</target>
 			</segment>
 		</unit>
-		<unit id="receiver-conflict-mark-resolved">
-			<segment>
-				<source>Mark As Resolved</source>
-				<target>Marcar como resolvido</target>
-			</segment>
-		</unit>
 		<unit id="common-view-details">
 			<segment>
 				<source>View Details</source>
@@ -75,8 +69,8 @@
 		</unit>
 		<unit id="receiver-conflict-confirm-resolve-message">
 			<segment>
-				<source>Are you sure you want to mark the conflict as resolved?</source>
-				<target>Tem certeza que deseja marcar este conflito como resolvido?</target>
+				<source>Are you sure you want to resolve the conflict?</source>
+				<target></target>
 			</segment>
 		</unit>
 		<unit id="common-attempts">
@@ -551,6 +545,72 @@
 		<unit id="receiver-conflict-verify-running">
 			<segment>
 				<source>Verify task is running</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-resolution">
+			<segment>
+				<source>Conflict Resolution</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-prop-name">
+			<segment>
+				<source>Property Name</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-current-value">
+			<segment>
+				<source>Current Value</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-new-value">
+			<segment>
+				<source>New Value</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-sync-qn">
+			<segment>
+				<source>Sync?</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-decision-required">
+			<segment>
+				<source>Decision is required</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-submit">
+			<segment>
+				<source>Submit</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-resolve">
+			<segment>
+				<source>Resolve</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-merge">
+			<segment>
+				<source>Merge</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-sync-new">
+			<segment>
+				<source>Sync New State</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-conflict-ignore-new">
+			<segment>
+				<source>Ignore New State</source>
 				<target></target>
 			</segment>
 		</unit>
