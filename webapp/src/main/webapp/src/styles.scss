@@ -64,8 +64,42 @@ body {
 	height: 5px !important;
 }
 
-.modal-header {
+.modal-header-silver {
+	@extend .modal-header;
 	background-color: $colorSilver;
+}
+
+.modal-header-success {
+	@extend .modal-header;
+	@extend .bg-success;
+}
+
+.modal-header-error {
+	@extend .modal-header;
+	@extend .bg-danger;
+}
+
+.modal-body-success {
+	@extend .modal-body;
+}
+
+.modal-body-error {
+	@extend .modal-body;
+	@extend .text-danger;
+}
+
+.modal-footer-msg {
+	@extend .modal-footer;
+	justify-content: center;
+}
+
+.modal-footer-success {
+	@extend .modal-footer-msg;
+}
+
+.modal-footer-error {
+	@extend .modal-footer-msg;
+	background-color: $colorLightPink;
 }
 
 .modal-title {

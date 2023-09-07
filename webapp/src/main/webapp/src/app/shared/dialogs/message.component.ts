@@ -8,7 +8,7 @@ export class MessageDialogComponent {
 
 	message?: string;
 
-	colorCode?: string;
+	theme?: string;
 
 	constructor(public activeModal: NgbActiveModal) {
 	}

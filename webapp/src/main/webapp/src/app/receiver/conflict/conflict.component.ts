@@ -142,7 +142,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 				},
 
 				(e) => {
-					this.showResolutionResultDialog($localize`:@@receiver-conflict-resolve-fail:An error occurred while resolving the conflict`, 'danger');
+					this.showResolutionResultDialog($localize`:@@receiver-conflict-resolve-fail:An error occurred while resolving the conflict`, 'error');
 				}
 			);
 		}
@@ -167,14 +167,14 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		});
 	}
 
-	showResolutionResultDialog(msg: string, colorCode: string): void {
+	showResolutionResultDialog(msg: string, theme: string): void {
 		const dialogConfig: NgbModalOptions = {
 			backdrop: 'static',
 			centered: true
 		}
 
 		const dialogRef = this.modalService.open(MessageDialogComponent, dialogConfig);
-		dialogRef.componentInstance.colorCode = colorCode;
+		dialogRef.componentInstance.theme = '-'+theme;
 		dialogRef.componentInstance.message = msg;
 
 		dialogRef.closed.subscribe(() => {
