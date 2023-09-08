@@ -79,10 +79,6 @@ body {
 	@extend .bg-danger;
 }
 
-.modal-body-success {
-	@extend .modal-body;
-}
-
 .modal-body-error {
 	@extend .modal-body;
 	@extend .text-danger;

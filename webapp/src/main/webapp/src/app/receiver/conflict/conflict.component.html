@@ -51,57 +51,59 @@
 </ng-template>
 
 <ng-template #diffTemplate>
-	<form #resolutionForm="ngForm">
-		<div class="modal-header-silver">
-			<h4 class="modal-title" id="modal-basic-title" i18n="@@receiver-conflict-resolution">Conflict Resolution</h4>
-			<button type="button" class="close" aria-label="Close" (click)="closeResolutionDialog()">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">
-			<p>
-				<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision:</span>&nbsp;
-				<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="text-danger">
-					<span *ngIf="decisionInput.errors?.required" i18n="@@receiver-conflict-decision-required">Decision is required</span>
-				</span>
-				<input [(ngModel)]="decision" type="radio" name="decision" value="MERGE" required #decisionInput="ngModel" />
-				&nbsp;<span i18n="@@receiver-conflict-merge">Merge</span>&nbsp;
-				<input [(ngModel)]="decision" type="radio" name="decision" value="SYNC_NEW" required #decisionInput="ngModel" />
-				&nbsp;<span i18n="@@receiver-conflict-sync-new">Sync New State</span>&nbsp;
-				<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
-				&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
-			</p>
-			<table [hidden]="decision != 'MERGE'" border="1" width="100%" class="ui-display-table">
-				<thead>
-					<tr class="text-center table-header">
-						<th i18n="@@receiver-conflict-prop-name">Property Name</th>
-						<th i18n="@@receiver-conflict-current-value">Current Value</th>
-						<th i18n="@@receiver-conflict-new-value">New Value</th>
-						<th class="px-2" i18n="@@receiver-conflict-sync-qn">Sync?</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr *ngFor="let prop of propsToSync" [ngClass]="{'ui-bg-light-green': diff?.additions?.includes(prop.name), 'ui-bg-light-yellow': diff?.modifications?.includes(prop.name), 'ui-bg-light-pink': diff?.removals?.includes(prop.name)}">
-						<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
-						<td class="text-left align-text-top text-break">{{diff?.currentState[prop.name]}}</td>
-						<td class="text-left align-text-top text-break">{{diff?.newState[prop.name]}}</td>
-						<td class="text-center">
-							<input [(ngModel)]="prop.checked" [hidden]="diff?.exclusions?.includes(prop.name)" type="checkbox" name="{{prop.name}}" value="{{prop.checked}}" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div class="pt-3">
-				<span class="font-weight-bold" i18n="@@common-legend">Legend</span>:&nbsp;&nbsp;
-				<span class="ui-color-key border-success ui-bg-light-green">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-added">Added</span>&nbsp;&nbsp;&nbsp;&nbsp;
-				<span class="ui-color-key border-warning ui-bg-light-yellow">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-modified">Modified</span>&nbsp;&nbsp;&nbsp;&nbsp;
-				<span class="ui-color-key border-danger ui-bg-light-pink">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-removed">Removed</span>
+	<div class="overflow-auto">
+		<form #resolutionForm="ngForm">
+			<div class="modal-header-silver">
+				<h4 class="modal-title" id="modal-basic-title" i18n="@@receiver-conflict-resolution">Conflict Resolution</h4>
+				<button type="button" class="close" aria-label="Close" (click)="closeResolutionDialog()">
+					<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-outline-danger" (click)="closeResolutionDialog()" i18n="@@common-close">Cancel</button>
-			<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid" i18n="@@common-submit">Submit</button>
-		</div>
-	</form>
+			<div class="modal-body">
+				<p>
+					<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision:</span>&nbsp;
+					<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="text-danger">
+						<span *ngIf="decisionInput.errors?.required" i18n="@@receiver-conflict-decision-required">Decision is required</span>
+					</span>
+					<input [(ngModel)]="decision" type="radio" name="decision" value="MERGE" required #decisionInput="ngModel" />
+					&nbsp;<span i18n="@@receiver-conflict-merge">Merge</span>&nbsp;
+					<input [(ngModel)]="decision" type="radio" name="decision" value="SYNC_NEW" required #decisionInput="ngModel" />
+					&nbsp;<span i18n="@@receiver-conflict-sync-new">Sync New State</span>&nbsp;
+					<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
+					&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
+				</p>
+				<table [hidden]="decision != 'MERGE'" border="1" width="100%" class="ui-display-table">
+					<thead>
+						<tr class="text-center table-header">
+							<th i18n="@@receiver-conflict-prop-name">Property Name</th>
+							<th i18n="@@receiver-conflict-current-value">Current Value</th>
+							<th i18n="@@receiver-conflict-new-value">New Value</th>
+							<th class="px-2" i18n="@@receiver-conflict-sync-qn">Sync?</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let prop of propsToSync" [ngClass]="{'ui-bg-light-green': diff?.additions?.includes(prop.name), 'ui-bg-light-yellow': diff?.modifications?.includes(prop.name), 'ui-bg-light-pink': diff?.removals?.includes(prop.name)}">
+							<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
+							<td class="text-left align-text-top text-break">{{diff?.currentState[prop.name]}}</td>
+							<td class="text-left align-text-top text-break">{{diff?.newState[prop.name]}}</td>
+							<td class="text-center">
+								<input [(ngModel)]="prop.checked" [hidden]="diff?.exclusions?.includes(prop.name)" type="checkbox" name="{{prop.name}}" value="{{prop.checked}}" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pt-3">
+					<span class="font-weight-bold" i18n="@@common-legend">Legend</span>:&nbsp;&nbsp;
+					<span class="ui-color-key border-success ui-bg-light-green">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-added">Added</span>&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class="ui-color-key border-warning ui-bg-light-yellow">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-modified">Modified</span>&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class="ui-color-key border-danger ui-bg-light-pink">&nbsp;</span>&nbsp;<span i18n="@@receiver-conflict-resolve-removed">Removed</span>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-danger" (click)="closeResolutionDialog()" i18n="@@common-close">Cancel</button>
+				<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid" i18n="@@common-submit">Submit</button>
+			</div>
+		</form>
+	</div>
 </ng-template>
 
