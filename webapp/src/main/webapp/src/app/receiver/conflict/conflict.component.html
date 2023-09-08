@@ -61,7 +61,7 @@
 			</div>
 			<div class="modal-body">
 				<p>
-					<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision:</span>&nbsp;
+					<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision</span><span class="text-danger">*</span>:&nbsp;
 					<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="text-danger">
 						<span *ngIf="decisionInput.errors?.required" i18n="@@receiver-conflict-decision-required">Decision is required</span>
 					</span>
@@ -101,7 +101,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-outline-danger" (click)="closeResolutionDialog()" i18n="@@common-close">Cancel</button>
-				<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid" i18n="@@common-submit">Submit</button>
+				<button class="btn btn-outline-primary" (click)="resolve()" [disabled]="resolutionForm.invalid || !isResolutionFormValid()" i18n="@@common-submit">Submit</button>
 			</div>
 		</form>
 	</div>

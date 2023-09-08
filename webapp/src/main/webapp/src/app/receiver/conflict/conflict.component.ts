@@ -134,7 +134,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	resolve(): void {
 		let props: any | undefined[] = [];
 		if (this.decision == Decision.MERGE) {
-			props = this.propsToSync?.filter(p => p.checked).map(p => p.name);
+			props = this.getPropsToSync();
 		}
 
 		let data = {'decision': this.decision, 'propsToSync': props};
@@ -171,6 +171,27 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.modalRef.closed.subscribe(() => {
 			this.store.dispatch(new ViewDiff());
 		});
+	}
+
+	getPropsToSync(): string[] {
+		let props: any | undefined[] = [];
+		if (this.decision == Decision.MERGE) {
+			props = this.propsToSync?.filter(p => p.checked).map(p => p.name);
+		}
+
+		return props;
+	}
+
+	isResolutionFormValid(): boolean {
+		if (this.decision != null) {
+			if (this.decision != Decision.MERGE) {
+				return true;
+			}
+
+			return this.getPropsToSync().length > 0;
+		}
+
+		return false;
 	}
 
 	showResolutionResultDialog(msg: string, theme: string): void {
