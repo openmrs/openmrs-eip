@@ -69,18 +69,26 @@ body {
 	background-color: $colorSilver;
 }
 
-.modal-header-success {
+.modal-header-msg {
 	@extend .modal-header;
-	@extend .bg-success;
-}
-
-.modal-header-error {
-	@extend .modal-header;
-	@extend .bg-danger;
 	@extend .p-2;
 }
 
-.modal-body-error {
+.modal-header-msg-success {
+	@extend .modal-header-msg;
+	@extend .bg-success;
+}
+
+.modal-header-msg-error {
+	@extend .modal-header-msg;
+	@extend .bg-danger;
+}
+
+.modal-body-msg-success {
+	@extend .modal-body;
+}
+
+.modal-body-msg-error {
 	@extend .modal-body;
 	@extend .text-danger;
 }
@@ -91,11 +99,11 @@ body {
 	@extend .p-0;
 }
 
-.modal-footer-success {
+.modal-footer-msg-success {
 	@extend .modal-footer-msg;
 }
 
-.modal-footer-error {
+.modal-footer-msg-error {
 	@extend .modal-footer-msg;
 	background-color: $colorLightPink;
 }
