@@ -1,9 +1,10 @@
 package org.openmrs.eip.app.receiver;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -129,8 +130,9 @@ public class ReceiverConstants {
 	
 	public static final String FIELD_RETIRED = "retired";
 	
-	public static final List<String> MERGE_EXCLUDE_FIELDS = unmodifiableList(asList("changedByUuid", "dateChanged",
-	    "patientChangedByUuid", "patientDateChanged", "voidedByUuid", "dateVoided", "voidReason", "patientVoidedByUuid",
-	    "patientDateVoided", "patientVoidReason", "retiredByUuid", "dateRetired", "retireReason"));
+	public static final Set<String> MERGE_EXCLUDE_FIELDS = unmodifiableSet(
+	    asList("changedByUuid", "dateChanged", "patientChangedByUuid", "patientDateChanged", "voidedByUuid", "dateVoided",
+	        "voidReason", "patientVoidedByUuid", "patientDateVoided", "patientVoidReason", "retiredByUuid", "dateRetired",
+	        "retireReason").stream().collect(Collectors.toSet()));
 	
 }

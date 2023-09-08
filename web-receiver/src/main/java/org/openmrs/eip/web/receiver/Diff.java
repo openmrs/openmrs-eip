@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.bouncycastle.util.Objects;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.model.BaseModel;
 import org.springframework.beans.BeanUtils;
 
@@ -17,6 +18,9 @@ import lombok.ToString;
  */
 @ToString(exclude = { "currentState", "newState" })
 public class Diff {
+	
+	@Getter
+	private Set<String> exclusions = ReceiverConstants.MERGE_EXCLUDE_FIELDS;
 	
 	@Getter
 	private BaseModel currentState;

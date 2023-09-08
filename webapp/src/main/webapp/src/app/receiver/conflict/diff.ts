@@ -2,6 +2,8 @@ import {Conflict} from "./conflict";
 
 export class Diff {
 
+	exclusions?: string[];
+
 	conflict?: Conflict;
 
 	currentState?: any;
