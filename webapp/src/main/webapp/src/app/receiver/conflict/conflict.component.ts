@@ -196,8 +196,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	showResolutionResultDialog(msg: string, theme: string): void {
 		const dialogConfig: NgbModalOptions = {
-			backdrop: 'static',
-			centered: true
+			backdrop: 'static'
 		}
 
 		const dialogRef = this.modalService.open(MessageDialogComponent, dialogConfig);

@@ -129,7 +129,7 @@ public class ConflictController extends BaseRestController {
 	}
 	
 	@GetMapping(ACTION_DIFF)
-	public Object getDiff(@PathVariable(PATH_VAR_ID) Long id) throws Exception {
+	public String getDiff(@PathVariable(PATH_VAR_ID) Long id) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Generating a diff for conflict with id: " + id);
 		}
@@ -139,7 +139,7 @@ public class ConflictController extends BaseRestController {
 		BaseModel currentModel = serviceFacade.getModel(syncEnum, conflict.getIdentifier());
 		BaseModel newModel = JsonUtils.unmarshalSyncModel(conflict.getEntityPayload()).getModel();
 		
-		return Diff.createInstance(currentModel, newModel);
+		return JsonUtils.marshall(Diff.createInstance(currentModel, newModel));
 	}
 	
 	@PostMapping(value = ACTION_RESOLVE, consumes = MediaType.APPLICATION_JSON_VALUE)
