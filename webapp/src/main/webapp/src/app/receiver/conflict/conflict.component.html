@@ -61,7 +61,7 @@
 		<div class="modal-body">
 			<p>
 				<span class="font-weight-bold" i18n="@@receiver-conflict-decision">Decision:</span>&nbsp;
-				<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="field-errors">
+				<span *ngIf="decisionInput.invalid && (decisionInput.dirty || decisionInput.touched)" class="text-danger">
 					<span *ngIf="decisionInput.errors?.required" i18n="@@receiver-conflict-decision-required">Decision is required</span>
 				</span>
 				<input [(ngModel)]="decision" type="radio" name="decision" value="MERGE" required #decisionInput="ngModel" />
@@ -71,7 +71,7 @@
 				<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
 				&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
 			</p>
-			<table border="1" width="100%" class="table-striped ui-display-table">
+			<table [hidden]="decision != 'MERGE'" border="1" width="100%" class="ui-display-table">
 				<thead>
 					<tr class="text-center table-header">
 						<th i18n="@@receiver-conflict-prop-name">Property Name</th>
@@ -81,7 +81,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let prop of propsToSync">
+					<tr *ngFor="let prop of propsToSync" [ngClass]="{'ui-bg-light-green': diff?.additions?.includes(prop.name), 'ui-bg-light-yellow': diff?.modifications?.includes(prop.name), 'ui-bg-light-pink': diff?.removals?.includes(prop.name)}">
 						<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
 						<td class="text-left align-text-top">{{diff?.currentState[prop.name]}}</td>
 						<td class="text-left align-text-top">{{diff?.newState[prop.name]}}</td>

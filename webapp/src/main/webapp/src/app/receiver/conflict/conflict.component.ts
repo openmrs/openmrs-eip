@@ -132,9 +132,14 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	}
 
 	resolve(): void {
-		let props = this.propsToSync?.filter(p => p.checked).map(p => p.name);
+		let props: any | undefined[] = [];
+		if (this.decision == Decision.MERGE) {
+			props = this.propsToSync?.filter(p => p.checked).map(p => p.name);
+		}
+
 		let data = {'decision': this.decision, 'propsToSync': props};
 		let conflict: Conflict | undefined = this.diff?.conflict;
+		this.closeResolutionDialog();
 		if (conflict) {
 			this.service.resolveConflict(conflict, data).subscribe(
 				() => {
@@ -157,6 +162,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	showDiffDialog(): void {
 		const dialogConfig: NgbModalOptions = {
+			backdrop: 'static',
 			size: 'xl',
 			scrollable: true
 		}
@@ -174,11 +180,10 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		}
 
 		const dialogRef = this.modalService.open(MessageDialogComponent, dialogConfig);
-		dialogRef.componentInstance.theme = '-'+theme;
+		dialogRef.componentInstance.theme = '-' + theme;
 		dialogRef.componentInstance.message = msg;
 
 		dialogRef.closed.subscribe(() => {
-			this.closeResolutionDialog();
 			this.loadConflicts();
 		});
 	}

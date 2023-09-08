@@ -216,7 +216,15 @@ body {
 	color: $colorMaroon;
 }
 
-.field-errors {
-	@extend .text-danger;
+.ui-bg-light-green {
+	background-color: $colorLightGreen;
+}
+
+.ui-bg-light-yellow {
+	background-color: $colorLightYellow;
+}
+
+.ui-bg-light-pink {
+	background-color: $colorLightPink;
 }
 
