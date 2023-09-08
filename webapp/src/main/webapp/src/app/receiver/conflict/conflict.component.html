@@ -39,7 +39,7 @@
 			<td container="body" ngbTooltip="{{c.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateReceived | date:'MMM dd, y'}}</td>
 			<td container="body" ngbTooltip="{{c.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateCreated | date:'MMM dd, y'}}</td>
 			<td>
-				<i class="bi bi-check-circle hover-success ui-cursor-pointer" [ngbTooltip]="resolveMsgTemplate" [openDelay]="1000" (click)="viewDiff(c)"></i>
+				<i class="bi bi-check-circle hover-primary ui-cursor-pointer" [ngbTooltip]="resolveMsgTemplate" [openDelay]="1000" (click)="viewDiff(c)"></i>
 			</td>
 		</tr>
 	</tbody>
