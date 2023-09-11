@@ -1,11 +1,5 @@
 <div class="d-flex">
 	<ul ngbNav #nav="ngbNav" class="ui-tabs-vertical" [animation]="false" orientation="vertical">
-		<li ngbNavItem="conflicts">
-			<a ngbNavLink i18n="@@receiver-conflicts">Conflicts</a>
-			<ng-template ngbNavContent>
-				<receiver-conflicts></receiver-conflicts>
-			</ng-template>
-		</li>
 		<li ngbNavItem="dashboard">
 			<a ngbNavLink i18n="@@common-dashboard">Dashboard</a>
 			<ng-template ngbNavContent>
@@ -28,6 +22,12 @@
 			<a ngbNavLink i18n="@@common-errors">Errors</a>
 			<ng-template ngbNavContent>
 				<receiver-errors></receiver-errors>
+			</ng-template>
+		</li>
+		<li ngbNavItem="conflicts">
+			<a ngbNavLink i18n="@@receiver-conflicts">Conflicts</a>
+			<ng-template ngbNavContent>
+				<receiver-conflicts></receiver-conflicts>
 			</ng-template>
 		</li>
 		<li ngbNavItem="statuses">
