@@ -70,7 +70,7 @@
 		<unit id="receiver-conflict-confirm-resolve-message">
 			<segment>
 				<source>Are you sure you want to resolve the conflict?</source>
-				<target></target>
+				<target>Tem certeza de que deseja resolver o conflito?</target>
 			</segment>
 		</unit>
 		<unit id="common-attempts">
@@ -509,151 +509,151 @@
 		<unit id="receiver-synced-msgs">
 			<segment>
 				<source>Synced Items</source>
-				<target></target>
+				<target>Itens sincronizados</target>
 			</segment>
 		</unit>
 		<unit id="receiver-added-to-conflict-queue">
 			<segment>
 				<source>Added to conflict queue</source>
-				<target></target>
+				<target>Adicionado à fila de conflitos</target>
 			</segment>
 		</unit>
 		<unit id="receiver-added-to-error-queue">
 			<segment>
 				<source>Added to error queue</source>
-				<target></target>
+				<target>Adicionado à fila de erros</target>
 			</segment>
 		</unit>
 		<unit id="receiver-response-sent">
 			<segment>
 				<source>Response sent</source>
-				<target></target>
+				<target>Resposta enviada</target>
 			</segment>
 		</unit>
 		<unit id="receiver-evicted-from-cache">
 			<segment>
 				<source>Evicted from cache</source>
-				<target></target>
+				<target>Removido de cache</target>
 			</segment>
 		</unit>
 		<unit id="receiver-search-index-updated">
 			<segment>
 				<source>Search index updated</source>
-				<target></target>
+				<target>Índice de pesquisa atualizado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-verify-running">
 			<segment>
 				<source>Verify task is running</source>
-				<target></target>
+				<target>Verifique se a tarefa está em execução</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolution">
 			<segment>
 				<source>Conflict Resolution</source>
-				<target></target>
+				<target>Resolução de Conflitos</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-prop-name">
 			<segment>
 				<source>Property Name</source>
-				<target></target>
+				<target>Nome da propriedade</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-current-value">
 			<segment>
 				<source>Current Value</source>
-				<target></target>
+				<target>Valor actual</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-new-value">
 			<segment>
 				<source>New Value</source>
-				<target></target>
+				<target>Novo valor</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-sync-qn">
 			<segment>
 				<source>Sync?</source>
-				<target></target>
+				<target>Sincronizar?</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-decision-required">
 			<segment>
 				<source>Decision is required</source>
-				<target></target>
+				<target>É necessário decidir</target>
 			</segment>
 		</unit>
 		<unit id="common-submit">
 			<segment>
 				<source>Submit</source>
-				<target></target>
+				<target>Submeter</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve">
 			<segment>
 				<source>Resolve</source>
-				<target></target>
+				<target>Resolver</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-merge">
 			<segment>
 				<source>Merge</source>
-				<target></target>
+				<target>Unificar</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-sync-new">
 			<segment>
 				<source>Sync New State</source>
-				<target></target>
+				<target>Sincronizar novo estado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-ignore-new">
 			<segment>
 				<source>Ignore New State</source>
-				<target></target>
+				<target>Ignorar novo estado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve-success">
 			<segment>
 				<source>Resolved successfully</source>
-				<target></target>
+				<target>Resolvido com sucesso</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve-fail">
 			<segment>
 				<source>An error occurred while resolving the conflict</source>
-				<target></target>
+				<target>Ocorreu um erro ao resolver o conflito</target>
 			</segment>
 		</unit>
 		<unit id="common-ok">
 			<segment>
 				<source>Ok</source>
-				<target></target>
+				<target>Ok</target>
 			</segment>
 		</unit>
 		<unit id="common-legend">
 			<segment>
 				<source>Legend</source>
-				<target></target>
+				<target>Legenda</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve-added">
 			<segment>
 				<source>Added</source>
-				<target></target>
+				<target>Adicionado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve-modified">
 			<segment>
 				<source>Modified</source>
-				<target></target>
+				<target>Modificado</target>
 			</segment>
 		</unit>
 		<unit id="receiver-conflict-resolve-removed">
 			<segment>
 				<source>Removed</source>
-				<target></target>
+				<target>Removido</target>
 			</segment>
 		</unit>
 	</file>
