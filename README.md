@@ -12,10 +12,11 @@
 7. [Logging](#logging)
 8. [Management Database](#management-database)
 9. [Error Handling And Retry Mechanism](#error-handling-and-retry-mechanism)
-10. [Sync Prioritization](#sync-prioritization)
-11. [Sync Archive Pruning](#sync-archive-pruning)
-12. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
-13. [Developer Guide](#developer-guide)
+10. [Conflict Resolution](#conflict-resolution)
+11. [Sync Prioritization](#sync-prioritization)
+12. [Sync Archive Pruning](#sync-archive-pruning)
+13. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
+14. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
@@ -235,6 +236,37 @@ the retry queue should run, please refer to the [configuration](#configuration) 
 
 The DB sync receiver application uses a table named `receiver_retry_queue` to store failed incoming DB sync messages, 
 please refer to the [configuration](#configuration) section.
+
+# Conflict Resolution
+When an entity is modified in the OpenMRS receiver database, the next sync item for the same entity will cause a
+conflict and the receiver will move the item to the conflict queue, human adjudication is required to resolve the
+conflict. When resolving a conflict, the user is able to view side by side both the current state in the receiver
+database and the new one from the remote site to be able to select the winning state or merge the states, below are the
+possible conflict resolution decisions to select from.
+
+**IGNORE_NEW**
+
+The current state in the receiving database is preserved i.e. the entire state from the remote is effectively ignored 
+and the item is archived immediately.
+
+**SYNC_NEW**
+
+The new state from the remote site is synced as is i.e. the database state is effectively overwritten just like a 
+regular sync and the item is moved to synced item queue.
+
+**MERGE**
+
+A merged state is synced i.e. the user selects the specific entity properties that they wish to overwrite with the new 
+values from the remote sites and preserve current databases values for other properties.
+
+To resolve a conflict from the UI, do the following.
+1. Navigate to the conflicts tab in the receiver and click on the row for the conflict you wish to resolve, you should 
+   see a dialog containing a state diff where green indicates added properties, yellow indicates modified properties, 
+   red indicates removed properties and others are unchanged.
+2. Select the decision option, if you select the MERGE option, you should go ahead to select the properties to be synced 
+   with the new values.
+3. Click the submit button.
+
 
 # Sync Prioritization
 When the receiver DB sync server is overwhelmed with a high volume of items waiting in the sync queue, this can have
