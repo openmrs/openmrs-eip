@@ -19,11 +19,10 @@
 			<th i18n="@@common-date-sent">Date Sent</th>
 			<th i18n="@@common-date-received">Date Received</th>
 			<th i18n="@@common-date-added">Date Added</th>
-			<th i18n="@@common-action">Action</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ngFor="let c of conflicts" class="ui-row-highlight">
+		<tr *ngFor="let c of conflicts" class="ui-row-highlight ui-cursor-pointer" (click)="viewDiff(c)">
 			<td>{{c.modelClassName | modelClass}}</td>
 			<td>{{c.identifier}}</td>
 			<td>{{c.site?.name}}</td>
@@ -38,17 +37,11 @@
 			<td container="body" ngbTooltip="{{c.dateSentBySender | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateSentBySender| date:'MMM dd, y'}}</td>
 			<td container="body" ngbTooltip="{{c.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateReceived | date:'MMM dd, y'}}</td>
 			<td container="body" ngbTooltip="{{c.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{c.dateCreated | date:'MMM dd, y'}}</td>
-			<td>
-				<i class="bi bi-check-circle hover-primary ui-cursor-pointer" [ngbTooltip]="resolveMsgTemplate" [openDelay]="1000" (click)="viewDiff(c)"></i>
-			</td>
 		</tr>
 	</tbody>
 </table>
 
 <!-- Templates -->
-<ng-template #resolveMsgTemplate>
-	<span i18n="@@receiver-conflict-resolve">Resolve</span>
-</ng-template>
 
 <ng-template #diffTemplate>
 	<div class="overflow-auto">
@@ -72,7 +65,7 @@
 					<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
 					&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
 				</p>
-				<table [hidden]="decision != 'MERGE'" border="1" width="100%" class="ui-display-table">
+				<table [hidden]="decision == 'IGNORE_NEW' || decision == 'SYNC_NEW'" border="1" width="100%" class="ui-display-table">
 					<thead>
 						<tr class="text-center table-header">
 							<th i18n="@@receiver-conflict-prop-name">Property Name</th>
