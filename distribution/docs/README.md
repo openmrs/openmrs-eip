@@ -280,7 +280,7 @@ by doing the following;
 
 1. Install the [open webapp module](https://addons.openmrs.org/show/org.openmrs.module.open-web-apps-module) in the 
    associated OpenMRS instance.
-2. Navigate to the main administration page, click on **Manage Apps** under the **Open Web Apps Module** section
+2. Navigate to the main administration page, click on **Settings** under the **Open Web Apps Module** section
 3. Set the value of the **App Base URL** field to `/{openmrsContextPath}/owa` where {openmrsContextPath} is the context
    path of the OpenMRS instance, usually it is `openmrs` which would make the field value `/openmrs/owa` in most cases.
 4. Keep note of the value of the **App Folder Path** field, you will need it in step 6 below.
