@@ -267,7 +267,6 @@ To resolve a conflict from the UI, do the following.
    with the new values.
 3. Click the submit button.
 
-
 # Sync Prioritization
 When the receiver DB sync server is overwhelmed with a high volume of items waiting in the sync queue, this can have
 negative implications to the centralization ecosystem e.g. the MPI data will be lagging behind remote sites since the 

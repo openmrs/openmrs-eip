@@ -65,13 +65,13 @@
 					<input [(ngModel)]="decision" type="radio" name="decision" value="IGNORE_NEW" required #decisionInput="ngModel" />
 					&nbsp;<span i18n="@@receiver-conflict-ignore-new">Ignore New State</span>
 				</p>
-				<table [hidden]="decision == 'IGNORE_NEW' || decision == 'SYNC_NEW'" border="1" width="100%" class="ui-display-table">
+				<table border="1" width="100%" class="ui-display-table">
 					<thead>
 						<tr class="text-center table-header">
 							<th i18n="@@receiver-conflict-prop-name">Property Name</th>
 							<th i18n="@@receiver-conflict-current-value">Current Value</th>
 							<th i18n="@@receiver-conflict-new-value">New Value</th>
-							<th class="px-2" i18n="@@receiver-conflict-sync-qn">Sync?</th>
+							<th class="px-2" i18n="@@receiver-conflict-sync-qn" [hidden]="decision != 'MERGE'">Sync?</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -79,7 +79,7 @@
 							<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
 							<td class="text-left align-text-top text-break">{{diff?.currentState[prop.name]}}</td>
 							<td class="text-left align-text-top text-break">{{diff?.newState[prop.name]}}</td>
-							<td class="text-center">
+							<td class="text-center" [hidden]="decision != 'MERGE'">
 								<input [(ngModel)]="prop.checked" [hidden]="diff?.exclusions?.includes(prop.name)" type="checkbox" name="{{prop.name}}" value="{{prop.checked}}" />
 							</td>
 						</tr>
