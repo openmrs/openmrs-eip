@@ -77,8 +77,8 @@
 					<tbody>
 						<tr *ngFor="let prop of propsToSync" [ngClass]="{'ui-bg-light-green': diff?.additions?.includes(prop.name), 'ui-bg-light-yellow': diff?.modifications?.includes(prop.name), 'ui-bg-light-pink': diff?.removals?.includes(prop.name)}">
 							<td class="text-right align-text-top font-weight-bold">{{prop.name}}</td>
-							<td class="text-left align-text-top text-break">{{diff?.currentState[prop.name]}}</td>
-							<td class="text-left align-text-top text-break">{{diff?.newState[prop.name]}}</td>
+							<td class="text-left align-text-top text-break">{{getCurrentValue(prop.name)}}</td>
+							<td class="text-left align-text-top text-break">{{getNewValue(prop.name)}}</td>
 							<td class="text-center" [hidden]="decision != 'MERGE'">
 								<input [(ngModel)]="prop.checked" [hidden]="diff?.exclusions?.includes(prop.name)" type="checkbox" name="{{prop.name}}" value="{{prop.checked}}" />
 							</td>

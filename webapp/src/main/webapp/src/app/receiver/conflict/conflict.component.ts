@@ -182,6 +182,23 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		return props;
 	}
 
+	getCurrentValue(propertyName: string): any {
+		return this.getDisplayValue(propertyName, this.diff?.currentState[propertyName]);
+	}
+
+	getNewValue(propertyName: string): any {
+		return this.getDisplayValue(propertyName, this.diff?.newState[propertyName]);
+	}
+
+	getDisplayValue(propertyName: string, value: any): any {
+		if (propertyName.endsWith('Uuid') && value) {
+			let originalValue: string = value;
+			return originalValue.substring(originalValue.indexOf('(') + 1, originalValue.indexOf(')'));
+		}
+
+		return value;
+	}
+
 	isResolutionFormValid(): boolean {
 		if (this.decision != null) {
 			if (this.decision != Decision.MERGE) {
