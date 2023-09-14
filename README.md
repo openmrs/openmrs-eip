@@ -252,12 +252,13 @@ and the item is archived immediately.
 **SYNC_NEW**
 
 The new state from the remote site is synced as is i.e. the database state is effectively overwritten just like a 
-regular sync and the item is moved to synced item queue.
+regular sync and the item is moved to the retry queue to be synced.
 
 **MERGE**
 
 A merged state is synced i.e. the user selects the specific entity properties that they wish to overwrite with the new 
-values from the remote sites and preserve current databases values for other properties.
+values from the remote sites and preserve current databases values for other properties, the merged state is immediately 
+synced and the item is moved to synced item queue.
 
 To resolve a conflict from the UI, do the following.
 1. Navigate to the conflicts tab in the receiver and click on the row for the conflict you wish to resolve, you should 
