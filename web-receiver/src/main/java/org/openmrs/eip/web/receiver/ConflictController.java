@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -98,15 +97,6 @@ public class ConflictController extends BaseRestController {
 		}
 		
 		return doGet(id);
-	}
-	
-	@DeleteMapping("/{" + PATH_VAR_ID + "}")
-	public void delete(@PathVariable(PATH_VAR_ID) Long id) {
-		if (log.isDebugEnabled()) {
-			log.debug("Removing conflict with id: " + id);
-		}
-		
-		service.moveToArchiveQueue((ConflictQueueItem) doGet(id));
 	}
 	
 	@PostMapping("/verify/start")

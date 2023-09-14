@@ -15,6 +15,8 @@ import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.SYNC_NEW;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_CONFLICT_DIFF;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_CONFLICT_RESOLVE;
+import static org.openmrs.eip.web.RestConstants.RES_RECEIVER_CONFLICT;
+import static org.openmrs.eip.web.RestConstants.RES_RECEIVER_CONFLICT_BY_ID;
 import static org.openmrs.eip.web.receiver.ConflictController.FIELD_DECISION;
 import static org.openmrs.eip.web.receiver.ConflictController.FIELD_PROPS_TO_SYNC;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -76,6 +78,28 @@ public class ConflictControllerTest extends BaseReceiverWebTest {
 	public void setup() {
 		mockService = Mockito.mock(ConflictService.class);
 		Whitebox.setInternalState(controller, ConflictService.class, mockService);
+	}
+	
+	@Test
+	public void getAll_shouldGetAllItemsInTheConflictQueue() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RES_RECEIVER_CONFLICT);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(2)));
+		result.andExpect(jsonPath("count", equalTo(5)));
+		result.andExpect(jsonPath("items.length()", equalTo(5)));
+	}
+	
+	@Test
+	public void shouldGetTheConflictItemMatchingTheSpecifiedId() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RES_RECEIVER_CONFLICT_BY_ID, 2L);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("messageUuid", equalTo("2cfd940e-32dc-491f-8038-a8f3afe3e36d")));
 	}
 	
 	@Test
