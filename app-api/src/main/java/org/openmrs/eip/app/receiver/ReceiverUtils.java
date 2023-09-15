@@ -1,8 +1,6 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
-import static org.openmrs.eip.component.Constants.OPENMRS_DATASOURCE_NAME;
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +19,6 @@ import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
-import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
-import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -34,6 +30,9 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.UserModel;
+import org.openmrs.eip.component.repository.PatientIdentifierRepository;
+import org.openmrs.eip.component.repository.PersonAttributeRepository;
+import org.openmrs.eip.component.repository.PersonNameRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
@@ -56,22 +55,7 @@ public class ReceiverUtils {
 	
 	private static final String QUERY_PARAM_ID = "rowId";
 	
-	private static final String QUERY_URI = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + OPENMRS_DATASOURCE_NAME;
-	
 	private static final String QUERY_URI_MGT = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + MGT_DATASOURCE_NAME;
-	
-	protected static final String NAME_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
-	    "SELECT n.uuid FROM person_name n, person p WHERE n.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
-	            + "'");
-	
-	protected static final String ID_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
-	    "SELECT i.uuid FROM patient_identifier i, person p WHERE i.patient_id = p.person_id AND " + "p.uuid = '"
-	            + PLACEHOLDER_UUID + "'");
-	
-	protected static final String ATTRIB_URI = QUERY_URI.replace(PLACEHOLDER_QUERY,
-	    "SELECT a.uuid FROM person_attribute a, person p WHERE a.person_id = p.person_id AND p.uuid = '" + PLACEHOLDER_UUID
-	            + "' AND a.person_attribute_type_id IN (SELECT person_attribute_type_id FROM person_attribute_type "
-	            + "WHERE searchable = true)");
 	
 	protected static final String UPDATE_URI = QUERY_URI_MGT.replace(PLACEHOLDER_QUERY, "UPDATE " + PLACEHOLDER_TABLE
 	        + " SET " + PLACEHOLDER_COLUMN + "=:#" + QUERY_PARAM_VALUE + " WHERE id=:#" + QUERY_PARAM_ID);
@@ -80,9 +64,11 @@ public class ReceiverUtils {
 	
 	private static final Set<String> INDEX_UPDATE_CLASS_NAMES;
 	
-	private static SyncedMessageRepository syncedMsgRepo;
+	private static PersonNameRepository nameRepo;
 	
-	private static ReceiverSyncArchiveRepository archiveRepo;
+	private static PatientIdentifierRepository idRepo;
+	
+	private static PersonAttributeRepository attribRepo;
 	
 	private static ProducerTemplate producerTemplate;
 	
@@ -262,9 +248,9 @@ public class ReceiverUtils {
 		} else if (PersonAttributeModel.class.getName().equals(modelClass)) {
 			payload = new OpenmrsPayload("person", "attribute", uuid);
 		} else if (PersonModel.class.getName().equals(modelClass) || PatientModel.class.getName().equals(modelClass)) {
-			List<String> nameUuids = getPersonNameUuids(uuid);
-			List<String> idUuids = getPatientIdentifierUuids(uuid);
-			List<String> attribUuids = getPersonAttributeUuids(uuid);
+			List<String> nameUuids = getNameRepo().getPersonNameUuids(uuid);
+			List<String> idUuids = getIdRepo().getPatientIdentifierUuids(uuid);
+			List<String> attribUuids = getAttribRepo().getPersonAttributeUuids(uuid);
 			List<OpenmrsPayload> payloadList = new ArrayList(nameUuids.size() + idUuids.size());
 			nameUuids.forEach(nameUuid -> payloadList.add(new OpenmrsPayload("person", "name", nameUuid)));
 			idUuids.forEach(idUuid -> payloadList.add(new OpenmrsPayload("patient", "identifier", idUuid)));
@@ -290,46 +276,6 @@ public class ReceiverUtils {
 		catch (JsonProcessingException e) {
 			throw new EIPException("Failed to generate search index update payload", e);
 		}
-	}
-	
-	/**
-	 * Should return the uuids of the names for the person with the specified uuid
-	 * 
-	 * @param personUuid the person uuid
-	 * @return list of person name uuids
-	 */
-	protected static List<String> getPersonNameUuids(String personUuid) {
-		return executeQuery(NAME_URI.replace(PLACEHOLDER_UUID, personUuid));
-	}
-	
-	/**
-	 * Should return the uuids of the identifiers for the patient with the specified uuid
-	 *
-	 * @param patientUuid the patient uuid
-	 * @return list of person name uuids
-	 */
-	protected static List<String> getPatientIdentifierUuids(String patientUuid) {
-		return executeQuery(ID_URI.replace(PLACEHOLDER_UUID, patientUuid));
-	}
-	
-	/**
-	 * Should return the uuids of the searchable attributes for the person with the specified uuid
-	 *
-	 * @param personUuid the person uuid
-	 * @return list of attribute name uuids
-	 */
-	protected static List<String> getPersonAttributeUuids(String personUuid) {
-		return executeQuery(ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid));
-	}
-	
-	private static List<String> executeQuery(String query) {
-		Exchange exchange = ExchangeBuilder.anExchange(getProducerTemplate().getCamelContext()).build();
-		CamelUtils.send(query, exchange);
-		List<Map<String, String>> rows = exchange.getMessage().getBody(List.class);
-		List<String> uuids = new ArrayList(rows.size());
-		rows.forEach(r -> uuids.add(r.get("uuid")));
-		
-		return uuids;
 	}
 	
 	/**
@@ -379,20 +325,28 @@ public class ReceiverUtils {
 		CamelUtils.send(query, exchange);
 	}
 	
-	private static SyncedMessageRepository getSyncMsgRepo() {
-		if (syncedMsgRepo == null) {
-			syncedMsgRepo = SyncContext.getBean(SyncedMessageRepository.class);
+	private static PersonNameRepository getNameRepo() {
+		if (nameRepo == null) {
+			nameRepo = SyncContext.getBean(PersonNameRepository.class);
 		}
 		
-		return syncedMsgRepo;
+		return nameRepo;
 	}
 	
-	private static ReceiverSyncArchiveRepository getArchiveRepo() {
-		if (archiveRepo == null) {
-			archiveRepo = SyncContext.getBean(ReceiverSyncArchiveRepository.class);
+	private static PatientIdentifierRepository getIdRepo() {
+		if (idRepo == null) {
+			idRepo = SyncContext.getBean(PatientIdentifierRepository.class);
 		}
 		
-		return archiveRepo;
+		return idRepo;
+	}
+	
+	private static PersonAttributeRepository getAttribRepo() {
+		if (attribRepo == null) {
+			attribRepo = SyncContext.getBean(PersonAttributeRepository.class);
+		}
+		
+		return attribRepo;
 	}
 	
 	private static ProducerTemplate getProducerTemplate() {

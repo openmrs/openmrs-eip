@@ -2,31 +2,24 @@ package org.openmrs.eip.app.receiver;
 
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.CONFLICT;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.ERROR;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.SUCCESS;
-import static org.openmrs.eip.app.receiver.ReceiverUtils.ATTRIB_URI;
-import static org.openmrs.eip.app.receiver.ReceiverUtils.ID_URI;
-import static org.openmrs.eip.app.receiver.ReceiverUtils.NAME_URI;
 import static org.openmrs.eip.app.receiver.ReceiverUtils.generateEvictionPayload;
 import static org.openmrs.eip.app.receiver.ReceiverUtils.generateSearchIndexUpdatePayload;
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_UUID;
 import static org.openmrs.eip.component.SyncOperation.c;
 import static org.openmrs.eip.component.SyncOperation.d;
 
 import java.util.List;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,9 +43,13 @@ import org.openmrs.eip.component.model.PersonNameModel;
 import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.model.VisitModel;
+import org.openmrs.eip.component.repository.PatientIdentifierRepository;
+import org.openmrs.eip.component.repository.PersonAttributeRepository;
+import org.openmrs.eip.component.repository.PersonNameRepository;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.springframework.beans.BeanUtils;
 
 import com.jayway.jsonpath.Configuration;
@@ -67,6 +64,15 @@ public class ReceiverUtilsTest {
 	@Mock
 	private ProducerTemplate mockTemplate;
 	
+	@Mock
+	private PersonNameRepository mockNameRepo;
+	
+	@Mock
+	private PatientIdentifierRepository mockIdRepo;
+	
+	@Mock
+	private PersonAttributeRepository mockAttribRepo;
+	
 	private ParseContext jsonPathContext = JsonPath
 	        .using(Configuration.builder().options(DEFAULT_PATH_LEAF_TO_NULL).build());
 	
@@ -76,7 +82,17 @@ public class ReceiverUtilsTest {
 		PowerMockito.mockStatic(CamelUtils.class);
 		PowerMockito.mockStatic(BeanUtils.class);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockTemplate);
+		when(SyncContext.getBean(PersonNameRepository.class)).thenReturn(mockNameRepo);
+		when(SyncContext.getBean(PatientIdentifierRepository.class)).thenReturn(mockIdRepo);
+		when(SyncContext.getBean(PersonAttributeRepository.class)).thenReturn(mockAttribRepo);
 		when(mockTemplate.getCamelContext()).thenReturn(new DefaultCamelContext());
+	}
+	
+	@After
+	public void tearDown() {
+		Whitebox.setInternalState(ReceiverUtils.class, "nameRepo", (Object) null);
+		Whitebox.setInternalState(ReceiverUtils.class, "idRepo", (Object) null);
+		Whitebox.setInternalState(ReceiverUtils.class, "attribRepo", (Object) null);
 	}
 	
 	@Test
@@ -339,24 +355,9 @@ public class ReceiverUtilsTest {
 		final String idUuid2 = "id-uuid-2";
 		final String attribUuid1 = "attrib-uuid-1";
 		final String attribUuid2 = "attrib-uuid-2";
-		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, personUuid);
-		String idUri = ID_URI.replace(PLACEHOLDER_UUID, personUuid);
-		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid);
-		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(idUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
-			return exchange;
-		});
+		when(mockNameRepo.getPersonNameUuids(personUuid)).thenReturn(asList(nameUuid1, nameUuid2));
+		when(mockIdRepo.getPatientIdentifierUuids(personUuid)).thenReturn(asList(idUuid1, idUuid2));
+		when(mockAttribRepo.getPersonAttributeUuids(personUuid)).thenReturn(asList(attribUuid1, attribUuid2));
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PersonModel.class.getName(), personUuid, c);
 		
@@ -392,24 +393,9 @@ public class ReceiverUtilsTest {
 		final String idUuid2 = "id-uuid-2";
 		final String attribUuid1 = "attrib-uuid-1";
 		final String attribUuid2 = "attrib-uuid-2";
-		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, personUuid);
-		String idUri = ID_URI.replace(PLACEHOLDER_UUID, personUuid);
-		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, personUuid);
-		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(idUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
-			return exchange;
-		});
+		when(mockNameRepo.getPersonNameUuids(personUuid)).thenReturn(asList(nameUuid1, nameUuid2));
+		when(mockIdRepo.getPatientIdentifierUuids(personUuid)).thenReturn(asList(idUuid1, idUuid2));
+		when(mockAttribRepo.getPersonAttributeUuids(personUuid)).thenReturn(asList(attribUuid1, attribUuid2));
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PersonModel.class.getName(), personUuid, d);
 		
@@ -445,24 +431,9 @@ public class ReceiverUtilsTest {
 		final String idUuid2 = "id-uuid-2";
 		final String attribUuid1 = "attrib-uuid-1";
 		final String attribUuid2 = "attrib-uuid-2";
-		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		String idUri = ID_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(idUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
-			return exchange;
-		});
+		when(mockNameRepo.getPersonNameUuids(patientUuid)).thenReturn(asList(nameUuid1, nameUuid2));
+		when(mockIdRepo.getPatientIdentifierUuids(patientUuid)).thenReturn(asList(idUuid1, idUuid2));
+		when(mockAttribRepo.getPersonAttributeUuids(patientUuid)).thenReturn(asList(attribUuid1, attribUuid2));
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PatientModel.class.getName(), patientUuid, c);
 		
@@ -501,25 +472,9 @@ public class ReceiverUtilsTest {
 		SyncedMessage msg = new SyncedMessage();
 		msg.setIdentifier(patientUuid);
 		msg.setModelClassName(PatientModel.class.getName());
-		msg.setOperation(SyncOperation.d);
-		String nameUri = NAME_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		String idUri = ID_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		String attribUri = ATTRIB_URI.replace(PLACEHOLDER_UUID, patientUuid);
-		when(CamelUtils.send(eq(nameUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", nameUuid1), singletonMap("uuid", nameUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(idUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", idUuid1), singletonMap("uuid", idUuid2)));
-			return exchange;
-		});
-		when(CamelUtils.send(eq(attribUri), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchange.getMessage().setBody(asList(singletonMap("uuid", attribUuid1), singletonMap("uuid", attribUuid2)));
-			return exchange;
-		});
+		when(mockNameRepo.getPersonNameUuids(patientUuid)).thenReturn(asList(nameUuid1, nameUuid2));
+		when(mockIdRepo.getPatientIdentifierUuids(patientUuid)).thenReturn(asList(idUuid1, idUuid2));
+		when(mockAttribRepo.getPersonAttributeUuids(patientUuid)).thenReturn(asList(attribUuid1, attribUuid2));
 		
 		List<String> payloads = (List) generateSearchIndexUpdatePayload(PatientModel.class.getName(), patientUuid, d);
 		
