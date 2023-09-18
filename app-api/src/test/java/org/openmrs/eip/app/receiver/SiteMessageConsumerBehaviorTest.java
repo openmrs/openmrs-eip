@@ -55,7 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 @TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
 @TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
-@Ignore
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
