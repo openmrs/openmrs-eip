@@ -40,7 +40,6 @@ public final class TestDatabase {
 	public void start() throws Exception {
 		MYSQL_CONTAINER.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		MYSQL_CONTAINER.withDatabaseName("openmrs");
-		MYSQL_CONTAINER.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
 		
 		Resource[] scripts = RESOLVER.getResources("classpath*:" + SCRIPT_DIR + "*.sql");
 		
