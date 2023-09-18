@@ -21,7 +21,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  * Custom TestExecutionListener that resets all tables in the database by deleting all rows in them.
  * Typically, this listener should be configured to run after every test method has executed
  */
-public class DeleteDataTestExecutionListener extends AbstractTestExecutionListener {
+public class ResetDbsTestExecutionListener extends AbstractTestExecutionListener {
 	
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 	

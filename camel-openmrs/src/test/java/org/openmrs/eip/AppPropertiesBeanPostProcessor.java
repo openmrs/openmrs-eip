@@ -1,6 +1,6 @@
 package org.openmrs.eip;
 
-import org.openmrs.eip.app.SyncConstants;
+import org.openmrs.eip.component.Constants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -20,12 +20,13 @@ public class AppPropertiesBeanPostProcessor implements BeanPostProcessor {
 	
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		if (SyncConstants.CUSTOM_PROP_SOURCE_BEAN_NAME.equals(beanName)) {
+		if (Constants.CUSTOM_PROP_SOURCE_BEAN_NAME.equals(beanName)) {
 			MapPropertySource propSource = (MapPropertySource) bean;
 			propSource.getSource().put("openmrs.db.port", testDatabase.getMysqlPort());
 			propSource.getSource().put("openmrs.db.host", "localhost");
 			propSource.getSource().put("openmrs.db.name", testDatabase.getDbName());
-			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl", testDatabase.getJdbcUrl() + "?useSSL=false");
+			propSource.getSource().put("spring.openmrs-datasource.jdbcUrl",
+			    testDatabase.getJdbcUrl() + "?useSSL=false&nullCatalogMeansCurrent=true");
 			propSource.getSource().put("spring.openmrs-datasource.driverClassName", Driver.class.getName());
 			propSource.getSource().put("spring.openmrs-datasource.username", "root");
 			propSource.getSource().put("spring.openmrs-datasource.password", testDatabase.getPassword());

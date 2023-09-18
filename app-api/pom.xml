@@ -66,11 +66,6 @@
             <artifactId>spring-boot-starter-artemis</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysqlConnectionVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-debezium-mysql-starter</artifactId>
             <version>3.3.0</version>

@@ -18,11 +18,13 @@ import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.service.impl.PersonService;
 import org.openmrs.eip.component.service.impl.UserService;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Sql(scripts = "classpath:test_data.sql")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class AbstractEntityServiceIntegrationTest extends BaseDbDrivenTest {
 	
 	private static final String EXISTING_USER_UUID = "1a3b12d1-5c4f-415f-871b-b98a22137605";

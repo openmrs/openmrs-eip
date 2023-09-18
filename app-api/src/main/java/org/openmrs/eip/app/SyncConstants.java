@@ -36,8 +36,6 @@ public class SyncConstants {
 	
 	public final static String MGT_DATASOURCE_NAME = "mngtDataSource";
 	
-	public final static String CUSTOM_PROP_SOURCE_BEAN_NAME = "customPropSource";
-	
 	public final static String MGT_ENTITY_MGR = "mngtEntityManager";
 	
 	public final static String MGT_TX_MGR = "mngtTransactionManager";

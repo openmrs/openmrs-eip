@@ -26,7 +26,6 @@ public class SenderSyncArchiveControllerTest extends BaseSenderTest {
 		assertEquals(2, result.size());
 		assertEquals(3, result.get("count"));
 		assertEquals(3, ((List) result.get("items")).size());
-		
 	}
 	
 	@Test

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Import({ TestDBConfig.class })
 @Transactional(transactionManager = MGT_TX_MGR)
-@TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
+@TestExecutionListeners(value = { ResetDbsTestExecutionListener.class, SqlScriptsTestExecutionListener.class,
         TransactionalTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")

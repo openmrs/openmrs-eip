@@ -50,6 +50,8 @@ public class Constants {
 	
 	public static final List<String> SUBCLASS_TABLES;
 	
+	public final static String CUSTOM_PROP_SOURCE_BEAN_NAME = "customPropSource";
+	
 	static {
 		List<String> subclassTables = new ArrayList();
 		subclassTables.add("patient");

@@ -12,6 +12,7 @@ import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.SyncConstants;
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(name = SyncConstants.MGT_ENTITY_MGR)
-	@DependsOn(SyncConstants.CUSTOM_PROP_SOURCE_BEAN_NAME)
+	@DependsOn(Constants.CUSTOM_PROP_SOURCE_BEAN_NAME)
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            @Qualifier("mngtDataSource") final DataSource dataSource,
 	                                                            Environment env) {

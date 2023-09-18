@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.sender;
 
-import static org.openmrs.eip.app.SyncConstants.CUSTOM_PROP_SOURCE_BEAN_NAME;
+import static org.openmrs.eip.component.Constants.CUSTOM_PROP_SOURCE_BEAN_NAME;
 import static org.openmrs.eip.component.Constants.PROP_URI_ERROR_HANDLER;
 
 import java.util.HashMap;
