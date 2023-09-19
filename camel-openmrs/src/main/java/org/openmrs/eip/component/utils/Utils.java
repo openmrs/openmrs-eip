@@ -21,8 +21,8 @@ public final class Utils {
 	private static Map<String, List<String>> CLASS_HIERARCHY_MAP = new ConcurrentHashMap();
 	
 	/**
-	 * Gets comma-separated list of table names surrounded with apostrophes associated to the specified
-	 * table as tables of subclass or superclass entities.
+	 * Gets the table names associated to the specified table i.e. tables of subclass for superclass
+	 * entities.
 	 *
 	 * @param tableName the table name
 	 * @return a list of table names
@@ -51,7 +51,8 @@ public final class Utils {
 	}
 	
 	/**
-	 * Gets the tables associated to the specified table as tables of subclass or superclass entities.
+	 * Gets comma-separated list of table names surrounded with apostrophes associated to the specified
+	 * table as tables of subclass or superclass entities.
 	 *
 	 * @param tableName the tables to inspect
 	 * @return a comma-separated list of table names
@@ -62,9 +63,8 @@ public final class Utils {
 	}
 	
 	/**
-	 * Gets comma-separated list of model class names surrounded with apostrophes that are subclasses or
-	 * superclasses of the specified class name.
-	 *
+	 * Gets all the model classes that are subclasses or superclass of the specified class name.
+	 * 
 	 * @param modelClass the model class name
 	 * @return a list of model class names
 	 */
@@ -93,7 +93,8 @@ public final class Utils {
 	}
 	
 	/**
-	 * Gets all the model classes that are subclasses or superclass of the specified class name.
+	 * Gets comma-separated list of model class names surrounded with apostrophes that are subclasses or
+	 * superclasses of the specified class name.
 	 *
 	 * @param modelClass the model class to inspect
 	 * @return a comma-separated list of model class names

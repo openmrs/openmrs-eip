@@ -28,6 +28,7 @@ import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,6 +150,36 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(expectedNewHash, hashEntity.getHash());
 		long dateChangedMillis = hashEntity.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void hasSyncItem_shouldReturnTrueIfAnEntityHasASyncItem() {
+		assertTrue(service.hasSyncItem("4bfd940e-32dc-491f-8038-a8f3afe3e36c", PersonModel.class.getName()));
+		assertTrue(service.hasSyncItem("4bfd940e-32dc-491f-8038-a8f3afe3e36c", PatientModel.class.getName()));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void hasSyncItem_shouldReturnFalseIfAnEntityHasNoSyncItem() {
+		assertFalse(service.hasSyncItem("some-uuid", PersonModel.class.getName()));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void hasRetryItem_shouldReturnTrueIfAnEntityHasARetryItem() {
+		assertTrue(service.hasRetryItem("uuid-1", PersonModel.class.getName()));
+		assertTrue(service.hasRetryItem("uuid-1", PatientModel.class.getName()));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void hasRetryItem_shouldReturnTrueIfAnEntityHasNoRetryItem() {
+		assertFalse(service.hasRetryItem("some-uuid", PersonModel.class.getName()));
 	}
 	
 }

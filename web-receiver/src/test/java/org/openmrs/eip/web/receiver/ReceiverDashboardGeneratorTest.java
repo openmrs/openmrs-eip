@@ -31,13 +31,17 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 		Dashboard dashboard = generator.generate();
 		Map<String, Object> syncMsgs = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_SYNC_MSGS);
 		Assert.assertEquals(2, syncMsgs.size());
-		Assert.assertEquals(4, ((AtomicInteger) syncMsgs.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
+		Assert.assertEquals(6, ((AtomicInteger) syncMsgs.get(ReceiverDashboardGenerator.KEY_TOTAL_COUNT)).get());
 		Map<String, Map> entityStatsMap = (Map) syncMsgs.get(ReceiverDashboardGenerator.KEY_ENTITY_STATS);
-		Assert.assertEquals(1, entityStatsMap.size());
+		Assert.assertEquals(2, entityStatsMap.size());
 		Assert.assertEquals(2, entityStatsMap.get(PersonModel.class.getName()).size());
-		Assert.assertEquals(3, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
+		Assert.assertEquals(4, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.c));
 		Assert.assertEquals(1, entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.u));
 		Assert.assertNull(entityStatsMap.get(PersonModel.class.getName()).get(SyncOperation.d));
+		Assert.assertEquals(1, entityStatsMap.get(PatientModel.class.getName()).size());
+		Assert.assertEquals(1, entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.c));
+		Assert.assertNull(entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.u));
+		Assert.assertNull(entityStatsMap.get(PatientModel.class.getName()).get(SyncOperation.d));
 		
 		Map<String, Object> syncedMsgs = (Map) dashboard.getEntries().get(ReceiverDashboardGenerator.KEY_SYNCED_MSGS);
 		Assert.assertEquals(2, syncedMsgs.size());

@@ -32,8 +32,8 @@ public class ReceiverSyncMessageControllerTest extends BaseReceiverWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(2)));
-		result.andExpect(jsonPath("count", equalTo(4)));
-		result.andExpect(jsonPath("items.length()", equalTo(4)));
+		result.andExpect(jsonPath("count", equalTo(6)));
+		result.andExpect(jsonPath("items.length()", equalTo(6)));
 	}
 	
 	@Test

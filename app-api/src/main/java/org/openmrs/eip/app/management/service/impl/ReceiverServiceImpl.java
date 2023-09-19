@@ -4,6 +4,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
@@ -26,6 +27,7 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -177,6 +179,18 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved new hash for the entity");
 		}
+	}
+	
+	@Override
+	public boolean hasSyncItem(String identifier, String modelClassname) {
+		List<String> classNames = Utils.getListOfModelClassHierarchy(modelClassname);
+		return syncMsgRepo.countByIdentifierAndModelClassNameIn(identifier, classNames) > 0;
+	}
+	
+	@Override
+	public boolean hasRetryItem(String identifier, String modelClassname) {
+		List<String> classNames = Utils.getListOfModelClassHierarchy(modelClassname);
+		return retryRepo.countByIdentifierAndModelClassNameIn(identifier, classNames) > 0;
 	}
 	
 }
