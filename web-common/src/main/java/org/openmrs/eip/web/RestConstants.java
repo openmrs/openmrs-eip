@@ -12,7 +12,9 @@ public final class RestConstants {
 	
 	public static final String PATH_VAR_ID = "id";
 	
-	public static final String SUB_PATH_RECEIVER = API_PATH + "dbsync/receiver/";
+	public static final String SUB_PATH_DB_SYNC = API_PATH + "dbsync/";
+	
+	public static final String SUB_PATH_RECEIVER = SUB_PATH_DB_SYNC + "receiver/";
 	
 	public static final String PATH_RECEIVER_SYNC_MSG = SUB_PATH_RECEIVER + "sync";
 	
@@ -49,5 +51,13 @@ public final class RestConstants {
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 	
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(RestConstants.DATE_PATTERN);
+	
+	public static final String RES_DASHBOARD = SUB_PATH_DB_SYNC + "dashboard";
+	
+	public static final String SUB_PATH_DASHBOARD = RES_DASHBOARD + "/";
+	
+	public static final String RES_NAME_METADATA = "metadata";
+	
+	public static final String RES_DASHBOARD_METADATA = SUB_PATH_DASHBOARD + RES_NAME_METADATA;
 	
 }

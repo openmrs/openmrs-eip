@@ -10,12 +10,12 @@ import org.openmrs.eip.component.SyncOperation;
  */
 public class DashboardMetadata {
 	
-	private Set<String> entityClassNames;
+	private Set<String> groups;
 	
 	private List<SyncOperation> operations;
 	
-	public DashboardMetadata(Set<String> entityClassNames, List<SyncOperation> operations) {
-		this.entityClassNames = entityClassNames;
+	public DashboardMetadata(Set<String> groups, List<SyncOperation> operations) {
+		this.groups = groups;
 		this.operations = operations;
 	}
 	

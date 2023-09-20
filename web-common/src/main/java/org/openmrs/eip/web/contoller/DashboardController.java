@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.contoller;
 
 import org.openmrs.eip.web.Dashboard;
+import org.openmrs.eip.web.DashboardMetadata;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestConstants.API_PATH + "/dbsync/dashboard")
+@RequestMapping(RestConstants.RES_DASHBOARD)
 public class DashboardController {
 	
 	private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
@@ -29,6 +30,15 @@ public class DashboardController {
 		}
 		
 		return generator.generate();
+	}
+	
+	@GetMapping("/" + RestConstants.RES_NAME_METADATA)
+	public DashboardMetadata getMetadata() {
+		if (log.isDebugEnabled()) {
+			log.debug("Getting dashboard metadata");
+		}
+		
+		return generator.createMetadata();
 	}
 	
 }
