@@ -15,7 +15,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.Dashboard;
-import org.openmrs.eip.web.contoller.DashboardGenerator;
+import org.openmrs.eip.web.controller.DashboardGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

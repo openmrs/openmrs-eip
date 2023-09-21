@@ -13,7 +13,7 @@ import java.util.Map;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.RestConstants;
-import org.openmrs.eip.web.contoller.BaseRestController;
+import org.openmrs.eip.web.controller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;

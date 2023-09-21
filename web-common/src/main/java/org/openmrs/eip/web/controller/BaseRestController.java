@@ -1,4 +1,4 @@
-package org.openmrs.eip.web.contoller;
+package org.openmrs.eip.web.controller;
 
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
 import static org.openmrs.eip.web.RestConstants.FIELD_COUNT;

@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.RestConstants;
-import org.openmrs.eip.web.contoller.BaseRestController;
+import org.openmrs.eip.web.controller.BaseRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;

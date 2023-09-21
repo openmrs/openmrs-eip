@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.web.BaseWebTest;
 import org.openmrs.eip.web.RestConstants;
-import org.openmrs.eip.web.contoller.DashboardGenerator;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;

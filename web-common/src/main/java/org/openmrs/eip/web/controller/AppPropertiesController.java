@@ -1,4 +1,4 @@
-package org.openmrs.eip.web.contoller;
+package org.openmrs.eip.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;
