@@ -1,6 +1,5 @@
 package org.openmrs.eip.web.controller;
 
-import static org.openmrs.eip.web.RestConstants.RES_DASHBOARD_METADATA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,15 +40,6 @@ public class DashboardControllerTest extends BaseWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		Mockito.verify(mockDelegateGenerator).generate();
-	}
-	
-	@Test
-	public void shouldGetTheDashboardMetadata() throws Exception {
-		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_METADATA);
-		
-		ResultActions result = mockMvc.perform(builder);
-		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegateGenerator).createMetadata();
 	}
 	
 }

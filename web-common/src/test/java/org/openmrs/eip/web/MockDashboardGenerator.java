@@ -11,9 +11,4 @@ public class MockDashboardGenerator implements DashboardGenerator {
 		return delegate.generate();
 	}
 	
-	@Override
-	public DashboardMetadata createMetadata() {
-		return delegate.createMetadata();
-	}
-	
 }

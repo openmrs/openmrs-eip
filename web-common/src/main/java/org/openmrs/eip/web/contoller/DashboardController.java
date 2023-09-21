@@ -1,7 +1,6 @@
 package org.openmrs.eip.web.contoller;
 
 import org.openmrs.eip.web.Dashboard;
-import org.openmrs.eip.web.DashboardMetadata;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +29,6 @@ public class DashboardController {
 		}
 		
 		return generator.generate();
-	}
-	
-	@GetMapping("/" + RestConstants.RES_NAME_METADATA)
-	public DashboardMetadata getMetadata() {
-		if (log.isDebugEnabled()) {
-			log.debug("Getting dashboard metadata");
-		}
-		
-		return generator.createMetadata();
 	}
 	
 }
