@@ -1,5 +1,7 @@
 package org.openmrs.eip.web;
 
+import java.util.List;
+
 import org.openmrs.eip.web.contoller.DashboardGenerator;
 
 public class MockDashboardGenerator implements DashboardGenerator {
@@ -9,6 +11,11 @@ public class MockDashboardGenerator implements DashboardGenerator {
 	@Override
 	public Dashboard generate() {
 		return delegate.generate();
+	}
+	
+	@Override
+	public List<String> getGroups() {
+		return delegate.getGroups();
 	}
 	
 }

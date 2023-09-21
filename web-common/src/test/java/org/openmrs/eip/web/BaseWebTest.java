@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
+@TestPropertySource(properties = "logging.config=classpath:logback-test.xml")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
 public abstract class BaseWebTest {
 	

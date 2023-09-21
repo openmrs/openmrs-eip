@@ -1,5 +1,6 @@
 package org.openmrs.eip.web.controller;
 
+import static org.openmrs.eip.web.RestConstants.RES_DASHBOARD_GROUPS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +41,16 @@ public class DashboardControllerTest extends BaseWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		Mockito.verify(mockDelegateGenerator).generate();
+	}
+	
+	@Test
+	public void shouldGetTheGroups() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_GROUPS);
+		Mockito.when(mockDelegateGenerator.getGroups()).thenReturn(null);
+		
+		ResultActions result = mockMvc.perform(builder);
+		result.andExpect(status().isOk());
+		Mockito.verify(mockDelegateGenerator).getGroups();
 	}
 	
 }
