@@ -1,5 +1,7 @@
 package org.openmrs.eip.web.contoller;
 
+import java.util.List;
+
 import org.openmrs.eip.web.Dashboard;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
@@ -29,6 +31,15 @@ public class DashboardController {
 		}
 		
 		return generator.generate();
+	}
+	
+	@GetMapping("/" + RestConstants.RES_NAME_GROUPS)
+	public List<String> getGroups() {
+		if (log.isDebugEnabled()) {
+			log.debug("Getting dashboard groups");
+		}
+		
+		return generator.getGroups();
 	}
 	
 }

@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -144,6 +145,11 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 		dashboard.add(KEY_CONFLICTS, conflicts);
 		
 		return dashboard;
+	}
+	
+	@Override
+	public List<String> getGroups() {
+		return null;
 	}
 	
 	private Integer getCount(String entityName, String modelClass, SyncOperation op) {

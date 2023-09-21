@@ -54,4 +54,10 @@ public final class RestConstants {
 	
 	public static final String RES_DASHBOARD = SUB_PATH_DB_SYNC + "dashboard";
 	
+	public static final String SUB_PATH_DASHBOARD = RES_DASHBOARD + "/";
+	
+	public static final String RES_NAME_GROUPS = "groups";
+	
+	public static final String RES_DASHBOARD_GROUPS = SUB_PATH_DASHBOARD + RES_NAME_GROUPS;
+	
 }

@@ -182,4 +182,9 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		return dashboard;
 	}
 	
+	@Override
+	public List<String> getGroups() {
+		return null;
+	}
+	
 }
