@@ -26,7 +26,7 @@ public class DashboardController {
 	@GetMapping
 	public Dashboard getDashboard() {
 		if (log.isDebugEnabled()) {
-			log.debug("Fetching dashboard");
+			log.debug("Getting dashboard");
 		}
 		
 		return generator.generate();
