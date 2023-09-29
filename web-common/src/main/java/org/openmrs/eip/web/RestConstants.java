@@ -56,8 +56,10 @@ public final class RestConstants {
 	
 	public static final String SUB_PATH_DASHBOARD = RES_DASHBOARD + "/";
 	
-	public static final String RES_NAME_GROUPS = "groups";
+	public static final String RES_NAME_CATEGORIES = "groupings";
 	
-	public static final String RES_DASHBOARD_GROUPS = SUB_PATH_DASHBOARD + RES_NAME_GROUPS;
+	public static final String RES_DASHBOARD_CATEGORIES = SUB_PATH_DASHBOARD + RES_NAME_CATEGORIES;
+	
+	public static final String PARAM_ENTITY_NAME = "entityName";
 	
 }

@@ -1,6 +1,6 @@
 package org.openmrs.eip.web.controller;
 
-import static org.openmrs.eip.web.RestConstants.RES_DASHBOARD_GROUPS;
+import static org.openmrs.eip.web.RestConstants.RES_DASHBOARD_CATEGORIES;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +34,7 @@ public class DashboardControllerTest extends BaseWebTest {
 	}
 	
 	@Test
-	public void shouldGetTheDashboard() throws Exception {
+	public void getDashboard_shouldGetTheDashboard() throws Exception {
 		MockHttpServletRequestBuilder builder = get(RestConstants.RES_DASHBOARD);
 		
 		ResultActions result = mockMvc.perform(builder);
@@ -43,13 +43,15 @@ public class DashboardControllerTest extends BaseWebTest {
 	}
 	
 	@Test
-	public void shouldGetTheGroups() throws Exception {
-		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_GROUPS);
-		Mockito.when(mockDelegateGenerator.getGroups()).thenReturn(null);
+	public void getCategories_shouldGetTheCategories() throws Exception {
+		final String entityName = "MyEntity";
+		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_CATEGORIES);
+		builder.param(RestConstants.PARAM_ENTITY_NAME, entityName);
+		Mockito.when(mockDelegateGenerator.getCategories(entityName)).thenReturn(null);
 		
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegateGenerator).getGroups();
+		Mockito.verify(mockDelegateGenerator).getCategories(entityName);
 	}
 	
 }

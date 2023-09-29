@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.utils.collections.ConcurrentHashSet;
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
@@ -20,6 +21,7 @@ import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.web.Dashboard;
+import org.openmrs.eip.web.controller.BaseDashboardGenerator;
 import org.openmrs.eip.web.controller.DashboardGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -27,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.SENDER)
-public class SenderDashboardGenerator implements DashboardGenerator {
+public class SenderDashboardGenerator extends BaseDashboardGenerator {
 	
 	private static final String ERROR_ENTITY_NAME = SenderRetryQueueItem.class.getSimpleName();
 	
@@ -38,8 +40,14 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 	protected CamelContext camelContext;
 	
 	@Autowired
-	public SenderDashboardGenerator(CamelContext camelContext) {
+	public SenderDashboardGenerator(CamelContext camelContext, ProducerTemplate producerTemplate) {
+		super(producerTemplate);
 		this.camelContext = camelContext;
+	}
+	
+	@Override
+	public String getCategorizationProperty() {
+		return "tableName";
 	}
 	
 	/**
@@ -180,11 +188,6 @@ public class SenderDashboardGenerator implements DashboardGenerator {
 		dashboard.add("syncMessages", syncMessages);
 		
 		return dashboard;
-	}
-	
-	@Override
-	public List<String> getGroups() {
-		return null;
 	}
 	
 }

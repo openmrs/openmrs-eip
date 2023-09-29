@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,13 +34,13 @@ public class DashboardController {
 		return generator.generate();
 	}
 	
-	@GetMapping("/" + RestConstants.RES_NAME_GROUPS)
-	public List<String> getGroups() {
+	@GetMapping("/" + RestConstants.RES_NAME_CATEGORIES)
+	public List<String> getCategories(@RequestParam(RestConstants.PARAM_ENTITY_NAME) String entityName) {
 		if (log.isDebugEnabled()) {
-			log.debug("Getting dashboard groups");
+			log.debug("Getting categories for items of type: " + entityName);
 		}
 		
-		return generator.getGroups();
+		return generator.getCategories(entityName);
 	}
 	
 }

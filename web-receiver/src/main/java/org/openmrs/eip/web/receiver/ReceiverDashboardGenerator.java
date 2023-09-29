@@ -1,7 +1,6 @@
 package org.openmrs.eip.web.receiver;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,6 +14,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.Dashboard;
+import org.openmrs.eip.web.controller.BaseDashboardGenerator;
 import org.openmrs.eip.web.controller.DashboardGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.RECEIVER)
-public class ReceiverDashboardGenerator implements DashboardGenerator {
+public class ReceiverDashboardGenerator extends BaseDashboardGenerator {
 	
 	private static final String SYNC_ENTITY_NAME = SyncMessage.class.getSimpleName();
 	
@@ -44,11 +44,14 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 	
 	protected static final String KEY_CONFLICTS = "conflicts";
 	
-	protected ProducerTemplate producerTemplate;
-	
 	@Autowired
 	public ReceiverDashboardGenerator(ProducerTemplate producerTemplate) {
-		this.producerTemplate = producerTemplate;
+		super(producerTemplate);
+	}
+	
+	@Override
+	public String getCategorizationProperty() {
+		return "modelClassName";
 	}
 	
 	/**
@@ -145,17 +148,6 @@ public class ReceiverDashboardGenerator implements DashboardGenerator {
 		dashboard.add(KEY_CONFLICTS, conflicts);
 		
 		return dashboard;
-	}
-	
-	@Override
-	public List<String> getGroups() {
-		return null;
-	}
-	
-	private Integer getCount(String entityName, String modelClass, SyncOperation op) {
-		return producerTemplate.requestBody("jpa:" + entityName + "?query=SELECT count(*) FROM " + entityName
-		        + " WHERE modelClassName = '" + modelClass + "' AND operation = '" + op + "'",
-		    null, Integer.class);
 	}
 	
 }

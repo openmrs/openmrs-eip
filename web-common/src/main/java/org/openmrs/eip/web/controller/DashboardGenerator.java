@@ -5,7 +5,7 @@ import java.util.List;
 import org.openmrs.eip.web.Dashboard;
 
 /**
- * Marker interface for classes that can generate a {@link Dashboard}
+ * Marker interface for classes that can generate a {@link Dashboard} data.
  */
 public interface DashboardGenerator {
 	
@@ -17,10 +17,17 @@ public interface DashboardGenerator {
 	Dashboard generate();
 	
 	/**
-	 * Gets the grouping names for the dashboard entries
-	 *
-	 * @return the list of groups
+	 * Gets the categorization property name for the entities handled by this generated
+	 * 
+	 * @return the categorization property name
 	 */
-	List<String> getGroups();
+	String getCategorizationProperty();
+	
+	/**
+	 * Gets the unique category names for the entities handled by this generated
+	 *
+	 * @return the list of categories
+	 */
+	List<String> getCategories(String entityName);
 	
 }
