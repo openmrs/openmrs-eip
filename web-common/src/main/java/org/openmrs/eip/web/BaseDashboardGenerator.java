@@ -1,9 +1,10 @@
-package org.openmrs.eip.web.controller;
+package org.openmrs.eip.web;
 
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.SyncOperation;
+import org.openmrs.eip.web.controller.DashboardGenerator;
 
 public abstract class BaseDashboardGenerator implements DashboardGenerator {
 	
@@ -25,9 +26,9 @@ public abstract class BaseDashboardGenerator implements DashboardGenerator {
 		    Integer.class);
 	}
 	
-	protected Integer getCount(String entityName, String groupingPropertyValue, SyncOperation op) {
+	protected Integer getCount(String entityName, String category, SyncOperation op) {
 		return producerTemplate.requestBody("jpa:" + entityName + "?query=SELECT count(*) FROM " + entityName + " WHERE "
-		        + getCategorizationProperty() + " = '" + groupingPropertyValue + "' AND operation = '" + op + "'",
+		        + getCategorizationProperty() + " = '" + category + "' AND operation = '" + op + "'",
 		    null, Integer.class);
 	}
 	

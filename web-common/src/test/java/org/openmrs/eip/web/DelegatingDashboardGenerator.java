@@ -2,15 +2,15 @@ package org.openmrs.eip.web;
 
 import java.util.List;
 
-import org.openmrs.eip.web.controller.BaseDashboardGenerator;
+import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.web.controller.DashboardGenerator;
 
-public class MockDashboardGenerator extends BaseDashboardGenerator {
+public class DelegatingDashboardGenerator extends BaseDashboardGenerator {
 	
 	private DashboardGenerator delegate;
 	
-	public MockDashboardGenerator() {
-		super(null);
+	public DelegatingDashboardGenerator(ProducerTemplate producerTemplate) {
+		super(producerTemplate);
 	}
 	
 	@Override
@@ -20,7 +20,7 @@ public class MockDashboardGenerator extends BaseDashboardGenerator {
 	
 	@Override
 	public String getCategorizationProperty() {
-		return null;
+		return delegate.getCategorizationProperty();
 	}
 	
 	@Override

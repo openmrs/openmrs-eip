@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.web.BaseWebTest;
+import org.openmrs.eip.web.DelegatingDashboardGenerator;
 import org.openmrs.eip.web.RestConstants;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public class DashboardControllerTest extends BaseWebTest {
 	
 	@Autowired
-	private DashboardGenerator generator;
+	private DelegatingDashboardGenerator generator;
 	
-	private DashboardGenerator mockDelegateGenerator;
+	private DashboardGenerator mockDelegate;
 	
 	@Before
 	public void setup() {
-		mockDelegateGenerator = Mockito.mock(DashboardGenerator.class);
-		Whitebox.setInternalState(generator, DashboardGenerator.class, mockDelegateGenerator);
+		mockDelegate = Mockito.mock(DashboardGenerator.class);
+		Whitebox.setInternalState(generator, DashboardGenerator.class, mockDelegate);
 	}
 	
 	@After
@@ -39,7 +40,7 @@ public class DashboardControllerTest extends BaseWebTest {
 		
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegateGenerator).generate();
+		Mockito.verify(mockDelegate).generate();
 	}
 	
 	@Test
@@ -47,11 +48,11 @@ public class DashboardControllerTest extends BaseWebTest {
 		final String entityName = "MyEntity";
 		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_CATEGORIES);
 		builder.param(RestConstants.PARAM_ENTITY_NAME, entityName);
-		Mockito.when(mockDelegateGenerator.getCategories(entityName)).thenReturn(null);
+		Mockito.when(mockDelegate.getCategories(entityName)).thenReturn(null);
 		
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegateGenerator).getCategories(entityName);
+		Mockito.verify(mockDelegate).getCategories(entityName);
 	}
 	
 }

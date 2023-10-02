@@ -56,6 +56,13 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.openmrs.eip</groupId>
+            <artifactId>camel-openmrs</artifactId>
+            <type>test-jar</type>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.eip</groupId>
             <artifactId>app-api</artifactId>
             <type>test-jar</type>
             <version>${project.parent.version}</version>
