@@ -27,7 +27,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
         "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class BaseDashboardGeneratorTest extends BaseReceiverTest {
 	
-	private static final String ENTITY_NAME = SyncMessage.class.getSimpleName();
+	private static final String ENTITY_TYPE = SyncMessage.class.getSimpleName();
 	
 	@Autowired
 	private ProducerTemplate producerTemplate;
@@ -45,20 +45,20 @@ public class BaseDashboardGeneratorTest extends BaseReceiverTest {
 	
 	@Test
 	public void getCategories_shouldGetTheUniqueModelClassNamesInTheQueue() {
-		List<String> modelNames = generator.getCategories(ENTITY_NAME);
+		List<String> modelNames = generator.getCategories(ENTITY_TYPE);
 		assertEquals(2, modelNames.size());
 		assertTrue(modelNames.contains(PersonModel.class.getName()));
 		assertTrue(modelNames.contains(PatientModel.class.getName()));
 	}
 	
 	@Test
-	public void getTotalCount_shouldGetTheTotalCountOfItemsTheQueue() {
-		assertEquals(6, generator.getTotalCount(ENTITY_NAME).intValue());
+	public void getCount_shouldGetTheTotalCountOfItemsTheQueue() {
+		assertEquals(6, generator.getCount(ENTITY_TYPE, null, null).intValue());
 	}
 	
 	@Test
 	public void getCount_shouldGetTheQueueItemCountMatchingTheCategoryAndOperation() {
-		assertEquals(4, generator.getCount(ENTITY_NAME, PersonModel.class.getName(), c).intValue());
+		assertEquals(4, generator.getCount(ENTITY_TYPE, PersonModel.class.getName(), c).intValue());
 	}
 	
 }

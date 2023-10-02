@@ -1,7 +1,12 @@
 package org.openmrs.eip.web.controller;
 
+import static org.openmrs.eip.web.RestConstants.PARAM_ENTITY_CATEGORY;
+import static org.openmrs.eip.web.RestConstants.PARAM_ENTITY_OPERATION;
+import static org.openmrs.eip.web.RestConstants.PARAM_ENTITY_TYPE;
+
 import java.util.List;
 
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.web.Dashboard;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
@@ -34,13 +39,30 @@ public class DashboardController {
 		return generator.generate();
 	}
 	
-	@GetMapping("/" + RestConstants.RES_NAME_CATEGORIES)
-	public List<String> getCategories(@RequestParam(RestConstants.PARAM_ENTITY_NAME) String entityName) {
+	@GetMapping("/" + RestConstants.RES_NAME_CATEGORY)
+	public List<String> getCategories(@RequestParam(PARAM_ENTITY_TYPE) String entityName) {
 		if (log.isDebugEnabled()) {
 			log.debug("Getting categories for items of type: " + entityName);
 		}
 		
 		return generator.getCategories(entityName);
+	}
+	
+	@GetMapping("/" + RestConstants.RES_NAME_COUNT)
+	public Integer getCount(@RequestParam(PARAM_ENTITY_TYPE) String entityType,
+	                        @RequestParam(value = PARAM_ENTITY_CATEGORY, required = false) String category,
+	                        @RequestParam(value = PARAM_ENTITY_OPERATION, required = false) String operation) {
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Getting item count of type: " + entityType + ", category: " + category + ", operation: " + operation);
+		}
+		
+		SyncOperation op = null;
+		if (operation != null) {
+			op = SyncOperation.valueOf(operation);
+		}
+		
+		return generator.getCount(entityType, category, op);
 	}
 	
 }

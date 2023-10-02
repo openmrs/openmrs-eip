@@ -15,19 +15,20 @@ public abstract class BaseDashboardGenerator implements DashboardGenerator {
 	}
 	
 	@Override
-	public List<String> getCategories(String entityName) {
+	public List<String> getCategories(String entityType) {
 		return producerTemplate.requestBody(
-		    "jpa:" + entityName + "?query=SELECT DISTINCT " + getCategorizationProperty() + " FROM " + entityName, null,
+		    "jpa:" + entityType + "?query=SELECT DISTINCT " + getCategorizationProperty() + " FROM " + entityType, null,
 		    List.class);
 	}
 	
-	protected Integer getTotalCount(String entityName) {
-		return producerTemplate.requestBody("jpa:" + entityName + "?query=SELECT count(*) FROM " + entityName, null,
-		    Integer.class);
-	}
-	
-	protected Integer getCount(String entityName, String category, SyncOperation op) {
-		return producerTemplate.requestBody("jpa:" + entityName + "?query=SELECT count(*) FROM " + entityName + " WHERE "
+	@Override
+	public Integer getCount(String entityType, String category, SyncOperation op) {
+		if (category == null && op == null) {
+			return producerTemplate.requestBody("jpa:" + entityType + "?query=SELECT count(*) FROM " + entityType, null,
+			    Integer.class);
+		}
+		
+		return producerTemplate.requestBody("jpa:" + entityType + "?query=SELECT count(*) FROM " + entityType + " WHERE "
 		        + getCategorizationProperty() + " = '" + category + "' AND operation = '" + op + "'",
 		    null, Integer.class);
 	}

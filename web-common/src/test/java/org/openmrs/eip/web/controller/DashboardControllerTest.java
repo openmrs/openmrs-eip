@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.controller;
 
-import static org.openmrs.eip.web.RestConstants.RES_DASHBOARD_CATEGORIES;
+import static org.openmrs.eip.web.RestConstants.PATH_DASHBOARD_CATEGORY;
+import static org.openmrs.eip.web.RestConstants.PATH_DASHBOARD_COUNT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -8,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.web.BaseWebTest;
 import org.openmrs.eip.web.DelegatingDashboardGenerator;
 import org.openmrs.eip.web.RestConstants;
@@ -39,20 +41,51 @@ public class DashboardControllerTest extends BaseWebTest {
 		MockHttpServletRequestBuilder builder = get(RestConstants.RES_DASHBOARD);
 		
 		ResultActions result = mockMvc.perform(builder);
+		
 		result.andExpect(status().isOk());
 		Mockito.verify(mockDelegate).generate();
 	}
 	
 	@Test
-	public void getCategories_shouldGetTheCategories() throws Exception {
-		final String entityName = "MyEntity";
-		MockHttpServletRequestBuilder builder = get(RES_DASHBOARD_CATEGORIES);
-		builder.param(RestConstants.PARAM_ENTITY_NAME, entityName);
-		Mockito.when(mockDelegate.getCategories(entityName)).thenReturn(null);
+	public void getCategories_shouldGetTheListOfCategoryNames() throws Exception {
+		final String entityType = "MyEntity";
+		MockHttpServletRequestBuilder builder = get(PATH_DASHBOARD_CATEGORY);
+		builder.param(RestConstants.PARAM_ENTITY_TYPE, entityType);
+		Mockito.when(mockDelegate.getCategories(entityType)).thenReturn(null);
 		
 		ResultActions result = mockMvc.perform(builder);
+		
 		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegate).getCategories(entityName);
+		Mockito.verify(mockDelegate).getCategories(entityType);
+	}
+	
+	@Test
+	public void getCount_shouldGetTheTotalCountOfItemsTheQueue() throws Exception {
+		final String entityType = "MyEntity";
+		MockHttpServletRequestBuilder builder = get(PATH_DASHBOARD_COUNT);
+		builder.param(RestConstants.PARAM_ENTITY_TYPE, entityType);
+		Mockito.when(mockDelegate.getCount(entityType, null, null)).thenReturn(null);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		Mockito.verify(mockDelegate).getCount(entityType, null, null);
+	}
+	
+	@Test
+	public void getCount_shouldGetTheQueueItemCountMatchingTheCategoryAndOperation() throws Exception {
+		final String entityType = "MyEntity";
+		final String category = "MyCategory";
+		MockHttpServletRequestBuilder builder = get(PATH_DASHBOARD_COUNT);
+		builder.param(RestConstants.PARAM_ENTITY_TYPE, entityType);
+		builder.param(RestConstants.PARAM_ENTITY_CATEGORY, category);
+		builder.param(RestConstants.PARAM_ENTITY_OPERATION, SyncOperation.u.name());
+		Mockito.when(mockDelegate.getCount(entityType, category, SyncOperation.u)).thenReturn(null);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		Mockito.verify(mockDelegate).getCount(entityType, category, SyncOperation.u);
 	}
 	
 }

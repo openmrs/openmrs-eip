@@ -56,10 +56,18 @@ public final class RestConstants {
 	
 	public static final String SUB_PATH_DASHBOARD = RES_DASHBOARD + "/";
 	
-	public static final String RES_NAME_CATEGORIES = "groupings";
+	public static final String RES_NAME_CATEGORY = "category";
 	
-	public static final String RES_DASHBOARD_CATEGORIES = SUB_PATH_DASHBOARD + RES_NAME_CATEGORIES;
+	public static final String PATH_DASHBOARD_CATEGORY = SUB_PATH_DASHBOARD + RES_NAME_CATEGORY;
 	
-	public static final String PARAM_ENTITY_NAME = "entityName";
+	public static final String PARAM_ENTITY_TYPE = "entityType";
+	
+	public static final String RES_NAME_COUNT = "count";
+	
+	public static final String PATH_DASHBOARD_COUNT = SUB_PATH_DASHBOARD + RES_NAME_COUNT;
+	
+	public static final String PARAM_ENTITY_CATEGORY = "category";
+	
+	public static final String PARAM_ENTITY_OPERATION = "op";
 	
 }

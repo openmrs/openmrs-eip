@@ -3,6 +3,7 @@ package org.openmrs.eip.web;
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.web.controller.DashboardGenerator;
 
 public class DelegatingDashboardGenerator extends BaseDashboardGenerator {
@@ -26,6 +27,11 @@ public class DelegatingDashboardGenerator extends BaseDashboardGenerator {
 	@Override
 	public List<String> getCategories(String entityName) {
 		return delegate.getCategories(entityName);
+	}
+	
+	@Override
+	public Integer getCount(String entityType, String category, SyncOperation op) {
+		return delegate.getCount(entityType, category, op);
 	}
 	
 }
