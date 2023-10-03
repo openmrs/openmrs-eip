@@ -39,16 +39,16 @@ public class DashboardController {
 		return generator.generate();
 	}
 	
-	@GetMapping("/" + RestConstants.RES_NAME_CATEGORY)
-	public List<String> getCategories(@RequestParam(PARAM_ENTITY_TYPE) String entityName) {
+	@GetMapping("/" + RestConstants.PATH_NAME_CATEGORY)
+	public List<String> getCategories(@RequestParam(PARAM_ENTITY_TYPE) String entityType) {
 		if (log.isDebugEnabled()) {
-			log.debug("Getting categories for items of type: " + entityName);
+			log.debug("Getting categories for type: " + entityType);
 		}
 		
-		return generator.getCategories(entityName);
+		return generator.getCategories(entityType);
 	}
 	
-	@GetMapping("/" + RestConstants.RES_NAME_COUNT)
+	@GetMapping("/" + RestConstants.PATH_NAME_COUNT)
 	public Integer getCount(@RequestParam(PARAM_ENTITY_TYPE) String entityType,
 	                        @RequestParam(value = PARAM_ENTITY_CATEGORY, required = false) String category,
 	                        @RequestParam(value = PARAM_ENTITY_OPERATION, required = false) String operation) {

@@ -16,4 +16,16 @@ export class DashboardService {
 		return this.httpClient.get<Dashboard>(environment.apiBaseUrl + "dashboard");
 	}
 
+	getCategories(entityType: string): Observable<Dashboard> {
+		return this.httpClient.get<Dashboard>(environment.apiBaseUrl + "dashboard/category", {
+			params: {entityType: entityType}
+		});
+	}
+
+	getCount(entityType: string, category: string, operation: string): Observable<Dashboard> {
+		return this.httpClient.get<Dashboard>(environment.apiBaseUrl + "dashboard/count", {
+			params: {entityType: entityType, category: category, operation: operation}
+		});
+	}
+
 }

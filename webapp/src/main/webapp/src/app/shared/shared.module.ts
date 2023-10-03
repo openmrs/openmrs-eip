@@ -16,6 +16,7 @@ import {StoreModule} from "@ngrx/store";
 import {dashboardReducer} from "./state/dashboard.reducer";
 import {ServerDownComponent} from "./server-down.component";
 import {MessageDialogComponent} from "./dialogs/message.component";
+import {QueueDataComponent} from "./dashboard/queue-data.component";
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import {MessageDialogComponent} from "./dialogs/message.component";
 		GroupViewComponent,
 		ClassNamePipe,
 		ModelClassPipe,
-		ServerDownComponent
+		ServerDownComponent,
+		QueueDataComponent
 	],
 	imports: [
 		CommonModule,
@@ -42,7 +44,8 @@ import {MessageDialogComponent} from "./dialogs/message.component";
 		GroupViewComponent,
 		ClassNamePipe,
 		ModelClassPipe,
-		ServerDownComponent
+		ServerDownComponent,
+		QueueDataComponent
 	],
 	providers: [
 		{
