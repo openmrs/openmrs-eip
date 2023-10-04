@@ -58,7 +58,7 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 		}, delay);
 	}
 
-	handleLoadError(error: HttpErrorResponse): void {
+	handleLoadError(error: HttpErrorResponse | undefined): void {
 		if (error) {
 			if (error.status === 0) {
 				this.serverDown = true;

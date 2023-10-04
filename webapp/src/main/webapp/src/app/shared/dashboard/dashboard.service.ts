@@ -24,7 +24,7 @@ export class DashboardService {
 		});
 	}
 
-	getCount(entityType: any, category: any, operation: any): Observable<number> {
+	getCount(entityType: string, category: string | null, operation: string | null): Observable<number> {
 		let requestParams;
 		if (!category || !operation) {
 			requestParams = {

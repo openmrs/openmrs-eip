@@ -1,10 +1,10 @@
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from 'rxjs';
-import {Store} from "@ngrx/store";
+import {select, Store} from "@ngrx/store";
 import {QueueData} from "./queue-data";
-import {SyncMode} from "../../sync-mode.enum";
 import {FetchCount} from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
+import {GET_SYNC_COUNT} from "../state/dashboard.reducer";
 
 @Component({
 	selector: 'queue-data',
@@ -12,15 +12,14 @@ import {DashboardService} from "../dashboard.service";
 })
 export class QueueDataComponent implements OnInit, OnDestroy {
 
+	receiverQueueNames: string[] = ['sync'];
+
 	data = new QueueData();
 
 	categorizationLabel?: string;
 
 	@Input()
-	syncMode?: SyncMode;
-
-	@Input()
-	entityType: string = '';
+	queueName: string = '';
 
 	timeoutId?: number;
 
@@ -30,17 +29,17 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		if (this.syncMode == SyncMode.RECEIVER) {
+		if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
 			this.categorizationLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
 		} else {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
-		/*this.countReceivedSub = this.store.pipe(select('')).subscribe(count => {
-			if(count) {
+		this.countReceivedSub = this.store.pipe(select(GET_SYNC_COUNT)).subscribe(count => {
+			if (count) {
 				this.data.count = count;
 			}
-		});*/
+		});
 
 		//Display placeholders
 		//Get count and refresh
@@ -52,11 +51,12 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	getCount(): void {
-		let queueName: string = '';
-		if (this.entityType == 'SyncMessage') {
-			queueName = 'sync';
+		let entityType: string = '';
+		if (this.queueName == 'sync') {
+			entityType = 'SyncMessage';
 		}
-		this.store.dispatch(new FetchCount(this.entityType, queueName));
+
+		this.store.dispatch(new FetchCount(entityType, this.queueName));
 	}
 
 	ngOnDestroy(): void {
