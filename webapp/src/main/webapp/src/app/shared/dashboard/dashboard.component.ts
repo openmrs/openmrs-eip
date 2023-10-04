@@ -3,11 +3,11 @@ import {DashboardService} from "./dashboard.service";
 import {Dashboard} from "./dashboard";
 import {Subscription} from 'rxjs';
 import {select, Store} from "@ngrx/store";
-import {GET_PROPS} from "../state/app.reducer";
-import {SyncMode} from "./sync-mode.enum";
 import {LoadDashboard} from "./state/dashboard.actions";
 import {GET_DASHBOARD, GET_DASHBOARD_ERROR} from "./state/dashboard.reducer";
 import {HttpErrorResponse} from "@angular/common/http";
+import {GET_PROPS} from "../../state/app.reducer";
+import {SyncMode} from "../sync-mode.enum";
 
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {

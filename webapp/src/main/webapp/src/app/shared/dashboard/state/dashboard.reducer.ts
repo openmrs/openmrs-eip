@@ -2,7 +2,7 @@ import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {Dashboard} from "../dashboard";
 import {DashboardAction, DashboardActionType} from "./dashboard.actions";
 import {HttpErrorResponse} from "@angular/common/http";
-import {QueueData} from "../dashboard/queue-data/queue-data";
+import {QueueData} from "../queue-data/queue-data";
 
 export interface DashboardState {
 	dashboard?: Dashboard;

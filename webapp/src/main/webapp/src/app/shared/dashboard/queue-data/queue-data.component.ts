@@ -1,10 +1,10 @@
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from 'rxjs';
-import {select, Store} from "@ngrx/store";
+import {Store} from "@ngrx/store";
 import {QueueData} from "./queue-data";
 import {SyncMode} from "../../sync-mode.enum";
-import {DashboardService} from "../../dashboard.service";
-import {FetchCount} from "../../state/dashboard.actions";
+import {FetchCount} from "../state/dashboard.actions";
+import {DashboardService} from "../dashboard.service";
 
 @Component({
 	selector: 'queue-data',
@@ -36,11 +36,11 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
-		this.countReceivedSub = this.store.pipe(select('')).subscribe(count => {
+		/*this.countReceivedSub = this.store.pipe(select('')).subscribe(count => {
 			if(count) {
 				this.data.count = count;
 			}
-		});
+		});*/
 
 		//Display placeholders
 		//Get count and refresh
@@ -53,7 +53,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	getCount(): void {
 		let queueName: string = '';
-		if(this.entityType == 'SyncMessage'){
+		if (this.entityType == 'SyncMessage') {
 			queueName = 'sync';
 		}
 		this.store.dispatch(new FetchCount(this.entityType, queueName));

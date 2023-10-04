@@ -1,5 +1,5 @@
 export class Dashboard {
 
-    entries?: any;
+	entries?: any;
 
 }

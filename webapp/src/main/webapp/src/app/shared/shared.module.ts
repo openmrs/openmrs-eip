@@ -11,12 +11,12 @@ import {GlobalErrorHandler} from "./global-error.handler";
 import {ClassNamePipe} from "./pipes/class-name.pipe";
 import {GroupViewComponent} from "./view/group/group-view.component";
 import {EffectsModule} from "@ngrx/effects";
-import {DashboardEffects} from "./state/dashboard.effects";
 import {StoreModule} from "@ngrx/store";
-import {dashboardReducer} from "./state/dashboard.reducer";
 import {ServerDownComponent} from "./server-down.component";
 import {MessageDialogComponent} from "./dialogs/message.component";
 import {QueueDataComponent} from "./dashboard/queue-data/queue-data.component";
+import {DashboardEffects} from "./dashboard/state/dashboard.effects";
+import {dashboardReducer} from "./dashboard/state/dashboard.reducer";
 
 
 @NgModule({
