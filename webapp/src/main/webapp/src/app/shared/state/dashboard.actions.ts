@@ -8,7 +8,11 @@ export enum DashboardActionType {
 
 	DASHBOARD_LOADED = 'DASHBOARD_LOADED',
 
-	LOAD_DASHBOARD_ERROR = 'LOAD_DASHBOARD_ERROR'
+	LOAD_DASHBOARD_ERROR = 'LOAD_DASHBOARD_ERROR',
+
+	FETCH_COUNT = 'FETCH_COUNT',
+
+	COUNT_RECEIVED = 'COUNT_RECEIVED'
 
 }
 
@@ -33,4 +37,22 @@ export class LoadDashboardError implements Action {
 	}
 }
 
-export type DashboardAction = LoadDashboard | DashboardLoaded | LoadDashboardError;
+export class FetchCount implements Action {
+
+	readonly type = DashboardActionType.FETCH_COUNT;
+
+	constructor(public entityType: string, public queueName: string) {
+	}
+
+}
+
+export class CountReceived implements Action {
+
+	readonly type = DashboardActionType.COUNT_RECEIVED;
+
+	constructor(public count: number, public queueName: string) {
+	}
+
+}
+
+export type DashboardAction = LoadDashboard | DashboardLoaded | LoadDashboardError | FetchCount | CountReceived;

@@ -16,9 +16,7 @@ import {StoreModule} from "@ngrx/store";
 import {dashboardReducer} from "./state/dashboard.reducer";
 import {ServerDownComponent} from "./server-down.component";
 import {MessageDialogComponent} from "./dialogs/message.component";
-import {QueueDataEffects} from "./dashboard/queue-data/state/queue-data.effects";
 import {QueueDataComponent} from "./dashboard/queue-data/queue-data.component";
-import {queueDataReducer} from "./dashboard/queue-data/state/queue-data.reducer";
 
 
 @NgModule({
@@ -34,9 +32,8 @@ import {queueDataReducer} from "./dashboard/queue-data/state/queue-data.reducer"
 	imports: [
 		CommonModule,
 		DataTablesModule,
-		EffectsModule.forFeature([DashboardEffects, QueueDataEffects]),
-		StoreModule.forFeature("dashboard", dashboardReducer),
-		StoreModule.forFeature("syncQueueData", queueDataReducer)
+		EffectsModule.forFeature([DashboardEffects]),
+		StoreModule.forFeature("dashboard", dashboardReducer)
 	],
 	exports: [
 		CommonModule,
