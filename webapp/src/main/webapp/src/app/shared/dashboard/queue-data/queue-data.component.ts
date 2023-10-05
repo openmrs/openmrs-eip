@@ -4,7 +4,8 @@ import {select, Store} from "@ngrx/store";
 import {QueueData} from "./queue-data";
 import {FetchCount} from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
-import {GET_SYNC_COUNT} from "../state/dashboard.reducer";
+import {GET_SYNC_COUNT, GET_SYNCED_COUNT} from "../state/dashboard.reducer";
+import {Selector} from "@ngrx/store/src/models";
 
 @Component({
 	selector: 'queue-data',
@@ -12,7 +13,17 @@ import {GET_SYNC_COUNT} from "../state/dashboard.reducer";
 })
 export class QueueDataComponent implements OnInit, OnDestroy {
 
-	receiverQueueNames: string[] = ['sync'];
+	receiverQueueNames: string[] = ['sync', 'synced'];
+
+	queueAndCountSelectorMap = new Map<string, Selector<object, number | undefined>>([
+		['sync', GET_SYNC_COUNT],
+		['synced', GET_SYNCED_COUNT]
+	]);
+
+	queueAndTypeMap = new Map<string, string>([
+		['sync', 'SyncMessage'],
+		['synced', 'SyncedMessage']
+	]);
 
 	data = new QueueData();
 
@@ -35,11 +46,14 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
-		this.countReceivedSub = this.store.pipe(select(GET_SYNC_COUNT)).subscribe(count => {
-			if (count) {
-				this.data.count = count;
-			}
-		});
+		let countSelector: Selector<object, number | undefined> | undefined = this.queueAndCountSelectorMap.get(this.queueName);
+		if (countSelector) {
+			this.countReceivedSub = this.store.pipe(select(countSelector)).subscribe(count => {
+				if (count) {
+					this.data.count = count;
+				}
+			});
+		}
 
 		//Display placeholders
 		//Get count and refresh
@@ -51,12 +65,10 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	getCount(): void {
-		let entityType: string = '';
-		if (this.queueName == 'sync') {
-			entityType = 'SyncMessage';
+		let entityType: string | undefined = this.queueAndTypeMap.get(this.queueName);
+		if (entityType) {
+			this.store.dispatch(new FetchCount(entityType, this.queueName));
 		}
-
-		this.store.dispatch(new FetchCount(entityType, this.queueName));
 	}
 
 	ngOnDestroy(): void {

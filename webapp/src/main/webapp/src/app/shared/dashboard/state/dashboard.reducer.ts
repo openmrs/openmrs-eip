@@ -27,6 +27,11 @@ export const GET_SYNC_COUNT = createSelector(
 	state => state.queueDataMap?.get('sync')?.count
 );
 
+export const GET_SYNCED_COUNT = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueDataMap?.get('synced')?.count
+);
+
 export function dashboardReducer(state: DashboardState = {error: undefined}, action: DashboardAction) {
 
 	switch (action.type) {
