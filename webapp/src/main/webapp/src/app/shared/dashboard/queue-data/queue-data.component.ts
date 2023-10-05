@@ -15,11 +15,6 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	receiverQueueNames = ['sync', 'synced'];
 
-	queueAndTypeMap = new Map<string, string>([
-		['sync', 'SyncMessage'],
-		['synced', 'SyncedMessage']
-	]);
-
 	queueAndCountSelectorMap = new Map<string, Selector<object, number | undefined>>([
 		['sync', GET_SYNC_COUNT],
 		['synced', GET_SYNCED_COUNT]
@@ -81,17 +76,11 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	getCount(): void {
-		let entityType: string | undefined = this.queueAndTypeMap.get(this.queueName);
-		if (entityType) {
-			this.store.dispatch(new FetchQueueCount(entityType, this.queueName));
-		}
+		this.store.dispatch(new FetchQueueCount(this.queueName));
 	}
 
 	getCategories(): void {
-		let entityType: string | undefined = this.queueAndTypeMap.get(this.queueName);
-		if (entityType) {
-			this.store.dispatch(new FetchQueueCategories(entityType, this.queueName));
-		}
+		this.store.dispatch(new FetchQueueCategories(this.queueName));
 	}
 
 	ngOnDestroy(): void {

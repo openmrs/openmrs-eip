@@ -45,7 +45,7 @@ export class FetchQueueCount implements Action {
 
 	readonly type = DashboardActionType.FETCH_QUEUE_COUNT;
 
-	constructor(public entityType: string, public queueName: string) {
+	constructor(public queueName: string) {
 	}
 
 }
@@ -63,7 +63,7 @@ export class FetchQueueCategories implements Action {
 
 	readonly type = DashboardActionType.FETCH_QUEUE_CATEGORIES;
 
-	constructor(public entityType: string, public queueName: string) {
+	constructor(public queueName: string) {
 	}
 
 }

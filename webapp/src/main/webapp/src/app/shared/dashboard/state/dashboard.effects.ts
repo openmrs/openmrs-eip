@@ -14,6 +14,11 @@ import {of} from "rxjs";
 @Injectable()
 export class DashboardEffects {
 
+	queueAndTypeMap = new Map<string, string>([
+		['sync', 'SyncMessage'],
+		['synced', 'SyncedMessage']
+	]);
+
 	constructor(private actions$: Actions, private dashboardService: DashboardService) {
 	}
 
@@ -32,7 +37,7 @@ export class DashboardEffects {
 	fetchQueueCount$ = createEffect(() =>
 		this.actions$.pipe(
 			ofType(DashboardActionType.FETCH_QUEUE_COUNT),
-			mergeMap(action => this.dashboardService.getCount(action['entityType'], null, null)
+			mergeMap(action => this.dashboardService.getCount(this.queueAndTypeMap.get(action['queueName']))
 				.pipe(
 					map(count => new QueueCountReceived(count, action['queueName'])),
 					catchError(err => of(new LoadDashboardError(err)))
@@ -44,7 +49,7 @@ export class DashboardEffects {
 	fetchQueueCategories$ = createEffect(() =>
 		this.actions$.pipe(
 			ofType(DashboardActionType.FETCH_QUEUE_CATEGORIES),
-			mergeMap(action => this.dashboardService.getCategories(action['entityType'])
+			mergeMap(action => this.dashboardService.getCategories(this.queueAndTypeMap.get(action['queueName']))
 				.pipe(
 					map(categories => new QueueCategoriesReceived(categories, action['queueName'])),
 					catchError(err => of(new LoadDashboardError(err)))

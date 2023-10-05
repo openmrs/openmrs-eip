@@ -16,23 +16,23 @@ export class DashboardService {
 		return this.httpClient.get<Dashboard>(environment.apiBaseUrl + "dashboard");
 	}
 
-	getCategories(entityType: string): Observable<string[]> {
+	getCategories(entityType: string | undefined): Observable<string[]> {
 		return this.httpClient.get<string[]>(environment.apiBaseUrl + "dashboard/category", {
 			params: {
-				entityType: entityType
+				entityType: entityType ? entityType : ''
 			}
 		});
 	}
 
-	getCount(entityType: string, category: string | null, operation: string | null): Observable<number> {
+	getCount(entityType: string | undefined, category?: string, operation?: string): Observable<number> {
 		let requestParams;
 		if (!category || !operation) {
 			requestParams = {
-				entityType: entityType
+				entityType: entityType ? entityType : ''
 			}
 		} else {
 			requestParams = {
-				entityType: entityType,
+				entityType: entityType ? entityType : '',
 				category: category,
 				operation: operation
 			}
