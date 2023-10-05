@@ -6,7 +6,7 @@ import {QueueData} from "../queue-data/queue-data";
 
 export interface DashboardState {
 	dashboard?: Dashboard;
-	queueDataMap?: Map<string, QueueData>;
+	queueAndDataMap?: Map<string, QueueData>;
 	error: HttpErrorResponse | undefined;
 }
 
@@ -24,12 +24,17 @@ export const GET_DASHBOARD_ERROR = createSelector(
 
 export const GET_SYNC_COUNT = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
-	state => state.queueDataMap?.get('sync')?.count
+	state => state.queueAndDataMap?.get('sync')?.count
+);
+
+export const GET_SYNC_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('sync')?.categories
 );
 
 export const GET_SYNCED_COUNT = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
-	state => state.queueDataMap?.get('synced')?.count
+	state => state.queueAndDataMap?.get('synced')?.count
 );
 
 export function dashboardReducer(state: DashboardState = {error: undefined}, action: DashboardAction) {
@@ -48,28 +53,52 @@ export function dashboardReducer(state: DashboardState = {error: undefined}, act
 				error: action.error
 			};
 
-		case DashboardActionType.COUNT_RECEIVED:
-			let stateCopy = {
+		case DashboardActionType.QUEUE_COUNT_RECEIVED:
+			let stateCopyForCount = {
 				...state
 			};
 
-			let queueDataMap: Map<string, QueueData> | undefined = stateCopy.queueDataMap;
-			if (!queueDataMap) {
-				queueDataMap = new Map<string, QueueData>();
-				stateCopy.queueDataMap = queueDataMap;
+			let queueAndDataMapForCount: Map<string, QueueData> | undefined = stateCopyForCount.queueAndDataMap;
+			if (!queueAndDataMapForCount) {
+				queueAndDataMapForCount = new Map<string, QueueData>();
+				stateCopyForCount.queueAndDataMap = queueAndDataMapForCount;
 			}
 
-			let queueData: QueueData | undefined = queueDataMap.get(action.queueName);
-			if (!queueData) {
-				queueData = new QueueData();
-				queueDataMap.set(action.queueName, queueData);
+			let queueDataForCount: QueueData | undefined = queueAndDataMapForCount.get(action.queueName);
+			if (!queueDataForCount) {
+				queueDataForCount = new QueueData();
+				queueAndDataMapForCount.set(action.queueName, queueDataForCount);
 			}
 
-			queueData.count = action.count;
+			queueDataForCount.count = action.count;
 
 			return {
 				...state,
-				queueDataMap: queueDataMap
+				queueAndDataMap: queueAndDataMapForCount
+			};
+
+		case DashboardActionType.QUEUE_CATEGORIES_RECEIVED:
+			let stateCopyForCats = {
+				...state
+			};
+
+			let queueDataMapForCats: Map<string, QueueData> | undefined = stateCopyForCats.queueAndDataMap;
+			if (!queueDataMapForCats) {
+				queueDataMapForCats = new Map<string, QueueData>();
+				stateCopyForCats.queueAndDataMap = queueDataMapForCats;
+			}
+
+			let queueDataForCats: QueueData | undefined = queueDataMapForCats.get(action.queueName);
+			if (!queueDataForCats) {
+				queueDataForCats = new QueueData();
+				queueDataMapForCats.set(action.queueName, queueDataForCats);
+			}
+
+			queueDataForCats.categories = action.categories;
+
+			return {
+				...state,
+				queueAndDataMap: queueDataMapForCats
 			};
 
 		default:

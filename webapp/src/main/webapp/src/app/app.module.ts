@@ -24,6 +24,7 @@ import {EffectsModule} from "@ngrx/effects";
 		StoreDevtoolsModule.instrument({
 			name: "DB Sync",
 			maxAge: 25,
+			serialize: true,
 			logOnly: environment.production
 		})
 	],

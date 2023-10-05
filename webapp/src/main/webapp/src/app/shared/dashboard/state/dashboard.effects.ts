@@ -2,7 +2,13 @@ import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {DashboardService} from "../dashboard.service";
 import {catchError, map, mergeMap, switchMap} from "rxjs/operators";
-import {CountReceived, DashboardActionType, DashboardLoaded, LoadDashboardError} from "./dashboard.actions";
+import {
+	DashboardActionType,
+	DashboardLoaded,
+	LoadDashboardError,
+	QueueCategoriesReceived,
+	QueueCountReceived
+} from "./dashboard.actions";
 import {of} from "rxjs";
 
 @Injectable()
@@ -23,12 +29,24 @@ export class DashboardEffects {
 		)
 	);
 
-	fetchCount$ = createEffect(() =>
+	fetchQueueCount$ = createEffect(() =>
 		this.actions$.pipe(
-			ofType(DashboardActionType.FETCH_COUNT),
+			ofType(DashboardActionType.FETCH_QUEUE_COUNT),
 			mergeMap(action => this.dashboardService.getCount(action['entityType'], null, null)
 				.pipe(
-					map(count => new CountReceived(count, action['queueName'])),
+					map(count => new QueueCountReceived(count, action['queueName'])),
+					catchError(err => of(new LoadDashboardError(err)))
+				)
+			)
+		)
+	);
+
+	fetchQueueCategories$ = createEffect(() =>
+		this.actions$.pipe(
+			ofType(DashboardActionType.FETCH_QUEUE_CATEGORIES),
+			mergeMap(action => this.dashboardService.getCategories(action['entityType'])
+				.pipe(
+					map(categories => new QueueCategoriesReceived(categories, action['queueName'])),
 					catchError(err => of(new LoadDashboardError(err)))
 				)
 			)

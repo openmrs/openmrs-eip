@@ -10,9 +10,13 @@ export enum DashboardActionType {
 
 	LOAD_DASHBOARD_ERROR = 'LOAD_DASHBOARD_ERROR',
 
-	FETCH_COUNT = 'FETCH_COUNT',
+	FETCH_QUEUE_COUNT = 'FETCH_QUEUE_COUNT',
 
-	COUNT_RECEIVED = 'COUNT_RECEIVED'
+	QUEUE_COUNT_RECEIVED = 'QUEUE_COUNT_RECEIVED',
+
+	FETCH_QUEUE_CATEGORIES = 'FETCH_QUEUE_CATEGORIES',
+
+	QUEUE_CATEGORIES_RECEIVED = 'QUEUE_CATEGORIES_RECEIVED'
 
 }
 
@@ -37,22 +41,47 @@ export class LoadDashboardError implements Action {
 	}
 }
 
-export class FetchCount implements Action {
+export class FetchQueueCount implements Action {
 
-	readonly type = DashboardActionType.FETCH_COUNT;
+	readonly type = DashboardActionType.FETCH_QUEUE_COUNT;
 
 	constructor(public entityType: string, public queueName: string) {
 	}
 
 }
 
-export class CountReceived implements Action {
+export class QueueCountReceived implements Action {
 
-	readonly type = DashboardActionType.COUNT_RECEIVED;
+	readonly type = DashboardActionType.QUEUE_COUNT_RECEIVED;
 
 	constructor(public count: number, public queueName: string) {
 	}
 
 }
 
-export type DashboardAction = LoadDashboard | DashboardLoaded | LoadDashboardError | FetchCount | CountReceived;
+export class FetchQueueCategories implements Action {
+
+	readonly type = DashboardActionType.FETCH_QUEUE_CATEGORIES;
+
+	constructor(public entityType: string, public queueName: string) {
+	}
+
+}
+
+export class QueueCategoriesReceived implements Action {
+
+	readonly type = DashboardActionType.QUEUE_CATEGORIES_RECEIVED;
+
+	constructor(public categories: string[], public queueName: string) {
+	}
+
+}
+
+export type DashboardAction =
+	LoadDashboard
+	| DashboardLoaded
+	| LoadDashboardError
+	| FetchQueueCount
+	| QueueCountReceived
+	| FetchQueueCategories
+	| QueueCategoriesReceived;
