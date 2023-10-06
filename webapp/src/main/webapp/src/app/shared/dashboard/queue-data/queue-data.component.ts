@@ -2,10 +2,16 @@ import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from 'rxjs';
 import {select, Store} from "@ngrx/store";
 import {QueueData} from "./queue-data";
-import {FetchQueueCategories, FetchQueueCount} from "../state/dashboard.actions";
+import {FetchQueueCategories, FetchQueueCategoryCount, FetchQueueCount} from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
-import {GET_SYNC_CATEGORIES, GET_SYNC_COUNT, GET_SYNCED_COUNT} from "../state/dashboard.reducer";
+import {
+	GET_SYNC_CATEGORIES,
+	GET_SYNC_CATEGORY_COUNTS,
+	GET_SYNC_COUNT,
+	GET_SYNCED_COUNT
+} from "../state/dashboard.reducer";
 import {Selector} from "@ngrx/store/src/models";
+import {SyncOperation} from "../../sync-operation.enum";
 
 @Component({
 	selector: 'queue-data',
@@ -13,18 +19,24 @@ import {Selector} from "@ngrx/store/src/models";
 })
 export class QueueDataComponent implements OnInit, OnDestroy {
 
-	receiverQueueNames = ['sync', 'synced'];
+	readonly SYNC_OPS = Object.values(SyncOperation);
 
-	queueAndCountSelectorMap = new Map<string, Selector<object, number | undefined>>([
+	readonly receiverQueueNames = ['sync', 'synced'];
+
+	readonly queueAndCountSelectorMap = new Map<string, Selector<object, number | undefined>>([
 		['sync', GET_SYNC_COUNT],
 		['synced', GET_SYNCED_COUNT]
 	]);
 
-	queueAndCategoriesSelectorMap = new Map<string, Selector<object, string[] | undefined>>([
+	readonly queueAndCategoriesSelectorMap = new Map<string, Selector<object, string[] | undefined>>([
 		['sync', GET_SYNC_CATEGORIES]
 	]);
 
-	data = new QueueData();
+	readonly queueAndCatCountSelectorMap = new Map<string, Selector<object, Map<string, Map<SyncOperation, number>> | undefined>>([
+		['sync', GET_SYNC_CATEGORY_COUNTS]
+	]);
+
+	readonly data = new QueueData();
 
 	categorizationLabel?: string;
 
@@ -62,17 +74,26 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				if (categories) {
 					this.data.categories = categories;
 				}
+
+				this.getCategoryCounts();
+			});
+		}
+
+		let catCountSelector: Selector<object, Map<string, Map<SyncOperation, number>> | undefined> | undefined = this.queueAndCatCountSelectorMap.get(this.queueName);
+		if (catCountSelector) {
+			this.categoriesSubscription = this.store.pipe(select(catCountSelector)).subscribe(catAndCounts => {
+				if (catAndCounts) {
+					this.data.categoryAndCounts = catAndCounts;
+				}
+
+				//Update total count and refresh
+				//Schedule next reload after all counts are received
 			});
 		}
 
 		//Display placeholders
-		//Get count and refresh
 		this.getCount();
 		this.getCategories();
-		//Get categories and refresh to display placeholders for each category count
-		//Get the count for each category and refresh
-		//Update count and refresh
-		//Schedule next reload
 	}
 
 	getCount(): void {
@@ -81,6 +102,14 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	getCategories(): void {
 		this.store.dispatch(new FetchQueueCategories(this.queueName));
+	}
+
+	getCategoryCounts(): void {
+		this.data.categories?.forEach(c => {
+			this.SYNC_OPS.forEach(o => {
+				this.store.dispatch(new FetchQueueCategoryCount(this.queueName, c, o));
+			});
+		});
 	}
 
 	ngOnDestroy(): void {

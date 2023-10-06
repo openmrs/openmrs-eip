@@ -3,6 +3,7 @@ import {Observable} from "rxjs";
 import {Dashboard} from "./dashboard";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
+import {SyncOperation} from "../sync-operation.enum";
 
 @Injectable({
 	providedIn: 'root'
@@ -24,7 +25,7 @@ export class DashboardService {
 		});
 	}
 
-	getCount(entityType: string | undefined, category?: string, operation?: string): Observable<number> {
+	getCount(entityType: string | undefined, category?: string, operation?: SyncOperation): Observable<number> {
 		let requestParams;
 		if (!category || !operation) {
 			requestParams = {

@@ -1,11 +1,11 @@
-<li class="list-group-item text-secondary text-center" [hidden]="data">
+<li class="list-group-item text-secondary text-center" [hidden]="data.count">
 	<span i18n="@@common-loading">Loading</span>...
 </li>
-<li class="list-group-item text-center" [hidden]="data.count > 0">
+<li class="list-group-item text-center" [hidden]="data.count && data.count > 0">
 	<i class="bi-check-circle-fill text-success"></i>&nbsp;
 	<span i18n="@@common-no-sync-msg">No items, everything looks good!</span>
 </li>
-<li class="list-group-item" [hidden]="data.count == 0">
+<li class="list-group-item" [hidden]="!data.count && data.count == 0">
 	<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-quick-summary">Quick Summary</div>
 	<div class="ml-3 mr-3">
 		<table class="text-dark">
@@ -20,9 +20,11 @@
 		</table>
 	</div>
 </li>
-<li class="list-group-item" [hidden]="data.count == 0">
+<li class="list-group-item" [hidden]="!data.count && data.count == 0">
 	<div class="h6 card-title ui-text-theme-secondary">{{categorizationLabel}}</div>
 	<div class="ml-3 mr-3">
-		Category And Count
+		<div class="ml-3 mr-3">
+			<breakdown [categoryAndCountsMap]="data.categoryAndCounts"></breakdown>
+		</div>
 	</div>
 </li>

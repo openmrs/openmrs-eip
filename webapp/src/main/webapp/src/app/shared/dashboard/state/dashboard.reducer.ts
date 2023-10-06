@@ -3,11 +3,15 @@ import {Dashboard} from "../dashboard";
 import {DashboardAction, DashboardActionType} from "./dashboard.actions";
 import {HttpErrorResponse} from "@angular/common/http";
 import {QueueData} from "../queue-data/queue-data";
+import {SyncOperation} from "../../sync-operation.enum";
 
-export interface DashboardState {
+export class DashboardState {
 	dashboard?: Dashboard;
-	queueAndDataMap?: Map<string, QueueData>;
-	error: HttpErrorResponse | undefined;
+	queueAndDataMap?: Map<string, QueueData> = new Map<string, QueueData>([
+		['sync', new QueueData()],
+		['synced', new QueueData()]
+	]);
+	error?: HttpErrorResponse;
 }
 
 const GET_DASHBOARD_FEATURE_STATE = createFeatureSelector<DashboardState>('dashboard');
@@ -32,12 +36,17 @@ export const GET_SYNC_CATEGORIES = createSelector(
 	state => state.queueAndDataMap?.get('sync')?.categories
 );
 
+export const GET_SYNC_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('sync')?.categoryAndCounts
+);
+
 export const GET_SYNCED_COUNT = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
 	state => state.queueAndDataMap?.get('synced')?.count
 );
 
-export function dashboardReducer(state: DashboardState = {error: undefined}, action: DashboardAction) {
+export function dashboardReducer(state: DashboardState = new DashboardState(), action: DashboardAction) {
 
 	switch (action.type) {
 
@@ -54,52 +63,52 @@ export function dashboardReducer(state: DashboardState = {error: undefined}, act
 			};
 
 		case DashboardActionType.QUEUE_COUNT_RECEIVED:
-			let stateCopyForCount = {
+			let newStateForCount = {
 				...state
 			};
 
-			let queueAndDataMapForCount: Map<string, QueueData> | undefined = stateCopyForCount.queueAndDataMap;
-			if (!queueAndDataMapForCount) {
-				queueAndDataMapForCount = new Map<string, QueueData>();
-				stateCopyForCount.queueAndDataMap = queueAndDataMapForCount;
+			let queueDataForCount: QueueData | undefined = newStateForCount.queueAndDataMap?.get(action.queueName);
+			if (queueDataForCount) {
+				queueDataForCount.count = action.count;
 			}
 
-			let queueDataForCount: QueueData | undefined = queueAndDataMapForCount.get(action.queueName);
-			if (!queueDataForCount) {
-				queueDataForCount = new QueueData();
-				queueAndDataMapForCount.set(action.queueName, queueDataForCount);
-			}
-
-			queueDataForCount.count = action.count;
-
-			return {
-				...state,
-				queueAndDataMap: queueAndDataMapForCount
-			};
+			return newStateForCount;
 
 		case DashboardActionType.QUEUE_CATEGORIES_RECEIVED:
-			let stateCopyForCats = {
+			let newStateForCats = {
 				...state
 			};
 
-			let queueDataMapForCats: Map<string, QueueData> | undefined = stateCopyForCats.queueAndDataMap;
-			if (!queueDataMapForCats) {
-				queueDataMapForCats = new Map<string, QueueData>();
-				stateCopyForCats.queueAndDataMap = queueDataMapForCats;
+			let queueDataForCats: QueueData | undefined = newStateForCats.queueAndDataMap?.get(action.queueName);
+			if (queueDataForCats) {
+				queueDataForCats.categories = action.categories;
 			}
 
-			let queueDataForCats: QueueData | undefined = queueDataMapForCats.get(action.queueName);
-			if (!queueDataForCats) {
-				queueDataForCats = new QueueData();
-				queueDataMapForCats.set(action.queueName, queueDataForCats);
-			}
+			return newStateForCats;
 
-			queueDataForCats.categories = action.categories;
-
-			return {
-				...state,
-				queueAndDataMap: queueDataMapForCats
+		case DashboardActionType.QUEUE_CATEGORY_COUNT_RECEIVED:
+			let newStateForCatCounts = {
+				...state
 			};
+
+			let queueDataForCatCounts: QueueData | undefined = newStateForCatCounts.queueAndDataMap?.get(action.queueName);
+			if (queueDataForCatCounts) {
+				let catAndCountsMap: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCatCounts.categoryAndCounts;
+				if (!catAndCountsMap) {
+					catAndCountsMap = new Map<string, Map<SyncOperation, number>>();
+					queueDataForCatCounts.categoryAndCounts = catAndCountsMap;
+				}
+
+				let opAndCountMap: Map<SyncOperation, number> | undefined = catAndCountsMap.get(action.category);
+				if (!opAndCountMap) {
+					opAndCountMap = new Map<SyncOperation, number>();
+					catAndCountsMap.set(action.category, opAndCountMap);
+				}
+
+				opAndCountMap.set(action.operation, action.count);
+			}
+
+			return newStateForCatCounts;
 
 		default:
 			return state;

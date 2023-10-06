@@ -17,6 +17,7 @@ import {MessageDialogComponent} from "./dialogs/message.component";
 import {QueueDataComponent} from "./dashboard/queue-data/queue-data.component";
 import {DashboardEffects} from "./dashboard/state/dashboard.effects";
 import {dashboardReducer} from "./dashboard/state/dashboard.reducer";
+import {BreakdownComponent} from "./dashboard/breakdown/breakdown.component";
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import {dashboardReducer} from "./dashboard/state/dashboard.reducer";
 		ClassNamePipe,
 		ModelClassPipe,
 		ServerDownComponent,
-		QueueDataComponent
+		QueueDataComponent,
+		BreakdownComponent
 	],
 	imports: [
 		CommonModule,

@@ -1,9 +1,11 @@
+import {SyncOperation} from "../../sync-operation.enum";
+
 export class QueueData {
 
-	count: number = 0;
+	count?: number;
 
-	categories: string[] = [];
+	categories?: string[];
 
-	categoryAndCount = new Map<string, number>();
+	categoryAndCounts?: Map<string, Map<SyncOperation, number>>;
 
 }

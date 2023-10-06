@@ -1,6 +1,7 @@
 import {Action} from "@ngrx/store";
 import {Dashboard} from "../dashboard";
 import {HttpErrorResponse} from "@angular/common/http";
+import {SyncOperation} from "../../sync-operation.enum";
 
 export enum DashboardActionType {
 
@@ -16,7 +17,11 @@ export enum DashboardActionType {
 
 	FETCH_QUEUE_CATEGORIES = 'FETCH_QUEUE_CATEGORIES',
 
-	QUEUE_CATEGORIES_RECEIVED = 'QUEUE_CATEGORIES_RECEIVED'
+	QUEUE_CATEGORIES_RECEIVED = 'QUEUE_CATEGORIES_RECEIVED',
+
+	FETCH_QUEUE_CATEGORY_COUNT = 'FETCH_QUEUE_CATEGORY_COUNT',
+
+	QUEUE_CATEGORY_COUNT_RECEIVED = 'QUEUE_CATEGORY_COUNT_RECEIVED'
 
 }
 
@@ -77,6 +82,24 @@ export class QueueCategoriesReceived implements Action {
 
 }
 
+export class FetchQueueCategoryCount implements Action {
+
+	readonly type = DashboardActionType.FETCH_QUEUE_CATEGORY_COUNT;
+
+	constructor(public queueName: string, public category: string, public operation: SyncOperation) {
+	}
+
+}
+
+export class QueueCategoryCountReceived implements Action {
+
+	readonly type = DashboardActionType.QUEUE_CATEGORY_COUNT_RECEIVED;
+
+	constructor(public count: number, public queueName: string, public category: string, public operation: SyncOperation) {
+	}
+
+}
+
 export type DashboardAction =
 	LoadDashboard
 	| DashboardLoaded
@@ -84,4 +107,6 @@ export type DashboardAction =
 	| FetchQueueCount
 	| QueueCountReceived
 	| FetchQueueCategories
-	| QueueCategoriesReceived;
+	| QueueCategoriesReceived
+	| FetchQueueCategoryCount
+	| QueueCategoryCountReceived;
