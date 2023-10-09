@@ -10,6 +10,9 @@ export class BreakdownComponent {
 	readonly SyncOperation = SyncOperation;
 
 	@Input()
+	categories?: string[];
+
+	@Input()
 	categoryAndCountsMap?: Map<string, Map<SyncOperation, number>>;
 
 }

@@ -81,7 +81,9 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 
 			let queueDataForCats: QueueData | undefined = newStateForCats.queueAndDataMap?.get(action.queueName);
 			if (queueDataForCats) {
-				queueDataForCats.categories = action.categories;
+				let n: number = Math.floor(Math.random() * 2);
+				n = action.categories.length;
+				queueDataForCats.categories = n > 0 ? action.categories : [];
 			}
 
 			return newStateForCats;
@@ -96,8 +98,11 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 				let catAndCountsMap: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCatCounts.categoryAndCounts;
 				if (!catAndCountsMap) {
 					catAndCountsMap = new Map<string, Map<SyncOperation, number>>();
-					queueDataForCatCounts.categoryAndCounts = catAndCountsMap;
+				}else{
+					catAndCountsMap = new Map<string, Map<SyncOperation, number>>(catAndCountsMap);
 				}
+
+				queueDataForCatCounts.categoryAndCounts = catAndCountsMap;
 
 				let opAndCountMap: Map<SyncOperation, number> | undefined = catAndCountsMap.get(action.category);
 				if (!opAndCountMap) {

@@ -2,7 +2,12 @@ import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from 'rxjs';
 import {select, Store} from "@ngrx/store";
 import {QueueData} from "./queue-data";
-import {FetchQueueCategories, FetchQueueCategoryCount, FetchQueueCount} from "../state/dashboard.actions";
+import {
+	FetchQueueCategories,
+	FetchQueueCategoryCount,
+	FetchQueueCount,
+	QueueCountReceived
+} from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
 import {
 	GET_SYNC_CATEGORIES,
@@ -45,9 +50,13 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	timeoutId?: number;
 
+	receivedCategoryCounts: number = 0;
+
 	countSubscription?: Subscription;
 
 	categoriesSubscription?: Subscription;
+
+	categoryCountSubscription?: Subscription;
 
 	constructor(private service: DashboardService, private store: Store) {
 	}
@@ -59,11 +68,13 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
+		//TODO Move selector to class level and init in constructor
 		let countSelector: Selector<object, number | undefined> | undefined = this.queueAndCountSelectorMap.get(this.queueName);
 		if (countSelector) {
 			this.countSubscription = this.store.pipe(select(countSelector)).subscribe(count => {
-				if (count) {
+				if (count !== undefined) {
 					this.data.count = count;
+					this.getCategories();
 				}
 			});
 		}
@@ -71,29 +82,70 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		let catSelector: Selector<object, string[] | undefined> | undefined = this.queueAndCategoriesSelectorMap.get(this.queueName);
 		if (catSelector) {
 			this.categoriesSubscription = this.store.pipe(select(catSelector)).subscribe(categories => {
+				console.log('Received categories: ' + categories?.length);
+				//Ignore because this is the first value when initializing the component state.
 				if (categories) {
 					this.data.categories = categories;
+					if (this.data.categories.length > 0) {
+						this.getCategoryCounts();
+					} else {
+						this.updateCount(0);
+						//TODO Reload
+					}
 				}
-
-				this.getCategoryCounts();
 			});
 		}
 
 		let catCountSelector: Selector<object, Map<string, Map<SyncOperation, number>> | undefined> | undefined = this.queueAndCatCountSelectorMap.get(this.queueName);
 		if (catCountSelector) {
-			this.categoriesSubscription = this.store.pipe(select(catCountSelector)).subscribe(catAndCounts => {
+			this.categoryCountSubscription = this.store.pipe(select(catCountSelector)).subscribe(catAndCounts => {
 				if (catAndCounts) {
+					console.log('Received category count: ' + catAndCounts);
 					this.data.categoryAndCounts = catAndCounts;
-				}
+					this.receivedCategoryCounts++;
+					//We're done fetching all the queue data
+					if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)) {
+						console.log('Done loading queue data');
+						//Update queue count to match the sum of all the counts by type and operation
+						let effectiveCount: number = 0;
+						catAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
+							opAndCount.forEach((count: number) => {
+								effectiveCount += count;
+							});
+						});
 
-				//Update total count and refresh
-				//Schedule next reload after all counts are received
+						this.updateCount(effectiveCount);
+						this.loadData(5000);
+					}
+				}
 			});
 		}
 
 		//Display placeholders
-		this.getCount();
-		this.getCategories();
+		this.loadData(0);
+	}
+
+	loadData(delay: number): void {
+		this.timeoutId = setTimeout(() => {
+			if (delay > 0) {
+				console.log('Reload queue data');
+				this.reset();
+			} else {
+				console.log('Load data queue initial');
+			}
+
+			this.getCount();
+		}, delay);
+	}
+
+	reset(): void {
+		console.log('Reset');
+		this.receivedCategoryCounts = 0;
+		//this.store.dispatch(new QueueCountReceived(this.queueName));
+	}
+
+	updateCount(count: number): void {
+		this.store.dispatch(new QueueCountReceived(count, this.queueName));
 	}
 
 	getCount(): void {
@@ -118,8 +170,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	stopSubscriptions(): void {
 		clearTimeout(this.timeoutId);
+		this.countSubscription?.unsubscribe();
 		this.categoriesSubscription?.unsubscribe();
-		this.categoriesSubscription?.unsubscribe();
+		this.categoryCountSubscription?.unsubscribe();
 	}
 
 }
