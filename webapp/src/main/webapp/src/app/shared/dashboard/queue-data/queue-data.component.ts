@@ -6,6 +6,7 @@ import {
 	FetchQueueCategories,
 	FetchQueueCategoryCount,
 	FetchQueueCount,
+	QueueCategoriesReceived,
 	QueueCountReceived
 } from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
@@ -80,7 +81,8 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 						if (this.data.count > 0) {
 							this.getCategories();
 						} else {
-							//TODO dispatch clear event and schedule next reload
+							this.clearCategories();
+							this.scheduleReload();
 						}
 					}
 				}
@@ -98,7 +100,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 						this.getCategoryCounts();
 					} else {
 						this.updateCount(0);
-						//TODO Reload
+						this.scheduleReload();
 					}
 				}
 			});
@@ -124,17 +126,21 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 						});
 
 						this.updateCount(effectiveCount);
-						this.loadData(10000);
+						this.scheduleReload();
 					}
 				}
 			});
 		}
 
 		//Display placeholders
-		this.loadData(0);
+		this.scheduleLoadData(0);
 	}
 
-	loadData(delay: number): void {
+	scheduleReload(): void {
+		this.scheduleLoadData(30000);
+	}
+
+	scheduleLoadData(delay: number): void {
 		this.timeoutId = setTimeout(() => {
 			if (delay > 0) {
 				console.log('Reload queue data');
@@ -155,6 +161,10 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	updateCount(count: number): void {
 		this.store.dispatch(new QueueCountReceived(count, this.queueName));
+	}
+
+	clearCategories(): void {
+		this.store.dispatch(new QueueCategoriesReceived([], this.queueName));
 	}
 
 	getCount(): void {

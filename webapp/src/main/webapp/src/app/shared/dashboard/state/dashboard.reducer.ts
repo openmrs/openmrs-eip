@@ -83,7 +83,7 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 			if (queueDataForCats) {
 				queueDataForCats.categories = action.categories;
 
-				//TODO Add action remove stale categories
+				//TODO Add action to remove stale categories without updating UI to avoid flicker
 
 				//Removes any stale categories from then ngrx state from previous load operations that are no longer
 				//contained in the current list of categories otherwise the effective total of category counts will be
