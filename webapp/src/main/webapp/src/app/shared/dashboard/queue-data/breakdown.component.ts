@@ -13,6 +13,6 @@ export class BreakdownComponent {
 	categories?: string[];
 
 	@Input()
-	categoryAndCountsMap?: Map<string, Map<SyncOperation, number>>;
+	categoryAndCountsMap?: Map<string, Map<SyncOperation, number | null>>;
 
 }

@@ -6,6 +6,6 @@ export class QueueData {
 
 	categories?: string[];
 
-	categoryAndCounts?: Map<string, Map<SyncOperation, number>>;
+	categoryAndCounts?: Map<string, Map<SyncOperation, number | null>>;
 
 }

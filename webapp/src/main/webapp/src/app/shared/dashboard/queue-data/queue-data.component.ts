@@ -38,7 +38,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		['sync', GET_SYNC_CATEGORIES]
 	]);
 
-	readonly queueAndCatCountSelectorMap = new Map<string, Selector<object, Map<string, Map<SyncOperation, number>> | undefined>>([
+	readonly queueAndCatCountSelectorMap = new Map<string, Selector<object, Map<string, Map<SyncOperation, number | null>> | undefined>>([
 		['sync', GET_SYNC_CATEGORY_COUNTS]
 	]);
 
@@ -53,7 +53,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	categorySelector: Selector<object, string[] | undefined> | undefined;
 
-	categoryAndCountsSelector: Selector<object, Map<string, Map<SyncOperation, number>> | undefined> | undefined;
+	categoryAndCountsSelector: Selector<object, Map<string, Map<SyncOperation, number | null>> | undefined> | undefined;
 
 	timeoutId?: number;
 
@@ -177,7 +177,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	onCategoryCountsChange(catAndCounts?: Map<string, Map<SyncOperation, number>>): void {
+	onCategoryCountsChange(catAndCounts?: Map<string, Map<SyncOperation, number | null>>): void {
 		if (catAndCounts) {
 			console.log('Received category counts: ' + catAndCounts);
 			this.data.categoryAndCounts = catAndCounts;
@@ -188,9 +188,11 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				console.log('');
 				//Update queue count to match the sum of all the counts by type and operation
 				let effectiveCount: number = 0;
-				this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
-					opAndCount.forEach((count: number, op: SyncOperation) => {
-						effectiveCount += count;
+				this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number | null>, category: string) => {
+					opAndCount.forEach((count: number | null, op: SyncOperation) => {
+						if (count) {
+							effectiveCount += count;
+						}
 					});
 				});
 
