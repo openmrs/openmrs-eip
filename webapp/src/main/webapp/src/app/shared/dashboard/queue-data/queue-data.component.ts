@@ -29,7 +29,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	readonly receiverQueueNames = ['sync', 'synced'];
 
-	readonly queueAndCountSelectorMap = new Map<string, Selector<object, number | undefined | null>>([
+	readonly queueAndCountSelectorMap = new Map<string, Selector<object, number | null | undefined>>([
 		['sync', GET_SYNC_COUNT],
 		['synced', GET_SYNCED_COUNT]
 	]);
@@ -66,9 +66,6 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	categoryCountSubscription?: Subscription;
 
 	constructor(private service: DashboardService, private store: Store) {
-		this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
-		this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
-		this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
 	}
 
 	ngOnInit(): void {
@@ -78,18 +75,21 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
+		this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
 		if (this.countSelector) {
 			this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
 				this.onCountChange(count);
 			});
 		}
 
+		this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
 		if (this.categorySelector) {
 			this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
 				this.onCategoriesChange(categories);
 			});
 		}
 
+		this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
 		if (this.categoryAndCountsSelector) {
 			this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
 				this.onCategoryCountsChange(catAndCounts);
