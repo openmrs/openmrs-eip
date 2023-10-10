@@ -59,7 +59,7 @@ export class QueueCountReceived implements Action {
 
 	readonly type = DashboardActionType.QUEUE_COUNT_RECEIVED;
 
-	constructor(public count: number, public queueName: string) {
+	constructor(public count: number | null, public queueName: string) {
 	}
 
 }

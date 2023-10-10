@@ -81,9 +81,21 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 
 			let queueDataForCats: QueueData | undefined = newStateForCats.queueAndDataMap?.get(action.queueName);
 			if (queueDataForCats) {
-				let n: number = Math.floor(Math.random() * 2);
-				n = action.categories.length;
-				queueDataForCats.categories = n > 0 ? action.categories : [];
+				queueDataForCats.categories = action.categories;
+
+				//TODO Add action remove stale categories
+
+				//Removes any stale categories from then ngrx state from previous load operations that are no longer
+				//contained in the current list of categories otherwise the effective total of category counts will be
+				//out of sync with the queue total
+				let catAndCountsMapForCats: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCats.categoryAndCounts;
+				if (catAndCountsMapForCats) {
+					for (let category of catAndCountsMapForCats?.keys()) {
+						if (action.categories.indexOf(category) < 0) {
+							catAndCountsMapForCats.delete(category);
+						}
+					}
+				}
 			}
 
 			return newStateForCats;
@@ -98,7 +110,7 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 				let catAndCountsMap: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCatCounts.categoryAndCounts;
 				if (!catAndCountsMap) {
 					catAndCountsMap = new Map<string, Map<SyncOperation, number>>();
-				}else{
+				} else {
 					catAndCountsMap = new Map<string, Map<SyncOperation, number>>(catAndCountsMap);
 				}
 

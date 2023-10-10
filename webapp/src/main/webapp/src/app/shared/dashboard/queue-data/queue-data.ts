@@ -2,7 +2,7 @@ import {SyncOperation} from "../../sync-operation.enum";
 
 export class QueueData {
 
-	count?: number;
+	count?: number | null;
 
 	categories?: string[];
 
