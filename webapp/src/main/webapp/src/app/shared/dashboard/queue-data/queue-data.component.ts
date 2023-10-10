@@ -49,6 +49,12 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	@Input()
 	queueName: string = '';
 
+	countSelector: Selector<object, number | null | undefined> | undefined;
+
+	categorySelector: Selector<object, string[] | undefined> | undefined;
+
+	categoryAndCountsSelector: Selector<object, Map<string, Map<SyncOperation, number>> | undefined> | undefined;
+
 	timeoutId?: number;
 
 	receivedCategoryCounts: number = 0;
@@ -60,6 +66,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	categoryCountSubscription?: Subscription;
 
 	constructor(private service: DashboardService, private store: Store) {
+		this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
+		this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
+		this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
 	}
 
 	ngOnInit(): void {
@@ -69,66 +78,21 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
-		//TODO Move selector to class level and init in constructor
-		let countSelector: Selector<object, number | null | undefined> | undefined = this.queueAndCountSelectorMap.get(this.queueName);
-		if (countSelector) {
-			this.countSubscription = this.store.pipe(select(countSelector)).subscribe(count => {
-				//Ignore because this is the first event when initializing the component state.
-				if (count !== undefined) {
-					//Don't update the UI yet because this is a count reset event
-					if (count !== null) {
-						this.data.count = count;
-						if (this.data.count > 0) {
-							this.getCategories();
-						} else {
-							this.clearCategories();
-							this.scheduleReload();
-						}
-					}
-				}
+		if (this.countSelector) {
+			this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
+				this.onCountChange(count);
 			});
 		}
 
-		let catSelector: Selector<object, string[] | undefined> | undefined = this.queueAndCategoriesSelectorMap.get(this.queueName);
-		if (catSelector) {
-			this.categoriesSubscription = this.store.pipe(select(catSelector)).subscribe(categories => {
-				//Ignore because this is the first value when initializing the component state.
-				if (categories) {
-					console.log('Received categories: ' + categories?.length);
-					this.data.categories = categories;
-					if (this.data.categories.length > 0) {
-						this.getCategoryCounts();
-					} else {
-						this.updateCount(0);
-						this.scheduleReload();
-					}
-				}
+		if (this.categorySelector) {
+			this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
+				this.onCategoriesChange(categories);
 			});
 		}
 
-		let catCountSelector: Selector<object, Map<string, Map<SyncOperation, number>> | undefined> | undefined = this.queueAndCatCountSelectorMap.get(this.queueName);
-		if (catCountSelector) {
-			this.categoryCountSubscription = this.store.pipe(select(catCountSelector)).subscribe(catAndCounts => {
-				if (catAndCounts) {
-					console.log('Received category counts: ' + catAndCounts);
-					this.data.categoryAndCounts = catAndCounts;
-					this.receivedCategoryCounts++;
-					//We're done fetching all the queue data
-					if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)) {
-						console.log('Done loading queue data');
-						console.log('');
-						//Update queue count to match the sum of all the counts by type and operation
-						let effectiveCount: number = 0;
-						this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
-							opAndCount.forEach((count: number, op: SyncOperation) => {
-								effectiveCount += count;
-							});
-						});
-
-						this.updateCount(effectiveCount);
-						this.scheduleReload();
-					}
-				}
+		if (this.categoryAndCountsSelector) {
+			this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
+				this.onCategoryCountsChange(catAndCounts);
 			});
 		}
 
@@ -181,6 +145,59 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				this.store.dispatch(new FetchQueueCategoryCount(this.queueName, c, o));
 			});
 		});
+	}
+
+	onCountChange(count?: number | null): void {
+		//Ignore because this is the first event when initializing the component state.
+		if (count !== undefined) {
+			//Don't update the UI yet because this is a count reset event
+			if (count !== null) {
+				this.data.count = count;
+				if (this.data.count > 0) {
+					this.getCategories();
+				} else {
+					this.clearCategories();
+					this.scheduleReload();
+				}
+			}
+		}
+	}
+
+	onCategoriesChange(categories?: string[]): void {
+		//Ignore because this is the first value when initializing the component state.
+		if (categories) {
+			console.log('Received categories: ' + categories?.length);
+			this.data.categories = categories;
+			if (this.data.categories.length > 0) {
+				this.getCategoryCounts();
+			} else {
+				this.updateCount(0);
+				this.scheduleReload();
+			}
+		}
+	}
+
+	onCategoryCountsChange(catAndCounts?: Map<string, Map<SyncOperation, number>>): void {
+		if (catAndCounts) {
+			console.log('Received category counts: ' + catAndCounts);
+			this.data.categoryAndCounts = catAndCounts;
+			this.receivedCategoryCounts++;
+			//We're done fetching all the queue data
+			if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)) {
+				console.log('Done loading queue data');
+				console.log('');
+				//Update queue count to match the sum of all the counts by type and operation
+				let effectiveCount: number = 0;
+				this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
+					opAndCount.forEach((count: number, op: SyncOperation) => {
+						effectiveCount += count;
+					});
+				});
+
+				this.updateCount(effectiveCount);
+				this.scheduleReload();
+			}
+		}
 	}
 
 	ngOnDestroy(): void {
