@@ -656,5 +656,11 @@
 				<target>Removido</target>
 			</segment>
 		</unit>
+		<unit id="common-no-items">
+			<segment>
+				<source>No items</source>
+				<target>Sem itens</target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

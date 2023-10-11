@@ -44,7 +44,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	readonly data = new QueueData();
 
-	categorizationLabel?: string;
+	breakdownLabel?: string;
 
 	@Input()
 	queueName: string = '';
@@ -70,9 +70,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
-			this.categorizationLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
+			this.breakdownLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
 		} else {
-			this.categorizationLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
+			this.breakdownLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
 		}
 
 		this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
@@ -96,7 +96,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			});
 		}
 
-		//Display placeholders
+		//TODO Display placeholders
 		this.scheduleLoadData(0);
 	}
 

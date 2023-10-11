@@ -21,10 +21,10 @@
 	</div>
 </li>
 <li class="list-group-item" [hidden]="!data.count && data.count == 0">
-	<div class="h6 card-title ui-text-theme-secondary">{{categorizationLabel}}</div>
+	<div class="h6 card-title ui-text-theme-secondary">{{breakdownLabel}}</div>
 	<div class="ml-3 mr-3">
 		<div class="ml-3 mr-3">
-			<breakdown [categories]="data.categories" [categoryAndCountsMap]="data.categoryAndCounts"></breakdown>
+			<breakdown [isReceiver]="true" [categories]="data.categories" [categoryAndCountsMap]="data.categoryAndCounts"></breakdown>
 		</div>
 	</div>
 </li>
