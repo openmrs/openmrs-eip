@@ -1,4 +1,4 @@
-<table class="text-center border table-striped">
+<table class="text-center border table-striped" [hidden]="!categories">
 	<thead>
 		<tr class="bg-light-silver">
 			<td class="pr-1 pl-1 border border-secondary">
@@ -19,22 +19,31 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ngFor="let c of categories">
+		<tr class="placeholder-glow" *ngFor="let c of categories">
 			<td class="text-right pr-2 pl-2 border-bottom-0">
 				{{getCategoryDisplay(c)}}
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{categoryAndCountsMap?.get(c)?.get(SyncOperation.c)}}</span>
+				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.c)"></span>
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{categoryAndCountsMap?.get(c)?.get(SyncOperation.u)}}</span>
+				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.u)"></span>
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{categoryAndCountsMap?.get(c)?.get(SyncOperation.d)}}</span>
+				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.d)"></span>
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{categoryAndCountsMap?.get(c)?.get(SyncOperation.r)}}</span>
+				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.r)"></span>
 			</td>
 		</tr>
 	</tbody>
 </table>
+
+<div class="placeholder-wave" [hidden]="categories">
+	<span class="placeholder w-100"></span>
+	<span class="placeholder w-100"></span>
+</div>

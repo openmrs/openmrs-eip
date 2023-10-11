@@ -1,6 +1,3 @@
-<li class="list-group-item text-secondary text-center" [hidden]="data.count">
-	<span i18n="@@common-loading">Loading</span>...
-</li>
 <li class="list-group-item text-center" [hidden]="data.count && data.count > 0">
 	<i class="bi-check-circle-fill text-success"></i>&nbsp;
 	<span i18n="@@common-no-items">No items</span>
@@ -13,8 +10,9 @@
 				<td class="ui-no-wrap">
 					<span i18n="@@common-total-count">Total Count</span>
 				</td>
-				<td class="pl-2">
+				<td class="pl-2 placeholder-glow">
 					<span class="badge border border-secondary">{{data.count}}</span>
+					<span class="placeholder placeholder-lg col-1" [hidden]="data.count"></span>
 				</td>
 			</tr>
 		</table>
