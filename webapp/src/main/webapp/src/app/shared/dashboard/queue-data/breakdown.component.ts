@@ -19,7 +19,7 @@ export class BreakdownComponent implements OnInit {
 	categoryLabel?: string;
 
 	@Input()
-	categoryAndCountsMap?: Map<string, Map<SyncOperation, number | null>>;
+	categoryAndCountsMap?: Map<string, Map<SyncOperation, number>>;
 
 	constructor(private classPipe: ModelClassPipe) {
 	}

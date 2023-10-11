@@ -88,7 +88,7 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 				//Removes any stale categories from then ngrx state from previous load operations that are no longer
 				//contained in the current list of categories otherwise the effective total of category counts will be
 				//out of sync with the queue total
-				let catAndCountsMapForCats: Map<string, Map<SyncOperation, number | null>> | undefined = queueDataForCats.categoryAndCounts;
+				let catAndCountsMapForCats: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCats.categoryAndCounts;
 				if (catAndCountsMapForCats) {
 					for (let category of catAndCountsMapForCats?.keys()) {
 						if (action.categories.indexOf(category) < 0) {
@@ -107,18 +107,18 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 
 			let queueDataForCatCounts: QueueData | undefined = newStateForCatCounts.queueAndDataMap?.get(action.queueName);
 			if (queueDataForCatCounts) {
-				let catAndCountsMap: Map<string, Map<SyncOperation, number | null>> | undefined = queueDataForCatCounts.categoryAndCounts;
+				let catAndCountsMap: Map<string, Map<SyncOperation, number>> | undefined = queueDataForCatCounts.categoryAndCounts;
 				if (!catAndCountsMap) {
-					catAndCountsMap = new Map<string, Map<SyncOperation, number | null>>();
+					catAndCountsMap = new Map<string, Map<SyncOperation, number>>();
 				} else {
-					catAndCountsMap = new Map<string, Map<SyncOperation, number | null>>(catAndCountsMap);
+					catAndCountsMap = new Map<string, Map<SyncOperation, number>>(catAndCountsMap);
 				}
 
 				queueDataForCatCounts.categoryAndCounts = catAndCountsMap;
 
-				let opAndCountMap: Map<SyncOperation, number | null> | undefined = catAndCountsMap.get(action.category);
+				let opAndCountMap: Map<SyncOperation, number> | undefined = catAndCountsMap.get(action.category);
 				if (!opAndCountMap) {
-					opAndCountMap = new Map<SyncOperation, number | null>();
+					opAndCountMap = new Map<SyncOperation, number>();
 					catAndCountsMap.set(action.category, opAndCountMap);
 				}
 
