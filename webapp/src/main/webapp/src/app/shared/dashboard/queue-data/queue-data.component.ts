@@ -106,10 +106,10 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	scheduleLoadData(delay: number): void {
 		this.timeoutId = setTimeout(() => {
 			if (delay > 0) {
-				console.log('Reload queue data');
+				console.debug('Reload queue data');
 				this.reset();
 			} else {
-				console.log('Load data queue initial');
+				console.debug('Load data queue initial');
 			}
 
 			this.getCount();
@@ -117,7 +117,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	reset(): void {
-		console.log('Reset');
+		console.debug('Reset');
 		this.receivedCategoryCounts = 0;
 		this.store.dispatch(new QueueCountReceived(null, this.queueName));
 	}
@@ -165,7 +165,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	onCategoriesChange(categories?: string[]): void {
 		//Ignore because this is the first value when initializing the component state.
 		if (categories) {
-			console.log('Received categories: ' + categories?.length);
+			console.debug('Received categories: ' + categories?.length);
 			this.data.categories = categories;
 			if (this.data.categories.length > 0) {
 				this.getCategoryCounts();
@@ -178,13 +178,13 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	onCategoryCountsChange(catAndCounts?: Map<string, Map<SyncOperation, number>>): void {
 		if (catAndCounts) {
-			console.log('Received category counts: ' + catAndCounts);
+			console.debug('Received category counts: ' + catAndCounts);
 			this.data.categoryAndCounts = catAndCounts;
 			this.receivedCategoryCounts++;
 			//We're done fetching all the queue data
 			if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)) {
-				console.log('Done loading queue data');
-				console.log('');
+				console.debug('Done loading queue data');
+				console.debug('');
 				//Update queue count to match the sum of all the counts by type and operation
 				let effectiveCount: number = 0;
 				this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
