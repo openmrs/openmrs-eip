@@ -122,7 +122,7 @@ export function dashboardReducer(state: DashboardState = new DashboardState(), a
 					catAndCountsMap.set(action.category, opAndCountMap);
 				}
 
-				opAndCountMap.set(action.operation, action.count ? action.count : null);
+				opAndCountMap.set(action.operation, action.count);
 			}
 
 			return newStateForCatCounts;

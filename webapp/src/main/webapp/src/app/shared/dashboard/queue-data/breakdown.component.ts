@@ -24,6 +24,14 @@ export class BreakdownComponent implements OnInit {
 	constructor(private classPipe: ModelClassPipe) {
 	}
 
+	ngOnInit(): void {
+		if (this.isReceiver) {
+			this.categoryLabel = $localize`:@@common-entity:Entity`;
+		} else {
+			this.categoryLabel = $localize`:@@common-table-name:Table Name`;
+		}
+	}
+
 	public getCategoryDisplay(value: string): string {
 		if (this.isReceiver) {
 			return this.classPipe.transform(value);
@@ -32,12 +40,12 @@ export class BreakdownComponent implements OnInit {
 		return value;
 	}
 
-	ngOnInit(): void {
-		if (this.isReceiver) {
-			this.categoryLabel = $localize`:@@common-entity:Entity`;
-		} else {
-			this.categoryLabel = $localize`:@@common-table-name:Table Name`;
+	public getCountDisplay(count: number | null | undefined): number | string {
+		if (!count) {
+			return '';
 		}
+
+		return count;
 	}
 
 }
