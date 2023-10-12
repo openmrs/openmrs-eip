@@ -12,6 +12,8 @@ import {SyncMode} from "../sync-mode.enum";
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {
 
+	syncMode?: SyncMode;
+
 	dashboard?: Dashboard;
 
 	timeoutId?: number;
@@ -31,6 +33,10 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		this.propsLoaded = this.store.pipe(select(GET_PROPS)).subscribe(props => {
+			if (props.syncMode) {
+				this.syncMode = props.syncMode;
+			}
+
 			if (props.syncMode == this.getSyncMode()) {
 				this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
 					this.dashboard = dashboard;

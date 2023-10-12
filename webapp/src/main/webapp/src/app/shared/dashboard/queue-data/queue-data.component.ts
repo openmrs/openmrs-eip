@@ -26,6 +26,7 @@ import {
 } from "../state/dashboard.reducer";
 import {Selector} from "@ngrx/store/src/models";
 import {SyncOperation} from "../../sync-operation.enum";
+import {SyncMode} from "../../sync-mode.enum";
 
 @Component({
 	selector: 'queue-data',
@@ -34,6 +35,8 @@ import {SyncOperation} from "../../sync-operation.enum";
 export class QueueDataComponent implements OnInit, OnDestroy {
 
 	readonly SYNC_OPS = Object.values(SyncOperation);
+
+	readonly SyncMode = SyncMode;
 
 	readonly receiverQueueNames = ['sync', 'synced', 'error', 'conflict'];
 
@@ -63,6 +66,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	breakdownLabel?: string;
 
 	@Input()
+	syncMode?: SyncMode;
+
+	@Input()
 	queueName: string = '';
 
 	countSelector: Selector<object, number | null | undefined> | undefined;
@@ -85,34 +91,36 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
-			this.breakdownLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
-		} else {
-			this.breakdownLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
-		}
+		if (this.canLoad()) {
+			if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
+				this.breakdownLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
+			} else {
+				this.breakdownLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
+			}
 
-		this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
-		if (this.countSelector) {
-			this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
-				this.onCountChange(count);
-			});
-		}
+			this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
+			if (this.countSelector) {
+				this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
+					this.onCountChange(count);
+				});
+			}
 
-		this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
-		if (this.categorySelector) {
-			this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
-				this.onCategoriesChange(categories);
-			});
-		}
+			this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
+			if (this.categorySelector) {
+				this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
+					this.onCategoriesChange(categories);
+				});
+			}
 
-		this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
-		if (this.categoryAndCountsSelector) {
-			this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
-				this.onCategoryCountsChange(catAndCounts);
-			});
-		}
+			this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
+			if (this.categoryAndCountsSelector) {
+				this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
+					this.onCategoryCountsChange(catAndCounts);
+				});
+			}
 
-		this.scheduleLoadData(0);
+			this.scheduleLoadData(0);
+		}
 	}
 
 	scheduleReload(): void {
@@ -160,6 +168,16 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				this.store.dispatch(new FetchQueueCategoryCount(this.queueName, c, o));
 			});
 		});
+	}
+
+	canLoad(): boolean {
+		if (this.syncMode == SyncMode.RECEIVER && this.receiverQueueNames.indexOf(this.queueName) > -1) {
+			return true;
+		} else if (this.syncMode == SyncMode.SENDER && this.receiverQueueNames.indexOf(this.queueName) < 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	onCountChange(count?: number | null): void {

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {SyncOperation} from "../../sync-operation.enum";
 import {ModelClassPipe} from "../../pipes/model-class.pipe";
+import {SyncMode} from "../../sync-mode.enum";
 
 @Component({
 	selector: 'breakdown',
@@ -11,7 +12,7 @@ export class BreakdownComponent implements OnInit {
 	readonly SyncOperation = SyncOperation;
 
 	@Input()
-	isReceiver?: boolean;
+	syncMode?: SyncMode;
 
 	@Input()
 	categories?: string[];
@@ -25,7 +26,7 @@ export class BreakdownComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		if (this.isReceiver) {
+		if (this.syncMode == SyncMode.RECEIVER) {
 			this.categoryLabel = $localize`:@@common-entity:Entity`;
 		} else {
 			this.categoryLabel = $localize`:@@common-table-name:Table Name`;
@@ -33,7 +34,7 @@ export class BreakdownComponent implements OnInit {
 	}
 
 	public getCategoryDisplay(value: string): string {
-		if (this.isReceiver) {
+		if (this.syncMode == SyncMode.RECEIVER) {
 			return this.classPipe.transform(value);
 		}
 

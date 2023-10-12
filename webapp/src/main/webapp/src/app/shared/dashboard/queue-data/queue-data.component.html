@@ -22,7 +22,7 @@
 	<div class="h6 card-title ui-text-theme-secondary">{{breakdownLabel}}</div>
 	<div class="ml-3 mr-3">
 		<div class="ml-3 mr-3">
-			<breakdown [isReceiver]="true" [categories]="data.categories" [categoryAndCountsMap]="data.categoryAndCounts"></breakdown>
+			<breakdown [syncMode]="syncMode" [categories]="data.categories" [categoryAndCountsMap]="data.categoryAndCounts"></breakdown>
 		</div>
 	</div>
 </li>
