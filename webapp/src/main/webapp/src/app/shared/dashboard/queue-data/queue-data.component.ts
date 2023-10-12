@@ -27,6 +27,7 @@ import {
 import {Selector} from "@ngrx/store/src/models";
 import {SyncOperation} from "../../sync-operation.enum";
 import {SyncMode} from "../../sync-mode.enum";
+import {GET_PROPS} from "../../../state/app.reducer";
 
 @Component({
 	selector: 'queue-data',
@@ -65,7 +66,6 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	breakdownLabel?: string;
 
-	@Input()
 	syncMode?: SyncMode;
 
 	@Input()
@@ -81,6 +81,8 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	receivedCategoryCounts: number = 0;
 
+	propsLoadedSubscription?: Subscription;
+
 	countSubscription?: Subscription;
 
 	categoriesSubscription?: Subscription;
@@ -91,36 +93,42 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		if (this.canLoad()) {
-			if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
-				this.breakdownLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
-			} else {
-				this.breakdownLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
-			}
+		this.propsLoadedSubscription = this.store.pipe(select(GET_PROPS)).subscribe(props => {
+			if (props.syncMode) {
+				this.syncMode = props.syncMode;
 
-			this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
-			if (this.countSelector) {
-				this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
-					this.onCountChange(count);
-				});
-			}
+				if (this.canLoad()) {
+					if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
+						this.breakdownLabel = $localize`:@@common-entity-breakdown:Entity Breakdown`;
+					} else {
+						this.breakdownLabel = $localize`:@@common-db-table-breakdown:Database Table Breakdown`;
+					}
 
-			this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
-			if (this.categorySelector) {
-				this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
-					this.onCategoriesChange(categories);
-				});
-			}
+					this.countSelector = this.queueAndCountSelectorMap.get(this.queueName);
+					if (this.countSelector) {
+						this.countSubscription = this.store.pipe(select(this.countSelector)).subscribe(count => {
+							this.onCountChange(count);
+						});
+					}
 
-			this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
-			if (this.categoryAndCountsSelector) {
-				this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
-					this.onCategoryCountsChange(catAndCounts);
-				});
-			}
+					this.categorySelector = this.queueAndCategoriesSelectorMap.get(this.queueName);
+					if (this.categorySelector) {
+						this.categoriesSubscription = this.store.pipe(select(this.categorySelector)).subscribe(categories => {
+							this.onCategoriesChange(categories);
+						});
+					}
 
-			this.scheduleLoadData(0);
-		}
+					this.categoryAndCountsSelector = this.queueAndCatCountSelectorMap.get(this.queueName);
+					if (this.categoryAndCountsSelector) {
+						this.categoryCountSubscription = this.store.pipe(select(this.categoryAndCountsSelector)).subscribe(catAndCounts => {
+							this.onCategoryCountsChange(catAndCounts);
+						});
+					}
+
+					this.scheduleLoadData(0);
+				}
+			}
+		});
 	}
 
 	scheduleReload(): void {
@@ -241,6 +249,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	stopSubscriptions(): void {
 		clearTimeout(this.timeoutId);
+		this.propsLoadedSubscription?.unsubscribe();
 		this.countSubscription?.unsubscribe();
 		this.categoriesSubscription?.unsubscribe();
 		this.categoryCountSubscription?.unsubscribe();
