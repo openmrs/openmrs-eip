@@ -17,7 +17,9 @@ export class DashboardEffects {
 
 	readonly QUEUE_AND_TYPE_MAP = new Map<string, string>([
 		['sync', 'SyncMessage'],
-		['synced', 'SyncedMessage']
+		['synced', 'SyncedMessage'],
+		['error', 'ReceiverRetryQueueItem'],
+		['conflict', 'ConflictQueueItem']
 	]);
 
 	constructor(private actions$: Actions, private dashboardService: DashboardService) {

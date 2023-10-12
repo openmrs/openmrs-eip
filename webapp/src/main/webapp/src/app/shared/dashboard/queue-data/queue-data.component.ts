@@ -11,9 +11,17 @@ import {
 } from "../state/dashboard.actions";
 import {DashboardService} from "../dashboard.service";
 import {
+	GET_CONFLICT_CATEGORIES,
+	GET_CONFLICT_CATEGORY_COUNTS,
+	GET_CONFLICT_COUNT,
+	GET_ERROR_CATEGORIES,
+	GET_ERROR_CATEGORY_COUNTS,
+	GET_ERROR_COUNT,
 	GET_SYNC_CATEGORIES,
 	GET_SYNC_CATEGORY_COUNTS,
 	GET_SYNC_COUNT,
+	GET_SYNCED_CATEGORIES,
+	GET_SYNCED_CATEGORY_COUNTS,
 	GET_SYNCED_COUNT
 } from "../state/dashboard.reducer";
 import {Selector} from "@ngrx/store/src/models";
@@ -27,19 +35,27 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	readonly SYNC_OPS = Object.values(SyncOperation);
 
-	readonly receiverQueueNames = ['sync', 'synced'];
+	readonly receiverQueueNames = ['sync', 'synced', 'error', 'conflict'];
 
 	readonly queueAndCountSelectorMap = new Map<string, Selector<object, number | null | undefined>>([
 		['sync', GET_SYNC_COUNT],
-		['synced', GET_SYNCED_COUNT]
+		['synced', GET_SYNCED_COUNT],
+		['error', GET_ERROR_COUNT],
+		['conflict', GET_CONFLICT_COUNT]
 	]);
 
 	readonly queueAndCategoriesSelectorMap = new Map<string, Selector<object, string[] | undefined>>([
-		['sync', GET_SYNC_CATEGORIES]
+		['sync', GET_SYNC_CATEGORIES],
+		['synced', GET_SYNCED_CATEGORIES],
+		['error', GET_ERROR_CATEGORIES],
+		['conflict', GET_CONFLICT_CATEGORIES]
 	]);
 
 	readonly queueAndCatCountSelectorMap = new Map<string, Selector<object, Map<string, Map<SyncOperation, number>> | undefined>>([
-		['sync', GET_SYNC_CATEGORY_COUNTS]
+		['sync', GET_SYNC_CATEGORY_COUNTS],
+		['synced', GET_SYNCED_CATEGORY_COUNTS],
+		['error', GET_ERROR_CATEGORY_COUNTS],
+		['conflict', GET_CONFLICT_CATEGORY_COUNTS]
 	]);
 
 	readonly data = new QueueData();

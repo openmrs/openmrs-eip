@@ -9,7 +9,9 @@ export class DashboardState {
 	dashboard?: Dashboard;
 	queueAndDataMap?: Map<string, QueueData> = new Map<string, QueueData>([
 		['sync', new QueueData()],
-		['synced', new QueueData()]
+		['synced', new QueueData()],
+		['error', new QueueData()],
+		['conflict', new QueueData()]
 	]);
 	error?: HttpErrorResponse;
 }
@@ -44,6 +46,46 @@ export const GET_SYNC_CATEGORY_COUNTS = createSelector(
 export const GET_SYNCED_COUNT = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
 	state => state.queueAndDataMap?.get('synced')?.count
+);
+
+export const GET_SYNCED_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('synced')?.categories
+);
+
+export const GET_SYNCED_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('synced')?.categoryAndCounts
+);
+
+export const GET_ERROR_COUNT = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('error')?.count
+);
+
+export const GET_ERROR_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('error')?.categories
+);
+
+export const GET_ERROR_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('error')?.categoryAndCounts
+);
+
+export const GET_CONFLICT_COUNT = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('conflict')?.count
+);
+
+export const GET_CONFLICT_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('conflict')?.categories
+);
+
+export const GET_CONFLICT_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('conflict')?.categoryAndCounts
 );
 
 export function dashboardReducer(state: DashboardState = new DashboardState(), action: DashboardAction) {
