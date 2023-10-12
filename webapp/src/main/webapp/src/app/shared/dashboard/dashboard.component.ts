@@ -31,7 +31,7 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		this.propsLoaded = this.store.pipe(select(GET_PROPS)).subscribe(props => {
-			if (props.syncMode == this.getSyncMode()) {
+			if (props.syncMode == this.getSyncMode() && this.getSyncMode() == SyncMode.SENDER) {
 				this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
 					this.dashboard = dashboard;
 					if (this.reload) {
