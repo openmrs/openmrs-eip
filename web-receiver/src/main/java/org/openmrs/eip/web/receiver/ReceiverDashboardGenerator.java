@@ -50,7 +50,7 @@ public class ReceiverDashboardGenerator extends BaseDashboardGenerator {
 	}
 	
 	@Override
-	public String getCategorizationProperty() {
+	public String getCategorizationProperty(String entityType) {
 		return "modelClassName";
 	}
 	

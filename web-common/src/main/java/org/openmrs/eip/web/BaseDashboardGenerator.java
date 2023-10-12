@@ -17,8 +17,8 @@ public abstract class BaseDashboardGenerator implements DashboardGenerator {
 	@Override
 	public List<String> getCategories(String entityType) {
 		return producerTemplate.requestBody(
-		    "jpa:" + entityType + "?query=SELECT DISTINCT " + getCategorizationProperty() + " FROM " + entityType, null,
-		    List.class);
+		    "jpa:" + entityType + "?query=SELECT DISTINCT " + getCategorizationProperty(entityType) + " FROM " + entityType,
+		    null, List.class);
 	}
 	
 	@Override
@@ -28,8 +28,9 @@ public abstract class BaseDashboardGenerator implements DashboardGenerator {
 			    Integer.class);
 		}
 		
-		return producerTemplate.requestBody("jpa:" + entityType + "?query=SELECT count(*) FROM " + entityType + " WHERE "
-		        + getCategorizationProperty() + " = '" + category + "' AND operation = '" + op + "'",
+		return producerTemplate.requestBody(
+		    "jpa:" + entityType + "?query=SELECT count(*) FROM " + entityType + " WHERE "
+		            + getCategorizationProperty(entityType) + " = '" + category + "' AND operation = '" + op + "'",
 		    null, Integer.class);
 	}
 	

@@ -24,6 +24,11 @@ public class ReceiverDashboardGeneratorTest extends BaseReceiverTest {
 	private ReceiverDashboardGenerator generator;
 	
 	@Test
+	public void getCategorizationProperty_shouldReturnModelClassName() {
+		Assert.assertEquals("modelClassName", generator.getCategorizationProperty(null));
+	}
+	
+	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_sync_msg.sql",
 	        "classpath:mgt_receiver_synced_msg.sql", "classpath:mgt_receiver_retry_queue.sql",
 	        "classpath:mgt_receiver_conflict_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))

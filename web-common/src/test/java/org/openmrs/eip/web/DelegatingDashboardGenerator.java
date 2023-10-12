@@ -20,8 +20,8 @@ public class DelegatingDashboardGenerator extends BaseDashboardGenerator {
 	}
 	
 	@Override
-	public String getCategorizationProperty() {
-		return delegate.getCategorizationProperty();
+	public String getCategorizationProperty(String entityType) {
+		return delegate.getCategorizationProperty(entityType);
 	}
 	
 	@Override

@@ -20,9 +20,10 @@ public interface DashboardGenerator {
 	/**
 	 * Gets the categorization property name for the entities handled by this generated
 	 * 
+	 * @param entityType the entity type
 	 * @return the categorization property name
 	 */
-	String getCategorizationProperty();
+	String getCategorizationProperty(String entityType);
 	
 	/**
 	 * Gets the unique category names for the entities handled by this generated
