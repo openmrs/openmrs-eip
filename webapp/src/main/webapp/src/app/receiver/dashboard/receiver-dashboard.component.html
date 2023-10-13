@@ -7,7 +7,7 @@
 					<span class="h5" i18n="@@receiver-sync-msgs">Pending Sync Items</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data queueName="sync"></queue-data>
+					<queue-data [parentSyncMode]="getSyncMode()" queueName="sync"></queue-data>
 				</ul>
 			</div>
 		</div>
@@ -18,7 +18,7 @@
 					<span class="h5" i18n="@@receiver-synced-msgs">Synced Items</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data queueName="synced"></queue-data>
+					<queue-data [parentSyncMode]="getSyncMode()" queueName="synced"></queue-data>
 				</ul>
 			</div>
 		</div>
@@ -31,7 +31,7 @@
 					<span class="h5" i18n="@@common-errors">Errors</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data queueName="error"></queue-data>
+					<queue-data [parentSyncMode]="getSyncMode()" queueName="error"></queue-data>
 				</ul>
 			</div>
 		</div>
@@ -42,7 +42,7 @@
 					<span class="h5" i18n="@@receiver-conflicts">Conflicts</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data queueName="conflict"></queue-data>
+					<queue-data [parentSyncMode]="getSyncMode()" queueName="conflict"></queue-data>
 				</ul>
 			</div>
 		</div>

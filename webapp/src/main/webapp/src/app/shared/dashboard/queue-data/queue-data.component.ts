@@ -37,8 +37,6 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	readonly SYNC_OPS = Object.values(SyncOperation);
 
-	readonly SyncMode = SyncMode;
-
 	readonly receiverQueueNames = ['sync', 'synced', 'error', 'conflict'];
 
 	readonly queueAndCountSelectorMap = new Map<string, Selector<object, number | null | undefined>>([
@@ -66,7 +64,10 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 
 	breakdownLabel?: string;
 
-	syncMode?: SyncMode;
+	appSyncMode?: SyncMode;
+
+	@Input()
+	parentSyncMode?: SyncMode;
 
 	@Input()
 	queueName: string = '';
@@ -95,7 +96,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		this.propsLoadedSubscription = this.store.pipe(select(GET_PROPS)).subscribe(props => {
 			if (props.syncMode) {
-				this.syncMode = props.syncMode;
+				this.appSyncMode = props.syncMode;
 
 				if (this.canLoad()) {
 					if (this.receiverQueueNames.indexOf(this.queueName) > -1) {
@@ -175,9 +176,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	}
 
 	canLoad(): boolean {
-		if (this.syncMode == SyncMode.RECEIVER && this.receiverQueueNames.indexOf(this.queueName) > -1) {
+		if (this.appSyncMode == SyncMode.RECEIVER && this.receiverQueueNames.indexOf(this.queueName) > -1) {
 			return true;
-		} else if (this.syncMode == SyncMode.SENDER && this.receiverQueueNames.indexOf(this.queueName) < 0) {
+		} else if (this.appSyncMode == SyncMode.SENDER && this.receiverQueueNames.indexOf(this.queueName) < 0) {
 			return true;
 		}
 
