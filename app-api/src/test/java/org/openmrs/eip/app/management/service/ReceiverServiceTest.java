@@ -178,7 +178,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void hasRetryItem_shouldReturnTrueIfAnEntityHasNoRetryItem() {
+	public void hasRetryItem_shouldReturnFalseIfAnEntityHasNoRetryItem() {
 		assertFalse(service.hasRetryItem("some-uuid", PersonModel.class.getName()));
 	}
 	

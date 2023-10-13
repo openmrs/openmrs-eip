@@ -222,9 +222,8 @@ public class ConflictQueueItem extends AbstractEntity {
 	@Override
 	public String toString() {
 		return "ConflictQueueItem {identifier=" + identifier + ", modelClassName=" + modelClassName + ", operation="
-		        + operation + ", payload=" + entityPayload + ", snapshot=" + snapshot + ", site=" + site
-		        + ", dateSentBySender=" + dateSentBySender + ", messageUuid=" + messageUuid + ", dateReceived="
-		        + dateReceived + "}";
+		        + operation + ", snapshot=" + snapshot + ", site=" + site + ", dateSentBySender=" + dateSentBySender
+		        + ", messageUuid=" + messageUuid + ", dateReceived=" + dateReceived + "}";
 	}
 	
 }
