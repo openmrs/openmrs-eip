@@ -4,6 +4,9 @@
 <div>
 	<button [hidden]="verifyTaskStatus?.running" type="button" class="btn btn-outline-primary btn-sm" (click)="startVerifyTask()" i18n="@@receiver-conflict-verify">Verify</button>
 	<span class="badge badge-success" [hidden]="!verifyTaskStatus?.running" i18n="@@receiver-conflict-verify-running">Verify task is running</span>
+	&nbsp;&nbsp;
+	<button [hidden]="resolverTaskStatus?.running" type="button" class="btn btn-outline-primary btn-sm" (click)="startResolverTask()" i18n="@@receiver-conflict-run-resolver-task">Run Resolver Task</button>
+	<span class="badge badge-success" [hidden]="!resolverTaskStatus?.running" i18n="@@receiver-conflict-resolver-task-running">Resolver task is running</span>
 </div>
 <div class="ui-bar-spacer"></div>
 <div class="ui-bar-spacer"></div>

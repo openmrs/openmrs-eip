@@ -7,7 +7,7 @@ import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewDiff} from "./state/confli
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Subscription} from "rxjs";
-import {VerifyTaskStatus} from "./verify-task-status";
+import {ConflictTaskStatus} from "./conflict-task-status";
 import {Decision} from "./decision.enum";
 import {Diff} from "./diff";
 import {MessageDialogComponent} from "../../shared/dialogs/message.component";
@@ -27,7 +27,7 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	modalRef?: NgbModalRef;
 
-	verifyTaskStatus?: VerifyTaskStatus;
+	verifyTaskStatus?: ConflictTaskStatus;
 
 	verifyTaskTimeoutId?: number;
 
@@ -118,14 +118,14 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	startVerifyTask(): void {
 		this.service.startVerifyTask().subscribe(() => {
-			this.store.dispatch(new VerifyTaskStatusUpdated(new VerifyTaskStatus(true, new Date())));
+			this.store.dispatch(new VerifyTaskStatusUpdated(new ConflictTaskStatus(true, new Date())));
 		});
 	}
 
 	getVerifyTaskStatus(delay: number): void {
 		this.verifyTaskTimeoutId = setTimeout(() => {
 			this.service.getVerifyTaskStatus().subscribe(running => {
-				this.store.dispatch(new VerifyTaskStatusUpdated(new VerifyTaskStatus(running, new Date())));
+				this.store.dispatch(new VerifyTaskStatusUpdated(new ConflictTaskStatus(running, new Date())));
 			});
 
 		}, delay);

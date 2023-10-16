@@ -36,4 +36,12 @@ export class ConflictService extends BaseService<Conflict> {
 		return this.httpClient.get<boolean>(environment.apiBaseUrl + RESOURCE_NAME + '/verify/status');
 	}
 
+	startResolverTask(): Observable<void> {
+		return this.httpClient.post<void>(environment.apiBaseUrl + RESOURCE_NAME + '/task/resolver/start', null);
+	}
+
+	getResolverTaskStatus(): Observable<boolean> {
+		return this.httpClient.get<boolean>(environment.apiBaseUrl + RESOURCE_NAME + '/task/resolver/status');
+	}
+
 }

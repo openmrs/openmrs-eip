@@ -1,6 +1,6 @@
 import {Action} from "@ngrx/store";
 import {ConflictCountAndItems} from "../confict-count-and-items";
-import {VerifyTaskStatus} from "../verify-task-status";
+import {ConflictTaskStatus} from "../conflict-task-status";
 import {Diff} from "../diff";
 
 export enum ConflictActionType {
@@ -31,7 +31,7 @@ export class VerifyTaskStatusUpdated implements Action {
 
 	readonly type = ConflictActionType.VERIFY_TASK_STATUS_UPDATED;
 
-	constructor(public verifyTaskStatus?: VerifyTaskStatus) {
+	constructor(public verifyTaskStatus?: ConflictTaskStatus) {
 	}
 
 }

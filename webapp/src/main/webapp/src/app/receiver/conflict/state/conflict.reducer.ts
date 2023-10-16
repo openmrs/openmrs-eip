@@ -1,13 +1,13 @@
 import {ConflictAction, ConflictActionType} from "./conflict.actions";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ConflictCountAndItems} from "../confict-count-and-items";
-import {VerifyTaskStatus} from "../verify-task-status";
+import {ConflictTaskStatus} from "../conflict-task-status";
 import {Diff} from "../diff";
 
 export interface ConflictState {
 	countAndItems: ConflictCountAndItems;
 	diff?: Diff;
-	verifyTaskStatus?: VerifyTaskStatus;
+	verifyTaskStatus?: ConflictTaskStatus;
 }
 
 const GET_CONFLICTS_FEATURE_STATE = createFeatureSelector<ConflictState>('conflictQueue');

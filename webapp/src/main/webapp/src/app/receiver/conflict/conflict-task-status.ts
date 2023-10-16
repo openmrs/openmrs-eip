@@ -1,4 +1,4 @@
-export class VerifyTaskStatus {
+export class ConflictTaskStatus {
 
 	running: boolean = false;
 
