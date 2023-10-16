@@ -13,47 +13,38 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SyncContext.class, AppUtils.class })
-public class ConflictVerifyingTaskTest {
+public class BaseConflictTaskTest {
 	
 	@Mock
 	private ConflictRepository mockRepo;
 	
 	@Mock
-	private ConflictVerifyingProcessor mockProcessor;
+	private BasePureParallelQueueProcessor mockProcessor;
 	
-	private ConflictVerifyingTask task;
-	
-	private ConflictRepository originalRepo;
-	
-	private ConflictVerifyingProcessor originalProcessor;
+	private BaseConflictTask task;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(AppUtils.class);
-		task = ConflictVerifyingTask.getInstance();
-		originalRepo = Whitebox.getInternalState(task, ConflictRepository.class);
-		originalProcessor = Whitebox.getInternalState(task, ConflictVerifyingProcessor.class);
+		task = new MockConflictTask(mockProcessor);
 		setInternalState(task, ConflictRepository.class, mockRepo);
-		setInternalState(task, ConflictVerifyingProcessor.class, mockProcessor);
 	}
 	
 	@After
 	public void tearDown() {
-		setInternalState(task, ConflictRepository.class, originalRepo);
-		setInternalState(task, ConflictVerifyingProcessor.class, originalProcessor);
 		setInternalState(task, "started", false);
 	}
 	
