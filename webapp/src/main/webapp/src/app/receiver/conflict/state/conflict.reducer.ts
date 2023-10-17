@@ -8,6 +8,7 @@ export interface ConflictState {
 	countAndItems: ConflictCountAndItems;
 	diff?: Diff;
 	verifyTaskStatus?: ConflictTaskStatus;
+	resolverTaskStatus?: ConflictTaskStatus;
 }
 
 const GET_CONFLICTS_FEATURE_STATE = createFeatureSelector<ConflictState>('conflictQueue');
@@ -25,6 +26,11 @@ export const GET_DIFF = createSelector(
 export const GET_VERIFY_TASK_STATUS = createSelector(
 	GET_CONFLICTS_FEATURE_STATE,
 	state => state.verifyTaskStatus
+);
+
+export const GET_RESOLVER_TASK_STATUS = createSelector(
+	GET_CONFLICTS_FEATURE_STATE,
+	state => state.resolverTaskStatus
 );
 
 const initialState: ConflictState = {
@@ -51,6 +57,13 @@ export function conflictReducer(state = initialState, action: ConflictAction) {
 			return {
 				...state,
 				verifyTaskStatus: action.verifyTaskStatus,
+
+			};
+
+		case ConflictActionType.RESOLVER_TASK_STATUS_UPDATED:
+			return {
+				...state,
+				resolverTaskStatus: action.resolverTaskStatus,
 
 			};
 

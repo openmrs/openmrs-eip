@@ -71,7 +71,7 @@ public class ConflictResolvingProcessor extends BasePureParallelQueueProcessor<C
 			}
 			catch (Exception e) {
 				//TODO Don't let this item make the task run indefinitely
-				log.warn("Failed to resolve conflict with id: " + item);
+				log.warn("Failed to resolve conflict with id: " + item.getId());
 			}
 		}
 	}

@@ -6,7 +6,8 @@ import {Diff} from "../diff";
 export enum ConflictActionType {
 	CONFLICTS_LOADED = 'CONFLICTS_LOADED',
 	VIEW_DIFF = 'VIEW_DIFF',
-	VERIFY_TASK_STATUS_UPDATED = 'VERIFY_TASK_STATUS_UPDATED'
+	VERIFY_TASK_STATUS_UPDATED = 'VERIFY_TASK_STATUS_UPDATED',
+	RESOLVER_TASK_STATUS_UPDATED = 'RESOLVER_TASK_STATUS_UPDATED'
 }
 
 export class ConflictsLoaded implements Action {
@@ -36,4 +37,13 @@ export class VerifyTaskStatusUpdated implements Action {
 
 }
 
-export type ConflictAction = ConflictsLoaded | ViewDiff | VerifyTaskStatusUpdated;
+export class ResolverTaskStatusUpdated implements Action {
+
+	readonly type = ConflictActionType.RESOLVER_TASK_STATUS_UPDATED;
+
+	constructor(public resolverTaskStatus?: ConflictTaskStatus) {
+	}
+
+}
+
+export type ConflictAction = ConflictsLoaded | ViewDiff | VerifyTaskStatusUpdated | ResolverTaskStatusUpdated;

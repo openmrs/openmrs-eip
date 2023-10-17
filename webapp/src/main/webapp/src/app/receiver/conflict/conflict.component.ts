@@ -2,8 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild,} from '@angular/core';
 import {ConflictService} from "./conflict.service";
 import {Conflict} from "./conflict";
 import {select, Store} from "@ngrx/store";
-import {GET_CONFLICTS, GET_DIFF, GET_VERIFY_TASK_STATUS} from "./state/conflict.reducer";
-import {ConflictsLoaded, VerifyTaskStatusUpdated, ViewDiff} from "./state/conflict.actions";
+import {GET_CONFLICTS, GET_DIFF, GET_RESOLVER_TASK_STATUS, GET_VERIFY_TASK_STATUS} from "./state/conflict.reducer";
+import {ConflictsLoaded, ResolverTaskStatusUpdated, VerifyTaskStatusUpdated, ViewDiff} from "./state/conflict.actions";
 import {BaseListingComponent} from "../../shared/base-listing.component";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Subscription} from "rxjs";
@@ -31,7 +31,13 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 
 	verifyTaskTimeoutId?: number;
 
-	lastReloadMillis?: number;
+	verifierReloadMillis?: number;
+
+	resolverTaskStatus?: ConflictTaskStatus;
+
+	resolverTaskTimeoutId?: number;
+
+	resolverReloadMillis?: number;
 
 	decision?: Decision;
 
@@ -45,6 +51,8 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 	loadedSubscription?: Subscription;
 
 	verifyStatusSubscription?: Subscription;
+
+	resolverStatusSubscription?: Subscription;
 
 	constructor(
 		private service: ConflictService,
@@ -89,13 +97,35 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 					}
 
 					let millis = status.lastUpdated?.getTime();
-					if (!this.lastReloadMillis) {
-						this.lastReloadMillis = millis;
+					if (!this.verifierReloadMillis) {
+						this.verifierReloadMillis = millis;
 					}
 
 					//Refresh the conflicts when the task is done or every 30 seconds
-					if (completed || (millis && this.lastReloadMillis && (millis - this.lastReloadMillis) >= 30000)) {
-						this.lastReloadMillis = millis;
+					if (completed || (millis && this.verifierReloadMillis && (millis - this.verifierReloadMillis) >= 30000)) {
+						this.verifierReloadMillis = millis;
+						this.loadConflicts();
+					}
+				}
+			}
+		);
+
+		this.resolverStatusSubscription = this.store.pipe(select(GET_RESOLVER_TASK_STATUS)).subscribe(status => {
+				if (status) {
+					let completed = this.resolverTaskStatus?.running && !status.running;
+					this.resolverTaskStatus = status;
+					if (this.resolverTaskStatus.running) {
+						this.getResolverTaskStatus(5000);
+					}
+
+					let millis = status.lastUpdated?.getTime();
+					if (!this.resolverReloadMillis) {
+						this.resolverReloadMillis = millis;
+					}
+
+					//Refresh the conflicts when the task is done or every 30 seconds
+					if (completed || (millis && this.resolverReloadMillis && (millis - this.resolverReloadMillis) >= 30000)) {
+						this.resolverReloadMillis = millis;
 						this.loadConflicts();
 					}
 				}
@@ -105,6 +135,10 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.loadConflicts();
 		if (this.verifyTaskTimeoutId) {
 			clearTimeout(this.verifyTaskTimeoutId);
+		}
+
+		if (this.resolverTaskTimeoutId) {
+			clearTimeout(this.resolverTaskTimeoutId);
 		}
 
 		this.getVerifyTaskStatus(0);
@@ -126,6 +160,21 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.verifyTaskTimeoutId = setTimeout(() => {
 			this.service.getVerifyTaskStatus().subscribe(running => {
 				this.store.dispatch(new VerifyTaskStatusUpdated(new ConflictTaskStatus(running, new Date())));
+			});
+
+		}, delay);
+	}
+
+	startResolverTask(): void {
+		this.service.startResolverTask().subscribe(() => {
+			this.store.dispatch(new ResolverTaskStatusUpdated(new ConflictTaskStatus(true, new Date())));
+		});
+	}
+
+	getResolverTaskStatus(delay: number): void {
+		this.resolverTaskTimeoutId = setTimeout(() => {
+			this.service.getResolverTaskStatus().subscribe(running => {
+				this.store.dispatch(new ResolverTaskStatusUpdated(new ConflictTaskStatus(running, new Date())));
 			});
 
 		}, delay);
@@ -233,7 +282,9 @@ export class ConflictComponent extends BaseListingComponent implements OnInit {
 		this.diffSubscription?.unsubscribe();
 		this.loadedSubscription?.unsubscribe();
 		this.verifyStatusSubscription?.unsubscribe();
+		this.resolverStatusSubscription?.unsubscribe();
 		clearTimeout(this.verifyTaskTimeoutId);
+		clearTimeout(this.resolverTaskTimeoutId);
 		super.ngOnDestroy();
 	}
 
