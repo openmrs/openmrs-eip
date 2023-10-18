@@ -1,6 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.web.RestConstants.ACTION_DIFF;
 import static org.openmrs.eip.web.RestConstants.ACTION_RESOLVE;
 import static org.openmrs.eip.web.RestConstants.DEFAULT_MAX_COUNT;
@@ -12,7 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
@@ -20,6 +21,7 @@ import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
 import org.openmrs.eip.app.receiver.ConflictResolverTask;
 import org.openmrs.eip.app.receiver.ConflictVerifyingTask;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -104,7 +106,8 @@ public class ConflictController extends BaseRestController {
 			log.debug("Processing request to start " + ConflictVerifyingTask.getInstance().getTaskName());
 		}
 		
-		Executors.newSingleThreadExecutor().execute(ConflictVerifyingTask.getInstance());
+		ExecutorService executor = SyncContext.getBean(BEAN_NAME_SYNC_EXECUTOR);
+		executor.execute(ConflictVerifyingTask.getInstance());
 	}
 	
 	@GetMapping("/verify/status")
@@ -163,7 +166,8 @@ public class ConflictController extends BaseRestController {
 			log.debug("Processing request to start " + ConflictResolverTask.getInstance().getTaskName());
 		}
 		
-		Executors.newSingleThreadExecutor().execute(ConflictResolverTask.getInstance());
+		ExecutorService executor = SyncContext.getBean(BEAN_NAME_SYNC_EXECUTOR);
+		executor.execute(ConflictResolverTask.getInstance());
 	}
 	
 }
