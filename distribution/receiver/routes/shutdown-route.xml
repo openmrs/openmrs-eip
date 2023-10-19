@@ -9,12 +9,6 @@
             </when>
             <otherwise>
                 <log loggingLevel="ERROR" message="An error occurred, ${exception.printStackTrace()}" />
-                
-                <setProperty name="org.openmrs.eip.app-appId">
-                    <simple>{{db-sync.receiverId}}</simple>
-                </setProperty>
-
-                <process ref="shutdownNotificationProcessor" />
 
                 <script>
                     <method beanType="org.openmrs.eip.app.AppUtils" method="shutdown()" />
