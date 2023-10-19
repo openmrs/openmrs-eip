@@ -30,15 +30,9 @@ public class OffsetUtils {
 			throw new EIPException("Invalid existing offset file content entry size: " + offsetRawData.size());
 		}
 		
-		log.info("Parsing existing offset data");
-		Map parsedOffsetData = new ObjectMapper().readValue(offsetRawData.values().iterator().next().array(), Map.class);
-		
-		log.info("Existing offset data: " + parsedOffsetData);
-		final String file = parsedOffsetData.get(SenderConstants.OFFSET_PROP_FILE).toString();
-		final Integer position = Integer.valueOf(parsedOffsetData.get(SenderConstants.OFFSET_PROP_POSITION).toString());
-		
+		Map parsedOffsetData = parseOffsetData(offsetRawData);
+		BinlogPosition binlogPosition = getBinlogPosition(parsedOffsetData);
 		log.info("Verifying existing offset");
-		BinlogPosition binlogPosition = new BinlogPosition(file, position);
 		OffsetVerificationResult result = new OffsetVerifier(binlogPosition).verify();
 		log.info("Offset verification result: " + result);
 		if (result == OffsetVerificationResult.PASS) {
@@ -61,6 +55,21 @@ public class OffsetUtils {
 		} else {
 			throw new EIPException("Failed to verify existing offset: " + parsedOffsetData);
 		}
+	}
+	
+	private static Map parseOffsetData(Map<ByteBuffer, ByteBuffer> offsetRawData) throws Exception {
+		log.info("Parsing existing offset data");
+		Map parsed = new ObjectMapper().readValue(offsetRawData.values().iterator().next().array(), Map.class);
+		log.info("Existing offset data: " + parsed);
+		
+		return parsed;
+	}
+	
+	private static BinlogPosition getBinlogPosition(Map offsetData) {
+		final String file = offsetData.get(SenderConstants.OFFSET_PROP_FILE).toString();
+		final Integer position = Integer.valueOf(offsetData.get(SenderConstants.OFFSET_PROP_POSITION).toString());
+		
+		return new BinlogPosition(file, position);
 	}
 	
 }
