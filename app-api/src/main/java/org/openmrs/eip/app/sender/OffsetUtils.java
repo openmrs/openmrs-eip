@@ -31,8 +31,11 @@ public class OffsetUtils {
 		}
 		
 		Map parsedOffsetData = parseOffsetData(offsetRawData);
-		BinlogPosition binlogPosition = getBinlogPosition(parsedOffsetData);
+		final String file = getBinlogFile(parsedOffsetData);
+		final Integer position = Integer.valueOf(parsedOffsetData.get(SenderConstants.OFFSET_PROP_POSITION).toString());
+		
 		log.info("Verifying existing offset");
+		BinlogPosition binlogPosition = new BinlogPosition(file, position);
 		OffsetVerificationResult result = new OffsetVerifier(binlogPosition).verify();
 		log.info("Offset verification result: " + result);
 		if (result == OffsetVerificationResult.PASS) {
@@ -65,11 +68,8 @@ public class OffsetUtils {
 		return parsed;
 	}
 	
-	private static BinlogPosition getBinlogPosition(Map offsetData) {
-		final String file = offsetData.get(SenderConstants.OFFSET_PROP_FILE).toString();
-		final Integer position = Integer.valueOf(offsetData.get(SenderConstants.OFFSET_PROP_POSITION).toString());
-		
-		return new BinlogPosition(file, position);
+	private static String getBinlogFile(Map offsetData) {
+		return offsetData.get(SenderConstants.OFFSET_PROP_FILE).toString();
 	}
 	
 }
