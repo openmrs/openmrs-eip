@@ -9,6 +9,8 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATC
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -255,6 +257,89 @@ public class AppUtils {
 		}
 		catch (Exception e) {
 			log.error("An error occurred while waiting for " + name + " executor to terminate");
+		}
+	}
+	
+	/**
+	 * Gets the value of the property represented by the specified name on the specified object.
+	 *
+	 * @param object the object
+	 * @param propertyName the property name
+	 * @return the property value
+	 * @param <T>
+	 */
+	public static <T> T getProperty(Object object, String propertyName) {
+		Boolean isAccessible = null;
+		Field field = null;
+		
+		try {
+			field = object.getClass().getDeclaredField(propertyName);
+			field.setAccessible(true);
+			
+			return (T) field.get(object);
+		}
+		catch (Exception e) {
+			throw new EIPException("Failed to get the value of the property " + propertyName + " on object of type "
+			        + object.getClass().getName(), e);
+		}
+		finally {
+			if (field != null && isAccessible != null) {
+				field.setAccessible(isAccessible);
+			}
+		}
+	}
+	
+	/**
+	 * Sets the value of the property represented by the specified name on the specified object.
+	 *
+	 * @param object the object
+	 * @param propertyName the property name
+	 * @param value the value to set
+	 */
+	public static void setProperty(Object object, String propertyName, Object value) {
+		Boolean isAccessible = null;
+		Field field = null;
+		
+		try {
+			field = object.getClass().getDeclaredField(propertyName);
+			field.setAccessible(true);
+			field.set(object, value);
+		}
+		catch (Exception e) {
+			throw new EIPException(
+			        "Failed to set property " + propertyName + " on object of type " + object.getClass().getName(), e);
+		}
+		finally {
+			if (field != null && isAccessible != null) {
+				field.setAccessible(isAccessible);
+			}
+		}
+	}
+	
+	/**
+	 * Invokes the method represented by the specified name on the specified object with the specified
+	 * arguments.
+	 * 
+	 * @param object the object
+	 * @param method the method
+	 * @param args the arguments to pass to the method
+	 */
+	public static Object invokeMethod(Object object, Method method, Object... args) {
+		Boolean isAccessible = null;
+		
+		try {
+			method.setAccessible(true);
+			
+			return method.invoke(object, args);
+		}
+		catch (Exception e) {
+			throw new EIPException(
+			        "Failed to invoke method " + method.getName() + " on object of type " + object.getClass().getName(), e);
+		}
+		finally {
+			if (isAccessible != null) {
+				method.setAccessible(isAccessible);
+			}
 		}
 	}
 	

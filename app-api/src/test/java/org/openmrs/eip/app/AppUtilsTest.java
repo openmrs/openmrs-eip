@@ -1,18 +1,21 @@
 package org.openmrs.eip.app;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -61,7 +64,7 @@ public class AppUtilsTest {
 	
 	@Test
 	public void getTaskPage_shouldGetThePageableObjectUsingConfiguredBatchSize() {
-		Assert.assertNull(Whitebox.getInternalState(AppUtils.class, "taskPage"));
+		assertNull(Whitebox.getInternalState(AppUtils.class, "taskPage"));
 		final int size = 5;
 		when(mockEnv.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE)).thenReturn(size);
 		
@@ -69,6 +72,29 @@ public class AppUtilsTest {
 		
 		assertEquals(0, pageable.getPageNumber());
 		assertEquals(size, pageable.getPageSize());
+	}
+	
+	@Test
+	public void getProperty_shouldGetThePropertyValue() throws Exception {
+		Field field = SenderSyncMessage.class.getDeclaredField("tableName");
+		assertFalse(field.isAccessible());
+		final String tableName = "person";
+		SenderSyncMessage msg = new SenderSyncMessage();
+		msg.setTableName(tableName);
+		assertEquals(tableName, AppUtils.getProperty(msg, "tableName"));
+		assertFalse(field.isAccessible());
+	}
+	
+	@Test
+	public void setProperty_shouldSetThePropertyValue() throws Exception {
+		Field field = SenderSyncMessage.class.getDeclaredField("tableName");
+		assertFalse(field.isAccessible());
+		final String tableName = "person";
+		SenderSyncMessage msg = new SenderSyncMessage();
+		assertNull(msg.getTableName());
+		AppUtils.setProperty(msg, "tableName", tableName);
+		assertEquals(tableName, msg.getTableName());
+		assertFalse(field.isAccessible());
 	}
 	
 }
