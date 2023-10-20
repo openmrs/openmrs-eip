@@ -81,24 +81,24 @@ public class AppUtilsTest {
 	}
 	
 	@Test
-	public void getProperty_shouldGetThePropertyValue() throws Exception {
+	public void getFieldValue_shouldGetTheFieldValue() throws Exception {
 		Field field = SenderSyncMessage.class.getDeclaredField("tableName");
 		assertFalse(field.isAccessible());
 		final String tableName = "person";
 		SenderSyncMessage msg = new SenderSyncMessage();
 		msg.setTableName(tableName);
-		assertEquals(tableName, AppUtils.getProperty(msg, "tableName"));
+		assertEquals(tableName, AppUtils.getFieldValue(msg, field));
 		assertFalse(field.isAccessible());
 	}
 	
 	@Test
-	public void setProperty_shouldSetThePropertyValue() throws Exception {
+	public void setFieldValue_shouldSetTheFieldValue() throws Exception {
 		Field field = SenderSyncMessage.class.getDeclaredField("tableName");
 		assertFalse(field.isAccessible());
 		final String tableName = "person";
 		SenderSyncMessage msg = new SenderSyncMessage();
 		assertNull(msg.getTableName());
-		AppUtils.setProperty(msg, "tableName", tableName);
+		AppUtils.setFieldValue(msg, field, tableName);
 		assertEquals(tableName, msg.getTableName());
 		assertFalse(field.isAccessible());
 	}

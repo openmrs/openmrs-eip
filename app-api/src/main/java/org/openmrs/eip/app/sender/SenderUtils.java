@@ -107,7 +107,7 @@ public class SenderUtils {
 			
 			ResultSet r = s.executeQuery("SHOW BINARY LOGS");
 			while (r.next()) {
-				files.add(r.getString("Log_name"));
+				files.add(r.getString(1));
 			}
 		}
 		

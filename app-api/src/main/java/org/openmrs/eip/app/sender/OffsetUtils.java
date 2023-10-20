@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
+import org.apache.kafka.connect.storage.MemoryOffsetBackingStore;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.sender.OffsetVerifier.OffsetVerificationResult;
 import org.openmrs.eip.component.exception.EIPException;
@@ -72,9 +73,10 @@ public class OffsetUtils {
 	 */
 	public static String getBinlogFileName(File offsetFile) throws Exception {
 		FileOffsetBackingStore store = new FileOffsetBackingStore();
-		AppUtils.setProperty(store, "file", offsetFile);
+		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), offsetFile);
 		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
-		Map<ByteBuffer, ByteBuffer> offsetRawData = AppUtils.getProperty(store, "data");
+		Map<ByteBuffer, ByteBuffer> offsetRawData = AppUtils.getFieldValue(store,
+		    MemoryOffsetBackingStore.class.getDeclaredField("data"));
 		
 		return getBinlogFile(parseOffsetData(offsetRawData));
 	}
