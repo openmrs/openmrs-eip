@@ -123,7 +123,7 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 			
 			SyncContext.setAdminUser(userLightRepo.findById(optional.get().getId()).get());
 			
-			log.info("Starting sync message consumer threads, one per site");
+			log.info("Starting tasks");
 			
 			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 			        .collect(Collectors.toList());

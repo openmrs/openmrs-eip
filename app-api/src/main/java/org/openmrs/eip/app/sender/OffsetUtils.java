@@ -1,8 +1,11 @@
 package org.openmrs.eip.app.sender;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import org.apache.kafka.connect.storage.FileOffsetBackingStore;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.sender.OffsetVerifier.OffsetVerificationResult;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
@@ -58,6 +61,22 @@ public class OffsetUtils {
 		} else {
 			throw new EIPException("Failed to verify existing offset: " + parsedOffsetData);
 		}
+	}
+	
+	/**
+	 * Retrieves the current binlog file name from the specified debezium offset file
+	 * 
+	 * @param offsetFile the debezium offset file
+	 * @return the binlog file name
+	 * @throws Exception
+	 */
+	public static String getBinlogFileName(File offsetFile) throws Exception {
+		FileOffsetBackingStore store = new FileOffsetBackingStore();
+		AppUtils.setProperty(store, "file", offsetFile);
+		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
+		Map<ByteBuffer, ByteBuffer> offsetRawData = AppUtils.getProperty(store, "data");
+		
+		return getBinlogFile(parseOffsetData(offsetRawData));
 	}
 	
 	private static Map parseOffsetData(Map<ByteBuffer, ByteBuffer> offsetRawData) throws Exception {
