@@ -3,11 +3,13 @@ package org.openmrs.eip.app;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import org.junit.After;
@@ -15,7 +17,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
+import org.openmrs.eip.app.management.service.ConflictService;
+import org.openmrs.eip.app.management.service.impl.ConflictServiceImpl;
+import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -95,6 +101,20 @@ public class AppUtilsTest {
 		AppUtils.setProperty(msg, "tableName", tableName);
 		assertEquals(tableName, msg.getTableName());
 		assertFalse(field.isAccessible());
+	}
+	
+	@Test
+	public void invokeMethod_shouldInvokeTheMethod() throws Exception {
+		Method method = ConflictServiceImpl.class.getDeclaredMethod("resolveWithMerge", ConflictResolution.class);
+		assertFalse(method.isAccessible());
+		ConflictServiceImpl service = new ConflictServiceImpl(null, null, null, null, null, null, null);
+		ConflictResolution mockResolution = Mockito.mock(ConflictResolution.class);
+		ConflictService mockService = Mockito.mock(ConflictService.class);
+		when(SyncContext.getBean(ConflictService.class)).thenReturn(mockService);
+		
+		AppUtils.invokeMethod(service, method, mockResolution);
+		
+		Mockito.verify(mockService).resolveWithMerge(any(), any());
 	}
 	
 }
