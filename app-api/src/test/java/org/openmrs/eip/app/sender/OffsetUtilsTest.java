@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.sender;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -133,6 +135,23 @@ public class OffsetUtilsTest {
 		Assert.assertEquals(1, offsetData.size());
 		Assert.assertEquals(OFFSET_KEY_BYTE_BUFFER, offsetData.keySet().iterator().next());
 		Assert.assertEquals(createValueByteBuffer(file, 4, 0, 0), offsetData.values().iterator().next());
+	}
+	
+	@Test
+	public void getBinlogFileName_shouldReturnNullIfTheOffsetFileDoesNotExist() throws Exception {
+		Assert.assertNull(OffsetUtils.getBinlogFileName(Mockito.mock(File.class)));
+	}
+	
+	@Test
+	public void getBinlogFileName_shouldReturnNullIfTheOffsetFileIsEmpty() throws Exception {
+		File file = new File(ClassUtils.getDefaultClassLoader().getResource("empty_dbzm_offset.txt").getFile());
+		Assert.assertNull(OffsetUtils.getBinlogFileName(file));
+	}
+	
+	@Test
+	public void getBinlogFileName_shouldGetTheCurrentBinlogFile() throws Exception {
+		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
+		Assert.assertEquals("bin-log.000012", OffsetUtils.getBinlogFileName(file));
 	}
 	
 }

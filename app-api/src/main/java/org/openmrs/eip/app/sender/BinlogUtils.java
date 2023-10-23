@@ -25,7 +25,15 @@ import org.springframework.core.env.Environment;
  */
 public class BinlogUtils {
 	
-	protected static final Logger log = LoggerFactory.getLogger(BinlogUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(BinlogUtils.class);
+	
+	protected static final String URL_QUERY = "?autoReconnect=true&sessionVariables=storage_engine=InnoDB&useUnicode=true&characterEncoding=UTF-8";
+	
+	protected static final String QUERY_SHOW_BIN_LOGS = "SHOW BINARY LOGS";
+	
+	protected static final String FILE_PLACEHOLDER = "{TO_BIN_FILE}";
+	
+	protected static final String QUERY_PURGE_LOGS = "PURGE BINARY LOGS TO '" + FILE_PLACEHOLDER + "'";
 	
 	/**
 	 * Fetches the current list of all the mysql binary log files .
@@ -33,10 +41,10 @@ public class BinlogUtils {
 	 * @return list of binary log file names
 	 * @throws SQLException
 	 */
-	public static List<String> getBinLogFiles() throws SQLException {
+	protected static List<String> getBinLogFiles() throws SQLException {
 		List<String> files = new ArrayList<>();
 		try (Connection c = getConnectionToBinaryLogs(); Statement s = c.createStatement()) {
-			ResultSet r = s.executeQuery("SHOW BINARY LOGS");
+			ResultSet r = s.executeQuery(QUERY_SHOW_BIN_LOGS);
 			while (r.next()) {
 				files.add(r.getString(1));
 			}
@@ -54,7 +62,7 @@ public class BinlogUtils {
 	 * @return the name of the last binary log file to keep
 	 * @throws SQLException
 	 */
-	public static String getLastProcessedBinLogFileToKeep(String binlogFile, int maxKeepCount) throws Exception {
+	protected static String getLastProcessedBinLogFileToKeep(String binlogFile, int maxKeepCount) throws Exception {
 		List<String> binlogFiles = getBinLogFiles();
 		if (!binlogFiles.stream().anyMatch(binlogFile::equals)) {
 			throw new EIPException("Debezium offset binlog file " + binlogFile + " is unknown by MySQL server");
@@ -69,16 +77,16 @@ public class BinlogUtils {
 	}
 	
 	/**
-	 * Deletes all the processed binary log files prior to the specified binary log file name, the
-	 * specified file is not deleted.
+	 * Deletes all the processed binary log files up to the file that precedes the specified binary log
+	 * file name.
 	 *
-	 * @param priorToBinLogFile the name of the last file to keep
+	 * @param toBinLogFile the name of the last file to keep
 	 * @throws SQLException
 	 */
-	public static void purgeBinLogsTo(String priorToBinLogFile) throws SQLException {
+	protected static void purgeBinLogsTo(String toBinLogFile) throws SQLException {
 		try (Connection c = getConnectionToBinaryLogs(); Statement s = c.createStatement()) {
-			log.info("Purging binlog files up to " + priorToBinLogFile);
-			int purgeCount = s.executeUpdate("PURGE BINARY LOGS TO '" + priorToBinLogFile + "'");
+			log.info("Purging binlog files up to " + toBinLogFile);
+			int purgeCount = s.executeUpdate(QUERY_PURGE_LOGS.replace(FILE_PLACEHOLDER, toBinLogFile));
 			log.info("Successfully purged " + purgeCount);
 		}
 	}
@@ -94,8 +102,11 @@ public class BinlogUtils {
 	 */
 	public static void purgeBinLogs(File debeziumOffsetFile, int maxKeepCount) throws Exception {
 		String binlogFile = OffsetUtils.getBinlogFileName(debeziumOffsetFile);
-		if (debeziumOffsetFile.exists() && binlogFile == null) {
-			log.info("Debezium offset file contains no binlog file name");
+		if (binlogFile == null) {
+			if (debeziumOffsetFile.exists()) {
+				log.info("Debezium offset file contains no binlog file name");
+			}
+			
 			return;
 		}
 		
@@ -108,13 +119,12 @@ public class BinlogUtils {
 		purgeBinLogsTo(priorToBinLogFile);
 	}
 	
-	public static Connection getConnectionToBinaryLogs() throws SQLException {
+	protected static Connection getConnectionToBinaryLogs() throws SQLException {
 		Environment env = SyncContext.getBean(Environment.class);
 		final String host = env.getProperty(PROP_OPENMRS_DB_HOST);
 		final String port = env.getProperty(PROP_OPENMRS_DB_PORT);
 		final String user = env.getProperty(PROP_DBZM_DB_USER);
-		final String url = "jdbc:mysql://" + host + ":" + port
-		        + "?autoReconnect=true&sessionVariables=storage_engine=InnoDB&useUnicode=true&characterEncoding=UTF-8";
+		final String url = "jdbc:mysql://" + host + ":" + port + URL_QUERY;
 		
 		return DriverManager.getConnection(url, user, env.getProperty(PROP_DBZM_DB_PASSWORD));
 	}

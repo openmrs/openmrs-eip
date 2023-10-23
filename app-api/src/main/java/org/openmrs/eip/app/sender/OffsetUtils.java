@@ -2,6 +2,7 @@ package org.openmrs.eip.app.sender;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
@@ -88,6 +89,10 @@ public class OffsetUtils {
 	
 	private static Map parseOffsetData(Map<ByteBuffer, ByteBuffer> offsetRawData) throws Exception {
 		log.info("Parsing existing offset data");
+		if (offsetRawData.isEmpty()) {
+			return Collections.emptyMap();
+		}
+		
 		Map parsed = new ObjectMapper().readValue(offsetRawData.values().iterator().next().array(), Map.class);
 		log.info("Existing offset data: " + parsed);
 		
@@ -95,7 +100,8 @@ public class OffsetUtils {
 	}
 	
 	private static String getBinlogFile(Map offsetData) {
-		return offsetData.get(SenderConstants.OFFSET_PROP_FILE).toString();
+		Object file = offsetData.get(SenderConstants.OFFSET_PROP_FILE);
+		return file != null ? file.toString() : null;
 	}
 	
 }
