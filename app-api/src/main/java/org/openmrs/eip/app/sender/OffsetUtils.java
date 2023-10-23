@@ -72,6 +72,11 @@ public class OffsetUtils {
 	 * @throws Exception
 	 */
 	public static String getBinlogFileName(File offsetFile) throws Exception {
+		if (!offsetFile.exists()) {
+			log.info("No existing debezium offset file found");
+			return null;
+		}
+		
 		FileOffsetBackingStore store = new FileOffsetBackingStore();
 		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), offsetFile);
 		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
