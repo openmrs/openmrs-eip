@@ -4,6 +4,8 @@ public class SenderConstants {
 	
 	public static final String ACTIVEMQ_IN_ENDPOINT = "activemq:openmrs.sync.{{db-sync.senderId}}?connectionFactory=activeMqConnFactory&acknowledgementModeName=CLIENT_ACKNOWLEDGE&messageListenerContainerFactory=customMessageListenerContainerFactory&asyncStartListener=true";
 	
+	public static final String BEAN_NAME_SCHEDULED_EXECUTOR = "scheduledExecutor";
+	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "db-sync.sender.activemq.in";
 	
 	public static final String PROP_SENDER_ID = "db-sync.senderId";
@@ -13,6 +15,16 @@ public class SenderConstants {
 	public static final String PROP_DBZM_DB_USER = "debezium.db.user";
 	
 	public static final String PROP_DBZM_DB_PASSWORD = "debezium.db.password";
+	
+	public static final String PROP_DBZM_OFFSET_FILENAME = "debezium.offsetFilename";
+	
+	public static final String PROP_BINLOG_PURGER_ENABLED = "binlog.purger.task.enabled";
+	
+	public static final String PROP_BINLOG_MAX_KEEP_COUNT = "binlog.files.processed.keep.max";
+	
+	public static final String PROP_INITIAL_DELAY_BINLOG_PURGER = "binlog.purger.initial.delay";
+	
+	public static final String PROP_DELAY_BINLOG_PURGER = "binlog.purger.delay";
 	
 	public static final String EX_PROP_EVENT = "event";
 	

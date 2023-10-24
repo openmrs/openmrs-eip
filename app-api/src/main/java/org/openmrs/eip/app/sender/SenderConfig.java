@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.sender;
 
+import static org.openmrs.eip.app.sender.SenderConstants.BEAN_NAME_SCHEDULED_EXECUTOR;
 import static org.openmrs.eip.component.Constants.CUSTOM_PROP_SOURCE_BEAN_NAME;
 import static org.openmrs.eip.component.Constants.PROP_URI_ERROR_HANDLER;
 
@@ -7,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +56,11 @@ public class SenderConfig {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
 		builder.setUseOriginalMessage(true);
 		return builder;
+	}
+	
+	@Bean(BEAN_NAME_SCHEDULED_EXECUTOR)
+	public ScheduledExecutorService getScheduledExecutor() {
+		return Executors.newSingleThreadScheduledExecutor();
 	}
 	
 }
