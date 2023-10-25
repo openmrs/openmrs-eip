@@ -86,8 +86,8 @@ public class BinlogUtils {
 	protected static void purgeBinLogsTo(String toBinLogFile) throws SQLException {
 		try (Connection c = getConnectionToBinaryLogs(); Statement s = c.createStatement()) {
 			log.info("Purging binlog files up to " + toBinLogFile);
-			int purgeCount = s.executeUpdate(QUERY_PURGE_LOGS.replace(FILE_PLACEHOLDER, toBinLogFile));
-			log.info("Successfully purged " + purgeCount);
+			s.executeUpdate(QUERY_PURGE_LOGS.replace(FILE_PLACEHOLDER, toBinLogFile));
+			log.info("Successfully purged");
 		}
 	}
 	
