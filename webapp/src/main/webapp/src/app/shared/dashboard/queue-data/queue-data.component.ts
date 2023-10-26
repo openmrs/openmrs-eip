@@ -17,6 +17,9 @@ import {
 	GET_ERROR_CATEGORIES,
 	GET_ERROR_CATEGORY_COUNTS,
 	GET_ERROR_COUNT,
+	GET_SENDER_SYNC_CATEGORIES,
+	GET_SENDER_SYNC_CATEGORY_COUNTS,
+	GET_SENDER_SYNC_COUNT,
 	GET_SYNC_CATEGORIES,
 	GET_SYNC_CATEGORY_COUNTS,
 	GET_SYNC_COUNT,
@@ -43,21 +46,24 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		['sync', GET_SYNC_COUNT],
 		['synced', GET_SYNCED_COUNT],
 		['error', GET_ERROR_COUNT],
-		['conflict', GET_CONFLICT_COUNT]
+		['conflict', GET_CONFLICT_COUNT],
+		['sender-sync', GET_SENDER_SYNC_COUNT]
 	]);
 
 	readonly queueAndCategoriesSelectorMap = new Map<string, Selector<object, string[] | undefined>>([
 		['sync', GET_SYNC_CATEGORIES],
 		['synced', GET_SYNCED_CATEGORIES],
 		['error', GET_ERROR_CATEGORIES],
-		['conflict', GET_CONFLICT_CATEGORIES]
+		['conflict', GET_CONFLICT_CATEGORIES],
+		['sender-sync', GET_SENDER_SYNC_CATEGORIES]
 	]);
 
 	readonly queueAndCatCountSelectorMap = new Map<string, Selector<object, Map<string, Map<SyncOperation, number>> | undefined>>([
 		['sync', GET_SYNC_CATEGORY_COUNTS],
 		['synced', GET_SYNCED_CATEGORY_COUNTS],
 		['error', GET_ERROR_CATEGORY_COUNTS],
-		['conflict', GET_CONFLICT_CATEGORY_COUNTS]
+		['conflict', GET_CONFLICT_CATEGORY_COUNTS],
+		['sender-sync', GET_SENDER_SYNC_CATEGORY_COUNTS],
 	]);
 
 	readonly data = new QueueData();

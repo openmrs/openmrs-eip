@@ -11,7 +11,8 @@ export class DashboardState {
 		['sync', new QueueData()],
 		['synced', new QueueData()],
 		['error', new QueueData()],
-		['conflict', new QueueData()]
+		['conflict', new QueueData()],
+		['sender-sync', new QueueData()]
 	]);
 	error?: HttpErrorResponse;
 }
@@ -86,6 +87,21 @@ export const GET_CONFLICT_CATEGORIES = createSelector(
 export const GET_CONFLICT_CATEGORY_COUNTS = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
 	state => state.queueAndDataMap?.get('conflict')?.categoryAndCounts
+);
+
+export const GET_SENDER_SYNC_COUNT = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('sender-sync')?.count
+);
+
+export const GET_SENDER_SYNC_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('sender-sync')?.categories
+);
+
+export const GET_SENDER_SYNC_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('sender-sync')?.categoryAndCounts
 );
 
 export function dashboardReducer(state: DashboardState = new DashboardState(), action: DashboardAction) {

@@ -19,7 +19,8 @@ export class DashboardEffects {
 		['sync', 'SyncMessage'],
 		['synced', 'SyncedMessage'],
 		['error', 'ReceiverRetryQueueItem'],
-		['conflict', 'ConflictQueueItem']
+		['conflict', 'ConflictQueueItem'],
+		['sender-sync', 'SenderSyncMessage']
 	]);
 
 	constructor(private actions$: Actions, private dashboardService: DashboardService) {
