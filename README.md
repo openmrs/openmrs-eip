@@ -15,8 +15,9 @@
 10. [Conflict Resolution](#conflict-resolution)
 11. [Sync Prioritization](#sync-prioritization)
 12. [Sync Archive Pruning](#sync-archive-pruning)
-13. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
-14. [Developer Guide](#developer-guide)
+13. [Binary Log Purging](#binary-log-purging)
+14. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
+15. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
@@ -295,6 +296,16 @@ upgrades. Therefore, a pruner task was added to periodically delete all archives
 The pruning task is disabled by default but can be enabled and customized, please refer to the **Sync Archives Pruning** 
 section in the [receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties)
 
+# Binary Log Purging
+This feature applies to the sender, the number of binary log files on the MySQL server can grow to the point where the 
+server runs out of disk space, this feature allows the admin to configure the sender to periodically delete binary log 
+files that have already been processed by debezium engine and maintain a specific count of processed binary log files.
+
+**Note** that this feature uses the debezium user account defined via the **debezium.db.user** property in the sender, 
+you MUST assign it this user the **BINLOG_ADMIN** privilege in MySQL for the feature to work.
+
+The binary log purging task is disabled by default but can be enabled and customized, please refer to the 
+**Binary Log Purge Configuration** section in the [sender application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/sender/application.properties)
 
 # Requesting An Entity To Be Synced
 The application has a mechanism that allows the receiver to request for an entity to be synced from a specific remote 
