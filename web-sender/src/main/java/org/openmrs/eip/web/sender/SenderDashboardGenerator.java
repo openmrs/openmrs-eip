@@ -66,7 +66,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 		final AtomicInteger mostEncounteredErrorCount = new AtomicInteger();
 		final Set<Object> mostEncounteredErrors = new ConcurrentHashSet();
 		final AtomicInteger totalSyncMsgCount = new AtomicInteger();
-		final Map<String, Map> syncMsgsTableStatsMap = new ConcurrentHashMap();
 		final Map statusItemCountMap = new ConcurrentHashMap();
 		
 		AppUtils.getTablesToSync().parallelStream().forEach(table -> {
@@ -96,16 +95,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 				        .request(Integer.class);
 				
 				totalSyncMsgCount.addAndGet(msgCount);
-				
-				if (msgCount > 0) {
-					synchronized (this) {
-						if (syncMsgsTableStatsMap.get(tableName) == null) {
-							syncMsgsTableStatsMap.put(tableName, new ConcurrentHashMap());
-						}
-					}
-					
-					syncMsgsTableStatsMap.get(tableName).put(op, msgCount);
-				}
 				
 			});
 		});
@@ -162,8 +151,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 		dashboard.add("errors", errors);
 		
 		Map<String, Object> syncMessages = new ConcurrentHashMap();
-		syncMessages.put("totalCount", totalSyncMsgCount);
-		syncMessages.put("tableStatsMap", syncMsgsTableStatsMap);
 		syncMessages.put("statusItemCountMap", statusItemCountMap);
 		dashboard.add("syncMessages", syncMessages);
 		
