@@ -47,7 +47,11 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 	
 	@Override
 	public String getCategorizationProperty(String entityType) {
-		return DebeziumEvent.class.getSimpleName().equals(entityType) ? "event.tableName" : "tableName";
+		if (EVENT_ENTITY_NAME.equals(entityType) || ERROR_ENTITY_NAME.equals(entityType)) {
+			return "event.tableName";
+		}
+		
+		return "tableName";
 	}
 	
 	/**

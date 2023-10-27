@@ -145,12 +145,6 @@
 				<target>Fila de Eventos com Erros</target>
 			</segment>
 		</unit>
-		<unit id="common-loading">
-			<segment>
-				<source>Loading</source>
-				<target>Carregando</target>
-			</segment>
-		</unit>
 		<unit id="common-no-errors-msg">
 			<segment>
 				<source>No errors, everything looks good!</source>

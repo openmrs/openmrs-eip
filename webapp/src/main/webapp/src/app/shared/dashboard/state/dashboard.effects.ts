@@ -21,7 +21,8 @@ export class DashboardEffects {
 		['error', 'ReceiverRetryQueueItem'],
 		['conflict', 'ConflictQueueItem'],
 		['event', 'DebeziumEvent'],
-		['sender-sync', 'SenderSyncMessage']
+		['sender-sync', 'SenderSyncMessage'],
+		['sender-error', 'SenderRetryQueueItem']
 	]);
 
 	constructor(private actions$: Actions, private dashboardService: DashboardService) {
