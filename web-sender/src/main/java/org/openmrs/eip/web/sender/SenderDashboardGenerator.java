@@ -65,8 +65,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 		final AtomicInteger activeMqRelatedErrorCount = new AtomicInteger();
 		final AtomicInteger mostEncounteredErrorCount = new AtomicInteger();
 		final Set<Object> mostEncounteredErrors = new ConcurrentHashSet();
-		final Map<String, Map> eventsTableStatsMap = new ConcurrentHashMap();
-		final AtomicInteger totalEventCount = new AtomicInteger();
 		final AtomicInteger totalSyncMsgCount = new AtomicInteger();
 		final Map<String, Map> syncMsgsTableStatsMap = new ConcurrentHashMap();
 		final Map statusItemCountMap = new ConcurrentHashMap();
@@ -90,23 +88,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 					}
 					
 					errorTableStatsMap.get(tableName).put(op, errorCount);
-				}
-				
-				Integer eventCount = on(camelContext)
-				        .to("jpa:" + EVENT_ENTITY_NAME + "?query=SELECT count(*) FROM " + EVENT_ENTITY_NAME
-				                + " WHERE LOWER(event.tableName) = '" + tableName + "' AND event.operation = '" + op + "'")
-				        .request(Integer.class);
-				
-				totalEventCount.addAndGet(eventCount);
-				
-				if (eventCount > 0) {
-					synchronized (this) {
-						if (eventsTableStatsMap.get(tableName) == null) {
-							eventsTableStatsMap.put(tableName, new ConcurrentHashMap());
-						}
-					}
-					
-					eventsTableStatsMap.get(tableName).put(op, eventCount);
 				}
 				
 				Integer msgCount = on(camelContext)
@@ -179,11 +160,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 		errors.put("tableStatsMap", errorTableStatsMap);
 		errors.put("exceptionCountMap", exceptionCountMap);
 		dashboard.add("errors", errors);
-		
-		Map<String, Object> pendingEvents = new ConcurrentHashMap();
-		pendingEvents.put("totalCount", totalEventCount);
-		pendingEvents.put("tableStatsMap", eventsTableStatsMap);
-		dashboard.add("pendingEvents", pendingEvents);
 		
 		Map<String, Object> syncMessages = new ConcurrentHashMap();
 		syncMessages.put("totalCount", totalSyncMsgCount);
