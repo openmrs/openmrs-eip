@@ -84,7 +84,6 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 				        .request(Integer.class);
 				
 				totalSyncMsgCount.addAndGet(msgCount);
-				
 			});
 		});
 		
