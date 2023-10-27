@@ -20,6 +20,7 @@ export class DashboardEffects {
 		['synced', 'SyncedMessage'],
 		['error', 'ReceiverRetryQueueItem'],
 		['conflict', 'ConflictQueueItem'],
+		['event', 'DebeziumEvent'],
 		['sender-sync', 'SenderSyncMessage']
 	]);
 

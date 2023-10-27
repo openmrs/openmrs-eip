@@ -17,6 +17,9 @@ import {
 	GET_ERROR_CATEGORIES,
 	GET_ERROR_CATEGORY_COUNTS,
 	GET_ERROR_COUNT,
+	GET_EVENT_CATEGORIES,
+	GET_EVENT_CATEGORY_COUNTS,
+	GET_EVENT_COUNT,
 	GET_SENDER_SYNC_CATEGORIES,
 	GET_SENDER_SYNC_CATEGORY_COUNTS,
 	GET_SENDER_SYNC_COUNT,
@@ -47,6 +50,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		['synced', GET_SYNCED_COUNT],
 		['error', GET_ERROR_COUNT],
 		['conflict', GET_CONFLICT_COUNT],
+		['event', GET_EVENT_COUNT],
 		['sender-sync', GET_SENDER_SYNC_COUNT]
 	]);
 
@@ -55,6 +59,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		['synced', GET_SYNCED_CATEGORIES],
 		['error', GET_ERROR_CATEGORIES],
 		['conflict', GET_CONFLICT_CATEGORIES],
+		['event', GET_EVENT_CATEGORIES],
 		['sender-sync', GET_SENDER_SYNC_CATEGORIES]
 	]);
 
@@ -63,6 +68,7 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 		['synced', GET_SYNCED_CATEGORY_COUNTS],
 		['error', GET_ERROR_CATEGORY_COUNTS],
 		['conflict', GET_CONFLICT_CATEGORY_COUNTS],
+		['event', GET_EVENT_CATEGORY_COUNTS],
 		['sender-sync', GET_SENDER_SYNC_CATEGORY_COUNTS],
 	]);
 

@@ -12,6 +12,7 @@ export class DashboardState {
 		['synced', new QueueData()],
 		['error', new QueueData()],
 		['conflict', new QueueData()],
+		['event', new QueueData()],
 		['sender-sync', new QueueData()]
 	]);
 	error?: HttpErrorResponse;
@@ -87,6 +88,21 @@ export const GET_CONFLICT_CATEGORIES = createSelector(
 export const GET_CONFLICT_CATEGORY_COUNTS = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
 	state => state.queueAndDataMap?.get('conflict')?.categoryAndCounts
+);
+
+export const GET_EVENT_COUNT = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('event')?.count
+);
+
+export const GET_EVENT_CATEGORIES = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('event')?.categories
+);
+
+export const GET_EVENT_CATEGORY_COUNTS = createSelector(
+	GET_DASHBOARD_FEATURE_STATE,
+	state => state.queueAndDataMap?.get('event')?.categoryAndCounts
 );
 
 export const GET_SENDER_SYNC_COUNT = createSelector(
