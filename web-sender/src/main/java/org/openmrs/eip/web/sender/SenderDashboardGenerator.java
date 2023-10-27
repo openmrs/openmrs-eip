@@ -59,7 +59,7 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 	 */
 	@Override
 	public Dashboard generate() {
-		final Map<String, Map> tableStatsMap = new ConcurrentHashMap();
+		final Map<String, Map> errorTableStatsMap = new ConcurrentHashMap();
 		final Map exceptionCountMap = new ConcurrentHashMap();
 		final AtomicInteger totalErrorCount = new AtomicInteger();
 		final AtomicInteger activeMqRelatedErrorCount = new AtomicInteger();
@@ -84,12 +84,12 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 				
 				if (errorCount > 0) {
 					synchronized (this) {
-						if (tableStatsMap.get(tableName) == null) {
-							tableStatsMap.put(tableName, new ConcurrentHashMap());
+						if (errorTableStatsMap.get(tableName) == null) {
+							errorTableStatsMap.put(tableName, new ConcurrentHashMap());
 						}
 					}
 					
-					tableStatsMap.get(tableName).put(op, errorCount);
+					errorTableStatsMap.get(tableName).put(op, errorCount);
 				}
 				
 				Integer eventCount = on(camelContext)
@@ -129,7 +129,7 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 			});
 		});
 		
-		if (!tableStatsMap.isEmpty()) {
+		if (!errorTableStatsMap.isEmpty()) {
 			List<Object[]> items = on(camelContext).to("jpa:" + ERROR_ENTITY_NAME
 			        + "?query=SELECT exceptionType, count(*) FROM " + ERROR_ENTITY_NAME + " GROUP BY exceptionType")
 			        .request(List.class);
@@ -176,7 +176,7 @@ public class SenderDashboardGenerator extends BaseDashboardGenerator {
 		errors.put("totalCount", totalErrorCount);
 		errors.put("activeMqRelatedErrorCount", activeMqRelatedErrorCount);
 		errors.put("mostEncounteredErrors", mostEncounteredErrors);
-		errors.put("tableStatsMap", tableStatsMap);
+		errors.put("tableStatsMap", errorTableStatsMap);
 		errors.put("exceptionCountMap", exceptionCountMap);
 		dashboard.add("errors", errors);
 		
