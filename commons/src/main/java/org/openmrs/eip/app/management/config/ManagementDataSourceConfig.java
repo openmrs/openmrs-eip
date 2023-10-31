@@ -53,8 +53,7 @@ public class ManagementDataSourceConfig {
 	@Bean(name = "mngtEntityManager")
 	@DependsOn(Constants.COMMON_PROP_SOURCE_BEAN_NAME)
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
-	                                                            @Qualifier("mngtDataSource") final DataSource dataSource,
-	                                                            ConfigurableEnvironment env) {
+	        @Qualifier("mngtDataSource") final DataSource dataSource, ConfigurableEnvironment env) {
 		
 		Map<String, String> props = new HashMap();
 		props.put(AvailableSettings.DIALECT, hibernateDialect);
@@ -65,13 +64,14 @@ public class ManagementDataSourceConfig {
 	}
 	
 	@Bean(name = "mngtTransactionManager")
-	public PlatformTransactionManager transactionManager(@Qualifier("mngtEntityManager") EntityManagerFactory entityManagerFactory) {
+	public PlatformTransactionManager transactionManager(
+	        @Qualifier("mngtEntityManager") EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
 	}
 	
 	@Bean(value = "jpa")
 	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory,
-	                        @Qualifier(value = "mngtTransactionManager") PlatformTransactionManager txMgr) {
+	        @Qualifier(value = "mngtTransactionManager") PlatformTransactionManager txMgr) {
 		
 		JpaComponent comp = new JpaComponent();
 		comp.setEntityManagerFactory(entityManagerFactory);

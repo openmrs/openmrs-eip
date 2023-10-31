@@ -2,6 +2,7 @@ package org.openmrs.eip.mysql.watcher.route;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -91,7 +92,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfAnOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
@@ -110,7 +111,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfATestOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "test_order";
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
@@ -129,7 +130,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfADrugOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "drug_order";
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
@@ -148,7 +149,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsAmongFailedRetriesButForAnotherDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
@@ -212,7 +213,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldPassIfAnOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestinationAndTheCheckIsDisabled()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
@@ -232,7 +233,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfAReferralOrderHasAPreviousOrderAndThePreviousOrderIsAmongFailedRetriesForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "referral_order";
 		final Integer orderId = 112;
 		final Integer previousOrderId = 111;

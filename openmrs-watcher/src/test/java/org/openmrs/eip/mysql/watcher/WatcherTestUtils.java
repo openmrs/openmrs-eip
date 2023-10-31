@@ -48,7 +48,7 @@ public final class WatcherTestUtils {
 	}
 	
 	public static SenderRetryQueueItem addRetryItem(String entityTable, String entityId, String entityUuid,
-	                                                String destination) {
+	        String destination) {
 		SenderRetryQueueItem r = new SenderRetryQueueItem();
 		r.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
 		r.setRoute(destination);
