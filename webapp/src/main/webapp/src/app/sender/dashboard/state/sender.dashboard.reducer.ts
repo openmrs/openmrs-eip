@@ -12,7 +12,11 @@ export const GET_SYNC_COUNT_BY_STATUS = createSelector(
 	state => state.syncCountByStatus
 );
 
-export function senderDashboardReducer(state: {}, action: SenderDashboardAction) {
+const initialState: SenderDashboardState = {
+	syncCountByStatus: new Map<string, number>()
+};
+
+export function senderDashboardReducer(state = initialState, action: SenderDashboardAction) {
 
 	switch (action.type) {
 

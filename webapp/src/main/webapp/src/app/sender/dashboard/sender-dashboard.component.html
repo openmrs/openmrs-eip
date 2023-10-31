@@ -18,12 +18,12 @@
 					<span class="h5" i18n="@@sender-sync-msgs">Sync Items</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data [parentSyncMode]="getSyncMode()" queueName="sender-sync"></queue-data>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.syncMessages['totalCount'] == 0">
+					<queue-data queueName="sender-sync" [parentSyncMode]="getSyncMode()" [countChangeListener]="onSyncCountChange" [countChangeListenerProcessing]="processingSyncCountChange"></queue-data>
+					<li class="list-group-item" [hidden]="!statusAndCountMap || statusAndCountMap.size == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
 						<div class="ml-2 mr-2">
 							<table class="text-dark">
-								<tr *ngFor="let e of dashboard?.entries.syncMessages['statusItemCountMap'] | keyvalue">
+								<tr *ngFor="let e of statusAndCountMap | keyvalue">
 									<td>
 										<span [hidden]="e.key != 'NEW'" i18n="@@common-waiting-to-sent">Waiting To Be Sent</span>
 										<span [hidden]="e.key != 'SENT'" i18n="@@common-sent">Sent</span>
