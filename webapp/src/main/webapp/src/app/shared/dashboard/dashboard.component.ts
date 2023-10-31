@@ -9,8 +9,6 @@ import {GET_DASHBOARD_ERROR} from "./state/dashboard.reducer";
 @Component({template: ''})
 export abstract class DashboardComponent implements OnInit, OnDestroy {
 
-	readonly SyncMode = SyncMode;
-
 	propsLoaded?: Subscription;
 
 	dashboardError?: Subscription;

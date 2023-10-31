@@ -90,6 +90,12 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	@Input()
 	queueName: string = '';
 
+	@Input()
+	countChangeListener?: Function;
+
+	@Input()
+	isCountChangeListenerDone?: boolean;
+
 	countSelector: Selector<object, number | null | undefined> | undefined;
 
 	categorySelector: Selector<object, string[] | undefined> | undefined;
@@ -211,6 +217,9 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				this.data.count = count;
 				if (this.data.count > 0) {
 					this.getCategories();
+					if (this.countChangeListener) {
+						this.countChangeListener(this.data.count);
+					}
 				} else {
 					this.clearCategories();
 					this.scheduleReload();
@@ -237,7 +246,8 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 			this.data.categoryAndCounts = catAndCounts;
 			this.receivedCategoryCounts++;
 			//We're done fetching all the queue data
-			if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)) {
+			if (this.data.categories && this.receivedCategoryCounts == (this.data.categories.length * this.SYNC_OPS.length)
+				&& (!this.countChangeListener || this.isCountChangeListenerDone == true)) {
 				//Update queue count to match the sum of all the counts by type and operation
 				let effectiveCount: number = 0;
 				this.data.categoryAndCounts?.forEach((opAndCount: Map<SyncOperation, number>, category: string) => {
