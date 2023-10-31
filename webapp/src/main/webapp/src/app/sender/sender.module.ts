@@ -10,9 +10,12 @@ import {DbEventComponent} from "./event/db-event.component";
 import {dbEventReducer} from "./event/state/db-event.reducer";
 import {senderSyncMessageReducer} from "./sync/state/sender-sync-message.reducer";
 import {SenderSyncMessageComponent} from "./sync/sender-sync-message.component";
-import { SenderArchiveComponent } from './archive/sender-archive.component';
-import { senderArchiveReducer } from './archive/state/sender-archive.reducer';
-import { FormsModule } from '@angular/forms';
+import {SenderArchiveComponent} from './archive/sender-archive.component';
+import {senderArchiveReducer} from './archive/state/sender-archive.reducer';
+import {FormsModule} from '@angular/forms';
+import {EffectsModule} from "@ngrx/effects";
+import {senderDashboardReducer} from "./dashboard/state/sender.dashboard.reducer";
+import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects";
 
 
 @NgModule({
@@ -31,6 +34,8 @@ import { FormsModule } from '@angular/forms';
 		StoreModule.forFeature('eventQueue', dbEventReducer),
 		StoreModule.forFeature('syncQueue', senderSyncMessageReducer),
 		StoreModule.forFeature('senderArchiveQueue', senderArchiveReducer),
+		StoreModule.forFeature("senderDashboard", senderDashboardReducer),
+		EffectsModule.forFeature([SenderDashboardEffects]),
 		FormsModule,
 	], exports: [SenderComponent]
 })
