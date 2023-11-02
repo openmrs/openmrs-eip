@@ -33,8 +33,10 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	onInit(): void {
 		this.statusAndCountFetched = this.store.pipe(select(GET_SYNC_COUNT_BY_STATUS)).subscribe(statusAndCountMap => {
-			this.statusAndCountMap = statusAndCountMap;
-			this.processingSyncCountChange = false;
+			if (statusAndCountMap) {
+				this.statusAndCountMap = statusAndCountMap;
+				this.processingSyncCountChange = false;
+			}
 		});
 
 		this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
@@ -48,8 +50,12 @@ export class SenderDashboardComponent extends DashboardComponent {
 	}
 
 	onSyncCountChange(syncCount: number): void {
+		if (this.processingSyncCountChange) {
+			return;
+		}
+
+		this.processingSyncCountChange = true;
 		if (syncCount > 0) {
-			this.processingSyncCountChange = true;
 			this.store.dispatch(new FetchCountByStatus());
 		} else {
 			//Clear
