@@ -18,7 +18,7 @@
 					<span class="h5" i18n="@@sender-sync-msgs">Sync Items</span>
 				</div>
 				<ul class="list-group list-group-flush">
-					<queue-data queueName="sender-sync" [parentSyncMode]="getSyncMode()" [countChangeListener]="onSyncCountChange" [countChangeListenerProcessing]="processingSyncCountChange"></queue-data>
+					<queue-data queueName="sender-sync" [parentSyncMode]="getSyncMode()" [countChangeListener]="onSyncCountChange"></queue-data>
 					<li class="list-group-item" [hidden]="!statusAndCountMap || statusAndCountMap.size == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
 						<div class="ml-2 mr-2">
