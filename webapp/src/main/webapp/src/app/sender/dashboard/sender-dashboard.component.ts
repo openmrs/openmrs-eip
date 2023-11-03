@@ -1,13 +1,13 @@
 import {Component} from "@angular/core";
 import {DashboardComponent} from "../../shared/dashboard/dashboard.component";
 import {select} from "@ngrx/store";
-import {GET_DASHBOARD, GET_SENDER_SYNC_COUNT} from "../../shared/dashboard/state/dashboard.reducer";
+import {GET_DASHBOARD} from "../../shared/dashboard/state/dashboard.reducer";
 import {LoadDashboard} from "../../shared/dashboard/state/dashboard.actions";
 import {Dashboard} from "../../shared/dashboard/dashboard";
-import {Subscription} from "rxjs";
 import {SyncMode} from "../../shared/sync-mode.enum";
-import {CountByStatusReceived, FetchCountByStatus} from "./state/sender.dashboard.actions";
+import {FetchCountByStatus} from "./state/sender.dashboard.actions";
 import {GET_SYNC_COUNT_BY_STATUS} from "./state/sender.dashboard.reducer";
+import {Subscription} from "rxjs";
 
 @Component({
 	selector: 'sender-dashboard',
@@ -17,13 +17,13 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	dashboard?: Dashboard;
 
-	timeoutId?: number;
+	dashboardTimeoutId?: number;
+
+	countByStatusTimeoutId?: number;
 
 	dashboardLoaded?: Subscription;
 
 	statusAndCountFetched?: Subscription;
-
-	syncCountSubscription?: Subscription;
 
 	statusAndCountMap?: Map<string, number>;
 
@@ -32,13 +32,10 @@ export class SenderDashboardComponent extends DashboardComponent {
 	}
 
 	onInit(): void {
-		this.syncCountSubscription = this.store.pipe(select(GET_SENDER_SYNC_COUNT)).subscribe(count => {
-			this.onSyncCountChange(count);
-		});
-
 		this.statusAndCountFetched = this.store.pipe(select(GET_SYNC_COUNT_BY_STATUS)).subscribe(statusAndCountMap => {
 			if (statusAndCountMap) {
 				this.statusAndCountMap = statusAndCountMap;
+				this.fetchSyncCountByStatus(30000);
 			}
 		});
 
@@ -49,23 +46,18 @@ export class SenderDashboardComponent extends DashboardComponent {
 			}
 		});
 
-		this.loadDashboard(0);
+		this.fetchSyncCountByStatus(100);
+		this.loadDashboard(100);
 	}
 
-	onSyncCountChange(count: number | undefined | null): void {
-		if (count === undefined || count === null) {
-			return;
-		}
-
-		if (count > 0) {
+	fetchSyncCountByStatus(delay: number): void {
+		this.countByStatusTimeoutId = setTimeout(() => {
 			this.store.dispatch(new FetchCountByStatus());
-		} else {
-			this.store.dispatch(new CountByStatusReceived(new Map<string, number>()));
-		}
+		}, delay);
 	}
 
 	loadDashboard(delay: number): void {
-		this.timeoutId = setTimeout(() => {
+		this.dashboardTimeoutId = setTimeout(() => {
 			if (!this.reload) {
 				this.reload = true;
 			}
@@ -75,8 +67,8 @@ export class SenderDashboardComponent extends DashboardComponent {
 	}
 
 	stopSubscriptions(): void {
-		clearTimeout(this.timeoutId);
-		this.syncCountSubscription?.unsubscribe();
+		clearTimeout(this.countByStatusTimeoutId);
+		clearTimeout(this.dashboardTimeoutId);
 		this.statusAndCountFetched?.unsubscribe();
 		this.dashboardLoaded?.unsubscribe();
 		super.stopSubscriptions();
