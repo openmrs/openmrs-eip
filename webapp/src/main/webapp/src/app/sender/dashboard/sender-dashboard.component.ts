@@ -27,6 +27,8 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	statusAndCountMap?: Map<string, number>;
 
+	reloadCountByStatus = false;
+
 	getSyncMode(): SyncMode {
 		return SyncMode.SENDER;
 	}
@@ -35,7 +37,9 @@ export class SenderDashboardComponent extends DashboardComponent {
 		this.statusAndCountFetched = this.store.pipe(select(GET_SYNC_COUNT_BY_STATUS)).subscribe(statusAndCountMap => {
 			if (statusAndCountMap) {
 				this.statusAndCountMap = statusAndCountMap;
-				this.fetchSyncCountByStatus(30000);
+				if (this.reloadCountByStatus) {
+					this.fetchSyncCountByStatus(30000);
+				}
 			}
 		});
 
@@ -52,6 +56,10 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	fetchSyncCountByStatus(delay: number): void {
 		this.countByStatusTimeoutId = setTimeout(() => {
+			if (!this.reloadCountByStatus) {
+				this.reloadCountByStatus = true;
+			}
+
 			this.store.dispatch(new FetchCountByStatus());
 		}, delay);
 	}
