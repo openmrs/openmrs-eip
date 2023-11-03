@@ -22,7 +22,7 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		this.propsLoaded = this.store.pipe(select(GET_PROPS)).subscribe(props => {
-			if (props.syncMode == this.getSyncMode() && this.getSyncMode() == SyncMode.SENDER) {
+			if (props.syncMode == this.getSyncMode()) {
 				this.dashboardError = this.store.pipe(select(GET_DASHBOARD_ERROR)).subscribe(error => {
 					this.handleLoadError(error);
 				});
