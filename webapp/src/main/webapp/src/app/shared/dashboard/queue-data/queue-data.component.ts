@@ -90,9 +90,6 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 	@Input()
 	queueName: string = '';
 
-	@Input()
-	countChangeListener?: Function;
-
 	countSelector: Selector<object, number | null | undefined> | undefined;
 
 	categorySelector: Selector<object, string[] | undefined> | undefined;
@@ -214,15 +211,8 @@ export class QueueDataComponent implements OnInit, OnDestroy {
 				this.data.count = count;
 				if (this.data.count > 0) {
 					this.getCategories();
-					if (this.countChangeListener) {
-						this.countChangeListener(this.data.count);
-					}
 				} else {
 					this.clearCategories();
-					if (this.countChangeListener) {
-						this.countChangeListener(this.data.count);
-					}
-
 					this.scheduleReload();
 				}
 			}

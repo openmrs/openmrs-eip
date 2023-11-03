@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {DashboardComponent} from "../../shared/dashboard/dashboard.component";
 import {select} from "@ngrx/store";
-import {GET_DASHBOARD} from "../../shared/dashboard/state/dashboard.reducer";
+import {GET_DASHBOARD, GET_SENDER_SYNC_COUNT} from "../../shared/dashboard/state/dashboard.reducer";
 import {LoadDashboard} from "../../shared/dashboard/state/dashboard.actions";
 import {Dashboard} from "../../shared/dashboard/dashboard";
 import {Subscription} from "rxjs";
@@ -23,19 +23,22 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	statusAndCountFetched?: Subscription;
 
-	statusAndCountMap?: Map<string, number>;
+	syncCountSubscription?: Subscription;
 
-	processingSyncCountChange: boolean = false;
+	statusAndCountMap?: Map<string, number>;
 
 	getSyncMode(): SyncMode {
 		return SyncMode.SENDER;
 	}
 
 	onInit(): void {
+		this.syncCountSubscription = this.store.pipe(select(GET_SENDER_SYNC_COUNT)).subscribe(count => {
+			this.onSyncCountChange(count);
+		});
+
 		this.statusAndCountFetched = this.store.pipe(select(GET_SYNC_COUNT_BY_STATUS)).subscribe(statusAndCountMap => {
 			if (statusAndCountMap) {
 				this.statusAndCountMap = statusAndCountMap;
-				this.processingSyncCountChange = false;
 			}
 		});
 
@@ -49,16 +52,14 @@ export class SenderDashboardComponent extends DashboardComponent {
 		this.loadDashboard(0);
 	}
 
-	onSyncCountChange(syncCount: number): void {
-		if (this.processingSyncCountChange) {
+	onSyncCountChange(count: number | undefined | null): void {
+		if (count === undefined || count === null) {
 			return;
 		}
 
-		this.processingSyncCountChange = true;
-		if (syncCount > 0) {
+		if (count > 0) {
 			this.store.dispatch(new FetchCountByStatus());
 		} else {
-			//Clear
 			this.store.dispatch(new CountByStatusReceived(new Map<string, number>()));
 		}
 	}
@@ -75,6 +76,7 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	stopSubscriptions(): void {
 		clearTimeout(this.timeoutId);
+		this.syncCountSubscription?.unsubscribe();
 		this.statusAndCountFetched?.unsubscribe();
 		this.dashboardLoaded?.unsubscribe();
 		super.stopSubscriptions();
