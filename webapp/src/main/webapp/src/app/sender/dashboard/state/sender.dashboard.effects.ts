@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {catchError, map, switchMap} from "rxjs/operators";
 import {of} from "rxjs";
-import {CountByStatusReceived, SenderDashboardActionType} from "./sender.dashboard.actions";
+import {CountByStatusReceived, ErrorDetailsReceived, SenderDashboardActionType} from "./sender.dashboard.actions";
 import {SenderDashboardService} from "../sender.dashboard.service";
 import {LoadDashboardError} from "../../../shared/dashboard/state/dashboard.actions";
 
@@ -18,6 +18,18 @@ export class SenderDashboardEffects {
 			switchMap(() => this.service.getSenderSyncCountByStatus()
 				.pipe(
 					map(countByStatus => new CountByStatusReceived(countByStatus)),
+					catchError(err => of(new LoadDashboardError(err)))
+				)
+			)
+		)
+	);
+
+	getErrorDetails$ = createEffect(() =>
+		this.actions$.pipe(
+			ofType(SenderDashboardActionType.FETCH_ERROR_DETAILS),
+			switchMap(() => this.service.getErrorDetails()
+				.pipe(
+					map(errorDetails => new ErrorDetailsReceived(errorDetails)),
 					catchError(err => of(new LoadDashboardError(err)))
 				)
 			)

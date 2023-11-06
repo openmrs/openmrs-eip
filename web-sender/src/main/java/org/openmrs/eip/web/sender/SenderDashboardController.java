@@ -66,6 +66,10 @@ public class SenderDashboardController {
 	
 	@GetMapping(SenderRestConstants.PATH_NAME_ERR_DETAILS)
 	public Map<String, Object> getErrorDetails() {
+		if (log.isDebugEnabled()) {
+			log.debug("Fetching error details");
+		}
+		
 		int activeMqRelatedErrCount = 0;
 		int mostEncounteredErrCount = 0;
 		Set<String> mostEncounteredErrors = new HashSet<>();

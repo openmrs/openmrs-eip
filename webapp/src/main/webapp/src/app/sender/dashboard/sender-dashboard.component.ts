@@ -5,8 +5,8 @@ import {GET_DASHBOARD} from "../../shared/dashboard/state/dashboard.reducer";
 import {LoadDashboard} from "../../shared/dashboard/state/dashboard.actions";
 import {Dashboard} from "../../shared/dashboard/dashboard";
 import {SyncMode} from "../../shared/sync-mode.enum";
-import {FetchCountByStatus} from "./state/sender.dashboard.actions";
-import {GET_SYNC_COUNT_BY_STATUS} from "./state/sender.dashboard.reducer";
+import {FetchCountByStatus, FetchErrorDetails} from "./state/sender.dashboard.actions";
+import {GET_ERROR_DETAILS, GET_SYNC_COUNT_BY_STATUS} from "./state/sender.dashboard.reducer";
 import {Subscription} from "rxjs";
 
 @Component({
@@ -21,13 +21,21 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	countByStatusTimeoutId?: number;
 
+	errorDetailsTimeoutId?: number;
+
 	dashboardLoaded?: Subscription;
 
 	statusAndCountFetched?: Subscription;
 
+	errorDetailsFetched?: Subscription;
+
 	statusAndCountMap?: Map<string, number>;
 
+	errorDetails?: Map<string, any>;
+
 	reloadCountByStatus = false;
+
+	reloadErrorDetails = false;
 
 	getSyncMode(): SyncMode {
 		return SyncMode.SENDER;
@@ -43,6 +51,15 @@ export class SenderDashboardComponent extends DashboardComponent {
 			}
 		});
 
+		this.errorDetailsFetched = this.store.pipe(select(GET_ERROR_DETAILS)).subscribe(errorDetails => {
+			if (errorDetails) {
+				this.errorDetails = errorDetails;
+				if (this.reloadErrorDetails) {
+					this.fetchErrorDetails(30000);
+				}
+			}
+		});
+
 		this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
 			this.dashboard = dashboard;
 			if (this.reload) {
@@ -50,8 +67,9 @@ export class SenderDashboardComponent extends DashboardComponent {
 			}
 		});
 
-		this.fetchSyncCountByStatus(100);
-		this.loadDashboard(100);
+		this.fetchSyncCountByStatus(0);
+		this.fetchErrorDetails(0);
+		this.loadDashboard(0);
 	}
 
 	fetchSyncCountByStatus(delay: number): void {
@@ -61,6 +79,16 @@ export class SenderDashboardComponent extends DashboardComponent {
 			}
 
 			this.store.dispatch(new FetchCountByStatus());
+		}, delay);
+	}
+
+	fetchErrorDetails(delay: number): void {
+		this.errorDetailsTimeoutId = setTimeout(() => {
+			if (!this.reloadErrorDetails) {
+				this.reloadErrorDetails = true;
+			}
+
+			this.store.dispatch(new FetchErrorDetails());
 		}, delay);
 	}
 
@@ -76,8 +104,10 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	stopSubscriptions(): void {
 		clearTimeout(this.countByStatusTimeoutId);
+		clearTimeout(this.errorDetailsTimeoutId);
 		clearTimeout(this.dashboardTimeoutId);
 		this.statusAndCountFetched?.unsubscribe();
+		this.errorDetailsFetched?.unsubscribe();
 		this.dashboardLoaded?.unsubscribe();
 		super.stopSubscriptions();
 	}

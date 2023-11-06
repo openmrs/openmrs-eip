@@ -48,7 +48,7 @@
 				</div>
 				<ul class="list-group list-group-flush">
 					<queue-data [parentSyncMode]="getSyncMode()" queueName="sender-error"></queue-data>
-					<li class="list-group-item" [hidden]="!dashboard || dashboard?.entries.errors['totalCount'] == 0">
+					<li class="list-group-item">
 						<div class="h6 card-title text-danger" i18n="@@common-advanced-users">
 							For Advanced Users
 						</div>
@@ -56,19 +56,19 @@
 							<li class="list-group-item">
 								<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-most-encountered-errors">Most Encountered Event Error(s)</div>
 								<div class="ml-2 mr-2">
-									<span *ngFor="let e of dashboard?.entries.errors['mostEncounteredErrors']">
+									<span *ngFor="let e of errorDetails['mostEncounteredErrors']">
 										<span class="badge border border-secondary" ngbTooltip="{{e}}" [openDelay]="1000">{{e | classname}}</span>&nbsp;
 									</span>
 								</div>
 							</li>
-							<li class="list-group-item" [hidden]="dashboard?.entries.errors['activeMqRelatedErrorCount'] == 0">
+							<li class="list-group-item" [hidden]="errorDetails['activeMqRelatedErrorCount'] == 0">
 								<table class="text-dark">
 									<tr>
 										<td class="ui-no-wrap">
 											<span class="h6 card-title ui-text-theme-secondary" i18n="@@common-activemq-related-errors">ActiveMQ Related Event Errors</span>
 										</td>
 										<td class="pl-2">
-											<span class="badge border border-secondary">{{dashboard?.entries.errors['activeMqRelatedErrorCount']}}</span>
+											<span class="badge border border-secondary">{{errorDetails['activeMqRelatedErrorCount']}}</span>
 										</td>
 									</tr>
 								</table>
@@ -77,7 +77,7 @@
 								<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-error-type-breakdown">Error Type Breakdown</div>
 								<div class="ml-2 mr-2">
 									<table class="text-dark">
-										<tr *ngFor="let e of dashboard?.entries.errors['exceptionCountMap'] | keyvalue">
+										<tr *ngFor="let e of errorDetails['exceptionCountMap'] | keyvalue">
 											<td>
 												<span ngbTooltip="{{e.key}}" [openDelay]="1000">{{e.key | classname}}</span>
 											</td>

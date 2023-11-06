@@ -4,7 +4,11 @@ export enum SenderDashboardActionType {
 
 	FETCH_COUNT_BY_STATUS = 'FETCH_COUNT_BY_STATUS',
 
-	COUNT_BY_STATUS_RECEIVED = 'COUNT_BY_STATUS_RECEIVED'
+	COUNT_BY_STATUS_RECEIVED = 'COUNT_BY_STATUS_RECEIVED',
+
+	FETCH_ERROR_DETAILS = 'FETCH_ERROR_DETAILS',
+
+	ERROR_DETAILS_RECEIVED = 'ERROR_DETAILS_RECEIVED'
 
 }
 
@@ -21,4 +25,21 @@ export class CountByStatusReceived implements Action {
 
 }
 
-export type SenderDashboardAction = FetchCountByStatus | CountByStatusReceived;
+export class FetchErrorDetails implements Action {
+	readonly type = SenderDashboardActionType.FETCH_ERROR_DETAILS;
+}
+
+export class ErrorDetailsReceived implements Action {
+
+	readonly type = SenderDashboardActionType.ERROR_DETAILS_RECEIVED;
+
+	constructor(public errorDetails: Map<string, any>) {
+	}
+
+}
+
+export type SenderDashboardAction =
+	FetchCountByStatus
+	| CountByStatusReceived
+	| FetchErrorDetails
+	| ErrorDetailsReceived;

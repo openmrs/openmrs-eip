@@ -15,4 +15,8 @@ export class SenderDashboardService {
 		return this.httpClient.get<Map<string, number>>(environment.apiBaseUrl + "dashboard/sender/countByStatus");
 	}
 
+	getErrorDetails(): Observable<Map<string, any>> {
+		return this.httpClient.get<Map<string, any>>(environment.apiBaseUrl + "dashboard/sender/errorDetails");
+	}
+
 }

@@ -3,6 +3,7 @@ import {SenderDashboardAction, SenderDashboardActionType} from "./sender.dashboa
 
 export class SenderDashboardState {
 	syncCountByStatus?: Map<string, number>;
+	errorDetails?: Map<string, any>;
 }
 
 const GET_SENDER_DASHBOARD_FEATURE_STATE = createFeatureSelector<SenderDashboardState>('senderDashboard');
@@ -10,6 +11,11 @@ const GET_SENDER_DASHBOARD_FEATURE_STATE = createFeatureSelector<SenderDashboard
 export const GET_SYNC_COUNT_BY_STATUS = createSelector(
 	GET_SENDER_DASHBOARD_FEATURE_STATE,
 	state => state.syncCountByStatus
+);
+
+export const GET_ERROR_DETAILS = createSelector(
+	GET_SENDER_DASHBOARD_FEATURE_STATE,
+	state => state.errorDetails
 );
 
 export function senderDashboardReducer(state = {}, action: SenderDashboardAction) {
@@ -20,6 +26,12 @@ export function senderDashboardReducer(state = {}, action: SenderDashboardAction
 			return {
 				...state,
 				syncCountByStatus: action.countByStatus
+			};
+
+		case SenderDashboardActionType.ERROR_DETAILS_RECEIVED:
+			return {
+				...state,
+				errorDetails: action.errorDetails
 			};
 
 		default:
