@@ -10,11 +10,6 @@ public class TestDashboardGenerator extends BaseDashboardGenerator {
 	}
 	
 	@Override
-	public Dashboard generate() {
-		return null;
-	}
-	
-	@Override
 	public String getCategorizationProperty(String entityType) {
 		return "modelClassName";
 	}

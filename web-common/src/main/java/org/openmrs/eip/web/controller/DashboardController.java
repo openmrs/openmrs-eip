@@ -7,7 +7,6 @@ import static org.openmrs.eip.web.RestConstants.PARAM_ENTITY_TYPE;
 import java.util.List;
 
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.web.Dashboard;
 import org.openmrs.eip.web.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +27,6 @@ public class DashboardController {
 	@Autowired
 	public DashboardController(DashboardGenerator generator) {
 		this.generator = generator;
-	}
-	
-	@GetMapping
-	public Dashboard getDashboard() {
-		if (log.isDebugEnabled()) {
-			log.debug("Getting dashboard");
-		}
-		
-		return generator.generate();
 	}
 	
 	@GetMapping("/" + RestConstants.PATH_NAME_CATEGORY)

@@ -11,13 +11,6 @@ import org.openmrs.eip.web.Dashboard;
 public interface DashboardGenerator {
 	
 	/**
-	 * Generates a dashboard
-	 *
-	 * @return Dashboard the generated dashboard
-	 */
-	Dashboard generate();
-	
-	/**
 	 * Gets the categorization property name for the entities handled by this generated
 	 * 
 	 * @param entityType the entity type

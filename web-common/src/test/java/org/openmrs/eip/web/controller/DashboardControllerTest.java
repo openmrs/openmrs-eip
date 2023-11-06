@@ -37,16 +37,6 @@ public class DashboardControllerTest extends BaseWebTest {
 	}
 	
 	@Test
-	public void getDashboard_shouldGetTheDashboard() throws Exception {
-		MockHttpServletRequestBuilder builder = get(RestConstants.RES_DASHBOARD);
-		
-		ResultActions result = mockMvc.perform(builder);
-		
-		result.andExpect(status().isOk());
-		Mockito.verify(mockDelegate).generate();
-	}
-	
-	@Test
 	public void getCategories_shouldGetTheListOfCategoryNames() throws Exception {
 		final String entityType = "MyEntity";
 		MockHttpServletRequestBuilder builder = get(PATH_DASHBOARD_CATEGORY);
