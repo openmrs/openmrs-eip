@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.web.BaseWebTest;
-import org.openmrs.eip.web.DelegatingDashboardGenerator;
+import org.openmrs.eip.web.DelegatingDashboardHelper;
 import org.openmrs.eip.web.RestConstants;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +21,19 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public class DashboardControllerTest extends BaseWebTest {
 	
 	@Autowired
-	private DelegatingDashboardGenerator generator;
+	private DelegatingDashboardHelper generator;
 	
-	private DashboardGenerator mockDelegate;
+	private DashboardHelper mockDelegate;
 	
 	@Before
 	public void setup() {
-		mockDelegate = Mockito.mock(DashboardGenerator.class);
-		Whitebox.setInternalState(generator, DashboardGenerator.class, mockDelegate);
+		mockDelegate = Mockito.mock(DashboardHelper.class);
+		Whitebox.setInternalState(generator, DashboardHelper.class, mockDelegate);
 	}
 	
 	@After
 	public void tearDown() {
-		Whitebox.setInternalState(generator, DashboardGenerator.class, (Object) null);
+		Whitebox.setInternalState(generator, DashboardHelper.class, (Object) null);
 	}
 	
 	@Test

@@ -22,11 +22,11 @@ public class DashboardController {
 	
 	private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 	
-	private DashboardGenerator generator;
+	private DashboardHelper helper;
 	
 	@Autowired
-	public DashboardController(DashboardGenerator generator) {
-		this.generator = generator;
+	public DashboardController(DashboardHelper helper) {
+		this.helper = helper;
 	}
 	
 	@GetMapping("/" + RestConstants.PATH_NAME_CATEGORY)
@@ -35,7 +35,7 @@ public class DashboardController {
 			log.debug("Getting categories for type: " + entityType);
 		}
 		
-		return generator.getCategories(entityType);
+		return helper.getCategories(entityType);
 	}
 	
 	@GetMapping("/" + RestConstants.PATH_NAME_COUNT)
@@ -52,7 +52,7 @@ public class DashboardController {
 			op = SyncOperation.valueOf(operation);
 		}
 		
-		return generator.getCount(entityType, category, op);
+		return helper.getCount(entityType, category, op);
 	}
 	
 }

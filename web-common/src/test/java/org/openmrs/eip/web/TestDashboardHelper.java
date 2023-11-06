@@ -3,9 +3,9 @@ package org.openmrs.eip.web;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TestDashboardGenerator extends BaseDashboardGenerator {
+public class TestDashboardHelper extends BaseDashboardHelper {
 	
-	public TestDashboardGenerator(@Autowired ProducerTemplate producerTemplate) {
+	public TestDashboardHelper(@Autowired ProducerTemplate producerTemplate) {
 		super(producerTemplate);
 	}
 	

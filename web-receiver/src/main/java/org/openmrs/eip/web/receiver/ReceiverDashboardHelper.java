@@ -2,17 +2,17 @@ package org.openmrs.eip.web.receiver;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.web.BaseDashboardGenerator;
+import org.openmrs.eip.web.BaseDashboardHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.RECEIVER)
-public class ReceiverDashboardGenerator extends BaseDashboardGenerator {
+public class ReceiverDashboardHelper extends BaseDashboardHelper {
 	
 	@Autowired
-	public ReceiverDashboardGenerator(ProducerTemplate producerTemplate) {
+	public ReceiverDashboardHelper(ProducerTemplate producerTemplate) {
 		super(producerTemplate);
 	}
 	

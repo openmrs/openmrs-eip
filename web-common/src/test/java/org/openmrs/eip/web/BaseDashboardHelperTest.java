@@ -15,7 +15,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
-import org.openmrs.eip.web.controller.DashboardGenerator;
+import org.openmrs.eip.web.controller.DashboardHelper;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -25,7 +25,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 @Import(TestWebConfig.class)
 @Sql(scripts = { "classpath:mgt_site_info.sql",
         "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-public class BaseDashboardGeneratorTest extends BaseReceiverTest {
+public class BaseDashboardHelperTest extends BaseReceiverTest {
 	
 	private static final String ENTITY_TYPE = SyncMessage.class.getSimpleName();
 	
@@ -33,19 +33,19 @@ public class BaseDashboardGeneratorTest extends BaseReceiverTest {
 	private ProducerTemplate producerTemplate;
 	
 	@Autowired
-	private DelegatingDashboardGenerator generator;
+	private DelegatingDashboardHelper helper;
 	
-	private TestDashboardGenerator delegate;
+	private TestDashboardHelper delegate;
 	
 	@Before
 	public void setup() {
-		delegate = new TestDashboardGenerator(producerTemplate);
-		Whitebox.setInternalState(generator, DashboardGenerator.class, delegate);
+		delegate = new TestDashboardHelper(producerTemplate);
+		Whitebox.setInternalState(helper, DashboardHelper.class, delegate);
 	}
 	
 	@Test
 	public void getCategories_shouldGetTheUniqueModelClassNamesInTheQueue() {
-		List<String> modelNames = generator.getCategories(ENTITY_TYPE);
+		List<String> modelNames = helper.getCategories(ENTITY_TYPE);
 		assertEquals(2, modelNames.size());
 		assertTrue(modelNames.contains(PersonModel.class.getName()));
 		assertTrue(modelNames.contains(PatientModel.class.getName()));
@@ -53,12 +53,12 @@ public class BaseDashboardGeneratorTest extends BaseReceiverTest {
 	
 	@Test
 	public void getCount_shouldGetTheTotalCountOfItemsTheQueue() {
-		assertEquals(6, generator.getCount(ENTITY_TYPE, null, null).intValue());
+		assertEquals(6, helper.getCount(ENTITY_TYPE, null, null).intValue());
 	}
 	
 	@Test
 	public void getCount_shouldGetTheQueueItemCountMatchingTheCategoryAndOperation() {
-		assertEquals(4, generator.getCount(ENTITY_TYPE, PersonModel.class.getName(), c).intValue());
+		assertEquals(4, helper.getCount(ENTITY_TYPE, PersonModel.class.getName(), c).intValue());
 	}
 	
 }

@@ -3,12 +3,11 @@ package org.openmrs.eip.web.controller;
 import java.util.List;
 
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.web.Dashboard;
 
 /**
- * Marker interface for classes that can generate a {@link Dashboard} data.
+ * Marker interface for helper classes used by the {@link DashboardController}
  */
-public interface DashboardGenerator {
+public interface DashboardHelper {
 	
 	/**
 	 * Gets the categorization property name for the entities handled by this generated

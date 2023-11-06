@@ -7,23 +7,23 @@ import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 
-public class SenderDashboardGeneratorTest {
+public class SenderDashboardHelperTest {
 	
-	private SenderDashboardGenerator generator = new SenderDashboardGenerator(null, null);
+	private SenderDashboardHelper helper = new SenderDashboardHelper(null, null);
 	
 	@Test
 	public void getCategorizationProperty_shouldReturnTableName() {
-		assertEquals("tableName", generator.getCategorizationProperty(SenderSyncMessage.class.getSimpleName()));
+		assertEquals("tableName", helper.getCategorizationProperty(SenderSyncMessage.class.getSimpleName()));
 	}
 	
 	@Test
 	public void getCategorizationProperty_shouldReturnEventTableNameForDebeziumEvent() {
-		assertEquals("event.tableName", generator.getCategorizationProperty(DebeziumEvent.class.getSimpleName()));
+		assertEquals("event.tableName", helper.getCategorizationProperty(DebeziumEvent.class.getSimpleName()));
 	}
 	
 	@Test
 	public void getCategorizationProperty_shouldReturnEventTableNameForARetry() {
-		assertEquals("event.tableName", generator.getCategorizationProperty(SenderRetryQueueItem.class.getSimpleName()));
+		assertEquals("event.tableName", helper.getCategorizationProperty(SenderRetryQueueItem.class.getSimpleName()));
 	}
 	
 }

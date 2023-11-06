@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.web.controller.DashboardGenerator;
+import org.openmrs.eip.web.controller.DashboardHelper;
 
-public abstract class BaseDashboardGenerator implements DashboardGenerator {
+public abstract class BaseDashboardHelper implements DashboardHelper {
 	
 	private ProducerTemplate producerTemplate;
 	
-	public BaseDashboardGenerator(ProducerTemplate producerTemplate) {
+	public BaseDashboardHelper(ProducerTemplate producerTemplate) {
 		this.producerTemplate = producerTemplate;
 	}
 	
