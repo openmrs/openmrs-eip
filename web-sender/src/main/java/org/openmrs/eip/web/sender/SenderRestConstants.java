@@ -10,4 +10,8 @@ public class SenderRestConstants {
 	
 	public static final String PATH_COUNT_BY_STATUS = RES_SENDER_DASHBOARD + PATH_NAME_COUNT_BY_STATUS;
 	
+	public static final String PATH_NAME_ERR_DETAILS = "/errorDetails";
+	
+	public static final String PATH_ERR_DETAILS = RES_SENDER_DASHBOARD + PATH_NAME_ERR_DETAILS;
+	
 }
