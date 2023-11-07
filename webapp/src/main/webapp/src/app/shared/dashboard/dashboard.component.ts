@@ -15,8 +15,6 @@ export abstract class DashboardComponent implements OnInit, OnDestroy {
 
 	serverDown = false;
 
-	reload = false;
-
 	constructor(protected store: Store) {
 	}
 
