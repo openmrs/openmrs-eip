@@ -31,7 +31,7 @@
         <activeMq.version>5.15.8</activeMq.version>
         <micrometerVersion>1.7.2</micrometerVersion>
         <jsonassert.version>1.5.0</jsonassert.version>
-        <json.version>20190722</json.version>
+        <json.version>20231013</json.version>
         <testContainersVersion>1.15.2</testContainersVersion>
         <exclude.tests>nothing-to-exclude</exclude.tests>
         <powerMockVersion>2.0.9</powerMockVersion>
