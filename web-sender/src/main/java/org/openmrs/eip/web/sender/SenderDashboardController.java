@@ -101,7 +101,7 @@ public class SenderDashboardController {
 		}
 		
 		Map<String, Object> errors = new HashMap();
-		errors.put("activeMqRelatedErrorCount", activeMqRelatedErrCount);
+		errors.put("activeMqErrorCount", activeMqRelatedErrCount);
 		errors.put("mostEncounteredErrors", mostEncounteredErrors);
 		errors.put("exceptionCountMap", exceptionCountMap);
 		
