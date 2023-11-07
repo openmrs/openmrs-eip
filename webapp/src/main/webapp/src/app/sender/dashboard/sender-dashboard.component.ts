@@ -76,6 +76,14 @@ export class SenderDashboardComponent extends DashboardComponent {
 		}, delay);
 	}
 
+	getSyncCount(): number | undefined {
+		if (this.statusAndCountMap) {
+			return Object.keys(this.statusAndCountMap).length;
+		}
+
+		return undefined;
+	}
+
 	getErrorCount(): number | undefined {
 		if (this.errorDetails && this.errorDetails.exceptionCountMap) {
 			return Object.keys(this.errorDetails.exceptionCountMap).length;

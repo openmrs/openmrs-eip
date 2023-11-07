@@ -19,7 +19,7 @@
 				</div>
 				<ul class="list-group list-group-flush">
 					<queue-data queueName="sender-sync" [parentSyncMode]="getSyncMode()"></queue-data>
-					<li class="list-group-item" [hidden]="!statusAndCountMap || statusAndCountMap.size == 0">
+					<li class="list-group-item" [hidden]="getSyncCount() == 0">
 						<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-status-breakdown">Status Breakdown</div>
 						<div class="ml-2 mr-2">
 							<table class="text-dark">
@@ -33,6 +33,10 @@
 									</td>
 								</tr>
 							</table>
+							<div class="placeholder-wave w-100" [hidden]="statusAndCountMap">
+								<span class="placeholder w-25"></span><br>
+								<span class="placeholder w-25"></span>
+							</div>
 						</div>
 					</li>
 				</ul>
@@ -52,7 +56,7 @@
 						<div class="h6 card-title text-danger" i18n="@@common-advanced-users">
 							For Advanced Users
 						</div>
-						<ul class="list-group list-group-flush">
+						<ul class="list-group list-group-flush" [hidden]="!errorDetails">
 							<li class="list-group-item">
 								<div class="h6 card-title ui-text-theme-secondary" i18n="@@common-most-encountered-errors">Most Encountered Event Error(s)</div>
 								<div class="ml-2 mr-2">
@@ -89,6 +93,10 @@
 								</div>
 							</li>
 						</ul>
+						<div class="placeholder-wave w-100" [hidden]="errorDetails">
+							<span class="placeholder w-25"></span><br>
+							<span class="placeholder w-25"></span>
+						</div>
 					</li>
 				</ul>
 			</div>
