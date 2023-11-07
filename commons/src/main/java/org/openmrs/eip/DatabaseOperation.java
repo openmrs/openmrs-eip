@@ -5,6 +5,9 @@ package org.openmrs.eip;
  */
 public enum DatabaseOperation {
 	
-	c, r, u, d
+	c,
+	r,
+	u,
+	d
 	
 }

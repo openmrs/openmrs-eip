@@ -1,6 +1,7 @@
 package org.openmrs.eip;
 
 import static java.util.Arrays.stream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

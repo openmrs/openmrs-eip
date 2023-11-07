@@ -57,7 +57,7 @@ public class FailureTolerantMySqlConnectorTest {
 		PowerMockito.mockStatic(Utils.class);
 		PowerMockito.mockStatic(AppContext.class);
 		when(AppContext.getBean(CamelContext.class)).thenReturn(mockContext);
-        when(mockContext.getRouteController()).thenReturn(mockRouteController);
+		when(mockContext.getRouteController()).thenReturn(mockRouteController);
 		when(AppContext.getBean(OpenmrsDbReconnectWatchDog.class)).thenReturn(mockWatchdog);
 		when(AppContext.getBean(Environment.class)).thenReturn(mockEnv);
 		when(mockEnv.getProperty(PROP_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY, Long.class,

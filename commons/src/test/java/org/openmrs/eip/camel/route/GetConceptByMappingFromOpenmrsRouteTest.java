@@ -1,6 +1,7 @@
 package org.openmrs.eip.camel.route;
 
 import static java.util.Collections.singletonMap;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.openmrs.eip.Constants.EX_PROP_CONCEPT_CODE;

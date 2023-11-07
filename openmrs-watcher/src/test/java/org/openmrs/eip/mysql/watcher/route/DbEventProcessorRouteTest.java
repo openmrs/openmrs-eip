@@ -1,6 +1,7 @@
 package org.openmrs.eip.mysql.watcher.route;
 
 import static java.util.Collections.singletonMap;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
@@ -59,7 +60,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 2;
 		final Integer previousOrderId = 1;
@@ -79,7 +80,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAnOrderThatHasAPreviousTestOrderIfThePreviousTestOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 106;
 		final Integer previousOrderId = 105;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -98,7 +99,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAnOrderThatHasAPreviousDrugOrderIfThePreviousDrugOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 108;
 		final Integer previousOrderId = 107;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -117,7 +118,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessATestOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 102;
 		final Integer previousOrderId = 101;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -136,7 +137,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessATestOrderThatHasAPreviousTestOrderIfThePreviousTestOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "test_order";
 		final Integer orderId = 106;
 		final Integer previousOrderId = 105;
@@ -156,7 +157,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessADrugOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 104;
 		final Integer previousOrderId = 103;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -175,7 +176,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessADrugOrderThatHasAPreviousDrugOrderIfThePreviousDrugOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "drug_order";
 		final Integer orderId = 108;
 		final Integer previousOrderId = 107;
@@ -196,7 +197,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessADeletedOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 2;
 		final Integer previousOrderId = 1;
@@ -216,7 +217,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForAnotherDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "orders";
 		final Integer orderId = 110;
 		final Integer previousOrderId = 109;
@@ -237,7 +238,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldProcessARetryItemForAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 2;
 		final Integer previousOrderId = 1;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -258,7 +259,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestinationButTheCheckIsDisabled()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 2;
 		final Integer previousOrderId = 1;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -279,7 +280,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAnOrderThatHasAPreviousReferralOrderIfThePreviousReferralOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 114;
 		final Integer previousOrderId = 113;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -298,7 +299,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAReferralOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final Integer orderId = 112;
 		final Integer previousOrderId = 111;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
@@ -317,7 +318,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldNotProcessAReferralOrderThatHasAPreviousReferralOrderIfThePreviousReferralOrderIsInTheErrorQueueForTheDestination()
-	    throws Exception {
+	        throws Exception {
 		final String tableName = "referral_order";
 		final Integer orderId = 114;
 		final Integer previousOrderId = 113;

@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Registers and calls the debezium route
- * See https://camel.apache.org/components/3.20.x/debezium-mysql-component.html for properties
+ * Registers and calls the debezium route See
+ * https://camel.apache.org/components/3.20.x/debezium-mysql-component.html for properties
  */
 public class MySqlWatcherProducer extends DefaultProducer {
 	
@@ -27,7 +27,7 @@ public class MySqlWatcherProducer extends DefaultProducer {
 	        + "&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage={{"
 	        + WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS + "}}&databaseHistory={{"
 	        + WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS + "}}&offsetCommitTimeoutMs=15000"
-					+"{{debezium.extraParameters:}}";
+	        + "{{debezium.extraParameters:}}";
 	
 	public MySqlWatcherProducer(Endpoint endpoint) {
 		super(endpoint);

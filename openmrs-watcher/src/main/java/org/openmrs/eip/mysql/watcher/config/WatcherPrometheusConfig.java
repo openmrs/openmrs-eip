@@ -26,7 +26,8 @@ public class WatcherPrometheusConfig {
 	private static final String DS_PREFIX = METER_PREFIX + "datasource_status_";
 	
 	@Bean(BEAN_OPENMRS_DS_HEALTH_INDICATOR)
-	public DataSourceHealthIndicator getDataSourceHealthIndicator(@Autowired @Qualifier(OPENMRS_DATASOURCE_NAME) DataSource dataSource) {
+	public DataSourceHealthIndicator getDataSourceHealthIndicator(
+	        @Autowired @Qualifier(OPENMRS_DATASOURCE_NAME) DataSource dataSource) {
 		return new DataSourceHealthIndicator(dataSource);
 	}
 	
