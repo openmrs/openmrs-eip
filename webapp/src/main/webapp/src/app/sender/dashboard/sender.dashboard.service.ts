@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {ErrorDetails} from "./error-details";
 
 @Injectable({
 	providedIn: 'root'
@@ -15,8 +16,8 @@ export class SenderDashboardService {
 		return this.httpClient.get<Map<string, number>>(environment.apiBaseUrl + "dashboard/sender/countByStatus");
 	}
 
-	getErrorDetails(): Observable<Map<string, any>> {
-		return this.httpClient.get<Map<string, any>>(environment.apiBaseUrl + "dashboard/sender/errorDetails");
+	getErrorDetails(): Observable<ErrorDetails> {
+		return this.httpClient.get<ErrorDetails>(environment.apiBaseUrl + "dashboard/sender/errorDetails");
 	}
 
 }

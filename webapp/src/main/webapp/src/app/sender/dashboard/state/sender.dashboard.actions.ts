@@ -1,4 +1,5 @@
 import {Action} from "@ngrx/store";
+import {ErrorDetails} from "../error-details";
 
 export enum SenderDashboardActionType {
 
@@ -33,7 +34,7 @@ export class ErrorDetailsReceived implements Action {
 
 	readonly type = SenderDashboardActionType.ERROR_DETAILS_RECEIVED;
 
-	constructor(public errorDetails: Map<string, any>) {
+	constructor(public errorDetails: ErrorDetails) {
 	}
 
 }

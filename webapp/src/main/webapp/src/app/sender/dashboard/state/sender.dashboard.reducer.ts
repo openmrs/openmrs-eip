@@ -1,9 +1,10 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {SenderDashboardAction, SenderDashboardActionType} from "./sender.dashboard.actions";
+import {ErrorDetails} from "../error-details";
 
 export class SenderDashboardState {
 	syncCountByStatus?: Map<string, number>;
-	errorDetails?: Map<string, any>;
+	errorDetails?: ErrorDetails;
 }
 
 const GET_SENDER_DASHBOARD_FEATURE_STATE = createFeatureSelector<SenderDashboardState>('senderDashboard');

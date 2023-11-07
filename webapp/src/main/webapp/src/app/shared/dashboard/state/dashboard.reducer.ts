@@ -1,12 +1,10 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
-import {Dashboard} from "../dashboard";
 import {DashboardAction, DashboardActionType} from "./dashboard.actions";
 import {HttpErrorResponse} from "@angular/common/http";
 import {QueueData} from "../queue-data/queue-data";
 import {SyncOperation} from "../../sync-operation.enum";
 
 export class DashboardState {
-	dashboard?: Dashboard;
 	queueAndDataMap?: Map<string, QueueData> = new Map<string, QueueData>([
 		['sync', new QueueData()],
 		['synced', new QueueData()],
@@ -20,11 +18,6 @@ export class DashboardState {
 }
 
 const GET_DASHBOARD_FEATURE_STATE = createFeatureSelector<DashboardState>('dashboard');
-
-export const GET_DASHBOARD = createSelector(
-	GET_DASHBOARD_FEATURE_STATE,
-	state => state.dashboard
-);
 
 export const GET_DASHBOARD_ERROR = createSelector(
 	GET_DASHBOARD_FEATURE_STATE,
@@ -139,12 +132,6 @@ export const GET_SENDER_ERROR_CATEGORY_COUNTS = createSelector(
 export function dashboardReducer(state: DashboardState = new DashboardState(), action: DashboardAction) {
 
 	switch (action.type) {
-
-		case DashboardActionType.DASHBOARD_LOADED:
-			return {
-				...state,
-				dashboard: action.dashboard
-			};
 
 		case DashboardActionType.LOAD_DASHBOARD_ERROR:
 			return {

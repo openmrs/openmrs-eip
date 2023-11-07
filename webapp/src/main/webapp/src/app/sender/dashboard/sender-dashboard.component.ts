@@ -1,13 +1,11 @@
 import {Component} from "@angular/core";
 import {DashboardComponent} from "../../shared/dashboard/dashboard.component";
 import {select} from "@ngrx/store";
-import {GET_DASHBOARD} from "../../shared/dashboard/state/dashboard.reducer";
-import {LoadDashboard} from "../../shared/dashboard/state/dashboard.actions";
-import {Dashboard} from "../../shared/dashboard/dashboard";
 import {SyncMode} from "../../shared/sync-mode.enum";
 import {FetchCountByStatus, FetchErrorDetails} from "./state/sender.dashboard.actions";
 import {GET_ERROR_DETAILS, GET_SYNC_COUNT_BY_STATUS} from "./state/sender.dashboard.reducer";
 import {Subscription} from "rxjs";
+import {ErrorDetails} from "./error-details";
 
 @Component({
 	selector: 'sender-dashboard',
@@ -15,15 +13,9 @@ import {Subscription} from "rxjs";
 })
 export class SenderDashboardComponent extends DashboardComponent {
 
-	dashboard?: Dashboard;
-
-	dashboardTimeoutId?: number;
-
 	countByStatusTimeoutId?: number;
 
 	errorDetailsTimeoutId?: number;
-
-	dashboardLoaded?: Subscription;
 
 	statusAndCountFetched?: Subscription;
 
@@ -31,7 +23,7 @@ export class SenderDashboardComponent extends DashboardComponent {
 
 	statusAndCountMap?: Map<string, number>;
 
-	errorDetails?: Map<string, any>;
+	errorDetails?: ErrorDetails;
 
 	reloadCountByStatus = false;
 
@@ -60,16 +52,8 @@ export class SenderDashboardComponent extends DashboardComponent {
 			}
 		});
 
-		this.dashboardLoaded = this.store.pipe(select(GET_DASHBOARD)).subscribe(dashboard => {
-			this.dashboard = dashboard;
-			if (this.reload) {
-				this.loadDashboard(30000);
-			}
-		});
-
 		this.fetchSyncCountByStatus(0);
 		this.fetchErrorDetails(0);
-		this.loadDashboard(0);
 	}
 
 	fetchSyncCountByStatus(delay: number): void {
@@ -92,23 +76,19 @@ export class SenderDashboardComponent extends DashboardComponent {
 		}, delay);
 	}
 
-	loadDashboard(delay: number): void {
-		this.dashboardTimeoutId = setTimeout(() => {
-			if (!this.reload) {
-				this.reload = true;
-			}
+	getErrorCount(): number | undefined {
+		if (this.errorDetails && this.errorDetails.exceptionCountMap) {
+			return Object.keys(this.errorDetails.exceptionCountMap).length;
+		}
 
-			this.store.dispatch(new LoadDashboard());
-		}, delay);
+		return undefined;
 	}
 
 	stopSubscriptions(): void {
 		clearTimeout(this.countByStatusTimeoutId);
 		clearTimeout(this.errorDetailsTimeoutId);
-		clearTimeout(this.dashboardTimeoutId);
 		this.statusAndCountFetched?.unsubscribe();
 		this.errorDetailsFetched?.unsubscribe();
-		this.dashboardLoaded?.unsubscribe();
 		super.stopSubscriptions();
 	}
 
