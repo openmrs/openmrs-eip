@@ -36,7 +36,7 @@ public class SenderDashboardControllerTest extends BaseSenderWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(3)));
-		result.andExpect(jsonPath("activeMqRelatedErrorCount", equalTo(2)));
+		result.andExpect(jsonPath("activeMqErrorCount", equalTo(2)));
 		result.andExpect(jsonPath("mostEncounteredErrors.length()", equalTo(2)));
 		result.andExpect(jsonPath("mostEncounteredErrors", hasItem(EIPException.class.getName())));
 		result.andExpect(jsonPath("mostEncounteredErrors", hasItem(ActiveMQNativeIOError.class.getName())));
