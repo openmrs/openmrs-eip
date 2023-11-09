@@ -3,6 +3,7 @@ package org.openmrs.eip.app.sender;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
@@ -18,12 +19,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.utils.FileUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.core.env.Environment;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(AppUtils.class)
+@PrepareForTest({ AppUtils.class, SyncContext.class, FileUtils.class })
 public class SenderCamelListenerTest {
 	
 	@Mock
@@ -32,11 +36,16 @@ public class SenderCamelListenerTest {
 	@Mock
 	private File mockDbzmOffsetFile;
 	
+	@Mock
+	private Environment mockEnv;
+	
 	private SenderCamelListener listener;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(AppUtils.class);
+		PowerMockito.mockStatic(SyncContext.class);
+		PowerMockito.mockStatic(FileUtils.class);
 		listener = new SenderCamelListener(mockExecutor);
 	}
 	
@@ -53,7 +62,10 @@ public class SenderCamelListenerTest {
 		long initialDelay = 2000;
 		long delay = 1000;
 		setInternalState(listener, "binlogPurgerEnabled", true);
-		setInternalState(listener, "debeziumOffsetFile", mockDbzmOffsetFile);
+		final String offsetFile = "someFilename";
+		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
+		when(mockEnv.getProperty(SenderConstants.PROP_DBZM_OFFSET_FILENAME)).thenReturn(offsetFile);
+		when(FileUtils.instantiateFile(offsetFile)).thenReturn(mockDbzmOffsetFile);
 		setInternalState(listener, "binlogMaxKeepCount", maxKeepCount);
 		setInternalState(listener, "initialDelayBinlogPurger", initialDelay);
 		setInternalState(listener, "delayBinlogPurger", delay);

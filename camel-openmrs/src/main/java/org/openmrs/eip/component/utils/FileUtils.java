@@ -1,15 +1,20 @@
 package org.openmrs.eip.component.utils;
 
-import org.openmrs.eip.component.exception.EIPException;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.openmrs.eip.component.exception.EIPException;
 
 public final class FileUtils {
 	
@@ -49,6 +54,16 @@ public final class FileUtils {
 	public static List<byte[]> getPublicKeysFromFolder(final String folderPath) throws IOException {
 		return listKeysFromFolder(folderPath, PUBLIC_KEY_SUFFIX).stream().map(FileUtils::extractKeyFromFile)
 		        .collect(Collectors.toList());
+	}
+	
+	/**
+	 * Creates a File instance with the specified and name
+	 *
+	 * @param fileName file name
+	 * @return File object
+	 */
+	public static File instantiateFile(String fileName) {
+		return new File(fileName);
 	}
 	
 	private static byte[] extractKeyFromFile(final Path path) {

@@ -8,7 +8,6 @@ import static org.openmrs.eip.app.sender.SenderConstants.PROP_DBZM_OFFSET_FILENA
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_DELAY_BINLOG_PURGER;
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_INITIAL_DELAY_BINLOG_PURGER;
 
-import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.camel.spi.CamelEvent;
@@ -16,6 +15,7 @@ import org.apache.camel.support.EventNotifierSupport;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,8 +63,8 @@ public class SenderCamelListener extends EventNotifierSupport {
 			if (binlogPurgerEnabled) {
 				log.info("Starting tasks");
 				
-				String offsetFileName = SyncContext.getBean(Environment.class).getProperty(PROP_DBZM_OFFSET_FILENAME);
-				BinlogPurgingTask task = new BinlogPurgingTask(new File(offsetFileName), binlogMaxKeepCount);
+				String file = SyncContext.getBean(Environment.class).getProperty(PROP_DBZM_OFFSET_FILENAME);
+				BinlogPurgingTask task = new BinlogPurgingTask(FileUtils.instantiateFile(file), binlogMaxKeepCount);
 				scheduledExecutor.scheduleWithFixedDelay(task, initialDelayBinlogPurger, delayBinlogPurger, MILLISECONDS);
 			}
 		} else if (event instanceof CamelEvent.CamelContextStoppingEvent) {
