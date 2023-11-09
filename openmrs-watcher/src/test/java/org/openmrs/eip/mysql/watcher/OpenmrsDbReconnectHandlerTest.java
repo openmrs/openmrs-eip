@@ -2,6 +2,7 @@ package org.openmrs.eip.mysql.watcher;
 
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
@@ -44,6 +45,7 @@ public class OpenmrsDbReconnectHandlerTest {
 		for (AutoCloseable closeable : staticMocksAutoCloseable) {
 			closeable.close();
 		}
+		validateMockitoUsage();
 	}
 	
 	@BeforeEach

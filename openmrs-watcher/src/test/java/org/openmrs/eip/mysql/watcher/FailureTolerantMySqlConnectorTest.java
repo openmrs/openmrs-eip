@@ -3,9 +3,11 @@ package org.openmrs.eip.mysql.watcher;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.openmrs.eip.Utils.shutdownExecutor;
 import static org.openmrs.eip.mysql.watcher.FailureTolerantMySqlConnector.EXECUTOR_NAME;
 import static org.openmrs.eip.mysql.watcher.FailureTolerantMySqlConnector.EXECUTOR_SHUTDOWN_TIMEOUT;
@@ -24,11 +26,13 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.openmrs.eip.AppContext;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
@@ -75,6 +79,7 @@ public class FailureTolerantMySqlConnectorTest {
 			closeable.close();
 		}
 		initMocksAutoCloseable.close();
+		validateMockitoUsage();
 	}
 	
 	@BeforeEach
@@ -137,8 +142,8 @@ public class FailureTolerantMySqlConnectorTest {
 		connector.stop();
 		
 		verifyNoInteractions(mockExecutor);
+		verify(Utils.class, times(3));
 		Utils.shutdown();
-		verify(Utils.class);
 		AppContext.getBean(OpenmrsDbReconnectWatchDog.class);
 	}
 	
