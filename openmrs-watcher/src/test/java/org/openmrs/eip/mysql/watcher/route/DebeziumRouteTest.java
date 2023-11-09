@@ -1,5 +1,6 @@
 package org.openmrs.eip.mysql.watcher.route;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DBZM_MSG_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.ERROR_HANDLER_REF;
@@ -7,6 +8,7 @@ import static org.openmrs.eip.mysql.watcher.WatcherConstants.EX_PROP_SKIP;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.ID_SETTING_PROCESSOR;
 import static org.openmrs.eip.mysql.watcher.route.DebeziumRoute.ROUTE_ID_EVENT_LISTENER;
 import static org.openmrs.eip.mysql.watcher.route.DebeziumRoute.URI_EVENT_LISTENER;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -14,11 +16,9 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.mysql.watcher.CustomFileOffsetBackingStore;
-import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 
 import ch.qos.logback.classic.Level;
@@ -35,33 +35,27 @@ public class DebeziumRouteTest extends BaseWatcherRouteTest {
 	@EndpointInject("mock:" + ROUTE_ID_EVENT_LISTENER)
 	private MockEndpoint mockEventListenerEndpoint;
 	
-	private boolean routeAdded = false;
-	
 	protected static final String URI = "direct:" + DEBEZIUM_ROUTE_ID;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
+		setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 		mockDbzmEndpoint.reset();
 		mockIdSettingEndpoint.reset();
 		mockEventListenerEndpoint.reset();
 		
-		if (!routeAdded) {
-			camelContext.addRoutes(new DebeziumRoute("direct:" + DEBEZIUM_ROUTE_ID, ERROR_HANDLER_REF));
-			advise(DEBEZIUM_ROUTE_ID, new AdviceWithRouteBuilder() {
-				
-				@Override
-				public void configure() {
-					weaveByType(ProcessDefinition.class).selectFirst().replace().to(mockDbzmEndpoint);
-					weaveByType(ProcessDefinition.class).selectLast().replace().to(mockIdSettingEndpoint);
-					interceptSendToEndpoint(URI_EVENT_LISTENER).skipSendToOriginalEndpoint().to(mockEventListenerEndpoint);
-				}
-				
-			});
-			
-			routeAdded = true;
-		}
+		camelContext.addRoutes(new DebeziumRoute(URI, ERROR_HANDLER_REF));
 		
+		advise(DEBEZIUM_ROUTE_ID, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByType(ProcessDefinition.class).selectFirst().replace().to(mockDbzmEndpoint);
+				weaveByType(ProcessDefinition.class).selectLast().replace().to(mockIdSettingEndpoint);
+				interceptSendToEndpoint(URI_EVENT_LISTENER).skipSendToOriginalEndpoint().to(mockEventListenerEndpoint);
+			}
+			
+		});
 	}
 	
 	@Test
@@ -136,7 +130,6 @@ public class DebeziumRouteTest extends BaseWatcherRouteTest {
 		mockDbzmEndpoint.assertIsSatisfied();
 		mockIdSettingEndpoint.assertIsSatisfied();
 		mockEventListenerEndpoint.assertIsSatisfied();
-		Assert.assertNull(getException(exchange));
+		assertNull(getException(exchange));
 	}
-	
 }

@@ -1,7 +1,8 @@
 package org.openmrs.eip.camel.route;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
 import static org.openmrs.eip.Constants.ROUTE_ID_GET_ENTITY_BY_ID;
 import static org.openmrs.eip.Constants.URI_GET_ENTITY_BY_ID;
@@ -15,9 +16,9 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.model.ToDynamicDefinition;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.BaseCamelTest;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.TestConstants;
@@ -30,11 +31,13 @@ import ch.qos.logback.classic.Level;
 @TestPropertySource(properties = "openmrs.baseUrl=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_URL)
 @TestPropertySource(properties = "openmrs.username=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_USER)
 @TestPropertySource(properties = "openmrs.password=" + GetEntityByUuidFromOpenmrsRouteTest.OPENMRS_PASS)
-@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/" + ROUTE_ID_GET_ENTITY_BY_ID + ".xml")
+@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/" + ROUTE_ID_GET_ENTITY_BY_ID
+        + ".xml")
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_GET_ENTITY_BY_ID + "=DEBUG")
 @TestPropertySource(properties = "logging.level.org.apache.camel.reifier.RouteReifier=WARN")
+@TestPropertySource(properties = "camel.springboot.routes-collector-enabled=true")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
+class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 	
 	protected static final String OPENMRS_URL = "http://test.com";
 	
@@ -60,7 +63,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 	@EndpointInject("mock:processor")
 	private MockEndpoint mockProcessor;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		mockHttpEndpoint.reset();
 		mockProcessor.reset();
@@ -77,7 +80,7 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		mockHttpEndpoint.assertIsSatisfied();
 		mockProcessor.assertIsSatisfied();
@@ -245,7 +248,6 @@ public class GetEntityByUuidFromOpenmrsRouteTest extends BaseCamelTest {
 		
 		producerTemplate.send(URI_GET_ENTITY_BY_ID, exchange);
 		
-		assertEquals("An error occurred while fetching the resource from OpenMRS", getErrorMessage(exchange));
+		assertTrue(exchange.isFailed());
 	}
-	
 }

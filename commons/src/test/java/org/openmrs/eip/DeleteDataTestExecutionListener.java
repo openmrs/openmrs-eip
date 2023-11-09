@@ -4,10 +4,7 @@
 package org.openmrs.eip;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +26,6 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	
 	private static final String DELETE = "DELETE FROM ";
 	
-	private static final String DISABLE_KEYS = "SET FOREIGN_KEY_CHECKS=0";
-	
-	private static final String ENABLE_KEYS = "SET FOREIGN_KEY_CHECKS=1";
-	
 	/**
 	 * @see AbstractTestExecutionListener#afterTestMethod(TestContext)
 	 */
@@ -42,18 +35,17 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		DataSource dataSource = ctx.getBean(Constants.MGT_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from management DB tables...");
-		try (Connection c = dataSource.getConnection()) {
-			deleteAllData(c, "TEST");
+		try (Connection connection = dataSource.getConnection()) {
+			deleteAllData(connection, "TEST", "h2");
 		}
 		
 		dataSource = ctx.getBean(Constants.OPENMRS_DATASOURCE_NAME, DataSource.class);
 		
 		log.debug("Deleting all data from OpenMRS DB tables...");
 		
-		try (Connection c = dataSource.getConnection()) {
-			deleteAllData(c, "openmrs");
+		try (Connection connection = dataSource.getConnection()) {
+			deleteAllData(connection, "openmrs", "mysql");
 		}
-		
 	}
 	
 	/**
@@ -62,31 +54,67 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	 * @param connection JDBC Connection object
 	 * @param dbName the name of the database containing the tables from which to delete the rows
 	 */
-	private void deleteAllData(Connection connection, String dbName) throws SQLException {
-		List<String> tables = getTableNames(connection, dbName);
-		Statement statement = connection.createStatement();
+	private void deleteAllData(Connection connection, String dbName, String dbms) throws SQLException {
+		var tables = getTableNames(connection, dbName);
+		var statement = connection.createStatement();
+		var ENABLE_FOREIGN_KEY_CHECKS = dbms.equalsIgnoreCase("h2") ? "SET @FOREIGN_KEY_CHECKS=1"
+		        : "SET FOREIGN_KEY_CHECKS=1";
+		var DISABLE_FOREIGN_KEY_CHECKS = dbms.equalsIgnoreCase("h2") ? "SET @FOREIGN_KEY_CHECKS=0"
+		        : "SET FOREIGN_KEY_CHECKS=0";
+		
 		try {
-			statement.execute(DISABLE_KEYS);
+			statement.execute(DISABLE_FOREIGN_KEY_CHECKS);
 			for (String tableName : tables) {
-				statement.executeUpdate(DELETE + tableName);
+				if (doesTableExist(connection, tableName)) {
+					log.debug("Deleting all data from table -> " + tableName);
+					statement.executeUpdate(DELETE + tableName);
+				}
 			}
 		}
 		finally {
 			if (statement != null) {
-				statement.execute(ENABLE_KEYS);
+				statement.execute(ENABLE_FOREIGN_KEY_CHECKS);
 				statement.close();
 			}
 		}
 	}
 	
-	private static List<String> getTableNames(Connection connection, String dbName) throws SQLException {
-		DatabaseMetaData dbmd = connection.getMetaData();
-		ResultSet tables = dbmd.getTables(dbName, null, null, new String[] { "TABLE" });
-		List<String> tableNames = new ArrayList();
+	/**
+	 * Gets the names of all the tables in the database
+	 * 
+	 * @param connection JDBC Connection object
+	 * @param dbName the name of the database containing the tables
+	 * @return the names of all the tables in the database
+	 * @throws SQLException if an error occurs while querying the database
+	 */
+	private List<String> getTableNames(Connection connection, String dbName) throws SQLException {
+		var databaseMetaData = connection.getMetaData();
+		var tables = databaseMetaData.getTables(dbName, null, null, new String[] { "TABLE" });
+		
+		List<String> tableNames = new ArrayList<>();
 		while (tables.next()) {
 			tableNames.add(tables.getString("TABLE_NAME"));
 		}
 		return tableNames;
 	}
 	
+	/**
+	 * Checks whether a table exists in the database. This is done by attempting to query the table
+	 *
+	 * @param connection JDBC Connection object
+	 * @param tableName the name of the table to check
+	 * @return true if the table exists, false otherwise
+	 * @throws SQLException if an error occurs while querying the table
+	 */
+	private static boolean doesTableExist(Connection connection, String tableName) throws SQLException {
+		try {
+			// Attempt to query the table
+			connection.createStatement().executeQuery("SELECT * FROM " + tableName);
+			return true; // The table exists
+		}
+		catch (SQLException e) {
+			// The table does not exist
+			return false;
+		}
+	}
 }

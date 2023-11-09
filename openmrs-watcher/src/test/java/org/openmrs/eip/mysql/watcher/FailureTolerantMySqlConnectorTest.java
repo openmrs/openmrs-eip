@@ -1,37 +1,43 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.openmrs.eip.Utils.shutdownExecutor;
 import static org.openmrs.eip.mysql.watcher.FailureTolerantMySqlConnector.EXECUTOR_NAME;
 import static org.openmrs.eip.mysql.watcher.FailureTolerantMySqlConnector.EXECUTOR_SHUTDOWN_TIMEOUT;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEFAULT_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY;
+import static org.powermock.reflect.Whitebox.setInternalState;
+import static org.powermock.reflect.internal.WhiteboxImpl.getInternalState;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spi.RouteController;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.AppContext;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-@RunWith(PowerMockRunner.class)
+@ExtendWith(SpringExtension.class)
 @PrepareForTest({ Utils.class, AppContext.class })
 public class FailureTolerantMySqlConnectorTest {
 	
@@ -52,10 +58,27 @@ public class FailureTolerantMySqlConnectorTest {
 	
 	private FailureTolerantMySqlConnector connector = new FailureTolerantMySqlConnector();
 	
-	@Before
-	public void setup() {
-		PowerMockito.mockStatic(Utils.class);
-		PowerMockito.mockStatic(AppContext.class);
+	private static ImmutableList<AutoCloseable> staticMocksAutoCloseable = ImmutableList.of();
+	
+	private static AutoCloseable initMocksAutoCloseable;
+	
+	@BeforeAll
+	public static void setup() {
+		staticMocksAutoCloseable = ImmutableList.of(mockStatic(Utils.class), mockStatic(AppContext.class));
+		initMocksAutoCloseable = MockitoAnnotations.openMocks(FailureTolerantMySqlConnectorTest.class);
+	}
+	
+	@AfterAll
+	public static void tearDown() throws Exception {
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", (Object) null);
+		for (AutoCloseable closeable : staticMocksAutoCloseable) {
+			closeable.close();
+		}
+		initMocksAutoCloseable.close();
+	}
+	
+	@BeforeEach
+	public void beforeEachTest() {
 		when(AppContext.getBean(CamelContext.class)).thenReturn(mockContext);
 		when(mockContext.getRouteController()).thenReturn(mockRouteController);
 		when(AppContext.getBean(OpenmrsDbReconnectWatchDog.class)).thenReturn(mockWatchdog);
@@ -66,13 +89,14 @@ public class FailureTolerantMySqlConnectorTest {
 		when(connector.createExecutor()).thenReturn(mockExecutor);
 	}
 	
-	@After
-	public void tearDown() {
-		Whitebox.setInternalState(FailureTolerantMySqlConnector.class, "executor", (Object) null);
+	@AfterEach
+	public void afterEachTest() {
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", (Object) null);
 	}
 	
 	@Test
 	public void stop_shouldSuspendTheDebeziumRouteAndStartTheWatchDog() throws Exception {
+		when(Utils.isShuttingDown()).thenReturn(false);
 		connector.stop();
 		
 		verify(mockRouteController).suspendRoute(DEBEZIUM_ROUTE_ID);
@@ -83,69 +107,71 @@ public class FailureTolerantMySqlConnectorTest {
 	@Test
 	public void stop_shouldStopTheWatchDogExecutorAndDoNothingIfTheApplicationIsShutdown() {
 		when(Utils.isShuttingDown()).thenReturn(true);
-		Whitebox.setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
 		
 		connector.stop();
 		
 		verifyNoInteractions(mockRouteController);
-		PowerMockito.verifyStatic(Utils.class);
-		Utils.shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
+		verify(Utils.class);
+		shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
 	}
 	
 	@Test
 	public void stop_shouldFailIfTheDebeziumRouteCannotBeSuspended() throws Exception {
 		Mockito.doThrow(new EIPException("test")).when(mockRouteController).suspendRoute(DEBEZIUM_ROUTE_ID);
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
+		when(Utils.isShuttingDown()).thenReturn(false);
 		
 		connector.stop();
 		
 		verifyNoInteractions(mockExecutor);
-		PowerMockito.verifyStatic(Utils.class);
 		Utils.shutdown();
 	}
 	
 	@Test
-	public void stop_shouldFailIfTheWatchDogCannotBeStarted() {
+	public void stop_shouldFailIfTheWatchDogCannotBeStarted() throws Exception {
 		Mockito.doThrow(new EIPException("test")).when(mockEnv).getProperty(PROP_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY,
 		    Long.class, DEFAULT_OPENMRS_DB_RECONNECT_WATCHDOG_DELAY);
+		when(Utils.isShuttingDown()).thenReturn(false);
 		
 		connector.stop();
 		
 		verifyNoInteractions(mockExecutor);
-		PowerMockito.verifyStatic(Utils.class);
 		Utils.shutdown();
-		PowerMockito.verifyStatic(AppContext.class);
+		verify(Utils.class);
 		AppContext.getBean(OpenmrsDbReconnectWatchDog.class);
 	}
 	
 	@Test
 	public void stopReconnectWatchDogExecutor_shouldDoNothingIfTheTheExecutorIsNull() {
-		Assert.assertNull(Whitebox.getInternalState(FailureTolerantMySqlConnector.class, "executor"));
+		when(connector.createExecutor()).thenReturn(mockExecutor);
+		assertNull(getInternalState(FailureTolerantMySqlConnector.class, "executor"));
 		
 		FailureTolerantMySqlConnector.stopReconnectWatchDogExecutor();
 		
-		PowerMockito.verifyStatic(Utils.class, never());
-		Utils.shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
+		verify(Utils.class, never());
+		shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
 	}
 	
 	@Test
 	public void stopReconnectWatchDogExecutor_shouldDoNothingIfTheTheExecutorIsTerminated() {
-		Whitebox.setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
 		when(mockExecutor.isTerminated()).thenReturn(true);
 		
 		FailureTolerantMySqlConnector.stopReconnectWatchDogExecutor();
 		
-		PowerMockito.verifyStatic(Utils.class, never());
-		Utils.shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
+		verify(Utils.class, never());
+		shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
 	}
 	
 	@Test
 	public void stopReconnectWatchDogExecutor_shouldStopTheExecutorIfItIsNotTerminated() {
-		Whitebox.setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
+		setInternalState(FailureTolerantMySqlConnector.class, "executor", mockExecutor);
 		
 		FailureTolerantMySqlConnector.stopReconnectWatchDogExecutor();
 		
-		PowerMockito.verifyStatic(Utils.class);
-		Utils.shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
+		verify(Utils.class);
+		shutdownExecutor(mockExecutor, EXECUTOR_NAME, EXECUTOR_SHUTDOWN_TIMEOUT);
 	}
 	
 }

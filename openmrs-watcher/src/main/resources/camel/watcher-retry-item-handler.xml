@@ -45,7 +45,7 @@
                         <spel>#{T(org.openmrs.eip.Utils).isOrderTable(getProperty('retry-item').event.tableName)}</spel>
                         <!-- TODO After https://issues.openmrs.org/browse/EIP-89 is done, for a deleted orders event get the
                             previousOrderId from the previousState  -->
-                        <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.retry-item.event.primaryKeyId}?dataSource=openmrsDataSource" />
+                        <toD uri="sql:SELECT previous_order_id FROM orders WHERE order_id = ${exchangeProperty.retry-item.event.primaryKeyId}?dataSource=#openmrsDataSource" />
 
                         <when>
                             <simple>${body.size()} == 1</simple>

@@ -3,9 +3,11 @@ package org.openmrs.eip.app.management.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import jakarta.persistence.EntityManagerFactory;
+
+import org.apache.camel.component.jpa.DefaultTransactionStrategy;
 import org.apache.camel.component.jpa.JpaComponent;
 import org.hibernate.cfg.AvailableSettings;
 import org.openmrs.eip.Constants;
@@ -55,7 +57,7 @@ public class ManagementDataSourceConfig {
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	        @Qualifier("mngtDataSource") final DataSource dataSource, ConfigurableEnvironment env) {
 		
-		Map<String, String> props = new HashMap();
+		Map<String, String> props = new HashMap<>();
 		props.put(AvailableSettings.DIALECT, hibernateDialect);
 		props.put(AvailableSettings.HBM2DDL_AUTO, "none");
 		
@@ -72,12 +74,10 @@ public class ManagementDataSourceConfig {
 	@Bean(value = "jpa")
 	public JpaComponent jpa(@Qualifier(value = "mngtEntityManager") EntityManagerFactory entityManagerFactory,
 	        @Qualifier(value = "mngtTransactionManager") PlatformTransactionManager txMgr) {
-		
-		JpaComponent comp = new JpaComponent();
-		comp.setEntityManagerFactory(entityManagerFactory);
-		comp.setTransactionManager(txMgr);
-		
-		return comp;
+		JpaComponent component = new JpaComponent();
+		component.setEntityManagerFactory(entityManagerFactory);
+		component.setTransactionStrategy(new DefaultTransactionStrategy(component.getCamelContext(), entityManagerFactory));
+		return component;
 	}
 	
 	@Bean(name = Constants.LIQUIBASE_BEAN_NAME)

@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     <!--It's important to set the error handler ref to watcherErrorHandler -->
-    <route id="event-listener-example" errorHandlerRef="watcherErrorHandler">
+    <route id="event-listener-example" errorHandlerRef="watcherErrorHandler" description="Event listener example">
         <from uri="direct:event-listener-example" />
-
         <log message="Received db event: ${body}" loggingLevel="DEBUG" />
     </route>
 

@@ -1,8 +1,8 @@
 package org.openmrs.eip.mysql.watcher.route;
 
 import static org.apache.camel.impl.engine.DefaultFluentProducerTemplate.on;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT_DESTINATIONS;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HANDLER;
@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.openmrs.eip.mysql.watcher.management.entity.SenderRetryQueueItem;
 import org.springframework.core.env.MapPropertySource;
@@ -27,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@Ignore
+@Disabled
 @TestPropertySource(properties = "camel.springboot.routes-collector-enabled=false")
 @TestPropertySource(properties = "eip.watchedTables=person")
 @TestPropertySource(properties = "db-event.destinations=mock:db-event-processor")
@@ -48,8 +48,8 @@ public class DbEventListenerRouteTest extends BaseWatcherRouteTest {
 	@EndpointInject(URI_MOCK_EVENT_PROCESSOR)
 	private MockEndpoint mockProcessorEndpoint;
 	
-	@Before
-	public void setup() {
+	@BeforeEach
+	public void setup() throws Exception {
 		mockProcessorEndpoint.reset();
 		mockErrorHandlerEndpoint.reset();
 	}

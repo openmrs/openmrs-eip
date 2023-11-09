@@ -35,9 +35,15 @@ public final class WatcherTestUtils {
 		return template.requestBody(query, null, List.class).size() > 0;
 	}
 	
+	/**
+	 * Gets the previous order id for the given order id
+	 *
+	 * @param orderId the order id
+	 * @return the previous order id
+	 */
 	public static Integer getPreviousOrderId(Integer orderId) {
 		ProducerTemplate template = AppContext.getBean(ProducerTemplate.class);
-		String query = "sql:SELECT previous_order_id FROM orders WHERE order_id = " + orderId + "?dataSource="
+		String query = "sql:SELECT previous_order_id FROM orders WHERE order_id = " + orderId + "?dataSource=#"
 		        + OPENMRS_DATASOURCE_NAME;
 		List<Map<String, Integer>> rows = template.requestBody(query, null, List.class);
 		if (rows.isEmpty()) {
@@ -49,13 +55,27 @@ public final class WatcherTestUtils {
 	
 	public static SenderRetryQueueItem addRetryItem(String entityTable, String entityId, String entityUuid,
 	        String destination) {
-		SenderRetryQueueItem r = new SenderRetryQueueItem();
-		r.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
-		r.setRoute(destination);
-		r.setExceptionType(EIPException.class.getName());
-		r.setDateCreated(new Date());
+		SenderRetryQueueItem retryQueueItem = new SenderRetryQueueItem();
+		retryQueueItem.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
+		retryQueueItem.setRoute(destination);
+		retryQueueItem.setExceptionType(EIPException.class.getName());
+		retryQueueItem.setDateCreated(new Date());
 		ProducerTemplate template = AppContext.getBean(ProducerTemplate.class);
-		return (SenderRetryQueueItem) template.requestBody("jpa:" + SenderRetryQueueItem.class.getSimpleName(), r);
+		return (SenderRetryQueueItem) template.requestBody("jpa:" + SenderRetryQueueItem.class.getSimpleName(),
+		    retryQueueItem);
+	}
+	
+	public static SenderRetryQueueItem addRetryItem(String entityTable, String entityId, String entityUuid,
+	        String destination, Long retryItemId) {
+		SenderRetryQueueItem retryQueueItem = new SenderRetryQueueItem();
+		retryQueueItem.setId(retryItemId);
+		retryQueueItem.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
+		retryQueueItem.setRoute(destination);
+		retryQueueItem.setExceptionType(EIPException.class.getName());
+		retryQueueItem.setDateCreated(new Date());
+		ProducerTemplate template = AppContext.getBean(ProducerTemplate.class);
+		return (SenderRetryQueueItem) template.requestBody("jpa:" + SenderRetryQueueItem.class.getSimpleName(),
+		    retryQueueItem);
 	}
 	
 	public static Event createEvent(String table, String pkId, String identifier, String operation) {

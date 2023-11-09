@@ -1,12 +1,14 @@
 package org.openmrs.eip.mysql.watcher;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+
+import jakarta.persistence.EntityManagerFactory;
 
 import org.openmrs.eip.Constants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -15,6 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import liquibase.integration.spring.SpringLiquibase;
 
+@Configuration
 public class TestOpenmrsDataSourceConfig {
 	
 	@Bean(name = "openmrsTestEntityManager")
@@ -44,5 +47,4 @@ public class TestOpenmrsDataSourceConfig {
 		
 		return liquibase;
 	}
-	
 }
