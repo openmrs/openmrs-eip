@@ -16,14 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PrepareForTest({ Utils.class, FailureTolerantMySqlConnector.class })
 public class OpenmrsDbReconnectHandlerTest {
@@ -45,6 +47,7 @@ public class OpenmrsDbReconnectHandlerTest {
 	public void setup() {
 		staticMocksAutoCloseable = ImmutableList.of(mockStatic(Utils.class),
 		    mockStatic(FailureTolerantMySqlConnector.class));
+		openMocksAutoCloseable = MockitoAnnotations.openMocks(OpenmrsDbReconnectHandlerTest.class);
 	}
 	
 	@BeforeEach
@@ -58,6 +61,7 @@ public class OpenmrsDbReconnectHandlerTest {
 		for (AutoCloseable closeable : staticMocksAutoCloseable) {
 			closeable.close();
 		}
+		openMocksAutoCloseable.close();
 	}
 	
 	@Disabled
