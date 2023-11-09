@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -159,7 +160,8 @@ public class DebeziumMessageProcessorTest {
 		Event event = exchange.getProperty(PROP_EVENT, Event.class);
 		assertEquals(table, event.getTableName());
 		assertEquals(id.toString(), event.getPrimaryKeyId());
-		//assertEquals(uuid, event.getIdentifier());
+		// IdentifierSettingProcessor should have set the identifier to the uuid
+		// assertEquals(uuid, event.getIdentifier());
 		assertEquals(op, event.getOperation());
 		assertFalse(event.getSnapshot());
 		assertNull(event.getPreviousState());
@@ -212,7 +214,8 @@ public class DebeziumMessageProcessorTest {
 		Event event = exchange.getProperty(PROP_EVENT, Event.class);
 		assertEquals(table, event.getTableName());
 		assertEquals(id.toString(), event.getPrimaryKeyId());
-		//assertEquals(uuid, event.getIdentifier());
+		// IdentifierSettingProcessor should have set the identifier to the uuid
+		// assertEquals(uuid, event.getIdentifier());
 		assertEquals(op, event.getOperation());
 		assertFalse(event.getSnapshot());
 		assertEquals(3, event.getPreviousState().size());
@@ -392,7 +395,7 @@ public class DebeziumMessageProcessorTest {
 		final Integer id = 2;
 		CamelContext mockCamelContext = Mockito.mock(CamelContext.class);
 		FluentProducerTemplate mockTemplate = Mockito.mock(FluentProducerTemplate.class);
-		//PowerMockito.mockStatic(DefaultFluentProducerTemplate.class);
+		mockStatic(DefaultFluentProducerTemplate.class);
 		when(DefaultFluentProducerTemplate.on(mockCamelContext)).thenReturn(mockTemplate);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		Message message = new DefaultMessage(exchange);

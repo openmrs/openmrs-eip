@@ -72,7 +72,7 @@ public class IdentifierSettingProcessor implements Processor {
 			logger.debug("Looking up uuid for " + event.getTableName() + " from " + refTable + " table");
 			
 			String query = "SELECT uuid FROM " + refTable + " WHERE " + refColumn + "=" + event.getPrimaryKeyId()
-			        + "?dataSource=" + Constants.OPENMRS_DATASOURCE_NAME;
+			        + "?dataSource=#" + Constants.OPENMRS_DATASOURCE_NAME;
 			List<Map> rows = DefaultFluentProducerTemplate.on(exchange.getContext()).to("sql:" + query).request(List.class);
 			if (!rows.isEmpty()) {
 				event.setIdentifier(rows.get(0).get(WatcherConstants.FIELD_UUID).toString());
