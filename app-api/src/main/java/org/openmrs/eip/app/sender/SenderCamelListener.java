@@ -4,6 +4,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.sender.SenderConstants.BEAN_NAME_SCHEDULED_EXECUTOR;
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_BINLOG_MAX_KEEP_COUNT;
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_BINLOG_PURGER_ENABLED;
+import static org.openmrs.eip.app.sender.SenderConstants.PROP_DBZM_OFFSET_FILENAME;
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_DELAY_BINLOG_PURGER;
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_INITIAL_DELAY_BINLOG_PURGER;
 
@@ -13,12 +14,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,9 +44,6 @@ public class SenderCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_BINLOG_PURGER_ENABLED + ":false}")
 	private boolean binlogPurgerEnabled;
 	
-	@Value("${" + SenderConstants.PROP_DBZM_OFFSET_FILENAME + "}")
-	private File debeziumOffsetFile;
-	
 	@Value("${" + PROP_BINLOG_MAX_KEEP_COUNT + ":" + DEFAULT_BINLOG_MAX_KEEP_COUNT + "}")
 	private int binlogMaxKeepCount;
 	
@@ -63,7 +63,8 @@ public class SenderCamelListener extends EventNotifierSupport {
 			if (binlogPurgerEnabled) {
 				log.info("Starting tasks");
 				
-				BinlogPurgingTask task = new BinlogPurgingTask(debeziumOffsetFile, binlogMaxKeepCount);
+				String offsetFileName = SyncContext.getBean(Environment.class).getProperty(PROP_DBZM_OFFSET_FILENAME);
+				BinlogPurgingTask task = new BinlogPurgingTask(new File(offsetFileName), binlogMaxKeepCount);
 				scheduledExecutor.scheduleWithFixedDelay(task, initialDelayBinlogPurger, delayBinlogPurger, MILLISECONDS);
 			}
 		} else if (event instanceof CamelEvent.CamelContextStoppingEvent) {
