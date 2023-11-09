@@ -1,7 +1,7 @@
 package org.openmrs.eip.mysql.watcher;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
@@ -11,22 +11,17 @@ import org.apache.camel.spi.RouteController;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.Utils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.slf4j.Logger;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-@ExtendWith(SpringExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 @PrepareForTest({ Utils.class, FailureTolerantMySqlConnector.class })
 public class OpenmrsDbReconnectHandlerTest {
 	
@@ -36,57 +31,48 @@ public class OpenmrsDbReconnectHandlerTest {
 	@Mock
 	private RouteController mockRouteController;
 	
-	@Mock
-	private Logger logger;
-	
-	private AutoCloseable openMocksAutoCloseable;
-	
-	private ImmutableList<AutoCloseable> staticMocksAutoCloseable = ImmutableList.of();
+	private static ImmutableList<AutoCloseable> staticMocksAutoCloseable = ImmutableList.of();
 	
 	@BeforeAll
-	public void setup() {
+	public static void setupClass() {
 		staticMocksAutoCloseable = ImmutableList.of(mockStatic(Utils.class),
 		    mockStatic(FailureTolerantMySqlConnector.class));
-		openMocksAutoCloseable = MockitoAnnotations.openMocks(OpenmrsDbReconnectHandlerTest.class);
-	}
-	
-	@BeforeEach
-	public void beforeEach() throws Exception {
-		when(mockContext.getRouteController()).thenReturn(mockRouteController);
 	}
 	
 	@AfterAll
-	public void afterAll() throws Exception {
-		Utils.shutdown();
+	public static void tearDownClass() throws Exception {
 		for (AutoCloseable closeable : staticMocksAutoCloseable) {
 			closeable.close();
 		}
-		openMocksAutoCloseable.close();
 	}
 	
-	@Disabled
+	@BeforeEach
+	public void setup() throws Exception {
+		when(mockContext.getRouteController()).thenReturn(mockRouteController);
+		Mockito.doThrow(new EIPException("test")).when(mockRouteController).resumeRoute(DEBEZIUM_ROUTE_ID);
+	}
+	
+	@Test
 	public void run_shouldStopTheWatchDogExecutorAndResumeTheDebeziumRoute() throws Exception {
 		OpenmrsDbReconnectHandler handler = new OpenmrsDbReconnectHandler(mockContext);
 		
 		handler.run();
 		
+		verify(FailureTolerantMySqlConnector.class, times(2));
 		FailureTolerantMySqlConnector.stopReconnectWatchDogExecutor();
-		mockRouteController.resumeRoute(DEBEZIUM_ROUTE_ID);
-		
-		verify(FailureTolerantMySqlConnector.class);
 		verify(mockRouteController).resumeRoute(DEBEZIUM_ROUTE_ID);
+		Utils.shutdown();
 	}
 	
 	@Test
 	public void run_shouldFailIfTheDebeziumRouteCannotBeResumed() throws Exception {
 		OpenmrsDbReconnectHandler handler = new OpenmrsDbReconnectHandler(mockContext);
-		doThrow(new EIPException("test")).when(mockRouteController).resumeRoute(DEBEZIUM_ROUTE_ID);
 		
 		handler.run();
 		
-		verify(FailureTolerantMySqlConnector.class);
+		verify(FailureTolerantMySqlConnector.class, times(1));
 		FailureTolerantMySqlConnector.stopReconnectWatchDogExecutor();
-		verify(Utils.class);
+		verify(Utils.class, times(1));
 		Utils.shutdown();
 	}
 }
