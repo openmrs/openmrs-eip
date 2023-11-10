@@ -420,5 +420,50 @@
 
         <addNotNullConstraint tableName="sender_sync_archive" columnName="sync_data" columnDataType="TEXT" />
     </changeSet>
+
+    <changeSet author="wluyima" id="20231110-0900">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_pruned_archive" />
+            </not>
+        </preConditions>
+        <comment>Adding sender_pruned_archive table</comment>
+
+        <createTable tableName="sender_pruned_archive">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false" />
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)" />
+            <column name="snapshot" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="sync_data" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_sent" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="event_date" type="DATETIME(3)" />
+            <column name="date_received_by_receiver" type="DATETIME" >
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+    </changeSet>
     
 </databaseChangeLog>

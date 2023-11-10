@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.management.entity.receiver;
+package org.openmrs.eip.app.management.entity.sender;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
@@ -13,29 +13,29 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.component.model.PersonModel;
 import org.springframework.beans.BeanUtils;
 
-public class ReceiverPrunedItemTest {
+public class SenderPrunedArchiveTest {
 	
 	@Test
-	public void shouldCreateAReceiverPrunedItemFromAnArchive() throws Exception {
-		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(ReceiverSyncArchive.class);
-		ReceiverSyncArchive archive = new ReceiverSyncArchive();
+	public void shouldCreateAPrunedArchiveFromASyncArchive() throws Exception {
+		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(SenderSyncArchive.class);
+		SenderSyncArchive archive = new SenderSyncArchive();
 		archive.setId(1L);
 		archive.setDateCreated(new Date());
 		archive.setIdentifier("uuid");
-		archive.setEntityPayload("payload");
-		archive.setModelClassName(PersonModel.class.getName());
-		archive.setSite(new SiteInfo());
+		archive.setData("data");
+		archive.setTableName("person");
 		archive.setSnapshot(true);
 		archive.setMessageUuid("message-uuid");
-		archive.setDateSentBySender(LocalDateTime.now());
-		archive.setOperation(SyncOperation.c);
-		archive.setDateReceived(new Date());
+		archive.setRequestUuid("req-uuid");
+		archive.setEventDate(new Date());
+		archive.setDateSent(new Date());
+		archive.setDateReceivedByReceiver(LocalDateTime.now());
+		archive.setOperation(SyncOperation.c.name());
 		long timestamp = System.currentTimeMillis();
 		
-		ReceiverPrunedItem prune = new ReceiverPrunedItem(archive);
+		SenderPrunedArchive prune = new SenderPrunedArchive(archive);
 		
 		Assert.assertNull(prune.getId());
 		assertTrue(prune.getDateCreated().getTime() == timestamp || prune.getDateCreated().getTime() > timestamp);
