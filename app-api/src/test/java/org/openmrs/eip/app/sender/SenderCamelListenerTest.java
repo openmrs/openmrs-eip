@@ -80,6 +80,25 @@ public class SenderCamelListenerTest {
 	}
 	
 	@Test
+	public void notify_shouldStartThePrunerTaskIfEnabledForStartedEvent() throws Exception {
+		int maxAgeInDays = 1;
+		long initialDelay = 2000;
+		long delay = 1000;
+		setInternalState(listener, "prunerEnabled", true);
+		setInternalState(listener, "archivesMaxAgeInDays", maxAgeInDays);
+		setInternalState(listener, "initialDelayPruner", initialDelay);
+		setInternalState(listener, "delayPruner", delay);
+		
+		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		
+		ArgumentCaptor<SenderArchivePruningTask> taskCaptor = ArgumentCaptor.forClass(SenderArchivePruningTask.class);
+		verify(mockExecutor).scheduleWithFixedDelay(taskCaptor.capture(), eq(initialDelay), eq(delay), eq(MILLISECONDS));
+		
+		SenderArchivePruningTask task = taskCaptor.getValue();
+		Assert.assertEquals(maxAgeInDays, (int) getInternalState(task, "maxAgeDays"));
+	}
+	
+	@Test
 	public void notify_shouldStopTheExecutorForStoppingEvent() throws Exception {
 		listener.notify((CamelEvent.CamelContextStoppingEvent) () -> null);
 		

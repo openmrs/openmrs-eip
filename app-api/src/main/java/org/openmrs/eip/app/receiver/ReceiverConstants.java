@@ -38,14 +38,6 @@ public class ReceiverConstants {
 	
 	public static final String PROP_SITE_DISABLED_TASKS = "site.disabled.tasks";
 	
-	public static final String PROP_PRUNER_ENABLED = "archives.pruner.task.enabled";
-	
-	public static final String PROP_ARCHIVES_MAX_AGE_DAYS = "archives.pruner.max.age.days";
-	
-	public static final String PROP_INITIAL_DELAY_PRUNER = "archives.pruner.initial.delay";
-	
-	public static final String PROP_DELAY_PRUNER = "archives.pruner.delay";
-	
 	public static final String PROP_PRIORITIZE_DISABLED = "sync.prioritize.disabled";
 	
 	public static final String PROP_BACKLOG_THRESHOLD = "sync.prioritize.backlog.threshold.days";

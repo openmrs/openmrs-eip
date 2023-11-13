@@ -2,11 +2,12 @@ package org.openmrs.eip.app.receiver;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_DELAY_PRUNER;
+import static org.openmrs.eip.app.SyncConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
+import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
+import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_PRUNER;
+import static org.openmrs.eip.app.SyncConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_PRUNER;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_DISABLED_TASKS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_DELAY;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_INITIAL_DELAY;
@@ -52,8 +53,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private static final int DEFAULT_INITIAL_DELAY_SYNC = 5000;
 	
 	private static final int DEFAULT_DELAY = 300000;
-	
-	private static final int DEFAULT_DELAY_PRUNER = 86400000;
 	
 	private ScheduledThreadPoolExecutor siteExecutor;
 	

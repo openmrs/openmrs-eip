@@ -28,8 +28,6 @@ public class SyncConstants {
 	
 	public static final String PROP_THREAD_NUMBER = "parallel.processing.thread.number";
 	
-	public static final String EX_APP_ID = "org.openmrs.eip.app-appId";
-	
 	public final static String SAVEPOINT_FILE = "snapshot_savepoint.properties";
 	
 	public final static String OPENMRS_DATASOURCE_NAME = "openmrsDataSource";
@@ -44,10 +42,18 @@ public class SyncConstants {
 	
 	public final static String CHAINED_TX_MGR = "chainedTxManager";
 	
-	public final static String EX_PROP_APP_ID = "org.openmrs.eip.app-appId";
-	
 	public static final String ROUTE_ID_SHUTDOWN = "shutdown-route";
 	
 	public static final String URI_SHUTDOWN = "direct:" + ROUTE_ID_SHUTDOWN;
+	
+	public static final String PROP_PRUNER_ENABLED = "archives.pruner.task.enabled";
+	
+	public static final String PROP_ARCHIVES_MAX_AGE_DAYS = "archives.pruner.max.age.days";
+	
+	public static final String PROP_INITIAL_DELAY_PRUNER = "archives.pruner.initial.delay";
+	
+	public static final String PROP_DELAY_PRUNER = "archives.pruner.delay";
+	
+	public static final int DEFAULT_DELAY_PRUNER = 86400000;
 	
 }
