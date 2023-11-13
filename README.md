@@ -288,13 +288,15 @@ To disable or customize the sync prioritization feature, please refer to the **S
 [receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties)
 
 # Sync Archive Pruning
-The DB sync receiver application maintains an archive of each and every sync item sent it receives it in a database 
-table, you can guess that after a long period of time, this table can grow extremely large which would slow down the 
-queries against it when loading the receiver dashboard and DDL operations for the table would be very slow during 
-upgrades. Therefore, a pruner task was added to periodically delete all archives older than a configured age.
+The DB sync sender and receiver applications maintain an archive of each and every sync in a database table, you can 
+guess that after a long period of time, the tables can grow extremely large which would slow down the queries against 
+them e.g. when loading the dashboards and DDL operations for the table would be very slow during upgrades. Therefore, a 
+pruner task was added to each application to periodically delete all archives older than a configured age.
 
-The pruning task is disabled by default but can be enabled and customized, please refer to the **Sync Archives Pruning** 
-section in the [receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties)
+The pruning tasks are disabled by default but can be enabled and customized, please refer to the **Sync Archives Pruning** 
+section in the [sender application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/sender/application.properties) 
+and [receiver application.properties](https://github.com/FriendsInGlobalHealth/openmrs-eip/blob/master/distribution/docs/receiver/application.properties) 
+files.
 
 # Binary Log Purging
 This feature applies to the sender, the number of binary log files on the MySQL server can grow to the point where the 
