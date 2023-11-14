@@ -4,6 +4,7 @@
 package org.openmrs.eip;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		
 		log.debug("Deleting all data from management DB tables...");
 		try (Connection connection = dataSource.getConnection()) {
-			deleteAllData(connection, "TEST", "h2");
+			deleteAllData(connection, "TEST");
 		}
 		
 		dataSource = ctx.getBean(Constants.OPENMRS_DATASOURCE_NAME, DataSource.class);
@@ -44,7 +45,7 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		log.debug("Deleting all data from OpenMRS DB tables...");
 		
 		try (Connection connection = dataSource.getConnection()) {
-			deleteAllData(connection, "openmrs", "mysql");
+			deleteAllData(connection, "openmrs");
 		}
 	}
 	
@@ -54,9 +55,11 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	 * @param connection JDBC Connection object
 	 * @param dbName the name of the database containing the tables from which to delete the rows
 	 */
-	private void deleteAllData(Connection connection, String dbName, String dbms) throws SQLException {
+	private void deleteAllData(Connection connection, String dbName) throws SQLException {
 		var tables = getTableNames(connection, dbName);
 		var statement = connection.createStatement();
+		DatabaseMetaData dbMetaData = connection.getMetaData();
+		var dbms = dbMetaData.getDatabaseProductName();
 		var ENABLE_FOREIGN_KEY_CHECKS = dbms.equalsIgnoreCase("h2") ? "SET @FOREIGN_KEY_CHECKS=1"
 		        : "SET FOREIGN_KEY_CHECKS=1";
 		var DISABLE_FOREIGN_KEY_CHECKS = dbms.equalsIgnoreCase("h2") ? "SET @FOREIGN_KEY_CHECKS=0"
@@ -65,7 +68,7 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 		try {
 			statement.execute(DISABLE_FOREIGN_KEY_CHECKS);
 			for (String tableName : tables) {
-				if (doesTableExist(connection, tableName)) {
+				if (tableExists(connection, tableName)) {
 					log.debug("Deleting all data from table -> " + tableName);
 					statement.executeUpdate(DELETE + tableName);
 				}
@@ -104,9 +107,8 @@ public class DeleteDataTestExecutionListener extends AbstractTestExecutionListen
 	 * @param connection JDBC Connection object
 	 * @param tableName the name of the table to check
 	 * @return true if the table exists, false otherwise
-	 * @throws SQLException if an error occurs while querying the table
 	 */
-	private static boolean doesTableExist(Connection connection, String tableName) throws SQLException {
+	private boolean tableExists(Connection connection, String tableName) {
 		try {
 			// Attempt to query the table
 			connection.createStatement().executeQuery("SELECT * FROM " + tableName);

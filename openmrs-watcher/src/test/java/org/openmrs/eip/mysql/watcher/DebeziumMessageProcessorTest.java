@@ -160,8 +160,7 @@ public class DebeziumMessageProcessorTest {
 		Event event = exchange.getProperty(PROP_EVENT, Event.class);
 		assertEquals(table, event.getTableName());
 		assertEquals(id.toString(), event.getPrimaryKeyId());
-		// IdentifierSettingProcessor should have set the identifier to the uuid
-		// assertEquals(uuid, event.getIdentifier());
+		assertNull(event.getIdentifier());
 		assertEquals(op, event.getOperation());
 		assertFalse(event.getSnapshot());
 		assertNull(event.getPreviousState());
@@ -214,8 +213,7 @@ public class DebeziumMessageProcessorTest {
 		Event event = exchange.getProperty(PROP_EVENT, Event.class);
 		assertEquals(table, event.getTableName());
 		assertEquals(id.toString(), event.getPrimaryKeyId());
-		// IdentifierSettingProcessor should have set the identifier to the uuid
-		// assertEquals(uuid, event.getIdentifier());
+		assertNull(event.getIdentifier());
 		assertEquals(op, event.getOperation());
 		assertFalse(event.getSnapshot());
 		assertEquals(3, event.getPreviousState().size());
