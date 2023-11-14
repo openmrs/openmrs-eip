@@ -5,6 +5,9 @@ on:
       test-class-names:
         required: true
         description: Test classnames
+      project-names:
+        required: true
+        description: Project names
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,4 +19,4 @@ jobs:
           java-version: 8
           distribution: temurin
       - name: Build and test with maven
-        run: mvn test --no-transfer-progress -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DfailIfNoTests=false -Dtest=${{inputs.test-class-names}}
+        run: mvn test --no-transfer-progress -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -pl ${{inputs.project-names}} -DfailIfNoTests=false -Dtest=${{inputs.test-class-names}}
