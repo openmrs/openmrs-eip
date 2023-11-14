@@ -193,16 +193,16 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfTheEntityDestinationIsNotAmongTheRegisteredDestinations() throws Exception {
+		SenderRetryQueueItem SenderRetryQueueItemInserted = addRetryItem("person", "1", null, MOCK_LISTENER);
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty("event-destinations", emptyList());
-		exchange.getIn().setBody(3);
+		exchange.getIn().setBody(SenderRetryQueueItemInserted.getId());
 		mockEventProcessorEndpoint.expectedMessageCount(0);
 		
 		producerTemplate.send(ROUTE_URI, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		// assertEquals("No listener destination found with name direct:invalid-dest", getErrorMessage(exchange));
-		// Failed to invoke method: [0] on java.util.ArrayList due to: java.lang.IndexOutOfBoundsException: Index: 0, Size: 0 out of bounds with List from bean: []using OGNL path [[0]]
+		assertEquals("No listener destination found with name " + MOCK_LISTENER, getErrorMessage(exchange));
 	}
 	
 	@Test

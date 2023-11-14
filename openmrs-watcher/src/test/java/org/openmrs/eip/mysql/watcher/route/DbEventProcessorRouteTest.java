@@ -14,7 +14,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openmrs.eip.Constants;
 import org.openmrs.eip.mysql.watcher.Event;
@@ -213,7 +212,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		assertMessageLogged(Level.DEBUG, END_ROUTE_MSG);
 	}
 	
-	@Disabled
 	@Test
 	public void shouldProcessAnOrderThatHasAPreviousOrderIfThePreviousOrderIsInTheErrorQueueForAnotherDestination()
 	        throws Exception {
@@ -221,10 +219,10 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		final Integer orderId = 110;
 		final Integer previousOrderId = 109;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
-		// TODO - fix Unique index or primary key violation: "PRIMARY KEY ON PUBLIC.SENDER_RETRY_QUEUE(ID)
-		addRetryItem(tableName, previousOrderId.toString(), null, "mock:other");
+		addRetryItem(tableName, previousOrderId.toString(), previousOrderId.toString(), "mock:other");
 		Event event = createEvent(tableName, orderId.toString(), ORDER_UUID, "c");
 		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty("retry-item-id", 1);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(1);
 		mockEventListenerEndpoint.expectedBodiesReceived(event);

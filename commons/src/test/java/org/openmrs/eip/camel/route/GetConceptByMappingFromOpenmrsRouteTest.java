@@ -36,7 +36,8 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = "openmrs.baseUrl=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_URL)
 @TestPropertySource(properties = "openmrs.username=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_USER)
 @TestPropertySource(properties = "openmrs.password=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_PASS)
-@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/get-concept-by-mapping-from-openmrs.xml")
+@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/" + ROUTE_ID_GET_CONCEPT_BY_MAPPING
+        + ".xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 	

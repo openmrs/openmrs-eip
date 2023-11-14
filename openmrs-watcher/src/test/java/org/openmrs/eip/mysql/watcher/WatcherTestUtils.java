@@ -65,19 +65,6 @@ public final class WatcherTestUtils {
 		    retryQueueItem);
 	}
 	
-	public static SenderRetryQueueItem addRetryItem(String entityTable, String entityId, String entityUuid,
-	        String destination, Long retryItemId) {
-		SenderRetryQueueItem retryQueueItem = new SenderRetryQueueItem();
-		retryQueueItem.setId(retryItemId);
-		retryQueueItem.setEvent(createEvent(entityTable, entityId, entityUuid, "c"));
-		retryQueueItem.setRoute(destination);
-		retryQueueItem.setExceptionType(EIPException.class.getName());
-		retryQueueItem.setDateCreated(new Date());
-		ProducerTemplate template = AppContext.getBean(ProducerTemplate.class);
-		return (SenderRetryQueueItem) template.requestBody("jpa:" + SenderRetryQueueItem.class.getSimpleName(),
-		    retryQueueItem);
-	}
-	
 	public static Event createEvent(String table, String pkId, String identifier, String operation) {
 		Event event = new Event();
 		event.setTableName(table);
