@@ -13,4 +13,4 @@ jobs:
           java-version: 8
           distribution: temurin
       - name: Build and test with maven
-        run: mvn test -B
+        run: mvn test --no-transfer-progress -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
