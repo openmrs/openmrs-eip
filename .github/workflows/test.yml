@@ -13,4 +13,4 @@ jobs:
           java-version: 8
           distribution: temurin
       - name: Build and test with maven
-        run: mvn test
+        run: mvn test -B
