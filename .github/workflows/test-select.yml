@@ -1,0 +1,19 @@
+name: Build and Test Selected Tests
+on:
+  workflow_dispatch:
+    inputs:
+      class-names:
+        required: true
+        description: Comma separated list of the Java simple class names or name pattern for the tests to run
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: temurin
+      - name: Build and test with maven
+        run: mvn test -DfailIfNoTests=false -Dtest={{inputs.class-names}}
