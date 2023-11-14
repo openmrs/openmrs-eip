@@ -195,20 +195,20 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void postProcessSyncItem(SyncMessage message, SyncOutcome outcome) {
-		switch (outcome) {
-			case SUCCESS:
-				//Do nothing prior to moving to synced queue 
-				break;
-			case ERROR:
-				//TODO Add to error queue 
-				break;
-			case CONFLICT:
-				//TODO Add to conflict queue see https://jira.fgh.org.mz/browse/EC-529
-				break;
+	public void processFailedSyncItem(SyncMessage message, String exceptionType, String errorMsg) {
+		log.info("Adding new item to retry queue");
+		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem(message, exceptionType, errorMsg);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving retry item");
 		}
 		
-		moveToSyncedQueue(message, outcome);
+		retryRepo.save(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved retry item");
+		}
+		
+		moveToSyncedQueue(message, SyncOutcome.ERROR);
 	}
 	
 }

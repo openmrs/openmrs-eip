@@ -62,6 +62,14 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	public ReceiverRetryQueueItem() {
 	}
 	
+	public ReceiverRetryQueueItem(SyncMessage syncMessage, String exceptionType, String errorMsg) {
+		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
+		setDateReceived(syncMessage.getDateCreated());
+		setExceptionType(exceptionType);
+		setMessage(errorMsg);
+		setDateCreated(new Date());
+	}
+	
 	public ReceiverRetryQueueItem(ConflictQueueItem conflict) {
 		BeanUtils.copyProperties(conflict, this, "id", "dateCreated");
 		setDateCreated(new Date());

@@ -65,13 +65,13 @@ public interface ReceiverService extends Service {
 	boolean hasRetryItem(String identifier, String modelClassname);
 	
 	/**
-	 * For a successfully synced message it is moved to the synced queue, in case of error outcome the
-	 * message is copied to the error queue before it is moved and in case of a conflict outcome the
-	 * item is copied to the conflict queue before it is moved.
-	 *
+	 * Adds a synced message to the error queue and then moves the sync item from the sync to the synced
+	 * queue.
+	 * 
 	 * @param message the sync item to post process
-	 * @param outcome {@link SyncOutcome}
+	 * @param exceptionType the exception type name
+	 * @param errorMsg the error message
 	 */
-	void postProcessSyncItem(SyncMessage message, SyncOutcome outcome);
+	void processFailedSyncItem(SyncMessage message, String exceptionType, String errorMsg);
 	
 }
