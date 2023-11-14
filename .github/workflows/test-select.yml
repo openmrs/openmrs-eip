@@ -16,4 +16,4 @@ jobs:
           java-version: 8
           distribution: temurin
       - name: Build and test with maven
-        run: mvn test -DfailIfNoTests=false -Dtest={{test-class-names}}
+        run: mvn test -B -DfailIfNoTests=false -Dtest={{test-class-names}}
