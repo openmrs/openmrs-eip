@@ -193,4 +193,22 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		return retryRepo.countByIdentifierAndModelClassNameIn(identifier, classNames) > 0;
 	}
 	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void postProcessSyncItem(SyncMessage message, SyncOutcome outcome) {
+		switch (outcome) {
+			case SUCCESS:
+				//Do nothing prior to moving to synced queue 
+				break;
+			case ERROR:
+				//TODO Add to error queue 
+				break;
+			case CONFLICT:
+				//TODO Add to conflict queue see https://jira.fgh.org.mz/browse/EC-529
+				break;
+		}
+		
+		moveToSyncedQueue(message, outcome);
+	}
+	
 }

@@ -182,4 +182,21 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertFalse(service.hasRetryItem("some-uuid", PersonModel.class.getName()));
 	}
 	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void postProcessSyncItem_shouldMoveTheMessageToTheSyncedQueueIfOutcomeIsSuccess() {
+		final Long id = 1L;
+		SyncMessage msg = syncMsgRepo.findById(id).get();
+		assertEquals(0, syncedMsgRepo.count());
+		
+		service.postProcessSyncItem(msg, SyncOutcome.SUCCESS);
+		
+		assertFalse(syncMsgRepo.findById(id).isPresent());
+		List<SyncedMessage> syncedItems = syncedMsgRepo.findAll();
+		assertEquals(1, syncedItems.size());
+		assertEquals(msg.getMessageUuid(), syncedItems.get(0).getMessageUuid());
+		assertEquals(SyncOutcome.SUCCESS, syncedItems.get(0).getOutcome());
+	}
+	
 }
