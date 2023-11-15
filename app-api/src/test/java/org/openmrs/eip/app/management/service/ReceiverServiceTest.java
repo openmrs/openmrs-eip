@@ -25,6 +25,7 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
@@ -185,18 +186,26 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void postProcessSyncItem_shouldMoveTheMessageToTheSyncedQueueIfOutcomeIsSuccess() {
+	public void processFailedSyncItem_shouldAddTheItemToTheErrorAndSyncedQueues() {
 		final Long id = 1L;
 		SyncMessage msg = syncMsgRepo.findById(id).get();
 		assertEquals(0, syncedMsgRepo.count());
+		assertEquals(0, retryRepo.count());
+		final String exception = EIPException.class.getName();
+		final String errMsg = "test error msg";
 		
-		service.postProcessSyncItem(msg, SyncOutcome.SUCCESS);
+		service.processFailedSyncItem(msg, exception, errMsg);
 		
 		assertFalse(syncMsgRepo.findById(id).isPresent());
 		List<SyncedMessage> syncedItems = syncedMsgRepo.findAll();
 		assertEquals(1, syncedItems.size());
 		assertEquals(msg.getMessageUuid(), syncedItems.get(0).getMessageUuid());
-		assertEquals(SyncOutcome.SUCCESS, syncedItems.get(0).getOutcome());
+		assertEquals(SyncOutcome.ERROR, syncedItems.get(0).getOutcome());
+		List<ReceiverRetryQueueItem> retryItems = retryRepo.findAll();
+		assertEquals(1, retryItems.size());
+		assertEquals(msg.getMessageUuid(), retryItems.get(0).getMessageUuid());
+		assertEquals(exception, retryItems.get(0).getExceptionType());
+		assertEquals(errMsg, retryItems.get(0).getMessage());
 	}
 	
 }

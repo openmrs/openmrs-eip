@@ -65,10 +65,9 @@ public interface ReceiverService extends Service {
 	boolean hasRetryItem(String identifier, String modelClassname);
 	
 	/**
-	 * Adds a synced message to the error queue and then moves the sync item from the sync to the synced
-	 * queue.
+	 * Adds a sync item to the error and synced queues.
 	 * 
-	 * @param message the sync item to post process
+	 * @param message the failed sync item
 	 * @param exceptionType the exception type name
 	 * @param errorMsg the error message
 	 */
