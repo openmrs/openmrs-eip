@@ -4,8 +4,9 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
@@ -256,22 +257,20 @@ public class SiteMessageConsumer implements Runnable {
 		}
 		
 		boolean movedToConflict = exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, false, Boolean.class);
-		boolean movedToError = exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, false, Boolean.class);
+		String errorType = exchange.getProperty(EX_PROP_ERR_TYPE, String.class);
+		String errorMsg = exchange.getProperty(EX_PROP_ERR_MSG, String.class);
 		boolean msgProcessed = exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class);
 		
-		if (msgProcessed || movedToConflict || movedToError) {
-			SyncOutcome outcome;
-			if (msgProcessed) {
-				outcome = SyncOutcome.SUCCESS;
-			} else if (movedToConflict) {
-				outcome = SyncOutcome.CONFLICT;
+		if (msgProcessed || movedToConflict || errorType != null) {
+			if (errorType != null) {
+				service.processFailedSyncItem(msg, errorType, errorMsg);
 			} else {
-				outcome = SyncOutcome.ERROR;
+				SyncOutcome outcome = movedToConflict ? SyncOutcome.CONFLICT : SyncOutcome.SUCCESS;
+				
+				log.info("Moving the item to the synced queue with outcome as: " + outcome);
+				
+				service.moveToSyncedQueue(msg, outcome);
 			}
-			
-			log.info("Moving the item to the synced queue with outcome as: " + outcome);
-			
-			service.moveToSyncedQueue(msg, outcome);
 		} else {
 			throw new EIPException("Something went wrong while processing sync message -> " + msg);
 		}

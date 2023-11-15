@@ -16,8 +16,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_MSG_PROCESSOR;
@@ -680,10 +681,13 @@ public class SiteMessageConsumerTest {
 		Whitebox.setInternalState(consumer, "messageProcessorUri", MOCK_PROCESSOR_URI);
 		SyncMessage msg = new SyncMessage();
 		List<SyncMessage> processedMsgs = new ArrayList(1);
+		final String errType = EIPException.class.getName();
+		final String errMsg = "testing";
 		Mockito.when(CamelUtils.send(eq(MOCK_PROCESSOR_URI), any(Exchange.class))).thenAnswer(invocation -> {
 			Exchange exchange = invocation.getArgument(1);
 			processedMsgs.add(exchange.getIn().getBody(SyncMessage.class));
-			exchange.setProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, true);
+			exchange.setProperty(EX_PROP_ERR_TYPE, errType);
+			exchange.setProperty(EX_PROP_ERR_MSG, errMsg);
 			return null;
 		});
 		
@@ -691,7 +695,8 @@ public class SiteMessageConsumerTest {
 		
 		assertEquals(1, processedMsgs.size());
 		assertEquals(msg, processedMsgs.get(0));
-		verify(mockService).moveToSyncedQueue(msg, SyncOutcome.ERROR);
+		verify(mockService).processFailedSyncItem(msg, errType, errMsg);
+		verify(mockService, never()).moveToSyncedQueue(any(SyncMessage.class), any(SyncOutcome.class));
 	}
 	
 	@Test
