@@ -193,7 +193,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 	
 	@Test
 	public void shouldFailIfTheEntityDestinationIsNotAmongTheRegisteredDestinations() throws Exception {
-		SenderRetryQueueItem SenderRetryQueueItemInserted = addRetryItem("person", "1", null, MOCK_LISTENER);
+		SenderRetryQueueItem SenderRetryQueueItemInserted = addRetryItem("person", "1", null, "direct:invalid-dest");
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty("event-destinations", emptyList());
 		exchange.getIn().setBody(SenderRetryQueueItemInserted.getId());
@@ -202,7 +202,7 @@ public class WatcherRetryItemHandlerRouteTest extends BaseWatcherRouteTest {
 		producerTemplate.send(ROUTE_URI, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		assertEquals("No listener destination found with name " + MOCK_LISTENER, getErrorMessage(exchange));
+		assertEquals("No listener destination found with name direct:invalid-dest", getErrorMessage(exchange));
 	}
 	
 	@Test
