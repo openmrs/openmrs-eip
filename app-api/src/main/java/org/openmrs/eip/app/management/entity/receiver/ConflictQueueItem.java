@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncOperation;
+import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "receiver_conflict_queue")
@@ -56,6 +57,15 @@ public class ConflictQueueItem extends AbstractEntity {
 	
 	@Column(name = "date_received", nullable = false, updatable = false)
 	private Date dateReceived;
+	
+	public ConflictQueueItem() {
+	}
+	
+	public ConflictQueueItem(SyncMessage syncMessage) {
+		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
+		setDateReceived(syncMessage.getDateCreated());
+		setDateCreated(new Date());
+	}
 	
 	/**
 	 * Gets the modelClassName
