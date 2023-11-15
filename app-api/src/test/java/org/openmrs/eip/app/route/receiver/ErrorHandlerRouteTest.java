@@ -1,16 +1,16 @@
 package org.openmrs.eip.app.route.receiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
@@ -22,9 +22,7 @@ import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.camel.Exchange;
@@ -91,14 +89,11 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	public void shouldAddTheMessageToTheErrorQueue() {
 		final String errorMsg = "test error";
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
-		final String uuid = "person-uuid";
-		final String payLoad = "{}";
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException(errorMsg));
-		assertFalse(ReceiverTestUtils.hasRetryItem(modelClass, uuid));
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
+		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
+		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setSnapshot(true);
 		syncMessage.setMessageUuid("message-uuid");
@@ -110,38 +105,19 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		List<ReceiverRetryQueueItem> errorItems = TestUtils.getEntities(ReceiverRetryQueueItem.class).stream()
-		        .filter(r -> r.getModelClassName().equals(modelClass.getName()) && r.getIdentifier().equals(uuid))
-		        .collect(Collectors.toList());
-		assertEquals(1, errorItems.size());
-		ReceiverRetryQueueItem errorItem = errorItems.get(0);
-		assertEquals(uuid, errorItem.getIdentifier());
-		assertEquals(payLoad, errorItem.getEntityPayload());
-		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());
-		assertEquals(errorMsg, errorItem.getMessage());
-		assertEquals(1, errorItem.getAttemptCount().intValue());
-		assertNotNull(errorItem.getDateCreated());
-		assertEquals(syncMessage.getOperation(), errorItem.getOperation());
-		assertEquals(syncMessage.getSite(), errorItem.getSite());
-		assertEquals(syncMessage.getDateSentBySender(), errorItem.getDateSentBySender());
-		assertEquals(syncMessage.getMessageUuid(), errorItem.getMessageUuid());
-		assertEquals(syncMessage.getSnapshot(), errorItem.getSnapshot());
-		assertEquals(syncMessage.getDateCreated(), errorItem.getDateReceived());
-		assertNull(errorItem.getDateChanged());
-		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE, Boolean.class));
+		assertEquals(EIPException.class.getName(), exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertEquals(errorMsg, exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
 	public void shouldSetExceptionTypeToRootCause() {
 		final String rootCauseMsg = "test root error";
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
-		final String uuid = "person-uuid";
-		final String payLoad = "{}";
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException("test1", new Exception("test2", new ActiveMQException(rootCauseMsg))));
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
+		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
+		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
@@ -151,13 +127,8 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		List<ReceiverRetryQueueItem> errorItems = TestUtils.getEntities(ReceiverRetryQueueItem.class).stream()
-		        .filter(r -> r.getModelClassName().equals(modelClass.getName()) && r.getIdentifier().equals(uuid))
-		        .collect(Collectors.toList());
-		assertEquals(1, errorItems.size());
-		ReceiverRetryQueueItem errorItem = errorItems.get(0);
-		assertEquals(ActiveMQException.class.getName(), errorItem.getExceptionType());
-		assertEquals(rootCauseMsg, errorItem.getMessage());
+		assertEquals(ActiveMQException.class.getName(), exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertEquals(rootCauseMsg, exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
@@ -191,14 +162,11 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	public void shouldTruncateTheErrorMessageIfItIsLongerThan1024Characters() {
 		final String errorMsg = RandomStringUtils.randomAscii(1025);
 		final Class<? extends BaseModel> modelClass = PersonModel.class;
-		final String uuid = "person-uuid";
-		final String payLoad = "{}";
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException(errorMsg));
-		assertFalse(ReceiverTestUtils.hasRetryItem(modelClass, uuid));
 		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
+		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
+		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
 		SyncMessage syncMessage = new SyncMessage();
 		syncMessage.setOperation(SyncOperation.c);
 		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
@@ -208,13 +176,8 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		List<ReceiverRetryQueueItem> errorItems = TestUtils.getEntities(ReceiverRetryQueueItem.class).stream()
-		        .filter(r -> r.getModelClassName().equals(modelClass.getName()) && r.getIdentifier().equals(uuid))
-		        .collect(Collectors.toList());
-		assertEquals(1, errorItems.size());
-		ReceiverRetryQueueItem errorItem = errorItems.get(0);
-		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());
-		assertEquals(errorMsg.substring(0, 1024), errorItem.getMessage());
+		assertEquals(EIPException.class.getName(), exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertEquals(errorMsg.substring(0, 1024), exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test

@@ -56,6 +56,10 @@ public class ReceiverConstants {
 	
 	public static final String URI_INBOUND_DB_SYNC = "direct:" + ROUTE_ID_INBOUND_DB_SYNC;
 	
+	public static final String ROUTE_ID_ERROR_HANDLER = "inbound-error-handler";
+	
+	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
+	
 	public static final String ERROR_HANDLER_REF = "inBoundErrorHandler";
 	
 	public static final String EX_PROP_PAYLOAD = "entity-payload";
@@ -80,7 +84,9 @@ public class ReceiverConstants {
 	
 	public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToConflictQueue";
 	
-	public static final String EX_PROP_MOVED_TO_ERROR_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToErrorQueue";
+	public static final String EX_PROP_ERR_TYPE = ROUTE_ID_ERROR_HANDLER + "-errType";
+	
+	public static final String EX_PROP_ERR_MSG = ROUTE_ID_ERROR_HANDLER + "-errMsg";
 	
 	public static final String EX_PROP_IS_CONFLICT = "org.openmrs.eip.app.receiver.isConflictSync";
 	
@@ -113,10 +119,6 @@ public class ReceiverConstants {
 	public static final String ROUTE_ID_DBSYNC = "inbound-db-sync";
 	
 	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;
-	
-	public static final String ROUTE_ID_ERROR_HANDLER = "inbound-error-handler";
-	
-	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
 	
 	public static final String FIELD_VOIDED = "voided";
 	

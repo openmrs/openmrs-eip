@@ -74,37 +74,11 @@
                     <when>
                         <!-- This is a failure when processing a new message -->
                         <simple>${exchangeProperty.retry-item-id} == null</simple>
-                        <log message="Adding new item to retry queue" />
-                        <setBody>
-                            <spel>
-                                #{new org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem()}
-                            </spel>
-                        </setBody>
-                        <script>
-                            <spel>
-                                #{body.setIdentifier(getProperty('entity-id'))}
-                                #{body.setModelClassName(getProperty('model-class'))}
-                                #{body.setEntityPayload(getProperty('entity-payload', T(java.lang.String)))}
-                                #{body.setExceptionType(getProperty('exceptionType'))}
-                                #{body.setMessage(getProperty('error-msg'))}
-                                #{body.setDateCreated(new java.util.Date())}
-                                #{body.setOperation(getProperty('sync-message').getOperation())}
-                                #{body.setSite(getProperty('sync-message').getSite())}
-                                #{body.setDateSentBySender(getProperty('sync-message').getDateSentBySender())}
-                                #{body.setSnapshot(getProperty('sync-message').getSnapshot())}
-                                #{body.setMessageUuid(getProperty('sync-message').getMessageUuid())}
-                                #{body.setDateReceived(getProperty('sync-message').getDateCreated())}
-                            </spel>
-                        </script>
-
-                        <log message="Saving retry item" loggingLevel="DEBUG" />
-
-                        <to uri="jpa:ReceiverRetryQueueItem?usePersist=true" />
-
-                        <log message="Successfully saved retry item" loggingLevel="DEBUG" />
-
-                        <setProperty name="org.openmrs.eip.app.receiver.sync-movedToErrorQueue">
-                            <simple>true</simple>
+                        <setProperty name="${routeId}-errType">
+                            <exchangeProperty>exceptionType</exchangeProperty>
+                        </setProperty>
+                        <setProperty name="${routeId}-errMsg">
+                            <exchangeProperty>error-msg</exchangeProperty>
                         </setProperty>
                     </when>
                     <otherwise>

@@ -7,10 +7,11 @@ import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_ERROR_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
@@ -92,7 +93,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
@@ -114,7 +116,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
@@ -141,7 +144,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		mockLoadEndpoint.assertIsSatisfied();
 		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_ERROR_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
+		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
