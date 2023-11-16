@@ -13,12 +13,14 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
@@ -49,6 +51,9 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ReceiverRetryRepository retryRepo;
+	
+	@Autowired
+	private ConflictRepository conflictRepo;
 	
 	@Autowired
 	private ReceiverPrunedItemRepository prunedRepo;
@@ -206,6 +211,27 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(msg.getMessageUuid(), retryItems.get(0).getMessageUuid());
 		assertEquals(exception, retryItems.get(0).getExceptionType());
 		assertEquals(errMsg, retryItems.get(0).getMessage());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void processConflictedSyncItem_shouldAddTheItemToTheConflictAndSyncedQueues() {
+		final Long id = 1L;
+		SyncMessage msg = syncMsgRepo.findById(id).get();
+		assertEquals(0, syncedMsgRepo.count());
+		assertEquals(0, conflictRepo.count());
+		
+		service.processConflictedSyncItem(msg);
+		
+		assertFalse(syncMsgRepo.findById(id).isPresent());
+		List<SyncedMessage> syncedItems = syncedMsgRepo.findAll();
+		assertEquals(1, syncedItems.size());
+		assertEquals(msg.getMessageUuid(), syncedItems.get(0).getMessageUuid());
+		assertEquals(SyncOutcome.CONFLICT, syncedItems.get(0).getOutcome());
+		List<ConflictQueueItem> conflictItems = conflictRepo.findAll();
+		assertEquals(1, conflictItems.size());
+		assertEquals(msg.getMessageUuid(), conflictItems.get(0).getMessageUuid());
 	}
 	
 }

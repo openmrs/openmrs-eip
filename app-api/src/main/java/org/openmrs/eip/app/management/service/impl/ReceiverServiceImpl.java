@@ -7,12 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
@@ -48,6 +50,8 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	private ReceiverRetryRepository retryRepo;
 	
+	private ConflictRepository conflictRepo;
+	
 	private ReceiverPrunedItemRepository prunedRepo;
 	
 	private EntityServiceFacade serviceFacade;
@@ -55,12 +59,13 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	private ProducerTemplate producerTemplate;
 	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
-	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo,
+	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo, ConflictRepository conflictRepo,
 	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
 		this.syncMsgRepo = syncMsgRepo;
 		this.syncedMsgRepo = syncedMsgRepo;
 		this.archiveRepo = archiveRepo;
 		this.retryRepo = retryRepo;
+		this.conflictRepo = conflictRepo;
 		this.prunedRepo = prunedRepo;
 		this.serviceFacade = serviceFacade;
 		this.producerTemplate = producerTemplate;
@@ -196,7 +201,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void processFailedSyncItem(SyncMessage message, String exceptionType, String errorMsg) {
-		log.info("Adding new item to retry queue");
+		log.info("Adding item to retry queue");
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem(message, exceptionType, errorMsg);
 		if (log.isDebugEnabled()) {
 			log.debug("Saving retry item");
@@ -209,6 +214,24 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		}
 		
 		moveToSyncedQueue(message, SyncOutcome.ERROR);
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void processConflictedSyncItem(SyncMessage message) {
+		log.info("Adding item to conflict queue");
+		ConflictQueueItem conflict = new ConflictQueueItem(message);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving conflict item");
+		}
+		
+		conflictRepo.save(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved conflict item");
+		}
+		
+		moveToSyncedQueue(message, SyncOutcome.CONFLICT);
 	}
 	
 }

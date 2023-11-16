@@ -73,4 +73,11 @@ public interface ReceiverService extends Service {
 	 */
 	void processFailedSyncItem(SyncMessage message, String exceptionType, String errorMsg);
 	
+	/**
+	 * Adds a sync item to the conflict and synced queues.
+	 *
+	 * @param message the conflicted sync item
+	 */
+	void processConflictedSyncItem(SyncMessage message);
+	
 }
