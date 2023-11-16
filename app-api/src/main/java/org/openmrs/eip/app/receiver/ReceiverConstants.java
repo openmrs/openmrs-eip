@@ -82,7 +82,7 @@ public class ReceiverConstants {
 	
 	public static final String EX_PROP_MSG_PROCESSED = "org.openmrs.eip.app.receiver.sync-msgProcessed";
 	
-	public static final String EX_PROP_MOVED_TO_CONFLICT_QUEUE = "org.openmrs.eip.app.receiver.sync-movedToConflictQueue";
+	public static final String EX_PROP_FOUND_CONFLICT = ROUTE_ID_INBOUND_DB_SYNC + "-foundConflict";
 	
 	public static final String EX_PROP_ERR_TYPE = ROUTE_ID_ERROR_HANDLER + "-errType";
 	

@@ -6,7 +6,7 @@ import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SYNC_TASK_BATCH_SIZE;
 
@@ -256,21 +256,17 @@ public class SiteMessageConsumer implements Runnable {
 			}
 		}
 		
-		boolean movedToConflict = exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, false, Boolean.class);
+		boolean foundConflict = exchange.getProperty(EX_PROP_FOUND_CONFLICT, false, Boolean.class);
 		String errorType = exchange.getProperty(EX_PROP_ERR_TYPE, String.class);
 		String errorMsg = exchange.getProperty(EX_PROP_ERR_MSG, String.class);
 		boolean msgProcessed = exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class);
 		
-		if (msgProcessed || movedToConflict || errorType != null) {
-			if (errorType != null) {
-				service.processFailedSyncItem(msg, errorType, errorMsg);
-			} else {
-				SyncOutcome outcome = movedToConflict ? SyncOutcome.CONFLICT : SyncOutcome.SUCCESS;
-				
-				log.info("Moving the item to the synced queue with outcome as: " + outcome);
-				
-				service.moveToSyncedQueue(msg, outcome);
-			}
+		if (msgProcessed) {
+			service.moveToSyncedQueue(msg, SyncOutcome.SUCCESS);
+		} else if (foundConflict) {
+			service.processConflictedSyncItem(msg);
+		} else if (errorType != null) {
+			service.processFailedSyncItem(msg, errorType, errorMsg);
 		} else {
 			throw new EIPException("Something went wrong while processing sync message -> " + msg);
 		}

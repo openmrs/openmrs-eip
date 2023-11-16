@@ -9,13 +9,11 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SYNC_MESSAGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_DBSYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_DBSYNC;
 
@@ -33,7 +31,6 @@ import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
@@ -92,7 +89,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		
 		mockLoadEndpoint.assertIsSatisfied();
 		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_FOUND_CONFLICT));
 		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
 		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
@@ -115,7 +112,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		    getErrorMessage(exchange));
 		mockLoadEndpoint.assertIsSatisfied();
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_FOUND_CONFLICT));
 		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
 		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
@@ -143,37 +140,15 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		
 		mockLoadEndpoint.assertIsSatisfied();
 		assertTrue(exchange.getProperty(EX_PROP_MSG_PROCESSED, Boolean.class));
-		assertNull(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE));
+		assertNull(exchange.getProperty(EX_PROP_FOUND_CONFLICT));
 		assertNull(exchange.getProperty(EX_PROP_ERR_TYPE));
 		assertNull(exchange.getProperty(EX_PROP_ERR_MSG));
 	}
 	
 	@Test
-	public void shouldAddTheMessageToTheConflictQueueIfAConflictIsDetected() throws Exception {
-		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
-		final Class<? extends BaseModel> modelClass = UserModel.class;
-		final String uuid = "user-uuid";
-		final String payLoad = "{}";
-		UserModel model = new UserModel();
-		model.setUuid(uuid);
-		SyncModel syncModel = new SyncModel();
-		syncModel.setTableToSyncModelClass(modelClass);
-		syncModel.setModel(model);
-		syncModel.setMetadata(new SyncMetadata());
+	public void shouldGracefullyHandleAConflictException() throws Exception {
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.setProperty(EX_PROP_PAYLOAD, payLoad);
-		SyncMessage syncMessage = new SyncMessage();
-		syncMessage.setOperation(SyncOperation.c);
-		syncMessage.setSnapshot(true);
-		syncMessage.setMessageUuid("message-uuid");
-		syncMessage.setDateCreated(new Date());
-		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
-		syncMessage.setDateSentBySender(LocalDateTime.now());
-		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
-		exchange.getIn().setBody(syncModel);
-		mockLoadEndpoint.expectedBodiesReceived(syncModel);
+		exchange.setProperty(EX_PROP_MODEL_CLASS, UserModel.class.getName());
 		mockLoadEndpoint.whenAnyExchangeReceived(e -> {
 			throw new ConflictsFoundException();
 		});
@@ -181,20 +156,8 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
 		mockLoadEndpoint.assertIsSatisfied();
-		List<ConflictQueueItem> conflicts = TestUtils.getEntities(ConflictQueueItem.class);
-		assertEquals(1, conflicts.size());
-		ConflictQueueItem conflict = conflicts.get(0);
-		assertEquals(modelClass.getName(), conflict.getModelClassName());
-		assertEquals(uuid, conflict.getIdentifier());
-		assertEquals(syncMessage.getOperation(), conflict.getOperation());
-		assertEquals(payLoad, conflict.getEntityPayload());
-		assertEquals(syncMessage.getSite(), conflict.getSite());
-		assertEquals(syncMessage.getDateSentBySender(), conflict.getDateSentBySender());
-		assertEquals(syncMessage.getMessageUuid(), conflict.getMessageUuid());
-		assertEquals(syncMessage.getSnapshot(), conflict.getSnapshot());
-		assertEquals(syncMessage.getDateCreated(), conflict.getDateReceived());
-		assertNotNull(conflict.getDateCreated());
-		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
+		
+		assertTrue(exchange.getProperty(EX_PROP_FOUND_CONFLICT, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	
@@ -245,7 +208,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		assertEquals(retry.getDateReceived(), conflict.getDateReceived());
 		assertEquals(retry.getSite(), conflict.getSite());
 		assertNotNull(conflict.getDateCreated());
-		assertTrue(exchange.getProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, Boolean.class));
+		assertTrue(exchange.getProperty("org.openmrs.eip.app.receiver.sync-movedToConflictQueue", Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	

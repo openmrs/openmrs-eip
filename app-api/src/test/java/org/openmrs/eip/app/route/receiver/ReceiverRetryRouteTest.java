@@ -10,7 +10,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MOVED_TO_CONFLICT_QUEUE;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
@@ -282,7 +282,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		final AtomicInteger attemptCountHolder = new AtomicInteger();
 		mockMsgProcessorEndpoint.whenAnyExchangeReceived(e -> {
 			attemptCountHolder.set(e.getProperty(EX_PROP_RETRY_ITEM, ReceiverRetryQueueItem.class).getAttemptCount());
-			e.setProperty(EX_PROP_MOVED_TO_CONFLICT_QUEUE, true);
+			e.setProperty(EX_PROP_FOUND_CONFLICT, true);
 		});
 		
 		producerTemplate.send(URI_RETRY, new DefaultExchange(camelContext));

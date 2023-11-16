@@ -6,21 +6,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_PAYLOAD;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_SYNC_MESSAGE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_ERROR_HANDLER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_ERROR_HANDLER;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,16 +27,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
-import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.Constants;
-import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
-import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PatientModel;
-import org.openmrs.eip.component.model.PersonModel;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -88,20 +77,8 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	@Test
 	public void shouldAddTheMessageToTheErrorQueue() {
 		final String errorMsg = "test error";
-		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException(errorMsg));
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
-		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
-		SyncMessage syncMessage = new SyncMessage();
-		syncMessage.setSnapshot(true);
-		syncMessage.setMessageUuid("message-uuid");
-		syncMessage.setOperation(SyncOperation.c);
-		syncMessage.setDateCreated(new Date());
-		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
-		syncMessage.setDateSentBySender(LocalDateTime.now());
-		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
@@ -112,18 +89,8 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	@Test
 	public void shouldSetExceptionTypeToRootCause() {
 		final String rootCauseMsg = "test root error";
-		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException("test1", new Exception("test2", new ActiveMQException(rootCauseMsg))));
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
-		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
-		SyncMessage syncMessage = new SyncMessage();
-		syncMessage.setOperation(SyncOperation.c);
-		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
-		syncMessage.setDateSentBySender(LocalDateTime.now());
-		syncMessage.setDateCreated(new Date());
-		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
@@ -161,18 +128,8 @@ public class ErrorHandlerRouteTest extends BaseReceiverRouteTest {
 	@Test
 	public void shouldTruncateTheErrorMessageIfItIsLongerThan1024Characters() {
 		final String errorMsg = RandomStringUtils.randomAscii(1025);
-		final Class<? extends BaseModel> modelClass = PersonModel.class;
 		DefaultExchange exchange = new DefaultExchange(camelContext);
 		exchange.setException(new EIPException(errorMsg));
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, "person-uuid");
-		exchange.setProperty(EX_PROP_PAYLOAD, "{}");
-		SyncMessage syncMessage = new SyncMessage();
-		syncMessage.setOperation(SyncOperation.c);
-		syncMessage.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
-		syncMessage.setDateSentBySender(LocalDateTime.now());
-		syncMessage.setDateCreated(new Date());
-		exchange.setProperty(EX_PROP_SYNC_MESSAGE, syncMessage);
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
