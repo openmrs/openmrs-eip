@@ -80,4 +80,11 @@ public interface ReceiverService extends Service {
 	 */
 	void processConflictedSyncItem(SyncMessage message);
 	
+	/**
+	 * Moves the specified retry item to the conflict queue
+	 *
+	 * @param retry the message to move
+	 */
+	void moveToConflictQueue(ReceiverRetryQueueItem retry);
+	
 }

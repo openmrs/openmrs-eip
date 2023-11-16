@@ -55,4 +55,42 @@ public class ConflictQueueItemTest {
 		}
 	}
 	
+	@Test
+	public void shouldCreateAConflictItemFromARetryItem() throws Exception {
+		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(ReceiverRetryQueueItem.class);
+		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setId(1L);
+		retry.setDateCreated(new Date());
+		retry.setIdentifier("uuid");
+		retry.setEntityPayload("payload");
+		retry.setModelClassName(PersonModel.class.getName());
+		retry.setSite(new SiteInfo());
+		retry.setSnapshot(true);
+		retry.setMessageUuid("message-uuid");
+		retry.setDateSentBySender(LocalDateTime.now());
+		retry.setDateReceived(new Date());
+		long timestamp = System.currentTimeMillis();
+		
+		ConflictQueueItem conflict = new ConflictQueueItem(retry);
+		
+		Assert.assertNull(conflict.getId());
+		assertTrue(conflict.getDateCreated().getTime() == timestamp || conflict.getDateCreated().getTime() > timestamp);
+		Set<String> ignored = new HashSet();
+		ignored.add("id");
+		ignored.add("class");
+		ignored.add("dateCreated");
+		ignored.add("attemptCount");
+		ignored.add("dateChanged");
+		ignored.add("exceptionType");
+		ignored.add("message");
+		for (PropertyDescriptor descriptor : descriptors) {
+			if (ignored.contains(descriptor.getName())) {
+				continue;
+			}
+			
+			String getter = descriptor.getReadMethod().getName();
+			assertEquals(invokeMethod(retry, getter), invokeMethod(conflict, getter));
+		}
+	}
+	
 }

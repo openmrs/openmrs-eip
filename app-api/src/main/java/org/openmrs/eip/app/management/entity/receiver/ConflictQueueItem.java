@@ -67,6 +67,11 @@ public class ConflictQueueItem extends AbstractEntity {
 		setDateCreated(new Date());
 	}
 	
+	public ConflictQueueItem(ReceiverRetryQueueItem retry) {
+		BeanUtils.copyProperties(retry, this, "id", "dateCreated");
+		setDateCreated(new Date());
+	}
+	
 	/**
 	 * Gets the modelClassName
 	 *

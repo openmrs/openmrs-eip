@@ -234,4 +234,27 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		moveToSyncedQueue(message, SyncOutcome.CONFLICT);
 	}
 	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void moveToConflictQueue(ReceiverRetryQueueItem retry) {
+		log.info("Moving to conflict queue the retry item with uuid: " + retry.getMessageUuid());
+		
+		ConflictQueueItem conflict = new ConflictQueueItem(retry);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving conflict item");
+		}
+		
+		conflictRepo.save(conflict);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved conflict item, removing the retry item from the queue");
+		}
+		
+		retryRepo.delete(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed the retry item from the queue");
+		}
+	}
+	
 }
