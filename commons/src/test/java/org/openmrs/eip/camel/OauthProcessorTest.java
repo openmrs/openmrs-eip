@@ -143,7 +143,7 @@ public class OauthProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() throws Exception {
+	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() {
 		setInternalState(processor, "isOauthEnabled", true);
 		Map<String, Object> testResponse = new HashMap<>();
 		testResponse.put(OauthProcessor.FIELD_TOKEN, "some-token");
@@ -153,14 +153,12 @@ public class OauthProcessorTest {
 		assertNull(getInternalState(processor, "oauthToken"));
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
-		assertThrows(EIPException.class, () -> {
-			try {
-				processor.process(exchange);
-			}
-			catch (Exception e) {
-				throw new EIPException("Unsupported oauth token type: " + type, e);
-			}
-		}, "Unsupported oauth token type: " + type);
+		try {
+			processor.process(exchange);
+		}
+		catch (Exception e) {
+			assertEquals("Unsupported oauth token type: " + type, e.getMessage());
+		}
 	}
 	
 	@Test

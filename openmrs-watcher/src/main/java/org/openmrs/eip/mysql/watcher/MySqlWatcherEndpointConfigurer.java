@@ -19,7 +19,7 @@ public class MySqlWatcherEndpointConfigurer extends PropertyConfigurerSupport im
 	
 	@Override
 	public Class<?> getOptionType(String name, boolean ignoreCase) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
