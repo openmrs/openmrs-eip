@@ -6,7 +6,6 @@ import static java.time.ZoneId.systemDefault;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -143,7 +142,7 @@ public class OauthProcessorTest {
 	}
 	
 	@Test
-	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() {
+	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() throws Exception {
 		setInternalState(processor, "isOauthEnabled", true);
 		Map<String, Object> testResponse = new HashMap<>();
 		testResponse.put(OauthProcessor.FIELD_TOKEN, "some-token");
@@ -156,8 +155,8 @@ public class OauthProcessorTest {
 		try {
 			processor.process(exchange);
 		}
-		catch (Exception e) {
-			assertEquals("Unsupported oauth token type: " + type, e.getMessage());
+		catch (EIPException exception) {
+			assertEquals("Unsupported oauth token type: " + type, exception.getMessage());
 		}
 	}
 	

@@ -219,7 +219,6 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		final Integer orderId = 110;
 		final Integer previousOrderId = 109;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
-		addRetryItem(tableName, previousOrderId.toString(), previousOrderId.toString(), "mock:other");
 		Event event = createEvent(tableName, orderId.toString(), ORDER_UUID, "c");
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty("retry-item-id", 1);
