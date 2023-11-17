@@ -234,4 +234,23 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(msg.getMessageUuid(), conflictItems.get(0).getMessageUuid());
 	}
 	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_retry_queue.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToConflictQueue_shouldMoveTheRetryItemToTheConflictQueue() {
+		final Long id = 1L;
+		ReceiverRetryQueueItem retry = retryRepo.findById(id).get();
+		assertEquals(0, conflictRepo.count());
+		long timestamp = System.currentTimeMillis();
+		
+		service.moveToConflictQueue(retry);
+		
+		assertFalse(retryRepo.findById(id).isPresent());
+		List<ConflictQueueItem> conflicts = conflictRepo.findAll();
+		assertEquals(1, conflicts.size());
+		ConflictQueueItem c = conflicts.get(0);
+		assertEquals(retry.getMessageUuid(), c.getMessageUuid());
+		assertTrue(c.getDateCreated().getTime() == timestamp || c.getDateCreated().getTime() > timestamp);
+	}
+	
 }
