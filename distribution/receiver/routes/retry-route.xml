@@ -66,7 +66,7 @@
 
                             <choice>
                                 <when>
-                                    <simple>${exchangeProperty[org.openmrs.eip.app.receiver.sync-msgProcessed]} == true || ${exchangeProperty[org.openmrs.eip.app.receiver.sync-movedToConflictQueue]} == true</simple>
+                                    <simple>${exchangeProperty[org.openmrs.eip.app.receiver.sync-msgProcessed]} == true || ${exchangeProperty[inbound-db-sync-foundConflict]} == true</simple>
                                     <choice>
                                         <when>
                                             <simple>${exchangeProperty[org.openmrs.eip.app.receiver.sync-msgProcessed]} == true</simple>
@@ -75,11 +75,7 @@
                                             <bean ref="receiverService" method="archiveRetry(${exchangeProperty.retry-item})" />
                                         </when>
                                         <otherwise>
-                                            <log loggingLevel="DEBUG" message="Removing from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
-
-                                            <bean ref="receiverRetryRepository" method="delete(${exchangeProperty.retry-item})" />
-
-                                            <log loggingLevel="DEBUG" message="Successfully removed from the error queue an item with id: ${exchangeProperty.retry-item-id}" />
+                                            <bean ref="receiverService" method="moveToConflictQueue(${exchangeProperty.retry-item})" />
                                         </otherwise>
                                     </choice>
                                 </when>

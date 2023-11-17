@@ -36,50 +36,9 @@
 
                     <doCatch>
                         <exception>org.openmrs.eip.component.exception.ConflictsFoundException</exception>
-                        <setBody>
-                            <spel>
-                                #{new org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem()}
-                            </spel>
-                        </setBody>
-
-                        <choice>
-                            <when>
-                                <!-- This is a new message with a conflict -->
-                                <simple>${exchangeProperty.retry-item} == null</simple>
-                                <setProperty name="${routeId}-foundConflict">
-                                    <simple>true</simple>
-                                </setProperty>
-                            </when>
-                            <otherwise>
-                                <!-- This is a retry attempt with a conflict -->
-                                <log message="Adding message to conflict queue" />
-
-                                <script>
-                                    <spel>
-                                        #{body.setIdentifier(getProperty('retry-item').getIdentifier())}
-                                        #{body.setModelClassName(getProperty('retry-item').getModelClassName())}
-                                        #{body.setOperation(getProperty('retry-item').getOperation())}
-                                        #{body.setEntityPayload(getProperty('retry-item').getEntityPayload())}
-                                        #{body.setDateCreated(new java.util.Date())}
-                                        #{body.setSite(getProperty('retry-item').getSite())}
-                                        #{body.setDateSentBySender(getProperty('retry-item').getDateSentBySender())}
-                                        #{body.setSnapshot(getProperty('retry-item').getSnapshot())}
-                                        #{body.setMessageUuid(getProperty('retry-item').getMessageUuid())}
-                                        #{body.setDateReceived(getProperty('retry-item').getDateReceived())}
-                                    </spel>
-                                </script>
-
-                                <log message="Saving conflict item" loggingLevel="DEBUG" />
-
-                                <to uri="jpa:ConflictQueueItem" />
-
-                                <log message="Successfully saved conflict item" loggingLevel="DEBUG" />
-
-                                <setProperty name="org.openmrs.eip.app.receiver.sync-movedToConflictQueue">
-                                    <simple>true</simple>
-                                </setProperty>
-                            </otherwise>
-                        </choice>
+                        <setProperty name="${routeId}-foundConflict">
+                            <simple>true</simple>
+                        </setProperty>
                     </doCatch>
                 </doTry>
             </otherwise>

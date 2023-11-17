@@ -9,8 +9,8 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FAILED_ENTITIES;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFLICT;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM_ID;
@@ -38,15 +38,19 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -65,6 +69,12 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	private TestBean testCacheBean;
 	
 	private TestBean testIndexBean;
+	
+	@Autowired
+	private ConflictRepository conflictRepo;
+	
+	@Autowired
+	private ReceiverRetryRepository retryRepo;
 	
 	public class TestBean {
 		
@@ -258,10 +268,12 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
-	public void shouldProcessARetryItemAndRemoveItFromTheErrorQueueIfAConflictIsEncountered() throws Exception {
+	public void shouldMoveTheRetryItemToTheConflictQueueIfAConflictIsEncountered() throws Exception {
 		final String uuid = "person-uuid";
+		final String msgUuid = "msg-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setMessageUuid(msgUuid);
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
 		retry.setOperation(SyncOperation.c);
@@ -272,7 +284,8 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setDateSentBySender(LocalDateTime.now());
 		retry.setDateReceived(new Date());
 		TestUtils.saveEntity(retry);
-		assertEquals(1, getEntities(ReceiverRetryQueueItem.class).size());
+		assertEquals(1, retryRepo.count());
+		assertEquals(0, conflictRepo.count());
 		mockMsgProcessorEndpoint.expectedMessageCount(1);
 		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_RETRY_ITEM_ID, retry.getId());
 		mockMsgProcessorEndpoint.expectedPropertyReceived(EX_PROP_RETRY_ITEM, retry);
@@ -290,7 +303,10 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		mockMsgProcessorEndpoint.assertIsSatisfied();
 		assertTrue(testCacheBean.retries.isEmpty());
 		assertTrue(testIndexBean.retries.isEmpty());
-		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
+		List<ConflictQueueItem> conflicts = conflictRepo.findAll();
+		assertEquals(1, conflicts.size());
+		assertEquals(msgUuid, conflicts.get(0).getMessageUuid());
+		assertEquals(0, retryRepo.count());
 		assertEquals(2, attemptCountHolder.get());
 	}
 	

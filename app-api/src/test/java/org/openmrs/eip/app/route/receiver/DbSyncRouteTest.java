@@ -1,7 +1,6 @@
 package org.openmrs.eip.app.route.receiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
@@ -13,13 +12,8 @@ import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFL
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_RETRY_ITEM;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_DBSYNC;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_DBSYNC;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -29,10 +23,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.route.TestUtils;
-import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
@@ -156,38 +147,15 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
 		mockLoadEndpoint.assertIsSatisfied();
-		
 		assertTrue(exchange.getProperty(EX_PROP_FOUND_CONFLICT, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	
 	@Test
-	public void shouldAddTheMessageToTheConflictQueueIfAConflictIsDetectedForARetryItem() throws Exception {
+	public void shouldGracefullyHandleAConflictExceptionForARetryItem() throws Exception {
 		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
-		final Class<? extends BaseModel> modelClass = UserModel.class;
-		final String uuid = "user-uuid";
-		final String payLoad = "{}";
-		UserModel model = new UserModel();
-		model.setUuid(uuid);
-		SyncModel syncModel = new SyncModel();
-		syncModel.setTableToSyncModelClass(modelClass);
-		syncModel.setModel(model);
-		syncModel.setMetadata(new SyncMetadata());
-		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
-		retry.setModelClassName(modelClass.getName());
-		retry.setIdentifier(uuid);
-		retry.setOperation(SyncOperation.u);
-		retry.setEntityPayload(payLoad);
-		retry.setSnapshot(true);
-		retry.setSite(TestUtils.getEntity(SiteInfo.class, 1L));
-		retry.setDateSentBySender(LocalDateTime.now());
-		retry.setDateReceived(new Date());
 		Exchange exchange = new DefaultExchange(camelContext);
-		exchange.setProperty(EX_PROP_MODEL_CLASS, modelClass.getName());
-		exchange.setProperty(EX_PROP_ENTITY_ID, uuid);
-		exchange.setProperty(EX_PROP_RETRY_ITEM, retry);
-		exchange.getIn().setBody(syncModel);
-		mockLoadEndpoint.expectedBodiesReceived(syncModel);
+		exchange.setProperty(EX_PROP_MODEL_CLASS, UserModel.class.getName());
 		mockLoadEndpoint.whenAnyExchangeReceived(e -> {
 			throw new ConflictsFoundException();
 		});
@@ -195,20 +163,7 @@ public class DbSyncRouteTest extends BaseReceiverRouteTest {
 		producerTemplate.send(URI_DBSYNC, exchange);
 		
 		mockLoadEndpoint.assertIsSatisfied();
-		List<ConflictQueueItem> conflicts = TestUtils.getEntities(ConflictQueueItem.class);
-		assertEquals(1, conflicts.size());
-		ConflictQueueItem conflict = conflicts.get(0);
-		assertEquals(modelClass.getName(), conflict.getModelClassName());
-		assertEquals(uuid, conflict.getIdentifier());
-		assertEquals(retry.getOperation(), conflict.getOperation());
-		assertEquals(payLoad, conflict.getEntityPayload());
-		assertEquals(retry.getDateSentBySender(), conflict.getDateSentBySender());
-		assertEquals(retry.getMessageUuid(), conflict.getMessageUuid());
-		assertEquals(retry.getSnapshot(), conflict.getSnapshot());
-		assertEquals(retry.getDateReceived(), conflict.getDateReceived());
-		assertEquals(retry.getSite(), conflict.getSite());
-		assertNotNull(conflict.getDateCreated());
-		assertTrue(exchange.getProperty("org.openmrs.eip.app.receiver.sync-movedToConflictQueue", Boolean.class));
+		assertTrue(exchange.getProperty(EX_PROP_FOUND_CONFLICT, Boolean.class));
 		assertNull(exchange.getProperty(EX_PROP_MSG_PROCESSED));
 	}
 	
