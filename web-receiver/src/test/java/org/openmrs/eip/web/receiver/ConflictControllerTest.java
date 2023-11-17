@@ -30,12 +30,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.Holder;
-
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openmrs.eip.Holder;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
