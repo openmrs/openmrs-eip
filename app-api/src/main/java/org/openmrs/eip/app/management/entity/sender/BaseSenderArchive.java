@@ -3,11 +3,11 @@ package org.openmrs.eip.app.management.entity.sender;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-
 import org.openmrs.eip.app.management.entity.AbstractEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 @MappedSuperclass
 public abstract class BaseSenderArchive extends AbstractEntity {

@@ -2,10 +2,10 @@ package org.openmrs.eip.app.management.entity.sender;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.springframework.beans.BeanUtils;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "sender_pruned_archive")

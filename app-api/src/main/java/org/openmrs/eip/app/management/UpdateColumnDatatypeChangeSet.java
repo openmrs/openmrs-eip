@@ -4,7 +4,7 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.slf4j.Logger;

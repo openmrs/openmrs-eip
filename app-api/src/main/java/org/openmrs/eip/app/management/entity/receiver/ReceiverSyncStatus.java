@@ -1,14 +1,14 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
-import org.openmrs.eip.app.management.entity.AbstractEntity;
-
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import org.openmrs.eip.app.management.entity.AbstractEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "receiver_sync_status")

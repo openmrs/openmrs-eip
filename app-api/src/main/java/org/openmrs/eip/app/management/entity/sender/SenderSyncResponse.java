@@ -1,13 +1,13 @@
 package org.openmrs.eip.app.management.entity.sender;
 
-import org.openmrs.eip.app.management.entity.AbstractEntity;
-
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import org.openmrs.eip.app.management.entity.AbstractEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sender_sync_response")

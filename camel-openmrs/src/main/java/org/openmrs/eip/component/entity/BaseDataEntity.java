@@ -1,16 +1,17 @@
 package org.openmrs.eip.component.entity;
 
+import static java.util.Collections.singleton;
+
+import java.time.LocalDateTime;
+
 import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.utils.DateUtils;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-
-import static java.util.Collections.singleton;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * OpenMRS data model distinguishes between data and metadata, please refer to the javadocs in

@@ -1,13 +1,14 @@
 package org.openmrs.eip.component.entity;
 
+import java.time.LocalDateTime;
+
 import org.openmrs.eip.component.entity.light.UserLight;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 @MappedSuperclass
 public abstract class BaseCreatableEntity extends BaseEntity {

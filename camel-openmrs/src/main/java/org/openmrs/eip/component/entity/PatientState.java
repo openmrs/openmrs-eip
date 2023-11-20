@@ -1,18 +1,19 @@
 package org.openmrs.eip.component.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.time.LocalDate;
+
 import org.openmrs.eip.component.entity.light.PatientProgramLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowStateLight;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -3,8 +3,8 @@ package org.openmrs.eip.component.entity;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Transient;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 
 @Embeddable
 public class Event implements Serializable {

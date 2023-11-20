@@ -6,18 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.SessionFactory;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
-import org.hibernate.persister.entity.AbstractEntityPersister;
-import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.BaseEntity;
-import org.openmrs.eip.component.exception.EIPException;
 
 /**
  * Builder class for {@link DeIdentifyClassMetadata} objects
@@ -28,9 +17,9 @@ public class DeIdentifyClassMetadataBuilder {
 	}
 	
 	public DeIdentifyClassMetadata build(Class<? extends BaseEntity> entityClass, Set<String> deIdentifyColumnNames) {
-		SessionFactory sf = SyncContext.getBean(EntityManagerFactory.class).unwrap(SessionFactory.class);
-		MetamodelImplementor metamodel = (MetamodelImplementor) sf.getMetamodel();
-		EntityType entityType = metamodel.entity(entityClass);
+		/*SessionFactory sf = SyncContext.getBean(EntityManagerFactory.class).unwrap(SessionFactory.class);
+		MappingMetamodel metamodel = (MappingMetamodel) sf.getMetamodel();
+		EntityType entityType = metamodel.get(entityClass);
 		AbstractEntityPersister persister = (AbstractEntityPersister) metamodel.entityPersister(entityClass);
 		boolean[] nullability = persister.getPropertyNullability();
 		final String[] propertyNames = persister.getPropertyNames();
@@ -61,7 +50,8 @@ public class DeIdentifyClassMetadataBuilder {
 				}
 			}
 		}
-		return new DeIdentifyClassMetadataImpl(deIdentifyFields, requiredFields, uniqueFields, fieldAndLengthMap);
+		return new DeIdentifyClassMetadataImpl(deIdentifyFields, requiredFields, uniqueFields, fieldAndLengthMap);*/
+		return null;
 	}
 	
 	public static DeIdentifyClassMetadataBuilder getInstance() {

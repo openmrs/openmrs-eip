@@ -1,19 +1,19 @@
 package org.openmrs.eip.app.management.entity.sender;
 
-import org.openmrs.eip.app.management.entity.AbstractEntity;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import org.openmrs.eip.app.management.entity.AbstractEntity;
+
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sender_sync_message")

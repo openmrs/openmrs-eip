@@ -1,13 +1,12 @@
 package org.openmrs.eip.deindentification;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
-
 import org.openmrs.eip.component.entity.BaseCreatableEntity;
 import org.openmrs.eip.component.entity.BaseEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "mock")

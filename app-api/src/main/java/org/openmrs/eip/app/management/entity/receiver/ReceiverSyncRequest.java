@@ -1,20 +1,20 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
+import java.util.Date;
+
 import org.openmrs.eip.app.management.entity.BaseSyncRequest;
 import org.openmrs.eip.app.management.entity.SyncRequestModel;
 
-import java.util.Date;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Encapsulates info about a request made by the receiver to a remote site to sync an single entity

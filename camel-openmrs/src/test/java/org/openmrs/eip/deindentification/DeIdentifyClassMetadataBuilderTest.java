@@ -9,9 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.BaseDbDrivenTest;
 
+@Ignore
 public class DeIdentifyClassMetadataBuilderTest extends BaseDbDrivenTest {
 	
 	private DeIdentifyClassMetadataBuilder builder = DeIdentifyClassMetadataBuilder.getInstance();

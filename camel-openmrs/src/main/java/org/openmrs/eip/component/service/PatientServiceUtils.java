@@ -2,10 +2,10 @@ package org.openmrs.eip.component.service;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.eip.component.SyncContext;

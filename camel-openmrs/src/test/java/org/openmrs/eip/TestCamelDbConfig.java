@@ -2,8 +2,6 @@ package org.openmrs.eip;
 
 import java.util.HashMap;
 
-import javax.jms.ConnectionFactory;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.camel.CamelContext;
@@ -23,6 +21,8 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import jakarta.persistence.EntityManagerFactory;
 
 @EnableAutoConfiguration
 @ComponentScan

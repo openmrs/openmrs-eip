@@ -2,8 +2,8 @@ package org.openmrs.eip.component.management.hash.entity;
 
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users_hash")

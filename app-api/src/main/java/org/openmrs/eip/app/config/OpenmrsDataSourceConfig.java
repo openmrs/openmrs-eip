@@ -2,7 +2,6 @@ package org.openmrs.eip.app.config;
 
 import static java.util.Collections.singletonMap;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.openmrs.eip.app.SyncConstants;
@@ -22,6 +21,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import jakarta.persistence.EntityManagerFactory;
 
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "openmrsEntityManager", transactionManagerRef = "openmrsTransactionManager", basePackages = {

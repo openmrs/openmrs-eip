@@ -3,7 +3,7 @@ package org.openmrs.eip.component.common;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Data
 @EqualsAndHashCode

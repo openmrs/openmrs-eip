@@ -2,10 +2,10 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.springframework.beans.BeanUtils;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "receiver_pruned_item")

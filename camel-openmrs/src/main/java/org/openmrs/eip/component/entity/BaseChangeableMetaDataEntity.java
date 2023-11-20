@@ -1,15 +1,16 @@
 package org.openmrs.eip.component.entity;
 
-import org.openmrs.eip.component.entity.light.UserLight;
-import org.openmrs.eip.component.utils.DateUtils;
-
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import org.openmrs.eip.component.entity.light.UserLight;
+import org.openmrs.eip.component.utils.DateUtils;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class BaseChangeableMetaDataEntity extends BaseMetaDataEntity {
