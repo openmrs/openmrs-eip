@@ -5,6 +5,7 @@ import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_URI_ERROR_HAND
 import org.openmrs.eip.BaseDbBackedCamelTest;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.mysql.watcher.Event;
+import org.openmrs.eip.mysql.watcher.TestOpenmrsDataSourceConfig;
 import org.openmrs.eip.mysql.watcher.WatcherTestUtils;
 import org.openmrs.eip.mysql.watcher.config.WatcherConfig;
 import org.springframework.context.annotation.Import;
@@ -12,10 +13,11 @@ import org.springframework.test.context.TestPropertySource;
 
 /**
  * Base class for tests for routes that wish to be notified of DB events in the backing OpenMRS
- * database, .
+ * database.
  */
-@Import(WatcherConfig.class)
+@Import({ WatcherConfig.class, TestOpenmrsDataSourceConfig.class })
 @TestPropertySource(properties = PROP_URI_ERROR_HANDLER + "=" + TestConstants.URI_TEST_ERROR_HANDLER)
+@TestPropertySource(properties = "spring.jpa.open-in-view=false")
 @TestPropertySource("classpath:watcher-application-test.properties")
 public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	
@@ -24,5 +26,4 @@ public abstract class BaseWatcherRouteTest extends BaseDbBackedCamelTest {
 	protected Event createEvent(String table, String pkId, String identifier, String operation) {
 		return WatcherTestUtils.createEvent(table, pkId, identifier, operation);
 	}
-	
 }

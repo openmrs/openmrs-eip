@@ -3,6 +3,7 @@ package org.openmrs.eip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -20,11 +21,16 @@ public class Utils {
 	/**
 	 * Gets a list of all watched table names
 	 * 
-	 * @return
+	 * @return a list of table names
 	 */
 	public static List<String> getWatchedTables() {
-		String watchedTables = AppContext.getBean(Environment.class).getProperty(Constants.PROP_WATCHED_TABLES);
-		return Arrays.asList(watchedTables.split(","));
+		Optional<String> watchedTables = Optional
+		        .ofNullable(AppContext.getBean(Environment.class).getProperty(Constants.PROP_WATCHED_TABLES));
+		if (watchedTables.isEmpty()) {
+			throw new EIPException("The property " + Constants.PROP_WATCHED_TABLES
+			        + " must be set to a comma-separated list of table names to watch");
+		}
+		return Arrays.asList(watchedTables.get().split(","));
 	}
 	
 	/**
@@ -36,7 +42,7 @@ public class Utils {
 	 */
 	public static List<String> getListOfTablesInHierarchy(String tableName) {
 		//TODO This logic should be extensible
-		List<String> tables = new ArrayList();
+		List<String> tables = new ArrayList<>();
 		tables.add(tableName);
 		if ("person".equalsIgnoreCase(tableName) || "patient".equalsIgnoreCase(tableName)) {
 			tables.add("person".equalsIgnoreCase(tableName) ? "patient" : "person");

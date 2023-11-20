@@ -6,7 +6,7 @@
     <groupId>org.openmrs.eip</groupId>
     <artifactId>openmrs-eip</artifactId>
     <packaging>pom</packaging>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 
     <modules>
         <module>openmrs-watcher</module>
@@ -16,26 +16,32 @@
     </modules>
 
     <name>OpenMRS EIP</name>
+    <description>OpenMRS EIP</description>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
-        <sprintBootVersion>2.3.0.RELEASE</sprintBootVersion>
-        <hibernateVersion>5.4.21.Final</hibernateVersion>
+        <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
+        <sprintBootVersion>3.1.4</sprintBootVersion>
+        <hibernateVersion>6.3.1.Final</hibernateVersion>
         <hibernateValidatorVersion>6.1.5.Final</hibernateValidatorVersion>
-        <camelVersion>3.3.0</camelVersion>
-        <liquibaseVersion>4.21.1</liquibaseVersion>
-        <h2Version>1.4.200</h2Version>
-        <guava.version>29.0-jre</guava.version>
+        <camelVersion>4.1.0</camelVersion>
+        <liquibaseVersion>4.24.0</liquibaseVersion>
+        <h2Version>2.2.224</h2Version>
+        <guava.version>30.0-android</guava.version>
         <activeMq.version>5.15.8</activeMq.version>
-        <micrometerVersion>1.7.2</micrometerVersion>
+        <micrometerVersion>1.11.5</micrometerVersion>
         <jsonassert.version>1.5.0</jsonassert.version>
-        <json.version>20190722</json.version>
-        <testContainersVersion>1.15.2</testContainersVersion>
+        <json.version>20230227</json.version>
+        <testContainersVersion>1.19.1</testContainersVersion>
         <exclude.tests>nothing-to-exclude</exclude.tests>
         <powerMockVersion>2.0.9</powerMockVersion>
         <openmrsPlatformToolsVersion>2.4.0</openmrsPlatformToolsVersion>
+        <mockito.version>5.6.0</mockito.version>
+        <powermock.version>2.0.9</powermock.version>
     </properties>
 
     <scm>
@@ -71,23 +77,29 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- camel BOM -->
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${sprintBootVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Camel BOM -->
+            <dependency>
+                <groupId>org.apache.camel.springboot</groupId>
+                <artifactId>camel-spring-boot-bom</artifactId>
+                <version>${camelVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-parent</artifactId>
                 <version>${camelVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>${sprintBootVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${sprintBootVersion}</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
@@ -103,33 +115,55 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <scope>test</scope>
-                <version>${powerMockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito2</artifactId>
-                <scope>test</scope>
-                <version>${powerMockVersion}</version>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${sprintBootVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${sprintBootVersion}</version>
+        </dependency>
+
+        <!-- Camel -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-xml-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-xml-jaxb-dsl-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-stream-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-management-starter</artifactId>
+        </dependency>
+
+        <!-- Hibernate ORM-->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernateVersion}</version>
         </dependency>
@@ -167,6 +201,10 @@
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -177,15 +215,13 @@
 
         <!-- testing -->
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test-spring</artifactId>
-            <version>${camelVersion}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <version>${sprintBootVersion}</version>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test-spring-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -206,12 +242,21 @@
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
+            <artifactId>powermock-core</artifactId>
+            <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <version>${testContainersVersion}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>junit</artifactId>
+                    <groupId>junit</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -231,7 +276,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <appendAssemblyId>false</appendAssemblyId>
                     </configuration>
@@ -243,15 +288,15 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.2.3.RELEASE</version>
+                <version>${sprintBootVersion}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>

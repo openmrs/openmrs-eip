@@ -1,10 +1,11 @@
 package org.openmrs.eip.mysql.watcher;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_CHANGED_BY;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.COLUMN_DATE_CHANGED;
+import static org.powermock.reflect.Whitebox.getInternalState;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,9 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.DatabaseOperation;
-import org.powermock.reflect.Whitebox;
 
 public class AuditableFieldsEventFilterTest {
 	
@@ -42,7 +42,7 @@ public class AuditableFieldsEventFilterTest {
 		final String encounter = "ENCOUNTER";
 		List<String> tables = Arrays.asList(visit, "", encounter, null, " ");
 		AuditableEventFilter filter = new AuditableEventFilter(tables);
-		Set<String> filteredTables = Whitebox.getInternalState(filter, Set.class);
+		Set<String> filteredTables = getInternalState(filter, Set.class);
 		assertEquals(2, filteredTables.size());
 		assertTrue(filteredTables.contains(visit));
 		assertTrue(filteredTables.contains(encounter.toLowerCase()));

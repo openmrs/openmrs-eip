@@ -2,8 +2,8 @@ package org.openmrs.eip.mysql.watcher.route;
 
 import static java.util.Collections.singletonMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_EVENT;
 import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE;
 import static org.openmrs.eip.mysql.watcher.WatcherTestUtils.addRetryItem;
@@ -13,21 +13,18 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.Constants;
 import org.openmrs.eip.mysql.watcher.Event;
-import org.openmrs.eip.mysql.watcher.TestOpenmrsDataSourceConfig;
 import org.openmrs.eip.mysql.watcher.WatcherTestUtils;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 import ch.qos.logback.classic.Level;
 
-@Import(TestOpenmrsDataSourceConfig.class)
-@TestPropertySource(properties = "camel.springboot.xml-routes=classpath:camel/db-event-processor.xml")
+@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/db-event-processor.xml")
 @TestPropertySource(properties = "db-event.destinations=" + DbEventProcessorRouteTest.ROUTE_URI_LISTENER)
 @TestPropertySource(properties = "eip.watchedTables=orders")
 @Sql(value = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = Constants.MGT_DATASOURCE_NAME, transactionManager = Constants.MGT_TX_MGR_NAME))
@@ -52,7 +49,7 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	@EndpointInject(ROUTE_URI_LISTENER)
 	private MockEndpoint mockEventListenerEndpoint;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		mockEventListenerEndpoint.reset();
 		addInlinedPropertiesToEnvironment(env, PROP_IGNORE_PREV_ORDER_IN_ERROR_QUEUE + "=");
@@ -81,8 +78,8 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 	@Test
 	public void shouldNotProcessAnOrderThatHasAPreviousTestOrderIfThePreviousTestOrderIsInTheErrorQueueForTheDestination()
 	        throws Exception {
-		final Integer orderId = 106;
-		final Integer previousOrderId = 105;
+		final Integer orderId = 2;
+		final Integer previousOrderId = 1;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
 		assertTrue(WatcherTestUtils.hasRetryItem("test_order", previousOrderId.toString(), ROUTE_URI_LISTENER));
 		Event event = createEvent("orders", orderId.toString(), ORDER_UUID, "c");
@@ -222,9 +219,9 @@ public class DbEventProcessorRouteTest extends BaseWatcherRouteTest {
 		final Integer orderId = 110;
 		final Integer previousOrderId = 109;
 		assertEquals(previousOrderId, WatcherTestUtils.getPreviousOrderId(orderId));
-		addRetryItem(tableName, previousOrderId.toString(), null, "mock:other");
 		Event event = createEvent(tableName, orderId.toString(), ORDER_UUID, "c");
 		Exchange exchange = new DefaultExchange(camelContext);
+		exchange.setProperty("retry-item-id", 1);
 		exchange.setProperty(PROP_EVENT, event);
 		mockEventListenerEndpoint.expectedMessageCount(1);
 		mockEventListenerEndpoint.expectedBodiesReceived(event);

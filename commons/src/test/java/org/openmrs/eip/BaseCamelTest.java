@@ -1,5 +1,7 @@
 package org.openmrs.eip;
 
+import static org.apache.camel.builder.AdviceWith.adviceWith;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 import java.io.InputStream;
@@ -13,10 +15,9 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RoutesDefinition;
-import org.apache.camel.test.spring.CamelSpringRunner;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.apache.camel.xml.jaxb.JaxbHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -34,14 +34,16 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.read.ListAppender;
 
 /**
  * Base class for camel route tests and processors
  */
-@RunWith(CamelSpringRunner.class)
-@SpringBootTest(classes = TestConfig.class)
+
+@CamelSpringBootTest
+@SpringBootTest(classes = { TestConfig.class })
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         ResetMocksTestExecutionListener.class })
@@ -49,7 +51,7 @@ import ch.qos.logback.core.read.ListAppender;
 @TestPropertySource(properties = "camel.component.direct.block=false")
 @TestPropertySource(properties = "openmrs.eip.log.level=DEBUG")
 @TestPropertySource(properties = "logging.level.org.openmrs.eip=DEBUG")
-@DirtiesContext
+@TestPropertySource(properties = "camel.springboot.routes-collector-enabled=true")
 public abstract class BaseCamelTest {
 	
 	protected static final Logger log = LoggerFactory.getLogger(BaseCamelTest.class);
@@ -69,10 +71,10 @@ public abstract class BaseCamelTest {
 	protected ConfigurableEnvironment env;
 	
 	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
-		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);
+		adviceWith(routeId, camelContext, builder);
 	}
 	
-	@Before
+	@BeforeEach
 	public void beforeBaseCamelTest() throws Exception {
 		loadXmlRoutesInDirectory("camel-common", "test-error-handler.xml");
 		if (loggerContext == null) {
@@ -83,16 +85,22 @@ public abstract class BaseCamelTest {
 	}
 	
 	protected void assertMessageLogged(Level level, String message) {
-		ListAppender<LoggingEvent> app = (ListAppender) loggerContext.getLogger(ROOT_LOGGER_NAME).getAppender("test");
-		List<LoggingEvent> list = app.list;
-		for (LoggingEvent e : list) {
-			if (e.getLevel().equals(level) && e.getMessage().equalsIgnoreCase(message)) {
-				log.info("Log event satisfied -> [" + level + "] " + message);
-				return;
-			}
-		}
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		Appender<ILoggingEvent> appender = loggerContext.getLogger(ROOT_LOGGER_NAME).getAppender("test");
 		
-		Assert.fail("Log event not satisfied -> [" + level + "] " + message);
+		if (appender instanceof ListAppender<ILoggingEvent> listAppender) {
+			List<ILoggingEvent> list = listAppender.list;
+			
+			for (ILoggingEvent e : list) {
+				if (e.getLevel().equals(level) && e.getMessage().equalsIgnoreCase(message)) {
+					log.info("Log event satisfied -> [" + level + "] " + message);
+					return;
+				}
+			}
+		} else {
+			// Handle the case where the appender is not of the expected type
+			fail("Log event not satisfied -> [" + level + "] " + message);
+		}
 	}
 	
 	/**
@@ -104,8 +112,7 @@ public abstract class BaseCamelTest {
 	private void loadXmlRoutes(String... filenames) throws Exception {
 		for (String file : filenames) {
 			InputStream in = getClass().getClassLoader().getResourceAsStream(file);
-			RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
-			        .loadRoutesDefinition(camelContext, in);
+			RoutesDefinition rd = JaxbHelper.loadRoutesDefinition(camelContext, in);
 			camelContext.addRouteDefinitions(rd.getRoutes());
 		}
 	}
@@ -140,5 +147,4 @@ public abstract class BaseCamelTest {
 	protected Exception getException(Exchange e) {
 		return e.getProperty("error", Exception.class);
 	}
-	
 }

@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         platform: [ ubuntu-latest ]
-        java-version: [ 1.8 ]
+        java-version: [ 17 ]
 
     runs-on: ${{ matrix.platform }}
     env:

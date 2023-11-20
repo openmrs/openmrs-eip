@@ -9,7 +9,7 @@ import org.apache.camel.support.DefaultEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@UriEndpoint(firstVersion = "1.0.0", scheme = "openmrs-watcher", title = "OpenMRS EIP OpenMRS Watcher", syntax = "openmrs-watcher:name", label = "openmrs,eip,watcher", producerOnly = true)
+@UriEndpoint(firstVersion = "1.0.0", scheme = "openmrs-watcher", title = "OpenMRS EIP OpenMRS Watcher", syntax = "openmrs-watcher:name", producerOnly = true)
 public class MySqlWatcherEndpoint extends DefaultEndpoint {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MySqlWatcherEndpoint.class);
@@ -29,5 +29,4 @@ public class MySqlWatcherEndpoint extends DefaultEndpoint {
 	public Consumer createConsumer(Processor processor) {
 		throw new UnsupportedOperationException();
 	}
-	
 }

@@ -25,7 +25,7 @@ public class CommonConfig {
 	@Bean
 	public DeadLetterChannelBuilder deadLetterChannelBuilder() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
-		builder.setUseOriginalMessage(true);
+		builder.useOriginalMessage();
 		return builder;
 	}
 	

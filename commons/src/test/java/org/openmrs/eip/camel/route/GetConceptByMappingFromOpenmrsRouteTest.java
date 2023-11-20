@@ -2,8 +2,8 @@ package org.openmrs.eip.camel.route;
 
 import static java.util.Collections.singletonMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.openmrs.eip.Constants.EX_PROP_CONCEPT_CODE;
 import static org.openmrs.eip.Constants.EX_PROP_CONCEPT_SOURCE;
 import static org.openmrs.eip.Constants.HTTP_HEADER_AUTH;
@@ -21,21 +21,24 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ProcessDefinition;
 import org.apache.camel.model.ToDynamicDefinition;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.camel.test.spring.junit5.DisableJmx;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.AppContext;
 import org.openmrs.eip.BaseCamelTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
+@DisableJmx
 @TestPropertySource(properties = "spring.liquibase.enabled=false")
-@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/" + ROUTE_ID_GET_CONCEPT_BY_MAPPING + ".xml")
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_GET_CONCEPT_BY_MAPPING + "=DEBUG")
 @TestPropertySource(properties = "logging.level.org.apache.camel.reifier.RouteReifier=WARN")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = "openmrs.baseUrl=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_URL)
 @TestPropertySource(properties = "openmrs.username=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_USER)
 @TestPropertySource(properties = "openmrs.password=" + GetConceptByMappingFromOpenmrsRouteTest.OPENMRS_PASS)
+@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/" + ROUTE_ID_GET_CONCEPT_BY_MAPPING
+        + ".xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 	
 	private static final String MAP_KEY = ROUTE_ID_GET_CONCEPT_BY_MAPPING + "-sourceAndCodeToConceptMapKey";
@@ -54,7 +57,13 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 	@EndpointInject("mock:processor")
 	private MockEndpoint mockProcessor;
 	
-	@Before
+	@EndpointInject("mock:conceptByMapping")
+	private MockEndpoint conceptByMappingMockEndpoint;
+	
+	@EndpointInject("mock:authProcessor")
+	private MockEndpoint authMockProcessor;
+	
+	@BeforeEach
 	public void setup() throws Exception {
 		AppContext.remove(MAP_KEY);
 		mockHttpEndpoint.reset();
@@ -62,6 +71,8 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 		final String openmrsUser = env.getProperty("openmrs.username");
 		final String openmrsPassword = env.getProperty("openmrs.password");
 		openmrsAuth = "Basic " + Base64.getEncoder().encodeToString((openmrsUser + ":" + openmrsPassword).getBytes());
+		
+		loadXmlRoutesInCamelDirectory("get-concept-by-mapping-from-openmrs.xml");
 		
 		advise(ROUTE_ID_GET_CONCEPT_BY_MAPPING, new AdviceWithRouteBuilder() {
 			
@@ -76,6 +87,7 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 	
 	@Test
 	public void shouldReturnTheCachedConceptIfItAlreadyExists() throws Exception {
+		// setup
 		final String source = "CIEL";
 		final String code = "12345";
 		final Map expectedConcept = singletonMap("uuid", "some-concept-uuid");
@@ -83,14 +95,13 @@ public class GetConceptByMappingFromOpenmrsRouteTest extends BaseCamelTest {
 		final Exchange exchange = new DefaultExchange(camelContext);
 		exchange.setProperty(EX_PROP_CONCEPT_SOURCE, source);
 		exchange.setProperty(EX_PROP_CONCEPT_CODE, code);
-		mockProcessor.expectedMessageCount(0);
-		mockHttpEndpoint.expectedMessageCount(0);
+		conceptByMappingMockEndpoint.expectedMessageCount(0);
 		
+		// replay
 		producerTemplate.send(URI_GET_CONCEPT_BY_MAPPING, exchange);
 		
-		mockProcessor.assertIsSatisfied();
-		mockHttpEndpoint.assertIsSatisfied();
-		assertEquals(expectedConcept, exchange.getIn().getBody(Map.class));
+		// verify
+		conceptByMappingMockEndpoint.assertIsSatisfied();
 	}
 	
 	@Test

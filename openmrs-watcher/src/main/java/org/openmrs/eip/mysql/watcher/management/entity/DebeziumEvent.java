@@ -1,10 +1,10 @@
 package org.openmrs.eip.mysql.watcher.management.entity;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.mysql.watcher.Event;

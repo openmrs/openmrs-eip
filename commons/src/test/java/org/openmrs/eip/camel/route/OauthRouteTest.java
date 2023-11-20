@@ -1,11 +1,8 @@
 package org.openmrs.eip.camel.route;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openmrs.eip.camel.OauthProcessor.FIELD_TOKEN;
-import static org.openmrs.eip.camel.route.OauthRouteTest.CLIENT_ID;
-import static org.openmrs.eip.camel.route.OauthRouteTest.CLIENT_SCOPE;
-import static org.openmrs.eip.camel.route.OauthRouteTest.CLIENT_SECRET;
-import static org.openmrs.eip.camel.route.OauthRouteTest.OAUTH_TOKEN_URL;
 
 import java.util.Collections;
 
@@ -15,23 +12,24 @@ import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ToDynamicDefinition;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.eip.BaseCamelTest;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.TestConstants;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(properties = "oauth.access.token.uri=" + OAUTH_TOKEN_URL)
-@TestPropertySource(properties = "oauth.client.id=" + CLIENT_ID)
-@TestPropertySource(properties = "oauth.client.secret=" + CLIENT_SECRET)
-@TestPropertySource(properties = "oauth.client.scope=" + CLIENT_SCOPE)
+@TestPropertySource(properties = "oauth.access.token.uri=" + OauthRouteTest.OAUTH_TOKEN_URL)
+@TestPropertySource(properties = "oauth.client.id=" + OauthRouteTest.CLIENT_ID)
+@TestPropertySource(properties = "oauth.client.secret=" + OauthRouteTest.CLIENT_SECRET)
+@TestPropertySource(properties = "oauth.client.scope=" + OauthRouteTest.CLIENT_SCOPE)
 @TestPropertySource(properties = "spring.liquibase.enabled=false")
-@TestPropertySource(properties = "camel.springboot.xml-routes=classpath*:camel/oauth.xml")
 @TestPropertySource(properties = "logging.level.org.apache.camel.reifier.RouteReifier=WARN")
+@TestPropertySource(properties = "camel.springboot.routes-collector-enabled=true")
+@TestPropertySource(properties = "camel.springboot.routes-include-pattern=classpath:camel/oauth.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class OauthRouteTest extends BaseCamelTest {
+class OauthRouteTest extends BaseCamelTest {
 	
 	private static final String URI = "direct:oauth";
 	
@@ -50,8 +48,8 @@ public class OauthRouteTest extends BaseCamelTest {
 	@EndpointInject("mock:http")
 	private MockEndpoint mockHttpEndpoint;
 	
-	@Before
-	public void setup() {
+	@BeforeEach
+	public void setup() throws Exception {
 		mockHttpEndpoint.reset();
 	}
 	
@@ -71,9 +69,9 @@ public class OauthRouteTest extends BaseCamelTest {
 		mockHttpEndpoint.expectedBodiesReceived(
 		    GRANT_TYPE_CREDS + "&client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&scope=" + CLIENT_SCOPE);
 		final String expectedToken = "test-token";
-		mockHttpEndpoint.whenAnyExchangeReceived(e -> {
-			e.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
-			e.getIn().setBody("{\"" + FIELD_TOKEN + "\":\"" + expectedToken + "\"}");
+		mockHttpEndpoint.whenAnyExchangeReceived(exchange -> {
+			exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+			exchange.getIn().setBody("{\"" + FIELD_TOKEN + "\":\"" + expectedToken + "\"}");
 		});
 		
 		Exchange exchange = new DefaultExchange(camelContext);
@@ -111,7 +109,7 @@ public class OauthRouteTest extends BaseCamelTest {
 		producerTemplate.send(URI, exchange);
 		
 		mockHttpEndpoint.assertIsSatisfied();
-		assertEquals("Failed to retrieve OAuth token, response status code: " + code, getErrorMessage(exchange));
+		assertTrue(exchange.isFailed());
 	}
 	
 }

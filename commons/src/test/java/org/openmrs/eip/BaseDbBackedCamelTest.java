@@ -6,13 +6,15 @@ import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
@@ -30,9 +32,11 @@ import org.testcontainers.lifecycle.Startables;
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
+@TestPropertySource(properties = "spring.openmrs-datasource.driverClassName=com.mysql.cj.jdbc.Driver")
+@TestPropertySource(properties = "spring.openmrs-datasource.dialect=org.hibernate.dialect.MySQLDialect")
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
-	protected static MySQLContainer mysqlContainer = new MySQLContainer("mysql:5.7.31");
+	protected static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:5.7.31");
 	
 	protected static Integer mysqlPort;
 	
@@ -48,7 +52,14 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	@Qualifier(Constants.OPENMRS_DATASOURCE_NAME)
 	protected DataSource openmrsDataSource;
 	
-	@BeforeClass
+	@DynamicPropertySource
+	static void setProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.openmrs-datasource.jdbcUrl", () -> "jdbc:mysql://localhost:" + mysqlPort + "/openmrs");
+		registry.add("spring.openmrs-datasource.username", () -> "root");
+		registry.add("spring.openmrs-datasource.password", () -> "test");
+	}
+	
+	@BeforeAll
 	public static void startMysql() throws Exception {
 		mysqlContainer.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		mysqlContainer.withDatabaseName("openmrs");
@@ -67,9 +78,8 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 		mysqlPort = mysqlContainer.getMappedPort(3306);
 	}
 	
-	@AfterClass
+	@AfterAll
 	public static void stopMysql() {
 		mysqlContainer.stop();
 	}
-	
 }

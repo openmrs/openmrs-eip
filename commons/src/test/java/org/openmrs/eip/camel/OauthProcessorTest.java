@@ -3,15 +3,15 @@ package org.openmrs.eip.camel;
 import static java.time.Instant.ofEpochSecond;
 import static java.time.ZoneId.systemDefault;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static org.openmrs.eip.camel.OauthProcessor.HTTP_AUTH_SCHEME;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
@@ -19,46 +19,54 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.OauthToken;
 import org.openmrs.eip.Utils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Utils.class)
 public class OauthProcessorTest {
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
 	
 	@Mock
-	private ExtendedCamelContext mockCamelContext;
+	private CamelContext mockCamelContext;
 	
 	@Mock
 	private OauthToken mockOauthToken;
 	
-	private OauthProcessor processor = new OauthProcessor();
+	private OauthProcessor processor;
 	
-	@Before
+	private AutoCloseable openMocksAutoCloseable;
+	
+	private AutoCloseable mockStaticAutoCloseable;
+	
+	@BeforeEach
 	public void setup() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		this.openMocksAutoCloseable = openMocks(this);
+		this.mockStaticAutoCloseable = mockStatic(Utils.class);
+		
+		processor = new OauthProcessor();
+		setInternalState(processor, "isOauthEnabled", false);
 		setInternalState(processor, "producerTemplate", mockProducerTemplate);
+	}
+	
+	@AfterEach
+	public void tearDown() throws Exception {
+		this.openMocksAutoCloseable.close();
+		this.mockStaticAutoCloseable.close();
 	}
 	
 	@Test
 	public void process_shouldSkipSettingTheOauthHeaderIfDisabled() throws Exception {
-		processor.process(new DefaultExchange(mockCamelContext));
+		processor.process(new DefaultExchange((CamelContext) mockCamelContext));
 		
 		verifyNoInteractions(mockProducerTemplate);
 	}
@@ -84,14 +92,13 @@ public class OauthProcessorTest {
 		final long expiresIn = 300;
 		final long testSeconds = 1626898515;
 		setInternalState(processor, "isOauthEnabled", true);
-		Map<String, Object> testResponse = new HashMap();
+		Map<String, Object> testResponse = new HashMap<>();
 		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedToken);
 		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
 		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
 		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
 		assertNull(getInternalState(processor, "oauthToken"));
-		mockStatic(Utils.class);
-		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
 		processor.process(exchange);
@@ -114,18 +121,18 @@ public class OauthProcessorTest {
 		final long expiresIn = 360;
 		final long testSeconds = 1626898515;
 		setInternalState(processor, "isOauthEnabled", true);
-		Map<String, Object> testResponse = new HashMap();
+		Map<String, Object> testResponse = new HashMap<>();
 		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedNewToken);
 		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
 		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
 		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
 		setInternalState(processor, "oauthToken", mockOauthToken);
-		mockStatic(Utils.class);
-		PowerMockito.when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
 		processor.process(exchange);
 		
+		// Verify
 		OauthToken newCachedOauthToken = getInternalState(processor, "oauthToken");
 		assertNotNull(newCachedOauthToken);
 		assertEquals(expectedNewToken, newCachedOauthToken.getAccessToken());
@@ -137,7 +144,7 @@ public class OauthProcessorTest {
 	@Test
 	public void process_shouldFailWhenTheReturnedTokenHasAnUnSupportedType() throws Exception {
 		setInternalState(processor, "isOauthEnabled", true);
-		Map<String, Object> testResponse = new HashMap();
+		Map<String, Object> testResponse = new HashMap<>();
 		testResponse.put(OauthProcessor.FIELD_TOKEN, "some-token");
 		final String type = "MAC";
 		testResponse.put(OauthProcessor.FIELD_TYPE, type);
@@ -145,7 +152,12 @@ public class OauthProcessorTest {
 		assertNull(getInternalState(processor, "oauthToken"));
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
-		assertThrows("Unsupported oauth token type: " + type, EIPException.class, () -> processor.process(exchange));
+		try {
+			processor.process(exchange);
+		}
+		catch (EIPException exception) {
+			assertEquals("Unsupported oauth token type: " + type, exception.getMessage());
+		}
 	}
 	
 	@Test
@@ -158,5 +170,4 @@ public class OauthProcessorTest {
 		
 		assertNull(exchange.getIn().getBody());
 	}
-	
 }

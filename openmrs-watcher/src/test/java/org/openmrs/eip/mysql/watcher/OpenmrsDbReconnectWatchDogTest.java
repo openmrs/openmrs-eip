@@ -1,14 +1,18 @@
 package org.openmrs.eip.mysql.watcher;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.mockito.MockitoAnnotations.openMocks;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OpenmrsDbReconnectWatchDogTest {
 	
 	private OpenmrsDbReconnectWatchDog watchDog;
@@ -16,9 +20,16 @@ public class OpenmrsDbReconnectWatchDogTest {
 	@Mock
 	private HealthIndicator mockIndicator;
 	
-	@Before
+	private AutoCloseable openMocksAutoCloseable;
+	
+	@BeforeEach
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		this.openMocksAutoCloseable = openMocks(this);
+	}
+	
+	@AfterAll
+	public void tearDown() throws Exception {
+		this.openMocksAutoCloseable.close();
 	}
 	
 	@Test
