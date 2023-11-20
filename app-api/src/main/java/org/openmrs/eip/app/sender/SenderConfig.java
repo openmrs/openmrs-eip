@@ -13,9 +13,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.component.SyncProfiles;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -42,7 +42,8 @@ public class SenderConfig {
 		Map<String, Object> props = new HashMap();
 		props.put("debezium.tablesToSync", StringUtils.join(tables, ","));
 		props.put(SenderConstants.PROP_ACTIVEMQ_IN_ENDPOINT, SenderConstants.ACTIVEMQ_IN_ENDPOINT);
-		props.put("spring.jpa.properties.hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+		props.put("spring.jpa.properties.hibernate.physical_naming_strategy",
+		    CamelCaseToUnderscoresNamingStrategy.class.getName());
 		props.put(PROP_URI_ERROR_HANDLER, "direct:outbound-error-handler");
 		PropertySource customPropSource = new MapPropertySource("senderPropSource", props);
 		env.getPropertySources().addLast(customPropSource);
@@ -54,7 +55,7 @@ public class SenderConfig {
 	@DependsOn(CUSTOM_PROP_SOURCE_BEAN_NAME)
 	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
-		builder.setUseOriginalMessage(true);
+		builder.useOriginalBody();
 		return builder;
 	}
 	

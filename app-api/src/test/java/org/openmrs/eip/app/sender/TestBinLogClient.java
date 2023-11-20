@@ -2,7 +2,7 @@ package org.openmrs.eip.app.sender;
 
 import com.github.shyiko.mysql.binlog.event.Event;
 
-import io.debezium.connector.mysql.BinlogReader;
+import io.debezium.connector.mysql.MySqlStreamingChangeEventSource.BinlogPosition;
 
 public class TestBinLogClient extends BaseBinlogClient {
 	
@@ -10,7 +10,7 @@ public class TestBinLogClient extends BaseBinlogClient {
 		this(null);
 	}
 	
-	public TestBinLogClient(BinlogReader.BinlogPosition binlogPosition) {
+	public TestBinLogClient(BinlogPosition binlogPosition) {
 		super(binlogPosition);
 	}
 	

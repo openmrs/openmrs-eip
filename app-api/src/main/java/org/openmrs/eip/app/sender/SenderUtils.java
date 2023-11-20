@@ -13,7 +13,7 @@ import com.github.shyiko.mysql.binlog.BinaryLogClient.LifecycleListener;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer.CompatibilityMode;
 
-import io.debezium.connector.mysql.BinlogReader.BinlogPosition;
+import io.debezium.connector.mysql.MySqlStreamingChangeEventSource.BinlogPosition;
 
 public class SenderUtils {
 	

@@ -14,7 +14,7 @@ import org.powermock.reflect.Whitebox;
 
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 
-import io.debezium.connector.mysql.BinlogReader.BinlogPosition;
+import io.debezium.connector.mysql.MySqlStreamingChangeEventSource.BinlogPosition;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SenderUtils.class)
