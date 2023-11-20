@@ -10,8 +10,8 @@ import static org.openmrs.eip.component.Constants.EX_PROP_EXCEPTION;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class CamelUtilsTest {
 	@Test
 	public void send_shouldCreateAnExchangeAndSendTheMessageToTheEndpoint() {
 		Exchange e = Mockito.mock(Exchange.class);
-		CamelContext c = Mockito.mock(ExtendedCamelContext.class);
+		CamelContext c = Mockito.mock(DefaultCamelContext.class);
 		when(mockTemplate.getCamelContext()).thenReturn(c);
 		when(mockTemplate.send(eq(URI), any(Exchange.class))).thenReturn(e);
 		

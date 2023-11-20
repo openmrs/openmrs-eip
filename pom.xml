@@ -42,7 +42,6 @@
         <liquibaseVersion>4.2.0</liquibaseVersion>
         <tomcatVersion>9.0.17</tomcatVersion>
         <jstlVersion>1.2</jstlVersion>
-        <camelActiveMqVersion>4.2.0</camelActiveMqVersion>
         <commonsCollVersion>4.4</commonsCollVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <powerMockVersion>2.0.9</powerMockVersion>

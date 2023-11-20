@@ -1,5 +1,9 @@
 package org.openmrs.eip.component.camel;
 
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
@@ -9,14 +13,12 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
-import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.springframework.context.ApplicationContext;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
-
-@UriEndpoint(firstVersion = "1.0.0", scheme = "openmrs", title = "OpenMRS", syntax = "openmrs:action", producerOnly = true, label = "core,java")
+@UriEndpoint(firstVersion = "1.0.0", scheme = "openmrs", title = "OpenMRS", syntax = "openmrs:action", producerOnly = true, category = {
+        Category.CORE, Category.DATABASE })
 public class OpenmrsEndpoint extends DefaultEndpoint {
 	
 	@UriPath(name = "action")

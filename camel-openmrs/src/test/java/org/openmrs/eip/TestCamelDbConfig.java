@@ -22,6 +22,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import jakarta.jms.ConnectionFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 @EnableAutoConfiguration
