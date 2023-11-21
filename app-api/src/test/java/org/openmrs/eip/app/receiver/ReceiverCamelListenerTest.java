@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.camel.spi.CamelEvent;
+import org.apache.camel.impl.event.CamelContextStartedEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +113,7 @@ public class ReceiverCamelListenerTest {
 		Collection<SiteInfo> sites = Stream.of(siteInfo1, siteInfo2).collect(Collectors.toList());
 		when(ReceiverContext.getSites()).thenReturn(sites);
 		
-		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		listener.notify(new CamelContextStartedEvent(null));
 		
 		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
@@ -131,7 +131,7 @@ public class ReceiverCamelListenerTest {
 		setInternalState(listener, "prunerEnabled", true);
 		setInternalState(listener, "archivesMaxAgeInDays", 1);
 		
-		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		listener.notify(new CamelContextStartedEvent(null));
 		
 		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
@@ -157,7 +157,7 @@ public class ReceiverCamelListenerTest {
 		when(mockTask2.getChildExecutor()).thenReturn(mockSyncExecutor);
 		setInternalState(ReceiverCamelListener.class, "siteTasks", Arrays.asList(mockTask1, mockTask2));
 		
-		listener.notify((CamelEvent.CamelContextStoppingEvent) () -> null);
+		listener.notify(new CamelContextStartedEvent(null));
 		
 		PowerMockito.verifyStatic(AppUtils.class);
 		AppUtils.shutdownExecutor(mockSyncExecutor, siteName1 + " " + ReceiverConstants.CHILD_TASK_NAME, true);

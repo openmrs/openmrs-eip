@@ -55,7 +55,7 @@ public class SenderConfig {
 	@DependsOn(CUSTOM_PROP_SOURCE_BEAN_NAME)
 	public DeadLetterChannelBuilder getOutBoundErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("{{" + PROP_URI_ERROR_HANDLER + "}}");
-		builder.useOriginalBody();
+		builder.useOriginalMessage();
 		return builder;
 	}
 	

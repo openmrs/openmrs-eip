@@ -24,6 +24,12 @@
             <artifactId>web-receiver</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activeMq.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

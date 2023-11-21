@@ -30,8 +30,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Assert;
@@ -78,7 +78,7 @@ public class ConflictServiceImplTest {
 	private EntityServiceFacade mockServiceFacade;
 	
 	@Mock
-	private ExtendedCamelContext mockContext;
+	private CamelContext mockContext;
 	
 	@Before
 	public void setup() {

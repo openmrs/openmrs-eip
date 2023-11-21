@@ -40,8 +40,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.junit.After;
 import org.junit.Assert;
@@ -84,7 +84,7 @@ public class SiteMessageConsumerTest {
 	private ProducerTemplate mockProducerTemplate;
 	
 	@Mock
-	private ExtendedCamelContext mockCamelContext;
+	private CamelContext mockCamelContext;
 	
 	@Mock
 	private ReceiverService mockService;

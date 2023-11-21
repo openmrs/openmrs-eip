@@ -15,7 +15,7 @@ public class TestConfig {
 	@Bean
 	public DeadLetterChannelBuilder shutdownErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder(TestConstants.URI_ERROR_HANDLER);
-		builder.setUseOriginalMessage(true);
+		builder.useOriginalMessage();
 		return builder;
 	}
 	

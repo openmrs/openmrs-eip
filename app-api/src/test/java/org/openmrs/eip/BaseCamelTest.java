@@ -16,10 +16,11 @@ import java.util.List;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.test.spring.CamelSpringRunner;
+import org.apache.camel.xml.jaxb.JaxbHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,7 +78,7 @@ public abstract class BaseCamelTest {
 	protected ConfigurableEnvironment env;
 	
 	protected void advise(String routeId, AdviceWithRouteBuilder builder) throws Exception {
-		camelContext.adviceWith(camelContext.getRouteDefinition(routeId), builder);
+		AdviceWith.adviceWith(camelContext.getRouteDefinition(routeId), camelContext, builder);
 	}
 	
 	@BeforeClass
@@ -142,9 +143,7 @@ public abstract class BaseCamelTest {
 	}
 	
 	private void loadRoute(InputStream in) throws Exception {
-		RoutesDefinition rd = (RoutesDefinition) camelContext.getXMLRoutesDefinitionLoader()
-		        .loadRoutesDefinition(camelContext, in);
-		camelContext.addRouteDefinitions(rd.getRoutes());
+		camelContext.addRouteDefinitions(JaxbHelper.loadRoutesDefinition(camelContext, in).getRoutes());
 	}
 	
 	protected String getErrorMessage(Exchange e) {

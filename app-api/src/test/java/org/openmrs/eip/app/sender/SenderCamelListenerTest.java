@@ -10,7 +10,8 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.apache.camel.spi.CamelEvent;
+import org.apache.camel.impl.event.CamelContextStartedEvent;
+import org.apache.camel.impl.event.CamelContextStartingEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class SenderCamelListenerTest {
 	
 	@Test
 	public void notify_shouldNotStartTheBinlogTaskIfNotEnabled() throws Exception {
-		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		listener.notify(new CamelContextStartedEvent(null));
 		
 		Mockito.verifyNoInteractions(mockExecutor);
 	}
@@ -70,7 +71,7 @@ public class SenderCamelListenerTest {
 		setInternalState(listener, "initialDelayBinlogPurger", initialDelay);
 		setInternalState(listener, "delayBinlogPurger", delay);
 		
-		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		listener.notify(new CamelContextStartingEvent(null));
 		
 		ArgumentCaptor<BinlogPurgingTask> taskCaptor = ArgumentCaptor.forClass(BinlogPurgingTask.class);
 		verify(mockExecutor).scheduleWithFixedDelay(taskCaptor.capture(), eq(initialDelay), eq(delay), eq(MILLISECONDS));
@@ -89,7 +90,7 @@ public class SenderCamelListenerTest {
 		setInternalState(listener, "initialDelayPruner", initialDelay);
 		setInternalState(listener, "delayPruner", delay);
 		
-		listener.notify((CamelEvent.CamelContextStartedEvent) () -> null);
+		listener.notify(new CamelContextStartingEvent(null));
 		
 		ArgumentCaptor<SenderArchivePruningTask> taskCaptor = ArgumentCaptor.forClass(SenderArchivePruningTask.class);
 		verify(mockExecutor).scheduleWithFixedDelay(taskCaptor.capture(), eq(initialDelay), eq(delay), eq(MILLISECONDS));
@@ -100,7 +101,7 @@ public class SenderCamelListenerTest {
 	
 	@Test
 	public void notify_shouldStopTheExecutorForStoppingEvent() throws Exception {
-		listener.notify((CamelEvent.CamelContextStoppingEvent) () -> null);
+		listener.notify(new CamelContextStartingEvent(null));
 		
 		PowerMockito.verifyStatic(AppUtils.class);
 		AppUtils.shutdownExecutor(mockExecutor, "scheduled", false);

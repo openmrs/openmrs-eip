@@ -13,14 +13,14 @@ public class CamelConfig {
 	@Bean
 	public DeadLetterChannelBuilder deadLetterChannelBuilder() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:dlc");
-		builder.setUseOriginalMessage(true);
+		builder.useOriginalMessage();
 		return builder;
 	}
 	
 	@Bean
 	public DeadLetterChannelBuilder shutdownErrorHandler() {
 		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder("direct:shutdown-route");
-		builder.setUseOriginalMessage(true);
+		builder.useOriginalMessage();
 		return builder;
 	}
 	
