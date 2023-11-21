@@ -3,8 +3,6 @@ package org.openmrs.eip.app;
 import java.security.Security;
 import java.time.LocalDateTime;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.camel.CamelContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openmrs.eip.app.config.ActiveMqConfig;
@@ -17,6 +15,8 @@ import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+
+import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 @Import({ AppConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class,

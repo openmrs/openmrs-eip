@@ -1,7 +1,8 @@
 package org.openmrs.eip.app;
 
-import lombok.Builder;
-import lombok.Data;
+import java.security.Security;
+import java.time.LocalDateTime;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
@@ -24,72 +25,74 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
-import java.security.Security;
-import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Data;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = TestConfig.class)
 public abstract class OpenmrsExtractEndpointITest {
-
-    @Autowired
-    protected CamelContext camelContext;
-
-    @EndpointInject(uri = "mock:result")
-    protected MockEndpoint resultEndpoint;
-
-    @Produce(property = "uri")
-    protected ProducerTemplate template;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    protected PGPDecryptService pgpDecryptService;
-
-    @Autowired
-    private PGPEncryptService pgpEncryptService;
-
-    public String getUri() {
-        return "direct:start" + getClass().getSimpleName();
-    }
-
-    @Before
-    public void init() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-
-        camelContext.addComponent("openmrs", new OpenmrsComponent(camelContext, applicationContext));
-        camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class, new StringToLocalDateTimeConverter());
-        camelContext.addRoutes(createRouteBuilder());
-    }
-
-    @After
-    public void teardown() {
-        camelContext.removeComponent("openmrs");
-        resultEndpoint.getExchanges().clear();
-    }
-
-    protected RoutesBuilder createRouteBuilder() {
-        return new RouteBuilder() {
-            @Override
-            public void configure() {
-                from(getUri())
-                        .recipientList(simple("openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
-                        .split().jsonpathWriteAsString("$").streaming()
-                        .process(pgpEncryptService)
-                        .to("log:json")
-                        .to("mock:result");
-            }
-        };
-    }
-
-    @Data
-    @Builder
-    public static class CamelInitObect {
-        private LocalDateTime lastSyncDate;
-        private String tableToSync;
-
-        public String getLastSyncDateAsString() {
-            return DateUtils.dateToString(getLastSyncDate());
-        }
-    }
+	
+	@Autowired
+	protected CamelContext camelContext;
+	
+	@EndpointInject("mock:result")
+	protected MockEndpoint resultEndpoint;
+	
+	@Produce(property = "uri")
+	protected ProducerTemplate template;
+	
+	@Autowired
+	private ApplicationContext applicationContext;
+	
+	@Autowired
+	protected PGPDecryptService pgpDecryptService;
+	
+	@Autowired
+	private PGPEncryptService pgpEncryptService;
+	
+	public String getUri() {
+		return "direct:start" + getClass().getSimpleName();
+	}
+	
+	@Before
+	public void init() throws Exception {
+		Security.addProvider(new BouncyCastleProvider());
+		
+		camelContext.addComponent("openmrs", new OpenmrsComponent(camelContext, applicationContext));
+		camelContext.getTypeConverterRegistry().addTypeConverter(LocalDateTime.class, String.class,
+		    new StringToLocalDateTimeConverter());
+		camelContext.addRoutes(createRouteBuilder());
+	}
+	
+	@After
+	public void teardown() {
+		camelContext.removeComponent("openmrs");
+		resultEndpoint.getExchanges().clear();
+	}
+	
+	protected RoutesBuilder createRouteBuilder() {
+		return new RouteBuilder() {
+			
+			@Override
+			public void configure() {
+				from(getUri()).recipientList(simple(
+				    "openmrs:extract?tableToSync=${body.getTableToSync()}&lastSyncDate=${body.getLastSyncDateAsString()}"))
+				        .split().jsonpathWriteAsString("$").streaming().process(pgpEncryptService).to("log:json")
+				        .to("mock:result");
+			}
+		};
+	}
+	
+	@Data
+	@Builder
+	public static class CamelInitObect {
+		
+		private LocalDateTime lastSyncDate;
+		
+		private String tableToSync;
+		
+		public String getLastSyncDateAsString() {
+			return DateUtils.dateToString(getLastSyncDate());
+		}
+	}
 }
