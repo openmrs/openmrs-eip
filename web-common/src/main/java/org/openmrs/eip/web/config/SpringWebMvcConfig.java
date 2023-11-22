@@ -16,6 +16,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -24,12 +25,13 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
+@EnableWebMvc
 public class SpringWebMvcConfig implements WebMvcConfigurer {
 	
 	private static final Logger log = LoggerFactory.getLogger(SpringWebMvcConfig.class);
 	
 	@Bean
-	public LocaleResolver localeResolver() throws Exception {
+	public LocaleResolver customLocaleResolver() throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Loading locale configuration file...");
 		}
