@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile(SyncProfiles.RECEIVER)
-@RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/error")
+@RequestMapping(RestConstants.API_PATH + "dbsync/receiver/error")
 public class ReceiverErrorController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverErrorController.class);

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestConstants.API_PATH + "/dbsync/properties")
+@RequestMapping(RestConstants.API_PATH + "dbsync/properties")
 public class AppPropertiesController {
 	
 	protected static final Logger log = LoggerFactory.getLogger(AppPropertiesController.class);

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile(SyncProfiles.RECEIVER)
-@RequestMapping(RestConstants.API_PATH + "/dbsync/receiver/status")
+@RequestMapping(RestConstants.API_PATH + "dbsync/receiver/status")
 public class ReceiverSyncStatusController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReceiverSyncStatusController.class);
