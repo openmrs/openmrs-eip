@@ -30,7 +30,7 @@ public abstract class BaseDashboardHelper implements DashboardHelper {
 		
 		return producerTemplate.requestBody(
 		    "jpa:" + entityType + "?query=SELECT count(*) FROM " + entityType + " WHERE "
-		            + getCategorizationProperty(entityType) + " = '" + category + "' AND operation = '" + op + "'",
+		            + getCategorizationProperty(entityType) + " = '" + category + "' AND operation = " + op,
 		    null, Integer.class);
 	}
 	
