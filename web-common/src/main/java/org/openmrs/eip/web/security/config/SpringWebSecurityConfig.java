@@ -5,13 +5,15 @@ package org.openmrs.eip.web.security.config;
 
 import static org.openmrs.eip.web.RestConstants.API_PATH;
 import static org.openmrs.eip.web.RestConstants.PATH_LOGIN;
-import static org.openmrs.eip.web.security.SecurityConstants.ROLE_AUTHENTICATED;
 import static org.openmrs.eip.web.security.SecurityConstants.USERS_FILE;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.openmrs.eip.web.security.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -19,13 +21,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -38,12 +41,18 @@ public class SpringWebSecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers(PATH_LOGIN).permitAll());
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/favicon.*.ico").permitAll());
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/*/favicon.*.ico").permitAll());
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/styles.*.css").permitAll());
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/*/styles.*.css").permitAll());
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/css/login.*.css").permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher(PATH_LOGIN)).permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/favicon.*.ico")).permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/*/favicon.*.ico")).permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/styles.*.css")).permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/*/styles.*.css")).permitAll());
+		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/css/login.*.css")).permitAll());
 		http.httpBasic(Customizer.withDefaults());
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().fullyAuthenticated());
@@ -56,10 +65,7 @@ public class SpringWebSecurityConfig {
 	}
 	
 	@Bean
-	protected AuthenticationManager inMemoryUserDetailsManager(AuthenticationManagerBuilder auth,
-	                                                           PasswordEncoder passwordEncoder)
-	    throws Exception {
-		
+	protected UserDetailsService inMemoryUserDetailsManager(PasswordEncoder passwordEncoder) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Loading and setting up user info...");
 		}
@@ -73,17 +79,19 @@ public class SpringWebSecurityConfig {
 			users = PropertiesLoaderUtils.loadProperties(new ClassPathResource(USERS_FILE));
 		}
 		
-		InMemoryUserDetailsManagerConfigurer configurer = auth.inMemoryAuthentication();
+		List<UserDetails> userDetails = new ArrayList<>();
 		for (Map.Entry<Object, Object> entry : users.entrySet()) {
-			String encodedPass = passwordEncoder.encode(entry.getValue().toString());
-			configurer.withUser(entry.getKey().toString()).password(encodedPass).roles(ROLE_AUTHENTICATED);
+			UserDetails user = User.builder().username(entry.getKey().toString())
+			        .passwordEncoder(pass -> passwordEncoder.encode(entry.getValue().toString()))
+			        .roles(SecurityConstants.ROLE_AUTHENTICATED).build();
+			userDetails.add(user);
 		}
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Done setting up user info!");
 		}
 		
-		return auth.build();
+		return new InMemoryUserDetailsManager(userDetails);
 	}
 	
 }
