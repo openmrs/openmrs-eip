@@ -57,7 +57,8 @@ public class SpringWebSecurityConfig {
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().fullyAuthenticated());
 		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
-		http.formLogin(formLogin -> formLogin.loginPage(PATH_LOGIN).defaultSuccessUrl("/", true));
+		http.formLogin(Customizer.withDefaults());
+		//http.formLogin(formLogin -> formLogin.loginPage(PATH_LOGIN).defaultSuccessUrl("/", true));
 		http.exceptionHandling(exHandler -> exHandler.defaultAuthenticationEntryPointFor(
 		    new CustomAuthenticationEntryPoint(), new AntPathRequestMatcher(API_PATH + "**")));
 		
