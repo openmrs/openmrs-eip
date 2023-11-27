@@ -48,7 +48,7 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.4.0-b180830.0359</version>
+            <version>${jaxbApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
@@ -132,8 +132,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysqlConnectionVersion}</version>
         </dependency>
     </dependencies>

@@ -40,14 +40,14 @@
         <springSecurityVersion>6.1.5</springSecurityVersion>
         <liquibaseVersion>4.25.0</liquibaseVersion>
         <tomcatVersion>10.1.15</tomcatVersion>
-        <jstlVersion>1.2</jstlVersion>
         <commonsCollVersion>4.4</commonsCollVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <powerMockVersion>2.0.9</powerMockVersion>
         <testContainersVersion>1.15.2</testContainersVersion>
-        <mysqlConnectionVersion>8.0.33</mysqlConnectionVersion>
+        <mysqlConnectionVersion>8.2.0</mysqlConnectionVersion>
         <jstlApiVersion>3.0.0</jstlApiVersion>
         <jstlImplVersion>3.0.1</jstlImplVersion>
+        <jaxbApiVersion>2.4.0-b180830.0359</jaxbApiVersion>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
@@ -102,11 +102,6 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-taglibs</artifactId>
                 <version>${springSecurityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>jstl</groupId>
-                <artifactId>jstl</artifactId>
-                <version>${jstlVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
