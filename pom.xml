@@ -46,6 +46,8 @@
         <powerMockVersion>2.0.9</powerMockVersion>
         <testContainersVersion>1.15.2</testContainersVersion>
         <mysqlConnectionVersion>8.0.33</mysqlConnectionVersion>
+        <jstlApiVersion>3.0.0</jstlApiVersion>
+        <jstlImplVersion>3.0.1</jstlImplVersion>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>

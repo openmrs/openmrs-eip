@@ -10,4 +10,6 @@ public class SecurityConstants {
 	
 	public static final String DEFAULT_LOCALE_PROP_NAME = "locale.default";
 	
+	public static final String LOGIN_JSP = "/view/login.jsp";
+	
 }

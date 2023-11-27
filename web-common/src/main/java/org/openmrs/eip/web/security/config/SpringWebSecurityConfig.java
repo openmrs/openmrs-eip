@@ -44,6 +44,8 @@ public class SpringWebSecurityConfig {
 		http.authorizeHttpRequests(
 		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher(PATH_LOGIN)).permitAll());
 		http.authorizeHttpRequests(
+		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher(SecurityConstants.LOGIN_JSP)).permitAll());
+		http.authorizeHttpRequests(
 		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/favicon.*.ico")).permitAll());
 		http.authorizeHttpRequests(
 		    authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/*/favicon.*.ico")).permitAll());
@@ -57,8 +59,7 @@ public class SpringWebSecurityConfig {
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().fullyAuthenticated());
 		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
-		http.formLogin(Customizer.withDefaults());
-		//http.formLogin(formLogin -> formLogin.loginPage(PATH_LOGIN).defaultSuccessUrl("/", true));
+		http.formLogin(formLogin -> formLogin.loginPage(PATH_LOGIN).defaultSuccessUrl("/", true));
 		http.exceptionHandling(exHandler -> exHandler.defaultAuthenticationEntryPointFor(
 		    new CustomAuthenticationEntryPoint(), new AntPathRequestMatcher(API_PATH + "**")));
 		
