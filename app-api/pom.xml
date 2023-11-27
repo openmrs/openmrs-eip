@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-spring-boot-starter</artifactId>
+            <artifactId>camel-spring-boot-xml-starter</artifactId>
             <version>${camelVersion}</version>
         </dependency>
         <dependency>
