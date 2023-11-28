@@ -48,6 +48,8 @@
         <jstlApiVersion>3.0.0</jstlApiVersion>
         <jstlImplVersion>3.0.1</jstlImplVersion>
         <jaxbApiVersion>2.4.0-b180830.0359</jaxbApiVersion>
+        <hibernateValidatorVersion>8.0.1.Final</hibernateValidatorVersion>
+        <camelTestSpringVersion>3.21.2</camelTestSpringVersion>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
@@ -73,20 +75,32 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- camel BOM -->
             <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-parent</artifactId>
+                <groupId>org.apache.camel.springboot</groupId>
+                <artifactId>camel-spring-boot-dependencies</artifactId>
                 <version>${camelVersion}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <type>pom</type>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
                 <version>${springBootVersion}</version>
-                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+                <version>${springBootVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-json</artifactId>
+                <version>${springBootVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-artemis</artifactId>
+                <version>${springBootVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -128,6 +142,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commonsCollVersion}</version>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${springBootVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
@@ -172,7 +193,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring</artifactId>
-            <version>3.21.2</version>
+            <version>${camelTestSpringVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -180,6 +201,12 @@
                     <artifactId>camel-test</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test</artifactId>
+            <version>${camelTestSpringVersion}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.skyscreamer</groupId>
@@ -194,13 +221,14 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
@@ -213,8 +241,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${springBootVersion}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
