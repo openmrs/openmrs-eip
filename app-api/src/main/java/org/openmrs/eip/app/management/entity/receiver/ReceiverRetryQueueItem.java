@@ -3,15 +3,15 @@ package org.openmrs.eip.app.management.entity.receiver;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import org.openmrs.eip.app.SyncOperationConverter;
 import org.openmrs.eip.app.management.entity.BaseRetryQueueItem;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.springframework.beans.BeanUtils;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -33,8 +33,8 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	private String identifier;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, updatable = false, length = 1)
+	@Convert(converter = SyncOperationConverter.class)
 	private SyncOperation operation;
 	
 	@NotNull

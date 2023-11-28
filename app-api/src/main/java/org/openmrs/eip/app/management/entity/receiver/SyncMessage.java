@@ -2,13 +2,13 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
 
+import org.openmrs.eip.app.SyncOperationConverter;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncOperation;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -37,8 +37,8 @@ public class SyncMessage extends AbstractEntity {
 	private String modelClassName;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, updatable = false, length = 1)
+	@Convert(converter = SyncOperationConverter.class)
 	private SyncOperation operation;
 	
 	@ManyToOne(optional = false)

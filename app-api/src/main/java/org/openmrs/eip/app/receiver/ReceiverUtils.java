@@ -55,7 +55,7 @@ public class ReceiverUtils {
 	
 	private static final String QUERY_PARAM_ID = "rowId";
 	
-	private static final String QUERY_URI_MGT = "sql:" + PLACEHOLDER_QUERY + "?dataSource=" + MGT_DATASOURCE_NAME;
+	private static final String QUERY_URI_MGT = "sql:" + PLACEHOLDER_QUERY + "?dataSource=#" + MGT_DATASOURCE_NAME;
 	
 	protected static final String UPDATE_URI = QUERY_URI_MGT.replace(PLACEHOLDER_QUERY, "UPDATE " + PLACEHOLDER_TABLE
 	        + " SET " + PLACEHOLDER_COLUMN + "=:#" + QUERY_PARAM_VALUE + " WHERE id=:#" + QUERY_PARAM_ID);
