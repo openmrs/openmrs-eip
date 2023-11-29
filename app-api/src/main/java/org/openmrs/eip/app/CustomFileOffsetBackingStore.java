@@ -1,5 +1,9 @@
 package org.openmrs.eip.app;
 
+import java.util.Collections;
+
+import org.apache.kafka.connect.json.JsonConverter;
+import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
 import org.openmrs.eip.app.sender.OffsetUtils;
 import org.slf4j.Logger;
@@ -17,6 +21,13 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	private static boolean disabled = false;
 	
 	private static boolean paused = false;
+	
+	private static final JsonConverter KEY_CONVERTER = new JsonConverter();
+	
+	public CustomFileOffsetBackingStore() {
+		super(KEY_CONVERTER);
+		KEY_CONVERTER.configure(Collections.singletonMap(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, "false"), true);
+	}
 	
 	public synchronized static void enable() {
 		disabled = false;
