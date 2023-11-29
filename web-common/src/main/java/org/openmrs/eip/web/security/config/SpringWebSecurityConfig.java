@@ -31,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -58,7 +59,11 @@ public class SpringWebSecurityConfig {
 		http.httpBasic(Customizer.withDefaults());
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().fullyAuthenticated());
-		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+		http.csrf(csrf -> {
+			CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+			csrf.csrfTokenRepository(csrfRepo);
+			csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler());
+		});
 		http.formLogin(formLogin -> formLogin.loginPage(PATH_LOGIN).defaultSuccessUrl("/", true));
 		http.exceptionHandling(exHandler -> exHandler.defaultAuthenticationEntryPointFor(
 		    new CustomAuthenticationEntryPoint(), new AntPathRequestMatcher(API_PATH + "**")));
