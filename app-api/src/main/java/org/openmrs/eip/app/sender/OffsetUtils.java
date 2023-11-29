@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
 import org.apache.kafka.connect.storage.MemoryOffsetBackingStore;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.app.sender.OffsetVerifier.OffsetVerificationResult;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class OffsetUtils {
 			return null;
 		}
 		
-		FileOffsetBackingStore store = new FileOffsetBackingStore();
+		CustomFileOffsetBackingStore store = new CustomFileOffsetBackingStore();
 		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), offsetFile);
 		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
 		Map<ByteBuffer, ByteBuffer> offsetRawData = AppUtils.getFieldValue(store,
