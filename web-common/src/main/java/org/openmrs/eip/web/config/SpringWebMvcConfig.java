@@ -29,7 +29,7 @@ public class SpringWebMvcConfig implements WebMvcConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(SpringWebMvcConfig.class);
 	
 	@Bean
-	public LocaleResolver customLocaleResolver() throws Exception {
+	public LocaleResolver localeResolver() throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Loading locale configuration file...");
 		}
