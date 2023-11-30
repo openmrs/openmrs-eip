@@ -38,7 +38,7 @@
         <camelVersion>4.2.0</camelVersion>
         <springBootVersion>3.1.5</springBootVersion>
         <springSecurityVersion>6.1.5</springSecurityVersion>
-        <liquibaseVersion>4.25.0</liquibaseVersion>
+        <liquibaseVersion>4.2.0</liquibaseVersion>
         <tomcatVersion>10.1.15</tomcatVersion>
         <commonsCollVersion>4.4</commonsCollVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
@@ -76,8 +76,15 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-parent</artifactId>
+                <version>${camelVersion}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.camel.springboot</groupId>
-                <artifactId>camel-spring-boot-dependencies</artifactId>
+                <artifactId>camel-spring-boot-bom</artifactId>
                 <version>${camelVersion}</version>
                 <scope>import</scope>
                 <type>pom</type>
@@ -149,6 +156,17 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${springBootVersion}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-junit-jupiter</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
@@ -219,6 +237,12 @@
                     <artifactId>android-json</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.3.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
@@ -352,7 +376,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.11.0</version>
                 <!--<configuration>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>-->
@@ -374,6 +398,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
                 <configuration>
+                    <argLine>
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.util.concurrent=ALL-UNNAMED
+                        --add-opens java.base/java.time=ALL-UNNAMED
+                        --add-opens java.base/java.net=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/java.nio=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                        --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED
+                    </argLine>
                     <excludes>
                         <exclude>${exclude.tests}</exclude>
                     </excludes>

@@ -19,7 +19,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.test.spring.CamelSpringRunner;
 import org.apache.camel.xml.jaxb.JaxbHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
@@ -37,6 +36,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
@@ -49,7 +49,7 @@ import ch.qos.logback.core.read.ListAppender;
 /**
  * Base class for camel route tests and processors
  */
-@RunWith(CamelSpringRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
 @TestExecutionListeners(value = { DirtiesContextBeforeModesTestExecutionListener.class, MockitoTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
