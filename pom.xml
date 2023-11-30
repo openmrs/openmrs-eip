@@ -44,7 +44,7 @@
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <powerMockVersion>2.0.9</powerMockVersion>
         <testContainersVersion>1.15.2</testContainersVersion>
-        <mysqlConnectionVersion>8.2.0</mysqlConnectionVersion>
+        <mysqlConnectionVersion>8.0.15</mysqlConnectionVersion>
         <jstlApiVersion>3.0.0</jstlApiVersion>
         <jstlImplVersion>3.0.1</jstlImplVersion>
         <jaxbApiVersion>2.4.0-b180830.0359</jaxbApiVersion>
@@ -408,6 +408,9 @@
                         --add-opens java.base/java.net=ALL-UNNAMED
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.nio=ALL-UNNAMED
+                        --add-opens java.base/java.math=ALL-UNNAMED
+                        --add-opens java.sql/java.sql=ALL-UNNAMED
+                        --add-opens java.base/java.time.format=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED
                     </argLine>
