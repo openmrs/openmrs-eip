@@ -50,6 +50,7 @@
         <jaxbApiVersion>2.4.0-b180830.0359</jaxbApiVersion>
         <hibernateValidatorVersion>8.0.1.Final</hibernateValidatorVersion>
         <camelTestSpringVersion>3.21.2</camelTestSpringVersion>
+        <mockitoVersion>3.3.0</mockitoVersion>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
@@ -76,15 +77,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-parent</artifactId>
-                <version>${camelVersion}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.camel.springboot</groupId>
-                <artifactId>camel-spring-boot-bom</artifactId>
+                <artifactId>camel-spring-boot-dependencies</artifactId>
                 <version>${camelVersion}</version>
                 <scope>import</scope>
                 <type>pom</type>
@@ -159,6 +153,10 @@
                 <scope>test</scope>
                 <exclusions>
                     <exclusion>
+                        <groupId>org.apache.activemq</groupId>
+                        <artifactId>activemq-client</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter</artifactId>
                     </exclusion>
@@ -218,6 +216,10 @@
                     <groupId>org.apache.camel</groupId>
                     <artifactId>camel-test</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId> org.springframework</groupId>
+                    <artifactId>spring-test</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -241,7 +243,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.3.3</version>
+            <version>${mockitoVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
