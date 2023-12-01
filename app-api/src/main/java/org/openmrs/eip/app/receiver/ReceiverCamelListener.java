@@ -20,12 +20,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
-import org.apache.camel.spi.CamelEvent;
-import org.apache.camel.spi.CamelEvent.CamelContextStartedEvent;
-import org.apache.camel.spi.CamelEvent.CamelContextStoppingEvent;
-import org.apache.camel.support.EventNotifierSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseCamelListener;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
@@ -46,7 +43,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(SyncProfiles.RECEIVER)
-public class ReceiverCamelListener extends EventNotifierSupport {
+public class ReceiverCamelListener extends BaseCamelListener {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverCamelListener.class);
 	
@@ -55,8 +52,6 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	private static final int DEFAULT_DELAY = 300000;
 	
 	private ScheduledThreadPoolExecutor siteExecutor;
-	
-	private ThreadPoolExecutor syncExecutor;
 	
 	@Value("${" + PROP_SITE_TASK_INITIAL_DELAY + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
 	private long siteTaskInitialDelay;
@@ -83,87 +78,72 @@ public class ReceiverCamelListener extends EventNotifierSupport {
 	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
+		super(syncExecutor);
 		this.siteExecutor = siteExecutor;
-		this.syncExecutor = syncExecutor;
 	}
 	
 	@Override
-	public void notify(CamelEvent event) {
-		
-		if (event instanceof CamelContextStartedEvent) {
-			log.info("Loading OpenMRS user account");
-			String username = SyncContext.getBean(Environment.class).getProperty(Constants.PROP_OPENMRS_USER);
-			if (StringUtils.isBlank(username)) {
-				throw new EIPException("No value set for application property: " + Constants.PROP_OPENMRS_USER);
-			}
-			
-			UserRepository userRepo = SyncContext.getBean(UserRepository.class);
-			User exampleUser = new User();
-			exampleUser.setUsername(username);
-			Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
-			Optional<User> optional = userRepo.findOne(example);
-			if (!optional.isPresent()) {
-				log.error("No user found with username: " + username);
-				AppUtils.shutdown();
-			}
-			
-			UserLightRepository userLightRepo = SyncContext.getBean(UserLightRepository.class);
-			SyncContext.setAppUser(userLightRepo.findById(optional.get().getId()).get());
-			
-			log.info("Loading OpenMRS admin user account");
-			exampleUser = new User();
-			exampleUser.setUsername("admin");
-			example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
-			optional = userRepo.findOne(example);
-			if (!optional.isPresent()) {
-				log.error("No admin user found");
-				AppUtils.shutdown();
-			}
-			
-			SyncContext.setAdminUser(userLightRepo.findById(optional.get().getId()).get());
-			
-			log.info("Starting tasks");
-			
-			Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
-			        .collect(Collectors.toList());
-			
-			startSiteParentTasks(sites);
-			
-			if (prunerEnabled) {
-				if (archivesMaxAgeInDays == null) {
-					log.error(PROP_ARCHIVES_MAX_AGE_DAYS + " is required when " + PROP_PRUNER_ENABLED + " is set to true");
-					AppUtils.shutdown();
-				}
-				
-				log.info("Pruning sync archives older than " + archivesMaxAgeInDays + " days");
-				
-				startPrunerTask();
-			}
-			
-		} else if (event instanceof CamelContextStoppingEvent) {
-			final int syncExecutorWait = 100;
-			while (!syncExecutor.isTerminated()) {
-				try {
-					Thread.sleep(syncExecutorWait);
-					if (log.isTraceEnabled()) {
-						log.trace("Waiting for " + syncExecutorWait + "ms for sync executor to terminate");
-					}
-				}
-				catch (InterruptedException e) {
-					log.error("An error occurred while waiting for sync executor to terminate", e);
-				}
-			}
-			
-			if (siteTasks != null) {
-				siteTasks.forEach(task -> {
-					AppUtils.shutdownExecutor(task.getChildExecutor(),
-					    task.getSiteInfo().getName() + " " + ReceiverConstants.CHILD_TASK_NAME, true);
-				});
-			}
-			
-			AppUtils.shutdownExecutor(siteExecutor, ReceiverConstants.PARENT_TASK_NAME, false);
+	public void applicationStarted() {
+		log.info("Loading OpenMRS user account");
+		String username = SyncContext.getBean(Environment.class).getProperty(Constants.PROP_OPENMRS_USER);
+		if (StringUtils.isBlank(username)) {
+			throw new EIPException("No value set for application property: " + Constants.PROP_OPENMRS_USER);
 		}
 		
+		UserRepository userRepo = SyncContext.getBean(UserRepository.class);
+		User exampleUser = new User();
+		exampleUser.setUsername(username);
+		Example<User> example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+		Optional<User> optional = userRepo.findOne(example);
+		if (!optional.isPresent()) {
+			log.error("No user found with username: " + username);
+			AppUtils.shutdown();
+		}
+		
+		UserLightRepository userLightRepo = SyncContext.getBean(UserLightRepository.class);
+		SyncContext.setAppUser(userLightRepo.findById(optional.get().getId()).get());
+		
+		log.info("Loading OpenMRS admin user account");
+		exampleUser = new User();
+		exampleUser.setUsername("admin");
+		example = Example.of(exampleUser, ExampleMatcher.matching().withIgnoreCase());
+		optional = userRepo.findOne(example);
+		if (!optional.isPresent()) {
+			log.error("No admin user found");
+			AppUtils.shutdown();
+		}
+		
+		SyncContext.setAdminUser(userLightRepo.findById(optional.get().getId()).get());
+		
+		log.info("Starting tasks");
+		
+		Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
+		        .collect(Collectors.toList());
+		
+		startSiteParentTasks(sites);
+		
+		if (prunerEnabled) {
+			if (archivesMaxAgeInDays == null) {
+				log.error(PROP_ARCHIVES_MAX_AGE_DAYS + " is required when " + PROP_PRUNER_ENABLED + " is set to true");
+				AppUtils.shutdown();
+			}
+			
+			log.info("Pruning sync archives older than " + archivesMaxAgeInDays + " days");
+			
+			startPrunerTask();
+		}
+	}
+	
+	@Override
+	public void applicationStopped() {
+		if (siteTasks != null) {
+			siteTasks.forEach(task -> {
+				AppUtils.shutdownExecutor(task.getChildExecutor(),
+				    task.getSiteInfo().getName() + " " + ReceiverConstants.CHILD_TASK_NAME, true);
+			});
+		}
+		
+		AppUtils.shutdownExecutor(siteExecutor, ReceiverConstants.PARENT_TASK_NAME, false);
 	}
 	
 	private void startSiteParentTasks(Collection<SiteInfo> sites) {

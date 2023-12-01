@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.camel.impl.event.CamelContextStartedEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +100,7 @@ public class ReceiverCamelListenerTest {
 	}
 	
 	@Test
-	public void notify_shouldOnlyStartSiteTasksForSitesThatAreNotDisabled() {
+	public void applicationStarted_shouldOnlyStartSiteTasksForSitesThatAreNotDisabled() {
 		SiteInfo siteInfo1 = new SiteInfo();
 		siteInfo1.setIdentifier("site1");
 		siteInfo1.setDisabled(true);
@@ -113,14 +112,14 @@ public class ReceiverCamelListenerTest {
 		Collection<SiteInfo> sites = Stream.of(siteInfo1, siteInfo2).collect(Collectors.toList());
 		when(ReceiverContext.getSites()).thenReturn(sites);
 		
-		listener.notify(new CamelContextStartedEvent(null));
+		listener.applicationStarted();
 		
 		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 	}
 	
 	@Test
-	public void notify_shouldOnlyStartSiteConsumersForSitesThatAreNotDisabled() {
+	public void applicationStarted_shouldOnlyStartSiteConsumersForSitesThatAreNotDisabled() {
 		final String siteIdentifier = "site2";
 		SiteInfo site = new SiteInfo();
 		site.setIdentifier(siteIdentifier);
@@ -131,7 +130,7 @@ public class ReceiverCamelListenerTest {
 		setInternalState(listener, "prunerEnabled", true);
 		setInternalState(listener, "archivesMaxAgeInDays", 1);
 		
-		listener.notify(new CamelContextStartedEvent(null));
+		listener.applicationStarted();
 		
 		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
@@ -141,7 +140,7 @@ public class ReceiverCamelListenerTest {
 	}
 	
 	@Test
-	public void notify_shouldCleanUpWhenApplicationContextIsStopped() {
+	public void applicationStopped_shouldCleanUpWhenApplicationContextIsStopped() {
 		when(mockSyncExecutor.isTerminated()).thenReturn(true);
 		final String siteName1 = "task 1";
 		final String siteName2 = "task 2";
@@ -157,7 +156,7 @@ public class ReceiverCamelListenerTest {
 		when(mockTask2.getChildExecutor()).thenReturn(mockSyncExecutor);
 		setInternalState(ReceiverCamelListener.class, "siteTasks", Arrays.asList(mockTask1, mockTask2));
 		
-		listener.notify(new CamelContextStartedEvent(null));
+		listener.applicationStopped();
 		
 		PowerMockito.verifyStatic(AppUtils.class);
 		AppUtils.shutdownExecutor(mockSyncExecutor, siteName1 + " " + ReceiverConstants.CHILD_TASK_NAME, true);

@@ -9,9 +9,8 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.impl.event.CamelContextStartedEvent;
-import org.apache.camel.impl.event.CamelContextStartingEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +34,9 @@ public class SenderCamelListenerTest {
 	private ScheduledExecutorService mockExecutor;
 	
 	@Mock
+	private ThreadPoolExecutor mockSyncExecutor;
+	
+	@Mock
 	private File mockDbzmOffsetFile;
 	
 	@Mock
@@ -47,18 +49,18 @@ public class SenderCamelListenerTest {
 		PowerMockito.mockStatic(AppUtils.class);
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(FileUtils.class);
-		listener = new SenderCamelListener(mockExecutor);
+		listener = new SenderCamelListener(mockExecutor, mockSyncExecutor);
 	}
 	
 	@Test
-	public void notify_shouldNotStartTheBinlogTaskIfNotEnabled() throws Exception {
-		listener.notify(new CamelContextStartedEvent(null));
+	public void applicationStarted_shouldNotStartTheBinlogTaskIfNotEnabled() throws Exception {
+		listener.applicationStarted();
 		
 		Mockito.verifyNoInteractions(mockExecutor);
 	}
 	
 	@Test
-	public void notify_shouldStartTheBinlogTaskIfEnabledForStartedEvent() throws Exception {
+	public void applicationStarted_shouldStartTheBinlogTaskIfEnabledForStartedEvent() throws Exception {
 		int maxKeepCount = 5;
 		long initialDelay = 2000;
 		long delay = 1000;
@@ -71,7 +73,7 @@ public class SenderCamelListenerTest {
 		setInternalState(listener, "initialDelayBinlogPurger", initialDelay);
 		setInternalState(listener, "delayBinlogPurger", delay);
 		
-		listener.notify(new CamelContextStartingEvent(null));
+		listener.applicationStarted();
 		
 		ArgumentCaptor<BinlogPurgingTask> taskCaptor = ArgumentCaptor.forClass(BinlogPurgingTask.class);
 		verify(mockExecutor).scheduleWithFixedDelay(taskCaptor.capture(), eq(initialDelay), eq(delay), eq(MILLISECONDS));
@@ -81,7 +83,7 @@ public class SenderCamelListenerTest {
 	}
 	
 	@Test
-	public void notify_shouldStartThePrunerTaskIfEnabledForStartedEvent() throws Exception {
+	public void applicationStarted_shouldStartThePrunerTaskIfEnabledForStartedEvent() throws Exception {
 		int maxAgeInDays = 1;
 		long initialDelay = 2000;
 		long delay = 1000;
@@ -90,7 +92,7 @@ public class SenderCamelListenerTest {
 		setInternalState(listener, "initialDelayPruner", initialDelay);
 		setInternalState(listener, "delayPruner", delay);
 		
-		listener.notify(new CamelContextStartingEvent(null));
+		listener.applicationStarted();
 		
 		ArgumentCaptor<SenderArchivePruningTask> taskCaptor = ArgumentCaptor.forClass(SenderArchivePruningTask.class);
 		verify(mockExecutor).scheduleWithFixedDelay(taskCaptor.capture(), eq(initialDelay), eq(delay), eq(MILLISECONDS));
@@ -100,8 +102,8 @@ public class SenderCamelListenerTest {
 	}
 	
 	@Test
-	public void notify_shouldStopTheExecutorForStoppingEvent() throws Exception {
-		listener.notify(new CamelContextStartingEvent(null));
+	public void applicationStopped_shouldStopTheExecutorForStoppingEvent() throws Exception {
+		listener.applicationStopped();
 		
 		PowerMockito.verifyStatic(AppUtils.class);
 		AppUtils.shutdownExecutor(mockExecutor, "scheduled", false);

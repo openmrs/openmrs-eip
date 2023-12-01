@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.sender;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
@@ -14,10 +15,10 @@ import static org.openmrs.eip.app.sender.SenderConstants.PROP_DELAY_BINLOG_PURGE
 import static org.openmrs.eip.app.sender.SenderConstants.PROP_INITIAL_DELAY_BINLOG_PURGER;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.spi.CamelEvent;
-import org.apache.camel.support.EventNotifierSupport;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.BaseCamelListener;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.FileUtils;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile(SyncProfiles.SENDER)
-public class SenderCamelListener extends EventNotifierSupport {
+public class SenderCamelListener extends BaseCamelListener {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SenderCamelListener.class);
 	
@@ -72,17 +73,20 @@ public class SenderCamelListener extends EventNotifierSupport {
 	@Value("${" + PROP_ARCHIVES_MAX_AGE_DAYS + ":}")
 	private Integer archivesMaxAgeInDays;
 	
-	public SenderCamelListener(@Qualifier(BEAN_NAME_SCHEDULED_EXECUTOR) ScheduledExecutorService scheduledExecutor) {
+	public SenderCamelListener(@Qualifier(BEAN_NAME_SCHEDULED_EXECUTOR) ScheduledExecutorService scheduledExecutor,
+	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
+		super(syncExecutor);
 		this.scheduledExecutor = scheduledExecutor;
 	}
 	
 	@Override
-	public void notify(CamelEvent event) throws Exception {
-		if (event instanceof CamelEvent.CamelContextStartedEvent) {
-			startTasks();
-		} else if (event instanceof CamelEvent.CamelContextStoppingEvent) {
-			AppUtils.shutdownExecutor(scheduledExecutor, "scheduled", false);
-		}
+	public void applicationStarted() {
+		startTasks();
+	}
+	
+	@Override
+	public void applicationStopped() {
+		AppUtils.shutdownExecutor(scheduledExecutor, "scheduled", false);
 	}
 	
 	private void startTasks() {
