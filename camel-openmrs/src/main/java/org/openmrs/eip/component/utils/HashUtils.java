@@ -175,7 +175,7 @@ public class HashUtils {
 	 * @return true if a duplicate hash row was found and updated otherwise false
 	 */
 	protected static boolean updateHashIfRowExists(Throwable cause, BaseHashEntity object, ProducerTemplate template) {
-		if (cause != null && cause.getCause() instanceof ConstraintViolationException) {
+		if (cause instanceof ConstraintViolationException) {
 			BaseHashEntity existing = getStoredHash(object.getIdentifier(), object.getClass(), template);
 			if (existing != null) {
 				//This will typically happen if we inserted the hash but something went wrong before or during

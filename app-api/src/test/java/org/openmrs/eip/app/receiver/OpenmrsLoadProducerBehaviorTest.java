@@ -48,7 +48,7 @@ public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String URI_LOAD = "openmrs:load";
 	
-	private static final String HASH_COUNT_URI = "sql:SELECT count(*) as c FROM person_hash?dataSource="
+	private static final String HASH_COUNT_URI = "sql:SELECT count(*) as c FROM person_hash?dataSource=#"
 	        + MGT_DATASOURCE_NAME;
 	
 	@Autowired

@@ -12,7 +12,7 @@ import static org.openmrs.eip.app.sender.SenderConstants.PROP_SENDER_ID;
 import static org.openmrs.eip.app.sender.SenderConstants.ROUTE_ID_ACTIVEMQ_PUBLISHER;
 import static org.openmrs.eip.app.sender.SenderConstants.URI_ACTIVEMQ_PUBLISHER;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,9 +101,9 @@ public class SenderActiveMqPublisherRouteTest extends BaseSenderRouteTest {
 		assertEquals(op, JsonPath.read(syncMsg, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncMsg, "metadata.messageUuid"));
 		assertTrue(JsonPath.read(syncMsg, "metadata.snapshot"));
-		LocalDateTime dateSent = LocalDateTime.ofInstant(msg.getDateSent().toInstant(), systemDefault());
-		assertEquals(dateSent, ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
-		        .withZoneSameInstant(systemDefault()).toLocalDateTime());
+		Instant dateSentInstant = ZonedDateTime.parse(JsonPath.read(syncMsg, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
+		        .withZoneSameInstant(systemDefault()).toInstant();
+		assertEquals(msg.getDateSent(), Date.from(dateSentInstant));
 		assertNull(JsonPath.read(syncMsg, "metadata.requestUuid"));
 	}
 	

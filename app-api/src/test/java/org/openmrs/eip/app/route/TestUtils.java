@@ -47,7 +47,7 @@ public final class TestUtils {
 	public static Map getRowById(String tableName, Long id) {
 		ProducerTemplate t = SyncContext.getBean(ProducerTemplate.class);
 		List<Map> matches = t.requestBody(
-		    "sql:SELECT * FROM " + tableName + " WHERE id = " + id + "?dataSource=" + SyncConstants.MGT_DATASOURCE_NAME,
+		    "sql:SELECT * FROM " + tableName + " WHERE id = " + id + "?dataSource=#" + SyncConstants.MGT_DATASOURCE_NAME,
 		    null, List.class);
 		if (matches.isEmpty()) {
 			return null;
