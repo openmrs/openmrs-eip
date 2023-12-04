@@ -15,7 +15,6 @@ import static org.openmrs.eip.component.Constants.PROP_OPENMRS_DB_PORT;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.DriverManagerUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.api.mockito.PowerMockito;
@@ -33,7 +33,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.env.Environment;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ BinlogUtils.class, SyncContext.class, DriverManager.class, OffsetUtils.class })
+@PrepareForTest({ BinlogUtils.class, SyncContext.class, DriverManagerUtils.class, OffsetUtils.class })
 public class BinlogUtilsTest {
 	
 	@Mock
@@ -51,7 +51,7 @@ public class BinlogUtilsTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
-		PowerMockito.mockStatic(DriverManager.class);
+		PowerMockito.mockStatic(DriverManagerUtils.class);
 		PowerMockito.mockStatic(OffsetUtils.class);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 	}
@@ -67,13 +67,13 @@ public class BinlogUtilsTest {
 		when(mockEnv.getProperty(PROP_OPENMRS_DB_PORT)).thenReturn(port);
 		when(mockEnv.getProperty(PROP_DBZM_DB_USER)).thenReturn(user);
 		when(mockEnv.getProperty(PROP_DBZM_DB_PASSWORD)).thenReturn(pass);
-		when(DriverManager.getConnection(url, user, pass)).thenReturn(mockConnection);
+		when(DriverManagerUtils.getConnection(url, user, pass)).thenReturn(mockConnection);
 		assertEquals(mockConnection, BinlogUtils.getConnectionToBinaryLogs());
 	}
 	
 	@Test
 	public void getBinLogFiles_shouldReturnTheListOfBinlogFiles() throws Exception {
-		when(DriverManager.getConnection(any(), any(), any())).thenReturn(mockConnection);
+		when(DriverManagerUtils.getConnection(any(), any(), any())).thenReturn(mockConnection);
 		when(mockConnection.createStatement()).thenReturn(mockStatement);
 		when(mockStatement.executeQuery(BinlogUtils.QUERY_SHOW_BIN_LOGS)).thenReturn(mockResultSet);
 		when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -120,7 +120,7 @@ public class BinlogUtilsTest {
 	
 	@Test
 	public void purgeBinLogsTo_shouldPurgeTheBinlogFilesUpToTheFileBeforeTheSpecifiedFile() throws Exception {
-		when(DriverManager.getConnection(any(), any(), any())).thenReturn(mockConnection);
+		when(DriverManagerUtils.getConnection(any(), any(), any())).thenReturn(mockConnection);
 		when(mockConnection.createStatement()).thenReturn(mockStatement);
 		final String file = "bin-log.000001";
 		

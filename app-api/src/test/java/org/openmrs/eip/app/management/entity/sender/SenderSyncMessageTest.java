@@ -2,10 +2,10 @@ package org.openmrs.eip.app.management.entity.sender;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus;
 
 public class SenderSyncMessageTest {
@@ -20,7 +20,7 @@ public class SenderSyncMessageTest {
 		msg.markAsSent(dateSent);
 		
 		Assert.assertEquals(SenderSyncMessageStatus.SENT, msg.getStatus());
-		Assert.assertEquals(dateSent.atZone(ZoneId.systemDefault()).toInstant(), msg.getDateSent().toInstant());
+		Assert.assertEquals(Date.from(dateSent.atZone(ZoneId.systemDefault()).toInstant()), msg.getDateSent());
 	}
 	
 }

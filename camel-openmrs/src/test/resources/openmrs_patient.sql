@@ -22,7 +22,7 @@ VALUES (1, 'Mobile Phone', 'java.lang.String', 1, 1, now(), 'e2e3fd64-1d5f-11e0-
        (3, 'Birth Place', 'java.lang.String', 0, 1, now(), 'f6c97a9d-a77b-401f-b06e-81900e21ed1e');
 
 INSERT INTO person_attribute (person_attribute_id,person_attribute_type_id,person_id,value,voided,creator,date_created,uuid)
-VALUES (1, 1, 1, '3172566786', 0, 2, now(), '1efd940e-32dc-491f-8038-a8f3afe3e35f'),
-       (2, 2, 101, '0987654321', 0, 2, now(), '2efd940e-32dc-491f-8038-a8f3afe3e35f'),
-       (3, 3, 101, 'Kampala', 0, 2, now(), '3efd940e-32dc-491f-8038-a8f3afe3e35f'),
-       (4, 1, 101, '1234567890', 0, 2, now(), '4efd940e-32dc-491f-8038-a8f3afe3e35f');
+VALUES (1, 1, 1, '3172566786', 0, 1, now(), '1efd940e-32dc-491f-8038-a8f3afe3e35f'),
+       (2, 2, 101, '0987654321', 0, 1, now(), '2efd940e-32dc-491f-8038-a8f3afe3e35f'),
+       (3, 3, 101, 'Kampala', 0, 1, now(), '3efd940e-32dc-491f-8038-a8f3afe3e35f'),
+       (4, 1, 101, '1234567890', 0, 1, now(), '4efd940e-32dc-491f-8038-a8f3afe3e35f');

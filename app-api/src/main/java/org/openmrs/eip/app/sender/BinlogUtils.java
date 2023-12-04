@@ -7,13 +7,13 @@ import static org.openmrs.eip.component.Constants.PROP_OPENMRS_DB_PORT;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openmrs.eip.app.DriverManagerUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
@@ -126,7 +126,7 @@ public class BinlogUtils {
 		final String user = env.getProperty(PROP_DBZM_DB_USER);
 		final String url = "jdbc:mysql://" + host + ":" + port + URL_QUERY;
 		
-		return DriverManager.getConnection(url, user, env.getProperty(PROP_DBZM_DB_PASSWORD));
+		return DriverManagerUtils.getConnection(url, user, env.getProperty(PROP_DBZM_DB_PASSWORD));
 	}
 	
 }

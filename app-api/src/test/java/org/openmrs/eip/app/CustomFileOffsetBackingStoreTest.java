@@ -1,5 +1,6 @@
 package org.openmrs.eip.app;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -24,7 +25,7 @@ public class CustomFileOffsetBackingStoreTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		store = Mockito.spy(CustomFileOffsetBackingStore.class);
+		store = Mockito.spy(new CustomFileOffsetBackingStore());
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "paused", false);
 		Whitebox.setInternalState(CustomFileOffsetBackingStore.class, "disabled", false);
 	}
@@ -59,7 +60,7 @@ public class CustomFileOffsetBackingStoreTest {
 	@Test
 	public void start_shouldVerifyTheExistingOffset() throws Exception {
 		Mockito.doNothing().when(store).doStart();
-		Map mockData = Mockito.mock(Map.class);
+		Map mockData = new HashMap();
 		PowerMockito.mockStatic(OffsetUtils.class);
 		Whitebox.setInternalState(store, Map.class, mockData);
 		
@@ -73,7 +74,7 @@ public class CustomFileOffsetBackingStoreTest {
 	@Test
 	public void start_shouldFailIfAnExceptionIsThrownWhenVerifyingTheOffset() throws Exception {
 		Mockito.doNothing().when(store).doStart();
-		Map mockData = Mockito.mock(Map.class);
+		Map mockData = new HashMap();
 		PowerMockito.mockStatic(OffsetUtils.class);
 		PowerMockito.mockStatic(AppUtils.class);
 		Whitebox.setInternalState(store, Map.class, mockData);
