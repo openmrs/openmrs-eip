@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.PersistenceException;
-
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +36,8 @@ import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import jakarta.persistence.PersistenceException;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(FileUtils.class)
@@ -124,7 +124,7 @@ public class HashUtilsTest {
 		newHash.setHash(newHashString);
 		newHash.setDateCreated(LocalDateTime.now());
 		ConstraintViolationException cause = new ConstraintViolationException("test", null, "constraint-name");
-		CamelExecutionException e = new CamelExecutionException("test", null, new PersistenceException(cause));
+		CamelExecutionException e = new CamelExecutionException("test", null, cause);
 		doThrow(e).when(mockTemplate).sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, className), newHash);
 		PersonHash existingHash = new PersonHash();
 		existingHash.setHash("old-hash");
