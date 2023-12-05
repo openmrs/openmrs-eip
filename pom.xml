@@ -58,6 +58,7 @@
         <springBootPluginVersion>3.1.5</springBootPluginVersion>
         <buildNumHelperPluginVersion>3.2.0</buildNumHelperPluginVersion>
         <buildHelperPluginVersion>3.4.0</buildHelperPluginVersion>
+        <compilerPluginVersion>3.11.0</compilerPluginVersion>
 
         <!-- UI properties -->
         <projectLocale>en</projectLocale>
@@ -384,10 +385,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <!--<configuration>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                </configuration>-->
+                <version>${compilerPluginVersion}</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
