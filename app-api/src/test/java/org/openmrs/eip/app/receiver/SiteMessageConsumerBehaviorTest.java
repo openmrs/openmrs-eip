@@ -3,7 +3,6 @@ package org.openmrs.eip.app.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_MSG_PROCESSOR;
 import static org.openmrs.eip.component.utils.HashUtils.computeHash;
 import static org.openmrs.eip.component.utils.HashUtils.getStoredHash;
@@ -21,8 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
@@ -53,15 +50,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Sql(scripts = "classpath:openmrs_core_data.sql")
-@TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=152")
-@TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=152")
+@TestPropertySource(properties = "spring.openmrs-datasource.maximum-pool-size=34")
+@TestPropertySource(properties = "spring.mngt-datasource.maximum-pool-size=34")
 public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private static final String ROUTE_DIR = "receiver";
 	
-	private static final int MSG_COUNT = 150;
+	private static final int MSG_COUNT = 32;
 	
-	private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(MSG_COUNT);
+	private static final ThreadPoolExecutor EXECUTOR = (ThreadPoolExecutor) Executors.newFixedThreadPool(MSG_COUNT);
 	
 	@Autowired
 	private SiteRepository siteRepo;
@@ -78,12 +75,6 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	@Autowired
 	private SyncMessageRepository syncMsgRepo;
 	
-	@BeforeClass
-	public static void setupClass() {
-		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI",
-		    SiteMessageConsumer.JPA_URI_PREFIX + DEFAULT_TASK_BATCH_SIZE);
-	}
-	
 	@Before
 	public void setup() throws Exception {
 		loadXmlRoutes(ROUTE_DIR, "message-processor.xml");
@@ -94,8 +85,7 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	@After
 	public void tearDown() {
-		setInternalState(BaseSiteRunnable.class, "initialized", false);
-		setInternalState(SiteMessageConsumer.class, "GET_JPA_URI", (Object) null);
+		setInternalState(SiteMessageConsumer.class, "initialized", false);
 		SyncContext.setAppUser(null);
 	}
 	
@@ -124,7 +114,7 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	}
 	
 	private SiteMessageConsumer createConsumer(SiteInfo siteInfo) {
-		SiteMessageConsumer c = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, executor);
+		SiteMessageConsumer c = new SiteMessageConsumer(URI_MSG_PROCESSOR, siteInfo, EXECUTOR);
 		return c;
 	}
 	

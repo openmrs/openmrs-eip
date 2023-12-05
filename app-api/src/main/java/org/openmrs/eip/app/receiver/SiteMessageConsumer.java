@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedList;
 import static org.openmrs.eip.app.SyncConstants.THREAD_THRESHOLD_MULTIPLIER;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_TASK_BATCH_SIZE;
@@ -22,11 +21,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.apache.camel.component.jpa.JpaConstants;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
@@ -35,6 +34,8 @@ import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * An instance of this class consumes sync messages for a single site and forwards them to the
@@ -43,15 +44,6 @@ import org.springframework.core.env.Environment;
 public class SiteMessageConsumer implements Runnable {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SiteMessageConsumer.class);
-	
-	private static final String PARAM_SITE = "site";
-	
-	protected static final String ENTITY = SyncMessage.class.getSimpleName();
-	
-	protected static final String JPA_URI_PREFIX = "jpa:" + ENTITY + "?query=SELECT m FROM " + ENTITY + " m WHERE m.site = :"
-	        + PARAM_SITE + " ORDER BY m.dateCreated ASC &maximumResults=";
-	
-	private static String GET_JPA_URI;
 	
 	private static boolean initialized = false;
 	
@@ -72,6 +64,10 @@ public class SiteMessageConsumer implements Runnable {
 	
 	private ReceiverService service;
 	
+	private SyncMessageRepository syncMsgRepo;
+	
+	private static Pageable page;
+	
 	/**
 	 * @param messageProcessorUri the camel endpoint URI to call to process a sync message
 	 * @param site sync messages from this site will be consumed by this instance
@@ -83,6 +79,7 @@ public class SiteMessageConsumer implements Runnable {
 		this.executor = executor;
 		producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		service = SyncContext.getBean(ReceiverService.class);
+		syncMsgRepo = SyncContext.getBean(SyncMessageRepository.class);
 		initIfNecessary();
 	}
 	
@@ -90,8 +87,8 @@ public class SiteMessageConsumer implements Runnable {
 		synchronized (SiteMessageConsumer.class) {
 			if (!initialized) {
 				Environment e = SyncContext.getBean(Environment.class);
-				int batchSize = e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE);
-				GET_JPA_URI = JPA_URI_PREFIX + batchSize;
+				int pageSize = e.getProperty(PROP_SYNC_TASK_BATCH_SIZE, Integer.class, DEFAULT_TASK_BATCH_SIZE);
+				page = PageRequest.of(0, pageSize);
 				//This ensures there will only be a limited number of queued items for each thread
 				taskThreshold = executor.getMaximumPoolSize() * THREAD_THRESHOLD_MULTIPLIER;
 				PROCESSING_MSG_QUEUE = Collections.synchronizedSet(new HashSet<>(executor.getMaximumPoolSize()));
@@ -122,8 +119,7 @@ public class SiteMessageConsumer implements Runnable {
 			}
 			
 			try {
-				List<SyncMessage> syncMessages = fetchNextSyncMessageBatch();
-				
+				List<SyncMessage> syncMessages = syncMsgRepo.getSyncMessageBySiteOrderByDateCreated(site, page);
 				if (syncMessages.isEmpty()) {
 					if (log.isTraceEnabled()) {
 						log.trace("No sync messages found from site: " + site);
@@ -151,11 +147,6 @@ public class SiteMessageConsumer implements Runnable {
 			}
 		}
 		
-	}
-	
-	protected List<SyncMessage> fetchNextSyncMessageBatch() throws Exception {
-		return producerTemplate.requestBodyAndHeader(GET_JPA_URI, null, JpaConstants.JPA_PARAMETERS_HEADER,
-		    singletonMap(PARAM_SITE, site), List.class);
 	}
 	
 	protected void processMessages(List<SyncMessage> syncMessages) throws Exception {
