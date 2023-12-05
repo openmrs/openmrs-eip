@@ -13,7 +13,6 @@ import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -36,9 +35,6 @@ import liquibase.integration.spring.SpringLiquibase;
         "org.openmrs.eip.app.management.repository" })
 public class ManagementDataSourceConfig {
 	
-	@Value("${spring.mngt-datasource.dialect}")
-	private String hibernateDialect;
-	
 	@Bean(name = SyncConstants.MGT_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
 	public DataSource dataSource() {
@@ -55,7 +51,6 @@ public class ManagementDataSourceConfig {
 	                                                            Environment env) {
 		
 		Map<String, String> props = new HashMap();
-		props.put("hibernate.dialect", hibernateDialect);
 		props.put("hibernate.hbm2ddl.auto", "none");
 		List<String> entityPackages = new ArrayList();
 		entityPackages.add("org.openmrs.eip.app.management.entity");

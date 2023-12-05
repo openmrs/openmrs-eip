@@ -1,7 +1,11 @@
 package org.openmrs.eip.app.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.apache.camel.ProducerTemplate;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.config.ReceiverEncryptionProperties;
@@ -23,9 +27,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import jakarta.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -34,9 +35,6 @@ import java.util.Map;
 @ComponentScan({ "org.openmrs.eip.component.service", "org.openmrs.eip.component.mapper",
         "org.openmrs.eip.component.camel" })
 public class TestConfig {
-	
-	@Value("${spring.datasource.dialect}")
-	private String hibernateDialect;
 	
 	@Value("${spring.datasource.ddlAuto}")
 	private String ddlAuto;
@@ -78,7 +76,6 @@ public class TestConfig {
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            final DataSource dataSource) {
 		Map<String, String> props = new HashMap<>();
-		props.put("hibernate.dialect", hibernateDialect);
 		props.put("hibernate.hbm2ddl.auto", ddlAuto);
 		
 		return builder.dataSource(dataSource).packages("org.openmrs.eip.component.entity").persistenceUnit("openmrs")

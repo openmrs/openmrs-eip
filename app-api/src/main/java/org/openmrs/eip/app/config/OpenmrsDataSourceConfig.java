@@ -1,14 +1,11 @@
 package org.openmrs.eip.app.config;
 
-import static java.util.Collections.singletonMap;
-
 import javax.sql.DataSource;
 
 import org.openmrs.eip.app.SyncConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -31,9 +28,6 @@ public class OpenmrsDataSourceConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(OpenmrsDataSourceConfig.class);
 	
-	@Value("${spring.openmrs-datasource.dialect}")
-	private String hibernateDialect;
-	
 	@Primary
 	@Bean(name = "openmrsDataSource")
 	@ConfigurationProperties(prefix = "spring.openmrs-datasource")
@@ -49,7 +43,7 @@ public class OpenmrsDataSourceConfig {
 	public LocalContainerEntityManagerFactoryBean entityManager(final EntityManagerFactoryBuilder builder,
 	                                                            @Qualifier("openmrsDataSource") final DataSource dataSource) {
 		return builder.dataSource(dataSource).packages("org.openmrs.eip.component.entity").persistenceUnit("openmrs")
-		        .properties(singletonMap("hibernate.dialect", hibernateDialect)).build();
+		        .build();
 	}
 	
 	@Primary
