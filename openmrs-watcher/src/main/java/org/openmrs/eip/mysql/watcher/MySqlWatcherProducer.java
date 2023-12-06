@@ -17,15 +17,14 @@ public class MySqlWatcherProducer extends DefaultProducer {
 	
 	private static final String DEBEZIUM_FROM_URI = "debezium-mysql:extract?additionalProperties.connector.class="
 	        + FailureTolerantMySqlConnector.class.getName() + "&databaseServerId={{debezium.db.serverId}}"
-	        + "&databaseServerName={{debezium.db.serverName}}&databaseHostname={{openmrs.db.host}}"
-	        + "&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}"
-	        + "&databasePassword={{debezium.db.password}}&databaseWhitelist={{openmrs.db.name}}"
-	        + "&offsetStorageFileName={{debezium.offsetFilename}}"
-	        + "&databaseHistoryFileFilename={{debezium.historyFilename}}&tableWhitelist={{debezium.tablesToSync}}"
+	        + "&databaseHostname={{openmrs.db.host}}" + "&databasePort={{openmrs.db.port}}&databaseUser={{debezium.db.user}}"
+	        + "&databasePassword={{debezium.db.password}}&databaseIncludeList={{openmrs.db.name}}"
+	        + "&offsetStorageFileName={{debezium.offsetFilename}}" + "&topicPrefix={{debezium.db.serverName}}"
+	        + "&schemaHistoryInternalFileFilename={{debezium.historyFilename}}&tableIncludeList={{debezium.tablesToSync}}"
 	        + "&offsetFlushIntervalMs=0&snapshotMode={{debezium.snapshotMode}}"
 	        + "&snapshotFetchSize=1000&snapshotLockingMode={{debezium.snapshotLockingMode}}&includeSchemaChanges=false"
 	        + "&maxBatchSize={{debezium.reader.maxBatchSize}}&offsetStorage={{"
-	        + WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS + "}}&databaseHistory={{"
+	        + WatcherConstants.PROP_DBZM_OFFSET_STORAGE_CLASS + "}}&schemaHistoryInternal={{"
 	        + WatcherConstants.PROP_DBZM_OFFSET_HISTORY_CLASS + "}}&offsetCommitTimeoutMs=15000"
 	        + "{{debezium.extraParameters:}}";
 	
