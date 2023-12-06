@@ -25,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
@@ -95,7 +94,7 @@ public class ChangeEventHandlerTest {
 		final String tableName = "person";
 		final String id = "1";
 		final String uuid = "test-uuid";
-		final String op = "c";
+		final String op = "r";
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 		Message message = new DefaultMessage(exchange);
 		message.setHeader(DebeziumConstants.HEADER_OPERATION, op);
@@ -114,7 +113,7 @@ public class ChangeEventHandlerTest {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
 				        && uuid.equals(dbzmEvent.getEvent().getIdentifier())
-				        && op.equals(dbzmEvent.getEvent().getOperation()) && dbzmEvent.getEvent().getSnapshot()
+				        && "c".equals(dbzmEvent.getEvent().getOperation()) && dbzmEvent.getEvent().getSnapshot()
 				        && dbzmEvent.getDateCreated() != null;
 			}
 			catch (Exception e) {

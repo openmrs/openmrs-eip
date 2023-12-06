@@ -54,8 +54,13 @@ public class ChangeEventHandler {
 		
 		log.info("Received DB change event: Operation=" + op + ", Metadata=" + metadata);
 		
-		if (!op.equals("c") && !op.equals("u") && !op.equals("d")) {
+		if (!op.equals("c") && !op.equals("u") && !op.equals("d") && !op.equals("r")) {
 			throw new EIPException("Don't know how to handle DB event with operation: " + op);
+		}
+		
+		//See https://jira.fgh.org.mz/browse/EC-601
+		if (op.equals("r")) {
+			op = "c";
 		}
 		
 		boolean isSubclassTable = Utils.isSubclassTable(tableName);
