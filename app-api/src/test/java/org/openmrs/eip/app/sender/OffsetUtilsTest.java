@@ -162,12 +162,12 @@ public class OffsetUtilsTest {
 	@Test
 	public void getBinlogFileName_shouldGetTheCurrentBinlogFile() throws Exception {
 		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
-		Assert.assertEquals("bin-log.000012", OffsetUtils.getBinlogFileName(file));
+		Assert.assertEquals("bin-log.000005", OffsetUtils.getBinlogFileName(file));
 	}
 	
 	@Test
-	public void transformOffsetIfNecessary_shouldTransformTheOffsetFileKey() throws Exception {
-		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
+	public void transformOffsetIfNecessary_shouldTransformTheOffsetFileKeyItIsAMap() throws Exception {
+		File file = new File(ClassUtils.getDefaultClassLoader().getResource("old_dbzm_offset.txt").getFile());
 		CustomFileOffsetBackingStore store = new CustomFileOffsetBackingStore();
 		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), file);
 		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
@@ -197,6 +197,58 @@ public class OffsetUtilsTest {
 		OffsetUtils.transformOffsetIfNecessary(offset);
 		
 		List keyList = mapper.readValue(offset.keySet().iterator().next().array(), List.class);
+		assertEquals(extract, keyList.get(0));
+		assertEquals(server, ((Map) keyList.get(1)).get("server"));
+		valueMap = mapper.readValue(offset.values().iterator().next().array(), Map.class);
+		assertEquals(ts, valueMap.get("ts_sec"));
+		assertEquals(binlogFile, valueMap.get(OFFSET_PROP_FILE));
+		assertEquals(position, valueMap.get(OFFSET_PROP_POSITION));
+		assertEquals(row, valueMap.get(OFFSET_PROP_ROW));
+		assertEquals(event, valueMap.get(OFFSET_PROP_EVENT));
+		assertEquals(serverId, valueMap.get("server_id"));
+	}
+	
+	@Test
+	public void transformOffsetIfNecessary_shouldSkipIfOffsetIsEmpty() throws Exception {
+		Map mockOffset = Mockito.mock(Map.class);
+		Mockito.when(mockOffset.isEmpty()).thenReturn(true);
+		
+		OffsetUtils.transformOffsetIfNecessary(mockOffset);
+		
+		Mockito.verify(mockOffset, Mockito.never()).keySet();
+	}
+	
+	@Test
+	public void transformOffsetIfNecessary_shouldNotTransformTheOffsetFileKeyIfItIsAList() throws Exception {
+		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
+		CustomFileOffsetBackingStore store = new CustomFileOffsetBackingStore();
+		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), file);
+		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
+		Map<ByteBuffer, ByteBuffer> offset = AppUtils.getFieldValue(store,
+		    MemoryOffsetBackingStore.class.getDeclaredField("data"));
+		ObjectMapper mapper = new ObjectMapper();
+		final String extract = "extract";
+		final String server = "Nsambya";
+		List keyList = mapper.readValue(offset.keySet().iterator().next().array(), List.class);
+		assertEquals(extract, keyList.get(0));
+		assertEquals(server, ((Map) keyList.get(1)).get("server"));
+		final int ts = 1701953000;
+		final String binlogFile = "bin-log.000005";
+		final int position = 4660;
+		final int row = 1;
+		final int event = 2;
+		final int serverId = 2;
+		Map valueMap = mapper.readValue(offset.values().iterator().next().array(), Map.class);
+		assertEquals(ts, valueMap.get("ts_sec"));
+		assertEquals(binlogFile, valueMap.get(OFFSET_PROP_FILE));
+		assertEquals(position, valueMap.get(OFFSET_PROP_POSITION));
+		assertEquals(row, valueMap.get(OFFSET_PROP_ROW));
+		assertEquals(event, valueMap.get(OFFSET_PROP_EVENT));
+		assertEquals(serverId, valueMap.get("server_id"));
+		
+		OffsetUtils.transformOffsetIfNecessary(offset);
+		
+		keyList = mapper.readValue(offset.keySet().iterator().next().array(), List.class);
 		assertEquals(extract, keyList.get(0));
 		assertEquals(server, ((Map) keyList.get(1)).get("server"));
 		valueMap = mapper.readValue(offset.values().iterator().next().array(), Map.class);
