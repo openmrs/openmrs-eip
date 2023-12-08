@@ -1,15 +1,26 @@
 package org.openmrs.eip.app.sender;
 
+import static org.junit.Assert.assertEquals;
+import static org.openmrs.eip.app.sender.SenderConstants.OFFSET_PROP_EVENT;
+import static org.openmrs.eip.app.sender.SenderConstants.OFFSET_PROP_FILE;
+import static org.openmrs.eip.app.sender.SenderConstants.OFFSET_PROP_POSITION;
+import static org.openmrs.eip.app.sender.SenderConstants.OFFSET_PROP_ROW;
+
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.connect.storage.FileOffsetBackingStore;
+import org.apache.kafka.connect.storage.MemoryOffsetBackingStore;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.CustomFileOffsetBackingStore;
 import org.openmrs.eip.app.sender.OffsetVerifier.OffsetVerificationResult;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.api.mockito.PowerMockito;
@@ -34,8 +45,8 @@ public class OffsetUtilsTest {
 	
 	private ByteBuffer createValueByteBuffer(String file, long position, Integer rows, Integer events) throws Exception {
 		Map valueMap = new HashMap();
-		valueMap.put(SenderConstants.OFFSET_PROP_FILE, file);
-		valueMap.put(SenderConstants.OFFSET_PROP_POSITION, position);
+		valueMap.put(OFFSET_PROP_FILE, file);
+		valueMap.put(OFFSET_PROP_POSITION, position);
 		valueMap.put(SenderConstants.OFFSET_PROP_ROW, rows);
 		valueMap.put(SenderConstants.OFFSET_PROP_EVENT, events);
 		return ByteBuffer.wrap(MAPPER.writeValueAsBytes(valueMap));
@@ -152,6 +163,49 @@ public class OffsetUtilsTest {
 	public void getBinlogFileName_shouldGetTheCurrentBinlogFile() throws Exception {
 		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
 		Assert.assertEquals("bin-log.000012", OffsetUtils.getBinlogFileName(file));
+	}
+	
+	@Test
+	public void transformOffsetIfNecessary_shouldTransformTheOffsetFileKey() throws Exception {
+		File file = new File(ClassUtils.getDefaultClassLoader().getResource("dbzm_offset.txt").getFile());
+		CustomFileOffsetBackingStore store = new CustomFileOffsetBackingStore();
+		AppUtils.setFieldValue(store, FileOffsetBackingStore.class.getDeclaredField("file"), file);
+		AppUtils.invokeMethod(store, FileOffsetBackingStore.class.getDeclaredMethod("load"));
+		Map<ByteBuffer, ByteBuffer> offset = AppUtils.getFieldValue(store,
+		    MemoryOffsetBackingStore.class.getDeclaredField("data"));
+		ObjectMapper mapper = new ObjectMapper();
+		Map keyMap = mapper.readValue(offset.keySet().iterator().next().array(), Map.class);
+		Assert.assertTrue(keyMap.containsKey("schema"));
+		final String extract = "extract";
+		final String server = "Nsambya";
+		assertEquals(extract, ((List) keyMap.get("payload")).get(0));
+		assertEquals(server, ((Map) ((List) keyMap.get("payload")).get(1)).get("server"));
+		final int ts = 1697696629;
+		final String binlogFile = "bin-log.000012";
+		final int position = 1192;
+		final int row = 1;
+		final int event = 2;
+		final int serverId = 2;
+		Map valueMap = mapper.readValue(offset.values().iterator().next().array(), Map.class);
+		assertEquals(ts, valueMap.get("ts_sec"));
+		assertEquals(binlogFile, valueMap.get(OFFSET_PROP_FILE));
+		assertEquals(position, valueMap.get(OFFSET_PROP_POSITION));
+		assertEquals(row, valueMap.get(OFFSET_PROP_ROW));
+		assertEquals(event, valueMap.get(OFFSET_PROP_EVENT));
+		assertEquals(serverId, valueMap.get("server_id"));
+		
+		OffsetUtils.transformOffsetIfNecessary(offset);
+		
+		List keyList = mapper.readValue(offset.keySet().iterator().next().array(), List.class);
+		assertEquals(extract, keyList.get(0));
+		assertEquals(server, ((Map) keyList.get(1)).get("server"));
+		valueMap = mapper.readValue(offset.values().iterator().next().array(), Map.class);
+		assertEquals(ts, valueMap.get("ts_sec"));
+		assertEquals(binlogFile, valueMap.get(OFFSET_PROP_FILE));
+		assertEquals(position, valueMap.get(OFFSET_PROP_POSITION));
+		assertEquals(row, valueMap.get(OFFSET_PROP_ROW));
+		assertEquals(event, valueMap.get(OFFSET_PROP_EVENT));
+		assertEquals(serverId, valueMap.get("server_id"));
 	}
 	
 }

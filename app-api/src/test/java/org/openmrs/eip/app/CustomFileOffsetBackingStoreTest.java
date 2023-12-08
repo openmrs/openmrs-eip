@@ -1,5 +1,6 @@
 package org.openmrs.eip.app;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class CustomFileOffsetBackingStoreTest {
 	}
 	
 	@Test
-	public void start_shouldVerifyTheExistingOffset() throws Exception {
+	public void start_shouldTransformAndVerifyTheExistingOffset() throws Exception {
 		Mockito.doNothing().when(store).doStart();
 		Map mockData = new HashMap();
 		PowerMockito.mockStatic(OffsetUtils.class);
@@ -67,6 +68,8 @@ public class CustomFileOffsetBackingStoreTest {
 		store.start();
 		
 		Mockito.verify(store).doStart();
+		PowerMockito.verifyStatic(OffsetUtils.class);
+		OffsetUtils.transformOffsetIfNecessary(mockData);
 		PowerMockito.verifyStatic(OffsetUtils.class);
 		OffsetUtils.verifyOffsetAndResetIfInvalid(mockData);
 	}
@@ -78,10 +81,8 @@ public class CustomFileOffsetBackingStoreTest {
 		PowerMockito.mockStatic(OffsetUtils.class);
 		PowerMockito.mockStatic(AppUtils.class);
 		Whitebox.setInternalState(store, Map.class, mockData);
-		PowerMockito
-		        .when(OffsetUtils.class,
-		            MethodUtils.getAccessibleMethod(OffsetUtils.class, "verifyOffsetAndResetIfInvalid", Map.class))
-		        .withArguments(mockData).thenThrow(new EIPException("test"));
+		Method method = MethodUtils.getAccessibleMethod(OffsetUtils.class, "verifyOffsetAndResetIfInvalid", Map.class);
+		PowerMockito.when(OffsetUtils.class, method).withArguments(mockData).thenThrow(new EIPException("test"));
 		
 		store.start();
 		
