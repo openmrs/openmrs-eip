@@ -1677,4 +1677,29 @@
         <dropColumn tableName="receiver_conflict_queue" columnName="is_resolved" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20231208-1530">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="clinical_summary_usage_report_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding clinical_summary_usage_report_hash table</comment>
+
+        <createTable tableName="clinical_summary_usage_report_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="DATETIME(3)" />
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

@@ -7,6 +7,7 @@ import java.util.Set;
 import jakarta.persistence.Table;
 
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -28,6 +29,13 @@ import liquibase.resource.ResourceAccessor;
 public class UpdateColumnDatatypeChangeSet implements CustomTaskChange {
 	
 	private static final Logger log = LoggerFactory.getLogger(UpdateColumnDatatypeChangeSet.class);
+	
+	private final static Set<String> IGNORE_HASH_TABLES;
+	
+	static {
+		IGNORE_HASH_TABLES = new HashSet();
+		IGNORE_HASH_TABLES.add(TableToSyncEnum.CLINICAL_SUMMARY_USAGE_REPORT.name().toLowerCase() + "_hash");
+	}
 	
 	@Override
 	public void execute(Database database) throws CustomChangeException {
@@ -75,8 +83,11 @@ public class UpdateColumnDatatypeChangeSet implements CustomTaskChange {
 		for (Resource resource : resources) {
 			final MetadataReader reader = readerFactory.getMetadataReader(resource);
 			if (filter.match(reader, readerFactory)) {
-				tableNames.add(
-				    reader.getAnnotationMetadata().getAnnotationAttributes(Table.class.getName()).get("name").toString());
+				final String table = reader.getAnnotationMetadata().getAnnotationAttributes(Table.class.getName())
+				        .get("name").toString();
+				if (!IGNORE_HASH_TABLES.contains(table)) {
+					tableNames.add(table);
+				}
 			}
 		}
 		
