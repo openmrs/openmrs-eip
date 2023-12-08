@@ -1,10 +1,8 @@
 package org.openmrs.eip.component.service;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import org.openmrs.eip.component.entity.Allergy;
 import org.openmrs.eip.component.entity.BaseEntity;
+import org.openmrs.eip.component.entity.ClinicalSummaryUsageReport;
 import org.openmrs.eip.component.entity.Concept;
 import org.openmrs.eip.component.entity.ConceptAttribute;
 import org.openmrs.eip.component.entity.Condition;
@@ -38,6 +36,7 @@ import org.openmrs.eip.component.entity.VisitAttribute;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.AllergyHash;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
+import org.openmrs.eip.component.management.hash.entity.ClinicalSummaryUsageReportHash;
 import org.openmrs.eip.component.management.hash.entity.ConditionHash;
 import org.openmrs.eip.component.management.hash.entity.DrugOrderHash;
 import org.openmrs.eip.component.management.hash.entity.EncounterDiagnosisHash;
@@ -66,6 +65,7 @@ import org.openmrs.eip.component.management.hash.entity.VisitHash;
 import org.openmrs.eip.component.model.AllergyModel;
 import org.openmrs.eip.component.model.AttributeModel;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.ClinicalSummaryUsageReportModel;
 import org.openmrs.eip.component.model.ConceptAttributeModel;
 import org.openmrs.eip.component.model.ConceptModel;
 import org.openmrs.eip.component.model.ConditionModel;
@@ -94,6 +94,9 @@ import org.openmrs.eip.component.model.TestOrderModel;
 import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.model.VisitAttributeModel;
 import org.openmrs.eip.component.model.VisitModel;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public enum TableToSyncEnum {
 	
@@ -157,7 +160,10 @@ public enum TableToSyncEnum {
 	
 	GAAC_FAMILY(GaacFamily.class, GaacFamilyModel.class, GaacFamilyHash.class),
 	
-	GAAC_FAMILY_MEMBER(GaacFamilyMember.class, GaacFamilyMemberModel.class, GaacFamilyMemberHash.class);
+	GAAC_FAMILY_MEMBER(GaacFamilyMember.class, GaacFamilyMemberModel.class, GaacFamilyMemberHash.class),
+	
+	CLINICAL_SUMMARY_USAGE_REPORT(ClinicalSummaryUsageReport.class, ClinicalSummaryUsageReportModel.class,
+	        ClinicalSummaryUsageReportHash.class);
 	
 	private Class<? extends BaseEntity> entityClass;
 	
