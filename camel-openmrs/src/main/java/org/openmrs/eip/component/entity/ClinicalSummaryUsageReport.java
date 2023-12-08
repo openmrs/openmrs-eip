@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +12,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "clinical_summary_usage_report")
 @AttributeOverride(name = "id", column = @Column(name = "clinical_summary_usage_report_id"))
 public class ClinicalSummaryUsageReport extends BaseChangeableDataEntity {
