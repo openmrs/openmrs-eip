@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
+@TestPropertySource(properties = "spring.mngt-datasource.connection-timeout=300000")
+@TestPropertySource(properties = "spring.openmrs-datasource.connection-timeout=300000")
 public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	@Autowired
