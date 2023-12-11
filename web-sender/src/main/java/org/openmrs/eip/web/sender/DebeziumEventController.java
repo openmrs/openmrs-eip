@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile(SyncProfiles.SENDER)
-@RequestMapping(RestConstants.API_PATH + "/dbsync/sender/event")
+@RequestMapping(RestConstants.API_PATH + "dbsync/sender/event")
 public class DebeziumEventController extends BaseRestController {
 	
 	@Override

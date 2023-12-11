@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile(SyncProfiles.SENDER)
-@RequestMapping(RestConstants.API_PATH + "/dbsync/sender/archive")
+@RequestMapping(RestConstants.API_PATH + "dbsync/sender/archive")
 public class SenderSyncArchiveController extends BaseRestController {
 	
 	private static final Logger log = LoggerFactory.getLogger(SenderSyncArchiveController.class);
