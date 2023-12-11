@@ -1,4 +1,8 @@
 SET FOREIGN_KEY_CHECKS=0;
+    
+DELETE FROM person_address;
+DELETE FROM person;
+DELETE FROM users;
 
 insert into users(uuid, user_id, system_id, creator, date_created, person_id, retired)
 values ('user_uuid', '1', 'admin', '1', '2005-01-01 00:00:00', '1', false);
