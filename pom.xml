@@ -51,6 +51,7 @@
         <hibernateValidatorVersion>8.0.1.Final</hibernateValidatorVersion>
         <camelTestSpringVersion>3.21.2</camelTestSpringVersion>
         <mockitoVersion>3.3.0</mockitoVersion>
+        <h2Version>1.4.199</h2Version>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
@@ -189,6 +190,12 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>mysql</artifactId>
                 <version>${testContainersVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2Version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
