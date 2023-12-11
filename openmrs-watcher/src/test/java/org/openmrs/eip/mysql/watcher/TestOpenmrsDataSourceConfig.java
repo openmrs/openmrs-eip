@@ -15,8 +15,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import liquibase.integration.spring.SpringLiquibase;
-
 @Configuration
 public class TestOpenmrsDataSourceConfig {
 	
@@ -33,18 +31,5 @@ public class TestOpenmrsDataSourceConfig {
 	public PlatformTransactionManager transactionManager(
 	        @Qualifier("openmrsTestEntityManager") final EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
-	}
-	
-	@Bean("openmrsSpringLiquibase")
-	public SpringLiquibase getSpringLiquibaseForOpenmrsDB(
-	        @Qualifier(Constants.OPENMRS_DATASOURCE_NAME) DataSource dataSource) {
-		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:liquibase-openmrs-test.xml");
-		liquibase.setDatabaseChangeLogTable("LIQUIBASECHANGELOG");
-		liquibase.setDatabaseChangeLogLockTable("LIQUIBASECHANGELOGLOCK");
-		liquibase.setShouldRun(true);
-		
-		return liquibase;
 	}
 }
