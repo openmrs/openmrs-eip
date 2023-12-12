@@ -60,18 +60,13 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.activemq</groupId>
-                    <artifactId>activemq-pool</artifactId>
+                    <artifactId>activemq-client</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-jms-pool</artifactId>
-            <version>${activeMq.version}</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
