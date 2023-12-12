@@ -5,7 +5,6 @@ import static org.testcontainers.utility.MountableFile.forClasspathResource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,6 +13,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+
+import liquibase.Liquibase;
+import liquibase.command.CommandScope;
+import liquibase.command.core.UpdateCommandStep;
+import liquibase.command.core.helpers.DbUrlConnectionCommandStep;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class SharedMysqlContainer extends MySQLContainer<SharedMysqlContainer> {
 	
@@ -46,57 +54,50 @@ public class SharedMysqlContainer extends MySQLContainer<SharedMysqlContainer> {
 		container.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		container.withDatabaseName("openmrs");
 		container.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
-		
 		super.start();
-		
 		executeLiquibase();
 		executeScripts();
 	}
 	
-	@Override
-	public void stop() {
-		//do nothing, JVM handles shut down
-	}
-	
 	private void executeLiquibase() {
-		// Execute Liquibase changelog file
-		try {
-			// Load JDBC driver and create a connection to the MySQL container
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(),
-			    container.getPassword());
+		try (Connection connection = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(),
+		    container.getPassword())) {
 			
-			// Run Liquibase changes
-			liquibase.integration.commandline.Main
-			        .run(new String[] { "--changeLogFile=liquibase-openmrs-test.xml", "--url=" + container.getJdbcUrl(),
-			                "--username=" + container.getUsername(), "--password=" + container.getPassword(), "update" });
+			Database database = DatabaseFactory.getInstance()
+			        .findCorrectDatabaseImplementation(new JdbcConnection(connection));
 			
-			conn.close();
+			Liquibase liquibase = new liquibase.Liquibase("liquibase-openmrs-test.xml", new ClassLoaderResourceAccessor(),
+			        database);
+			
+			CommandScope updateCommand = new CommandScope(UpdateCommandStep.COMMAND_NAME);
+			updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+			updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, liquibase.getChangeLogFile());
+			updateCommand.execute();
 		}
-		catch (Exception e) {
-			log.error("Liquibase execution failed: {}", e.getMessage());
-			throw new RuntimeException("Liquibase execution failed", e);
+		catch (Exception exception) {
+			log.error("Liquibase execution failed: {}", exception.getMessage());
+			throw new RuntimeException("Liquibase execution failed", exception);
 		}
 	}
 	
 	private void executeScripts() {
-		// Run scripts only if they haven't been executed before
 		if (!scriptsExecuted) {
-			List<Resource> scripts = new ArrayList<>();
+			List<Resource> scripts;
 			try {
 				scripts = List.of(RESOURCE_RESOLVER.getResources("classpath*:" + SCRIPT_DIR + "*.sql"));
+				
+				scripts.forEach(
+				    script -> container.withCopyFileToContainer(forClasspathResource(SCRIPT_DIR + script.getFilename()),
+				        "/docker-entrypoint-initdb.d/" + script.getFilename()));
 			}
 			catch (IOException e) {
 				log.error("An IOException occurred while trying to retrieve SQL scripts from the classpath {}",
 				    e.getMessage());
 				throw new RuntimeException("Failed to retrieve SQL scripts", e);
 			}
-			
-			scripts.forEach(
-			    script -> container.withCopyFileToContainer(forClasspathResource(SCRIPT_DIR + script.getFilename()),
-			        "/docker-entrypoint-initdb.d/" + script.getFilename()));
-			
-			scriptsExecuted = true; // Mark scripts as executed
+			finally {
+				scriptsExecuted = true;
+			}
 		}
 	}
 }

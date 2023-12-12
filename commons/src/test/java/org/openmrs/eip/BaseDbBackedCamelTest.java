@@ -2,9 +2,10 @@ package org.openmrs.eip;
 
 import javax.sql.DataSource;
 
+import org.openmrs.eip.config.DatasourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestExecutionListeners;
@@ -14,7 +15,7 @@ import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
 /**
  * Base class for tests for routes that require access to the management and OpenMRS databases.
  */
-@Import({ TestDBConfig.class })
+@ContextConfiguration(classes = { DatasourceConfig.class })
 @TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")
