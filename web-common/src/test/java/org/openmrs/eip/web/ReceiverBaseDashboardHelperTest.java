@@ -25,7 +25,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 @Import(TestWebConfig.class)
 @Sql(scripts = { "classpath:mgt_site_info.sql",
         "classpath:mgt_receiver_sync_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-public class BaseDashboardHelperTest extends BaseReceiverTest {
+public class ReceiverBaseDashboardHelperTest extends BaseReceiverTest {
 	
 	private static final String ENTITY_TYPE = SyncMessage.class.getSimpleName();
 	
@@ -39,7 +39,7 @@ public class BaseDashboardHelperTest extends BaseReceiverTest {
 	
 	@Before
 	public void setup() {
-		delegate = new TestDashboardHelper(producerTemplate);
+		delegate = new TestDashboardHelper(producerTemplate, true);
 		Whitebox.setInternalState(helper, DashboardHelper.class, delegate);
 	}
 	
