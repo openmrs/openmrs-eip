@@ -2,7 +2,6 @@ package org.openmrs.eip.component.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,8 +11,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "clinical_summary_usage_report")
-@AttributeOverride(name = "id", column = @Column(name = "clinical_summary_usage_report_id"))
+@Table(name = "clinicalsummary_usage_report")
 public class ClinicalSummaryUsageReport extends BaseChangeableDataEntity {
 	
 	@Column(name = "report")
@@ -22,7 +20,7 @@ public class ClinicalSummaryUsageReport extends BaseChangeableDataEntity {
 	@Column(name = "health_facility")
 	private String healthFacility;
 	
-	@Column(name = "username")
+	@Column(name = "user_name")
 	private String username;
 	
 	@Column(name = "confidential_terms")
