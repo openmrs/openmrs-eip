@@ -34,7 +34,7 @@ public class UpdateColumnDatatypeChangeSet implements CustomTaskChange {
 	
 	static {
 		IGNORE_HASH_TABLES = new HashSet();
-		IGNORE_HASH_TABLES.add(TableToSyncEnum.CLINICAL_SUMMARY_USAGE_REPORT.name().toLowerCase() + "_hash");
+		IGNORE_HASH_TABLES.add(TableToSyncEnum.CLINICALSUMMARY_USAGE_REPORT.name().toLowerCase() + "_hash");
 	}
 	
 	@Override

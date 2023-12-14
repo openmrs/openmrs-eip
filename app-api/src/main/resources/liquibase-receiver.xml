@@ -1680,12 +1680,12 @@
     <changeSet author="wluyima" id="20231208-1530">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="clinical_summary_usage_report_hash" />
+                <tableExists tableName="clinicalsummary_usage_report_hash" />
             </not>
         </preConditions>
-        <comment>Adding clinical_summary_usage_report_hash table</comment>
+        <comment>Adding clinicalsummary_usage_report_hash table</comment>
 
-        <createTable tableName="clinical_summary_usage_report_hash">
+        <createTable tableName="clinicalsummary_usage_report_hash">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" />
             </column>

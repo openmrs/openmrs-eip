@@ -1,5 +1,8 @@
 package org.openmrs.eip.component.service;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.openmrs.eip.component.entity.Allergy;
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.openmrs.eip.component.entity.ClinicalSummaryUsageReport;
@@ -95,9 +98,6 @@ import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.model.VisitAttributeModel;
 import org.openmrs.eip.component.model.VisitModel;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 public enum TableToSyncEnum {
 	
 	PERSON(Person.class, PersonModel.class, PersonHash.class),
@@ -162,7 +162,7 @@ public enum TableToSyncEnum {
 	
 	GAAC_FAMILY_MEMBER(GaacFamilyMember.class, GaacFamilyMemberModel.class, GaacFamilyMemberHash.class),
 	
-	CLINICAL_SUMMARY_USAGE_REPORT(ClinicalSummaryUsageReport.class, ClinicalSummaryUsageReportModel.class,
+	CLINICALSUMMARY_USAGE_REPORT(ClinicalSummaryUsageReport.class, ClinicalSummaryUsageReportModel.class,
 	        ClinicalSummaryUsageReportHash.class);
 	
 	private Class<? extends BaseEntity> entityClass;

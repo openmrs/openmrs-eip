@@ -21,7 +21,7 @@ public class ClinicalSummaryUsageReportService extends AbstractEntityService<Cli
 	
 	@Override
 	public TableToSyncEnum getTableToSync() {
-		return TableToSyncEnum.CLINICAL_SUMMARY_USAGE_REPORT;
+		return TableToSyncEnum.CLINICALSUMMARY_USAGE_REPORT;
 	}
 	
 }
