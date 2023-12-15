@@ -14,6 +14,9 @@
 				<span class="h6 text-dark" i18n="@@common-deletes">Deletes</span>
 			</td>
 			<td class="pr-1 pl-1 border border-secondary">
+				<span class="h6 text-dark" i18n="@@common-reads">Reads</span>
+			</td>
+			<td class="pr-1 pl-1 border border-secondary">
 				<span class="h6 text-dark" i18n="@@common-requests">Requests</span>
 			</td>
 		</tr>
@@ -34,6 +37,10 @@
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{getCountDisplay(categoryAndCountsMap?.get(c)?.get(SyncOperation.d))}}</span>
 				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.d) != null"></span>
+			</td>
+			<td class="pr-1 pl-1 border-bottom-0 border-left">
+				<span class="badge border border-secondary">{{getCountDisplay(categoryAndCountsMap?.get(c)?.get(SyncOperation.s))}}</span>
+				<span class="placeholder placeholder-lg col-1" [hidden]="categoryAndCountsMap?.get(c)?.get(SyncOperation.s) != null"></span>
 			</td>
 			<td class="pr-1 pl-1 border-bottom-0 border-left">
 				<span class="badge border border-secondary">{{getCountDisplay(categoryAndCountsMap?.get(c)?.get(SyncOperation.r))}}</span>

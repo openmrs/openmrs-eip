@@ -662,5 +662,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-reads">
+			<segment>
+				<source>Reads</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
