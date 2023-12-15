@@ -90,7 +90,7 @@ public class ChangeEventHandlerTest {
 	}
 	
 	@Test
-	public void handle_shouldProcessASnapshotEvent() {
+	public void handle_shouldProcessASnapshotReadEvent() {
 		final String tableName = "person";
 		final String id = "1";
 		final String uuid = "test-uuid";
@@ -113,7 +113,7 @@ public class ChangeEventHandlerTest {
 				return tableName.equals(dbzmEvent.getEvent().getTableName())
 				        && id.equals(dbzmEvent.getEvent().getPrimaryKeyId())
 				        && uuid.equals(dbzmEvent.getEvent().getIdentifier())
-				        && "c".equals(dbzmEvent.getEvent().getOperation()) && dbzmEvent.getEvent().getSnapshot()
+				        && "s".equals(dbzmEvent.getEvent().getOperation()) && dbzmEvent.getEvent().getSnapshot()
 				        && dbzmEvent.getDateCreated() != null;
 			}
 			catch (Exception e) {

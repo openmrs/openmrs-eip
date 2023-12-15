@@ -19,6 +19,7 @@
 			<span class="text-success" [hidden]="e.event?.operation != 'c'" i18n="@@common-insert">Insert</span>
 			<span [hidden]="e.event?.operation != 'u'" i18n="@@common-update">Update</span>
 			<span class="text-danger" [hidden]="e.event?.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-secondary" [hidden]="e.event?.operation != 's'" i18n="@@common-read">Read</span>
 			<span class="text-info" [hidden]="e.event?.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
 		<td container="body" ngbTooltip="{{e.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss.SSS'}}" [openDelay]="1000">

@@ -58,9 +58,8 @@ public class ChangeEventHandler {
 			throw new EIPException("Don't know how to handle DB event with operation: " + op);
 		}
 		
-		//See https://jira.fgh.org.mz/browse/EC-601
 		if (op.equals("r")) {
-			op = "c";
+			op = "s";
 		}
 		
 		boolean isSubclassTable = Utils.isSubclassTable(tableName);

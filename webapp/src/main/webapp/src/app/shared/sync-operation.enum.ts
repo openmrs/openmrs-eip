@@ -6,6 +6,8 @@ export enum SyncOperation {
 
 	d = 'd',
 
-	r = 'r'
+	r = 'r',
+
+	s = 's'
 
 }

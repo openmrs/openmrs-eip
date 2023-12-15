@@ -656,5 +656,11 @@
 				<target>Sem itens</target>
 			</segment>
 		</unit>
+		<unit id="common-read">
+			<segment>
+				<source>Read</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
