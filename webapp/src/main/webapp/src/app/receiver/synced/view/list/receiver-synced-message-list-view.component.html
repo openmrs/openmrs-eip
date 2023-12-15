@@ -27,6 +27,7 @@
 			<span class="text-success" [hidden]="m.operation != 'c'" i18n="@@common-insert">Insert</span>
 			<span [hidden]="m.operation != 'u'" i18n="@@common-update">Update</span>
 			<span class="text-danger" [hidden]="m.operation != 'd'" i18n="@@common-delete">Delete</span>
+			<span class="text-secondary" [hidden]="m.operation != 's'" i18n="@@common-read">Read</span>
 			<span class="text-info" [hidden]="m.operation != 'r'" i18n="@@common-request">Request</span>
 		</td>
 		<td>{{m.messageUuid}}</td>

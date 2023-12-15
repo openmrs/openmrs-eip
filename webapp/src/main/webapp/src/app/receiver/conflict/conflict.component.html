@@ -34,6 +34,7 @@
 				<span class="text-success" [hidden]="c.operation != 'c'" i18n="@@common-insert">Insert</span>
 				<span [hidden]="c.operation != 'u'" i18n="@@common-update">Update</span>
 				<span class="text-danger" [hidden]="c.operation != 'd'" i18n="@@common-delete">Delete</span>
+				<span class="text-secondary" [hidden]="c.operation != 's'" i18n="@@common-read">Read</span>
 				<span class="text-info" [hidden]="c.operation != 'r'" i18n="@@common-request">Request</span>
 			</td>
 			<td>{{c.messageUuid}}</td>
