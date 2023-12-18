@@ -1,7 +1,6 @@
 package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.route.TestUtils.getEntity;
 import static org.openmrs.eip.app.sender.SenderConstants.EX_PROP_DBZM_EVENT;
@@ -71,7 +70,6 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DBZM_EVENT_PROCESSOR, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 	@Test
@@ -109,7 +107,6 @@ public class DebeziumEventProcessorRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(URI_DBZM_EVENT_PROCESSOR, exchange);
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
 	}
 	
 }

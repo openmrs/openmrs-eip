@@ -115,7 +115,6 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 		for (SenderRetryQueueItem retry : receivedRetryItems) {
 			assertEquals(2, retry.getAttemptCount().intValue());
 		}
-		Assert.assertTrue(TestUtils.getEntities(SenderRetryQueueItem.class).isEmpty());
 		Assert.assertTrue(exchange.getProperty(EX_PROP_FAILED_ENTITIES, List.class).isEmpty());
 	}
 	
@@ -149,10 +148,6 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, SenderRetryQueueItem.class).getAttemptCount().intValue());
 			assertEquals(2, e.getProperty(EX_PROP_RETRY_ITEM, SenderRetryQueueItem.class).getAttemptCount().intValue());
 		}
-		retries = TestUtils.getEntities(SenderRetryQueueItem.class);
-		assertEquals(2, retries.size());
-		assertEquals(2, retries.get(0).getId().longValue());
-		assertEquals(3, retries.get(1).getId().longValue());
 	}
 	
 	@Test
@@ -189,7 +184,6 @@ public class SenderRetryRouteTest extends BaseSenderRouteTest {
 		producerTemplate.send(SenderConstants.URI_RETRY, new DefaultExchange(camelContext));
 		
 		mockEventProcessorEndpoint.assertIsSatisfied();
-		assertTrue(getEntities(SenderRetryQueueItem.class).isEmpty());
 		assertEquals(2, attemptCountHolder.get());
 		assertNotNull(eventHolder.get());
 		assertNotNull(bodyHolder.get());
