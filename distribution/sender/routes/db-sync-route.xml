@@ -48,86 +48,19 @@
         <choice>
             <when>
                 <simple>${body} != null || ${exchangeProperty.event.operation} == 'r'</simple>
-                <when>
-                    <simple>${body} == null</simple>
-
-                    <log message="Entity not found for request with uuid: ${exchangeProperty.event.requestUuid}" />
-
-                    <setBody>
-                        <spel>#{new org.openmrs.eip.component.model.SyncModel()}</spel>
-                    </setBody>
-                    <script>
-                        <spel>
-                            #{body.setMetadata(new org.openmrs.eip.component.model.SyncMetadata())}
-                        </spel>
-                    </script>
-                </when>
-
-                <setProperty name="${routeId}-msg-uuid">
-                    <spel>#{T(java.util.UUID).randomUUID().toString()}</spel>
-                </setProperty>
-
-                <script>
-                    <spel>
-                        #{body.metadata.setOperation(getProperty('event').operation)}
-                        #{body.metadata.setRequestUuid(getProperty('event').requestUuid)}
-                        #{body.metadata.setSnapshot(getProperty('event').snapshot)}
-                        #{body.metadata.setMessageUuid(getProperty('out-bound-db-sync-msg-uuid'))}
-                    </spel>
-                </script>
-                
-                <setBody>
-                    <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="marshall(${body})" />
-                </setBody>
-
-                <log loggingLevel="DEBUG" message="Sync data -> ${body}" />
-
-                <setProperty name="${routeId}-sync-data">
-                    <simple>${body}</simple>
-                </setProperty>
-                <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncMessage()}</spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setTableName(getProperty('event').tableName)}
-                        #{body.setIdentifier(getProperty('event').identifier)}
-                        #{body.setOperation(getProperty('event').operation)}
-                        #{body.setSnapshot(getProperty('event').snapshot)}
-                        #{body.setData(getProperty('out-bound-db-sync-sync-data'))}
-                        #{body.setMessageUuid(getProperty('out-bound-db-sync-msg-uuid'))}
-                        #{body.setDateCreated(new java.util.Date())}
-                        #{body.setRequestUuid(getProperty('event').requestUuid)}
-                    </spel>
-                </script>
-
                 <choice>
                     <when>
                         <simple>${exchangeProperty.dbzmEvent} != null</simple>
-                        <script>
-                            <spel>
-                                #{body.setEventDate(getProperty('dbzmEvent').dateCreated)}
-                            </spel>
-                        </script>
+                        <bean ref="senderService" method="moveToSyncQueue(${exchangeProperty.dbzmEvent}, ${body})" />
                     </when>
                     <when>
                         <simple>${exchangeProperty.retry-item} != null</simple>
-                        <script>
-                            <spel>
-                                #{body.setEventDate(getProperty('retry-item').eventDate)}
-                            </spel>
-                        </script>
+                        <bean ref="senderService" method="moveToSyncQueue(${exchangeProperty.retry-item}, ${body})" />
                     </when>
                     <otherwise>
                         <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="No debezium event or retry item found on the exchange" />
                     </otherwise>
                 </choice>
-
-                <log loggingLevel="DEBUG" message="Adding sync message to the outbound queue -> ${body}" />
-
-                <to uri="jpa:SenderSyncMessage" />
-
-                <log message="Successfully added sync message to the outbound queue" />
             </when>
             <otherwise>
                 <log message="No entity found in the database matching identifier ${exchangeProperty.event.identifier} in table ${exchangeProperty.event.tableName}" />

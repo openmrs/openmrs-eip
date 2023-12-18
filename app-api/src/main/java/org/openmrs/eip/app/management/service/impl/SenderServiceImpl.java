@@ -101,19 +101,19 @@ public class SenderServiceImpl implements SenderService {
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel) {
 		if (log.isDebugEnabled()) {
-			log.debug("Moving retry item to the sync queue");
+			log.debug("Moving error item to the sync queue");
 		}
 		
 		addToSyncQueue(retry.getEvent(), syncModel, retry.getEventDate());
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Removing item from the retry queue");
+			log.debug("Removing from the error queue an item with id: " + retry.getId());
 		}
 		
 		retryRepo.delete(retry);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed item from the retry queue");
+			log.debug("Successfully removed from the error queue an item with id: " + retry.getId());
 		}
 	}
 	
