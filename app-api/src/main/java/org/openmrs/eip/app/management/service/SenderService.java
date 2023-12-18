@@ -1,6 +1,8 @@
 package org.openmrs.eip.app.management.service;
 
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
+import org.openmrs.eip.component.model.SyncModel;
 
 /**
  * Contains service methods for the sender
@@ -13,5 +15,13 @@ public interface SenderService extends Service {
 	 * @param archive the archive to prune
 	 */
 	void prune(SenderSyncArchive archive);
+	
+	/**
+	 * Moves the specified debezium event to the synced queue
+	 *
+	 * @param debeziumEvent the DebeziumEvent object to move
+	 * @param syncModel the SyncModel object
+	 */
+	void moveToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel);
 	
 }

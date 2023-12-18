@@ -2,20 +2,36 @@ package org.openmrs.eip.app.management.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderPrunedArchive;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus;
+import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.SenderPrunedArchiveRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncArchiveRepository;
+import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
 import org.openmrs.eip.app.sender.BaseSenderTest;
+import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.SyncMetadata;
+import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.service.impl.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+
+import com.jayway.jsonpath.JsonPath;
 
 public class SenderServiceTest extends BaseSenderTest {
 	
@@ -26,7 +42,33 @@ public class SenderServiceTest extends BaseSenderTest {
 	private SenderPrunedArchiveRepository prunedRepo;
 	
 	@Autowired
+	private DebeziumEventRepository eventRepo;
+	
+	@Autowired
+	private SenderSyncMessageRepository syncRepo;
+	
+	@Autowired
+	private PatientService patientService;
+	
+	@Autowired
 	private SenderService service;
+	
+	protected Event createEvent(String table, String pkId, String identifier, String op, boolean snapshot) {
+		Event event = new Event();
+		event.setTableName(table);
+		event.setPrimaryKeyId(pkId);
+		event.setIdentifier(identifier);
+		event.setOperation(op);
+		event.setSnapshot(snapshot);
+		return event;
+	}
+	
+	protected DebeziumEvent createDebeziumEvent(String table, String pkId, String uuid, String op, boolean snapshot) {
+		DebeziumEvent dbzmEvent = new DebeziumEvent();
+		dbzmEvent.setEvent(createEvent(table, pkId, uuid, op, snapshot));
+		dbzmEvent.setDateCreated(new Date());
+		return eventRepo.save(dbzmEvent);
+	}
 	
 	@Test
 	@Sql(scripts = "classpath:mgt_sender_sync_archive.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -41,6 +83,45 @@ public class SenderServiceTest extends BaseSenderTest {
 		List<SenderPrunedArchive> prunedItems = prunedRepo.findAll();
 		assertEquals(1, prunedItems.size());
 		assertEquals(archive.getMessageUuid(), prunedItems.get(0).getMessageUuid());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
+	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToSyncQueue_shouldMoveAnItemFromTheEventToTheSyncQueue() {
+		final String table = "patient";
+		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
+		final String op = "c";
+		final boolean snapshot = true;
+		DebeziumEvent dbzmEvent = createDebeziumEvent(table, "101", uuid, op, snapshot);
+		PatientModel patientModel = patientService.getModel(uuid);
+		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PatientModel.class).model(patientModel)
+		        .metadata(new SyncMetadata()).build();
+		
+		service.moveToSyncQueue(dbzmEvent, syncModel);
+		
+		assertFalse(eventRepo.findById(dbzmEvent.getId()).isPresent());
+		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();
+		assertEquals(1, syncMsgs.size());
+		SenderSyncMessage msg = syncMsgs.get(0);
+		assertEquals(table, msg.getTableName());
+		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
+		assertEquals(snapshot, msg.getSnapshot());
+		assertEquals(SenderSyncMessageStatus.NEW, msg.getStatus());
+		assertNotNull(msg.getMessageUuid());
+		assertNotNull(msg.getDateCreated());
+		assertEquals(msg.getEventDate().getTime(), dbzmEvent.getDateCreated().getTime());
+		assertNull(msg.getRequestUuid());
+		assertNull(msg.getDateSent());
+		assertEquals(PatientModel.class.getName(), JsonPath.read(msg.getData(), "tableToSyncModelClass"));
+		assertEquals(uuid, JsonPath.read(msg.getData(), "model.uuid"));
+		assertEquals(op, JsonPath.read(msg.getData(), "metadata.operation"));
+		assertEquals(msg.getMessageUuid(), JsonPath.read(msg.getData(), "metadata.messageUuid"));
+		assertTrue(JsonPath.read(msg.getData(), "metadata.snapshot"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
 	}
 	
 }
