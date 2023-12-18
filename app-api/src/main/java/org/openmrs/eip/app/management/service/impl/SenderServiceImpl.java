@@ -7,10 +7,12 @@ import java.util.UUID;
 
 import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderPrunedArchive;
+import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.SenderPrunedArchiveRepository;
+import org.openmrs.eip.app.management.repository.SenderRetryRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
 import org.openmrs.eip.app.management.service.SenderService;
@@ -39,12 +41,15 @@ public class SenderServiceImpl implements SenderService {
 	
 	private SenderSyncMessageRepository syncRepo;
 	
+	private SenderRetryRepository retryRepo;
+	
 	public SenderServiceImpl(SenderSyncArchiveRepository archiveRepo, SenderPrunedArchiveRepository prunedRepo,
-	    DebeziumEventRepository eventRepo, SenderSyncMessageRepository syncRepo) {
+	    DebeziumEventRepository eventRepo, SenderSyncMessageRepository syncRepo, SenderRetryRepository retryRepo) {
 		this.archiveRepo = archiveRepo;
 		this.prunedRepo = prunedRepo;
 		this.eventRepo = eventRepo;
 		this.syncRepo = syncRepo;
+		this.retryRepo = retryRepo;
 	}
 	
 	@Override
@@ -89,6 +94,26 @@ public class SenderServiceImpl implements SenderService {
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed item from the event queue");
+		}
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel) {
+		if (log.isDebugEnabled()) {
+			log.debug("Moving retry item to the sync queue");
+		}
+		
+		addToSyncQueue(retry.getEvent(), syncModel, retry.getEventDate());
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Removing item from the retry queue");
+		}
+		
+		retryRepo.delete(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item from the retry queue");
 		}
 	}
 	

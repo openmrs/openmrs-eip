@@ -14,15 +14,18 @@ import java.util.List;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderPrunedArchive;
+import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage.SenderSyncMessageStatus;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.SenderPrunedArchiveRepository;
+import org.openmrs.eip.app.management.repository.SenderRetryRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
 import org.openmrs.eip.app.sender.BaseSenderTest;
 import org.openmrs.eip.component.entity.Event;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
@@ -46,6 +49,9 @@ public class SenderServiceTest extends BaseSenderTest {
 	
 	@Autowired
 	private SenderSyncMessageRepository syncRepo;
+	
+	@Autowired
+	private SenderRetryRepository retryRepo;
 	
 	@Autowired
 	private PatientService patientService;
@@ -119,6 +125,50 @@ public class SenderServiceTest extends BaseSenderTest {
 		assertEquals(op, JsonPath.read(msg.getData(), "metadata.operation"));
 		assertEquals(msg.getMessageUuid(), JsonPath.read(msg.getData(), "metadata.messageUuid"));
 		assertTrue(JsonPath.read(msg.getData(), "metadata.snapshot"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
+	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToSyncQueue_shouldMoveAnItemFromTheRetryToTheSyncQueue() {
+		final String table = "patient";
+		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
+		final String op = "c";
+		SenderRetryQueueItem retry = new SenderRetryQueueItem();
+		retry.setEvent(createEvent(table, "101", uuid, op, false));
+		retry.setDateCreated(new Date());
+		retry.setAttemptCount(1);
+		retry.setExceptionType(EIPException.class.getName());
+		retry.setEventDate(new Date());
+		retry = retryRepo.save(retry);
+		PatientModel patientModel = patientService.getModel(uuid);
+		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PatientModel.class).model(patientModel)
+		        .metadata(new SyncMetadata()).build();
+		
+		service.moveToSyncQueue(retry, syncModel);
+		
+		assertFalse(retryRepo.findById(retry.getId()).isPresent());
+		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();
+		assertEquals(1, syncMsgs.size());
+		SenderSyncMessage msg = syncMsgs.get(0);
+		assertEquals(table, msg.getTableName());
+		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
+		assertFalse(msg.getSnapshot());
+		assertEquals(SenderSyncMessageStatus.NEW, msg.getStatus());
+		assertNotNull(msg.getMessageUuid());
+		assertNotNull(msg.getDateCreated());
+		assertEquals(msg.getEventDate().getTime(), retry.getEventDate().getTime());
+		assertNull(msg.getRequestUuid());
+		assertNull(msg.getDateSent());
+		assertEquals(PatientModel.class.getName(), JsonPath.read(msg.getData(), "tableToSyncModelClass"));
+		assertEquals(uuid, JsonPath.read(msg.getData(), "model.uuid"));
+		assertEquals(op, JsonPath.read(msg.getData(), "metadata.operation"));
+		assertEquals(msg.getMessageUuid(), JsonPath.read(msg.getData(), "metadata.messageUuid"));
+		assertFalse(JsonPath.read(msg.getData(), "metadata.snapshot"));
 		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
 		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
 		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
