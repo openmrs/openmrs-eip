@@ -81,6 +81,45 @@ public class DbSyncRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
+	public void shouldProcessASnapshotReadEvent() {
+		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
+		DefaultExchange exchange = new DefaultExchange(camelContext);
+		final String table = "patient";
+		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
+		final String op = "s";
+		final boolean snapshot = true;
+		DebeziumEvent debeziumEvent = createDebeziumEvent(table, null, uuid, op);
+		debeziumEvent.setDateCreated(new Date());
+		debeziumEvent.getEvent().setSnapshot(snapshot);
+		exchange.setProperty(EX_PROP_EVENT, debeziumEvent.getEvent());
+		exchange.setProperty(EX_PROP_DBZM_EVENT, debeziumEvent);
+		
+		producerTemplate.send(URI_DBSYNC, exchange);
+		
+		List<SenderSyncMessage> syncMsgs = TestUtils.getEntities(SenderSyncMessage.class);
+		assertEquals(1, syncMsgs.size());
+		SenderSyncMessage msg = syncMsgs.get(0);
+		assertEquals(table, msg.getTableName());
+		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
+		assertEquals(snapshot, msg.getSnapshot());
+		assertEquals(SenderSyncMessageStatus.NEW, msg.getStatus());
+		assertNotNull(msg.getMessageUuid());
+		assertNotNull(msg.getDateCreated());
+		assertEquals(msg.getEventDate().getTime(), debeziumEvent.getDateCreated().getTime());
+		assertNull(msg.getRequestUuid());
+		assertNull(msg.getDateSent());
+		assertEquals(PatientModel.class.getName(), JsonPath.read(msg.getData(), "tableToSyncModelClass"));
+		assertEquals(uuid, JsonPath.read(msg.getData(), "model.uuid"));
+		assertEquals(op, JsonPath.read(msg.getData(), "metadata.operation"));
+		assertEquals(msg.getMessageUuid(), JsonPath.read(msg.getData(), "metadata.messageUuid"));
+		assertTrue(JsonPath.read(msg.getData(), "metadata.snapshot"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
+	}
+	
+	@Test
 	public void shouldProcessAnUpdateEvent() {
 		assertTrue(TestUtils.getEntities(SenderSyncMessage.class).isEmpty());
 		DefaultExchange exchange = new DefaultExchange(camelContext);
