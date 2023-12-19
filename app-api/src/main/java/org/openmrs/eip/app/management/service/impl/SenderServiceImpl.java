@@ -101,19 +101,52 @@ public class SenderServiceImpl implements SenderService {
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel) {
 		if (log.isDebugEnabled()) {
-			log.debug("Moving error item to the sync queue");
+			log.debug("Moving retry item to the sync queue");
 		}
 		
 		addToSyncQueue(retry.getEvent(), syncModel, retry.getEventDate());
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Removing from the error queue an item with id: " + retry.getId());
+			log.debug("Removing from the retry queue an item with id: " + retry.getId());
 		}
 		
 		retryRepo.delete(retry);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed from the error queue an item with id: " + retry.getId());
+			log.debug("Successfully removed from the retry queue an item with id: " + retry.getId());
+		}
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void moveToRetryQueue(DebeziumEvent debeziumEvent, String exceptionType, String errorMessage) {
+		log.info("Moving debezium event to the retry queue");
+		
+		SenderRetryQueueItem retry = new SenderRetryQueueItem();
+		retry.setEvent(debeziumEvent.getEvent());
+		retry.setExceptionType(exceptionType);
+		retry.setMessage(errorMessage);
+		retry.setEventDate(debeziumEvent.getDateCreated());
+		retry.setDateCreated(new Date());
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Saving retry item");
+		}
+		
+		retryRepo.save(retry);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved retry item");
+		}
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Removing item from the event queue");
+		}
+		
+		eventRepo.delete(debeziumEvent);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed item from the event queue");
 		}
 	}
 	

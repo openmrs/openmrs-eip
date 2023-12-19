@@ -18,7 +18,7 @@ public interface SenderService extends Service {
 	void prune(SenderSyncArchive archive);
 	
 	/**
-	 * Moves the specified debezium event to the synced queue
+	 * Moves a debezium event to the synced queue
 	 *
 	 * @param debeziumEvent the DebeziumEvent object to move
 	 * @param syncModel the SyncModel object
@@ -26,11 +26,20 @@ public interface SenderService extends Service {
 	void moveToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel);
 	
 	/**
-	 * Moves the specified retry item to the synced queue
+	 * Moves a retry item to the synced queue
 	 *
 	 * @param retry the retry item to move
 	 * @param syncModel the SyncModel object
 	 */
 	void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel);
+	
+	/**
+	 * Moves a debezium event to the retry queue.
+	 *
+	 * @param debeziumEvent the DebeziumEvent object to move
+	 * @param exceptionType the fully qualified Java class name of the thrown exception
+	 * @param errorMessage the error message
+	 */
+	void moveToRetryQueue(DebeziumEvent debeziumEvent, String exceptionType, String errorMessage);
 	
 }

@@ -23,6 +23,7 @@ import org.openmrs.eip.app.management.repository.SenderPrunedArchiveRepository;
 import org.openmrs.eip.app.management.repository.SenderRetryRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncArchiveRepository;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
+import org.openmrs.eip.app.route.sender.SenderTestUtils;
 import org.openmrs.eip.app.sender.BaseSenderTest;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
@@ -103,6 +104,7 @@ public class SenderServiceTest extends BaseSenderTest {
 		PatientModel patientModel = patientService.getModel(uuid);
 		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PatientModel.class).model(patientModel)
 		        .metadata(new SyncMetadata()).build();
+		assertEquals(0, syncRepo.count());
 		
 		service.moveToSyncQueue(dbzmEvent, syncModel);
 		
@@ -138,6 +140,7 @@ public class SenderServiceTest extends BaseSenderTest {
 		final String uuid = "some-person-uuid";
 		final String op = "r";
 		DebeziumEvent dbzmEvent = createDebeziumEvent(table, "101", uuid, op, false);
+		assertEquals(0, syncRepo.count());
 		
 		service.moveToSyncQueue(dbzmEvent, null);
 		
@@ -182,6 +185,7 @@ public class SenderServiceTest extends BaseSenderTest {
 		PatientModel patientModel = patientService.getModel(uuid);
 		SyncModel syncModel = SyncModel.builder().tableToSyncModelClass(PatientModel.class).model(patientModel)
 		        .metadata(new SyncMetadata()).build();
+		assertEquals(0, syncRepo.count());
 		
 		service.moveToSyncQueue(retry, syncModel);
 		
@@ -207,6 +211,36 @@ public class SenderServiceTest extends BaseSenderTest {
 		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
 		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
 		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToRetryQueue_shouldMoveAnItemFromTheEventToTheRetryQueue() {
+		final Long debeziumEventId = 1L;
+		final String errorMsg = "test error";
+		DebeziumEvent dbzmEvent = eventRepo.getReferenceById(debeziumEventId);
+		Event event = dbzmEvent.getEvent();
+		assertFalse(SenderTestUtils.hasRetryItem(event.getTableName(), event.getPrimaryKeyId()));
+		assertEquals(0, retryRepo.count());
+		
+		service.moveToRetryQueue(dbzmEvent, EIPException.class.getName(), errorMsg);
+		
+		assertFalse(eventRepo.findById(dbzmEvent.getId()).isPresent());
+		List<SenderRetryQueueItem> retries = retryRepo.findAll();
+		assertEquals(1, retries.size());
+		SenderRetryQueueItem errorItem = retries.get(0);
+		assertEquals(event.getTableName(), errorItem.getEvent().getTableName());
+		assertEquals(event.getPrimaryKeyId(), errorItem.getEvent().getPrimaryKeyId());
+		assertEquals(event.getIdentifier(), errorItem.getEvent().getIdentifier());
+		assertEquals(event.getOperation(), errorItem.getEvent().getOperation());
+		assertEquals(event.getSnapshot(), errorItem.getEvent().getSnapshot());
+		assertEquals(event.getRequestUuid(), errorItem.getEvent().getRequestUuid());
+		assertEquals(1, errorItem.getAttemptCount().intValue());
+		assertEquals(dbzmEvent.getDateCreated(), errorItem.getEventDate());
+		assertNotNull(errorItem.getDateCreated());
+		assertNull(errorItem.getDateChanged());
+		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());
+		assertEquals(errorMsg, errorItem.getMessage());
 	}
 	
 }
