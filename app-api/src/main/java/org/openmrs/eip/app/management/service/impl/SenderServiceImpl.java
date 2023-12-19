@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Profile(SyncProfiles.SENDER)
 public class SenderServiceImpl implements SenderService {
 	
-	private static final Logger log = LoggerFactory.getLogger(ReceiverServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SenderServiceImpl.class);
 	
 	private SenderSyncArchiveRepository archiveRepo;
 	

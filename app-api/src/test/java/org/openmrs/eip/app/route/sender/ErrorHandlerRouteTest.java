@@ -29,10 +29,13 @@ import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
+import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
+import org.openmrs.eip.app.management.repository.SenderRetryRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.entity.Event;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.reflect.Whitebox;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -44,6 +47,12 @@ import io.debezium.DebeziumException;
 @Sql(scripts = "classpath:mgt_sender_retry_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 @TestPropertySource(properties = "logging.level." + ROUTE_ID_ERROR_HANDLER + "=DEBUG")
 public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
+	
+	@Autowired
+	private DebeziumEventRepository eventRepo;
+	
+	@Autowired
+	private SenderRetryRepository retryRepo;
 	
 	@Override
 	public String getTestRouteFilename() {
@@ -64,7 +73,7 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 	}
 	
 	@Test
-	public void shouldAddTheEventToTheErrorQueue() {
+	public void shouldAddTheEventToTheRetryQueue() {
 		final Long debeziumEventId = 1L;
 		final String errorMsg = "test error";
 		DefaultExchange exchange = new DefaultExchange(camelContext);
@@ -74,26 +83,12 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 		assertFalse(SenderTestUtils.hasRetryItem(event.getTableName(), event.getPrimaryKeyId()));
 		exchange.setProperty(EX_PROP_DBZM_EVENT, debeziumEvent);
 		exchange.setProperty(EX_PROP_EVENT, debeziumEvent.getEvent());
+		final long retryCount = retryRepo.count();
 		
 		producerTemplate.send(URI_ERROR_HANDLER, exchange);
 		
-		assertNull(getEntity(DebeziumEvent.class, debeziumEventId));
-		List<SenderRetryQueueItem> errorItems = TestUtils.getEntities(SenderRetryQueueItem.class).stream()
-		        .filter(r -> r.getEvent().getTableName().equals(event.getTableName())
-		                && r.getEvent().getPrimaryKeyId().equals(event.getPrimaryKeyId()))
-		        .collect(Collectors.toList());
-		assertEquals(1, errorItems.size());
-		SenderRetryQueueItem errorItem = errorItems.get(0);
-		assertEquals(event.getIdentifier(), errorItem.getEvent().getIdentifier());
-		assertEquals(event.getOperation(), errorItem.getEvent().getOperation());
-		assertEquals(event.getSnapshot(), errorItem.getEvent().getSnapshot());
-		assertEquals(event.getRequestUuid(), errorItem.getEvent().getRequestUuid());
-		assertEquals(1, errorItem.getAttemptCount().intValue());
-		assertEquals(debeziumEvent.getDateCreated(), errorItem.getEventDate());
-		assertNotNull(errorItem.getDateCreated());
-		assertNull(errorItem.getDateChanged());
-		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());
-		assertEquals(errorMsg, errorItem.getMessage());
+		assertFalse(eventRepo.findById(debeziumEventId).isPresent());
+		assertEquals(retryCount + 1, retryRepo.count());
 	}
 	
 	@Test
@@ -118,7 +113,6 @@ public class ErrorHandlerRouteTest extends BaseSenderRouteTest {
 		SenderRetryQueueItem errorItem = errorItems.get(0);
 		assertEquals(DebeziumException.class.getName(), errorItem.getExceptionType());
 		assertEquals(rootCauseMsg, errorItem.getMessage());
-		
 	}
 	
 	@Test

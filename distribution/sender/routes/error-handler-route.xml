@@ -70,36 +70,7 @@
                     <when>
                         <!-- This is a failure when processing a new debezium event -->
                         <simple>${exchangeProperty.dbzmEvent} != null</simple>
-                        <log message="Adding new item to retry queue" />
-                        <setProperty name="retry-item">
-                            <spel>
-                                #{new org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem()}
-                            </spel>
-                        </setProperty>
-                        <script>
-                            <spel>
-                                #{getProperty('retry-item').setEvent(getProperty('event'))}
-                                #{getProperty('retry-item').setExceptionType(getProperty('exceptionType'))}
-                                #{getProperty('retry-item').setMessage(getProperty('error-msg'))}
-                                #{getProperty('retry-item').setEventDate(getProperty('dbzmEvent').dateCreated)}
-                                #{getProperty('retry-item').setDateCreated(new java.util.Date())}
-                            </spel>
-                        </script>
-                        <setBody>
-                            <simple>${exchangeProperty.retry-item}</simple>
-                        </setBody>
-
-                        <log loggingLevel="DEBUG" message="Saving failed DB event to retry queue" />
-
-                        <to uri="jpa:SenderRetryQueueItem?usePersist=true" />
-
-                        <log loggingLevel="DEBUG" message="Successfully saved DB event to retry queue" />
-
-                        <log message="Removing item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue" loggingLevel="DEBUG" />
-
-                        <bean ref="debeziumEventRepository" method="delete(${exchangeProperty.dbzmEvent})" />
-
-                        <log message="Successfully removed item with id: ${exchangeProperty.dbzmEvent.id} from the debezium event queue since it has been moved to the error queue" />
+                        <bean ref="senderService" method="moveToRetryQueue(${exchangeProperty.dbzmEvent}, ${exchangeProperty.exceptionType}, ${exchangeProperty.error-msg})" />
                     </when>
                     <otherwise>
                         <!-- This is a failure when re-processing a previously failed event -->
