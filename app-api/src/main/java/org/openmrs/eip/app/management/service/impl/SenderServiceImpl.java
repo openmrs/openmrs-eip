@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -181,6 +182,31 @@ public class SenderServiceImpl implements SenderService {
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved sync message");
+		}
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void archiveSyncMessage(SenderSyncMessage message, LocalDateTime dateReceivedByReceiver) {
+		log.info("Archiving the sync item");
+		
+		SenderSyncArchive archive = new SenderSyncArchive(message);
+		archive.setDateCreated(new Date());
+		archive.setDateReceivedByReceiver(dateReceivedByReceiver);
+		if (log.isDebugEnabled()) {
+			log.debug("Saving archive");
+		}
+		
+		archiveRepo.save(archive);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully saved archive, removing sync item(s) with a matching message uuid");
+		}
+		
+		syncRepo.deleteByMessageUuid(message.getMessageUuid());
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully removed sync item(s) from the sync queue with a matching message uuid");
 		}
 	}
 	

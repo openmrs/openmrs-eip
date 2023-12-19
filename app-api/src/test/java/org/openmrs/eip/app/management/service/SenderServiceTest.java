@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Date;
 import java.util.List;
 
@@ -241,6 +243,26 @@ public class SenderServiceTest extends BaseSenderTest {
 		assertNull(errorItem.getDateChanged());
 		assertEquals(EIPException.class.getName(), errorItem.getExceptionType());
 		assertEquals(errorMsg, errorItem.getMessage());
+	}
+	
+	@Test
+	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void archiveSyncedMessage_shouldMoveTheSyncedMessageToTheArchiveQueue() {
+		final Long id = 1L;
+		SenderSyncMessage msg = syncRepo.findById(id).get();
+		assertEquals(0, archiveRepo.count());
+		long timestamp = System.currentTimeMillis();
+		LocalDateTime dateReceivedByReceiver = LocalDateTime.of(2020, Month.JUNE, 28, 0, 0, 1);
+		
+		service.archiveSyncMessage(msg, dateReceivedByReceiver);
+		
+		assertFalse(syncRepo.findById(id).isPresent());
+		List<SenderSyncArchive> archives = archiveRepo.findAll();
+		assertEquals(1, archives.size());
+		SenderSyncArchive a = archives.get(0);
+		assertEquals(msg.getMessageUuid(), a.getMessageUuid());
+		assertEquals(dateReceivedByReceiver, a.getDateReceivedByReceiver());
+		assertTrue(a.getDateCreated().getTime() == timestamp || a.getDateCreated().getTime() > timestamp);
 	}
 	
 }

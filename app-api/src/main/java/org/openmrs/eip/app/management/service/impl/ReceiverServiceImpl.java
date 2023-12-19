@@ -107,13 +107,13 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		archiveRepo.save(archive);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully saved archive, removing message from the synced queue");
+			log.debug("Successfully saved archive, removing item from the synced queue");
 		}
 		
 		syncedMsgRepo.delete(message);
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Successfully removed message removed from the synced queue");
+			log.debug("Successfully removed item from the synced queue");
 		}
 	}
 	

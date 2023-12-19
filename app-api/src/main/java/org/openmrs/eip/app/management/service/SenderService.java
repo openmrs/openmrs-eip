@@ -1,8 +1,11 @@
 package org.openmrs.eip.app.management.service;
 
+import java.time.LocalDateTime;
+
 import org.openmrs.eip.app.management.entity.sender.DebeziumEvent;
 import org.openmrs.eip.app.management.entity.sender.SenderRetryQueueItem;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.component.model.SyncModel;
 
 /**
@@ -41,5 +44,13 @@ public interface SenderService extends Service {
 	 * @param errorMessage the error message
 	 */
 	void moveToRetryQueue(DebeziumEvent debeziumEvent, String exceptionType, String errorMessage);
+	
+	/**
+	 * Moves a {@link SenderSyncMessage} to the archive queue
+	 *
+	 * @param message the message to archive
+	 * @param dateReceivedByReceiver the date the sync message was received by the receiver
+	 */
+	void archiveSyncMessage(SenderSyncMessage message, LocalDateTime dateReceivedByReceiver);
 	
 }
