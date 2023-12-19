@@ -133,6 +133,41 @@ public class SenderServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void moveToSyncQueue_shouldMoveARequestEventFromTheEventToTheSyncQueue() {
+		final String table = "person";
+		final String uuid = "some-person-uuid";
+		final String op = "r";
+		DebeziumEvent dbzmEvent = createDebeziumEvent(table, "101", uuid, op, false);
+		
+		service.moveToSyncQueue(dbzmEvent, null);
+		
+		assertFalse(eventRepo.findById(dbzmEvent.getId()).isPresent());
+		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();
+		assertEquals(1, syncMsgs.size());
+		SenderSyncMessage msg = syncMsgs.get(0);
+		assertEquals(table, msg.getTableName());
+		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
+		assertFalse(msg.getSnapshot());
+		assertEquals(SenderSyncMessageStatus.NEW, msg.getStatus());
+		assertNotNull(msg.getMessageUuid());
+		assertNotNull(msg.getDateCreated());
+		assertEquals(msg.getEventDate().getTime(), dbzmEvent.getDateCreated().getTime());
+		assertEquals(op, JsonPath.read(msg.getData(), "metadata.operation"));
+		assertEquals(msg.getMessageUuid(), JsonPath.read(msg.getData(), "metadata.messageUuid"));
+		assertFalse(JsonPath.read(msg.getData(), "metadata.snapshot"));
+		assertNull(msg.getRequestUuid());
+		assertNull(msg.getDateSent());
+		assertNull(JsonPath.read(msg.getData(), "tableToSyncModelClass"));
+		assertNull(JsonPath.read(msg.getData(), "model"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.sourceIdentifier"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.dateSent"));
+		assertNull(JsonPath.read(msg.getData(), "metadata.requestUuid"));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
+	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void moveToSyncQueue_shouldMoveAnItemFromTheRetryToTheSyncQueue() {
 		final String table = "patient";
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";

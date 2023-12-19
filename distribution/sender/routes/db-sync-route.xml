@@ -68,7 +68,6 @@
         </choice>
         
         <log loggingLevel="DEBUG" message="End ${routeId}" />
-
     </route>
 
 </routes>

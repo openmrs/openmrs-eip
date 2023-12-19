@@ -118,7 +118,7 @@ public class SenderServiceImpl implements SenderService {
 	}
 	
 	private void addToSyncQueue(Event event, SyncModel syncModel, Date eventDate) {
-		if (syncModel == null) {
+		if (syncModel == null && "r".equals(event.getOperation())) {
 			log.info("Entity not found for request with uuid: " + event.getRequestUuid());
 			syncModel = SyncModel.builder().metadata(new SyncMetadata()).build();
 		}
