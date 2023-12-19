@@ -95,7 +95,7 @@ public class SenderServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void moveToSyncQueue_shouldMoveAnItemFromTheEventToTheSyncQueue() {
+	public void moveEventToSyncQueue_shouldMoveAnItemFromTheEventToTheSyncQueue() {
 		final String table = "patient";
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String op = "c";
@@ -106,7 +106,7 @@ public class SenderServiceTest extends BaseSenderTest {
 		        .metadata(new SyncMetadata()).build();
 		assertEquals(0, syncRepo.count());
 		
-		service.moveToSyncQueue(dbzmEvent, syncModel);
+		service.moveEventToSyncQueue(dbzmEvent, syncModel);
 		
 		assertFalse(eventRepo.findById(dbzmEvent.getId()).isPresent());
 		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();
@@ -135,14 +135,14 @@ public class SenderServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void moveToSyncQueue_shouldMoveARequestEventFromTheEventToTheSyncQueue() {
+	public void moveEventToSyncQueue_shouldMoveARequestEventFromTheEventToTheSyncQueue() {
 		final String table = "person";
 		final String uuid = "some-person-uuid";
 		final String op = "r";
 		DebeziumEvent dbzmEvent = createDebeziumEvent(table, "101", uuid, op, false);
 		assertEquals(0, syncRepo.count());
 		
-		service.moveToSyncQueue(dbzmEvent, null);
+		service.moveEventToSyncQueue(dbzmEvent, null);
 		
 		assertFalse(eventRepo.findById(dbzmEvent.getId()).isPresent());
 		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();
@@ -171,7 +171,7 @@ public class SenderServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	@Sql(scripts = "classpath:mgt_debezium_event_queue.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void moveToSyncQueue_shouldMoveAnItemFromTheRetryToTheSyncQueue() {
+	public void moveRetryToSyncQueue_shouldMoveAnItemFromTheRetryToTheSyncQueue() {
 		final String table = "patient";
 		final String uuid = "abfd940e-32dc-491f-8038-a8f3afe3e35b";
 		final String op = "c";
@@ -187,7 +187,7 @@ public class SenderServiceTest extends BaseSenderTest {
 		        .metadata(new SyncMetadata()).build();
 		assertEquals(0, syncRepo.count());
 		
-		service.moveToSyncQueue(retry, syncModel);
+		service.moveRetryToSyncQueue(retry, syncModel);
 		
 		assertFalse(retryRepo.findById(retry.getId()).isPresent());
 		List<SenderSyncMessage> syncMsgs = syncRepo.findAll();

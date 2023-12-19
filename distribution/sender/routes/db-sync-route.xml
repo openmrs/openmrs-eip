@@ -51,11 +51,11 @@
                 <choice>
                     <when>
                         <simple>${exchangeProperty.dbzmEvent} != null</simple>
-                        <bean ref="senderService" method="moveToSyncQueue(${exchangeProperty.dbzmEvent}, ${body})" />
+                        <bean ref="senderService" method="moveEventToSyncQueue(${exchangeProperty.dbzmEvent}, ${body})" />
                     </when>
                     <when>
                         <simple>${exchangeProperty.retry-item} != null</simple>
-                        <bean ref="senderService" method="moveToSyncQueue(${exchangeProperty.retry-item}, ${body})" />
+                        <bean ref="senderService" method="moveRetryToSyncQueue(${exchangeProperty.retry-item}, ${body})" />
                     </when>
                     <otherwise>
                         <throwException exceptionType="org.openmrs.eip.component.exception.EIPException" message="No debezium event or retry item found on the exchange" />

@@ -23,7 +23,7 @@ public interface SenderService extends Service {
 	 * @param debeziumEvent the DebeziumEvent object to move
 	 * @param syncModel the SyncModel object
 	 */
-	void moveToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel);
+	void moveEventToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel);
 	
 	/**
 	 * Moves a retry item to the synced queue
@@ -31,7 +31,7 @@ public interface SenderService extends Service {
 	 * @param retry the retry item to move
 	 * @param syncModel the SyncModel object
 	 */
-	void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel);
+	void moveRetryToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel);
 	
 	/**
 	 * Moves a debezium event to the retry queue.

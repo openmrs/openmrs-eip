@@ -79,7 +79,7 @@ public class SenderServiceImpl implements SenderService {
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void moveToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel) {
+	public void moveEventToSyncQueue(DebeziumEvent debeziumEvent, SyncModel syncModel) {
 		if (log.isDebugEnabled()) {
 			log.debug("Moving debezium event to the sync queue");
 		}
@@ -99,7 +99,7 @@ public class SenderServiceImpl implements SenderService {
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void moveToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel) {
+	public void moveRetryToSyncQueue(SenderRetryQueueItem retry, SyncModel syncModel) {
 		if (log.isDebugEnabled()) {
 			log.debug("Moving retry item to the sync queue");
 		}
@@ -120,7 +120,7 @@ public class SenderServiceImpl implements SenderService {
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void moveToRetryQueue(DebeziumEvent debeziumEvent, String exceptionType, String errorMessage) {
-		log.info("Moving debezium event to the retry queue");
+		log.info("Moving event to the retry queue");
 		
 		SenderRetryQueueItem retry = new SenderRetryQueueItem();
 		retry.setEvent(debeziumEvent.getEvent());
