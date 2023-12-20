@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog context="sender"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-4">
+        <createTable tableName="debezium_event_queue">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_key_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snapshot" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime"/>
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-5">
+        <createTable tableName="hibernate_sequence">
+            <column name="next_val" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-6">
+        <createTable tableName="sender_pruned_archive">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)"/>
+            <column name="snapshot" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sync_data" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_sent" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_date" type="datetime"/>
+            <column name="date_received_by_receiver" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-7">
+        <createTable tableName="sender_retry_queue">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_key_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snapshot" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="VARCHAR(1024)"/>
+            <column name="date_created" type="datetime"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="exception_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints unique="true"/>
+            </column>
+            <column name="event_date" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-8">
+        <createTable tableName="sender_sync_archive">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)"/>
+            <column name="snapshot" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sync_data" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_sent" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_date" type="datetime"/>
+            <column name="date_received_by_receiver" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-9">
+        <createTable tableName="sender_sync_message">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation" type="VARCHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snapshot" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sync_data" type="TEXT"/>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_sent" type="datetime"/>
+            <column name="event_date" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-10">
+        <createTable tableName="sender_sync_request">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column defaultValueNumeric="0" name="found" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_processed" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-11">
+        <createTable tableName="sender_sync_response">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_uuid" type="VARCHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_received_by_receiver" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_sent_by_receiver" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    
+</databaseChangeLog>
