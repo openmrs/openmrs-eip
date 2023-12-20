@@ -7,6 +7,12 @@
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet author="wluyima" id="20231220-1301">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="debezium_event_queue"/>
+            </not>
+        </preConditions>
+        <comment>Adding debezium_event_queue table</comment>
         <createTable tableName="debezium_event_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -59,6 +65,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1304">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_pruned_archive"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_pruned_archive table</comment>
         <createTable tableName="sender_pruned_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -96,6 +108,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1305">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_retry_queue"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_retry_queue table</comment>
         <createTable tableName="sender_retry_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -130,6 +148,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1306">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_archive"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_archive table</comment>
         <createTable tableName="sender_sync_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -167,6 +191,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1307">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_message"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_message table</comment>
         <createTable tableName="sender_sync_message">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -200,6 +230,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1308">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_request"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_request table</comment>
         <createTable tableName="sender_sync_request">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -227,6 +263,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1309">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sender_sync_response"/>
+            </not>
+        </preConditions>
+        <comment>Adding sender_sync_response table</comment>
         <createTable tableName="sender_sync_response">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
