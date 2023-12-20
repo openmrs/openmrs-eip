@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<databaseChangeLog context="sender"
+<databaseChangeLog contextFilter="sender"
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-4">
+    <changeSet author="wluyima" id="20231220-1301">
         <createTable tableName="debezium_event_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -31,13 +31,34 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-5">
-        <createTable tableName="hibernate_sequence">
-            <column name="next_val" type="BIGINT"/>
-        </createTable>
+    <changeSet author="wluyima" id="20231220-1302" dbms="!mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="hibernate_sequence" />
+            </not>
+        </preConditions>
+        <comment>Adding hibernate_sequence sequence</comment>
+        <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-6">
+    <changeSet author="wluyima" id="20231220-1303" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="hibernate_sequence" />
+            </not>
+        </preConditions>
+        <comment>Adding hibernate_sequence table</comment>
+
+        <createTable tableName="hibernate_sequence">
+            <column name="next_val" type="BIGINT" />
+        </createTable>
+
+        <insert tableName="hibernate_sequence">
+            <column name="next_val" value="1" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20231220-1304">
         <createTable tableName="sender_pruned_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -74,7 +95,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-7">
+    <changeSet author="wluyima" id="20231220-1305">
         <createTable tableName="sender_retry_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -108,7 +129,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-8">
+    <changeSet author="wluyima" id="20231220-1306">
         <createTable tableName="sender_sync_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -145,7 +166,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-9">
+    <changeSet author="wluyima" id="20231220-1307">
         <createTable tableName="sender_sync_message">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -178,7 +199,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-10">
+    <changeSet author="wluyima" id="20231220-1308">
         <createTable tableName="sender_sync_request">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -205,7 +226,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" contextFilter="sender" id="1703066381815-11">
+    <changeSet author="wluyima" id="20231220-1309">
         <createTable tableName="sender_sync_response">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
