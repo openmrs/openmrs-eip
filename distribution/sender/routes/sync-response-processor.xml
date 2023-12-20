@@ -18,29 +18,7 @@
                 <simple>${body.size()} == 1</simple>
                 <log loggingLevel="DEBUG" message="Fetched ${body.size()} sender sync message(s) matching message uuid ${exchangeProperty.syncResponse.messageUuid}" />
 
-                <log message="Archiving the sync message with id: ${body[0].id}" />
-
-                <setBody>
-                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncArchive(body[0])}</spel>
-                </setBody>
-                <script>
-                    <spel>
-                        #{body.setDateCreated(new java.util.Date())}
-                        #{body.setDateReceivedByReceiver(getProperty('syncResponse').dateReceivedByReceiver)}
-                    </spel>
-                </script>
-
-                <log loggingLevel="DEBUG" message="Saving sync archive" />
-
-                <toD uri="jpa:SenderSyncArchive" />
-
-                <log loggingLevel="DEBUG" message="Successfully saved sync archive" />
-
-                <log loggingLevel="DEBUG" message="Removing Sender sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
-
-                <bean ref="senderSyncMessageRepository" method="deleteByMessageUuid(${exchangeProperty.syncResponse.messageUuid})" />
-
-                <log loggingLevel="DEBUG" message="Successfully removed sync message(s) with uuid ${exchangeProperty.syncResponse.messageUuid}" />
+                <bean ref="senderService" method="archiveSyncMessage(${body[0]}, ${exchangeProperty.syncResponse.dateReceivedByReceiver})" />
             </when>
             <otherwise>
                 <log message="No sync message was found with message uuid ${exchangeProperty.syncResponse.messageUuid}" />

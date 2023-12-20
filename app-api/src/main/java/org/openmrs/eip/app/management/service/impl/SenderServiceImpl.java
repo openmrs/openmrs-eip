@@ -188,7 +188,9 @@ public class SenderServiceImpl implements SenderService {
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void archiveSyncMessage(SenderSyncMessage message, LocalDateTime dateReceivedByReceiver) {
-		log.info("Archiving the sync item");
+		if (log.isDebugEnabled()) {
+			log.debug("Archiving the sync item");
+		}
 		
 		SenderSyncArchive archive = new SenderSyncArchive(message);
 		archive.setDateCreated(new Date());

@@ -1,8 +1,8 @@
 package org.openmrs.eip.app.route.sender;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
@@ -19,10 +19,14 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncResponse;
-import org.openmrs.eip.app.management.entity.sender.SenderSyncArchive;
+import org.openmrs.eip.app.management.repository.SenderSyncArchiveRepository;
+import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
+import org.openmrs.eip.app.management.repository.SenderSyncResponseRepository;
 import org.openmrs.eip.app.route.TestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -36,6 +40,15 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 	
 	@EndpointInject(TEST_LISTENER)
 	private MockEndpoint mockListener;
+	
+	@Autowired
+	private SenderSyncArchiveRepository archiveRepo;
+	
+	@Autowired
+	private SenderSyncMessageRepository syncRepo;
+	
+	@Autowired
+	private SenderSyncResponseRepository responseRepo;
 	
 	@Override
 	public String getTestRouteFilename() {
@@ -56,20 +69,20 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	@Sql(scripts = "classpath:mgt_sender_sync_response.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldProcessAResponseForASyncMessageWithAMessageUuidMatches() {
-		assertTrue(TestUtils.getEntities(SenderSyncArchive.class).isEmpty());
+		assertEquals(0, archiveRepo.count());
 		final String msgUuid = "26beb8bd-287c-47f2-9786-a7b98c933c04";
-		SenderSyncMessage msg = TestUtils.getEntity(SenderSyncMessage.class, 2L);
+		SenderSyncMessage msg = syncRepo.getReferenceById(2L);
 		assertEquals(msgUuid, msg.getMessageUuid());
-		SenderSyncResponse response = TestUtils.getEntity(SenderSyncResponse.class, 2L);
+		SenderSyncResponse response = responseRepo.getReferenceById(2L);
 		assertEquals(msgUuid, response.getMessageUuid());
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(response);
 		
 		producerTemplate.send(URI_RESPONSE_PROCESSOR, exchange);
 		
-		assertNull(TestUtils.getEntity(SenderSyncMessage.class, msg.getId()));
-		assertNull(TestUtils.getEntity(SenderSyncResponse.class, response.getId()));
-		List<SenderSyncArchive> archives = TestUtils.getEntities(SenderSyncArchive.class);
+		assertFalse(syncRepo.findById(msg.getId()).isPresent());
+		assertFalse(responseRepo.findById(response.getId()).isPresent());
+		List<SenderSyncArchive> archives = archiveRepo.findAll();
 		assertEquals(1, archives.size());
 		SenderSyncArchive archive = archives.get(0);
 		assertEquals(msg.getIdentifier(), archive.getIdentifier());
