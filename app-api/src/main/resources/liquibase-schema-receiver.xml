@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="wluyima" id="1703147143886-36">
+    <changeSet author="wluyima" id="20231221-1101">
         <createTable tableName="site_info">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -32,7 +32,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-33">
+    <changeSet author="wluyima" id="20231221-1102">
         <createTable tableName="receiver_sync_status">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -49,7 +49,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-31">
+    <changeSet author="wluyima" id="20231221-1103">
         <createTable tableName="receiver_sync_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -80,7 +80,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-34">
+    <changeSet author="wluyima" id="20231221-1104">
         <createTable tableName="receiver_synced_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -134,7 +134,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="wluyima" id="1703147143886-29">
+    <changeSet author="wluyima" id="20231221-1105">
         <createTable tableName="receiver_retry_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -176,7 +176,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-27">
+    <changeSet author="wluyima" id="20231221-1106">
         <createTable tableName="receiver_conflict_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -210,7 +210,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="wluyima" id="1703147143886-30">
+    <changeSet author="wluyima" id="20231221-1107">
         <createTable tableName="receiver_sync_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -244,7 +244,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-28">
+    <changeSet author="wluyima" id="20231221-1108">
         <createTable tableName="receiver_pruned_item">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -278,7 +278,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="1703147143886-32">
+    <changeSet author="wluyima" id="20231221-1109">
         <createTable tableName="receiver_sync_request">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
