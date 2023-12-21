@@ -94,10 +94,10 @@
             <column name="sync_data" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_sent" type="DATETIME">
+            <column name="date_sent" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
-            <column name="event_date" type="DATETIME"/>
+            <column name="event_date" type="DATETIME(3)"/>
             <column name="date_received_by_receiver" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
@@ -143,7 +143,7 @@
             <column name="request_uuid" type="VARCHAR(38)">
                 <constraints unique="true"/>
             </column>
-            <column name="event_date" type="DATETIME"/>
+            <column name="event_date" type="DATETIME(3)"/>
         </createTable>
     </changeSet>
 
@@ -177,10 +177,10 @@
             <column name="sync_data" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_sent" type="DATETIME">
+            <column name="date_sent" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
-            <column name="event_date" type="DATETIME"/>
+            <column name="event_date" type="DATETIME(3)"/>
             <column name="date_received_by_receiver" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
@@ -214,7 +214,7 @@
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="request_uuid" type="VARCHAR(38)"/>
-            <column name="date_created" type="DATETIME">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
             <column name="snapshot" type="BOOLEAN">
@@ -224,8 +224,8 @@
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_sent" type="DATETIME"/>
-            <column name="event_date" type="DATETIME"/>
+            <column name="date_sent" type="DATETIME(3)"/>
+            <column name="event_date" type="DATETIME(3)"/>
         </createTable>
     </changeSet>
 
@@ -273,7 +273,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="date_created" type="DATETIME">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)">
@@ -282,7 +282,7 @@
             <column name="date_received_by_receiver" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_sent_by_receiver" type="DATETIME">
+            <column name="date_sent_by_receiver" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
