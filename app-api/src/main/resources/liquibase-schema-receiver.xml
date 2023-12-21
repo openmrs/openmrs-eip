@@ -26,7 +26,7 @@
             <column name="site_instance_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueNumeric="0" name="sync_disabled" type="BIT(1)">
+            <column name="sync_disabled" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -67,7 +67,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="date_created" type="datetime"/>
-            <column defaultValueNumeric="0" name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
@@ -100,7 +100,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
@@ -113,19 +113,19 @@
             <column name="sync_outcome" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueNumeric="0" name="response_sent" type="BIT(1)">
+            <column name="response_sent" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_cached" type="BIT(1)">
+            <column name="is_cached" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="evicted_from_cache" type="BIT(1)">
+            <column name="evicted_from_cache" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_indexed" type="BIT(1)">
+            <column name="is_indexed" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="search_index_updated" type="BIT(1)">
+            <column name="search_index_updated" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="date_created" type="datetime">
@@ -167,7 +167,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
-            <column defaultValueNumeric="0" name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="date_received" type="datetime">
@@ -201,7 +201,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
-            <column defaultValueNumeric="0" name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="date_received" type="datetime">
@@ -230,7 +230,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
@@ -264,7 +264,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_snapshot" type="BIT(1)">
+            <column name="is_snapshot" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="message_uuid" type="VARCHAR(38)"/>
@@ -290,10 +290,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="site_id" type="BIGINT"/>
-            <column name="status" type="VARCHAR(50)">
+            <column name="status" type="VARCHAR(50)" defaultValue="NEW">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueNumeric="0" name="found" type="BIT(1)">
+            <column name="found" type="BOOLEAN" defaultValueNumeric="false">
                 <constraints nullable="false"/>
             </column>
             <column name="request_uuid" type="VARCHAR(38)">
