@@ -7,6 +7,12 @@
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet author="wluyima" id="20231221-1101">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="site_info" />
+            </not>
+        </preConditions>
+        <comment>Adding site_info table</comment>
         <createTable tableName="site_info">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -33,6 +39,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1102">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_status" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_status table</comment>
         <createTable tableName="receiver_sync_status">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -50,6 +62,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1103">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_msg" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_msg table</comment>
         <createTable tableName="receiver_sync_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -81,6 +99,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1104">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_synced_msg" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_synced_msg table</comment>
         <createTable tableName="receiver_synced_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -135,6 +159,12 @@
     </changeSet>
     
     <changeSet author="wluyima" id="20231221-1105">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_retry_queue" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_retry_queue table</comment>
         <createTable tableName="receiver_retry_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -177,6 +207,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1106">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_conflict_queue" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_conflict_queue table</comment>
         <createTable tableName="receiver_conflict_queue">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -211,6 +247,12 @@
     </changeSet>
     
     <changeSet author="wluyima" id="20231221-1107">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_archive" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_archive table</comment>
         <createTable tableName="receiver_sync_archive">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -245,6 +287,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1108">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_pruned_item" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_pruned_item table</comment>
         <createTable tableName="receiver_pruned_item">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -279,6 +327,12 @@
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1109">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receiver_sync_request" />
+            </not>
+        </preConditions>
+        <comment>Adding receiver_sync_request table</comment>
         <createTable tableName="receiver_sync_request">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
