@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="wluyima" id="20231220-1302" dbms="!mysql">
+    <changeSet author="wluyima" id="20231220-1301" dbms="!mysql">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sequenceExists sequenceName="hibernate_sequence" />
@@ -16,7 +16,7 @@
         <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
     </changeSet>
 
-    <changeSet author="wluyima" id="20231220-1303" dbms="mysql">
+    <changeSet author="wluyima" id="20231220-1302" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="hibernate_sequence" />
@@ -33,7 +33,7 @@
         </insert>
     </changeSet>
 
-    <changeSet author="wluyima" id="20231220-1301">
+    <changeSet author="wluyima" id="20231220-1303">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="debezium_event_queue"/>
@@ -64,7 +64,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20231220-1307">
+    <changeSet author="wluyima" id="20231220-1304">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="sender_sync_message"/>
@@ -186,7 +186,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20231220-1304">
+    <changeSet author="wluyima" id="20231220-1307">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="sender_pruned_archive"/>
