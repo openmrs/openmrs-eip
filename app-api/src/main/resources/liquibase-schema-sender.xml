@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <databaseChangeLog contextFilter="sender"
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet author="wluyima" id="20231220-1301" dbms="!mysql">
         <preConditions onFail="MARK_RAN">
             <not>
-                <sequenceExists sequenceName="hibernate_sequence" />
+                <sequenceExists sequenceName="hibernate_sequence"/>
             </not>
         </preConditions>
         <comment>Adding hibernate_sequence sequence</comment>
-        <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1" />
+        <createSequence sequenceName="hibernate_sequence" startValue="1" incrementBy="1"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231220-1302" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="hibernate_sequence" />
+                <tableExists tableName="hibernate_sequence"/>
             </not>
         </preConditions>
         <comment>Adding hibernate_sequence table</comment>
         <createTable tableName="hibernate_sequence">
-            <column name="next_val" type="BIGINT" />
+            <column name="next_val" type="BIGINT"/>
         </createTable>
 
         <insert tableName="hibernate_sequence">
-            <column name="next_val" value="1" />
+            <column name="next_val" value="1"/>
         </insert>
     </changeSet>
 
@@ -286,5 +286,5 @@
             </column>
         </createTable>
     </changeSet>
-    
+
 </databaseChangeLog>

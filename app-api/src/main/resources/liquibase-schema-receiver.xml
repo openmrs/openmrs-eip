@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <databaseChangeLog contextFilter="receiver"
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet author="wluyima" id="20231221-1101">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="site_info" />
+                <tableExists tableName="site_info"/>
             </not>
         </preConditions>
         <comment>Adding site_info table</comment>
@@ -41,7 +41,7 @@
     <changeSet author="wluyima" id="20231221-1102">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_sync_status" />
+                <tableExists tableName="receiver_sync_status"/>
             </not>
         </preConditions>
         <comment>Adding receiver_sync_status table</comment>
@@ -64,7 +64,7 @@
     <changeSet author="wluyima" id="20231221-1103">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_sync_msg" />
+                <tableExists tableName="receiver_sync_msg"/>
             </not>
         </preConditions>
         <comment>Adding receiver_sync_msg table</comment>
@@ -101,7 +101,7 @@
     <changeSet author="wluyima" id="20231221-1104">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_synced_msg" />
+                <tableExists tableName="receiver_synced_msg"/>
             </not>
         </preConditions>
         <comment>Adding receiver_synced_msg table</comment>
@@ -157,11 +157,11 @@
             </column>
         </createTable>
     </changeSet>
-    
+
     <changeSet author="wluyima" id="20231221-1105">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_retry_queue" />
+                <tableExists tableName="receiver_retry_queue"/>
             </not>
         </preConditions>
         <comment>Adding receiver_retry_queue table</comment>
@@ -209,7 +209,7 @@
     <changeSet author="wluyima" id="20231221-1106">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_conflict_queue" />
+                <tableExists tableName="receiver_conflict_queue"/>
             </not>
         </preConditions>
         <comment>Adding receiver_conflict_queue table</comment>
@@ -245,11 +245,11 @@
             </column>
         </createTable>
     </changeSet>
-    
+
     <changeSet author="wluyima" id="20231221-1107">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_sync_archive" />
+                <tableExists tableName="receiver_sync_archive"/>
             </not>
         </preConditions>
         <comment>Adding receiver_sync_archive table</comment>
@@ -289,7 +289,7 @@
     <changeSet author="wluyima" id="20231221-1108">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_pruned_item" />
+                <tableExists tableName="receiver_pruned_item"/>
             </not>
         </preConditions>
         <comment>Adding receiver_pruned_item table</comment>
@@ -329,7 +329,7 @@
     <changeSet author="wluyima" id="20231221-1109">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_sync_request" />
+                <tableExists tableName="receiver_sync_request"/>
             </not>
         </preConditions>
         <comment>Adding receiver_sync_request table</comment>
@@ -360,5 +360,5 @@
             </column>
         </createTable>
     </changeSet>
-    
+
 </databaseChangeLog>
