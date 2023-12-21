@@ -59,6 +59,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="sync_status_site_fk"
+                                 baseTableName="receiver_sync_status"
+                                 baseColumnNames="site_info_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1103">
@@ -96,6 +101,11 @@
             </column>
             <column name="date_created" type="DATETIME"/>
         </createTable>
+        <addForeignKeyConstraint constraintName="sync_msg_site_fk"
+                                 baseTableName="receiver_sync_msg"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1104">
@@ -156,6 +166,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_synced_msg_site_fk"
+                                 baseTableName="receiver_synced_msg"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1105">
@@ -204,6 +219,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_retry_queue_site_fk"
+                                 baseTableName="receiver_retry_queue"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1106">
@@ -244,6 +264,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_conflict_queue_site_fk"
+                                 baseTableName="receiver_conflict_queue"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1107">
@@ -284,6 +309,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_sync_archive_site_fk"
+                                 baseTableName="receiver_sync_archive"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1108">
@@ -324,6 +354,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_pruned_item_site_fk"
+                                 baseTableName="receiver_pruned_item"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20231221-1109">
@@ -359,6 +394,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint constraintName="receiver_sync_request_site_fk"
+                                 baseTableName="receiver_sync_request"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
 </databaseChangeLog>
