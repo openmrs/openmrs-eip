@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog contextFilter="receiver"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="wluyima" id="20211007-1801">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding person_hash table</comment>
+
+        <createTable tableName="person_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1802">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="patient_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding patient_hash table</comment>
+
+        <createTable tableName="patient_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1803">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="visit_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding visit_hash table</comment>
+
+        <createTable tableName="visit_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1804">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="encounter_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding encounter_hash table</comment>
+
+        <createTable tableName="encounter_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1805">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="obs_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding obs_hash table</comment>
+
+        <createTable tableName="obs_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1806">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_attribute_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding person_attribute_hash table</comment>
+
+        <createTable tableName="person_attribute_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1807">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="patient_program_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding patient_program_hash table</comment>
+
+        <createTable tableName="patient_program_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1808">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="patient_state_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding patient_state_hash table</comment>
+
+        <createTable tableName="patient_state_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1809">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="visit_attribute_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding visit_attribute_hash table</comment>
+
+        <createTable tableName="visit_attribute_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1810">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="encounter_diagnosis_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding encounter_diagnosis_hash table</comment>
+
+        <createTable tableName="encounter_diagnosis_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1811">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="condition_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding condition_hash table</comment>
+
+        <createTable tableName="condition_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1812">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_name_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding person_name_hash table</comment>
+
+        <createTable tableName="person_name_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1813">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="allergy_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding allergy_hash table</comment>
+
+        <createTable tableName="allergy_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1814">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_address_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding person_address_hash table</comment>
+
+        <createTable tableName="person_address_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1815">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="patient_identifier_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding patient_identifier_hash table</comment>
+
+        <createTable tableName="patient_identifier_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1816">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="orders_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding orders_hash table</comment>
+
+        <createTable tableName="orders_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1817">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="drug_order_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding drug_order_hash table</comment>
+
+        <createTable tableName="drug_order_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1818">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="test_order_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding test_order_hash table</comment>
+
+        <createTable tableName="test_order_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1819">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="relationship_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding relationship_hash table</comment>
+
+        <createTable tableName="relationship_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1820">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="encounter_provider_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding encounter_provider_hash table</comment>
+
+        <createTable tableName="encounter_provider_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1821">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="order_group_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding order_group_hash table</comment>
+
+        <createTable tableName="order_group_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1822">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="patient_program_attribute_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding patient_program_attribute_hash table</comment>
+
+        <createTable tableName="patient_program_attribute_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1823">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding users_hash table</comment>
+
+        <createTable tableName="users_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20211007-1824">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="provider_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding provider_hash table</comment>
+
+        <createTable tableName="provider_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1420">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_hash table</comment>
+
+        <createTable tableName="gaac_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1421">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_member_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_member_hash table</comment>
+
+        <createTable tableName="gaac_member_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1422">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_family_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_family_hash table</comment>
+
+        <createTable tableName="gaac_family_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20220203-1423">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gaac_family_member_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding gaac_family_member_hash table</comment>
+
+        <createTable tableName="gaac_family_member_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="TIMESTAMP(3)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20231208-1530">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="clinicalsummary_usage_report_hash" />
+            </not>
+        </preConditions>
+        <comment>Adding clinicalsummary_usage_report_hash table</comment>
+
+        <createTable tableName="clinicalsummary_usage_report_hash">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_changed" type="DATETIME(3)" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
