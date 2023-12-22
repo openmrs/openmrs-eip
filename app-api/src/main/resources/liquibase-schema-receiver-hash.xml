@@ -6,7 +6,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="wluyima" id="20211007-1801">
+    <changeSet author="wluyima" id="20231222-0801">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="person_hash" />
@@ -31,7 +31,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1802">
+    <changeSet author="wluyima" id="20231222-0802">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="patient_hash" />
@@ -56,7 +56,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1803">
+    <changeSet author="wluyima" id="20231222-0803">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="visit_hash" />
@@ -81,7 +81,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1804">
+    <changeSet author="wluyima" id="20231222-0804">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="encounter_hash" />
@@ -106,7 +106,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1805">
+    <changeSet author="wluyima" id="20231222-0805">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="obs_hash" />
@@ -131,7 +131,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1806">
+    <changeSet author="wluyima" id="20231222-0806">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="person_attribute_hash" />
@@ -156,7 +156,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1807">
+    <changeSet author="wluyima" id="20231222-0807">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="patient_program_hash" />
@@ -181,7 +181,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1808">
+    <changeSet author="wluyima" id="20231222-0808">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="patient_state_hash" />
@@ -206,7 +206,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1809">
+    <changeSet author="wluyima" id="20231222-0809">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="visit_attribute_hash" />
@@ -231,7 +231,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1810">
+    <changeSet author="wluyima" id="20231222-0810">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="encounter_diagnosis_hash" />
@@ -256,7 +256,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1811">
+    <changeSet author="wluyima" id="20231222-0811">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="condition_hash" />
@@ -281,7 +281,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1812">
+    <changeSet author="wluyima" id="20231222-0812">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="person_name_hash" />
@@ -306,7 +306,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1813">
+    <changeSet author="wluyima" id="20231222-0813">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="allergy_hash" />
@@ -331,7 +331,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1814">
+    <changeSet author="wluyima" id="20231222-0814">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="person_address_hash" />
@@ -356,7 +356,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1815">
+    <changeSet author="wluyima" id="20231222-0815">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="patient_identifier_hash" />
@@ -381,7 +381,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1816">
+    <changeSet author="wluyima" id="20231222-0816">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="orders_hash" />
@@ -406,7 +406,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1817">
+    <changeSet author="wluyima" id="20231222-0817">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="drug_order_hash" />
@@ -431,7 +431,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1818">
+    <changeSet author="wluyima" id="20231222-0818">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="test_order_hash" />
@@ -456,7 +456,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1819">
+    <changeSet author="wluyima" id="20231222-0819">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="relationship_hash" />
@@ -481,7 +481,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1820">
+    <changeSet author="wluyima" id="20231222-0820">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="encounter_provider_hash" />
@@ -506,7 +506,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1821">
+    <changeSet author="wluyima" id="20231222-0821">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="order_group_hash" />
@@ -531,7 +531,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1822">
+    <changeSet author="wluyima" id="20231222-0822">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="patient_program_attribute_hash" />
@@ -556,7 +556,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1823">
+    <changeSet author="wluyima" id="20231222-0823">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="users_hash" />
@@ -581,7 +581,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20211007-1824">
+    <changeSet author="wluyima" id="20231222-0824">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="provider_hash" />
@@ -606,7 +606,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20220203-1420">
+    <changeSet author="wluyima" id="20231222-0825">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="gaac_hash" />
@@ -631,7 +631,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20220203-1421">
+    <changeSet author="wluyima" id="20231222-0826">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="gaac_member_hash" />
@@ -656,7 +656,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20220203-1422">
+    <changeSet author="wluyima" id="20231222-0827">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="gaac_family_hash" />
@@ -681,7 +681,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20220203-1423">
+    <changeSet author="wluyima" id="20231222-0828">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="gaac_family_member_hash" />
@@ -706,7 +706,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20231208-1530">
+    <changeSet author="wluyima" id="20231222-0829">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="clinicalsummary_usage_report_hash" />
