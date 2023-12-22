@@ -32,7 +32,7 @@
             <column name="sync_disabled" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="DATETIME(3)">
+            <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -99,7 +99,7 @@
             <column name="operation" type="VARCHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="DATETIME"/>
+            <column name="date_created" type="DATETIME(3)"/>
         </createTable>
         <addForeignKeyConstraint constraintName="sync_msg_site_fk"
                                  baseTableName="receiver_sync_msg"
@@ -304,7 +304,7 @@
             <column name="date_sent_by_sender" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_received" type="(3)"/>
+            <column name="date_received" type="DATETIME(3)"/>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
