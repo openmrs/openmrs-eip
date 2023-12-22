@@ -55,19 +55,18 @@ public class SharedMysqlContainer extends MySQLContainer<SharedMysqlContainer> {
 		container.withDatabaseName("openmrs");
 		container.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");
 		super.start();
-		executeLiquibase();
+		executeLiquibase("liquibase-openmrs-test.xml");
 		executeScripts();
 	}
 	
-	private void executeLiquibase() {
+	public void executeLiquibase(String changeLogFile) {
 		try (Connection connection = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(),
 		    container.getPassword())) {
 			
 			Database database = DatabaseFactory.getInstance()
 			        .findCorrectDatabaseImplementation(new JdbcConnection(connection));
 			
-			Liquibase liquibase = new liquibase.Liquibase("liquibase-openmrs-test.xml", new ClassLoaderResourceAccessor(),
-			        database);
+			Liquibase liquibase = new liquibase.Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
 			
 			CommandScope updateCommand = new CommandScope(UpdateCommandStep.COMMAND_NAME);
 			updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);

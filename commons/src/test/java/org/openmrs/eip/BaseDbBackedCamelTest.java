@@ -43,7 +43,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.openmrs-datasource.jdbc-url", () -> container.getJdbcUrl() + "?useSSL=false&mode=MySQL");
+		registry.add("spring.openmrs-datasource.jdbcUrl", () -> container.getJdbcUrl() + "?useSSL=false&mode=MySQL");
 		registry.add("spring.openmrs-datasource.username", container::getUsername);
 		registry.add("spring.openmrs-datasource.password", container::getPassword);
 		registry.add("spring.openmrs-datasource.driverClassName", container::getDriverClassName);
