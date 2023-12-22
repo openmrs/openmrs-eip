@@ -24,10 +24,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -49,10 +49,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -74,10 +74,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -99,10 +99,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -124,10 +124,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -149,10 +149,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -174,10 +174,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -199,10 +199,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -224,10 +224,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -249,10 +249,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -274,10 +274,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -299,10 +299,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -324,10 +324,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -349,10 +349,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -374,10 +374,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -399,10 +399,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -424,10 +424,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -449,10 +449,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -474,10 +474,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -499,10 +499,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -524,10 +524,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -549,10 +549,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -574,10 +574,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -599,10 +599,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -624,10 +624,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -649,10 +649,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -674,10 +674,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
@@ -699,10 +699,10 @@
             <column name="hash" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_created" type="TIMESTAMP(3)">
+            <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="date_changed" type="TIMESTAMP(3)" />
+            <column name="date_changed" type="DATETIME(3)" />
         </createTable>
     </changeSet>
 
