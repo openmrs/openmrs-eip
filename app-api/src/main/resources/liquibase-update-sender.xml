@@ -6,4 +6,13 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <changeSet author="wluyima" id="20240102-1945">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_created" tableName="debezium_event_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to debezium_event_queue.date_created</comment>
+
+        <addNotNullConstraint tableName="debezium_event_queue" columnName="date_created" columnDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
