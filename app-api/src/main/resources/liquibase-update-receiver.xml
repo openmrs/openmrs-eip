@@ -6,4 +6,13 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <changeSet author="wluyima" id="20240102-1947">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_created" tableName="receiver_sync_msg" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_sync_msg.date_created</comment>
+
+        <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_created" columnDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
