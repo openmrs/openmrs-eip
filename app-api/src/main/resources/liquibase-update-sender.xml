@@ -15,4 +15,13 @@
         <addNotNullConstraint tableName="debezium_event_queue" columnName="date_created" columnDataType="DATETIME(3)" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20240102-1946">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="date_created" tableName="sender_retry_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to sender_retry_queue.date_created</comment>
+
+        <addNotNullConstraint tableName="sender_retry_queue" columnName="date_created" columnDataType="DATETIME(3)" />
+    </changeSet>
+
 </databaseChangeLog>
