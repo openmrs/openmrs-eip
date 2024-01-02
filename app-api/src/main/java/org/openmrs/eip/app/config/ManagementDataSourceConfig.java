@@ -37,10 +37,12 @@ public class ManagementDataSourceConfig {
 	
 	@Bean(name = SyncConstants.MGT_DATASOURCE_NAME)
 	@ConfigurationProperties(prefix = "spring.mngt-datasource")
-	public DataSource dataSource() {
+	public DataSource dataSource(Environment env) {
 		HikariDataSource ds = ((HikariDataSource) DataSourceBuilder.create().build());
 		ds.setPoolName(SyncConstants.DEFAULT_MGT_POOL_NAME);
-		ds.setMaximumPoolSize(SyncConstants.DEFAULT_CONN_POOL_SIZE);
+		if (ArrayUtils.contains(env.getActiveProfiles(), SyncProfiles.RECEIVER)) {
+			ds.setMaximumPoolSize(SyncConstants.DEFAULT_CONN_POOL_SIZE);
+		}
 		return ds;
 	}
 	
