@@ -10,18 +10,18 @@
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="date_created" tableName="debezium_event_queue" />
         </preConditions>
-        <comment>Adding not null constraint to debezium_event_queue.date_created</comment>
+        <comment>Adding not null constraint to debezium_event_queue.date_created column</comment>
 
-        <addNotNullConstraint tableName="debezium_event_queue" columnName="date_created" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="debezium_event_queue" columnDataType="DATETIME(3)" />
     </changeSet>
 
     <changeSet author="wluyima" id="20240102-1946">
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="date_created" tableName="sender_retry_queue" />
         </preConditions>
-        <comment>Adding not null constraint to sender_retry_queue.date_created</comment>
+        <comment>Adding not null constraint to sender_retry_queue.date_created column</comment>
 
-        <addNotNullConstraint tableName="sender_retry_queue" columnName="date_created" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="sender_retry_queue" columnDataType="DATETIME(3)" />
     </changeSet>
 
 </databaseChangeLog>

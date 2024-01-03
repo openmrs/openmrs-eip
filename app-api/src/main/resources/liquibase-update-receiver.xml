@@ -10,9 +10,27 @@
         <preConditions onFail="MARK_RAN">
             <columnExists columnName="date_created" tableName="receiver_sync_msg" />
         </preConditions>
-        <comment>Adding not null constraint to receiver_sync_msg.date_created</comment>
+        <comment>Adding not null constraint to receiver_sync_msg.date_created column</comment>
 
-        <addNotNullConstraint tableName="receiver_sync_msg" columnName="date_created" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="receiver_sync_msg" columnDataType="DATETIME(3)" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240103-0840">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_id" tableName="receiver_retry_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_retry_queue.site_id column</comment>
+
+        <addNotNullConstraint columnName="site_id" tableName="receiver_retry_queue" columnDataType="BIGINT" />
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240103-0841">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="site_id" tableName="receiver_conflict_queue" />
+        </preConditions>
+        <comment>Adding not null constraint to receiver_conflict_queue.site_id column</comment>
+
+        <addNotNullConstraint columnName="site_id" tableName="receiver_conflict_queue" columnDataType="BIGINT" />
     </changeSet>
 
 </databaseChangeLog>
