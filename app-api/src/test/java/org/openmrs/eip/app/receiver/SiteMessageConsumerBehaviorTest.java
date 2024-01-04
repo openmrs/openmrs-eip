@@ -99,6 +99,7 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	
 	private SyncMessage createMessage(int msgId, String identifier, LocalDateTime dateCreated, SiteInfo siteInfo) {
 		SyncMessage m = new SyncMessage();
+		m.setMessageUuid("msg-uuid-" + msgId);
 		m.setModelClassName(PersonModel.class.getName());
 		m.setIdentifier(identifier);
 		m.setSite(siteInfo);

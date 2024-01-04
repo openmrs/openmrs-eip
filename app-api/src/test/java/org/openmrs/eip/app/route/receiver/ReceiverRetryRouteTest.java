@@ -44,6 +44,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
@@ -75,6 +76,9 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	
 	@Autowired
 	private ReceiverRetryRepository retryRepo;
+	
+	@Autowired
+	private SiteRepository siteRepo;
 	
 	public class TestBean {
 		
@@ -268,6 +272,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
+	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldMoveTheRetryItemToTheConflictQueueIfAConflictIsEncountered() throws Exception {
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
@@ -277,6 +282,7 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
 		retry.setOperation(SyncOperation.c);
+		retry.setSite(siteRepo.getReferenceById(1L));
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
@@ -311,13 +317,16 @@ public class ReceiverRetryRouteTest extends BaseReceiverRouteTest {
 	}
 	
 	@Test
+	@Sql(scripts = "classpath:mgt_site_info.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldFailForAnUnknownOutComeWhenProcessingARetryItem() throws Exception {
 		final String uuid = "person-uuid";
 		assertTrue(getEntities(ReceiverRetryQueueItem.class).isEmpty());
 		ReceiverRetryQueueItem retry = new ReceiverRetryQueueItem();
+		retry.setMessageUuid("msg-uuid");
 		retry.setModelClassName(PersonModel.class.getName());
 		retry.setIdentifier(uuid);
 		retry.setOperation(SyncOperation.c);
+		retry.setSite(siteRepo.getReferenceById(1L));
 		retry.setDateCreated(new Date());
 		retry.setAttemptCount(1);
 		retry.setEntityPayload("{}");
