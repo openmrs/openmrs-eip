@@ -37,3 +37,23 @@ jobs:
         run: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version --file pom.xml
       - name: Build with Maven
         run: mvn test --batch-mode --file pom.xml
+
+  deploy-snapshots:
+    needs: build
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up OpenMRS Nexus Snapshots
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: openmrs-repo-snapshots
+          server-username: MAVEN_REPO_USERNAME
+          server-password: MAVEN_REPO_API_KEY
+      - name: Publish to OpenMRS Nexus Snapshots
+        run: mvn deploy -DskipTests=true --batch-mode --show-version --file pom.xml
+        env:
+          MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
+          MAVEN_REPO_API_KEY: ${{ secrets.MAVEN_REPO_API_KEY }}

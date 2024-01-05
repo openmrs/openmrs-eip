@@ -395,12 +395,12 @@
         <repository>
             <id>openmrs-repo-releases</id>
             <name>OpenMRS Nexus Releases</name>
-            <url>https://openmrs.jfrog.io/openmrs/releases</url>
+            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>openmrs-repo-snapshots</id>
             <name>OpenMRS Nexus Snapshots</name>
-            <url>https://openmrs.jfrog.io/openmrs/snapshots</url>
+            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
