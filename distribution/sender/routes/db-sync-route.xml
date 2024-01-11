@@ -64,6 +64,24 @@
             </when>
             <otherwise>
                 <log message="No entity found in the database matching identifier ${exchangeProperty.event.identifier} in table ${exchangeProperty.event.tableName}" />
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.dbzmEvent} != null</simple>
+                        <log loggingLevel="DEBUG" message="Removing item from the event queue" />
+
+                        <bean ref="debeziumEventRepository" method="delete(${exchangeProperty.dbzmEvent})" />
+
+                        <log loggingLevel="DEBUG" message="Successfully removed item from the event queue" />
+                    </when>
+                    <when>
+                        <simple>${exchangeProperty.retry-item} != null</simple>
+                        <log loggingLevel="DEBUG" message="Removing from the retry queue an item with id: ${exchangeProperty.retry-item-id}" />
+
+                        <bean ref="senderRetryRepository" method="delete(${exchangeProperty.retry-item})" />
+
+                        <log message="Successfully removed from the retry queue an item with id: ${exchangeProperty.retry-item-id}" />
+                    </when>
+                </choice>
             </otherwise>
         </choice>
         
