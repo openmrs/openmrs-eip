@@ -44,43 +44,31 @@ public class BatchSender {
 			log.debug("Sending " + items.size() + " sync messages(s)");
 		}
 		
-		List<String> messages = new ArrayList<>(items.size());
-		List<Long> ids = new ArrayList<>(items.size());
+		List<SyncModel> syncModels = new ArrayList<>(items.size());
+		List<Long> msgIds = new ArrayList<>(items.size());
 		LocalDateTime dateSent = LocalDateTime.now();
 		for (SenderSyncMessage m : items) {
 			SyncModel model = JsonUtils.unmarshalSyncModel(m.getData());
 			model.getMetadata().setSourceIdentifier(senderId);
 			model.getMetadata().setDateSent(dateSent);
-			messages.add(JsonUtils.marshall(model));
-			ids.add(m.getId());
+			syncModels.add(model);
+			msgIds.add(m.getId());
 		}
 		
-		try (Connection conn = activeMqConnFactory.createConnection();
-		        Session session = conn.createSession(true, Session.AUTO_ACKNOWLEDGE)) {
-			
+		try (Connection conn = activeMqConnFactory.createConnection(); Session session = conn.createSession()) {
 			Queue queue = session.createQueue(queueName);
 			try (MessageProducer p = session.createProducer(queue)) {
-				p.send(session.createTextMessage(JsonUtils.marshall(messages)));
-			}
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Committing " + messages.size() + " messages(s)");
-			}
-			
-			session.commit();
-			
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully committed " + messages.size() + " messages(s)");
+				p.send(session.createTextMessage(JsonUtils.marshall(syncModels)));
 			}
 		}
 		
-		log.info("Successfully sent " + messages.size() + " sync messages");
+		log.info("Successfully sent a sync batch of " + syncModels.size() + " sync messages");
 		
-		String myIds = StringUtils.join(ids, ",");
+		String myIds = StringUtils.join(msgIds, ",");
 		CamelUtils.send("sql:UPDATE sender_sync_message set status = 'SENT', date_sent = now() where id in (" + myIds
 		        + ")?dataSource=#" + MGT_DATASOURCE_NAME);
 		
-		log.info("Successfully updated the statuses of " + messages.size() + " sync messages");
+		log.info("Successfully updated the statuses of " + msgIds.size() + " sync messages");
 	}
 	
 }
