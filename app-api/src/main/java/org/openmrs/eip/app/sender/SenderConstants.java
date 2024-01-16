@@ -8,7 +8,11 @@ public class SenderConstants {
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "db-sync.sender.activemq.in";
 	
+	public static final String PROP_ACTIVEMQ_ENDPOINT = "camel.output.endpoint";
+	
 	public static final String PROP_SENDER_ID = "db-sync.senderId";
+	
+	public static final String PROP_JMS_SEND_BATCH_SIZE = "jms.send.batch.size";
 	
 	public static final String PROP_DBZM_SERVER_ID = "debezium.db.serverId";
 	

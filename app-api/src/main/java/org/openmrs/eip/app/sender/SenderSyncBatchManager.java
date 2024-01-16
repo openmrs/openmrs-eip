@@ -2,7 +2,6 @@ package org.openmrs.eip.app.sender;
 
 import java.util.List;
 
-import org.apache.camel.spi.annotations.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
@@ -11,22 +10,33 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import jakarta.jms.ConnectionFactory;
 
 @Component("senderSyncBatchManager")
 public class SenderSyncBatchManager extends BaseSyncBatchManager<SenderSyncMessage, SyncModel> {
 	
-	@Value("db-sync.senderId")
+	protected static final int DEFAULT_BATCH_SIZE = 200;
+	
+	@Value("${" + SenderConstants.PROP_SENDER_ID + "}")
 	private String senderId;
 	
-	@Value("camel.output.endpoint")
+	@Value("${" + SenderConstants.PROP_ACTIVEMQ_ENDPOINT + "}")
 	private String brokerEndpoint;
+	
+	@Value("${" + SenderConstants.PROP_JMS_SEND_BATCH_SIZE + ":" + DEFAULT_BATCH_SIZE + "}")
+	private int batchSize;
 	
 	private String queueName;
 	
-	public SenderSyncBatchManager(int batchSize, ConnectionFactory connectionFactory) {
-		super(batchSize, connectionFactory);
+	public SenderSyncBatchManager(ConnectionFactory connectionFactory) {
+		super(connectionFactory);
+	}
+	
+	@Override
+	protected int getBatchSize() {
+		return batchSize;
 	}
 	
 	@Override

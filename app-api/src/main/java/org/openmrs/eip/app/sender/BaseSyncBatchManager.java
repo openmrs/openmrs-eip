@@ -20,16 +20,13 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BaseSyncBatchManager.class);
 	
-	private int batchSize;
-	
 	private List<O> items;
 	
 	private List<Long> itemIds;
 	
 	private ConnectionFactory connectionFactory;
 	
-	public BaseSyncBatchManager(int batchSize, ConnectionFactory connectionFactory) {
-		this.batchSize = batchSize;
+	public BaseSyncBatchManager(ConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 	
@@ -73,13 +70,15 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	protected abstract String getQueueName();
 	
+	protected abstract int getBatchSize();
+	
 	protected abstract O convert(I item);
 	
 	protected abstract void updateItems(List<Long> itemIds);
 	
 	private List<O> getItems() {
 		if (items == null) {
-			items = Collections.synchronizedList(new ArrayList<>(batchSize));
+			items = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
 		}
 		
 		return items;
@@ -87,7 +86,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	private List<Long> getItemIds() {
 		if (itemIds == null) {
-			itemIds = Collections.synchronizedList(new ArrayList<>(batchSize));
+			itemIds = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
 		}
 		
 		return itemIds;
