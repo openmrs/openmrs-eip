@@ -22,16 +22,13 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	private int batchSize;
 	
-	private String queueName;
-	
 	private List<O> items;
 	
 	private List<Long> itemIds;
 	
 	private ConnectionFactory connectionFactory;
 	
-	public BaseSyncBatchManager(String queueName, int batchSize, ConnectionFactory connectionFactory) {
-		this.queueName = queueName;
+	public BaseSyncBatchManager(int batchSize, ConnectionFactory connectionFactory) {
 		this.batchSize = batchSize;
 		this.connectionFactory = connectionFactory;
 	}
@@ -56,7 +53,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		}
 		
 		try (Connection conn = connectionFactory.createConnection(); Session session = conn.createSession()) {
-			Queue queue = session.createQueue(queueName);
+			Queue queue = session.createQueue(getQueueName());
 			try (MessageProducer p = session.createProducer(queue)) {
 				//TODO Zip and send ByteMessage instead
 				p.send(session.createTextMessage(JsonUtils.marshall(getItems())));
@@ -73,6 +70,8 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		
 		reset();
 	}
+	
+	protected abstract String getQueueName();
 	
 	protected abstract O convert(I item);
 	

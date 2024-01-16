@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,26 @@ public class SenderSyncBatchManager extends BaseSyncBatchManager<SenderSyncMessa
 	@Value("db-sync.senderId")
 	private String senderId;
 	
-	public SenderSyncBatchManager(String queueName, int batchSize, ConnectionFactory connectionFactory) {
-		super(queueName, batchSize, connectionFactory);
+	@Value("camel.output.endpoint")
+	private String brokerEndpoint;
+	
+	private String queueName;
+	
+	public SenderSyncBatchManager(int batchSize, ConnectionFactory connectionFactory) {
+		super(batchSize, connectionFactory);
+	}
+	
+	@Override
+	protected String getQueueName() {
+		if (queueName == null) {
+			if (!brokerEndpoint.startsWith("activemq:")) {
+				throw new EIPException(brokerEndpoint + " is an invalid broker endpoint value");
+			}
+			
+			queueName = brokerEndpoint.substring(brokerEndpoint.indexOf(":") + 1);
+		}
+		
+		return queueName;
 	}
 	
 	@Override
