@@ -16,9 +16,9 @@ import jakarta.jms.MessageProducer;
 import jakarta.jms.Queue;
 import jakarta.jms.Session;
 
-public abstract class BaseSyncBatch<I extends AbstractEntity, O> {
+public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(BaseSyncBatch.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseSyncBatchManager.class);
 	
 	private int batchSize;
 	
@@ -30,7 +30,10 @@ public abstract class BaseSyncBatch<I extends AbstractEntity, O> {
 	
 	private ConnectionFactory connectionFactory;
 	
-	private BaseSyncBatch() {
+	public BaseSyncBatchManager(String queueName, int batchSize, ConnectionFactory connectionFactory) {
+		this.queueName = queueName;
+		this.batchSize = batchSize;
+		this.connectionFactory = connectionFactory;
 	}
 	
 	public void reset() {
@@ -62,7 +65,7 @@ public abstract class BaseSyncBatch<I extends AbstractEntity, O> {
 		
 		LOG.info("Successfully sent a sync batch of " + getItems().size() + " items");
 		
-		updateItems();
+		updateItems(getItemIds());
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Successfully updated " + getItemIds().size() + " items");
@@ -71,9 +74,9 @@ public abstract class BaseSyncBatch<I extends AbstractEntity, O> {
 		reset();
 	}
 	
-	protected abstract <O> O convert(I item);
+	protected abstract O convert(I item);
 	
-	protected abstract void updateItems();
+	protected abstract void updateItems(List<Long> itemIds);
 	
 	private List<O> getItems() {
 		if (items == null) {
