@@ -68,6 +68,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 			Queue queue = session.createQueue(getQueueName());
 			try (MessageProducer p = session.createProducer(queue)) {
 				//TODO Zip the message if larger than a certain configured size in bytes.
+				//TODO Exclude JMSMessageId and timestamp by disabling them
 				BytesMessage bytesMessage = session.createBytesMessage();
 				bytesMessage.setIntProperty(SyncConstants.SYNC_BATCH_PROP_SIZE, getItems().size());
 				byte[] bytes = JsonUtils.marshallToBytes(getItems());
@@ -76,12 +77,12 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 			}
 		}
 		
-		LOG.info("Successfully sent a sync batch of " + getItems().size() + " items");
+		LOG.info("Successfully sent a sync batch of " + getItems().size() + " item(s)");
 		
 		updateItems(getItemIds());
 		
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Successfully updated " + getItemIds().size() + " items");
+			LOG.debug("Successfully updated " + getItemIds().size() + " items(s)");
 		}
 		
 		reset();

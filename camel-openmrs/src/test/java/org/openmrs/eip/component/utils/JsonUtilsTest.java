@@ -1,7 +1,10 @@
 package org.openmrs.eip.component.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,7 +94,7 @@ public class JsonUtilsTest {
 		syncMetadata.put("snapshot", true);
 		syncModel.put("metadata", syncMetadata);
 		SyncModel result = JsonUtils.unmarshal(new ObjectMapper().writeValueAsString(syncModel), SyncModel.class);
-		Assert.assertTrue(result.getMetadata().getSnapshot());
+		assertTrue(result.getMetadata().getSnapshot());
 	}
 	
 	@Test
@@ -102,6 +105,13 @@ public class JsonUtilsTest {
 		syncModel.put("metadata", syncMetadata);
 		SyncModel result = JsonUtils.unmarshal(new ObjectMapper().writeValueAsString(syncModel), SyncModel.class);
 		Assert.assertFalse(result.getMetadata().getSnapshot());
+	}
+	
+	@Test
+	public void marshallToBytes_shouldMarshallTheObjectToBytes() {
+		Map person = Map.of("gender", "M");
+		byte[] expected = "{\"gender\":\"M\"}".getBytes(StandardCharsets.UTF_8);
+		assertTrue(Arrays.equals(expected, JsonUtils.marshallToBytes(person)));
 	}
 	
 	private String badlyFormattedJson() {
