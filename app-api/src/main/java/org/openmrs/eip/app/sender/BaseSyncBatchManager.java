@@ -30,6 +30,9 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		this.connectionFactory = connectionFactory;
 	}
 	
+	/**
+	 * Clears all the batch contents.
+	 */
 	public void reset() {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Resetting batch");
@@ -39,11 +42,21 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		getItemIds().clear();
 	}
 	
+	/**
+	 * Adds the item to the batch
+	 * 
+	 * @param item the item to add
+	 */
 	public void add(I item) {
 		getItems().add(convert(item));
 		getItemIds().add(item.getId());
 	}
 	
+	/**
+	 * Sends all the messages contained in the batch to the message broker.
+	 * 
+	 * @throws JMSException
+	 */
 	public void send() throws JMSException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Sending batch of " + items.size() + " items(s)");
@@ -68,17 +81,42 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		reset();
 	}
 	
+	/**
+	 * Gets the queue name to send to in the message broker.
+	 * 
+	 * @return the queue name
+	 */
 	protected abstract String getQueueName();
 	
+	/**
+	 * Gets the maximum batch size to send to the message broker.
+	 * 
+	 * @return batch size
+	 */
 	protected abstract int getBatchSize();
 	
+	/**
+	 * Converts the item to a serializable instance.
+	 * 
+	 * @param item the item to convert
+	 * @return the converted object
+	 */
 	protected abstract O convert(I item);
 	
+	/**
+	 * Updates any relevant fields for the entities matching the specified ids.
+	 * 
+	 * @param itemIds the entity ids
+	 */
 	protected abstract void updateItems(List<Long> itemIds);
 	
 	private List<O> getItems() {
 		if (items == null) {
-			items = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
+			synchronized (this) {
+				if (items == null) {
+					items = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
+				}
+			}
 		}
 		
 		return items;
@@ -86,7 +124,11 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	private List<Long> getItemIds() {
 		if (itemIds == null) {
-			itemIds = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
+			synchronized (this) {
+				if (itemIds == null) {
+					itemIds = Collections.synchronizedList(new ArrayList<>(getBatchSize()));
+				}
+			}
 		}
 		
 		return itemIds;
