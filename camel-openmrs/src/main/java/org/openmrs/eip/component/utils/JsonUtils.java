@@ -50,6 +50,21 @@ public final class JsonUtils {
 	}
 	
 	/**
+	 * Utility method to marshal an object to JSON
+	 *
+	 * @param object
+	 * @return the object as a JSON string
+	 */
+	public static byte[] marshallToBytes(Object object) {
+		try {
+			return MAPPER.writeValueAsBytes(object);
+		}
+		catch (JsonProcessingException e) {
+			throw new EIPException("Error while marshalling object to bytes", e);
+		}
+	}
+	
+	/**
 	 * Utility method to unmarshal a JSON string
 	 * 
 	 * @param json

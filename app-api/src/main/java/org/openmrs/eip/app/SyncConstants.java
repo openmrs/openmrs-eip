@@ -56,4 +56,6 @@ public class SyncConstants {
 	
 	public static final int DEFAULT_DELAY_PRUNER = 86400000;
 	
+	public static final String SYNC_BATCH_PROP_SIZE = "batchSize";
+	
 }

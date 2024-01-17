@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.jms.BytesMessage;
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
@@ -65,8 +67,12 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		try (Connection conn = connectionFactory.createConnection(); Session session = conn.createSession()) {
 			Queue queue = session.createQueue(getQueueName());
 			try (MessageProducer p = session.createProducer(queue)) {
-				//TODO Zip and send ByteMessage instead
-				p.send(session.createTextMessage(JsonUtils.marshall(getItems())));
+				//TODO Zip the message if larger than a certain configured size in bytes.
+				BytesMessage bytesMessage = session.createBytesMessage();
+				bytesMessage.setIntProperty(SyncConstants.SYNC_BATCH_PROP_SIZE, getItems().size());
+				byte[] bytes = JsonUtils.marshallToBytes(getItems());
+				bytesMessage.writeBytes(bytes);
+				p.send(bytesMessage);
 			}
 		}
 		
