@@ -1,6 +1,5 @@
 package org.openmrs.eip.component.utils;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -61,7 +60,7 @@ public final class JsonUtils {
 	public static ByteArrayOutputStream marshallToStream(Object object, int initialCapacity) {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream(initialCapacity);
-			MAPPER.writeValue(new BufferedOutputStream(out), object);
+			MAPPER.writeValue(out, object);
 			return out;
 		}
 		catch (IOException e) {

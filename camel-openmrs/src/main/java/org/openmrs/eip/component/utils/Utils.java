@@ -1,20 +1,33 @@
 package org.openmrs.eip.component.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.model.DrugOrderModel;
 import org.openmrs.eip.component.model.OrderModel;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.TestOrderModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Utils {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 	
 	private static Map<String, List<String>> TABLE_HIERARCHY_MAP = new ConcurrentHashMap();
 	
@@ -124,6 +137,52 @@ public final class Utils {
 	 */
 	public static long getMillisElapsed(Date start, Date end) {
 		return end.getTime() - start.getTime();
+	}
+	
+	/**
+	 * Compresses the specified data
+	 * 
+	 * @param data the bytes to compress
+	 * @return the compressed bytes
+	 * @throws Exception
+	 */
+	public static byte[] compress(byte[] data) throws IOException {
+		try (ByteArrayOutputStream compressedStream = new ByteArrayOutputStream(data.length);
+		        ZipOutputStream zos = new ZipOutputStream(compressedStream, UTF_8)) {
+			ZipEntry entry = new ZipEntry(Constants.ZIP_ENTRY_NAME);
+			zos.putNextEntry(entry);
+			zos.write(data);
+			zos.closeEntry();
+			byte[] result = compressedStream.toByteArray();
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Compressed from " + (data.length / 1024) + " to " + (result.length / 1024) + " KiB");
+			}
+			
+			return result;
+		}
+	}
+	
+	/**
+	 * Decompressed the specified data
+	 *
+	 * @param data the bytes to decompress
+	 * @return the decompressed bytes
+	 * @throws Exception
+	 */
+	public static byte[] decompress(byte[] data) throws IOException {
+		try (ByteArrayInputStream compressedStream = new ByteArrayInputStream(data);
+		        ZipInputStream zis = new ZipInputStream(compressedStream, UTF_8)) {
+			zis.getNextEntry();
+			try (ByteArrayOutputStream decompressedStream = new ByteArrayOutputStream(data.length)) {
+				IOUtils.copy(zis, decompressedStream);
+				byte[] result = decompressedStream.toByteArray();
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Decompressed from " + (data.length / 1024) + " to " + (result.length / 1024) + " KiB");
+				}
+				
+				return result;
+			}
+		}
 	}
 	
 }

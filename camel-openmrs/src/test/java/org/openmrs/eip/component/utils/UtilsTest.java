@@ -1,5 +1,6 @@
 package org.openmrs.eip.component.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.component.model.DrugOrderModel;
@@ -205,6 +207,13 @@ public class UtilsTest {
 	public void getMillisElapsed_shouldGetTheTimeDifferenceInMilliseconds() throws Exception {
 		final DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		assertEquals(3000, Utils.getMillisElapsed(f.parse("2023-04-27 12:00:00"), f.parse("2023-04-27 12:00:03")));
+	}
+	
+	@Test
+	public void compressAndDecompress() throws Exception {
+		String data = RandomStringUtils.random(1024 * 1024);
+		byte[] compressed = Utils.compress(data.getBytes(UTF_8));
+		assertEquals(data, new String(Utils.decompress(compressed), UTF_8));
 	}
 	
 }
