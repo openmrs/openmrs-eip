@@ -52,6 +52,11 @@ public class BaseSyncBatchManagerTest {
 		}
 		
 		@Override
+		protected int getItemSize() {
+			return ITEM_SIZE;
+		}
+		
+		@Override
 		protected Object convert(AbstractEntity item) {
 			convertedItems.add(item);
 			return item;
@@ -65,6 +70,8 @@ public class BaseSyncBatchManagerTest {
 	}
 	
 	private static final String QUEUE_NAME = "test";
+	
+	private static final int ITEM_SIZE = 32;
 	
 	@Mock
 	private ConnectionFactory mockConnFactory;
@@ -85,7 +92,7 @@ public class BaseSyncBatchManagerTest {
 	private BytesMessage mockMsg;
 	
 	@Test
-	public void send_shouldSendTheMessagesTheBufferItems() throws Exception {
+	public void send_shouldSendTheItemsInTheBatchBuffer() throws Exception {
 		when(mockConnFactory.createConnection()).thenReturn(mockConnection);
 		when(mockConnection.createSession()).thenReturn(mockSession);
 		when(mockSession.createQueue(QUEUE_NAME)).thenReturn(mockQueue);
@@ -94,7 +101,7 @@ public class BaseSyncBatchManagerTest {
 		final Long id = 3L;
 		SenderSyncMessage msg = new SenderSyncMessage();
 		msg.setId(id);
-		byte[] expectedSentBytes = JsonUtils.marshallToBytes(List.of(msg));
+		byte[] expectedSentBytes = JsonUtils.marshallToStream(List.of(msg), ITEM_SIZE).toByteArray();
 		MockSyncBatchManager manager = new MockSyncBatchManager();
 		manager.add(msg);
 		

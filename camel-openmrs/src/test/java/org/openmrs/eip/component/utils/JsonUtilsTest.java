@@ -108,10 +108,10 @@ public class JsonUtilsTest {
 	}
 	
 	@Test
-	public void marshallToBytes_shouldMarshallTheObjectToBytes() {
+	public void marshallToStream_shouldMarshallTheObjectToAStream() {
 		Map person = Map.of("gender", "M");
 		byte[] expected = "{\"gender\":\"M\"}".getBytes(StandardCharsets.UTF_8);
-		assertTrue(Arrays.equals(expected, JsonUtils.marshallToBytes(person)));
+		assertTrue(Arrays.equals(expected, JsonUtils.marshallToStream(person, 32).toByteArray()));
 	}
 	
 	private String badlyFormattedJson() {

@@ -64,6 +64,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 			LOG.debug("Sending batch of " + items.size() + " items(s)");
 		}
 		
+		//TODO Reuse Session and MessageProducer
 		try (Connection conn = connectionFactory.createConnection(); Session session = conn.createSession()) {
 			Queue queue = session.createQueue(getQueueName());
 			try (MessageProducer p = session.createProducer(queue)) {
@@ -71,7 +72,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 				//TODO Exclude JMSMessageId and timestamp by disabling them
 				BytesMessage bytesMessage = session.createBytesMessage();
 				bytesMessage.setIntProperty(SyncConstants.SYNC_BATCH_PROP_SIZE, getItems().size());
-				byte[] bytes = JsonUtils.marshallToBytes(getItems());
+				byte[] bytes = JsonUtils.marshallToStream(getItems(), getItems().size() * getItemSize()).toByteArray();
 				bytesMessage.writeBytes(bytes);
 				p.send(bytesMessage);
 			}
@@ -101,6 +102,13 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	 * @return batch size
 	 */
 	protected abstract int getBatchSize();
+	
+	/**
+	 * Gets the estimated size in bytes for each item to be sent.
+	 *
+	 * @return size in bytes
+	 */
+	protected abstract int getItemSize();
 	
 	/**
 	 * Converts the item to a serializable instance.
