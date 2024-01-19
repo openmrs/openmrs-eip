@@ -40,12 +40,6 @@ public class SenderSyncBatchManager extends BaseSyncBatchManager<SenderSyncMessa
 	}
 	
 	@Override
-	protected int getItemSize() {
-		//Sync messages are estimated to be around 1KiB based data in testing.
-		return 1024;
-	}
-	
-	@Override
 	protected String getQueueName() {
 		if (queueName == null) {
 			if (!brokerEndpoint.startsWith("activemq:")) {

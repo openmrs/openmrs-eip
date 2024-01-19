@@ -1,6 +1,5 @@
 package org.openmrs.eip.component.utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,20 +50,17 @@ public final class JsonUtils {
 	}
 	
 	/**
-	 * Utility method to marshall an object to a ByteArrayOutputStream
+	 * Marshals an object to a byte array
 	 * 
-	 * @param object the object to marshall
-	 * @param initialCapacity the initial capacity of the output stream
-	 * @return output stream
+	 * @param object the object to marshal
+	 * @return byte array
 	 */
-	public static ByteArrayOutputStream marshallToStream(Object object, int initialCapacity) {
+	public static byte[] marshalToBytes(Object object) {
 		try {
-			ByteArrayOutputStream out = new ByteArrayOutputStream(initialCapacity);
-			MAPPER.writeValue(out, object);
-			return out;
+			return MAPPER.writeValueAsBytes(object);
 		}
 		catch (IOException e) {
-			throw new EIPException("Error while marshalling object to output stream", e);
+			throw new EIPException("Error while marshalling object to bytes", e);
 		}
 	}
 	

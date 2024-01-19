@@ -1,5 +1,9 @@
 package org.openmrs.eip.app.sender;
 
+import static org.openmrs.eip.app.SyncConstants.DEFAULT_LARGE_MSG_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_LARGE_MSG_SIZE;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,20 +11,27 @@ import java.util.List;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.jms.BytesMessage;
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
+import jakarta.jms.Message;
 import jakarta.jms.MessageProducer;
 import jakarta.jms.Queue;
 import jakarta.jms.Session;
+import jakarta.jms.StreamMessage;
 
 public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BaseSyncBatchManager.class);
+	
+	@Value("${" + PROP_LARGE_MSG_SIZE + ":" + DEFAULT_LARGE_MSG_SIZE + "}")
+	private int largeMsgSize;
 	
 	private List<O> items;
 	
@@ -59,7 +70,7 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	 * 
 	 * @throws JMSException
 	 */
-	public void send() throws JMSException {
+	public void send() throws JMSException, IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Sending batch of " + items.size() + " items(s)");
 		}
@@ -68,13 +79,28 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 		try (Connection conn = connectionFactory.createConnection(); Session session = conn.createSession()) {
 			Queue queue = session.createQueue(getQueueName());
 			try (MessageProducer p = session.createProducer(queue)) {
-				//TODO Zip the message if larger than a certain configured size in bytes.
 				//TODO Exclude JMSMessageId and timestamp by disabling them
-				BytesMessage bytesMessage = session.createBytesMessage();
-				bytesMessage.setIntProperty(SyncConstants.SYNC_BATCH_PROP_SIZE, getItems().size());
-				byte[] bytes = JsonUtils.marshallToStream(getItems(), getItems().size() * getItemSize()).toByteArray();
-				bytesMessage.writeBytes(bytes);
-				p.send(bytesMessage);
+				byte[] bytes = JsonUtils.marshalToBytes(getItems());
+				Message msg;
+				if (bytes.length < largeMsgSize) {
+					BytesMessage bytesMsg = session.createBytesMessage();
+					bytesMsg.writeBytes(bytes);
+					msg = bytesMsg;
+				} else {
+					byte[] compressedBytes = Utils.compress(bytes);
+					if (compressedBytes.length < largeMsgSize) {
+						BytesMessage bytesMsg = session.createBytesMessage();
+						bytesMsg.writeBytes(compressedBytes);
+						msg = bytesMsg;
+					} else {
+						StreamMessage streamMsg = session.createStreamMessage();
+						streamMsg.writeBytes(compressedBytes);
+						msg = streamMsg;
+					}
+				}
+				
+				msg.setIntProperty(SyncConstants.SYNC_BATCH_PROP_SIZE, getItems().size());
+				p.send(msg);
 			}
 		}
 		
@@ -102,13 +128,6 @@ public abstract class BaseSyncBatchManager<I extends AbstractEntity, O> {
 	 * @return batch size
 	 */
 	protected abstract int getBatchSize();
-	
-	/**
-	 * Gets the estimated size in bytes for each item to be sent.
-	 *
-	 * @return size in bytes
-	 */
-	protected abstract int getItemSize();
 	
 	/**
 	 * Converts the item to a serializable instance.
