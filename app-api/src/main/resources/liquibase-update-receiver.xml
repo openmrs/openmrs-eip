@@ -69,4 +69,32 @@
         <addNotNullConstraint columnName="message_uuid" tableName="receiver_conflict_queue" columnDataType="VARCHAR(38)" />
     </changeSet>
 
+    <changeSet author="wluyima" id="20240123-0815" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="jms_msg"/>
+            </not>
+        </preConditions>
+        <comment>Adding jms_msg table</comment>
+        <createTable tableName="jms_msg">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="site_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="MEDIUMBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="jms_msg_site_fk"
+                                 baseTableName="jms_msg"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="identifier"/>
+    </changeSet>
+
 </databaseChangeLog>
