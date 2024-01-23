@@ -83,9 +83,6 @@
             <column name="site_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="body" type="MEDIUMBLOB">
-                <constraints nullable="false"/>
-            </column>
             <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
@@ -95,6 +92,50 @@
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="identifier"/>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240123-1230" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="text_jms_msg"/>
+            </not>
+        </preConditions>
+        <comment>Adding text_jms_msg table</comment>
+        <createTable tableName="text_jms_msg">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="text_jms_msg_parent_fk"
+                                 baseTableName="text_jms_msg"
+                                 baseColumnNames="id"
+                                 referencedTableName="jms_msg"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240123-1231" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytes_jms_msg"/>
+            </not>
+        </preConditions>
+        <comment>Adding bytes_jms_msg table</comment>
+        <createTable tableName="bytes_jms_msg">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="body" type="MEDIUMBLOB">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="bytes_jms_msg_parent_fk"
+                                 baseTableName="bytes_jms_msg"
+                                 baseColumnNames="id"
+                                 referencedTableName="jms_msg"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -12,23 +12,22 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "jms_msg")
-public class JmsMessage extends AbstractEntity {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class BaseJmsMessage<T> extends AbstractEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,12 +41,17 @@ public class JmsMessage extends AbstractEntity {
 	@Setter
 	private String siteId;
 	
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
-	@Column(columnDefinition = "mediumblob", nullable = false, updatable = false)
-	@NotNull
-	@Getter
-	@Setter
-	private byte[] body;
+	/**
+	 * Gets the body
+	 *
+	 * @return the body
+	 */
+	public abstract T getBody();
 	
+	/**
+	 * Sets the body
+	 *
+	 * @param body the body to set
+	 */
+	public abstract void setBody(T body);
 }
