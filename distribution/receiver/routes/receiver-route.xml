@@ -1,5 +1,5 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver-main" errorHandlerRef="shutdownErrorHandler">
+    <route id="receiver-main" errorHandlerRef="shutdownErrorHandler" autoStartup="false">
         <from uri="{{camel.input.endpoint}}&amp;asyncStartListener=true" />
         
         <log message="Received sync message" />

@@ -23,6 +23,8 @@ public class ReceiverConstants {
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
 	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
+
+	public static final String PROP_SYNC_QUEUE = "sync.queue.name";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
 	
