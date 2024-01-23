@@ -5,16 +5,19 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import jakarta.jms.ConnectionFactory;
 
 @Component("senderSyncBatchManager")
+@Profile(SyncProfiles.SENDER)
 public class SenderSyncBatchManager extends BaseSyncBatchManager<SenderSyncMessage, SyncModel> {
 	
 	protected static final int DEFAULT_BATCH_SIZE = 200;
