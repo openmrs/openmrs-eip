@@ -12,15 +12,16 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,8 +30,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "jms_msg")
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class BaseJmsMessage<T> extends AbstractEntity {
+public class JmsMessage extends AbstractEntity {
 	
 	public enum MessageType {
 		
@@ -59,17 +59,12 @@ public abstract class BaseJmsMessage<T> extends AbstractEntity {
 	@NotNull
 	private MessageType type;
 	
-	/**
-	 * Gets the body
-	 *
-	 * @return the body
-	 */
-	public abstract T getBody();
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Column(columnDefinition = "mediumblob", nullable = false, updatable = false)
+	@NotNull
+	@Getter
+	@Setter
+	private byte[] body;
 	
-	/**
-	 * Sets the body
-	 *
-	 * @param body the body to set
-	 */
-	public abstract void setBody(T body);
 }

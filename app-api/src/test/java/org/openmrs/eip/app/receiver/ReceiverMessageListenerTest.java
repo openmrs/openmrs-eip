@@ -14,7 +14,7 @@ public class ReceiverMessageListenerTest {
 	@Test
 	public void onMessage_shouldShutdownTheApplicationWhenAnErrorIsEncountered() {
 		PowerMockito.mockStatic(AppUtils.class);
-		new ReceiverMessageListener(null, null).onMessage(null);
+		new ReceiverMessageListener(null).onMessage(null);
 		PowerMockito.verifyStatic(AppUtils.class);
 		AppUtils.shutdown();
 	}
