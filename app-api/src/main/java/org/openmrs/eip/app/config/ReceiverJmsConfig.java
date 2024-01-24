@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.config;
 
-import org.openmrs.eip.app.ReceiverMessageListener;
+import org.openmrs.eip.app.receiver.ReceiverMessageListener;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncProfiles;

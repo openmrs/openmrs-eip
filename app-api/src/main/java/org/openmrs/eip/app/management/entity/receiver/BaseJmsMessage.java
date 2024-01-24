@@ -14,6 +14,8 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +23,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +31,14 @@ import lombok.Setter;
 @Table(name = "jms_msg")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class BaseJmsMessage<T> extends AbstractEntity {
+	
+	public enum MessageType {
+		
+		SYNC,
+		
+		RECONCILIATION
+		
+	}
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +51,13 @@ public abstract class BaseJmsMessage<T> extends AbstractEntity {
 	@Getter
 	@Setter
 	private String siteId;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "msg_type", nullable = false, length = 50)
+	@Getter
+	@Setter
+	@NotNull
+	private MessageType type;
 	
 	/**
 	 * Gets the body

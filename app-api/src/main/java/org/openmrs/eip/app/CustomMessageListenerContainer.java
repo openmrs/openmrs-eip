@@ -1,25 +1,18 @@
 package org.openmrs.eip.app;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import jakarta.jms.Session;
-
 import org.apache.camel.component.jms.DefaultJmsMessageListenerContainer;
 import org.apache.camel.component.jms.JmsEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+
 /**
  * Custom {@link org.springframework.jms.listener.MessageListenerContainer} that only acknowledges
  * messages to be removed from active MQ depending on our application logic to ensure no message
- * ever goes unprocessed. Message acknowledgement is enabled only when the following happen,
- * 
- * <pre>
- * 1. A message is successfully synced to the receiver OpenMRS database
- * 2. If a message is saved to the receiver retry queue.
- * 3. If a message is saved to the receiver conflict queue.
- * 4. If a sync request is saved to the sender_sync_request table
- * </pre>
+ * ever goes unprocessed. This is currently only used by the sender to receive messages.
  */
 public class CustomMessageListenerContainer extends DefaultJmsMessageListenerContainer {
 	

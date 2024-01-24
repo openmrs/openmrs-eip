@@ -66,5 +66,7 @@ public class SyncConstants {
 	public static final int DEFAULT_LARGE_MSG_SIZE = 45 * 1024 * 1024;
 	
 	public static final String JMS_HEADER_SITE = "site";
+
+	public static final String JMS_HEADER_TYPE = "messageType";
 	
 }

@@ -1,8 +1,11 @@
-package org.openmrs.eip.app;
+package org.openmrs.eip.app.receiver;
 
 import java.util.Date;
 
+import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.BaseJmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.BaseJmsMessage.MessageType;
 import org.openmrs.eip.app.management.entity.receiver.BytesJmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.TextJmsMessage;
 import org.openmrs.eip.app.management.repository.BytesMessageRepository;
@@ -49,6 +52,7 @@ public class ReceiverMessageListener implements MessageListener {
 			}
 			
 			msg.setSiteId(message.getStringProperty(SyncConstants.JMS_HEADER_SITE));
+			msg.setType(MessageType.valueOf(message.getStringProperty(SyncConstants.JMS_HEADER_TYPE)));
 			msg.setDateCreated(new Date());
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Saving received JMS message");

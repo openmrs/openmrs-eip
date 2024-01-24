@@ -83,6 +83,9 @@
             <column name="site_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="msg_type" type="ENUM('SYNC','RECONCILIATION')">
+                <constraints nullable="false"/>
+            </column>
             <column name="date_created" type="DATETIME(3)">
                 <constraints nullable="false"/>
             </column>
