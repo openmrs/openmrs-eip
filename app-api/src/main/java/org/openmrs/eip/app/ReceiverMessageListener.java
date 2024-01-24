@@ -41,6 +41,7 @@ public class ReceiverMessageListener implements MessageListener {
 			if (message instanceof TextMessage) {
 				repo = txtMsgRepo;
 				msg = new TextJmsMessage();
+				msg.setBody(message.getBody(String.class));
 			} else {
 				repo = bytesMsgRepo;
 				msg = new BytesJmsMessage();
@@ -50,14 +51,13 @@ public class ReceiverMessageListener implements MessageListener {
 			msg.setSiteId(message.getStringProperty(SyncConstants.JMS_HEADER_SITE));
 			msg.setDateCreated(new Date());
 			if (LOG.isDebugEnabled()) {
-				LOG.debug("Saving received message");
+				LOG.debug("Saving received JMS message");
 			}
 			
 			repo.save(msg);
-			message.acknowledge();
 		}
 		catch (Throwable e) {
-			LOG.warn("Failed to process incoming message", e);
+			LOG.warn("Failed to process incoming JMS message", e);
 			AppUtils.shutdown();
 		}
 	}

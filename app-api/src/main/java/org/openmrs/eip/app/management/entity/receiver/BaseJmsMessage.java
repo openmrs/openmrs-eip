@@ -35,7 +35,7 @@ public abstract class BaseJmsMessage<T> extends AbstractEntity {
 	@Setter
 	private Long id;
 	
-	@Column(nullable = false, updatable = false)
+	@Column(name = "site_id", nullable = false, updatable = false)
 	@NotBlank
 	@Getter
 	@Setter
