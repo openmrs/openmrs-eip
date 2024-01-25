@@ -51,7 +51,7 @@ public class Constants {
 	public static final List<String> SUBCLASS_TABLES;
 	
 	public final static String CUSTOM_PROP_SOURCE_BEAN_NAME = "customPropSource";
-
+	
 	public static final String ZIP_ENTRY_NAME = "data";
 	
 	static {

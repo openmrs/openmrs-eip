@@ -23,7 +23,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,8 +45,7 @@ public class JmsMessage extends AbstractEntity {
 	@Setter
 	private Long id;
 	
-	@Column(name = "site_id", nullable = false, updatable = false)
-	@NotBlank
+	@Column(name = "site_id", updatable = false)
 	@Getter
 	@Setter
 	private String siteId;
