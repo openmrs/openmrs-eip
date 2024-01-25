@@ -80,6 +80,9 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
+            <column name="msg_id" type="VARCHAR(38)">
+                <constraints unique="true"/>
+            </column>
             <column name="site_id" type="VARCHAR(255)" />
             <column name="msg_type" type="ENUM('SYNC','RECONCILIATION')">
                 <constraints nullable="false"/>

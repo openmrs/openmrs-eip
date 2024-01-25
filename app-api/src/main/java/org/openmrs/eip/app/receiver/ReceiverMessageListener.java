@@ -34,7 +34,10 @@ public class ReceiverMessageListener implements MessageListener {
 	@Override
 	public void onMessage(Message message) {
 		try {
-			JmsMessage msg = new JmsMessage();
+			final String msgId = message.getStringProperty(SyncConstants.JMS_HEADER_MSG_ID);
+			//TODO Skip of message if there is another message with the same id already exists.
+			JmsMessage jmsMsg = new JmsMessage();
+			jmsMsg.setMessageId(msgId);
 			byte[] body;
 			if (message instanceof TextMessage) {
 				body = message.getBody(String.class).getBytes(StandardCharsets.UTF_8);
@@ -42,21 +45,21 @@ public class ReceiverMessageListener implements MessageListener {
 				body = message.getBody(byte[].class);
 			}
 			
-			msg.setBody(body);
-			msg.setSiteId(message.getStringProperty(SyncConstants.JMS_HEADER_SITE));
+			jmsMsg.setBody(body);
+			jmsMsg.setSiteId(message.getStringProperty(SyncConstants.JMS_HEADER_SITE));
 			MessageType type = MessageType.SYNC;
 			String typeStr = message.getStringProperty(SyncConstants.JMS_HEADER_TYPE);
 			if (StringUtils.isNotBlank(typeStr)) {
 				type = MessageType.valueOf(typeStr);
 			}
 			
-			msg.setType(type);
-			msg.setDateCreated(new Date());
+			jmsMsg.setType(type);
+			jmsMsg.setDateCreated(new Date());
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Saving received JMS message");
 			}
 			
-			repo.save(msg);
+			repo.save(jmsMsg);
 		}
 		catch (Throwable t) {
 			throw new EIPException("Failed to process incoming JMS message", t);

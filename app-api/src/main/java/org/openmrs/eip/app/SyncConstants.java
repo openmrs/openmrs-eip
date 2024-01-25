@@ -65,8 +65,10 @@ public class SyncConstants {
 	//Our limit is set to half of that of artemis because artemis message encoding uses 2 bytes per character.
 	public static final int DEFAULT_LARGE_MSG_SIZE = 45 * 1024 * 1024;
 	
-	public static final String JMS_HEADER_SITE = "site";
+	public static final String JMS_HEADER_SITE = "eipSite";
 	
-	public static final String JMS_HEADER_TYPE = "messageType";
+	public static final String JMS_HEADER_TYPE = "eipMessageType";
+	
+	public static final String JMS_HEADER_MSG_ID = "eipMessageId";
 	
 }

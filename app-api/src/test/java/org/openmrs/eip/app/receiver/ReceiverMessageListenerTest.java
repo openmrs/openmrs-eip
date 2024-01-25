@@ -2,6 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.eip.app.SyncConstants.JMS_HEADER_MSG_ID;
 import static org.openmrs.eip.app.SyncConstants.JMS_HEADER_SITE;
 import static org.openmrs.eip.app.SyncConstants.JMS_HEADER_TYPE;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
@@ -36,8 +37,10 @@ public class ReceiverMessageListenerTest extends BaseReceiverTest {
 		assertEquals(0, repo.count());
 		final String body = "{}";
 		final String siteId = "remote1";
+		final String msgId = "jms-msg-uuid";
 		BytesMessage bytesMsg = new ActiveMQBytesMessage();
 		bytesMsg.writeBytes(body.getBytes());
+		bytesMsg.setStringProperty(JMS_HEADER_MSG_ID, msgId);
 		bytesMsg.setStringProperty(JMS_HEADER_SITE, siteId);
 		bytesMsg.setStringProperty(JMS_HEADER_TYPE, SYNC.name());
 		
@@ -47,6 +50,7 @@ public class ReceiverMessageListenerTest extends BaseReceiverTest {
 		assertEquals(1, msgs.size());
 		JmsMessage msg = msgs.get(0);
 		assertTrue(Arrays.equals(body.getBytes(), msg.getBody()));
+		assertEquals(msgId, msg.getMessageId());
 		assertEquals(siteId, msg.getSiteId());
 		assertEquals(SYNC, msg.getType());
 	}
