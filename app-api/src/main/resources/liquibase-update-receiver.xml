@@ -72,11 +72,11 @@
     <changeSet author="wluyima" id="20240123-0815" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="jms_msg"/>
+                <tableExists tableName="receiver_jms_msg"/>
             </not>
         </preConditions>
-        <comment>Adding jms_msg table</comment>
-        <createTable tableName="jms_msg">
+        <comment>Adding receiver_jms_msg table</comment>
+        <createTable tableName="receiver_jms_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -94,8 +94,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="jms_msg_site_fk"
-                                 baseTableName="jms_msg"
+        <addForeignKeyConstraint constraintName="receiver_jms_msg_site_fk"
+                                 baseTableName="receiver_jms_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="identifier"/>

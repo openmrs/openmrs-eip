@@ -35,6 +35,14 @@ public class ReceiverMessageListener implements MessageListener {
 	public void onMessage(Message message) {
 		try {
 			final String msgId = message.getStringProperty(SyncConstants.JMS_HEADER_MSG_ID);
+			if (StringUtils.isNotBlank(msgId) && repo.existsByMessageId(msgId)) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Skipping duplicate incoming JMS message with the message id: " + msgId);
+				}
+				
+				return;
+			}
+			
 			//TODO Skip of message if there is another message with the same id already exists.
 			JmsMessage jmsMsg = new JmsMessage();
 			jmsMsg.setMessageId(msgId);

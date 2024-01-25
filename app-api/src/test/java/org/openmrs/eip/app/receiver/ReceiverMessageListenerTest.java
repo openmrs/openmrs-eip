@@ -22,8 +22,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 import jakarta.jms.BytesMessage;
 
-@Sql(scripts = {
-        "classpath:mgt_site_info.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class ReceiverMessageListenerTest extends BaseReceiverTest {
 	
 	@Autowired
@@ -33,6 +31,8 @@ public class ReceiverMessageListenerTest extends BaseReceiverTest {
 	private JmsMessageRepository repo;
 	
 	@Test
+	@Sql(scripts = {
+	        "classpath:mgt_site_info.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void onMessage_shouldAddTheJmsMessageToTheDb() throws Exception {
 		assertEquals(0, repo.count());
 		final String body = "{}";
@@ -53,6 +53,26 @@ public class ReceiverMessageListenerTest extends BaseReceiverTest {
 		assertEquals(msgId, msg.getMessageId());
 		assertEquals(siteId, msg.getSiteId());
 		assertEquals(SYNC, msg.getType());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_jms_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void onMessage_shouldSkipADuplicateMessage() throws Exception {
+		final String msgId = "1cef940e-32dc-491f-8038-a8f3afe3e37d";
+		assertTrue(repo.existsByMessageId(msgId));
+		final long originalCount = repo.count();
+		final String body = "{}";
+		final String siteId = "remote1";
+		BytesMessage bytesMsg = new ActiveMQBytesMessage();
+		bytesMsg.writeBytes(body.getBytes());
+		bytesMsg.setStringProperty(JMS_HEADER_MSG_ID, msgId);
+		bytesMsg.setStringProperty(JMS_HEADER_SITE, siteId);
+		bytesMsg.setStringProperty(JMS_HEADER_TYPE, SYNC.name());
+		
+		listener.onMessage(bytesMsg);
+		
+		assertEquals(originalCount, repo.count());
 	}
 	
 }
