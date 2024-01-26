@@ -248,7 +248,7 @@ public class SenderServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = "classpath:mgt_sender_sync_message.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void archiveSyncedMessage_shouldMoveTheSyncedMessageToTheArchiveQueue() {
-		final Long id = 1L;
+		final Long id = 4L;
 		SenderSyncMessage msg = syncRepo.findById(id).get();
 		assertEquals(0, archiveRepo.count());
 		long timestamp = System.currentTimeMillis();

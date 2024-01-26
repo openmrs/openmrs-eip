@@ -70,10 +70,10 @@ public class SenderResponseProcessorRouteTest extends BaseSenderRouteTest {
 	@Sql(scripts = "classpath:mgt_sender_sync_response.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void shouldProcessAResponseForASyncMessageWithAMessageUuidMatches() {
 		assertEquals(0, archiveRepo.count());
-		final String msgUuid = "26beb8bd-287c-47f2-9786-a7b98c933c04";
-		SenderSyncMessage msg = syncRepo.getReferenceById(2L);
+		final String msgUuid = "46beb8bd-287c-47f2-9786-a7b98c933c04";
+		SenderSyncMessage msg = syncRepo.getReferenceById(4L);
 		assertEquals(msgUuid, msg.getMessageUuid());
-		SenderSyncResponse response = responseRepo.getReferenceById(2L);
+		SenderSyncResponse response = responseRepo.getReferenceById(4L);
 		assertEquals(msgUuid, response.getMessageUuid());
 		Exchange exchange = new DefaultExchange(camelContext);
 		exchange.getIn().setBody(response);
