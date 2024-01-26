@@ -23,7 +23,7 @@ public class ReceiverConstants {
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
 	
 	public static final String PROP_MSG_DESTINATION = "message.destination";
-
+	
 	public static final String PROP_SYNC_QUEUE = "sync.queue.name";
 	
 	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
@@ -101,6 +101,8 @@ public class ReceiverConstants {
 	public static final String URI_RETRY = "direct:" + ROUTE_ID_RETRY;
 	
 	public static final String ROUTE_ID_RECEIVER_MAIN = "receiver-main";
+	
+	public static final String URI_RECEIVER_MAIN = "direct:" + ROUTE_ID_RECEIVER_MAIN;
 	
 	public static final String ROUTE_ID_UPDATE_LAST_SYNC_DATE = "update-site-last-sync-date";
 	

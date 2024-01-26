@@ -1,8 +1,8 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route id="receiver-main" errorHandlerRef="shutdownErrorHandler" autoStartup="false">
-        <from uri="{{camel.input.endpoint}}&amp;asyncStartListener=true" />
+    <route id="receiver-main" errorHandlerRef="shutdownErrorHandler">
+        <from uri="direct:receiver-main" />
         
-        <log message="Received sync message" />
+        <log loggingLevel="DEBUG" message="Processing sync JMS message" />
 
         <when>
             <simple>{{openmrs.eip.dbsync.encryption.enabled:false}} == true</simple>
@@ -135,11 +135,5 @@
                 </choice>
             </otherwise>
         </choice>
-
-        <log loggingLevel="DEBUG" message="Enabling message acknowledgement" />
-
-        <script>
-            <method beanType="org.openmrs.eip.app.CustomMessageListenerContainer" method="enableAcknowledgement()" />
-        </script>
     </route>
 </routes>
