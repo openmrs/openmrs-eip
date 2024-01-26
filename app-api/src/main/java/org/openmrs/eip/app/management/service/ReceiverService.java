@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.service;
 
+import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
@@ -86,5 +87,12 @@ public interface ReceiverService extends Service {
 	 * @param retry the message to move
 	 */
 	void moveToConflictQueue(ReceiverRetryQueueItem retry);
+	
+	/**
+	 * Processes a {@link JmsMessage}
+	 *
+	 * @param jmsMessage the message to process
+	 */
+	void processSyncJmsMessage(JmsMessage jmsMessage);
 	
 }

@@ -2,12 +2,17 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.ExchangeBuilder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
@@ -22,13 +27,19 @@ import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.model.SyncMetadata;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,6 +265,41 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully removed the retry item from the queue");
+		}
+	}
+	
+	@Override
+	public void processSyncJmsMessage(JmsMessage jmsMessage) {
+		if (log.isDebugEnabled()) {
+			log.debug("Processing sync JMS message");
+		}
+		
+		String body = new String(jmsMessage.getBody(), StandardCharsets.UTF_8);
+		SyncModel syncModel = JsonUtils.unmarshalSyncModel(body);
+		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(syncModel).build();
+		try {
+			CamelUtils.send(ReceiverConstants.URI_UPDATE_LAST_SYNC_DATE, exchange);
+		}
+		catch (Throwable t) {
+			Throwable cause = ExceptionUtils.getRootCause(t);
+			if (cause == null) {
+				cause = t;
+			}
+			
+			log.warn("An error occurred while updating site last sync date, " + cause.getMessage());
+		}
+		
+		SyncMetadata metadata = syncModel.getMetadata();
+		if (SyncOperation.r.name().equals(metadata.getOperation())) {
+			processSyncRequestResponse(syncModel);
+		}
+		
+	}
+	
+	private void processSyncRequestResponse(SyncModel syncModel) {
+		SyncMetadata metadata = syncModel.getMetadata();
+		if (log.isDebugEnabled()) {
+			log.debug("Looking up the sync request for request uuid: " + metadata.getRequestUuid());
 		}
 	}
 	
