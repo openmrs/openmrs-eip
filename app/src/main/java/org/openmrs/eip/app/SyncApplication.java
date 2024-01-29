@@ -11,6 +11,7 @@ import org.openmrs.eip.app.config.CamelConfig;
 import org.openmrs.eip.app.config.JpaCamelConf;
 import org.openmrs.eip.app.config.ManagementDataSourceConfig;
 import org.openmrs.eip.app.config.OpenmrsDataSourceConfig;
+import org.openmrs.eip.app.config.ReceiverJmsConfig;
 import org.openmrs.eip.component.camel.StringToLocalDateTimeConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +21,7 @@ import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = "org.openmrs.eip")
 @Import({ AppConfig.class, ManagementDataSourceConfig.class, OpenmrsDataSourceConfig.class, JpaCamelConf.class,
-        ActiveMqConfig.class, CamelConfig.class })
+        ActiveMqConfig.class, CamelConfig.class, ReceiverJmsConfig.class })
 public class SyncApplication {
 	
 	private CamelContext camelContext;

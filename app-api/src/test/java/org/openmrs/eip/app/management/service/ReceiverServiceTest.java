@@ -1,44 +1,75 @@
 package org.openmrs.eip.app.management.service;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.app.management.service.ReceiverServiceTest.URI_ACTIVEMQ_RESPONSE_PREFIX;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_UPDATE_LAST_SYNC_DATE;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.camel.EndpointInject;
+import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.model.ProcessDefinition;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.ReceiverRequestStatus;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
+import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
+import org.openmrs.eip.component.Constants;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
+import org.openmrs.eip.component.model.SyncMetadata;
+import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
+@TestPropertySource(properties = PROP_CAMEL_OUTPUT_ENDPOINT + "=" + URI_ACTIVEMQ_RESPONSE_PREFIX + "{0}")
+@TestPropertySource(properties = Constants.PROP_URI_ERROR_HANDLER + "=" + TestConstants.URI_ERROR_HANDLER)
+@TestPropertySource(properties = "logging.level.org.apache.camel.builder.AdviceWith=WARN")
 public class ReceiverServiceTest extends BaseReceiverTest {
+	
+	public static final String URI_ACTIVEMQ_RESPONSE_PREFIX = "mock:response.";
 	
 	@Autowired
 	private SyncMessageRepository syncMsgRepo;
@@ -59,10 +90,30 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	private ReceiverPrunedItemRepository prunedRepo;
 	
 	@Autowired
+	private SiteRepository siteRepo;
+	
+	@Autowired
+	private JmsMessageRepository jmsMsgRepo;
+	
+	@Autowired
+	private ReceiverSyncRequestRepository syncReqRepo;
+	
+	@Autowired
 	private ReceiverService service;
 	
 	@Autowired
 	private PatientService patientService;
+	
+	@EndpointInject("mock:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE)
+	private MockEndpoint mockUpdateSyncStatusEndpoint;
+	
+	@EndpointInject(URI_ACTIVEMQ_RESPONSE_PREFIX + "remote1")
+	private MockEndpoint mockActiveMqResEndpoint;
+	
+	@Before
+	public void setup() throws Exception {
+		mockUpdateSyncStatusEndpoint.reset();
+	}
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
@@ -251,6 +302,170 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		ConflictQueueItem c = conflicts.get(0);
 		assertEquals(retry.getMessageUuid(), c.getMessageUuid());
 		assertTrue(c.getDateCreated().getTime() == timestamp || c.getDateCreated().getTime() > timestamp);
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldProcessAndSaveASyncMessage() throws Exception {
+		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
+		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
+			}
+			
+		});
+		final LocalDateTime dateSent = LocalDateTime.now();
+		final String uuid = "person-uuid";
+		final String msgUuid = "msg-uuid";
+		final SyncOperation op = SyncOperation.u;
+		assertEquals(0, syncMsgRepo.count());
+		SyncModel syncModel = new SyncModel();
+		syncModel.setTableToSyncModelClass(PersonModel.class);
+		PersonModel personModel = new PersonModel();
+		personModel.setUuid(uuid);
+		syncModel.setModel(personModel);
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setMessageUuid(msgUuid);
+		metadata.setSnapshot(false);
+		metadata.setOperation(op.toString());
+		SiteInfo siteInfo = siteRepo.findById(1L).get();
+		metadata.setSourceIdentifier(siteInfo.getIdentifier());
+		metadata.setDateSent(dateSent);
+		syncModel.setMetadata(metadata);
+		String payLoad = JsonUtils.marshall(syncModel);
+		JmsMessage jmsMsg = new JmsMessage();
+		jmsMsg.setType(MessageType.SYNC);
+		jmsMsg.setBody(payLoad.getBytes(UTF_8));
+		jmsMsg.setDateCreated(new Date());
+		jmsMsgRepo.save(jmsMsg);
+		assertEquals(1, jmsMsgRepo.count());
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
+		
+		service.processSyncJmsMessage(jmsMsg);
+		
+		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
+		List<SyncMessage> msgs = syncMsgRepo.findAll();
+		assertEquals(1, msgs.size());
+		SyncMessage msg = msgs.get(0);
+		assertEquals(PersonModel.class.getName(), msg.getModelClassName());
+		assertEquals(uuid, msg.getIdentifier());
+		assertEquals(op, msg.getOperation());
+		assertEquals(msgUuid, msg.getMessageUuid());
+		assertEquals(JsonUtils.marshall(syncModel), msg.getEntityPayload());
+		assertEquals(siteInfo, msg.getSite());
+		assertEquals(dateSent, msg.getDateSentBySender());
+		assertFalse(msg.getSnapshot());
+		assertNotNull(msg.getDateCreated());
+		assertEquals(0, jmsMsgRepo.count());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
+		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
+		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
+			}
+			
+		});
+		final LocalDateTime dateSent = LocalDateTime.now();
+		final String uuid = "person-uuid";
+		final String msgUuid = "msg-uuid";
+		final SyncOperation op = SyncOperation.r;
+		final String requestUuid = "46beb8bd-287c-47f2-9786-a7b98c933c04";
+		ReceiverSyncRequest request = syncReqRepo.findById(4L).get();
+		assertEquals(requestUuid, request.getRequestUuid());
+		assertEquals(ReceiverRequestStatus.SENT, request.getStatus());
+		assertEquals(0, syncMsgRepo.count());
+		SyncModel syncModel = new SyncModel();
+		syncModel.setTableToSyncModelClass(PersonModel.class);
+		PersonModel personModel = new PersonModel();
+		personModel.setUuid(uuid);
+		syncModel.setModel(personModel);
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setMessageUuid(msgUuid);
+		metadata.setSnapshot(false);
+		metadata.setOperation(op.toString());
+		metadata.setRequestUuid(requestUuid);
+		SiteInfo siteInfo = siteRepo.findById(1L).get();
+		metadata.setSourceIdentifier(siteInfo.getIdentifier());
+		metadata.setDateSent(dateSent);
+		syncModel.setMetadata(metadata);
+		String payLoad = JsonUtils.marshall(syncModel);
+		JmsMessage jmsMsg = new JmsMessage();
+		jmsMsg.setType(MessageType.SYNC);
+		jmsMsg.setBody(payLoad.getBytes(UTF_8));
+		jmsMsg.setDateCreated(new Date());
+		jmsMsgRepo.save(jmsMsg);
+		assertEquals(1, jmsMsgRepo.count());
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
+		
+		service.processSyncJmsMessage(jmsMsg);
+		
+		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
+		assertEquals(1, syncMsgRepo.count());
+		assertEquals(ReceiverRequestStatus.RECEIVED, syncReqRepo.findByRequestUuid(requestUuid).getStatus());
+		assertEquals(0, jmsMsgRepo.count());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound() throws Exception {
+		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
+		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
+			
+			@Override
+			public void configure() {
+				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
+			}
+			
+		});
+		final LocalDateTime dateSent = LocalDateTime.now();
+		final String msgUuid = "msg-uuid";
+		final String op = "r";
+		final String requestUuid = "46beb8bd-287c-47f2-9786-a7b98c933c04";
+		ReceiverSyncRequest request = syncReqRepo.findById(4L).get();
+		assertEquals(requestUuid, request.getRequestUuid());
+		assertEquals(ReceiverRequestStatus.SENT, request.getStatus());
+		assertEquals(0, syncMsgRepo.count());
+		SyncModel syncModel = new SyncModel();
+		SyncMetadata metadata = new SyncMetadata();
+		metadata.setMessageUuid(msgUuid);
+		metadata.setSnapshot(false);
+		metadata.setOperation(op);
+		metadata.setRequestUuid(requestUuid);
+		SiteInfo siteInfo = siteRepo.findById(1L).get();
+		metadata.setSourceIdentifier(siteInfo.getIdentifier());
+		metadata.setDateSent(dateSent);
+		syncModel.setMetadata(metadata);
+		String payLoad = JsonUtils.marshall(syncModel);
+		JmsMessage jmsMsg = new JmsMessage();
+		jmsMsg.setType(MessageType.SYNC);
+		jmsMsg.setBody(payLoad.getBytes(UTF_8));
+		jmsMsg.setDateCreated(new Date());
+		jmsMsgRepo.save(jmsMsg);
+		assertEquals(1, jmsMsgRepo.count());
+		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
+		mockActiveMqResEndpoint.expectedMessageCount(1);
+		
+		service.processSyncJmsMessage(jmsMsg);
+		
+		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
+		mockActiveMqResEndpoint.assertIsSatisfied();
+		assertEquals(0, syncMsgRepo.count());
+		assertEquals(ReceiverRequestStatus.RECEIVED, syncReqRepo.findByRequestUuid(requestUuid).getStatus());
+		assertEquals(0, jmsMsgRepo.count());
 	}
 	
 }

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -19,7 +18,6 @@ import org.springframework.util.ErrorHandler;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Session;
 
-@Configuration
 @Profile(SyncProfiles.RECEIVER)
 public class ReceiverJmsConfig {
 	

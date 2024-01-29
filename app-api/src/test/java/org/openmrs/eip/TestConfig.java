@@ -19,4 +19,11 @@ public class TestConfig {
 		return builder;
 	}
 	
+	@Bean
+	public DeadLetterChannelBuilder deadLetterChannelBuilder() {
+		DeadLetterChannelBuilder builder = new DeadLetterChannelBuilder(TestConstants.URI_ERROR_HANDLER);
+		builder.useOriginalMessage();
+		return builder;
+	}
+	
 }

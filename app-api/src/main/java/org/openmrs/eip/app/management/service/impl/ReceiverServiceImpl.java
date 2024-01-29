@@ -16,18 +16,23 @@ import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverPrunedItemRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncArchiveRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ReceiverActiveMqMessagePublisher;
 import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.app.receiver.ReceiverContext;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
@@ -65,13 +70,21 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	private ReceiverPrunedItemRepository prunedRepo;
 	
+	private ReceiverSyncRequestRepository syncRequestRepo;
+	
+	private JmsMessageRepository jmsMsgRepo;
+	
 	private EntityServiceFacade serviceFacade;
 	
 	private ProducerTemplate producerTemplate;
 	
+	private ReceiverActiveMqMessagePublisher activeMqPublisher;
+	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo, ConflictRepository conflictRepo,
-	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
+	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate,
+	    ReceiverSyncRequestRepository syncRequestRepo, JmsMessageRepository jmsMsgRepo,
+	    ReceiverActiveMqMessagePublisher activeMqPublisher) {
 		this.syncMsgRepo = syncMsgRepo;
 		this.syncedMsgRepo = syncedMsgRepo;
 		this.archiveRepo = archiveRepo;
@@ -80,6 +93,9 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		this.prunedRepo = prunedRepo;
 		this.serviceFacade = serviceFacade;
 		this.producerTemplate = producerTemplate;
+		this.syncRequestRepo = syncRequestRepo;
+		this.activeMqPublisher = activeMqPublisher;
+		this.jmsMsgRepo = jmsMsgRepo;
 	}
 	
 	@Override
@@ -289,18 +305,54 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 			log.warn("An error occurred while updating site last sync date, " + cause.getMessage());
 		}
 		
-		SyncMetadata metadata = syncModel.getMetadata();
-		if (SyncOperation.r.name().equals(metadata.getOperation())) {
-			processSyncRequestResponse(syncModel);
+		boolean isRequestWithNoEntity = false;
+		SyncMetadata md = syncModel.getMetadata();
+		if (SyncOperation.r.name().equals(md.getOperation())) {
+			if (log.isDebugEnabled()) {
+				log.debug("Looking up the sync request for request uuid: {}", md.getRequestUuid());
+			}
+			
+			ReceiverSyncRequest request = syncRequestRepo.findByRequestUuid(md.getRequestUuid());
+			if (log.isDebugEnabled()) {
+				log.debug("Updating and saving request status as received");
+			}
+			
+			request.markAsReceived(syncModel.getModel() != null);
+			syncRequestRepo.save(request);
+			if (syncModel.getModel() == null) {
+				isRequestWithNoEntity = true;
+				if (log.isDebugEnabled()) {
+					log.debug("Entity not found in the DB at {} for request with uuid: {}", md.getSourceIdentifier(),
+					    md.getRequestUuid());
+				}
+				
+				activeMqPublisher.sendSyncResponse(request, md.getMessageUuid());
+			}
 		}
 		
-	}
-	
-	private void processSyncRequestResponse(SyncModel syncModel) {
-		SyncMetadata metadata = syncModel.getMetadata();
-		if (log.isDebugEnabled()) {
-			log.debug("Looking up the sync request for request uuid: " + metadata.getRequestUuid());
+		if (!isRequestWithNoEntity) {
+			SyncMessage syncMsg = new SyncMessage();
+			syncMsg.setIdentifier(syncModel.getModel().getUuid());
+			syncMsg.setModelClassName(syncModel.getTableToSyncModelClass().getName());
+			syncMsg.setOperation(SyncOperation.valueOf(md.getOperation()));
+			syncMsg.setEntityPayload(body);
+			syncMsg.setSite(ReceiverContext.getSiteInfo(md.getSourceIdentifier()));
+			syncMsg.setDateCreated(new Date());
+			syncMsg.setSnapshot(md.getSnapshot());
+			syncMsg.setMessageUuid(md.getMessageUuid());
+			syncMsg.setDateSentBySender(md.getDateSent());
+			if (log.isDebugEnabled()) {
+				log.debug("Saving sync message");
+			}
+			
+			syncMsgRepo.save(syncMsg);
 		}
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Removing JMS message");
+		}
+		
+		jmsMsgRepo.delete(jmsMessage);
 	}
 	
 }
