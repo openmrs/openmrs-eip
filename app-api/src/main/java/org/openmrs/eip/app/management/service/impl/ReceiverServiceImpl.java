@@ -285,6 +285,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	}
 	
 	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public void processSyncJmsMessage(JmsMessage jmsMessage) {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing sync JMS message");
@@ -292,7 +293,8 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		String body = new String(jmsMessage.getBody(), StandardCharsets.UTF_8);
 		SyncModel syncModel = JsonUtils.unmarshalSyncModel(body);
-		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(syncModel).build();
+		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext())
+		        .withProperty(ReceiverConstants.EX_PROP_IS_FILE, false).withBody(syncModel).build();
 		try {
 			CamelUtils.send(ReceiverConstants.URI_UPDATE_LAST_SYNC_DATE, exchange);
 		}

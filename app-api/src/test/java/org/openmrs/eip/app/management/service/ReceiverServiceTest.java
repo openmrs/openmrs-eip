@@ -47,6 +47,7 @@ import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
+import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
@@ -343,6 +344,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		
 		service.processSyncJmsMessage(jmsMsg);
@@ -407,6 +409,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		
 		service.processSyncJmsMessage(jmsMsg);
@@ -456,6 +459,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
+		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		mockActiveMqResEndpoint.expectedMessageCount(1);
 		
