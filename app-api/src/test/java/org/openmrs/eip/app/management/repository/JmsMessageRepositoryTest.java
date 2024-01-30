@@ -1,12 +1,17 @@
 package org.openmrs.eip.app.management.repository;
 
+import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
@@ -25,6 +30,20 @@ public class JmsMessageRepositoryTest extends BaseReceiverTest {
 	@Test
 	public void existsByMessageId_shouldReturnFalseIfNoMessageWithTheSameIdExists() {
 		Assert.assertFalse(repo.existsByMessageId("some-uuid"));
+	}
+	
+	@Test
+	public void getAllOrderByDateCreatedAsc_shouldGetJmsMessages() {
+		List<JmsMessage> msgs = repo.findAllByOrderByDateCreatedAsc(Pageable.ofSize(5));
+		assertEquals(3, msgs.size());
+		assertEquals(3, msgs.get(0).getId().longValue());
+		assertEquals(1, msgs.get(1).getId().longValue());
+		assertEquals(2, msgs.get(2).getId().longValue());
+		
+		msgs = repo.findAllByOrderByDateCreatedAsc(Pageable.ofSize(2));
+		assertEquals(2, msgs.size());
+		assertEquals(3, msgs.get(0).getId().longValue());
+		assertEquals(1, msgs.get(1).getId().longValue());
 	}
 	
 }

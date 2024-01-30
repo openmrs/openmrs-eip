@@ -3,21 +3,16 @@ package org.openmrs.eip.app.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import java.nio.charset.StandardCharsets;
-
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -31,13 +26,13 @@ public class ReceiverJmsMessageProcessorTest {
 	private ReceiverJmsMessageProcessor processor;
 	
 	@Mock
-	private CamelContext mockContext;
+	private ReceiverService mockService;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(CamelUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReceiverJmsMessageProcessor(null, null, mockContext);
+		processor = new ReceiverJmsMessageProcessor(null, mockService);
 	}
 	
 	@After
@@ -69,20 +64,13 @@ public class ReceiverJmsMessageProcessorTest {
 	}
 	
 	@Test
-	public void processItem_shouldProcessASyncMessage() throws Exception {
-		final String body = "{}";
+	public void processItem_shouldProcessASyncMessage() {
 		JmsMessage msg = new JmsMessage();
 		msg.setType(MessageType.SYNC);
-		msg.setBody(body.getBytes(StandardCharsets.UTF_8));
 		
 		processor.processItem(msg);
 		
-		ArgumentCaptor<Exchange> exArgCaptor = ArgumentCaptor.forClass(Exchange.class);
-		PowerMockito.verifyStatic(CamelUtils.class);
-		CamelUtils.send(ArgumentMatchers.eq(ReceiverConstants.URI_RECEIVER_MAIN), exArgCaptor.capture());
-		Exchange exchange = exArgCaptor.getValue();
-		Assert.assertEquals(body, exchange.getIn().getBody());
-		Assert.assertEquals(mockContext, exchange.getContext());
+		Mockito.verify(mockService).processSyncJmsMessage(msg);
 	}
 	
 }
