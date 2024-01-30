@@ -19,6 +19,10 @@ public class ReceiverMessageListenerContainer extends DefaultMessageListenerCont
 	
 	private static boolean commit = false;
 	
+	public synchronized static void enableAcknowledgement() {
+		commit = true;
+	}
+	
 	@Override
 	protected void messageReceived(Object invoker, Session session) {
 		commit = false;

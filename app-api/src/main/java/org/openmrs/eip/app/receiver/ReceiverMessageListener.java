@@ -68,6 +68,7 @@ public class ReceiverMessageListener implements MessageListener {
 			jmsMsg.setType(type);
 			jmsMsg.setDateCreated(new Date());
 			service.saveJmsMessage(jmsMsg);
+			ReceiverMessageListenerContainer.enableAcknowledgement();
 		}
 		catch (Throwable t) {
 			throw new EIPException("Failed to process incoming JMS message", t);
