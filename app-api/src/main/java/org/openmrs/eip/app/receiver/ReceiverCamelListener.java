@@ -8,6 +8,8 @@ import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_JMS_MSG_TASK;
+import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_INITIAL_DELAY_JMS_MSG_TASK;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_DISABLED_TASKS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_DELAY;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_SITE_TASK_INITIAL_DELAY;
@@ -51,7 +53,15 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	
 	private static final int DEFAULT_DELAY = 300000;
 	
+	private static final int DEFAULT_DELAY_JMS_MSG_TASK = 30000;
+	
 	private ScheduledThreadPoolExecutor siteExecutor;
+	
+	@Value("${" + PROP_INITIAL_DELAY_JMS_MSG_TASK + ":" + (DEFAULT_INITIAL_DELAY_SYNC) + "}")
+	private long initialDelayMsgTsk;
+	
+	@Value("${" + PROP_DELAY_JMS_MSG_TASK + ":" + DEFAULT_DELAY_JMS_MSG_TASK + "}")
+	private long delayMsgTask;
 	
 	@Value("${" + PROP_SITE_TASK_INITIAL_DELAY + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
 	private long siteTaskInitialDelay;
@@ -120,6 +130,7 @@ public class ReceiverCamelListener extends BaseCamelListener {
 		Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 		        .collect(Collectors.toList());
 		
+		startJmsMessageTask();
 		startSiteParentTasks(sites);
 		
 		if (prunerEnabled) {
@@ -157,6 +168,11 @@ public class ReceiverCamelListener extends BaseCamelListener {
 			siteExecutor.scheduleWithFixedDelay(task, siteTaskInitialDelay, siteTaskDelay, MILLISECONDS);
 			siteTasks.add(task);
 		});
+	}
+	
+	private void startJmsMessageTask() {
+		ReceiverJmsMessageTask task = new ReceiverJmsMessageTask();
+		siteExecutor.scheduleWithFixedDelay(task, initialDelayMsgTsk, delayMsgTask, MILLISECONDS);
 	}
 	
 	private void startPrunerTask() {

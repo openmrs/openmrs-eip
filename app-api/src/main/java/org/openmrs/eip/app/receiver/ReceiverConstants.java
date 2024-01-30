@@ -26,13 +26,15 @@ public class ReceiverConstants {
 	
 	public static final String PROP_SYNC_QUEUE = "sync.queue.name";
 	
-	public static final String PROP_ACTIVEMQ_IN_ENDPOINT = "camel.input.endpoint";
-	
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
 	
 	public static final String PROP_RECEIVER_ID = "db-sync.receiverId";
 	
 	public static final String PROP_SYNC_TASK_BATCH_SIZE = "sync.task.batch.size";
+	
+	public static final String PROP_INITIAL_DELAY_JMS_MSG_TASK = "jms.msg.task.initial.delay";
+	
+	public static final String PROP_DELAY_JMS_MSG_TASK = "jms.msg.task.delay";
 	
 	public static final String PROP_SITE_TASK_INITIAL_DELAY = "site.task.initial.delay";
 	

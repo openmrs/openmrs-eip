@@ -8,6 +8,7 @@ import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
@@ -27,8 +28,11 @@ public class ReceiverMessageListener implements MessageListener {
 	
 	private JmsMessageRepository repo;
 	
-	public ReceiverMessageListener(JmsMessageRepository repo) {
+	private ReceiverService service;
+	
+	public ReceiverMessageListener(JmsMessageRepository repo, ReceiverService service) {
 		this.repo = repo;
+		this.service = service;
 	}
 	
 	@Override
@@ -63,11 +67,7 @@ public class ReceiverMessageListener implements MessageListener {
 			
 			jmsMsg.setType(type);
 			jmsMsg.setDateCreated(new Date());
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Saving received JMS message");
-			}
-			
-			repo.save(jmsMsg);
+			service.saveJmsMessage(jmsMsg);
 		}
 		catch (Throwable t) {
 			throw new EIPException("Failed to process incoming JMS message", t);

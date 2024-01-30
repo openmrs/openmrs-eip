@@ -87,6 +87,13 @@ public interface ReceiverService extends Service {
 	 * @param retry the message to move
 	 */
 	void moveToConflictQueue(ReceiverRetryQueueItem retry);
+
+	/**
+	 * Saves a {@link JmsMessage} to the database
+	 *
+	 * @param jmsMessage the message to save
+	 */
+	void saveJmsMessage(JmsMessage jmsMessage);
 	
 	/**
 	 * Processes a {@link JmsMessage}

@@ -285,6 +285,15 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	}
 	
 	@Override
+	public void saveJmsMessage(JmsMessage jmsMessage) {
+		if (log.isDebugEnabled()) {
+			log.debug("Saving JMS message");
+		}
+		
+		jmsMsgRepo.save(jmsMessage);
+	}
+	
+	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void processSyncJmsMessage(JmsMessage jmsMessage) {
 		if (log.isDebugEnabled()) {
