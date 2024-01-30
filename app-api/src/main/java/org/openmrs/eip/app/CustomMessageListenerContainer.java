@@ -12,7 +12,7 @@ import jakarta.jms.Session;
 /**
  * Custom {@link org.springframework.jms.listener.MessageListenerContainer} that only acknowledges
  * messages to be removed from active MQ depending on our application logic to ensure no message
- * ever goes unprocessed. This is currently only used by the sender to receive messages.
+ * ever goes unprocessed.
  */
 public class CustomMessageListenerContainer extends DefaultJmsMessageListenerContainer {
 	
