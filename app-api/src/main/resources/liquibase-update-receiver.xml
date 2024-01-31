@@ -84,7 +84,7 @@
                 <constraints unique="true"/>
             </column>
             <column name="site_id" type="VARCHAR(255)" />
-            <column name="msg_type" type="ENUM('SYNC','RECONCILIATION')">
+            <column name="msg_type" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="body" type="MEDIUMBLOB">
