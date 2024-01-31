@@ -36,21 +36,26 @@ public class TableReconciliation extends AbstractEntity {
 	@Setter
 	private Long rowCount;
 	
-	@Column(name = "processed_count", nullable = false)
-	@Getter
-	@Setter
-	private long processedCount;
-	
 	@Column(name = "remote_start_date", nullable = false)
 	@NotNull
 	@Getter
 	@Setter
 	private LocalDateTime remoteStartDate;
 	
+	@Column(name = "processed_count", nullable = false)
+	@Getter
+	@Setter
+	private long processedCount;
+	
 	@Column(name = "last_batch_received", nullable = false)
 	@Getter
 	@Setter
 	private boolean lastBatchReceived;
+	
+	@Column(name = "completed", nullable = false)
+	@Getter
+	@Setter
+	private boolean completed;
 	
 	@Column(name = "date_changed")
 	@Getter

@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
@@ -25,10 +26,10 @@ public class SiteReconciliation extends AbstractEntity {
 	@Setter
 	private SiteInfo site;
 	
-	@Column(name = "completed", nullable = false)
+	@Column(name = "date_completed")
 	@Getter
 	@Setter
-	private boolean completed;
+	private LocalDateTime dateCompleted;
 	
 	@OneToMany(mappedBy = "siteReconciliation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@Getter

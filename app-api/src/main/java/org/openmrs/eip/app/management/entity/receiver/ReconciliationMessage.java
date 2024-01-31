@@ -20,22 +20,11 @@ import lombok.Setter;
 @Table(name = "reconciliation_msg")
 public class ReconciliationMessage extends AbstractEntity {
 	
-	@Column(name = "reconciliation_identifier", nullable = false, updatable = false, length = 50)
-	@NotBlank
-	@Getter
-	@Setter
-	private String identifier;
-	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
 	@Getter
 	@Setter
 	private SiteInfo site;
-	
-	@Column(name = "batch_size", nullable = false, updatable = false)
-	@Getter
-	@Setter
-	private Integer batchSize;
 	
 	@Column(name = "table_name", nullable = false, updatable = false, length = 100)
 	@NotBlank
@@ -43,12 +32,12 @@ public class ReconciliationMessage extends AbstractEntity {
 	@Setter
 	private String tableName;
 	
-	@Column(name = "processed_count", nullable = false)
+	@Column(name = "batch_size", nullable = false, updatable = false)
 	@Getter
 	@Setter
-	private long processedCount;
+	private Integer batchSize;
 	
-	@Column(name = "last_table_batch", nullable = false)
+	@Column(name = "last_table_batch", nullable = false, updatable = false)
 	@Getter
 	@Setter
 	private boolean lastTableBatch;
@@ -60,4 +49,9 @@ public class ReconciliationMessage extends AbstractEntity {
 	@Getter
 	@Setter
 	private byte[] data;
+	
+	@Column(name = "processed_count", nullable = false)
+	@Getter
+	@Setter
+	private int processedCount;
 }
