@@ -14,4 +14,21 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	 * @return an entity
 	 */
 	E findByUuid(String uuid);
+	
+	/**
+	 * Checks if a row exists matching the specified uuid
+	 *
+	 * @param uuid the uuid
+	 * @return true of a match is found otherwise false
+	 */
+	boolean existsByUuid(String uuid);
+	
+	/**
+	 * Gets the count of rows matching the specified uuids
+	 *
+	 * @param uuids array of uuids to match
+	 * @return the count of matches
+	 */
+	int countByUuidIn(String[] uuids);
+	
 }
