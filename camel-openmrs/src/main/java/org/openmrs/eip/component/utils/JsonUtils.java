@@ -77,8 +77,25 @@ public final class JsonUtils {
 			return MAPPER.readValue(json, objectClass);
 		}
 		catch (IOException e) {
-			log.error("Error while unmarshalling object", e);
-			throw new EIPException("Error while unmarshalling object", e);
+			log.error("Error while unmarshalling json", e);
+			throw new EIPException("Error while unmarshalling json", e);
+		}
+	}
+	
+	/**
+	 * Unmarshalls the specified byte array
+	 *
+	 * @param data the data to unmarshal
+	 * @param objectClass the class to unmarshal to
+	 * @return the object
+	 */
+	public static <C> C unmarshalBytes(byte[] data, Class<C> objectClass) {
+		try {
+			return MAPPER.readValue(data, objectClass);
+		}
+		catch (IOException e) {
+			log.error("Error while unmarshalling bytes", e);
+			throw new EIPException("Error while unmarshalling bytes", e);
 		}
 	}
 	

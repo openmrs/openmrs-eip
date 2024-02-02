@@ -4,7 +4,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
@@ -308,7 +307,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldProcessAndSaveASyncMessage() throws Exception {
+	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessage() throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
 			
@@ -346,6 +345,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
 		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
+		Long timestamp = System.currentTimeMillis();
 		
 		service.processSyncJmsMessage(jmsMsg);
 		
@@ -361,14 +361,14 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(siteInfo, msg.getSite());
 		assertEquals(dateSent, msg.getDateSentBySender());
 		assertFalse(msg.getSnapshot());
-		assertNotNull(msg.getDateCreated());
+		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
 	}
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
+	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
 			
@@ -423,7 +423,8 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound() throws Exception {
+	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound()
+	    throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
 			

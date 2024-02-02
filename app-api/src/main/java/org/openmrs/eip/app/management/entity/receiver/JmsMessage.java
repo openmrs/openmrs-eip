@@ -35,7 +35,7 @@ public class JmsMessage extends AbstractEntity {
 		
 		SYNC,
 		
-		RECONCILIATION
+		RECONCILE
 		
 	}
 	

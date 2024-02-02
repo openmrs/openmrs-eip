@@ -13,6 +13,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.management.service.ReconcileService;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -26,13 +27,16 @@ public class ReceiverJmsMessageProcessorTest {
 	private ReceiverJmsMessageProcessor processor;
 	
 	@Mock
-	private ReceiverService mockService;
+	private ReceiverService mockReceiverService;
+	
+	@Mock
+	private ReconcileService mockReconcileService;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(CamelUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReceiverJmsMessageProcessor(null, mockService);
+		processor = new ReceiverJmsMessageProcessor(null, mockReceiverService, mockReconcileService);
 	}
 	
 	@After
@@ -52,7 +56,7 @@ public class ReceiverJmsMessageProcessorTest {
 		final Long id = 2L;
 		JmsMessage msg = new JmsMessage();
 		msg.setId(id);
-		msg.setType(MessageType.RECONCILIATION);
+		msg.setType(MessageType.RECONCILE);
 		assertEquals(id.toString(), processor.getUniqueId(msg));
 	}
 	
@@ -70,7 +74,17 @@ public class ReceiverJmsMessageProcessorTest {
 		
 		processor.processItem(msg);
 		
-		Mockito.verify(mockService).processSyncJmsMessage(msg);
+		Mockito.verify(mockReceiverService).processSyncJmsMessage(msg);
+	}
+	
+	@Test
+	public void processItem_shouldProcessAReconcileMessage() {
+		JmsMessage msg = new JmsMessage();
+		msg.setType(MessageType.RECONCILE);
+		
+		processor.processItem(msg);
+		
+		Mockito.verify(mockReconcileService).processSyncJmsMessage(msg);
 	}
 	
 }

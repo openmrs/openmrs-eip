@@ -114,6 +114,13 @@ public class JsonUtilsTest {
 		assertTrue(Arrays.equals(expected, JsonUtils.marshalToBytes(person)));
 	}
 	
+	@Test
+	public void unmarshalBytes_shouldUnMarshalTheBytesToObkect() {
+		Map person = Map.of("gender", "M");
+		byte[] expected = "{\"gender\":\"M\"}".getBytes(StandardCharsets.UTF_8);
+		assertEquals(person, JsonUtils.unmarshalBytes(expected, Map.class));
+	}
+	
 	private String badlyFormattedJson() {
 		return "{" + "tableToSyncModelClass:" + PersonModel.class.getName() + "," + "model: {" + "uuid:" + UUID + ","
 		        + "creatorUuid:null," + "dateCreated:null," + "changedByUuid:null," + "dateChanged:null," + "voided:false,"

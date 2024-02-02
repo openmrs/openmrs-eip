@@ -219,7 +219,7 @@
             <column name="last_table_batch" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="body" type="MEDIUMBLOB">
+            <column name="data" type="MEDIUMTEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="date_created" type="DATETIME">

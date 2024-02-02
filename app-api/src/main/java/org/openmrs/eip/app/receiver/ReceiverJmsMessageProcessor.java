@@ -9,6 +9,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.management.service.ReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +20,21 @@ import org.springframework.stereotype.Component;
 /**
  * Processes a jms message by moving it to the appropriate queue
  */
-@Component("receiverJmsMessageProcessor")
+@Component("receiverJmsMsgProcessor")
 @Profile(SyncProfiles.RECEIVER)
 public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverJmsMessageProcessor.class);
 	
-	private ReceiverService service;
+	private ReceiverService receiverService;
+	
+	private ReconcileService reconcileService;
 	
 	public ReceiverJmsMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReceiverService service) {
+	    ReceiverService receiverService, ReconcileService reconcileService) {
 		super(executor);
-		this.service = service;
+		this.receiverService = receiverService;
+		this.reconcileService = reconcileService;
 	}
 	
 	@Override
@@ -45,7 +49,7 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	
 	@Override
 	public String getUniqueId(JmsMessage item) {
-		if (item.getType() == MessageType.RECONCILIATION) {
+		if (item.getType() == MessageType.RECONCILE) {
 			//Process any reconciliation message in parallel
 			return item.getId().toString();
 		}
@@ -72,7 +76,9 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	@Override
 	public void processItem(JmsMessage item) {
 		if (item.getType() == MessageType.SYNC) {
-			service.processSyncJmsMessage(item);
+			receiverService.processSyncJmsMessage(item);
+		} else if (item.getType() == MessageType.RECONCILE) {
+			reconcileService.processSyncJmsMessage(item);
 		}
 	}
 	

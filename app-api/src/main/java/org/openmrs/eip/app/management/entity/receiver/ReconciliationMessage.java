@@ -44,11 +44,11 @@ public class ReconciliationMessage extends AbstractEntity {
 	
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	@Column(columnDefinition = "mediumblob", nullable = false, updatable = false)
+	@Column(columnDefinition = "mediumtext", nullable = false, updatable = false)
 	@NotNull
 	@Getter
 	@Setter
-	private byte[] data;
+	private String data;
 	
 	@Column(name = "processed_count", nullable = false)
 	@Getter
