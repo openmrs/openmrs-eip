@@ -36,8 +36,8 @@ public class OpenmrsRepositoryTest extends BaseReceiverTest {
 	
 	@Test
 	public void countByUuidIn_shouldReturnTheCountOfEntitiesMatchingTheSpecifiedUuids() {
-		String[] uuids = new String[] { "2efd940e-32dc-491f-8038-a8f3afe3e35f", "some-uuid",
-		        "4efd940e-32dc-491f-8038-a8f3afe3e35f" };
+		final String uuid = "2efd940e-32dc-491f-8038-a8f3afe3e35f";
+		String[] uuids = new String[] { uuid, "some-uuid", "4efd940e-32dc-491f-8038-a8f3afe3e35f", uuid };
 		Assert.assertEquals(2, repo.countByUuidIn(uuids));
 	}
 	

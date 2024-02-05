@@ -60,6 +60,10 @@ public class SyncConstants {
 	
 	public static final String PROP_LARGE_MSG_SIZE = "jms.large.msg.size";
 	
+	public static final String RECONCILE_MSG_SEPARATOR = ",";
+	
+	public static final int RECONCILE_MSG_BATCH_SIZE = 1000;
+	
 	//By default, artemisMQ considers a message larger than 100KiB to be a large message.
 	//We need to try and avoid sending large messages by compressing any message close to half the large size.
 	//Our limit is set to half of that of artemis because artemis message encoding uses 2 bytes per character.
