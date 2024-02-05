@@ -8,13 +8,17 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.ReceiverRequestStatus;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMessageRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
@@ -38,6 +42,9 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 	
 	@Autowired
 	private SiteRepository siteRepo;
+	
+	@Autowired
+	private ReceiverSyncRequestRepository requestRepo;
 	
 	@Test
 	public void processSyncJmsMessage_shouldProcessAndSaveAReconcileMessage() {
@@ -75,6 +82,57 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(0, msg.getProcessedCount());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
+	}
+	
+	@Test
+	public void updateReconciliationMessage_shouldProcessFoundUuidsAndUpdateTheProcessedCount() {
+		final String uuid1 = "uuid-1";
+		final String uuid2 = "uuid-2";
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setSite(siteRepo.getReferenceById(1L));
+		msg.setTableName("");
+		msg.setBatchSize(10);
+		msg.setData("uuid1");
+		msg.setDateCreated(new Date());
+		reconcileMsgRep.save(msg);
+		assertEquals(0, msg.getProcessedCount());
+		
+		service.updateReconciliationMessage(msg, true, new String[] { uuid1, uuid2 });
+		
+		assertEquals(2, msg.getProcessedCount());
+	}
+	
+	@Test
+	public void updateReconciliationMessage_shouldRequestForNotFoundUuidsAndUpdateTheProcessedCount() {
+		assertEquals(0, requestRepo.count());
+		final String uuid1 = "uuid-1";
+		final String uuid2 = "uuid-2";
+		final String table = "person";
+		ReconciliationMessage msg = new ReconciliationMessage();
+		final SiteInfo site = siteRepo.getReferenceById(1L);
+		msg.setSite(site);
+		msg.setTableName(table);
+		msg.setBatchSize(10);
+		msg.setData("uuid1");
+		msg.setDateCreated(new Date());
+		reconcileMsgRep.save(msg);
+		assertEquals(0, msg.getProcessedCount());
+		long timestamp = System.currentTimeMillis();
+		
+		service.updateReconciliationMessage(msg, false, new String[] { uuid1, uuid2 });
+		
+		assertEquals(2, msg.getProcessedCount());
+		List<ReceiverSyncRequest> requests = requestRepo.findAll();
+		assertEquals(2, requests.size());
+		List<String> entityUuids = requests.stream().map(r -> r.getIdentifier()).collect(Collectors.toList());
+		assertTrue(entityUuids.contains(uuid1));
+		assertTrue(entityUuids.contains(uuid2));
+		for (ReceiverSyncRequest r : requests) {
+			assertEquals(ReceiverRequestStatus.NEW, r.getStatus());
+			assertEquals(site, r.getSite());
+			assertEquals(table, r.getTableName());
+			assertTrue(r.getDateCreated().getTime() == timestamp || r.getDateCreated().getTime() > timestamp);
+		}
 	}
 	
 }

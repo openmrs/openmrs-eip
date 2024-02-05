@@ -57,7 +57,7 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	
 	private ScheduledThreadPoolExecutor siteExecutor;
 	
-	@Value("${" + PROP_INITIAL_DELAY_JMS_MSG_TASK + ":" + (DEFAULT_INITIAL_DELAY_SYNC) + "}")
+	@Value("${" + PROP_INITIAL_DELAY_JMS_MSG_TASK + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
 	private long initialDelayMsgTsk;
 	
 	@Value("${" + PROP_DELAY_JMS_MSG_TASK + ":" + DEFAULT_DELAY_JMS_MSG_TASK + "}")

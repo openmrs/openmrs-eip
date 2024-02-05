@@ -3,11 +3,14 @@ package org.openmrs.eip.app.management.service.impl;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
+import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMessageRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.service.BaseService;
@@ -32,11 +35,14 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	private JmsMessageRepository jmsMsgRepo;
 	
+	private ReceiverSyncRequestRepository requestRepo;
+	
 	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMessageRepository reconcileMsgRep,
-	    JmsMessageRepository jmsMsgRepo) {
+	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
+		this.requestRepo = requestRepo;
 	}
 	
 	@Override
@@ -60,6 +66,31 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 		}
 		
 		jmsMsgRepo.delete(jmsMessage);
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void updateReconciliationMessage(ReconciliationMessage message, boolean found, String... uuids) {
+		if (found) {
+			//TODO Mark all as found
+		} else {
+			for (String uuid : uuids) {
+				ReceiverSyncRequest request = new ReceiverSyncRequest();
+				request.setSite(message.getSite());
+				request.setTableName(message.getTableName());
+				request.setIdentifier(uuid);
+				request.setRequestUuid(UUID.randomUUID().toString());
+				request.setDateCreated(new Date());
+				requestRepo.save(request);
+			}
+		}
+		
+		message.setProcessedCount(message.getProcessedCount() + uuids.length);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Saving updated reconciliation message");
+		}
+		
+		reconcileMsgRep.save(message);
 	}
 	
 }

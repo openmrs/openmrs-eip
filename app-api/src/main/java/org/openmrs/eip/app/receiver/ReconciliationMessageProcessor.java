@@ -1,10 +1,10 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
+import static org.openmrs.eip.app.SyncConstants.PROP_MAX_BATCH_RECONCILE_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_MIN_BATCH_RECONCILE_SIZE;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +19,7 @@ import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,15 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReconciliationMessageProcessor.class);
 	
-	private final static int MIN_PROCESS_SIZE = 50;
+	private final static int DEFAULT_MIN_BATCH_RECONCILE_SIZE = 50;
+	
+	private final static int DEFAULT_MAX_BATCH_RECONCILE_SIZE = 500;
+	
+	@Value("${" + PROP_MIN_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MIN_BATCH_RECONCILE_SIZE + "}")
+	private long minReconcileBatchSize;
+	
+	@Value("${" + PROP_MAX_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MAX_BATCH_RECONCILE_SIZE + "}")
+	private long maxReconcileBatchSize;
 	
 	private ReconcileService service;
 	
@@ -57,53 +66,44 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 	}
 	
 	@Override
-	public void processItem(ReconciliationMessage item) {
-		//TODO Mark entities as reconciled
-		String[] uuids = StringUtils.split(item.getData().trim(), SyncConstants.RECONCILE_MSG_SEPARATOR);
-		if (uuids.length != item.getBatchSize()) {
+	public void processItem(ReconciliationMessage msg) {
+		String[] uuids = StringUtils.split(msg.getData().trim(), SyncConstants.RECONCILE_MSG_SEPARATOR);
+		if (uuids.length != msg.getBatchSize()) {
 			throw new EIPException("Batch size and item count do not for the reconciliation message");
 		}
 		
-		OpenmrsRepository repo = SyncContext.getRepositoryBean(item.getTableName());
-		int maxProcessSize = SyncConstants.RECONCILE_MSG_BATCH_SIZE / 2;
-		if (item.getBatchSize() < maxProcessSize) {
-			reconcile(uuids, repo);
-		} else {
-			int midIndex = item.getBatchSize() / 2;
-			reconcile(Arrays.copyOfRange(uuids, 0, midIndex), repo);
-			reconcile(Arrays.copyOfRange(uuids, midIndex, item.getBatchSize()), repo);
-		}
+		OpenmrsRepository repo = SyncContext.getRepositoryBean(msg.getTableName());
+		reconcile(uuids, msg, repo);
 	}
 	
-	private void reconcile(String[] uuids, OpenmrsRepository repo) {
+	private void reconcile(String[] uuids, ReconciliationMessage msg, OpenmrsRepository repo) {
 		final int size = uuids.length;
+		if (size > maxReconcileBatchSize) {
+			bisectAndReconcile(uuids, msg, repo);
+		}
+		
 		if (repo.countByUuidIn(uuids) == uuids.length) {
-			//Mark all as found and update processed count
+			service.updateReconciliationMessage(msg, true, uuids);
 			return;
 		}
 		
-		if (size <= MIN_PROCESS_SIZE) {
-			List<String> foundUuids = new ArrayList<>(uuids.length);
+		//Give up on the split approach and process uuids individually
+		if (size < minReconcileBatchSize) {
 			for (String uuid : uuids) {
-				if (repo.existsByUuid(uuid)) {
-					foundUuids.add(uuid);
-				} else {
-					//TODO Add to sync request queue
-				}
+				service.updateReconciliationMessage(msg, repo.existsByUuid(uuid), uuid);
 			}
 			
-			//TODO Mark all in foundUuids as found
-			//TODO update processed count
 			return;
 		}
 		
-		splitAndReconcile(uuids, repo);
+		//Recursively split and check until we find a left half with no missing uuids and then proceed to the right.
+		bisectAndReconcile(uuids, msg, repo);
 	}
 	
-	private void splitAndReconcile(String[] uuids, OpenmrsRepository repo) {
+	private void bisectAndReconcile(String[] uuids, ReconciliationMessage msg, OpenmrsRepository repo) {
 		int midIndex = uuids.length / 2;
-		reconcile(Arrays.copyOfRange(uuids, 0, midIndex), repo);
-		reconcile(Arrays.copyOfRange(uuids, midIndex, uuids.length), repo);
+		reconcile(Arrays.copyOfRange(uuids, 0, midIndex), msg, repo);
+		reconcile(Arrays.copyOfRange(uuids, midIndex, uuids.length), msg, repo);
 	}
 	
 }

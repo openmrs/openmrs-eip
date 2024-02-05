@@ -62,6 +62,10 @@ public class SyncConstants {
 	
 	public static final String RECONCILE_MSG_SEPARATOR = ",";
 	
+	public static final String PROP_MIN_BATCH_RECONCILE_SIZE = "reconcile.min.batch.size";
+	
+	public static final String PROP_MAX_BATCH_RECONCILE_SIZE = "reconcile.max.batch.size";
+	
 	public static final int RECONCILE_MSG_BATCH_SIZE = 1000;
 	
 	//By default, artemisMQ considers a message larger than 100KiB to be a large message.
