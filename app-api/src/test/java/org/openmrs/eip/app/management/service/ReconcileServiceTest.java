@@ -97,7 +97,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		reconcileMsgRep.save(msg);
 		assertEquals(0, msg.getProcessedCount());
 		
-		service.updateReconciliationMessage(msg, true, new String[] { uuid1, uuid2 });
+		service.updateReconciliationMessage(msg, true, List.of(uuid1, uuid2));
 		
 		assertEquals(2, msg.getProcessedCount());
 	}
@@ -119,7 +119,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(0, msg.getProcessedCount());
 		long timestamp = System.currentTimeMillis();
 		
-		service.updateReconciliationMessage(msg, false, new String[] { uuid1, uuid2 });
+		service.updateReconciliationMessage(msg, false, List.of(uuid1, uuid2));
 		
 		assertEquals(2, msg.getProcessedCount());
 		List<ReceiverSyncRequest> requests = requestRepo.findAll();

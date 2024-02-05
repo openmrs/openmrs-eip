@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.repository;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
@@ -37,7 +39,7 @@ public class OpenmrsRepositoryTest extends BaseReceiverTest {
 	@Test
 	public void countByUuidIn_shouldReturnTheCountOfEntitiesMatchingTheSpecifiedUuids() {
 		final String uuid = "2efd940e-32dc-491f-8038-a8f3afe3e35f";
-		String[] uuids = new String[] { uuid, "some-uuid", "4efd940e-32dc-491f-8038-a8f3afe3e35f", uuid };
+		List<String> uuids = List.of(uuid, "some-uuid", "4efd940e-32dc-491f-8038-a8f3afe3e35f", uuid);
 		Assert.assertEquals(2, repo.countByUuidIn(uuids));
 	}
 	

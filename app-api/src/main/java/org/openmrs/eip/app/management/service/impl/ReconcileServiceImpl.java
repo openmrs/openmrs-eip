@@ -3,6 +3,7 @@ package org.openmrs.eip.app.management.service.impl;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
@@ -70,7 +71,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void updateReconciliationMessage(ReconciliationMessage message, boolean found, String... uuids) {
+	public void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids) {
 		if (found) {
 			//TODO Mark all as found
 		} else {
@@ -85,7 +86,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 			}
 		}
 		
-		message.setProcessedCount(message.getProcessedCount() + uuids.length);
+		message.setProcessedCount(message.getProcessedCount() + uuids.size());
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Saving updated reconciliation message");
 		}
