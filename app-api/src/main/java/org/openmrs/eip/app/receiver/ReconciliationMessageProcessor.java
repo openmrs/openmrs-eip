@@ -5,6 +5,7 @@ import static org.openmrs.eip.app.SyncConstants.PROP_MAX_BATCH_RECONCILE_SIZE;
 import static org.openmrs.eip.app.SyncConstants.PROP_MIN_BATCH_RECONCILE_SIZE;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,37 +74,59 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 		}
 		
 		OpenmrsRepository repo = SyncContext.getRepositoryBean(msg.getTableName());
-		reconcile(uuids, msg, repo);
+		List<String> uuidList = Arrays.stream(uuids).toList();
+		reconcile(uuidList, uuidList, msg, repo);
 	}
 	
-	private void reconcile(String[] uuids, ReconciliationMessage msg, OpenmrsRepository repo) {
-		final int size = uuids.length;
-		if (size > maxReconcileBatchSize) {
-			bisectAndReconcile(uuids, msg, repo);
+	private void reconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg, OpenmrsRepository repo) {
+		final int size = uuids.size();
+		if (log.isTraceEnabled()) {
+			log.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
+			    allUuids.indexOf(uuids.get(size - 1)));
 		}
 		
-		if (repo.countByUuidIn(uuids) == uuids.length) {
-			service.updateReconciliationMessage(msg, true, uuids);
+		if (size > maxReconcileBatchSize) {
+			bisectAndReconcile(uuids, allUuids, msg, repo);
+			return;
+		}
+		
+		final int matchCount = repo.countByUuidIn(uuids);
+		if (matchCount == 0 || matchCount == size) {
+			boolean found = matchCount == size;
+			if (log.isTraceEnabled()) {
+				log.trace("Updating reconciliation msg with {} {} uuid(s)", matchCount, (found ? "found" : "missing"));
+			}
+			
+			//All uuids are missing or existing
+			service.updateReconciliationMessage(msg, found, uuids);
 			return;
 		}
 		
 		//Give up on the split approach and process uuids individually
 		if (size < minReconcileBatchSize) {
 			for (String uuid : uuids) {
-				service.updateReconciliationMessage(msg, repo.existsByUuid(uuid), uuid);
+				boolean found = repo.existsByUuid(uuid);
+				if (log.isTraceEnabled()) {
+					log.trace("Updating reconciliation msg for {} uuid", (found ? "found" : "missing"));
+				}
+				
+				service.updateReconciliationMessage(msg, found, List.of(uuid));
 			}
 			
 			return;
 		}
 		
 		//Recursively split and check until we find a left half with no missing uuids and then proceed to the right.
-		bisectAndReconcile(uuids, msg, repo);
+		bisectAndReconcile(uuids, allUuids, msg, repo);
 	}
 	
-	private void bisectAndReconcile(String[] uuids, ReconciliationMessage msg, OpenmrsRepository repo) {
-		int midIndex = uuids.length / 2;
-		reconcile(Arrays.copyOfRange(uuids, 0, midIndex), msg, repo);
-		reconcile(Arrays.copyOfRange(uuids, midIndex, uuids.length), msg, repo);
+	private void bisectAndReconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg,
+	                                OpenmrsRepository repo) {
+		int midIndex = uuids.size() / 2;
+		List<String> left = uuids.subList(0, midIndex);
+		List<String> right = uuids.subList(midIndex, uuids.size());
+		reconcile(left, allUuids, msg, repo);
+		reconcile(right, allUuids, msg, repo);
 	}
 	
 }
