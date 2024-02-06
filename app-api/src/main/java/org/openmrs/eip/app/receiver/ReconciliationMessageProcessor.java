@@ -80,21 +80,21 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 	
 	private void reconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg, OpenmrsRepository repo) {
 		final int size = uuids.size();
-		if (log.isTraceEnabled()) {
-			log.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
-			    allUuids.indexOf(uuids.get(size - 1)));
-		}
-		
 		if (size > maxReconcileBatchSize) {
 			bisectAndReconcile(uuids, allUuids, msg, repo);
 			return;
+		}
+		
+		if (log.isTraceEnabled()) {
+			log.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
+			    allUuids.indexOf(uuids.get(size - 1)));
 		}
 		
 		final int matchCount = repo.countByUuidIn(uuids);
 		if (matchCount == 0 || matchCount == size) {
 			boolean found = matchCount == size;
 			if (log.isTraceEnabled()) {
-				log.trace("Updating reconciliation msg with {} {} uuid(s)", matchCount, (found ? "found" : "missing"));
+				log.trace("Updating reconciliation msg with {} {} uuid(s)", size, (found ? "found" : "missing"));
 			}
 			
 			//All uuids are missing or existing
@@ -107,7 +107,7 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 			for (String uuid : uuids) {
 				boolean found = repo.existsByUuid(uuid);
 				if (log.isTraceEnabled()) {
-					log.trace("Updating reconciliation msg for {} uuid", (found ? "found" : "missing"));
+					log.trace("Updating reconciliation after {} uuid", (found ? "found" : "missing"));
 				}
 				
 				service.updateReconciliationMessage(msg, found, List.of(uuid));

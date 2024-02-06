@@ -125,6 +125,7 @@ public class ReconciliationMessageProcessorTest {
 		processor.processItem(msg);
 		
 		assertTrue(uuids.equals(processedUuids));
+		verify(mockService, times(8)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 	}
 	
 	@Test
