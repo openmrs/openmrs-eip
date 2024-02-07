@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "reconciliation")
+@Table(name = "mgt_reconciliation")
 public class Reconciliation extends AbstractEntity {
 	
 	@Column(name = "identifier", nullable = false, updatable = false, unique = true, length = 50)

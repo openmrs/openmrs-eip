@@ -72,11 +72,11 @@
     <changeSet author="wluyima" id="20240123-0815" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="receiver_jms_msg"/>
+                <tableExists tableName="mgt_receiver_jms_msg"/>
             </not>
         </preConditions>
-        <comment>Adding receiver_jms_msg table</comment>
-        <createTable tableName="receiver_jms_msg">
+        <comment>Adding mgt_receiver_jms_msg table</comment>
+        <createTable tableName="mgt_receiver_jms_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -95,7 +95,7 @@
             </column>
         </createTable>
         <addForeignKeyConstraint constraintName="receiver_jms_msg_site_fk"
-                                 baseTableName="receiver_jms_msg"
+                                 baseTableName="mgt_receiver_jms_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="identifier"/>
@@ -104,11 +104,11 @@
     <changeSet author="wluyima" id="20240131-0901" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="reconciliation"/>
+                <tableExists tableName="mgt_reconciliation"/>
             </not>
         </preConditions>
-        <comment>Adding reconciliation table</comment>
-        <createTable tableName="reconciliation">
+        <comment>Adding mgt_reconciliation table</comment>
+        <createTable tableName="mgt_reconciliation">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -128,11 +128,11 @@
     <changeSet author="wluyima" id="20240131-0902" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="site_reconciliation"/>
+                <tableExists tableName="mgt_site_reconciliation"/>
             </not>
         </preConditions>
-        <comment>Adding site_reconciliation table</comment>
-        <createTable tableName="site_reconciliation">
+        <comment>Adding mgt_site_reconciliation table</comment>
+        <createTable tableName="mgt_site_reconciliation">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -145,7 +145,7 @@
             <column name="date_completed" type="DATETIME"/>
         </createTable>
         <addForeignKeyConstraint constraintName="site_reconciliation_site_fk"
-                                 baseTableName="site_reconciliation"
+                                 baseTableName="mgt_site_reconciliation"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>
@@ -154,11 +154,11 @@
     <changeSet author="wluyima" id="20240131-0903" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="table_reconciliation"/>
+                <tableExists tableName="mgt_table_reconciliation"/>
             </not>
         </preConditions>
-        <comment>Adding table_reconciliation table</comment>
-        <createTable tableName="table_reconciliation">
+        <comment>Adding mgt_table_reconciliation table</comment>
+        <createTable tableName="mgt_table_reconciliation">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -188,22 +188,22 @@
             </column>
             <column name="date_changed" type="DATETIME"/>
         </createTable>
-        <addUniqueConstraint tableName="table_reconciliation" columnNames="site_reconciliation_id, table_name" constraintName="table_site_uk"/>
+        <addUniqueConstraint tableName="mgt_table_reconciliation" columnNames="site_reconciliation_id, table_name" constraintName="table_site_uk"/>
         <addForeignKeyConstraint constraintName="table_site_reconciliation_fk"
-                                 baseTableName="table_reconciliation"
+                                 baseTableName="mgt_table_reconciliation"
                                  baseColumnNames="site_reconciliation_id"
-                                 referencedTableName="site_reconciliation"
+                                 referencedTableName="mgt_site_reconciliation"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240131-0904" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="reconciliation_msg"/>
+                <tableExists tableName="mgt_reconciliation_msg"/>
             </not>
         </preConditions>
-        <comment>Adding reconciliation_msg table</comment>
-        <createTable tableName="reconciliation_msg">
+        <comment>Adding mgt_reconciliation_msg table</comment>
+        <createTable tableName="mgt_reconciliation_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -230,7 +230,7 @@
             </column>
         </createTable>
         <addForeignKeyConstraint constraintName="reconciliation_msg_site_fk"
-                                 baseTableName="reconciliation_msg"
+                                 baseTableName="mgt_reconciliation_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>

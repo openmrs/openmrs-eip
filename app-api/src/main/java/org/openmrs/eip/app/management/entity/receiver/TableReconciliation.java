@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "table_reconciliation")
+@Table(name = "mgt_table_reconciliation")
 public class TableReconciliation extends AbstractEntity {
 	
 	@ManyToOne(optional = false)
