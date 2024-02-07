@@ -12,11 +12,11 @@ import org.springframework.data.domain.Pageable;
  * Reads a batch of reconciliation messages and forwards them to the
  * {@link ReconcileMessageProcessor}.
  */
-public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<ReconciliationMessage, ReconcileMessageProcessor> {
+public class ReceiverReconcileMsgTask extends BaseReceiverSyncPrioritizingTask<ReconciliationMessage, ReconcileMessageProcessor> {
 	
 	private ReconciliationMsgRepository repo;
 	
-	public ReceiverReconcileTask() {
+	public ReceiverReconcileMsgTask() {
 		super(SyncContext.getBean(ReconcileMessageProcessor.class));
 		this.repo = SyncContext.getBean(ReconciliationMsgRepository.class);
 	}

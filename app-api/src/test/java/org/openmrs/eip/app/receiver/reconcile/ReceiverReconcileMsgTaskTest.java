@@ -26,7 +26,7 @@ import org.springframework.data.domain.Pageable;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SyncContext.class)
-public class ReceiverReconcileTaskTest {
+public class ReceiverReconcileMsgTaskTest {
 	
 	@Mock
 	private ReconciliationMsgRepository mockRepo;
@@ -34,13 +34,13 @@ public class ReceiverReconcileTaskTest {
 	@Mock
 	private Page mockPage;
 	
-	private ReceiverReconcileTask task;
+	private ReceiverReconcileMsgTask task;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		setInternalState(BaseReceiverSyncPrioritizingTask.class, "initialized", true);
-		task = new ReceiverReconcileTask();
+		task = new ReceiverReconcileMsgTask();
 	}
 	
 	@After
