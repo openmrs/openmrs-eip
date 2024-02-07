@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
  */
 @Component("reconcileMsgProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class ReconciliationMessageProcessor extends BasePureParallelQueueProcessor<ReconciliationMessage> {
+public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<ReconciliationMessage> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(ReconciliationMessageProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(ReconcileMessageProcessor.class);
 	
 	private final static int DEFAULT_MIN_BATCH_RECONCILE_SIZE = 50;
 	
@@ -45,7 +45,7 @@ public class ReconciliationMessageProcessor extends BasePureParallelQueueProcess
 	
 	private ReconcileService service;
 	
-	public ReconciliationMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	public ReconcileMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    ReconcileService service) {
 		super(executor);
 		this.service = service;

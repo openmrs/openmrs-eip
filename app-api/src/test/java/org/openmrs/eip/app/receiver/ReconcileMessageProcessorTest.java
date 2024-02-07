@@ -33,11 +33,11 @@ import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SyncContext.class)
-public class ReconciliationMessageProcessorTest {
+public class ReconcileMessageProcessorTest {
 	
 	private static final int MAX_REC_BATCH_SIZE = 100;
 	
-	private ReconciliationMessageProcessor processor;
+	private ReconcileMessageProcessor processor;
 	
 	@Mock
 	private SyncEntityRepository mockEntityRepo;
@@ -49,7 +49,7 @@ public class ReconciliationMessageProcessorTest {
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReconciliationMessageProcessor(null, mockService);
+		processor = new ReconcileMessageProcessor(null, mockService);
 		Whitebox.setInternalState(processor, "maxReconcileBatchSize", MAX_REC_BATCH_SIZE);
 		Whitebox.setInternalState(processor, "minReconcileBatchSize", 2);
 	}

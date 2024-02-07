@@ -19,7 +19,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
-import org.openmrs.eip.app.management.repository.ReconciliationMessageRepository;
+import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -35,7 +35,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 	private ReconcileService service;
 	
 	@Autowired
-	private ReconciliationMessageRepository reconcileMsgRep;
+	private ReconciliationMsgRepository reconcileMsgRep;
 	
 	@Autowired
 	private JmsMessageRepository jmsMsgRepo;

@@ -12,7 +12,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
-import org.openmrs.eip.app.management.repository.ReconciliationMessageRepository;
+import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReconcileService;
@@ -32,13 +32,13 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	private SiteRepository siteRepo;
 	
-	private ReconciliationMessageRepository reconcileMsgRep;
+	private ReconciliationMsgRepository reconcileMsgRep;
 	
 	private JmsMessageRepository jmsMsgRepo;
 	
 	private ReceiverSyncRequestRepository requestRepo;
 	
-	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMessageRepository reconcileMsgRep,
+	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
