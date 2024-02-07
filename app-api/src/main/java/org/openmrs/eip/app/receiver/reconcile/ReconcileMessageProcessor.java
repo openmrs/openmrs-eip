@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app.receiver.reconcile;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.PROP_MAX_BATCH_RECONCILE_SIZE;

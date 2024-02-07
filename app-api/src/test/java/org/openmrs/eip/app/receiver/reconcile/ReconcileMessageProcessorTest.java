@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app.receiver.reconcile;
 
 import static java.util.stream.IntStream.rangeClosed;
 import static org.junit.Assert.assertTrue;

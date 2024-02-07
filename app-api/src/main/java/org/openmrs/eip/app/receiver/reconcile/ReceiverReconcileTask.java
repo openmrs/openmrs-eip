@@ -1,9 +1,10 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app.receiver.reconcile;
 
 import java.util.List;
 
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
+import org.openmrs.eip.app.receiver.BaseReceiverSyncPrioritizingTask;
 import org.openmrs.eip.component.SyncContext;
 import org.springframework.data.domain.Pageable;
 

@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app.receiver.reconcile;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
+import org.openmrs.eip.app.receiver.BaseReceiverSyncPrioritizingTask;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
