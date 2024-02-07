@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome.CONFLICT;
@@ -25,7 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncContext;
@@ -93,6 +96,7 @@ public class ReceiverUtilsTest {
 		Whitebox.setInternalState(ReceiverUtils.class, "nameRepo", (Object) null);
 		Whitebox.setInternalState(ReceiverUtils.class, "idRepo", (Object) null);
 		Whitebox.setInternalState(ReceiverUtils.class, "attribRepo", (Object) null);
+		Whitebox.setInternalState(ReceiverUtils.class, ReceiverActiveMqMessagePublisher.class, (Object) null);
 	}
 	
 	@Test
@@ -653,6 +657,38 @@ public class ReceiverUtilsTest {
 		assertFalse(msg.isSearchIndexUpdated());
 		assertFalse(msg.isCached());
 		assertFalse(msg.isEvictedFromCache());
+	}
+	
+	@Test
+	public void getSiteQueueName_shouldReturnTheSiteQueueName() {
+		final String siteIdentifier = "test-site-id";
+		final String queueName = "test-queue";
+		SiteInfo mockSite = Mockito.mock(SiteInfo.class);
+		ReceiverActiveMqMessagePublisher mockPublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
+		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
+		when(mockSite.getIdentifier()).thenReturn(siteIdentifier);
+		when(mockPublisher.getCamelOutputEndpoint(siteIdentifier)).thenReturn("activemq:" + queueName);
+		when(mockSite.getIdentifier()).thenReturn(siteIdentifier);
+		Assert.assertEquals(queueName, ReceiverUtils.getSiteQueueName(siteIdentifier));
+	}
+	
+	@Test
+	public void getSiteQueueName_shouldFailForAnInvalidActiveMqEndpoint() {
+		final String siteIdentifier = "test-site-id";
+		final String queueName = "test-queue";
+		SiteInfo mockSite = Mockito.mock(SiteInfo.class);
+		ReceiverActiveMqMessagePublisher mockPublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
+		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
+		when(mockSite.getIdentifier()).thenReturn(siteIdentifier);
+		when(mockPublisher.getCamelOutputEndpoint(siteIdentifier)).thenReturn("activemq:" + queueName);
+		when(mockSite.getIdentifier()).thenReturn(siteIdentifier);
+		final String endpoint = "jms:" + queueName;
+		when(mockPublisher.getCamelOutputEndpoint(siteIdentifier)).thenReturn("jms:" + queueName);
+		Exception e = assertThrows(EIPException.class, () -> {
+			ReceiverUtils.getSiteQueueName(siteIdentifier);
+		});
+		
+		assertEquals(endpoint + " is an invalid message broker endpoint value for outbound messages", e.getMessage());
 	}
 	
 }

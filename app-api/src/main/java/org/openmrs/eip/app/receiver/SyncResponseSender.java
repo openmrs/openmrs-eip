@@ -4,22 +4,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.openmrs.eip.app.management.entity.SyncResponseModel;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
+import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.utils.DateUtils;
+import org.openmrs.eip.component.utils.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.MessageProducer;
 import jakarta.jms.Queue;
 import jakarta.jms.Session;
-
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
-import org.openmrs.eip.app.management.entity.SyncResponseModel;
-import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
-import org.openmrs.eip.component.SyncContext;
-import org.openmrs.eip.component.exception.EIPException;
-import org.openmrs.eip.component.utils.DateUtils;
-import org.openmrs.eip.component.utils.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Reads a batch of messages in the synced queue for which responses have not yet ben sent and sends
@@ -39,13 +38,7 @@ public class SyncResponseSender extends BasePostSyncActionRunnable {
 		super(site);
 		activeMqConnFactory = SyncContext.getBean(ConnectionFactory.class);
 		processor = SyncContext.getBean(SyncResponseSenderProcessor.class);
-		String endpoint = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)
-		        .getCamelOutputEndpoint(site.getIdentifier());
-		if (!endpoint.startsWith("activemq:")) {
-			throw new EIPException(endpoint + " is an invalid message broker endpoint value for outbound messages");
-		}
-		
-		queueName = endpoint.substring(endpoint.indexOf(":") + 1);
+		queueName = ReceiverUtils.getSiteQueueName(site.getIdentifier());
 	}
 	
 	@Override

@@ -76,6 +76,8 @@ public class ReceiverUtils {
 	
 	private static Map<String, String> modelClassNameParentMap;
 	
+	private static ReceiverActiveMqMessagePublisher activeMqPublisher;
+	
 	static {
 		//TODO instead define the cache and search index requirements on the TableToSyncEnum
 		CACHE_EVICT_CLASS_NAMES = new HashSet();
@@ -325,6 +327,15 @@ public class ReceiverUtils {
 		CamelUtils.send(query, exchange);
 	}
 	
+	public static String getSiteQueueName(String siteIdentifier) {
+		String endpoint = getActiveMqMessagePublisher().getCamelOutputEndpoint(siteIdentifier);
+		if (!endpoint.startsWith("activemq:")) {
+			throw new EIPException(endpoint + " is an invalid message broker endpoint value for outbound messages");
+		}
+		
+		return endpoint.substring(endpoint.indexOf(":") + 1);
+	}
+	
 	private static PersonNameRepository getNameRepo() {
 		if (nameRepo == null) {
 			nameRepo = SyncContext.getBean(PersonNameRepository.class);
@@ -355,6 +366,14 @@ public class ReceiverUtils {
 		}
 		
 		return producerTemplate;
+	}
+	
+	private static ReceiverActiveMqMessagePublisher getActiveMqMessagePublisher() {
+		if (activeMqPublisher == null) {
+			activeMqPublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
+		}
+		
+		return activeMqPublisher;
 	}
 	
 }

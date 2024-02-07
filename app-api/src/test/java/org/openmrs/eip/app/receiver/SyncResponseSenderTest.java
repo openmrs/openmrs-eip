@@ -2,7 +2,6 @@ package org.openmrs.eip.app.receiver;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -19,13 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import jakarta.jms.Connection;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.MessageProducer;
-import jakarta.jms.Queue;
-import jakarta.jms.Session;
-import jakarta.jms.TextMessage;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,6 +39,13 @@ import org.springframework.data.domain.Pageable;
 
 import com.jayway.jsonpath.JsonPath;
 
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Queue;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SyncContext.class, ReceiverUtils.class })
 public class SyncResponseSenderTest {
@@ -54,9 +53,6 @@ public class SyncResponseSenderTest {
 	private static final String SITE_IDENTIFIER = "test-site-id";
 	
 	private static final String QUEUE_NAME = "test-queue";
-	
-	@Mock
-	private ReceiverActiveMqMessagePublisher mockPublisher;
 	
 	@Mock
 	private SiteInfo mockSite;
@@ -81,9 +77,8 @@ public class SyncResponseSenderTest {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		setInternalState(BaseSiteRunnable.class, "initialized", true);
 		setInternalState(BaseSiteRunnable.class, "page", mockPage);
-		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
 		when(mockSite.getIdentifier()).thenReturn(SITE_IDENTIFIER);
-		when(mockPublisher.getCamelOutputEndpoint(SITE_IDENTIFIER)).thenReturn("activemq:" + QUEUE_NAME);
+		when(ReceiverUtils.getSiteQueueName(SITE_IDENTIFIER)).thenReturn(QUEUE_NAME);
 		sender = new SyncResponseSender(mockSite);
 		Whitebox.setInternalState(sender, ConnectionFactory.class, mockConnFactory);
 		Whitebox.setInternalState(sender, SyncResponseSenderProcessor.class, mockProcessor);
@@ -93,18 +88,6 @@ public class SyncResponseSenderTest {
 	public void tearDown() {
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
 		setInternalState(BaseSiteRunnable.class, "page", (Object) null);
-	}
-	
-	@Test
-	public void shouldFailForAnInvalidActiveMqEndpoint() {
-		when(mockSite.getIdentifier()).thenReturn(SITE_IDENTIFIER);
-		final String endpoint = "jms:" + QUEUE_NAME;
-		when(mockPublisher.getCamelOutputEndpoint(SITE_IDENTIFIER)).thenReturn("jms:" + QUEUE_NAME);
-		Exception e = assertThrows(EIPException.class, () -> {
-			new SyncResponseSender(mockSite);
-		});
-		
-		assertEquals(endpoint + " is an invalid message broker endpoint value for outbound messages", e.getMessage());
 	}
 	
 	@Test
