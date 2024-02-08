@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes a receiver sync archive by moving it to the pruned queue.
+ * Processes a ReconciliationMessage
  */
 @Component("reconcileMsgProcessor")
 @Profile(SyncProfiles.RECEIVER)
@@ -38,10 +38,10 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 	private final static int DEFAULT_MAX_BATCH_RECONCILE_SIZE = 500;
 	
 	@Value("${" + PROP_MIN_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MIN_BATCH_RECONCILE_SIZE + "}")
-	private long minReconcileBatchSize;
+	private int minReconcileBatchSize;
 	
 	@Value("${" + PROP_MAX_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MAX_BATCH_RECONCILE_SIZE + "}")
-	private long maxReconcileBatchSize;
+	private int maxReconcileBatchSize;
 	
 	private ReconcileService service;
 	
@@ -53,12 +53,12 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 	
 	@Override
 	public String getProcessorName() {
-		return "reconcile";
+		return "reconcile msg";
 	}
 	
 	@Override
 	public String getQueueName() {
-		return "reconcile";
+		return "reconcile-msg";
 	}
 	
 	@Override

@@ -10,11 +10,15 @@ public class ReconciliationResponse {
 	
 	@Getter
 	@Setter
+	private String identifier;
+	
+	@Getter
+	@Setter
 	private String tableName;
 	
 	@Getter
 	@Setter
-	private Integer batchSize;
+	private int batchSize;
 	
 	@Getter
 	@Setter
