@@ -52,12 +52,12 @@ public class ReceiverJmsMessageProcessorTest {
 	}
 	
 	@Test
-	public void getUniqueId_shouldReturnIdForAReconciliationMessage() {
-		final Long id = 2L;
+	public void getUniqueId_shouldReturnSiteIdentifierForAReconciliationMessage() {
+		final String siteIdentifier = "test";
 		JmsMessage msg = new JmsMessage();
-		msg.setId(id);
+		msg.setSiteId(siteIdentifier);
 		msg.setType(MessageType.RECONCILE);
-		assertEquals(id.toString(), processor.getUniqueId(msg));
+		assertEquals(siteIdentifier, processor.getUniqueId(msg));
 	}
 	
 	@Test

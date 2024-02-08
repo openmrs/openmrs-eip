@@ -50,11 +50,12 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	@Override
 	public String getUniqueId(JmsMessage item) {
 		if (item.getType() == MessageType.RECONCILE) {
-			//Process any reconciliation message in parallel
-			return item.getId().toString();
+			//Process messages from same site serially
+			return item.getSiteId();
 		}
 		
-		//Ensures that messages of this type are processed in serial
+		//Process all messages serially
+		//We currently ignore site because it will be null in prod for existing messages at time of upgrade.
 		return getLogicalType(item);
 	}
 	
