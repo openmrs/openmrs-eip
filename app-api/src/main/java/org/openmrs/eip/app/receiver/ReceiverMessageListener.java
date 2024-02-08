@@ -47,7 +47,7 @@ public class ReceiverMessageListener implements MessageListener {
 				return;
 			}
 			
-			//TODO Skip of message if there is another message with the same id already exists.
+			//TODO Skip message if there is another message with the same id already exists.
 			JmsMessage jmsMsg = new JmsMessage();
 			jmsMsg.setMessageId(msgId);
 			byte[] body;

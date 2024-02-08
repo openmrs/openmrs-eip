@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.entity;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +17,14 @@ public class ReconciliationResponse {
 	@Getter
 	@Setter
 	private String tableName;
+	
+	@Getter
+	@Setter
+	private Long rowCount;
+	
+	@Getter
+	@Setter
+	private LocalDateTime remoteStartDate;
 	
 	@Getter
 	@Setter

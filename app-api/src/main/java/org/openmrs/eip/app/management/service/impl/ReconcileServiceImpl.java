@@ -10,9 +10,13 @@ import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
+import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReconcileService;
@@ -38,32 +42,60 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	private ReceiverSyncRequestRepository requestRepo;
 	
+	private SiteReconciliationRepository siteReconcileRepo;
+	
 	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
-	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo) {
+	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
+	    SiteReconciliationRepository siteReconcileRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
 		this.requestRepo = requestRepo;
+		this.siteReconcileRepo = siteReconcileRepo;
 	}
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void processSyncJmsMessage(JmsMessage jmsMessage) {
 		ReconciliationMessage msg = new ReconciliationMessage();
-		msg.setSite(siteRepo.getByIdentifier(jmsMessage.getSiteId()));
+		final SiteInfo site = siteRepo.getByIdentifier(jmsMessage.getSiteId());
+		msg.setSite(site);
 		ReconciliationResponse resp = JsonUtils.unmarshalBytes(jmsMessage.getBody(), ReconciliationResponse.class);
-		msg.setTableName(resp.getTableName());
+		final String table = resp.getTableName();
+		msg.setTableName(table);
 		msg.setBatchSize(resp.getBatchSize());
 		msg.setLastTableBatch(resp.isLastTableBatch());
 		msg.setData(resp.getData());
 		msg.setDateCreated(new Date());
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Saving reconciliation message");
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Saving reconciliation message");
 		}
 		
 		reconcileMsgRep.save(msg);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Removing reconciliation message");
+		
+		if (resp.getRowCount() != null && resp.getRemoteStartDate() != null) {
+			//These are the first uuids for the associated table
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Adding table reconciliation");
+			}
+			
+			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
+			TableReconciliation tableRec = new TableReconciliation();
+			tableRec.setTableName(table);
+			tableRec.setRowCount(resp.getRowCount());
+			tableRec.setRemoteStartDate(resp.getRemoteStartDate());
+			tableRec.setLastBatchReceived(resp.isLastTableBatch());
+			tableRec.setDateCreated(new Date());
+			siteRec.addTableReconciliation(tableRec);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Saving updated to site reconciliation");
+			}
+			
+			siteReconcileRepo.save(siteRec);
+		}
+		
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Removing reconciliation message");
 		}
 		
 		jmsMsgRepo.delete(jmsMessage);
@@ -72,9 +104,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids) {
-		if (found) {
-			//TODO Mark all as found
-		} else {
+		if (!found) {
 			for (String uuid : uuids) {
 				ReceiverSyncRequest request = new ReceiverSyncRequest();
 				request.setSite(message.getSite());
@@ -87,8 +117,8 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 		}
 		
 		message.setProcessedCount(message.getProcessedCount() + uuids.size());
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Saving updated reconciliation message");
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Saving updated reconciliation message");
 		}
 		
 		reconcileMsgRep.save(message);
