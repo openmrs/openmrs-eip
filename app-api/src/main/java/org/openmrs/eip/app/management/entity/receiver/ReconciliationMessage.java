@@ -54,4 +54,14 @@ public class ReconciliationMessage extends AbstractEntity {
 	@Getter
 	@Setter
 	private int processedCount;
+	
+	/**
+	 * Checks whether this message has been processed completely.
+	 * 
+	 * @return true if completed otherwise false
+	 */
+	public boolean isCompleted() {
+		return getBatchSize() == getProcessedCount();
+	}
+	
 }

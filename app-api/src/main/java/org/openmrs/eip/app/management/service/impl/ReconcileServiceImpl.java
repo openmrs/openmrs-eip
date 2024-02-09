@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
@@ -44,14 +46,17 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	private SiteReconciliationRepository siteReconcileRepo;
 	
+	private TableReconciliationRepository tableReconcileRepo;
+	
 	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
-	    SiteReconciliationRepository siteReconcileRepo) {
+	    SiteReconciliationRepository siteReconcileRepo, TableReconciliationRepository tableReconcileRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
 		this.requestRepo = requestRepo;
 		this.siteReconcileRepo = siteReconcileRepo;
+		this.tableReconcileRepo = tableReconcileRepo;
 	}
 	
 	@Override
@@ -122,6 +127,36 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 		}
 		
 		reconcileMsgRep.save(message);
+	}
+	
+	/**
+	 * This method is synchronized as mentioned in the javadocs on the interface
+	 */
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public synchronized void updateTableReconciliation(ReconciliationMessage message) {
+		SiteReconciliation siteRec = siteReconcileRepo.getBySite(message.getSite());
+		TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
+		    message.getTableName());
+		tableRec.setProcessedCount(tableRec.getProcessedCount() + message.getProcessedCount());
+		if (message.isLastTableBatch()) {
+			tableRec.setLastBatchReceived(true);
+		}
+		tableRec.setDateChanged(LocalDateTime.now());
+		if (message.isCompleted() && tableRec.isLastBatchReceived()
+		        && tableRec.getRowCount() == tableRec.getProcessedCount()) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Table reconciliation completed");
+			}
+			
+			tableRec.setCompleted(true);
+		}
+		
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Saving updated table reconciliation");
+		}
+		
+		tableReconcileRepo.save(tableRec);
 	}
 	
 }

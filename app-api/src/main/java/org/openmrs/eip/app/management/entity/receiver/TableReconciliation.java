@@ -31,10 +31,9 @@ public class TableReconciliation extends AbstractEntity {
 	private String tableName;
 	
 	@Column(name = "row_count", nullable = false)
-	@NotNull
 	@Getter
 	@Setter
-	private Long rowCount;
+	private long rowCount;
 	
 	@Column(name = "remote_start_date", nullable = false)
 	@NotNull

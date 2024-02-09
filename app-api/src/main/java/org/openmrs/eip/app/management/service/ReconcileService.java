@@ -26,5 +26,14 @@ public interface ReconcileService extends Service {
 	 * @param uuids the uuids
 	 */
 	void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids);
+
+	/**
+	 * Inserts or updates a table reconciliation based on the state of the specified message.
+	 * Implementation of this method MUST be synchronized because it can be called from multiple threads
+	 * since multiple reconciliation messages for the same table can be processed in parallel.
+	 *
+	 * @param message the message to update
+	 */
+	void updateTableReconciliation(ReconciliationMessage message);
 	
 }
