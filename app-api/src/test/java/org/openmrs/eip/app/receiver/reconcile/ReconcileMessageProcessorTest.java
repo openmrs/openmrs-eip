@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.receiver.reconcile;
 
 import static java.util.stream.IntStream.rangeClosed;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -23,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
+import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.service.ReconcileService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
@@ -60,6 +62,31 @@ public class ReconcileMessageProcessorTest {
 	}
 	
 	@Test
+	public void getUniqueId_shouldReturnThePrimaryKeyId() {
+		final String siteIdentifier = "site1";
+		ReconciliationMessage msg = new ReconciliationMessage();
+		SiteInfo site = new SiteInfo();
+		site.setIdentifier(siteIdentifier);
+		msg.setSite(site);
+		assertEquals(siteIdentifier, processor.getUniqueId(msg));
+	}
+	
+	@Test
+	public void getLogicalType_shouldReturnTheTableName() {
+		final String table = "visit";
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		assertEquals(table, processor.getLogicalType(msg));
+	}
+	
+	@Test
+	public void getLogicalTypeHierarchy_shouldReturnTheTablesInTheSameHierarchy() {
+		assertEquals(1, processor.getLogicalTypeHierarchy("visit").size());
+		assertEquals(2, processor.getLogicalTypeHierarchy("person").size());
+		assertEquals(3, processor.getLogicalTypeHierarchy("orders").size());
+	}
+	
+	@Test
 	public void processItem_shouldReconcileTheUuidsInTheMessage() {
 		final int uuidSize = 100;
 		final String table = "person";
@@ -74,6 +101,7 @@ public class ReconcileMessageProcessorTest {
 		processor.processItem(msg);
 		
 		verify(mockService).updateReconciliationMessage(msg, true, uuids);
+		verify(mockService).updateTableReconciliation(msg);
 	}
 	
 	@Test
@@ -101,6 +129,7 @@ public class ReconcileMessageProcessorTest {
 		verify(mockService).updateReconciliationMessage(msg, true, batch2);
 		verify(mockService).updateReconciliationMessage(msg, true, batch3);
 		verify(mockService).updateReconciliationMessage(msg, true, batch4);
+		verify(mockService, times(4)).updateTableReconciliation(msg);
 	}
 	
 	@Test
@@ -126,6 +155,7 @@ public class ReconcileMessageProcessorTest {
 		
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(8)).updateReconciliationMessage(eq(msg), eq(true), anyList());
+		verify(mockService, times(8)).updateTableReconciliation(msg);
 	}
 	
 	@Test
@@ -165,6 +195,7 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(4)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 		verify(mockService).updateReconciliationMessage(eq(msg), eq(false), anyList());
+		verify(mockService, times(5)).updateTableReconciliation(msg);
 	}
 	
 	@Test
@@ -194,6 +225,7 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(3)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 		verify(mockService, times(2)).updateReconciliationMessage(eq(msg), eq(false), anyList());
+		verify(mockService, times(5)).updateTableReconciliation(msg);
 	}
 	
 }

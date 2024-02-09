@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.eip.app.BasePureParallelQueueProcessor;
+import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.service.ReconcileService;
@@ -17,6 +17,7 @@ import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("reconcileMsgProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<ReconciliationMessage> {
+public class ReconcileMessageProcessor extends BaseQueueProcessor<ReconciliationMessage> {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReconcileMessageProcessor.class);
 	
@@ -67,6 +68,22 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 	}
 	
 	@Override
+	public String getUniqueId(ReconciliationMessage item) {
+		//Items belonging to same site and table are processed serially.
+		return item.getSite().getIdentifier();
+	}
+	
+	@Override
+	public String getLogicalType(ReconciliationMessage item) {
+		return item.getTableName();
+	}
+	
+	@Override
+	public List<String> getLogicalTypeHierarchy(String logicalType) {
+		return Utils.getListOfTablesInHierarchy(logicalType);
+	}
+	
+	@Override
 	public void processItem(ReconciliationMessage msg) {
 		String[] uuids = StringUtils.split(msg.getData().trim(), SyncConstants.RECONCILE_MSG_SEPARATOR);
 		if (uuids.length != msg.getBatchSize()) {
@@ -98,7 +115,7 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 			}
 			
 			//All uuids are missing or existing
-			service.updateReconciliationMessage(msg, found, uuids);
+			updateStatus(msg, found, uuids);
 			return;
 		}
 		
@@ -110,7 +127,7 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 					log.trace("Updating reconciliation after {} uuid", (found ? "found" : "missing"));
 				}
 				
-				service.updateReconciliationMessage(msg, found, List.of(uuid));
+				updateStatus(msg, found, List.of(uuid));
 			}
 			
 			return;
@@ -127,6 +144,11 @@ public class ReconcileMessageProcessor extends BasePureParallelQueueProcessor<Re
 		List<String> right = uuids.subList(midIndex, uuids.size());
 		reconcile(left, allUuids, msg, repo);
 		reconcile(right, allUuids, msg, repo);
+	}
+	
+	private void updateStatus(ReconciliationMessage msg, boolean found, List<String> uuids) {
+		service.updateReconciliationMessage(msg, found, uuids);
+		service.updateTableReconciliation(msg);
 	}
 	
 }
