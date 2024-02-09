@@ -74,7 +74,7 @@ public class ReceiverJmsMessageProcessorTest {
 		
 		processor.processItem(msg);
 		
-		Mockito.verify(mockReceiverService).processSyncJmsMessage(msg);
+		Mockito.verify(mockReceiverService).processJmsMessage(msg);
 	}
 	
 	@Test
@@ -84,7 +84,7 @@ public class ReceiverJmsMessageProcessorTest {
 		
 		processor.processItem(msg);
 		
-		Mockito.verify(mockReconcileService).processSyncJmsMessage(msg);
+		Mockito.verify(mockReconcileService).processJmsMessage(msg);
 	}
 	
 }

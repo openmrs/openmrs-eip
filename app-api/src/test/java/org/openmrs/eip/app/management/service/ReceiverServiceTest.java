@@ -307,7 +307,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessage() throws Exception {
+	public void processJmsMessage_shouldProcessAndSaveASyncMessage() throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
 			
@@ -347,7 +347,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		Long timestamp = System.currentTimeMillis();
 		
-		service.processSyncJmsMessage(jmsMsg);
+		service.processJmsMessage(jmsMsg);
 		
 		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
 		List<SyncMessage> msgs = syncMsgRepo.findAll();
@@ -368,7 +368,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
+	public void processJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
 			
@@ -412,7 +412,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		
-		service.processSyncJmsMessage(jmsMsg);
+		service.processJmsMessage(jmsMsg);
 		
 		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
 		assertEquals(1, syncMsgRepo.count());
@@ -423,7 +423,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void processSyncJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound()
+	public void processJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound()
 	    throws Exception {
 		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
 		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
@@ -464,7 +464,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		mockActiveMqResEndpoint.expectedMessageCount(1);
 		
-		service.processSyncJmsMessage(jmsMsg);
+		service.processJmsMessage(jmsMsg);
 		
 		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
 		mockActiveMqResEndpoint.assertIsSatisfied();

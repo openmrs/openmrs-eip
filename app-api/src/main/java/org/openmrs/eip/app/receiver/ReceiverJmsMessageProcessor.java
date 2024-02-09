@@ -77,9 +77,9 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	@Override
 	public void processItem(JmsMessage item) {
 		if (item.getType() == MessageType.SYNC) {
-			receiverService.processSyncJmsMessage(item);
+			receiverService.processJmsMessage(item);
 		} else if (item.getType() == MessageType.RECONCILE) {
-			reconcileService.processSyncJmsMessage(item);
+			reconcileService.processJmsMessage(item);
 		}
 	}
 	

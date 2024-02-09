@@ -296,7 +296,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void processSyncJmsMessage(JmsMessage jmsMessage) {
+	public void processJmsMessage(JmsMessage jmsMessage) {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing sync JMS message");
 		}

@@ -61,7 +61,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 	private TableReconciliationRepository tableRecRepo;
 	
 	@Test
-	public void processSyncJmsMessage_shouldProcessAndSaveAReconcileMessage() {
+	public void processJmsMessage_shouldProcessAndSaveAReconcileMessage() {
 		assertEquals(0, reconcileMsgRep.count());
 		assertEquals(0, tableRecRepo.count());
 		final String table = "person";
@@ -84,7 +84,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(1, jmsMsgRepo.count());
 		Long timestamp = System.currentTimeMillis();
 		
-		service.processSyncJmsMessage(jmsMsg);
+		service.processJmsMessage(jmsMsg);
 		
 		List<ReconciliationMessage> msgs = reconcileMsgRep.findAll();
 		assertEquals(1, msgs.size());
@@ -101,7 +101,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void processSyncJmsMessage_shouldAddTableReconciliationForTheFirstReconcileMessage() {
+	public void processJmsMessage_shouldAddTableReconciliationForTheFirstReconcileMessage() {
 		assertEquals(0, reconcileMsgRep.count());
 		assertEquals(0, tableRecRepo.count());
 		final String table = "person";
@@ -134,7 +134,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		assertTrue(siteRec.getTableReconciliations().isEmpty());
 		Long timestamp = System.currentTimeMillis();
 		
-		service.processSyncJmsMessage(jmsMsg);
+		service.processJmsMessage(jmsMsg);
 		
 		assertEquals(1, reconcileMsgRep.count());
 		assertEquals(1, siteRec.getTableReconciliations().size());

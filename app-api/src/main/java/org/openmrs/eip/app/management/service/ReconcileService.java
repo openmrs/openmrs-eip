@@ -15,7 +15,7 @@ public interface ReconcileService extends Service {
 	 *
 	 * @param jmsMessage the message to process
 	 */
-	void processSyncJmsMessage(JmsMessage jmsMessage);
+	void processJmsMessage(JmsMessage jmsMessage);
 	
 	/**
 	 * Updates the processed count, if the uuids were found, they are marked as found otherwise a sync

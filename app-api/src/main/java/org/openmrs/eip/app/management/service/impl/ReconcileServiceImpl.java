@@ -61,7 +61,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void processSyncJmsMessage(JmsMessage jmsMessage) {
+	public void processJmsMessage(JmsMessage jmsMessage) {
 		ReconciliationMessage msg = new ReconciliationMessage();
 		final SiteInfo site = siteRepo.getByIdentifier(jmsMessage.getSiteId());
 		msg.setSite(site);
