@@ -134,7 +134,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	 */
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public synchronized void updateTableReconciliation(ReconciliationMessage message) {
+	public void updateTableReconciliation(ReconciliationMessage message) {
 		SiteReconciliation siteRec = siteReconcileRepo.getBySite(message.getSite());
 		TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
 		    message.getTableName());
