@@ -14,6 +14,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
+import org.openmrs.eip.app.management.entity.receiver.Reconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
@@ -82,10 +83,9 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 	
 	@Override
 	public void processItem(Reconciliation reconciliation) {
-		//If site has no reconcile item, insert one, if all sites are covered, marked as started
-		if (!reconciliation.isStarted()) {
+		if (reconciliation.getStatus() == ReconciliationStatus.NEW) {
 			initialize(reconciliation);
-		} else {
+		} else if (reconciliation.getStatus() == ReconciliationStatus.PROCESSING) {
 			update(reconciliation);
 		}
 	}
@@ -105,7 +105,7 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 			}
 		}
 		
-		reconciliation.setStarted(true);
+		reconciliation.setStatus(ReconciliationStatus.PROCESSING);
 		reconcileRepo.save(reconciliation);
 	}
 	
@@ -137,8 +137,12 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 		}
 		
 		if (incompleteSites.isEmpty()) {
-			reconciliation.setDateCompleted(LocalDateTime.now());
-			LOG.info("Saving updates to completed reconciliation");
+			LOG.info("Updating reconciliation status to " + ReconciliationStatus.FINALIZING);
+			reconciliation.setStatus(ReconciliationStatus.FINALIZING);
+			if (LOG.isDebugEnabled()) {
+				LOG.info("Saving updated reconciliation");
+			}
+			
 			reconcileRepo.save(reconciliation);
 		} else {
 			if (LOG.isTraceEnabled()) {

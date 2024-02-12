@@ -15,7 +15,6 @@ import java.time.ZoneId;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +24,7 @@ import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
+import org.openmrs.eip.app.management.entity.receiver.Reconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
@@ -92,7 +92,7 @@ public class ReconciliationProcessorTest {
 		site3.setIdentifier("site-3");
 		Reconciliation rec = new Reconciliation();
 		rec.setIdentifier(recIdentifier);
-		Assert.assertFalse(rec.isStarted());
+		assertEquals(ReconciliationStatus.NEW, rec.getStatus());
 		when(mockSiteRepo.findAll()).thenReturn(List.of(site1, site3, site2));
 		when(mockSiteRecRepo.getBySite(site3)).thenReturn(Mockito.mock(SiteReconciliation.class));
 		when(ReceiverUtils.getSiteQueueName(siteIdentifier1)).thenReturn(siteQueue1);
@@ -117,7 +117,7 @@ public class ReconciliationProcessorTest {
 		SiteReconciliation siteRec2 = siteRecArgCaptor.getAllValues().get(1);
 		assertEquals(site2, siteRec2.getSite());
 		assertTrue(siteRec2.getDateCreated().getTime() == timestamp || siteRec2.getDateCreated().getTime() > timestamp);
-		assertTrue(rec.isStarted());
+		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 		verify(mockRecRepo).save(rec);
 	}
 	
@@ -130,7 +130,7 @@ public class ReconciliationProcessorTest {
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
 		Reconciliation rec = new Reconciliation();
-		rec.setStarted(true);
+		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
@@ -149,8 +149,7 @@ public class ReconciliationProcessorTest {
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		dateCompletedMillis = siteRec2.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
-		dateCompletedMillis = rec.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
+		assertEquals(ReconciliationStatus.FINALIZING, rec.getStatus());
 	}
 	
 	@Test
@@ -162,7 +161,7 @@ public class ReconciliationProcessorTest {
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
 		Reconciliation rec = new Reconciliation();
-		rec.setStarted(true);
+		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
@@ -181,7 +180,7 @@ public class ReconciliationProcessorTest {
 		long dateCompletedMillis = siteRec1.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertNull(siteRec2.getDateCompleted());
-		assertNull(rec.getDateCompleted());
+		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 	}
 	
 	@Test
@@ -193,7 +192,7 @@ public class ReconciliationProcessorTest {
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
 		Reconciliation rec = new Reconciliation();
-		rec.setStarted(true);
+		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
@@ -210,7 +209,7 @@ public class ReconciliationProcessorTest {
 		long dateCompletedMillis = siteRec1.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertNull(siteRec2.getDateCompleted());
-		assertNull(rec.getDateCompleted());
+		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 	}
 	
 }

@@ -115,13 +115,12 @@
             <column name="identifier" type="VARCHAR(50)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="started" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_completed" type="DATETIME"/>
         </createTable>
     </changeSet>
 

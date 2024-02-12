@@ -23,7 +23,7 @@ public class ReceiverReconcileMsgTask extends BaseReceiverSyncPrioritizingTask<R
 	
 	@Override
 	public String getTaskName() {
-		return "reconcile task";
+		return "reconcile msg task";
 	}
 	
 	@Override

@@ -1,11 +1,11 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
-import java.time.LocalDateTime;
-
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -15,20 +15,20 @@ import lombok.Setter;
 @Table(name = "mgt_reconciliation")
 public class Reconciliation extends AbstractEntity {
 	
+	public enum ReconciliationStatus {
+		NEW, PROCESSING, FINALIZING, COMPLETED
+	}
+	
 	@Column(name = "identifier", nullable = false, updatable = false, unique = true, length = 50)
 	@NotBlank
 	@Getter
 	@Setter
 	private String identifier;
 	
-	@Column(name = "started", nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 50)
 	@Getter
 	@Setter
-	private boolean started;
-	
-	@Column(name = "date_completed")
-	@Getter
-	@Setter
-	private LocalDateTime dateCompleted;
+	private ReconciliationStatus status = ReconciliationStatus.NEW;
 	
 }
