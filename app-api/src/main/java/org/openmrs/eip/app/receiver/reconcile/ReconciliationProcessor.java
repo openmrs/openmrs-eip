@@ -4,17 +4,23 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.PROP_RECONCILE_MSG_BATCH_SIZE;
 import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_BATCH_SIZE;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
 import org.openmrs.eip.app.management.repository.ReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -33,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Profile(SyncProfiles.RECEIVER)
 public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reconciliation> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(ReconciliationProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReconciliationProcessor.class);
 	
 	private SiteRepository siteRepo;
 	
@@ -41,17 +47,21 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 	
 	private SiteReconciliationRepository siteReconcileRepo;
 	
+	private TableReconciliationRepository tableReconcileRepo;
+	
 	private JmsTemplate jmsTemplate;
 	
 	@Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}")
 	private int batchSize;
 	
 	public ReconciliationProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SiteRepository siteRepo,
-	    ReconciliationRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo, JmsTemplate jmsTemplate) {
+	    ReconciliationRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
+	    TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
 		this.siteReconcileRepo = siteReconcileRepo;
+		this.tableReconcileRepo = tableReconcileRepo;
 		this.jmsTemplate = jmsTemplate;
 	}
 	
@@ -100,7 +110,34 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 	}
 	
 	private void update(Reconciliation reconciliation) {
+		List<SiteInfo> sites = siteRepo.findAll();
+		List<SiteInfo> incompleteSites = new ArrayList<>(sites.size());
+		for (SiteInfo site : sites) {
+			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
+			List<String> incompleteTables = AppUtils.getTablesToSync().stream().filter(table -> {
+				TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec, table);
+				return tableRec == null || !tableRec.isCompleted();
+			}).toList();
+			
+			if (incompleteTables.isEmpty()) {
+				siteRec.setDateCompleted(LocalDateTime.now());
+			} else {
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("Site {} still has {} incomplete table reconciliation(s)", site.getName(),
+					    incompleteTables.size());
+				}
+				
+				incompleteSites.add(site);
+			}
+		}
 		
+		if (incompleteSites.isEmpty()) {
+			reconciliation.setDateCompleted(LocalDateTime.now());
+		} else {
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("There are still {} incomplete sites reconciliation(s)", incompleteSites.size());
+			}
+		}
 	}
 	
 }
