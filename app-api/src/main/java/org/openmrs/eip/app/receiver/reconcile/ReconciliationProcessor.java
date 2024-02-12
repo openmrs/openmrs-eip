@@ -121,6 +121,11 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 			
 			if (incompleteTables.isEmpty()) {
 				siteRec.setDateCompleted(LocalDateTime.now());
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("Saving updates to completed site reconciliation");
+				}
+				
+				siteReconcileRepo.save(siteRec);
 			} else {
 				if (LOG.isTraceEnabled()) {
 					LOG.trace("Site {} still has {} incomplete table reconciliation(s)", site.getName(),
@@ -133,6 +138,8 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 		
 		if (incompleteSites.isEmpty()) {
 			reconciliation.setDateCompleted(LocalDateTime.now());
+			LOG.info("Saving updates to completed reconciliation");
+			reconcileRepo.save(reconciliation);
 		} else {
 			if (LOG.isTraceEnabled()) {
 				LOG.trace("There are still {} incomplete sites reconciliation(s)", incompleteSites.size());

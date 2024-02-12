@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -141,6 +142,9 @@ public class ReconciliationProcessorTest {
 		
 		processor.processItem(rec);
 		
+		verify(mockSiteRecRepo).save(siteRec1);
+		verify(mockSiteRecRepo).save(siteRec2);
+		verify(mockRecRepo).save(rec);
 		long dateCompletedMillis = siteRec1.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		dateCompletedMillis = siteRec2.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -171,6 +175,9 @@ public class ReconciliationProcessorTest {
 		
 		processor.processItem(rec);
 		
+		verify(mockSiteRecRepo).save(siteRec1);
+		verify(mockSiteRecRepo, never()).save(siteRec2);
+		verify(mockRecRepo, never()).save(rec);
 		long dateCompletedMillis = siteRec1.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertNull(siteRec2.getDateCompleted());
@@ -197,6 +204,9 @@ public class ReconciliationProcessorTest {
 		
 		processor.processItem(rec);
 		
+		verify(mockSiteRecRepo).save(siteRec1);
+		verify(mockSiteRecRepo, never()).save(siteRec2);
+		verify(mockRecRepo, never()).save(rec);
 		long dateCompletedMillis = siteRec1.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertNull(siteRec2.getDateCompleted());
