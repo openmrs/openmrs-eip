@@ -56,6 +56,14 @@ public class SyncConstants {
 	
 	public static final int DEFAULT_DELAY_PRUNER = 86400000;
 	
+	public static final String PROP_INITIAL_DELAY_RECONCILER = "reconcile.initial.delay";
+	
+	public static final String PROP_DELAY_RECONCILER = "reconcile.delay";
+	
+	public static final String PROP_INITIAL_DELAY_MSG_RECONCILER = "reconcile.msg.initial.delay";
+	
+	public static final String PROP_DELAY_MSG_RECONCILER = "reconcile.msg.delay";
+	
 	public static final String SYNC_BATCH_PROP_SIZE = "batchSize";
 	
 	public static final String PROP_LARGE_MSG_SIZE = "jms.large.msg.size";

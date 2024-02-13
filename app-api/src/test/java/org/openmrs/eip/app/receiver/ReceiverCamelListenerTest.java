@@ -23,6 +23,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileMsgTask;
+import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileTask;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.User;
@@ -111,10 +113,22 @@ public class ReceiverCamelListenerTest {
 		when(mockPublisher.getCamelOutputEndpoint(siteIdentifier)).thenReturn("activemq:test");
 		Collection<SiteInfo> sites = Stream.of(siteInfo1, siteInfo2).collect(Collectors.toList());
 		when(ReceiverContext.getSites()).thenReturn(sites);
+		setInternalState(listener, "initialDelayMsgTsk", testInitialDelay);
+		setInternalState(listener, "delayMsgTask", testDelay);
+		setInternalState(listener, "initDelayReconciler", testInitialDelay);
+		setInternalState(listener, "delayReconciler", testDelay);
+		setInternalState(listener, "initDelayMsgReconciler", testInitialDelay);
+		setInternalState(listener, "delayMsgReconciler", testDelay);
 		
 		listener.applicationStarted();
 		
 		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverJmsMessageTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileMsgTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 	}
 	

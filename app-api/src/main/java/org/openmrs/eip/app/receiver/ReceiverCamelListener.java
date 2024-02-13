@@ -4,8 +4,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
+import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_MSG_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
+import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_RECONCILER;
+import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_MSG_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_PRUNER;
+import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_JMS_MSG_TASK;
@@ -26,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseCamelListener;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileMsgTask;
+import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileTask;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -84,6 +90,18 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	@Value("${" + PROP_ARCHIVES_MAX_AGE_DAYS + ":}")
 	private Integer archivesMaxAgeInDays;
 	
+	@Value("${" + PROP_INITIAL_DELAY_RECONCILER + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
+	private long initDelayReconciler;
+	
+	@Value("${" + PROP_DELAY_RECONCILER + ":" + DEFAULT_DELAY + "}")
+	private long delayReconciler;
+	
+	@Value("${" + PROP_INITIAL_DELAY_MSG_RECONCILER + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
+	private long initDelayMsgReconciler;
+	
+	@Value("${" + PROP_DELAY_MSG_RECONCILER + ":" + DEFAULT_DELAY + "}")
+	private long delayMsgReconciler;
+	
 	private static List<SiteParentTask> siteTasks;
 	
 	public ReceiverCamelListener(@Qualifier(BEAN_NAME_SITE_EXECUTOR) ScheduledThreadPoolExecutor siteExecutor,
@@ -130,7 +148,7 @@ public class ReceiverCamelListener extends BaseCamelListener {
 		Collection<SiteInfo> sites = ReceiverContext.getSites().stream().filter(s -> !s.getDisabled())
 		        .collect(Collectors.toList());
 		
-		startJmsMessageTask();
+		startTasks();
 		startSiteParentTasks(sites);
 		
 		if (prunerEnabled) {
@@ -170,9 +188,13 @@ public class ReceiverCamelListener extends BaseCamelListener {
 		});
 	}
 	
-	private void startJmsMessageTask() {
-		ReceiverJmsMessageTask task = new ReceiverJmsMessageTask();
-		siteExecutor.scheduleWithFixedDelay(task, initialDelayMsgTsk, delayMsgTask, MILLISECONDS);
+	private void startTasks() {
+		ReceiverJmsMessageTask jmsTask = new ReceiverJmsMessageTask();
+		siteExecutor.scheduleWithFixedDelay(jmsTask, initialDelayMsgTsk, delayMsgTask, MILLISECONDS);
+		ReceiverReconcileTask recTask = new ReceiverReconcileTask();
+		siteExecutor.scheduleWithFixedDelay(recTask, initDelayReconciler, delayReconciler, MILLISECONDS);
+		ReceiverReconcileMsgTask recMsgTask = new ReceiverReconcileMsgTask();
+		siteExecutor.scheduleWithFixedDelay(recMsgTask, initDelayMsgReconciler, delayMsgReconciler, MILLISECONDS);
 	}
 	
 	private void startPrunerTask() {
