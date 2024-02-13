@@ -90,6 +90,11 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 			throw new EIPException("Batch size and item count do not for the reconciliation message");
 		}
 		
+		//Pick up from where we left off
+		if (msg.getProcessedCount() > 0) {
+			uuids = Arrays.copyOfRange(uuids, msg.getProcessedCount(), uuids.length);
+		}
+		
 		OpenmrsRepository repo = SyncContext.getRepositoryBean(msg.getTableName());
 		List<String> uuidList = Arrays.stream(uuids).toList();
 		reconcile(uuidList, uuidList, msg, repo);

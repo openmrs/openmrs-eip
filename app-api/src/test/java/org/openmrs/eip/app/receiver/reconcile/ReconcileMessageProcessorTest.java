@@ -105,6 +105,28 @@ public class ReconcileMessageProcessorTest {
 	}
 	
 	@Test
+	public void processItem_shouldReconcileOnlyTheRemainingUuidsInTheMessage() {
+		final int uuidSize = 5;
+		final int alreadyProcessed = 2;
+		final String table = "person";
+		final String uuidPrefix = "uuid-";
+		List<String> uuids = rangeClosed(1, uuidSize).boxed().map(i -> uuidPrefix + i).toList();
+		List<String> expectedUuids = List.of(uuidPrefix + "3", uuidPrefix + "4", uuidPrefix + "5");
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		msg.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
+		msg.setBatchSize(uuidSize);
+		msg.setProcessedCount(alreadyProcessed);
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockEntityRepo);
+		when(mockEntityRepo.countByUuidIn(expectedUuids)).thenReturn(expectedUuids.size());
+		
+		processor.processItem(msg);
+		
+		verify(mockService).updateReconciliationMessage(msg, true, expectedUuids);
+		verify(mockService).updateTableReconciliation(msg);
+	}
+	
+	@Test
 	public void processItem_shouldBisectTheUuidsIfTheSizeIsLargerThanTheMaxThreshold() {
 		final String table = "person";
 		List<String> uuids = rangeClosed(1, 40).boxed().map(i -> "uuid-" + i).toList();
