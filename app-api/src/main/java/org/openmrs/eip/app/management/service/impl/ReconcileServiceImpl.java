@@ -129,16 +129,13 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 		reconcileMsgRep.save(message);
 	}
 	
-	/**
-	 * This method is synchronized as mentioned in the javadocs on the interface
-	 */
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void updateTableReconciliation(ReconciliationMessage message) {
+	public void updateTableReconciliation(ReconciliationMessage message, int processedUuidCount) {
 		SiteReconciliation siteRec = siteReconcileRepo.getBySite(message.getSite());
 		TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
 		    message.getTableName());
-		tableRec.setProcessedCount(tableRec.getProcessedCount() + message.getProcessedCount());
+		tableRec.setProcessedCount(tableRec.getProcessedCount() + processedUuidCount);
 		if (message.isLastTableBatch()) {
 			tableRec.setLastBatchReceived(true);
 		}

@@ -153,7 +153,7 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private void updateStatus(ReconciliationMessage msg, boolean found, List<String> uuids) {
 		service.updateReconciliationMessage(msg, found, uuids);
-		service.updateTableReconciliation(msg);
+		service.updateTableReconciliation(msg, uuids.size());
 	}
 	
 }

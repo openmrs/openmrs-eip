@@ -216,24 +216,24 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		assertFalse(tableRec.isLastBatchReceived());
 		assertNull(tableRec.getDateChanged());
 		final long originalProcessedCount = tableRec.getProcessedCount();
-		final int msgProcessedCount = 5;
+		final int processedCount = 2;
 		ReconciliationMessage msg = new ReconciliationMessage();
 		msg.setSite(site);
 		msg.setTableName(table);
 		msg.setBatchSize(10);
-		msg.setProcessedCount(msgProcessedCount);
+		msg.setProcessedCount(8);
 		msg.setLastTableBatch(true);
 		msg.setData("uuid1");
 		msg.setDateCreated(new Date());
 		reconcileMsgRep.save(msg);
 		long timestamp = System.currentTimeMillis();
 		
-		service.updateTableReconciliation(msg);
+		service.updateTableReconciliation(msg, processedCount);
 		
 		tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertFalse(tableRec.isCompleted());
 		assertTrue(tableRec.isLastBatchReceived());
-		assertEquals(originalProcessedCount + msgProcessedCount, tableRec.getProcessedCount());
+		assertEquals(originalProcessedCount + processedCount, tableRec.getProcessedCount());
 		long dateChangedMillis = tableRec.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
 	}
@@ -262,7 +262,7 @@ public class ReconcileServiceTest extends BaseReceiverTest {
 		reconcileMsgRep.save(msg);
 		long timestamp = System.currentTimeMillis();
 		
-		service.updateTableReconciliation(msg);
+		service.updateTableReconciliation(msg, batchSize);
 		
 		tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertEquals(originalProcessedCount + batchSize, tableRec.getProcessedCount());

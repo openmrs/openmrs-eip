@@ -18,8 +18,8 @@ public interface ReconcileService extends Service {
 	void processJmsMessage(JmsMessage jmsMessage);
 	
 	/**
-	 * Updates the processed count, if the uuids were found, they are marked as found otherwise a sync
-	 * request is created for the associated entity.
+	 * Updates the status of a ReconciliationMessage if the uuids were found, they are marked as found
+	 * otherwise a sync request is created for the associated entity.
 	 *
 	 * @param message the message to update
 	 * @param found specifies whether the uuids were found or not
@@ -28,12 +28,13 @@ public interface ReconcileService extends Service {
 	void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids);
 	
 	/**
-	 * Inserts or updates a table reconciliation based on the state of the specified message.
-	 * Implementation of this method assumes no parallel invocations from multiple threads for
-	 * reconciliation messages for the same site table.
+	 * Inserts or updates a table reconciliation based on the state of the specified message and
+	 * processed count. Implementation of this method assumes no parallel invocations from multiple
+	 * threads for reconciliation messages for the same site table.
 	 *
 	 * @param message the ReconciliationMessage instance
+	 * @param processedUuidCount the count of processed uuids.
 	 */
-	void updateTableReconciliation(ReconciliationMessage message);
+	void updateTableReconciliation(ReconciliationMessage message, int processedUuidCount);
 	
 }
