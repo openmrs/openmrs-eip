@@ -21,7 +21,6 @@ import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @RunWith(PowerMockRunner.class)
@@ -30,9 +29,6 @@ public class ReceiverReconcileMsgTaskTest {
 	
 	@Mock
 	private ReconciliationMsgRepository mockRepo;
-	
-	@Mock
-	private Page mockPage;
 	
 	private ReceiverReconcileMsgTask task;
 	
@@ -51,15 +47,14 @@ public class ReceiverReconcileMsgTaskTest {
 	@Test
 	public void getNextBatch_shouldReadTheNextPageOfReconcileMessages() {
 		setInternalState(task, ReconciliationMsgRepository.class, mockRepo);
-		when(mockRepo.findAll(any(Pageable.class))).thenReturn(mockPage);
 		List mockMessages = List.of(new ReconciliationMessage());
-		when(mockPage.getContent()).thenReturn(mockMessages);
+		when(mockRepo.getIncompleteMessages(any(Pageable.class))).thenReturn(mockMessages);
 		
 		List messages = task.getNextBatch();
 		
 		Assert.assertEquals(mockMessages, messages);
 		ArgumentCaptor<Pageable> pageArgCaptor = ArgumentCaptor.forClass(Pageable.class);
-		verify(mockRepo).findAll(pageArgCaptor.capture());
+		verify(mockRepo).getIncompleteMessages(pageArgCaptor.capture());
 		Assert.assertEquals(Runtime.getRuntime().availableProcessors(), pageArgCaptor.getValue().getPageSize());
 	}
 	

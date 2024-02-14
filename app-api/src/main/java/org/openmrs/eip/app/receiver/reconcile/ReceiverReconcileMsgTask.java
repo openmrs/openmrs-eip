@@ -28,7 +28,7 @@ public class ReceiverReconcileMsgTask extends BaseReceiverSyncPrioritizingTask<R
 	
 	@Override
 	public List<ReconciliationMessage> getNextBatch() {
-		return repo.findAll(Pageable.ofSize(Runtime.getRuntime().availableProcessors())).getContent();
+		return repo.getIncompleteMessages(Pageable.ofSize(Runtime.getRuntime().availableProcessors()));
 	}
 	
 }
