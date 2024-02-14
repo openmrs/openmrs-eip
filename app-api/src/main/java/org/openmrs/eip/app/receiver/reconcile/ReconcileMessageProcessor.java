@@ -120,7 +120,7 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 			}
 			
 			//All uuids are missing or existing
-			updateStatus(msg, found, uuids);
+			service.updateReconciliationMessage(msg, found, uuids);
 			return;
 		}
 		
@@ -132,7 +132,7 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 					log.trace("Updating reconciliation after {} uuid", (found ? "found" : "missing"));
 				}
 				
-				updateStatus(msg, found, List.of(uuid));
+				service.updateReconciliationMessage(msg, found, List.of(uuid));
 			}
 			
 			return;
@@ -149,11 +149,6 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 		List<String> right = uuids.subList(midIndex, uuids.size());
 		reconcile(left, allUuids, msg, repo);
 		reconcile(right, allUuids, msg, repo);
-	}
-	
-	private void updateStatus(ReconciliationMessage msg, boolean found, List<String> uuids) {
-		service.updateReconciliationMessage(msg, found, uuids);
-		service.updateTableReconciliation(msg, uuids.size());
 	}
 	
 }

@@ -127,11 +127,18 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 		}
 		
 		reconcileMsgRep.save(message);
+		updateTableReconciliation(message, uuids.size());
 	}
 	
-	@Override
-	@Transactional(transactionManager = MGT_TX_MGR)
-	public void updateTableReconciliation(ReconciliationMessage message, int processedUuidCount) {
+	/**
+	 * Inserts or updates a table reconciliation based on the state of the specified message and
+	 * processed count. Implementation of this method assumes no parallel invocations from multiple
+	 * threads for reconciliation messages for the same site table.
+	 *
+	 * @param message the ReconciliationMessage instance
+	 * @param processedUuidCount the count of processed uuids.
+	 */
+	private void updateTableReconciliation(ReconciliationMessage message, int processedUuidCount) {
 		SiteReconciliation siteRec = siteReconcileRepo.getBySite(message.getSite());
 		TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
 		    message.getTableName());

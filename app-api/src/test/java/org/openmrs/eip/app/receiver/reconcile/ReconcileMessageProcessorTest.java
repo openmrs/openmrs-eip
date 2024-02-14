@@ -101,7 +101,6 @@ public class ReconcileMessageProcessorTest {
 		processor.processItem(msg);
 		
 		verify(mockService).updateReconciliationMessage(msg, true, uuids);
-		verify(mockService).updateTableReconciliation(msg, uuidSize);
 	}
 	
 	@Test
@@ -123,7 +122,6 @@ public class ReconcileMessageProcessorTest {
 		processor.processItem(msg);
 		
 		verify(mockService).updateReconciliationMessage(msg, true, expectedUuids);
-		verify(mockService).updateTableReconciliation(msg, expectedUuids.size());
 	}
 	
 	@Test
@@ -151,7 +149,6 @@ public class ReconcileMessageProcessorTest {
 		verify(mockService).updateReconciliationMessage(msg, true, batch2);
 		verify(mockService).updateReconciliationMessage(msg, true, batch3);
 		verify(mockService).updateReconciliationMessage(msg, true, batch4);
-		verify(mockService, times(4)).updateTableReconciliation(msg, batch1.size());
 	}
 	
 	@Test
@@ -177,8 +174,6 @@ public class ReconcileMessageProcessorTest {
 		
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(8)).updateReconciliationMessage(eq(msg), eq(true), anyList());
-		verify(mockService, times(2)).updateTableReconciliation(msg, 8);
-		verify(mockService, times(6)).updateTableReconciliation(msg, 9);
 	}
 	
 	@Test
@@ -218,11 +213,6 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(4)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 		verify(mockService).updateReconciliationMessage(eq(msg), eq(false), anyList());
-		verify(mockService).updateTableReconciliation(msg, 3);
-		verify(mockService).updateTableReconciliation(msg, 4);
-		verify(mockService).updateTableReconciliation(msg, 8);
-		verify(mockService).updateTableReconciliation(msg, 16);
-		verify(mockService).updateTableReconciliation(msg, 32);
 	}
 	
 	@Test
@@ -252,7 +242,6 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(3)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 		verify(mockService, times(2)).updateReconciliationMessage(eq(msg), eq(false), anyList());
-		verify(mockService, times(5)).updateTableReconciliation(msg, 1);
 	}
 	
 }
