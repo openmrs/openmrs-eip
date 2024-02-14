@@ -57,7 +57,7 @@ public class ReceiverMessageListenerTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_receiver_jms_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_jms_msg.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void onMessage_shouldSkipADuplicateMessage() throws Exception {
 		final String msgId = "1cef940e-32dc-491f-8038-a8f3afe3e37d";
 		assertTrue(repo.existsByMessageId(msgId));
