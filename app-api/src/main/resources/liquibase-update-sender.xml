@@ -8,20 +8,53 @@
 
     <changeSet author="wluyima" id="20240102-1945" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="date_created" tableName="debezium_event_queue" />
+            <columnExists columnName="date_created" tableName="debezium_event_queue"/>
         </preConditions>
         <comment>Adding not null constraint to debezium_event_queue.date_created column</comment>
 
-        <addNotNullConstraint columnName="date_created" tableName="debezium_event_queue" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="debezium_event_queue" columnDataType="DATETIME(3)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240102-1946" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="date_created" tableName="sender_retry_queue" />
+            <columnExists columnName="date_created" tableName="sender_retry_queue"/>
         </preConditions>
         <comment>Adding not null constraint to sender_retry_queue.date_created column</comment>
 
-        <addNotNullConstraint columnName="date_created" tableName="sender_retry_queue" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="sender_retry_queue" columnDataType="DATETIME(3)"/>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240214-1301" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mgt_table_reconciliation"/>
+            </not>
+        </preConditions>
+        <comment>Adding mgt_table_reconciliation table</comment>
+        <createTable tableName="mgt_table_reconciliation">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="row_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_processed_id" type="BIGINT"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>

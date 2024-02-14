@@ -8,65 +8,66 @@
 
     <changeSet author="wluyima" id="20240102-1947" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="date_created" tableName="receiver_sync_msg" />
+            <columnExists columnName="date_created" tableName="receiver_sync_msg"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_sync_msg.date_created column</comment>
 
-        <addNotNullConstraint columnName="date_created" tableName="receiver_sync_msg" columnDataType="DATETIME(3)" />
+        <addNotNullConstraint columnName="date_created" tableName="receiver_sync_msg" columnDataType="DATETIME(3)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0840" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="site_id" tableName="receiver_retry_queue" />
+            <columnExists columnName="site_id" tableName="receiver_retry_queue"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_retry_queue.site_id column</comment>
 
-        <addNotNullConstraint columnName="site_id" tableName="receiver_retry_queue" columnDataType="BIGINT" />
+        <addNotNullConstraint columnName="site_id" tableName="receiver_retry_queue" columnDataType="BIGINT"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0841" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="site_id" tableName="receiver_conflict_queue" />
+            <columnExists columnName="site_id" tableName="receiver_conflict_queue"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_conflict_queue.site_id column</comment>
 
-        <addNotNullConstraint columnName="site_id" tableName="receiver_conflict_queue" columnDataType="BIGINT" />
+        <addNotNullConstraint columnName="site_id" tableName="receiver_conflict_queue" columnDataType="BIGINT"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0951" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="message_uuid" tableName="receiver_sync_msg" />
+            <columnExists columnName="message_uuid" tableName="receiver_sync_msg"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_sync_msg.message_uuid column</comment>
 
-        <addNotNullConstraint columnName="message_uuid" tableName="receiver_sync_msg" columnDataType="VARCHAR(38)" />
+        <addNotNullConstraint columnName="message_uuid" tableName="receiver_sync_msg" columnDataType="VARCHAR(38)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0952" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="message_uuid" tableName="receiver_synced_msg" />
+            <columnExists columnName="message_uuid" tableName="receiver_synced_msg"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_synced_msg.message_uuid column</comment>
 
-        <addNotNullConstraint columnName="message_uuid" tableName="receiver_synced_msg" columnDataType="VARCHAR(38)" />
+        <addNotNullConstraint columnName="message_uuid" tableName="receiver_synced_msg" columnDataType="VARCHAR(38)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0953" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="message_uuid" tableName="receiver_retry_queue" />
+            <columnExists columnName="message_uuid" tableName="receiver_retry_queue"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_retry_queue.message_uuid column</comment>
 
-        <addNotNullConstraint columnName="message_uuid" tableName="receiver_retry_queue" columnDataType="VARCHAR(38)" />
+        <addNotNullConstraint columnName="message_uuid" tableName="receiver_retry_queue" columnDataType="VARCHAR(38)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240103-0954" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
-            <columnExists columnName="message_uuid" tableName="receiver_conflict_queue" />
+            <columnExists columnName="message_uuid" tableName="receiver_conflict_queue"/>
         </preConditions>
         <comment>Adding not null constraint to receiver_conflict_queue.message_uuid column</comment>
 
-        <addNotNullConstraint columnName="message_uuid" tableName="receiver_conflict_queue" columnDataType="VARCHAR(38)" />
+        <addNotNullConstraint columnName="message_uuid" tableName="receiver_conflict_queue"
+                              columnDataType="VARCHAR(38)"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240123-0815" labels="1.6.0">
@@ -83,7 +84,7 @@
             <column name="msg_id" type="VARCHAR(38)">
                 <constraints unique="true"/>
             </column>
-            <column name="site_id" type="VARCHAR(255)" />
+            <column name="site_id" type="VARCHAR(255)"/>
             <column name="msg_type" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -187,7 +188,8 @@
             </column>
             <column name="date_changed" type="DATETIME"/>
         </createTable>
-        <addUniqueConstraint tableName="mgt_table_reconciliation" columnNames="site_reconciliation_id, table_name" constraintName="table_site_uk"/>
+        <addUniqueConstraint tableName="mgt_table_reconciliation" columnNames="site_reconciliation_id, table_name"
+                             constraintName="table_site_uk"/>
         <addForeignKeyConstraint constraintName="table_site_reconciliation_fk"
                                  baseTableName="mgt_table_reconciliation"
                                  baseColumnNames="site_reconciliation_id"
