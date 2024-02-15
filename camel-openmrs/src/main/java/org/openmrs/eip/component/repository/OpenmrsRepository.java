@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.openmrs.eip.component.entity.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
@@ -32,5 +33,11 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	 * @return the count of matches
 	 */
 	int countByUuidIn(List<String> uuids);
+	
+	/**
+	 * Gets the maximum row id
+	 */
+	@Query("SELECT MAX(e.id) FROM #{#entityName} e")
+	Long getMaxId();
 	
 }
