@@ -53,4 +53,9 @@ public class OpenmrsRepositoryTest extends BaseReceiverTest {
 		Assert.assertEquals(2l, nameRepo.getMaxId().longValue());
 	}
 	
+	@Test
+	public void getMaxId_shouldGetTheNextRowId() {
+		Assert.assertEquals(3l, attribRepo.getNextId(2l).longValue());
+	}
+	
 }

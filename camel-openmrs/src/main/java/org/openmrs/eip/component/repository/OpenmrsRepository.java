@@ -6,6 +6,7 @@ import org.openmrs.eip.component.entity.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E, Long> {
@@ -35,7 +36,18 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	int countByUuidIn(List<String> uuids);
 	
 	/**
+	 * Gets the id of the row that comes after the row matching the specified id.
+	 * 
+	 * @param lastProcessedId the last processed id.
+	 * @return next row id
+	 */
+	@Query("SELECT MIN(e.id) FROM #{#entityName} e WHERE e.id > :lastProcessedId")
+	Long getNextId(@Param("lastProcessedId") Long lastProcessedId);
+	
+	/**
 	 * Gets the maximum row id
+	 * 
+	 * @return maximum row id
 	 */
 	@Query("SELECT MAX(e.id) FROM #{#entityName} e")
 	Long getMaxId();
