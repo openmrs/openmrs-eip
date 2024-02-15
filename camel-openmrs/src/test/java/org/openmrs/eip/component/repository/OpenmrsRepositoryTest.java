@@ -1,18 +1,17 @@
-package org.openmrs.eip.app.management.repository;
+package org.openmrs.eip.component.repository;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.eip.app.receiver.BaseReceiverTest;
+import org.openmrs.eip.BaseDbDrivenTest;
 import org.openmrs.eip.component.entity.PersonAttribute;
 import org.openmrs.eip.component.entity.PersonName;
-import org.openmrs.eip.component.repository.OpenmrsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = { "classpath:test_data.sql", "classpath:openmrs_patient.sql" })
-public class OpenmrsRepositoryTest extends BaseReceiverTest {
+public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 	
 	@Autowired
 	private OpenmrsRepository<PersonAttribute> attribRepo;
