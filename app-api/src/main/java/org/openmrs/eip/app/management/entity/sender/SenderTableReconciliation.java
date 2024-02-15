@@ -27,10 +27,10 @@ public class SenderTableReconciliation extends AbstractEntity {
 	@Setter
 	private long rowCount;
 	
-	@Column(name = "start_id", nullable = false)
+	@Column(name = "last_processed_id", nullable = false)
 	@Getter
 	@Setter
-	private long startId;
+	private long lastProcessedId;
 	
 	@Column(name = "end_id", nullable = false)
 	@Getter
@@ -42,10 +42,5 @@ public class SenderTableReconciliation extends AbstractEntity {
 	@Getter
 	@Setter
 	private LocalDateTime startDate;
-	
-	@Column(name = "last_processed_id")
-	@Getter
-	@Setter
-	private Long lastProcessedId;
 	
 }

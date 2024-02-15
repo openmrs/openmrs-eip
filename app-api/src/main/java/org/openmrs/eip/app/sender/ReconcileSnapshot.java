@@ -23,7 +23,7 @@ public class ReconcileSnapshot {
 		private long rowCount;
 		
 		@Getter
-		private long startId;
+		private long lastProcessedId;
 		
 		@Getter
 		private long endId;
@@ -31,10 +31,10 @@ public class ReconcileSnapshot {
 		@Getter
 		private LocalDateTime dateTaken;
 		
-		public TableSnapshot(String tableName, long rowCount, long startId, long endId, LocalDateTime dateTaken) {
+		public TableSnapshot(String tableName, long rowCount, long lastProcessedId, long endId, LocalDateTime dateTaken) {
 			this.tableName = tableName;
 			this.rowCount = rowCount;
-			this.startId = startId;
+			this.lastProcessedId = lastProcessedId;
 			this.endId = endId;
 			this.dateTaken = dateTaken;
 		}
