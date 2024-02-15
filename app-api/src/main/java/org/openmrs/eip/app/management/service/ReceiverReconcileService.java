@@ -6,9 +6,9 @@ import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 
 /**
- * Contains reconciliation service methods.
+ * Contains receiver reconciliation service methods.
  */
-public interface ReconcileService extends Service {
+public interface ReceiverReconcileService extends Service {
 	
 	/**
 	 * Processes a {@link JmsMessage}

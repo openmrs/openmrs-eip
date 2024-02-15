@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
-import org.openmrs.eip.app.management.service.ReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
@@ -44,10 +44,10 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	@Value("${" + PROP_MAX_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MAX_BATCH_RECONCILE_SIZE + "}")
 	private int maxReconcileBatchSize;
 	
-	private ReconcileService service;
+	private ReceiverReconcileService service;
 	
 	public ReconcileMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReconcileService service) {
+	    ReceiverReconcileService service) {
 		super(executor);
 		this.service = service;
 	}

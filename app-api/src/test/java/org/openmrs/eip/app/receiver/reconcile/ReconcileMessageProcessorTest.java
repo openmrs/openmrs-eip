@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
-import org.openmrs.eip.app.management.service.ReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.powermock.api.mockito.PowerMockito;
@@ -45,7 +45,7 @@ public class ReconcileMessageProcessorTest {
 	private SyncEntityRepository mockEntityRepo;
 	
 	@Mock
-	private ReconcileService mockService;
+	private ReceiverReconcileService mockService;
 	
 	@Before
 	public void setup() {

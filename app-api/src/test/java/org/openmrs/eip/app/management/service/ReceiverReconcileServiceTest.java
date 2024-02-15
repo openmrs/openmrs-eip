@@ -39,10 +39,10 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 @Sql(scripts = {
         "classpath:mgt_site_info.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-public class ReconcileServiceTest extends BaseReceiverTest {
+public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Autowired
-	private ReconcileService service;
+	private ReceiverReconcileService service;
 	
 	@Autowired
 	private ReconciliationMsgRepository reconcileMsgRep;

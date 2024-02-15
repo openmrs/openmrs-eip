@@ -9,7 +9,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.management.service.ReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +28,10 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	
 	private ReceiverService receiverService;
 	
-	private ReconcileService reconcileService;
+	private ReceiverReconcileService reconcileService;
 	
 	public ReceiverJmsMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReceiverService receiverService, ReconcileService reconcileService) {
+	    ReceiverService receiverService, ReceiverReconcileService reconcileService) {
 		super(executor);
 		this.receiverService = receiverService;
 		this.reconcileService = reconcileService;

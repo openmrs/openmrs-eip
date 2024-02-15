@@ -13,7 +13,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.management.service.ReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -30,7 +30,7 @@ public class ReceiverJmsMessageProcessorTest {
 	private ReceiverService mockReceiverService;
 	
 	@Mock
-	private ReconcileService mockReconcileService;
+	private ReceiverReconcileService mockReconcileService;
 	
 	@Before
 	public void setup() {

@@ -21,7 +21,7 @@ import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
 import org.openmrs.eip.app.management.service.BaseService;
-import org.openmrs.eip.app.management.service.ReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
@@ -30,11 +30,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service("reconcileService")
+@Service("receiverReconcileService")
 @Profile(SyncProfiles.RECEIVER)
-public class ReconcileServiceImpl extends BaseService implements ReconcileService {
+public class ReceiverReconcileServiceImpl extends BaseService implements ReceiverReconcileService {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ReconcileServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReceiverReconcileServiceImpl.class);
 	
 	private SiteRepository siteRepo;
 	
@@ -48,7 +48,7 @@ public class ReconcileServiceImpl extends BaseService implements ReconcileServic
 	
 	private TableReconciliationRepository tableReconcileRepo;
 	
-	public ReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
+	public ReceiverReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
 	    SiteReconciliationRepository siteReconcileRepo, TableReconciliationRepository tableReconcileRepo) {
 		this.siteRepo = siteRepo;
