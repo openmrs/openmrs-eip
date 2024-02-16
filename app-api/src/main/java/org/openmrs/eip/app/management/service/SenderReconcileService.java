@@ -1,6 +1,6 @@
 package org.openmrs.eip.app.management.service;
 
-import org.openmrs.eip.app.sender.ReconcileSnapshot;
+import org.openmrs.eip.app.sender.reconcile.ReconcileSnapshot;
 
 /**
  * Contains sender reconciliation service methods.

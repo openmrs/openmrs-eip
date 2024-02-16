@@ -9,8 +9,8 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
 import org.openmrs.eip.app.management.service.SenderReconcileService;
-import org.openmrs.eip.app.sender.ReconcileSnapshot;
-import org.openmrs.eip.app.sender.ReconcileSnapshot.TableSnapshot;
+import org.openmrs.eip.app.sender.reconcile.ReconcileSnapshot;
+import org.openmrs.eip.app.sender.reconcile.ReconcileSnapshot.TableSnapshot;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -38,7 +38,6 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 	public ReconcileSnapshot takeSnapshot() {
 		LOG.info("Taking reconciliation snapshot");
 		List<TableSnapshot> snapshots = AppUtils.getTablesToSync().stream().map(t -> takeTableSnapshot(t)).toList();
-		
 		LOG.info("Done taking reconciliation snapshot");
 		return new ReconcileSnapshot(snapshots);
 	}
