@@ -57,4 +57,10 @@ public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 		Assert.assertEquals(3l, attribRepo.getNextId(2l).longValue());
 	}
 	
+	@Test
+	public void getCountWithIdGreaterThan_shouldGetTheCountOfRowsWithIdsGreaterThanSpecifiedId() {
+		Assert.assertEquals(3, attribRepo.getCountWithIdGreaterThan(1l).longValue());
+		Assert.assertEquals(2, attribRepo.getCountWithIdGreaterThan(2l).longValue());
+	}
+
 }

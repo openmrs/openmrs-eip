@@ -36,13 +36,13 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	int countByUuidIn(List<String> uuids);
 	
 	/**
-	 * Gets the id of the row that comes after the row matching the specified id.
+	 * Gets the id of the row that comes after the row matching the specified offset id.
 	 * 
-	 * @param lastProcessedId the last processed id.
+	 * @param id offset id
 	 * @return next row id
 	 */
-	@Query("SELECT MIN(e.id) FROM #{#entityName} e WHERE e.id > :lastProcessedId")
-	Long getNextId(@Param("lastProcessedId") Long lastProcessedId);
+	@Query("SELECT MIN(e.id) FROM #{#entityName} e WHERE e.id > :id")
+	Long getNextId(@Param("id") Long id);
 	
 	/**
 	 * Gets the maximum row id
@@ -51,5 +51,14 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	 */
 	@Query("SELECT MAX(e.id) FROM #{#entityName} e")
 	Long getMaxId();
+	
+	/**
+	 * Gets the count of rows with ids greater than the specified offset id.
+	 *
+	 * @param id offset id
+	 * @return count of rows
+	 */
+	@Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.id > :id")
+	Long getCountWithIdGreaterThan(@Param("id") Long id);
 	
 }

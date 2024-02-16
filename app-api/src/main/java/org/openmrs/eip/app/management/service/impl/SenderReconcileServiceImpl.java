@@ -1,16 +1,16 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.app.SyncConstants.OPENMRS_TX_MGR;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
 import org.openmrs.eip.app.management.service.SenderReconcileService;
-import org.openmrs.eip.app.sender.reconcile.ReconcileSnapshot;
-import org.openmrs.eip.app.sender.reconcile.ReconcileSnapshot.TableSnapshot;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -35,30 +35,59 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 	
 	@Override
 	@Transactional(readOnly = true, transactionManager = OPENMRS_TX_MGR, isolation = Isolation.SERIALIZABLE)
-	public ReconcileSnapshot takeSnapshot() {
+	public List<SenderTableReconciliation> takeSnapshot() {
 		LOG.info("Taking reconciliation snapshot");
-		List<TableSnapshot> snapshots = AppUtils.getTablesToSync().stream().map(t -> takeTableSnapshot(t)).toList();
+		List<SenderTableReconciliation> l = AppUtils.getTablesToSync().stream().map(t -> takeTableSnapshot(t)).toList();
 		LOG.info("Done taking reconciliation snapshot");
-		return new ReconcileSnapshot(snapshots);
+		return l;
 	}
 	
-	private TableSnapshot takeTableSnapshot(String table) {
+	private SenderTableReconciliation takeTableSnapshot(String table) {
 		OpenmrsRepository<?> repo = SyncContext.getRepositoryBean(table);
-		LocalDateTime timeTaken = LocalDateTime.now();
-		final long maxId = repo.getMaxId();
-		final long count = repo.count();
-		SenderTableReconciliation tableRec = tableReconcileRepo.getByTableName(table);
-		long lastProcessedId = 0;
-		if (tableRec != null) {
-			lastProcessedId = tableRec.getLastProcessedId();
+		LocalDateTime startTime = LocalDateTime.now();
+		SenderTableReconciliation tableRec = tableReconcileRepo.getByTableNameIgnoreCase(table);
+		if (tableRec == null) {
+			tableRec = new SenderTableReconciliation();
+			tableRec.setTableName(table);
+			tableRec.setDateCreated(new Date());
+			tableRec.setLastProcessedId(0);
 		}
+		
+		long count;
+		Long endId = repo.getMaxId();
+		if (endId == null) {
+			//Table is empty, or all rows were deleted after a previous reconciliation, reset
+			endId = 0L;
+			count = 0;
+			tableRec.setLastProcessedId(0);
+		} else {
+			if (tableRec.getLastProcessedId() == 0) {
+				count = repo.count();
+			} else {
+				count = repo.getCountWithIdGreaterThan(tableRec.getLastProcessedId());
+			}
+		}
+		
+		tableRec.setRowCount(count);
+		tableRec.setEndId(endId);
+		tableRec.setStartDate(startTime);
 		
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Reconciliation to be done for {} rows in table {}, from row after that with id {} to {}", count,
-			    table, lastProcessedId, maxId);
+			LOG.debug("Reconciliation to be done for {} rows in table {}, with id greater than {} up to {}",
+			    tableRec.getRowCount(), table, tableRec.getLastProcessedId(), tableRec.getEndId());
 		}
 		
-		return new TableSnapshot(table, count, maxId, lastProcessedId, timeTaken);
+		return tableRec;
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public void saveTableReconciliations(List<SenderTableReconciliation> tableReconciliations) {
+		if (LOG.isDebugEnabled()) {
+			LOG.info("Saving reconciliation snapshot");
+		}
+		
+		tableReconciliations.forEach(tableRec -> tableReconcileRepo.save(tableRec));
 	}
 	
 }
