@@ -11,6 +11,6 @@ public interface SenderTableReconcileRepository extends JpaRepository<SenderTabl
 	 * @param table the name of the table to match
 	 * @return SenderTableReconciliation object
 	 */
-	SenderTableReconciliation getByTableName(String table);
+	SenderTableReconciliation getByTableNameIgnoreCase(String table);
 	
 }
