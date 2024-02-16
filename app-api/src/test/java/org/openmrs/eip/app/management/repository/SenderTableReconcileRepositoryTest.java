@@ -18,8 +18,9 @@ public class SenderTableReconcileRepositoryTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = {
 	        "classpath:mgt_sender_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void getByTableName_shouldReturnTheTableReconciliation() {
-		Assert.assertEquals(2l, repo.getByTableName("visit").getId().longValue());
+	public void getByTableNameIgnoreCase_shouldReturnTheTableReconciliation() {
+		Assert.assertEquals(2l, repo.getByTableNameIgnoreCase("visit").getId().longValue());
+		Assert.assertEquals(2l, repo.getByTableNameIgnoreCase("VISIT").getId().longValue());
 	}
 	
 }

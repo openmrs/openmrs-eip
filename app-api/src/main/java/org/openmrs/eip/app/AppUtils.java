@@ -55,6 +55,9 @@ public class AppUtils {
 		IGNORE_TABLES.add(TableToSyncEnum.LOCATION);
 		IGNORE_TABLES.add(TableToSyncEnum.PROVIDER);
 		IGNORE_TABLES.add(TableToSyncEnum.USERS);
+		IGNORE_TABLES.add(TableToSyncEnum.ORDERS);
+		IGNORE_TABLES.add(TableToSyncEnum.TEST_ORDER);
+		IGNORE_TABLES.add(TableToSyncEnum.DRUG_ORDER);
 	}
 	
 	private static Map<String, String> classAndSimpleNameMap = null;
