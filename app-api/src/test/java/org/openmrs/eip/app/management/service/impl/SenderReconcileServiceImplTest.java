@@ -27,7 +27,7 @@ public class SenderReconcileServiceImplTest {
 	private SenderTableReconcileRepository mockTableRecRepo;
 	
 	@Mock
-	private PersonRepository personRepo;
+	private PersonRepository mockPersonRepo;
 	
 	private SenderReconcileServiceImpl service;
 	
@@ -42,7 +42,7 @@ public class SenderReconcileServiceImplTest {
 	public void takeSnapshot_shouldResetForAnEmptyTable() {
 		final String table = "person";
 		when(AppUtils.getTablesToSync()).thenReturn(Set.of(table));
-		when(SyncContext.getRepositoryBean(table)).thenReturn(personRepo);
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockPersonRepo);
 		
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
 		
@@ -58,7 +58,7 @@ public class SenderReconcileServiceImplTest {
 	public void takeSnapshot_shouldResetForAnEmptyTableIfRowsWereDeleted() {
 		final String table = "person";
 		when(AppUtils.getTablesToSync()).thenReturn(Set.of(table));
-		when(SyncContext.getRepositoryBean(table)).thenReturn(personRepo);
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockPersonRepo);
 		SenderTableReconciliation existingRec = new SenderTableReconciliation();
 		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
 		
@@ -69,6 +69,50 @@ public class SenderReconcileServiceImplTest {
 		assertEquals(0, existingRec.getRowCount());
 		assertEquals(0, existingRec.getEndId());
 		assertEquals(0, existingRec.getLastProcessedId());
+	}
+	
+	@Test
+	public void takeSnapshot_shouldProcessInitialSnapshotForTableWithRows() {
+		final String table = "person";
+		final long expectedRowCount = 7;
+		final long maxId = 10;
+		when(AppUtils.getTablesToSync()).thenReturn(Set.of(table));
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockPersonRepo);
+		SenderTableReconciliation existingRec = new SenderTableReconciliation();
+		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
+		when(mockPersonRepo.getMaxId()).thenReturn(maxId);
+		when(mockPersonRepo.count()).thenReturn(expectedRowCount);
+		
+		List<SenderTableReconciliation> recs = service.takeSnapshot();
+		
+		assertEquals(1, recs.size());
+		assertEquals(existingRec, recs.get(0));
+		assertEquals(expectedRowCount, existingRec.getRowCount());
+		assertEquals(maxId, existingRec.getEndId());
+		assertEquals(0, existingRec.getLastProcessedId());
+	}
+	
+	@Test
+	public void takeSnapshot_shouldProcessIncrementalSnapshotForTableWithRows() {
+		final String table = "person";
+		final long expectedRowCount = 7;
+		final long maxId = 17;
+		final long lastProcessedId = 10;
+		when(AppUtils.getTablesToSync()).thenReturn(Set.of(table));
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockPersonRepo);
+		SenderTableReconciliation existingRec = new SenderTableReconciliation();
+		existingRec.setLastProcessedId(lastProcessedId);
+		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
+		when(mockPersonRepo.getMaxId()).thenReturn(maxId);
+		when(mockPersonRepo.getCountWithIdGreaterThan(lastProcessedId)).thenReturn(expectedRowCount);
+		
+		List<SenderTableReconciliation> recs = service.takeSnapshot();
+		
+		assertEquals(1, recs.size());
+		assertEquals(existingRec, recs.get(0));
+		assertEquals(expectedRowCount, existingRec.getRowCount());
+		assertEquals(maxId, existingRec.getEndId());
+		assertEquals(lastProcessedId, existingRec.getLastProcessedId());
 	}
 	
 }
