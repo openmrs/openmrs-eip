@@ -13,12 +13,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
-import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
-import org.openmrs.eip.app.management.entity.receiver.Reconciliation.ReconciliationStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
-import org.openmrs.eip.app.management.repository.ReconciliationRepository;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
@@ -38,13 +38,13 @@ import org.springframework.stereotype.Component;
  */
 @Component("reconciliationProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reconciliation> {
+public class ReconciliationProcessor extends BasePureParallelQueueProcessor<ReceiverReconciliation> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ReconciliationProcessor.class);
 	
 	private SiteRepository siteRepo;
 	
-	private ReconciliationRepository reconcileRepo;
+	private ReceiverReconcileRepository reconcileRepo;
 	
 	private SiteReconciliationRepository siteReconcileRepo;
 	
@@ -56,8 +56,8 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 	private int batchSize;
 	
 	public ReconciliationProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SiteRepository siteRepo,
-	    ReconciliationRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
-	    TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
+                                   ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
+                                   TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
@@ -77,12 +77,12 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 	}
 	
 	@Override
-	public String getThreadName(Reconciliation item) {
+	public String getThreadName(ReceiverReconciliation item) {
 		return item.getId().toString();
 	}
 	
 	@Override
-	public void processItem(Reconciliation reconciliation) {
+	public void processItem(ReceiverReconciliation reconciliation) {
 		if (reconciliation.getStatus() == ReconciliationStatus.NEW) {
 			initialize(reconciliation);
 		} else if (reconciliation.getStatus() == ReconciliationStatus.PROCESSING) {
@@ -90,7 +90,7 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 		}
 	}
 	
-	private void initialize(Reconciliation reconciliation) {
+	private void initialize(ReceiverReconciliation reconciliation) {
 		for (SiteInfo site : siteRepo.findAll()) {
 			if (siteReconcileRepo.getBySite(site) == null) {
 				ReconciliationRequest request = new ReconciliationRequest();
@@ -109,7 +109,7 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Reco
 		reconcileRepo.save(reconciliation);
 	}
 	
-	private void update(Reconciliation reconciliation) {
+	private void update(ReceiverReconciliation reconciliation) {
 		List<SiteInfo> sites = siteRepo.findAll();
 		List<SiteInfo> incompleteSites = new ArrayList<>(sites.size());
 		for (SiteInfo site : sites) {

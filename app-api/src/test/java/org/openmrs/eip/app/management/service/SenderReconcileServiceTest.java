@@ -3,6 +3,7 @@ package org.openmrs.eip.app.management.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -23,12 +24,12 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 	private SenderReconcileService service;
 	
 	@Autowired
-	private SenderTableReconcileRepository repo;
+	private SenderTableReconcileRepository tableRecRepo;
 	
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	public void takeSnapshot_shouldTakeInitialSnapshotForExistingRowsForEachSyncedTable() {
-		assertEquals(0, repo.count());
+		assertEquals(0, tableRecRepo.count());
 		long timestamp = System.currentTimeMillis();
 		
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
@@ -65,16 +66,16 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 	@Test
 	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
 	public void takeSnapshot_shouldTakeIncrementalSnapshotForExistingRowsForEachSyncedTable() {
-		assertEquals(0, repo.count());
+		assertEquals(0, tableRecRepo.count());
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
 		assertEquals(AppUtils.getTablesToSync().size(), recs.size());
 		service.saveTableReconciliations(recs);
 		Map<String, Date> tableDateCreatedMap = recs.stream().collect(
 		    Collectors.toMap(SenderTableReconciliation::getTableName, SenderTableReconciliation::getDateCreated));
 		final long personLastProcId = 101;
-		SenderTableReconciliation personRec = repo.getByTableNameIgnoreCase("person");
+		SenderTableReconciliation personRec = tableRecRepo.getByTableNameIgnoreCase("person");
 		personRec.setLastProcessedId(personLastProcId);
-		repo.save(personRec);
+		tableRecRepo.save(personRec);
 		long timestamp = System.currentTimeMillis();
 		
 		recs = service.takeSnapshot();
@@ -111,6 +112,29 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 			assertTrue(startDateMillis == timestamp || startDateMillis > timestamp);
 			assertEquals(tableDateCreatedMap.get(r.getTableName()), r.getDateCreated());
 		});
+	}
+	
+	@Test
+	public void saveTableReconciliations_shouldSaveAllTheReconciliations() {
+		assertEquals(0, tableRecRepo.count());
+		SenderTableReconciliation rec1 = new SenderTableReconciliation();
+		rec1.setTableName("person");
+		rec1.setDateCreated(new Date());
+		rec1.setLastProcessedId(0);
+		rec1.setRowCount(0);
+		rec1.setEndId(1);
+		rec1.setStartDate(LocalDateTime.now());
+		SenderTableReconciliation rec2 = new SenderTableReconciliation();
+		rec2.setTableName("visit");
+		rec2.setDateCreated(new Date());
+		rec2.setLastProcessedId(0);
+		rec2.setRowCount(0);
+		rec2.setEndId(1);
+		rec2.setStartDate(LocalDateTime.now());
+		
+		service.saveTableReconciliations(List.of(rec1, rec2));
+		
+		assertEquals(2, tableRecRepo.count());
 	}
 	
 }

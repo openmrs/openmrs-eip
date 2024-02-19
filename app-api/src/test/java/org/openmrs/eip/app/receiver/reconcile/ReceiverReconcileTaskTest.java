@@ -14,8 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
-import org.openmrs.eip.app.management.repository.ReconciliationRepository;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverSyncPrioritizingTask;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
@@ -27,7 +27,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class ReceiverReconcileTaskTest {
 	
 	@Mock
-	private ReconciliationRepository mockRepo;
+	private ReceiverReconcileRepository mockRepo;
 	
 	private ReceiverReconcileTask task;
 	
@@ -45,8 +45,8 @@ public class ReceiverReconcileTaskTest {
 	
 	@Test
 	public void getNextBatch_shouldFetchTheNextReconciliation() {
-		setInternalState(task, ReconciliationRepository.class, mockRepo);
-		List expectedReconciliations = List.of(new Reconciliation());
+		setInternalState(task, ReceiverReconcileRepository.class, mockRepo);
+		List expectedReconciliations = List.of(new ReceiverReconciliation());
 		when(mockRepo.getReconciliation()).thenReturn(expectedReconciliations);
 		
 		List reconciliations = task.getNextBatch();

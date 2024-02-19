@@ -13,7 +13,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "mgt_reconciliation")
-public class Reconciliation extends AbstractEntity {
+public class ReceiverReconciliation extends AbstractEntity {
 	
 	public enum ReconciliationStatus {
 		NEW, PROCESSING, FINALIZING, COMPLETED

@@ -23,12 +23,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
-import org.openmrs.eip.app.management.entity.receiver.Reconciliation;
-import org.openmrs.eip.app.management.entity.receiver.Reconciliation.ReconciliationStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
-import org.openmrs.eip.app.management.repository.ReconciliationRepository;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
@@ -50,7 +50,7 @@ public class ReconciliationProcessorTest {
 	private SiteRepository mockSiteRepo;
 	
 	@Mock
-	private ReconciliationRepository mockRecRepo;
+	private ReceiverReconcileRepository mockRecRepo;
 	
 	@Mock
 	private SiteReconciliationRepository mockSiteRecRepo;
@@ -90,7 +90,7 @@ public class ReconciliationProcessorTest {
 		site2.setIdentifier(siteIdentifier2);
 		SiteInfo site3 = new SiteInfo();
 		site3.setIdentifier("site-3");
-		Reconciliation rec = new Reconciliation();
+		ReceiverReconciliation rec = new ReceiverReconciliation();
 		rec.setIdentifier(recIdentifier);
 		assertEquals(ReconciliationStatus.NEW, rec.getStatus());
 		when(mockSiteRepo.findAll()).thenReturn(List.of(site1, site3, site2));
@@ -129,7 +129,7 @@ public class ReconciliationProcessorTest {
 		SiteReconciliation siteRec2 = new SiteReconciliation();
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
-		Reconciliation rec = new Reconciliation();
+		ReceiverReconciliation rec = new ReceiverReconciliation();
 		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
@@ -160,7 +160,7 @@ public class ReconciliationProcessorTest {
 		SiteReconciliation siteRec2 = new SiteReconciliation();
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
-		Reconciliation rec = new Reconciliation();
+		ReceiverReconciliation rec = new ReceiverReconciliation();
 		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
@@ -191,7 +191,7 @@ public class ReconciliationProcessorTest {
 		SiteReconciliation siteRec2 = new SiteReconciliation();
 		assertNull(siteRec1.getDateCompleted());
 		assertNull(siteRec2.getDateCompleted());
-		Reconciliation rec = new Reconciliation();
+		ReceiverReconciliation rec = new ReceiverReconciliation();
 		rec.setStatus(ReconciliationStatus.PROCESSING);
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
