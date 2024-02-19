@@ -56,4 +56,28 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240219-1101" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mgt_reconciliation"/>
+            </not>
+        </preConditions>
+        <comment>Adding mgt_reconciliation table</comment>
+        <createTable tableName="mgt_reconciliation">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="identifier" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_started" type="DATETIME"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

@@ -3,6 +3,7 @@ package org.openmrs.eip.component.repository;
 import java.util.List;
 
 import org.openmrs.eip.component.entity.BaseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -60,5 +61,8 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	 */
 	@Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.id > :id")
 	Long getCountWithIdGreaterThan(@Param("id") Long id);
+	
+	@Query("SELECT e.uuid FROM #{#entityName} e WHERE e.id > :offsetId AND e.id <= :endId")
+	List<String> getUuidBatchToReconcile(@Param("offsetId") Long offsetId, @Param("endId") Long endId, Pageable page);
 	
 }

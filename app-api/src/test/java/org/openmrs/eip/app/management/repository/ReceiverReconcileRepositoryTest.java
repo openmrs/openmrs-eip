@@ -19,7 +19,7 @@ public class ReceiverReconcileRepositoryTest extends BaseReceiverTest {
 	private ReceiverReconcileRepository repo;
 	
 	@Test
-	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	@Sql(scripts = {
 	        "classpath:mgt_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getReconciliation_shouldGetTheFirstIncompleteReconciliation() {
 		List<ReceiverReconciliation> recs = repo.getReconciliation();
