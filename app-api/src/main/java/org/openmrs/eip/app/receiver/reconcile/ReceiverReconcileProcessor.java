@@ -34,13 +34,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes a Reconciliation item
+ * Processes a receiver Reconciliation item
  */
-@Component("reconciliationProcessor")
+@Component("receiverReconcileProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class ReconciliationProcessor extends BasePureParallelQueueProcessor<ReceiverReconciliation> {
+public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<ReceiverReconciliation> {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ReconciliationProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReceiverReconcileProcessor.class);
 	
 	private SiteRepository siteRepo;
 	
@@ -55,9 +55,9 @@ public class ReconciliationProcessor extends BasePureParallelQueueProcessor<Rece
 	@Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}")
 	private int batchSize;
 	
-	public ReconciliationProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, SiteRepository siteRepo,
-                                   ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
-                                   TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
+	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
+	    TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;

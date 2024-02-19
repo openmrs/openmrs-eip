@@ -42,7 +42,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ReceiverUtils.class)
-public class ReconciliationProcessorTest {
+public class ReceiverReconcileProcessorTest {
 	
 	private static final int BATCH_SIZE = 100;
 	
@@ -61,13 +61,13 @@ public class ReconciliationProcessorTest {
 	@Mock
 	private JmsTemplate mockJmsTemplate;
 	
-	private ReconciliationProcessor processor;
+	private ReceiverReconcileProcessor processor;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReconciliationProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
+		processor = new ReceiverReconcileProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
 		        mockJmsTemplate);
 		Whitebox.setInternalState(processor, "batchSize", BATCH_SIZE);
 	}

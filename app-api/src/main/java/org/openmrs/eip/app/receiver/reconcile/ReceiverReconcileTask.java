@@ -7,12 +7,12 @@ import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverSyncPrioritizingTask;
 import org.openmrs.eip.component.SyncContext;
 
-public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<ReceiverReconciliation, ReconciliationProcessor> {
+public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<ReceiverReconciliation, ReceiverReconcileProcessor> {
 	
 	private ReceiverReconcileRepository repo;
 	
 	public ReceiverReconcileTask() {
-		super(SyncContext.getBean(ReconciliationProcessor.class));
+		super(SyncContext.getBean(ReceiverReconcileProcessor.class));
 		this.repo = SyncContext.getBean(ReceiverReconcileRepository.class);
 	}
 	
