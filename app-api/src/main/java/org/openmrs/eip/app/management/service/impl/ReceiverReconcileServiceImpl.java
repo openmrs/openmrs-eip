@@ -86,17 +86,17 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			
 			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
 			TableReconciliation tableRec = new TableReconciliation();
+			tableRec.setSiteReconciliation(siteRec);
 			tableRec.setTableName(table);
 			tableRec.setRowCount(resp.getRowCount());
 			tableRec.setRemoteStartDate(resp.getRemoteStartDate());
 			tableRec.setLastBatchReceived(resp.isLastTableBatch());
 			tableRec.setDateCreated(new Date());
-			siteRec.addTableReconciliation(tableRec);
 			if (LOG.isTraceEnabled()) {
-				LOG.trace("Saving updated to site reconciliation");
+				LOG.debug("Saving table reconciliation");
 			}
 			
-			siteReconcileRepo.save(siteRec);
+			tableReconcileRepo.save(tableRec);
 		}
 		
 		if (LOG.isTraceEnabled()) {

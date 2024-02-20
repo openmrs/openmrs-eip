@@ -133,13 +133,11 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		siteRec.setDateCreated(new Date());
 		siteRecRepo.save(siteRec);
 		assertEquals(1, siteRecRepo.count());
-		assertTrue(siteRec.getTableReconciliations().isEmpty());
 		Long timestamp = System.currentTimeMillis();
 		
 		service.processJmsMessage(jmsMsg);
 		
 		assertEquals(1, reconcileMsgRep.count());
-		assertEquals(1, siteRec.getTableReconciliations().size());
 		List<TableReconciliation> tableRecs = tableRecRepo.findAll();
 		assertEquals(1, tableRecs.size());
 		TableReconciliation tableRec = tableRecs.get(0);

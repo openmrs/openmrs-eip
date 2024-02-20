@@ -33,7 +33,7 @@ public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<Rece
 	
 	@Override
 	public List<ReceiverReconciliation> getNextBatch() {
-		return repo.getReconciliation();
+		return List.of(repo.getReconciliation());
 	}
 	
 }

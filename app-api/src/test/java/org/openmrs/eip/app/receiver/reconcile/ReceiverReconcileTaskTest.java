@@ -46,12 +46,12 @@ public class ReceiverReconcileTaskTest {
 	@Test
 	public void getNextBatch_shouldFetchTheNextReconciliation() {
 		setInternalState(task, ReceiverReconcileRepository.class, mockRepo);
-		List expectedReconciliations = List.of(new ReceiverReconciliation());
-		when(mockRepo.getReconciliation()).thenReturn(expectedReconciliations);
+		ReceiverReconciliation expectedRec = new ReceiverReconciliation();
+		when(mockRepo.getReconciliation()).thenReturn(new ReceiverReconciliation());
 		
-		List reconciliations = task.getNextBatch();
+		List reconciliation = task.getNextBatch();
 		
-		Assert.assertEquals(expectedReconciliations, reconciliations);
+		Assert.assertEquals(expectedRec, reconciliation);
 		verify(mockRepo).getReconciliation();
 	}
 	
