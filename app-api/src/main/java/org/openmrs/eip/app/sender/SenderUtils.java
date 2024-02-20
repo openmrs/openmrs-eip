@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.sender;
 
+import static org.openmrs.eip.app.sender.SenderConstants.PROP_ACTIVEMQ_ENDPOINT;
+
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
@@ -18,6 +20,8 @@ import io.debezium.connector.mysql.MySqlStreamingChangeEventSource.BinlogPositio
 public class SenderUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(SenderUtils.class);
+	
+	private static String queueName;
 	
 	/**
 	 * Generates a mask for the specified value
@@ -71,6 +75,24 @@ public class SenderUtils {
 		client.registerLifecycleListener(lifecycleListener);
 		
 		return client;
+	}
+	
+	/**
+	 * Gets the queue name to send to in the message broker.
+	 *
+	 * @return the queue name
+	 */
+	public static String getQueueName() {
+		if (queueName == null) {
+			final String brokerEndpoint = SyncContext.getBean(Environment.class).getProperty(PROP_ACTIVEMQ_ENDPOINT);
+			if (!brokerEndpoint.startsWith("activemq:")) {
+				throw new EIPException(brokerEndpoint + " is an invalid broker endpoint value");
+			}
+			
+			queueName = brokerEndpoint.substring(brokerEndpoint.indexOf(":") + 1);
+		}
+		
+		return queueName;
 	}
 	
 }
