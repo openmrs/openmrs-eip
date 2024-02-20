@@ -73,7 +73,10 @@
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_started" type="DATETIME"/>
+            <column name="snapshot_date" type="DATETIME"/>
+            <column name="is_started" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>

@@ -37,10 +37,15 @@ public class SenderTableReconciliation extends AbstractEntity {
 	@Setter
 	private long endId;
 	
-	@Column(name = "start_date", nullable = false)
+	@Column(name = "snapshot_date", nullable = false)
 	@NotNull
 	@Getter
 	@Setter
-	private LocalDateTime startDate;
+	private LocalDateTime snapshotDate;
+	
+	@Column(name = "is_started", nullable = false)
+	@Getter
+	@Setter
+	private boolean started;
 	
 }

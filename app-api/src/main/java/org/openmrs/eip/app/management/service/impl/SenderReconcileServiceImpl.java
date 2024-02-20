@@ -44,7 +44,7 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 	
 	private SenderTableReconciliation takeTableSnapshot(String table) {
 		OpenmrsRepository<?> repo = SyncContext.getRepositoryBean(table);
-		LocalDateTime startTime = LocalDateTime.now();
+		LocalDateTime snapshotDate = LocalDateTime.now();
 		SenderTableReconciliation tableRec = tableReconcileRepo.getByTableNameIgnoreCase(table);
 		if (tableRec == null) {
 			tableRec = new SenderTableReconciliation();
@@ -70,7 +70,7 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 		
 		tableRec.setRowCount(count);
 		tableRec.setEndId(endId);
-		tableRec.setStartDate(startTime);
+		tableRec.setSnapshotDate(snapshotDate);
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Reconciliation to be done for {} rows in table {}, with id greater than {} up to {}",

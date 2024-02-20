@@ -57,7 +57,7 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 			}
 			
 			assertEquals(0, r.getLastProcessedId());
-			long startDateMillis = r.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			long startDateMillis = r.getSnapshotDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			assertTrue(startDateMillis == timestamp || startDateMillis > timestamp);
 			assertTrue(r.getDateCreated().getTime() == timestamp || r.getDateCreated().getTime() > timestamp);
 		});
@@ -108,7 +108,7 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 				assertEquals(0, r.getLastProcessedId());
 			}
 			
-			long startDateMillis = r.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			long startDateMillis = r.getSnapshotDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			assertTrue(startDateMillis == timestamp || startDateMillis > timestamp);
 			assertEquals(tableDateCreatedMap.get(r.getTableName()), r.getDateCreated());
 		});
@@ -123,14 +123,14 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 		rec1.setLastProcessedId(0);
 		rec1.setRowCount(0);
 		rec1.setEndId(1);
-		rec1.setStartDate(LocalDateTime.now());
+		rec1.setSnapshotDate(LocalDateTime.now());
 		SenderTableReconciliation rec2 = new SenderTableReconciliation();
 		rec2.setTableName("visit");
 		rec2.setDateCreated(new Date());
 		rec2.setLastProcessedId(0);
 		rec2.setRowCount(0);
 		rec2.setEndId(1);
-		rec2.setStartDate(LocalDateTime.now());
+		rec2.setSnapshotDate(LocalDateTime.now());
 		
 		service.saveTableReconciliations(List.of(rec1, rec2));
 		

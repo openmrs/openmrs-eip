@@ -62,7 +62,15 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	@Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.id > :id")
 	Long getCountWithIdGreaterThan(@Param("id") Long id);
 	
-	@Query("SELECT e.uuid FROM #{#entityName} e WHERE e.id > :offsetId AND e.id <= :endId")
-	List<String> getUuidBatchToReconcile(@Param("offsetId") Long offsetId, @Param("endId") Long endId, Pageable page);
+	/**
+	 * Gets a batch of uuid and id pairs for rows with the ids that match the specified id range.
+	 *
+	 * @param offsetId offset id exclusive
+	 * @param endId last id inclusive
+	 * @param page Pageable object
+	 * @return list of uuid and id pairs
+	 */
+	@Query("SELECT e.uuid, e.id FROM #{#entityName} e WHERE e.id > :offsetId AND e.id <= :endId")
+	List<Object[]> getUuidAndIdBatchToReconcile(@Param("offsetId") Long offsetId, @Param("endId") Long endId, Pageable page);
 	
 }

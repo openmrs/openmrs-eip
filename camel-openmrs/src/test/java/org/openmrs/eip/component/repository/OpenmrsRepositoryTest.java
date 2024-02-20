@@ -1,7 +1,6 @@
 package org.openmrs.eip.component.repository;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -68,15 +67,18 @@ public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void getUuidBatchToReconcile_shouldGetTheBatchOfUuidsMatchingTheSpecifiedRange() {
-		List<String> uuids = attribRepo.getUuidBatchToReconcile(1L, 3L, Pageable.ofSize(5));
-		assertEquals(2, uuids.size());
-		assertTrue(uuids.contains("2efd940e-32dc-491f-8038-a8f3afe3e35f"));
-		assertTrue(uuids.contains("3efd940e-32dc-491f-8038-a8f3afe3e35f"));
+	public void getUuidAndIdBatchToReconcile_shouldGetTheBatchOfUuidsAndIdsMatchingTheSpecifiedRange() {
+		List<Object[]> uuidsAndIds = attribRepo.getUuidAndIdBatchToReconcile(1L, 3L, Pageable.ofSize(5));
+		assertEquals(2, uuidsAndIds.size());
+		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[0]);
+		assertEquals(2L, uuidsAndIds.get(0)[1]);
+		assertEquals("3efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(1)[0]);
+		assertEquals(3L, uuidsAndIds.get(1)[1]);
 		
-		uuids = attribRepo.getUuidBatchToReconcile(1L, 3L, Pageable.ofSize(1));
-		assertEquals(1, uuids.size());
-		assertTrue(uuids.contains("2efd940e-32dc-491f-8038-a8f3afe3e35f"));
+		uuidsAndIds = attribRepo.getUuidAndIdBatchToReconcile(1L, 3L, Pageable.ofSize(1));
+		assertEquals(1, uuidsAndIds.size());
+		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[0]);
+		assertEquals(2L, uuidsAndIds.get(0)[1]);
 	}
 	
 }

@@ -8,6 +8,7 @@ import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_BATCH_SIZE;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
@@ -16,6 +17,7 @@ import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
+import org.openmrs.eip.app.sender.SenderUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
@@ -33,9 +35,9 @@ import org.springframework.stereotype.Component;
  */
 @Component("senderTableReconcileProcessor")
 @Profile(SyncProfiles.SENDER)
-public class SenderTableReconciliationProcessor extends BasePureParallelQueueProcessor<SenderTableReconciliation> {
+public class SenderTableReconcileProcessor extends BasePureParallelQueueProcessor<SenderTableReconciliation> {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(SenderTableReconciliationProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SenderTableReconcileProcessor.class);
 	
 	@Value("${" + PROP_LARGE_MSG_SIZE + ":" + DEFAULT_LARGE_MSG_SIZE + "}")
 	private int largeMsgSize;
@@ -48,7 +50,7 @@ public class SenderTableReconciliationProcessor extends BasePureParallelQueuePro
 	
 	private Pageable page;
 	
-	public SenderTableReconciliationProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
+	public SenderTableReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    @Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}") int batchSize,
 	    SenderTableReconcileRepository tableReconcileRepo, SenderReconcileRepository reconcileRepo,
 	    JmsTemplate jmsTemplate) {
@@ -77,22 +79,40 @@ public class SenderTableReconciliationProcessor extends BasePureParallelQueuePro
 	@Override
 	public void processItem(SenderTableReconciliation rec) {
 		OpenmrsRepository<?> repo = SyncContext.getRepositoryBean(rec.getTableName());
-		List<String> uuids = repo.getUuidBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
+		List<Object[]> batch = repo.getUuidAndIdBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
+		final String table = rec.getTableName();
 		ReconciliationResponse response = new ReconciliationResponse();
-		response.setTableName(rec.getTableName());
+		response.setTableName(table);
 		response.setIdentifier(reconcileRepo.getReconciliation().getIdentifier());
-		if (rec.getLastProcessedId() == 0) {
+		if (!rec.isStarted()) {
 			//This is the first table payload to send
-			response.setRemoteStartDate(rec.getStartDate());
+			response.setRemoteStartDate(rec.getSnapshotDate());
 			response.setRowCount(rec.getRowCount());
 		}
 		
+		Long firstId = (Long) batch.get(0)[1];
+		Long lastId = (Long) batch.get(batch.size() - 1)[1];
+		response.setLastTableBatch(lastId == rec.getEndId());
+		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
 		response.setBatchSize(uuids.size());
 		response.setData(StringUtils.join(uuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
 		if (LOG.isTraceEnabled()) {
-			LOG.debug("Send reconcile batch of {} rows in table {}, with id greater than {} up to {}", uuids.size(),
-			    rec.getTableName(), rec.getLastProcessedId(), rec.getEndId());
+			LOG.debug("Sending reconcile batch of {} rows in table {}, with ids from {} up to {}", uuids.size(), table,
+			    firstId, lastId);
 		}
+		
+		jmsTemplate.convertAndSend(SenderUtils.getQueueName(), response);
+		
+		if (LOG.isTraceEnabled()) {
+			LOG.debug("Updating last processed id of table {} to {}", table, lastId);
+		}
+		
+		rec.setLastProcessedId(lastId);
+		if (!rec.isStarted()) {
+			rec.setStarted(true);
+		}
+		
+		tableReconcileRepo.save(rec);
 	}
 	
 }
