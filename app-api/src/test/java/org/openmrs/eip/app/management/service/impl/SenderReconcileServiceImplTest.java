@@ -35,7 +35,7 @@ public class SenderReconcileServiceImplTest {
 	public void setup() {
 		PowerMockito.mockStatic(AppUtils.class);
 		PowerMockito.mockStatic(SyncContext.class);
-		service = new SenderReconcileServiceImpl(mockTableRecRepo);
+		service = new SenderReconcileServiceImpl(null, mockTableRecRepo);
 	}
 	
 	@Test

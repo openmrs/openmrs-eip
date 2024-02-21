@@ -8,7 +8,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
+import org.openmrs.eip.app.management.entity.sender.SenderReconciliation.SenderReconcileStatus;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
+import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
 import org.openmrs.eip.app.management.service.SenderReconcileService;
 import org.openmrs.eip.component.SyncContext;
@@ -27,9 +30,13 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(SenderReconcileServiceImpl.class);
 	
+	private SenderReconcileRepository reconcileRepo;
+	
 	private SenderTableReconcileRepository tableReconcileRepo;
 	
-	public SenderReconcileServiceImpl(SenderTableReconcileRepository tableReconcileRepo) {
+	public SenderReconcileServiceImpl(SenderReconcileRepository reconcileRepo,
+	    SenderTableReconcileRepository tableReconcileRepo) {
+		this.reconcileRepo = reconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
 	}
 	
@@ -82,12 +89,14 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 	
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
-	public void saveTableReconciliations(List<SenderTableReconciliation> tableReconciliations) {
+	public void saveSnapshot(SenderReconciliation reconciliation, List<SenderTableReconciliation> tableReconciliations) {
 		if (LOG.isDebugEnabled()) {
 			LOG.info("Saving reconciliation snapshot");
 		}
 		
 		tableReconciliations.forEach(tableRec -> tableReconcileRepo.save(tableRec));
+        reconciliation.setStatus(SenderReconcileStatus.PROCESSING);
+		reconcileRepo.save(reconciliation);
 	}
 	
 }

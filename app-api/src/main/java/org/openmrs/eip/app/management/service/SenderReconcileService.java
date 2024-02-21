@@ -2,6 +2,7 @@ package org.openmrs.eip.app.management.service;
 
 import java.util.List;
 
+import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 
 /**
@@ -15,10 +16,11 @@ public interface SenderReconcileService extends Service {
 	List<SenderTableReconciliation> takeSnapshot();
 	
 	/**
-	 * Saves a list of table reconciliations
-	 * 
+	 * Saves the snapshot data
+	 *
+	 * @param reconciliation the sender reconciliation
 	 * @param tableReconciliations the list to save
 	 */
-	void saveTableReconciliations(List<SenderTableReconciliation> tableReconciliations);
+	void saveSnapshot(SenderReconciliation reconciliation, List<SenderTableReconciliation> tableReconciliations);
 	
 }

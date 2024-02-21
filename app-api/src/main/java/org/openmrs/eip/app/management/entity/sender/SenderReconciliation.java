@@ -1,8 +1,6 @@
 
 package org.openmrs.eip.app.management.entity.sender;
 
-import java.util.Date;
-
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import jakarta.persistence.Column;
@@ -33,10 +31,5 @@ public class SenderReconciliation extends AbstractEntity {
 	@Getter
 	@Setter
 	private SenderReconcileStatus status = SenderReconcileStatus.NEW;
-	
-	@Column(name = "date_started")
-	@Getter
-	@Setter
-	private Date dateStarted;
 	
 }
