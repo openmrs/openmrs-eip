@@ -82,25 +82,39 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		List<Object[]> batch = repo.getUuidAndIdBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
 		final String table = rec.getTableName();
 		ReconciliationResponse response = new ReconciliationResponse();
-		response.setTableName(table);
 		response.setIdentifier(reconcileRepo.getReconciliation().getIdentifier());
+		response.setTableName(table);
 		if (!rec.isStarted()) {
 			//This is the first table payload to send
 			response.setRemoteStartDate(rec.getSnapshotDate());
 			response.setRowCount(rec.getRowCount());
 		}
 		
-		Long firstId = (Long) batch.get(0)[1];
-		Long lastId = (Long) batch.get(batch.size() - 1)[1];
-		response.setLastTableBatch(lastId == rec.getEndId());
 		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
-		response.setBatchSize(uuids.size());
-		response.setData(StringUtils.join(uuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
-		if (LOG.isTraceEnabled()) {
-			LOG.debug("Sending reconcile batch of {} rows in table {}, with ids from {} up to {}", uuids.size(), table,
-			    firstId, lastId);
+		Long firstId;
+		Long lastId;
+		boolean lastBatch;
+		if (batch.isEmpty()) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("No more rows to reconcile");
+			}
+			
+			lastBatch = true;
+			lastId = rec.getEndId();
+		} else {
+			firstId = (Long) batch.get(0)[1];
+			lastId = (Long) batch.get(batch.size() - 1)[1];
+			lastBatch = lastId == rec.getEndId();
+			if (LOG.isTraceEnabled()) {
+				LOG.debug("Sending reconcile batch of {} rows in table {}, with ids from {} up to {}", uuids.size(), table,
+				    firstId, lastId);
+			}
 		}
 		
+		response.setData(StringUtils.join(uuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
+		response.setBatchSize(uuids.size());
+		response.setLastTableBatch(lastBatch);
+		//TODO First compress payload if necessary
 		jmsTemplate.convertAndSend(SenderUtils.getQueueName(), response);
 		
 		if (LOG.isTraceEnabled()) {
