@@ -91,7 +91,6 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		}
 		
 		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
-		Long firstId;
 		Long lastId;
 		boolean lastBatch;
 		if (batch.isEmpty()) {
@@ -102,7 +101,7 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 			lastBatch = true;
 			lastId = rec.getEndId();
 		} else {
-			firstId = (Long) batch.get(0)[1];
+			Long firstId = (Long) batch.get(0)[1];
 			lastId = (Long) batch.get(batch.size() - 1)[1];
 			lastBatch = lastId == rec.getEndId();
 			if (LOG.isTraceEnabled()) {
