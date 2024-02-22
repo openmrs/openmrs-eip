@@ -7,6 +7,9 @@ import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverSyncPrioritizingTask;
 import org.openmrs.eip.component.SyncContext;
 
+/**
+ * Task that executes the sender reconciliation.
+ */
 public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<ReceiverReconciliation, ReceiverReconcileProcessor> {
 	
 	private ReceiverReconcileRepository repo;
