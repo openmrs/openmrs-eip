@@ -48,4 +48,13 @@ public class SenderTableReconciliation extends AbstractEntity {
 	@Setter
 	private boolean started;
 	
+	/**
+	 * Convenience method to check if this table reconciliation is completed.
+	 * 
+	 * @return true of completed otherwise false
+	 */
+	public boolean isCompleted() {
+		return started && lastProcessedId == endId;
+	}
+	
 }

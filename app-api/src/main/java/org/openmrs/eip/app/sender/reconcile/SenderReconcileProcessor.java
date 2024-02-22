@@ -5,6 +5,7 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
 import org.openmrs.eip.app.management.entity.sender.SenderReconciliation.SenderReconcileStatus;
@@ -36,10 +37,12 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 	private SenderReconcileService service;
 	
 	public SenderReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    SenderReconcileRepository reconcileRepo, SenderTableReconcileRepository tableReconcileRepo) {
+	    SenderReconcileRepository reconcileRepo, SenderTableReconcileRepository tableReconcileRepo,
+	    SenderReconcileService service) {
 		super(executor);
 		this.reconcileRepo = reconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
+		this.service = service;
 	}
 	
 	@Override
@@ -59,14 +62,6 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 	
 	@Override
 	public void processItem(SenderReconciliation reconciliation) {
-		if (reconciliation.getStatus() == SenderReconcileStatus.NEW) {
-			initialize(reconciliation);
-		} else if (reconciliation.getStatus() == SenderReconcileStatus.PROCESSING) {
-			update(reconciliation);
-		} else if (reconciliation.getStatus() == SenderReconcileStatus.FINALIZING) {
-			finalise(reconciliation);
-		}
-		
 		switch (reconciliation.getStatus()) {
 			case NEW:
 				initialize(reconciliation);
@@ -88,11 +83,25 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 	}
 	
 	private void update(SenderReconciliation reconciliation) {
-		//TODO Check if all tables have completed
+		List<String> incompleteTables = AppUtils.getTablesToSync().stream()
+		        .filter(t -> !tableReconcileRepo.getByTableNameIgnoreCase(t).isCompleted()).toList();
+		if (incompleteTables.isEmpty()) {
+			reconciliation.setStatus(SenderReconcileStatus.FINALIZING);
+			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
+			if (LOG.isTraceEnabled()) {
+				LOG.debug("Saving updated reconciliation");
+			}
+			
+			reconcileRepo.save(reconciliation);
+		} else {
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("There is still {} incomplete table reconciliation(s)", incompleteTables.size());
+			}
+		}
 	}
 	
 	private void finalise(SenderReconciliation reconciliation) {
-		//TODO Check for deletes
+		//TODO Check for deletes and mark as completed
 	}
 	
 }

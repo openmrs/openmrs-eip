@@ -137,16 +137,16 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		}
 		
 		if (incompleteSites.isEmpty()) {
-			LOG.info("Updating reconciliation status to " + ReconciliationStatus.FINALIZING);
 			reconciliation.setStatus(ReconciliationStatus.FINALIZING);
+			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
 			if (LOG.isDebugEnabled()) {
-				LOG.info("Saving updated reconciliation");
+				LOG.debug("Saving updated reconciliation");
 			}
 			
 			reconcileRepo.save(reconciliation);
 		} else {
 			if (LOG.isTraceEnabled()) {
-				LOG.trace("There are still {} incomplete sites reconciliation(s)", incompleteSites.size());
+				LOG.trace("There is still {} incomplete sites reconciliation(s)", incompleteSites.size());
 			}
 		}
 	}
