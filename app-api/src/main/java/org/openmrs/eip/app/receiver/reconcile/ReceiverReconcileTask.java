@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.receiver.reconcile;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
@@ -36,7 +37,8 @@ public class ReceiverReconcileTask extends BaseReceiverSyncPrioritizingTask<Rece
 	
 	@Override
 	public List<ReceiverReconciliation> getNextBatch() {
-		return List.of(repo.getReconciliation());
+		ReceiverReconciliation rec = repo.getReconciliation();
+		return rec == null ? Collections.emptyList() : List.of(rec);
 	}
 	
 }

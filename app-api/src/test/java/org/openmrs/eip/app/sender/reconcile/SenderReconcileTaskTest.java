@@ -48,6 +48,16 @@ public class SenderReconcileTaskTest {
 	}
 	
 	@Test
+	public void getNextBatch_shouldReturnEmptyListIfNoReconciliationExists() {
+		setInternalState(task, SenderReconcileRepository.class, mockRepo);
+		
+		List<SenderReconciliation> reconciliations = task.getNextBatch();
+		
+		Assert.assertTrue(reconciliations.isEmpty());
+		verify(mockRepo).getReconciliation();
+	}
+	
+	@Test
 	public void doRun_shouldRunAndReturnFalse() throws Exception {
 		task = Mockito.spy(task);
 		doNothing().when(task).invokeSuper();

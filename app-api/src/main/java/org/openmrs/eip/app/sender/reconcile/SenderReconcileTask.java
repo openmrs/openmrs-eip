@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.sender.reconcile;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.openmrs.eip.app.BaseDelegatingQueueTask;
@@ -36,7 +37,8 @@ public class SenderReconcileTask extends BaseDelegatingQueueTask<SenderReconcili
 	
 	@Override
 	public List<SenderReconciliation> getNextBatch() {
-		return List.of(repo.getReconciliation());
+		SenderReconciliation rec = repo.getReconciliation();
+		return rec == null ? Collections.emptyList() : List.of(rec);
 	}
 	
 }

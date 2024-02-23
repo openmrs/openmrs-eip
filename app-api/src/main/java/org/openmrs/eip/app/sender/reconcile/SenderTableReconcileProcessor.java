@@ -21,6 +21,7 @@ import org.openmrs.eip.app.sender.SenderUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -95,7 +96,7 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		boolean lastBatch;
 		if (batch.isEmpty()) {
 			if (LOG.isDebugEnabled()) {
-				LOG.debug("No more rows to reconcile");
+				LOG.debug("No more rows to reconcile in table: {}", table);
 			}
 			
 			lastBatch = true;
@@ -113,8 +114,9 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		response.setData(StringUtils.join(uuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
 		response.setBatchSize(uuids.size());
 		response.setLastTableBatch(lastBatch);
+		final String json = JsonUtils.marshall(response);
 		//TODO First compress payload if necessary
-		jmsTemplate.convertAndSend(SenderUtils.getQueueName(), response);
+		jmsTemplate.convertAndSend(SenderUtils.getQueueName(), json);
 		
 		if (LOG.isTraceEnabled()) {
 			LOG.debug("Updating last processed id of table {} to {}", table, lastId);
