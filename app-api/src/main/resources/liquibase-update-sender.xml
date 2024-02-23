@@ -38,6 +38,9 @@
             <column name="identifier" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="batch_size" type="INT">
+                <constraints nullable="false"/>
+            </column>
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>

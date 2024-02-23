@@ -26,6 +26,11 @@ public class SenderReconciliation extends AbstractEntity {
 	@Setter
 	private String identifier;
 	
+	@Column(name = "batch_size", nullable = false)
+	@Getter
+	@Setter
+	private int batchSize;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
 	@Getter

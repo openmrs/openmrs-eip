@@ -3,8 +3,6 @@ package org.openmrs.eip.app.sender.reconcile;
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 import static org.openmrs.eip.app.SyncConstants.DEFAULT_LARGE_MSG_SIZE;
 import static org.openmrs.eip.app.SyncConstants.PROP_LARGE_MSG_SIZE;
-import static org.openmrs.eip.app.SyncConstants.PROP_RECONCILE_MSG_BATCH_SIZE;
-import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_BATCH_SIZE;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
+import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
@@ -49,14 +48,10 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 	
 	private JmsTemplate jmsTemplate;
 	
-	private Pageable page;
-	
 	public SenderTableReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    @Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}") int batchSize,
 	    SenderTableReconcileRepository tableReconcileRepo, SenderReconcileRepository reconcileRepo,
 	    JmsTemplate jmsTemplate) {
 		super(executor);
-		this.page = Pageable.ofSize(batchSize);
 		this.tableReconcileRepo = tableReconcileRepo;
 		this.reconcileRepo = reconcileRepo;
 		this.jmsTemplate = jmsTemplate;
@@ -80,10 +75,12 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 	@Override
 	public void processItem(SenderTableReconciliation rec) {
 		OpenmrsRepository<?> repo = SyncContext.getRepositoryBean(rec.getTableName());
+		SenderReconciliation senderRec = reconcileRepo.getReconciliation();
+		final Pageable page = Pageable.ofSize(senderRec.getBatchSize());
 		List<Object[]> batch = repo.getIdAndUuidBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
 		final String table = rec.getTableName();
 		ReconciliationResponse response = new ReconciliationResponse();
-		response.setIdentifier(reconcileRepo.getReconciliation().getIdentifier());
+		response.setIdentifier(senderRec.getIdentifier());
 		response.setTableName(table);
 		if (!rec.isStarted()) {
 			//This is the first table payload to send

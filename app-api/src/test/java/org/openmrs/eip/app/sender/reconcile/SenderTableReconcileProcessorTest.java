@@ -67,7 +67,8 @@ public class SenderTableReconcileProcessorTest {
 		PowerMockito.mockStatic(SyncContext.class, SenderUtils.class);
 		when(SenderUtils.getQueueName()).thenReturn(QUEUE_NAME);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SenderTableReconcileProcessor(null, BATCH_SIZE, mockTableRecRepo, mockRecRepo, mockJmsTemplate);
+		processor = new SenderTableReconcileProcessor(null, mockTableRecRepo, mockRecRepo, mockJmsTemplate);
+		when(mockReconciliation.getBatchSize()).thenReturn(BATCH_SIZE);
 		when(mockRecRepo.getReconciliation()).thenReturn(mockReconciliation);
 		when(mockReconciliation.getIdentifier()).thenReturn(RECONCILIATION_ID);
 	}
