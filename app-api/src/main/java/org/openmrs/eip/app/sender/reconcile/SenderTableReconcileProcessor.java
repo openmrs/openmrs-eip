@@ -80,7 +80,7 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 	@Override
 	public void processItem(SenderTableReconciliation rec) {
 		OpenmrsRepository<?> repo = SyncContext.getRepositoryBean(rec.getTableName());
-		List<Object[]> batch = repo.getUuidAndIdBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
+		List<Object[]> batch = repo.getIdAndUuidBatchToReconcile(rec.getLastProcessedId(), rec.getEndId(), page);
 		final String table = rec.getTableName();
 		ReconciliationResponse response = new ReconciliationResponse();
 		response.setIdentifier(reconcileRepo.getReconciliation().getIdentifier());
@@ -91,7 +91,7 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 			response.setRowCount(rec.getRowCount());
 		}
 		
-		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
+		List<String> uuids = batch.stream().map(entry -> entry[1].toString()).collect(Collectors.toList());
 		Long lastId;
 		boolean lastBatch;
 		if (batch.isEmpty()) {
@@ -102,8 +102,9 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 			lastBatch = true;
 			lastId = rec.getEndId();
 		} else {
-			Long firstId = (Long) batch.get(0)[1];
-			lastId = (Long) batch.get(batch.size() - 1)[1];
+			List<Long> ids = batch.stream().map(entry -> (Long) entry[0]).collect(Collectors.toList());
+			Long firstId = ids.get(0);
+			lastId = ids.get(ids.size() - 1);
 			lastBatch = lastId == rec.getEndId();
 			if (LOG.isTraceEnabled()) {
 				LOG.debug("Sending reconcile batch of {} rows in table {}, with ids from {} up to {}", uuids.size(), table,

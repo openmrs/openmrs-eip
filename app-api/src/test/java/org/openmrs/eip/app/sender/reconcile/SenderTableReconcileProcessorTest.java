@@ -125,12 +125,12 @@ public class SenderTableReconcileProcessorTest {
 		when(SyncContext.getRepositoryBean(table)).thenReturn(mockOpenmrsRepo);
 		Pageable page = Pageable.ofSize(BATCH_SIZE);
 		List<Object[]> batch = new ArrayList<>();
-		batch.add(new Object[] { "uuid-11", 11L });
-		batch.add(new Object[] { "uuid-12", 12L });
-		batch.add(new Object[] { "uuid-13", 13L });
-		batch.add(new Object[] { "uuid-14", 14L });
-		batch.add(new Object[] { "uuid-15", 15L });
-		when(mockOpenmrsRepo.getUuidAndIdBatchToReconcile(lastProcId, endId, page)).thenReturn(batch);
+		batch.add(new Object[] { 11L, "uuid-11" });
+		batch.add(new Object[] { 12L, "uuid-12" });
+		batch.add(new Object[] { 13L, "uuid-13" });
+		batch.add(new Object[] { 14L, "uuid-14" });
+		batch.add(new Object[] { 15L, "uuid-15" });
+		when(mockOpenmrsRepo.getIdAndUuidBatchToReconcile(lastProcId, endId, page)).thenReturn(batch);
 		
 		processor.processItem(rec);
 		
@@ -140,7 +140,7 @@ public class SenderTableReconcileProcessorTest {
 		expectedResp.setIdentifier(RECONCILIATION_ID);
 		expectedResp.setTableName(table);
 		expectedResp.setBatchSize(batch.size());
-		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
+		List<String> uuids = batch.stream().map(entry -> entry[1].toString()).collect(Collectors.toList());
 		expectedResp.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
 		Mockito.verify(mockJmsTemplate).convertAndSend(QUEUE_NAME, JsonUtils.marshall(expectedResp));
 	}
@@ -155,12 +155,12 @@ public class SenderTableReconcileProcessorTest {
 		when(SyncContext.getRepositoryBean(table)).thenReturn(mockOpenmrsRepo);
 		Pageable page = Pageable.ofSize(BATCH_SIZE);
 		List<Object[]> batch = new ArrayList<>();
-		batch.add(new Object[] { "uuid-11", 11L });
-		batch.add(new Object[] { "uuid-12", 12L });
-		batch.add(new Object[] { "uuid-13", 13L });
-		batch.add(new Object[] { "uuid-14", 14L });
-		batch.add(new Object[] { "uuid-15", 15L });
-		when(mockOpenmrsRepo.getUuidAndIdBatchToReconcile(lastProcId, endId, page)).thenReturn(batch);
+		batch.add(new Object[] { 11L, "uuid-11" });
+		batch.add(new Object[] { 12L, "uuid-12" });
+		batch.add(new Object[] { 13L, "uuid-13" });
+		batch.add(new Object[] { 14L, "uuid-14" });
+		batch.add(new Object[] { 15L, "uuid-15" });
+		when(mockOpenmrsRepo.getIdAndUuidBatchToReconcile(lastProcId, endId, page)).thenReturn(batch);
 		
 		processor.processItem(rec);
 		
@@ -171,7 +171,7 @@ public class SenderTableReconcileProcessorTest {
 		expectedResp.setTableName(table);
 		expectedResp.setBatchSize(batch.size());
 		expectedResp.setLastTableBatch(true);
-		List<String> uuids = batch.stream().map(entry -> entry[0].toString()).collect(Collectors.toList());
+		List<String> uuids = batch.stream().map(entry -> entry[1].toString()).collect(Collectors.toList());
 		expectedResp.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
 		Mockito.verify(mockJmsTemplate).convertAndSend(QUEUE_NAME, JsonUtils.marshall(expectedResp));
 	}

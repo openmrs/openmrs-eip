@@ -67,18 +67,18 @@ public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void getUuidAndIdBatchToReconcile_shouldGetTheBatchOfUuidsAndIdsMatchingTheSpecifiedRange() {
-		List<Object[]> uuidsAndIds = attribRepo.getUuidAndIdBatchToReconcile(1L, 3L, Pageable.ofSize(5));
+	public void getIdAndUuidBatchToReconcile_shouldGetTheBatchOfIdAndUuidMapsMatchingTheSpecifiedRange() {
+		List<Object[]> uuidsAndIds = attribRepo.getIdAndUuidBatchToReconcile(1L, 3L, Pageable.ofSize(5));
 		assertEquals(2, uuidsAndIds.size());
-		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[0]);
-		assertEquals(2L, uuidsAndIds.get(0)[1]);
-		assertEquals("3efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(1)[0]);
-		assertEquals(3L, uuidsAndIds.get(1)[1]);
+		assertEquals(2L, uuidsAndIds.get(0)[0]);
+		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[1]);
+		assertEquals(3L, uuidsAndIds.get(1)[0]);
+		assertEquals("3efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(1)[1]);
 		
-		uuidsAndIds = attribRepo.getUuidAndIdBatchToReconcile(1L, 3L, Pageable.ofSize(1));
+		uuidsAndIds = attribRepo.getIdAndUuidBatchToReconcile(1L, 3L, Pageable.ofSize(1));
 		assertEquals(1, uuidsAndIds.size());
-		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[0]);
-		assertEquals(2L, uuidsAndIds.get(0)[1]);
+		assertEquals(2L, uuidsAndIds.get(0)[0]);
+		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[1]);
 	}
 	
 }
