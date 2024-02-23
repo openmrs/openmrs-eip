@@ -16,7 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "mgt_table_reconciliation")
-public class TableReconciliation extends AbstractEntity {
+public class ReceiverTableReconciliation extends AbstractEntity {
 	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "site_reconciliation_id", nullable = false, updatable = false)

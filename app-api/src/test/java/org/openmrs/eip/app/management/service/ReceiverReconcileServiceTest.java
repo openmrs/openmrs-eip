@@ -24,13 +24,13 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.Receiv
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	private SiteReconciliationRepository siteRecRepo;
 	
 	@Autowired
-	private TableReconciliationRepository tableRecRepo;
+	private ReceiverTableReconcileRepository tableRecRepo;
 	
 	@Test
 	public void processJmsMessage_shouldProcessAndSaveAReconcileMessage() {
@@ -138,9 +138,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		service.processJmsMessage(jmsMsg);
 		
 		assertEquals(1, reconcileMsgRep.count());
-		List<TableReconciliation> tableRecs = tableRecRepo.findAll();
+		List<ReceiverTableReconciliation> tableRecs = tableRecRepo.findAll();
 		assertEquals(1, tableRecs.size());
-		TableReconciliation tableRec = tableRecs.get(0);
+		ReceiverTableReconciliation tableRec = tableRecs.get(0);
 		assertEquals(siteRec, tableRec.getSiteReconciliation());
 		assertEquals(table, tableRec.getTableName());
 		assertEquals(rowCount, tableRec.getRowCount());
@@ -155,14 +155,14 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-	        "classpath:mgt_table_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldProcessFoundUuidsAndUpdateTheProcessedCount() {
 		final String table = "person";
 		final SiteInfo site = siteRepo.getReferenceById(1L);
 		SiteReconciliation siteRec = siteRecRepo.getBySite(site);
 		final String uuid1 = "uuid-1";
 		final String uuid2 = "uuid-2";
-		TableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
+		ReceiverTableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertFalse(tableRec.isCompleted());
 		assertFalse(tableRec.isLastBatchReceived());
 		assertNull(tableRec.getDateChanged());
@@ -191,12 +191,12 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-	        "classpath:mgt_table_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldMarkTableReconciliationAsCompleted() {
 		final String table = "person";
 		final SiteInfo site = siteRepo.getReferenceById(1L);
 		SiteReconciliation siteRec = siteRecRepo.getBySite(site);
-		TableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
+		ReceiverTableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertFalse(tableRec.isCompleted());
 		assertFalse(tableRec.isLastBatchReceived());
 		assertNull(tableRec.getDateChanged());
@@ -225,7 +225,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-	        "classpath:mgt_table_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldRequestForNotFoundUuidsAndUpdateTheProcessedCount() {
 		assertEquals(0, requestRepo.count());
 		final String uuid1 = "uuid-1";

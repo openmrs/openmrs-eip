@@ -15,13 +15,13 @@ import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -48,7 +48,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private SiteReconciliationRepository siteReconcileRepo;
 	
-	private TableReconciliationRepository tableReconcileRepo;
+	private ReceiverTableReconcileRepository tableReconcileRepo;
 	
 	private JmsTemplate jmsTemplate;
 	
@@ -57,7 +57,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
-	    TableReconciliationRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
+	    ReceiverTableReconcileRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
@@ -115,7 +115,8 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		for (SiteInfo site : sites) {
 			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
 			List<String> incompleteTables = AppUtils.getTablesToSync().stream().filter(table -> {
-				TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec, table);
+				ReceiverTableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
+				    table);
 				return tableRec == null || !tableRec.isCompleted();
 			}).toList();
 			

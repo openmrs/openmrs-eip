@@ -11,17 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-public class TableReconciliationRepositoryTest extends BaseReceiverTest {
+public class ReceiverTableReconcileRepositoryTest extends BaseReceiverTest {
 	
 	@Autowired
-	private TableReconciliationRepository repo;
+	private ReceiverTableReconcileRepository repo;
 	
 	@Autowired
 	private SiteReconciliationRepository siteRecRepo;
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-	        "classpath:mgt_table_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getBySiteReconciliationAndTableName_shouldGetTheReconciliationForTheSite() {
 		SiteReconciliation siteRec = siteRecRepo.getReferenceById(2L);
 		Assert.assertEquals(2L, repo.getBySiteReconciliationAndTableName(siteRec, "person").getId().longValue());

@@ -27,11 +27,11 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -56,7 +56,7 @@ public class ReceiverReconcileProcessorTest {
 	private SiteReconciliationRepository mockSiteRecRepo;
 	
 	@Mock
-	private TableReconciliationRepository mockTableRecRepo;
+	private ReceiverTableReconcileRepository mockTableRecRepo;
 	
 	@Mock
 	private JmsTemplate mockJmsTemplate;
@@ -134,7 +134,7 @@ public class ReceiverReconcileProcessorTest {
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
-		TableReconciliation mockTableRec = Mockito.mock(TableReconciliation.class);
+		ReceiverTableReconciliation mockTableRec = Mockito.mock(ReceiverTableReconciliation.class);
 		when(mockTableRec.isCompleted()).thenReturn(true);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), anyString())).thenReturn(mockTableRec);
@@ -165,9 +165,9 @@ public class ReceiverReconcileProcessorTest {
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
-		TableReconciliation mockTableRec1 = Mockito.mock(TableReconciliation.class);
+		ReceiverTableReconciliation mockTableRec1 = Mockito.mock(ReceiverTableReconciliation.class);
 		when(mockTableRec1.isCompleted()).thenReturn(true);
-		TableReconciliation mockTableRec2 = Mockito.mock(TableReconciliation.class);
+		ReceiverTableReconciliation mockTableRec2 = Mockito.mock(ReceiverTableReconciliation.class);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec1);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), anyString())).thenReturn(mockTableRec2);
 		long timestamp = System.currentTimeMillis();
@@ -196,7 +196,7 @@ public class ReceiverReconcileProcessorTest {
 		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
 		when(mockSiteRecRepo.getBySite(mockSite1)).thenReturn(siteRec1);
 		when(mockSiteRecRepo.getBySite(mockSite2)).thenReturn(siteRec2);
-		TableReconciliation mockTableRec1 = Mockito.mock(TableReconciliation.class);
+		ReceiverTableReconciliation mockTableRec1 = Mockito.mock(ReceiverTableReconciliation.class);
 		when(mockTableRec1.isCompleted()).thenReturn(true);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec1);
 		long timestamp = System.currentTimeMillis();

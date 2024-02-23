@@ -10,16 +10,16 @@ import java.util.UUID;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.TableReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.TableReconciliationRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
@@ -46,11 +46,11 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	
 	private SiteReconciliationRepository siteReconcileRepo;
 	
-	private TableReconciliationRepository tableReconcileRepo;
+	private ReceiverTableReconcileRepository tableReconcileRepo;
 	
 	public ReceiverReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
-	    SiteReconciliationRepository siteReconcileRepo, TableReconciliationRepository tableReconcileRepo) {
+	    SiteReconciliationRepository siteReconcileRepo, ReceiverTableReconcileRepository tableReconcileRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
@@ -85,7 +85,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			}
 			
 			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
-			TableReconciliation tableRec = new TableReconciliation();
+			ReceiverTableReconciliation tableRec = new ReceiverTableReconciliation();
 			tableRec.setSiteReconciliation(siteRec);
 			tableRec.setTableName(table);
 			tableRec.setRowCount(resp.getRowCount());
@@ -140,7 +140,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	 */
 	private void updateTableReconciliation(ReconciliationMessage message, int processedUuidCount) {
 		SiteReconciliation siteRec = siteReconcileRepo.getBySite(message.getSite());
-		TableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
+		ReceiverTableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
 		    message.getTableName());
 		tableRec.setProcessedCount(tableRec.getProcessedCount() + processedUuidCount);
 		if (message.isLastTableBatch()) {
