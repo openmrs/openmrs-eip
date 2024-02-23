@@ -95,7 +95,7 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 		}
 		
 		tableReconciliations.forEach(tableRec -> tableReconcileRepo.save(tableRec));
-        reconciliation.setStatus(SenderReconcileStatus.PROCESSING);
+		reconciliation.setStatus(SenderReconcileStatus.PROCESSING);
 		reconcileRepo.save(reconciliation);
 	}
 	

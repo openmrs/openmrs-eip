@@ -64,6 +64,10 @@ public class SyncConstants {
 	
 	public static final String PROP_DELAY_MSG_RECONCILER = "reconcile.msg.delay";
 	
+	public static final String PROP_INITIAL_DELAY_TABLE_RECONCILER = "reconcile.table.initial.delay";
+	
+	public static final String PROP_DELAY_TABLE_RECONCILER = "reconcile.table.delay";
+	
 	public static final String SYNC_BATCH_PROP_SIZE = "batchSize";
 	
 	public static final String PROP_LARGE_MSG_SIZE = "jms.large.msg.size";

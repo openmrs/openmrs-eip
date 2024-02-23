@@ -1,7 +1,10 @@
 package org.openmrs.eip.app.sender;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.getInternalState;
@@ -10,6 +13,7 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +23,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
+import org.openmrs.eip.app.sender.reconcile.SenderReconcileTask;
+import org.openmrs.eip.app.sender.reconcile.SenderTableReconcileTask;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.utils.FileUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -44,19 +50,33 @@ public class SenderCamelListenerTest {
 	
 	private SenderCamelListener listener;
 	
+	private long testInitialDelay = 2;
+	
+	private long testDelay = 3;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(AppUtils.class);
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(FileUtils.class);
 		listener = new SenderCamelListener(mockExecutor, mockSyncExecutor);
+		setInternalState(listener, "initDelayReconciler", testInitialDelay);
+		setInternalState(listener, "delayReconciler", testDelay);
+		setInternalState(listener, "initDelayTblReconciler", testInitialDelay);
+		setInternalState(listener, "delayTblReconciler", testDelay);
 	}
 	
 	@Test
-	public void applicationStarted_shouldNotStartTheBinlogTaskIfNotEnabled() throws Exception {
+	public void applicationStarted_shouldStartTasksExceptTheDisableOnes() throws Exception {
 		listener.applicationStarted();
-		
-		Mockito.verifyNoInteractions(mockExecutor);
+		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SenderReconcileTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SenderTableReconcileTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		Mockito.verify(mockExecutor, never()).scheduleWithFixedDelay(any(BinlogPurgingTask.class), anyLong(), anyLong(),
+		    any(TimeUnit.class));
+		Mockito.verify(mockExecutor, never()).scheduleWithFixedDelay(any(SenderArchivePruningTask.class), anyLong(),
+		    anyLong(), any(TimeUnit.class));
 	}
 	
 	@Test
