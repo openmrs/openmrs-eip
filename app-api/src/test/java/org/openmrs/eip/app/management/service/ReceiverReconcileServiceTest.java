@@ -21,16 +21,16 @@ import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.ReceiverRequestStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,28 +40,28 @@ import org.springframework.test.context.jdbc.SqlConfig;
 @Sql(scripts = {
         "classpath:mgt_site_info.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 public class ReceiverReconcileServiceTest extends BaseReceiverTest {
-	
+
 	@Autowired
 	private ReceiverReconcileService service;
-	
+
 	@Autowired
 	private ReconciliationMsgRepository reconcileMsgRep;
-	
+
 	@Autowired
 	private JmsMessageRepository jmsMsgRepo;
-	
+
 	@Autowired
 	private SiteRepository siteRepo;
-	
+
 	@Autowired
 	private ReceiverSyncRequestRepository requestRepo;
-	
+
 	@Autowired
 	private SiteReconciliationRepository siteRecRepo;
-	
+
 	@Autowired
 	private ReceiverTableReconcileRepository tableRecRepo;
-	
+
 	@Test
 	public void processJmsMessage_shouldProcessAndSaveAReconcileMessage() {
 		assertEquals(0, reconcileMsgRep.count());
@@ -85,9 +85,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
 		Long timestamp = System.currentTimeMillis();
-		
+
 		service.processJmsMessage(jmsMsg);
-		
+
 		List<ReconciliationMessage> msgs = reconcileMsgRep.findAll();
 		assertEquals(1, msgs.size());
 		ReconciliationMessage msg = msgs.get(0);
@@ -101,7 +101,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(0, tableRecRepo.count());
 		assertEquals(0, jmsMsgRepo.count());
 	}
-	
+
 	@Test
 	public void processJmsMessage_shouldAddTableReconciliationForTheFirstReconcileMessage() {
 		assertEquals(0, reconcileMsgRep.count());
@@ -134,9 +134,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		siteRecRepo.save(siteRec);
 		assertEquals(1, siteRecRepo.count());
 		Long timestamp = System.currentTimeMillis();
-		
+
 		service.processJmsMessage(jmsMsg);
-		
+
 		assertEquals(1, reconcileMsgRep.count());
 		List<ReceiverTableReconciliation> tableRecs = tableRecRepo.findAll();
 		assertEquals(1, tableRecs.size());
@@ -152,7 +152,58 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertTrue(tableRec.getDateCreated().getTime() == timestamp || tableRec.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
 	}
-	
+
+	@Test
+	public void processJmsMessage_shouldAddTableReconciliationForTheFirstReconcileMessageForAnEmptyTable() {
+		assertEquals(0, reconcileMsgRep.count());
+		assertEquals(0, tableRecRepo.count());
+		final String table = "person";
+		final String data = "person-uuid-1,person-uuid-2";
+		final int batchSize = 10;
+		final boolean last = true;
+		final long rowCount = 0;
+		final LocalDateTime remoteStartDate = LocalDateTime.now();
+		ReconciliationResponse resp = new ReconciliationResponse();
+		resp.setTableName(table);
+		resp.setBatchSize(batchSize);
+		resp.setData(data);
+		resp.setLastTableBatch(last);
+		resp.setRowCount(rowCount);
+		resp.setRemoteStartDate(remoteStartDate);
+		String payLoad = JsonUtils.marshall(resp);
+		JmsMessage jmsMsg = new JmsMessage();
+		SiteInfo site = siteRepo.getReferenceById(1L);
+		jmsMsg.setSiteId(site.getIdentifier());
+		jmsMsg.setType(JmsMessage.MessageType.SYNC);
+		jmsMsg.setBody(payLoad.getBytes(UTF_8));
+		jmsMsg.setDateCreated(new Date());
+		jmsMsgRepo.save(jmsMsg);
+		assertEquals(1, jmsMsgRepo.count());
+		SiteReconciliation siteRec = new SiteReconciliation();
+		siteRec.setSite(site);
+		siteRec.setDateCreated(new Date());
+		siteRecRepo.save(siteRec);
+		assertEquals(1, siteRecRepo.count());
+		Long timestamp = System.currentTimeMillis();
+
+		service.processJmsMessage(jmsMsg);
+
+		assertEquals(1, reconcileMsgRep.count());
+		List<ReceiverTableReconciliation> tableRecs = tableRecRepo.findAll();
+		assertEquals(1, tableRecs.size());
+		ReceiverTableReconciliation tableRec = tableRecs.get(0);
+		assertEquals(siteRec, tableRec.getSiteReconciliation());
+		assertEquals(table, tableRec.getTableName());
+		assertEquals(rowCount, tableRec.getRowCount());
+		assertEquals(remoteStartDate, tableRec.getRemoteStartDate());
+		assertTrue(tableRec.isLastBatchReceived());
+		assertEquals(0, tableRec.getProcessedCount());
+		assertTrue(tableRec.isCompleted());
+		assertNull(tableRec.getDateChanged());
+		assertTrue(tableRec.getDateCreated().getTime() == timestamp || tableRec.getDateCreated().getTime() > timestamp);
+		assertEquals(0, jmsMsgRepo.count());
+	}
+
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -177,9 +228,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		reconcileMsgRep.save(msg);
 		assertEquals(0, msg.getProcessedCount());
 		long timestamp = System.currentTimeMillis();
-		
+
 		service.updateReconciliationMessage(msg, true, List.of(uuid1, uuid2));
-		
+
 		assertEquals(2, msg.getProcessedCount());
 		tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertFalse(tableRec.isCompleted());
@@ -188,7 +239,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		long dateChangedMillis = tableRec.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
 	}
-	
+
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -212,9 +263,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		msg.setDateCreated(new Date());
 		reconcileMsgRep.save(msg);
 		long timestamp = System.currentTimeMillis();
-		
+
 		service.updateReconciliationMessage(msg, true, uuids);
-		
+
 		tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertEquals(originalProcessedCount + batchSize, tableRec.getProcessedCount());
 		assertTrue(tableRec.isCompleted());
@@ -222,7 +273,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		long dateChangedMillis = tableRec.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
 	}
-	
+
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
@@ -241,9 +292,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		reconcileMsgRep.save(msg);
 		assertEquals(0, msg.getProcessedCount());
 		long timestamp = System.currentTimeMillis();
-		
+
 		service.updateReconciliationMessage(msg, false, List.of(uuid1, uuid2));
-		
+
 		assertEquals(2, msg.getProcessedCount());
 		List<ReceiverSyncRequest> requests = requestRepo.findAll();
 		assertEquals(2, requests.size());
@@ -257,5 +308,5 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 			assertTrue(r.getDateCreated().getTime() == timestamp || r.getDateCreated().getTime() > timestamp);
 		}
 	}
-	
+
 }

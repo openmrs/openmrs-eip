@@ -92,6 +92,10 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			tableRec.setRemoteStartDate(resp.getRemoteStartDate());
 			tableRec.setLastBatchReceived(resp.isLastTableBatch());
 			tableRec.setDateCreated(new Date());
+			if (tableRec.getRowCount() == 0) {
+				tableRec.setCompleted(true);
+			}
+			
 			if (LOG.isTraceEnabled()) {
 				LOG.debug("Saving table reconciliation");
 			}

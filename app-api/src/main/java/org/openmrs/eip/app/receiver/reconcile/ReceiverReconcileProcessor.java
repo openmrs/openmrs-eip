@@ -147,7 +147,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 			reconcileRepo.save(reconciliation);
 		} else {
 			if (LOG.isTraceEnabled()) {
-				LOG.trace("There is still {} incomplete sites reconciliation(s)", incompleteSites.size());
+				LOG.trace("There is still {} incomplete site reconciliation(s)", incompleteSites.size());
 			}
 		}
 	}

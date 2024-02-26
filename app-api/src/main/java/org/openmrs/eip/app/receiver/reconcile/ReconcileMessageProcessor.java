@@ -7,6 +7,7 @@ import static org.openmrs.eip.app.SyncConstants.PROP_MIN_BATCH_RECONCILE_SIZE;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
@@ -87,9 +88,10 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	public void processItem(ReconciliationMessage msg) {
 		String[] uuids = StringUtils.split(msg.getData().trim(), SyncConstants.RECONCILE_MSG_SEPARATOR);
 		if (uuids.length != msg.getBatchSize()) {
-			throw new EIPException("Batch size and item count do not for the reconciliation message");
+			throw new EIPException("Batch size and item count don't match for the reconciliation message");
 		}
 		
+		List<String> allUuids = Arrays.stream(uuids).collect(Collectors.toUnmodifiableList());
 		//Pick up from where we left off
 		if (msg.getProcessedCount() > 0) {
 			uuids = Arrays.copyOfRange(uuids, msg.getProcessedCount(), uuids.length);
@@ -97,7 +99,7 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 		
 		OpenmrsRepository repo = SyncContext.getRepositoryBean(msg.getTableName());
 		List<String> uuidList = Arrays.stream(uuids).toList();
-		reconcile(uuidList, uuidList, msg, repo);
+		reconcile(uuidList, allUuids, msg, repo);
 	}
 	
 	private void reconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg, OpenmrsRepository repo) {
@@ -108,8 +110,8 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 		}
 		
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
-			    allUuids.indexOf(uuids.get(size - 1)));
+			LOG.trace("Reconciling batch of {} items from index {} to {} in table {}", size, allUuids.indexOf(uuids.get(0)),
+			    allUuids.indexOf(uuids.get(size - 1)), msg.getTableName());
 		}
 		
 		final int matchCount = repo.countByUuidIn(uuids);
