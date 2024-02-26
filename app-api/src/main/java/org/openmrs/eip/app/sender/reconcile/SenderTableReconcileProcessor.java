@@ -16,6 +16,7 @@ import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
+import org.openmrs.eip.app.sender.SenderConstants;
 import org.openmrs.eip.app.sender.SenderUtils;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -41,6 +42,9 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 	
 	@Value("${" + PROP_LARGE_MSG_SIZE + ":" + DEFAULT_LARGE_MSG_SIZE + "}")
 	private int largeMsgSize;
+	
+	@Value("${" + SenderConstants.PROP_SENDER_ID + "}")
+	private String siteId;
 	
 	private SenderTableReconcileRepository tableReconcileRepo;
 	
@@ -113,8 +117,7 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		response.setBatchSize(uuids.size());
 		response.setLastTableBatch(lastBatch);
 		final String json = JsonUtils.marshall(response);
-		//TODO First compress payload if necessary
-		jmsTemplate.convertAndSend(SenderUtils.getQueueName(), json);
+		jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
 		
 		if (LOG.isTraceEnabled()) {
 			LOG.debug("Updating last processed id of table {} to {}", table, lastId);

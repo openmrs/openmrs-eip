@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Profile(SyncProfiles.RECEIVER)
 public class ReconcileMessageProcessor extends BaseQueueProcessor<ReconciliationMessage> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(ReconcileMessageProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReconcileMessageProcessor.class);
 	
 	private final static int DEFAULT_MIN_BATCH_RECONCILE_SIZE = 50;
 	
@@ -107,16 +107,17 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 			return;
 		}
 		
-		if (log.isTraceEnabled()) {
-			log.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Reconciling batch of {} items from index {} to {} : ", size, allUuids.indexOf(uuids.get(0)),
 			    allUuids.indexOf(uuids.get(size - 1)));
 		}
 		
 		final int matchCount = repo.countByUuidIn(uuids);
 		if (matchCount == 0 || matchCount == size) {
 			boolean found = matchCount == size;
-			if (log.isTraceEnabled()) {
-				log.trace("Updating reconciliation msg with {} {} uuid(s)", size, (found ? "found" : "missing"));
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Updating reconciliation msg with {} {} uuid(s) in table {}", size, (found ? "found" : "missing"),
+				    msg.getTableName());
 			}
 			
 			//All uuids are missing or existing
@@ -128,8 +129,9 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 		if (size < minReconcileBatchSize) {
 			for (String uuid : uuids) {
 				boolean found = repo.existsByUuid(uuid);
-				if (log.isTraceEnabled()) {
-					log.trace("Updating reconciliation after {} uuid", (found ? "found" : "missing"));
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("Updating reconciliation after {} uuid in table {}", (found ? "found" : "missing"),
+					    msg.getTableName());
 				}
 				
 				service.updateReconciliationMessage(msg, found, List.of(uuid));

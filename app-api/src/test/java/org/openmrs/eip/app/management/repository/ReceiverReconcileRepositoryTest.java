@@ -17,7 +17,7 @@ public class ReceiverReconcileRepositoryTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = {
-            "classpath:mgt_receiver_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_receiver_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getReconciliation_shouldGetTheFirstIncompleteReconciliation() {
 		Assert.assertEquals(2L, repo.getReconciliation().getId().longValue());
 	}

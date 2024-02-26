@@ -155,7 +155,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldProcessFoundUuidsAndUpdateTheProcessedCount() {
 		final String table = "person";
 		final SiteInfo site = siteRepo.getReferenceById(1L);
@@ -191,7 +191,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldMarkTableReconciliationAsCompleted() {
 		final String table = "person";
 		final SiteInfo site = siteRepo.getReferenceById(1L);
@@ -225,7 +225,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
-            "classpath:mgt_receiver_table_reconcile.sql"}, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldRequestForNotFoundUuidsAndUpdateTheProcessedCount() {
 		assertEquals(0, requestRepo.count());
 		final String uuid1 = "uuid-1";
