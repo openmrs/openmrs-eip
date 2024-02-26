@@ -144,7 +144,7 @@
             </column>
             <column name="date_completed" type="DATETIME"/>
         </createTable>
-        <addForeignKeyConstraint constraintName="site_reconciliation_site_fk"
+        <addForeignKeyConstraint constraintName="mgt_site_reconciliation_site_fk"
                                  baseTableName="mgt_site_reconciliation"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
@@ -189,8 +189,8 @@
             <column name="date_changed" type="DATETIME"/>
         </createTable>
         <addUniqueConstraint tableName="mgt_table_reconciliation" columnNames="site_reconciliation_id, table_name"
-                             constraintName="table_site_uk"/>
-        <addForeignKeyConstraint constraintName="table_site_reconciliation_fk"
+                             constraintName="mgt_table_site_uk"/>
+        <addForeignKeyConstraint constraintName="mgt_table_site_reconciliation_fk"
                                  baseTableName="mgt_table_reconciliation"
                                  baseColumnNames="site_reconciliation_id"
                                  referencedTableName="mgt_site_reconciliation"
@@ -230,8 +230,39 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="reconciliation_msg_site_fk"
+        <addForeignKeyConstraint constraintName="mgt_reconciliation_msg_site_fk"
                                  baseTableName="mgt_reconciliation_msg"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240226-1200" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mgt_missing_entity"/>
+            </not>
+        </preConditions>
+        <comment>Adding mgt_missing_entity table</comment>
+        <createTable tableName="mgt_missing_entity">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="site_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="mgt_missing_entity_site_fk"
+                                 baseTableName="mgt_missing_entity"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>

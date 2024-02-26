@@ -25,13 +25,14 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
+import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
+import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
-import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -43,40 +44,43 @@ import org.springframework.jms.core.JmsTemplate;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ReceiverUtils.class)
 public class ReceiverReconcileProcessorTest {
-	
+
 	private static final int BATCH_SIZE = 100;
-	
+
 	@Mock
 	private SiteRepository mockSiteRepo;
-	
+
 	@Mock
 	private ReceiverReconcileRepository mockRecRepo;
-	
+
 	@Mock
 	private SiteReconciliationRepository mockSiteRecRepo;
-	
+
 	@Mock
 	private ReceiverTableReconcileRepository mockTableRecRepo;
-	
+
+	@Mock
+	private MissingEntityRepository missingRepo;
+
 	@Mock
 	private JmsTemplate mockJmsTemplate;
-	
+
 	private ReceiverReconcileProcessor processor;
-	
+
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new ReceiverReconcileProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
-		        mockJmsTemplate);
+		        missingRepo, mockJmsTemplate);
 		Whitebox.setInternalState(processor, "batchSize", BATCH_SIZE);
 	}
-	
+
 	@After
 	public void tearDown() {
 		setInternalState(BaseQueueProcessor.class, "initialized", false);
 	}
-	
+
 	@Test
 	public void processItem_shouldStartTheReconciliation() {
 		final String recIdentifier = "rec-id";
@@ -98,9 +102,9 @@ public class ReceiverReconcileProcessorTest {
 		when(ReceiverUtils.getSiteQueueName(siteIdentifier1)).thenReturn(siteQueue1);
 		when(ReceiverUtils.getSiteQueueName(siteIdentifier2)).thenReturn(siteQueue2);
 		long timestamp = System.currentTimeMillis();
-		
+
 		processor.processItem(rec);
-		
+
 		ReconciliationRequest request1 = new ReconciliationRequest();
 		request1.setIdentifier(rec.getIdentifier());
 		request1.setBatchSize(BATCH_SIZE);
@@ -119,8 +123,9 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(siteRec2.getDateCreated().getTime() == timestamp || siteRec2.getDateCreated().getTime() > timestamp);
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 		verify(mockRecRepo).save(rec);
+		verify(missingRepo).deleteAll();
 	}
-	
+
 	@Test
 	public void processItem_shouldFinaliseReconciliationAfterAllSiteTablesHaveCompleted() {
 		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
@@ -139,9 +144,9 @@ public class ReceiverReconcileProcessorTest {
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), anyString())).thenReturn(mockTableRec);
 		long timestamp = System.currentTimeMillis();
-		
+
 		processor.processItem(rec);
-		
+
 		verify(mockSiteRecRepo).save(siteRec1);
 		verify(mockSiteRecRepo).save(siteRec2);
 		verify(mockRecRepo).save(rec);
@@ -151,7 +156,7 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertEquals(ReconciliationStatus.FINALIZING, rec.getStatus());
 	}
-	
+
 	@Test
 	public void processItem_shouldNotFinaliseReconciliationIfThereAreIncompleteTables() {
 		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
@@ -171,9 +176,9 @@ public class ReceiverReconcileProcessorTest {
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec1);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), anyString())).thenReturn(mockTableRec2);
 		long timestamp = System.currentTimeMillis();
-		
+
 		processor.processItem(rec);
-		
+
 		verify(mockSiteRecRepo).save(siteRec1);
 		verify(mockSiteRecRepo, never()).save(siteRec2);
 		verify(mockRecRepo, never()).save(rec);
@@ -182,7 +187,7 @@ public class ReceiverReconcileProcessorTest {
 		assertNull(siteRec2.getDateCompleted());
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 	}
-	
+
 	@Test
 	public void processItem_shouldNotFinaliseReconciliationIfThereAreMissingTableReconciliations() {
 		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
@@ -200,9 +205,9 @@ public class ReceiverReconcileProcessorTest {
 		when(mockTableRec1.isCompleted()).thenReturn(true);
 		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec1);
 		long timestamp = System.currentTimeMillis();
-		
+
 		processor.processItem(rec);
-		
+
 		verify(mockSiteRecRepo).save(siteRec1);
 		verify(mockSiteRecRepo, never()).save(siteRec2);
 		verify(mockRecRepo, never()).save(rec);
@@ -211,5 +216,5 @@ public class ReceiverReconcileProcessorTest {
 		assertNull(siteRec2.getDateCompleted());
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 	}
-	
+
 }

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.MissingEntity;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest.ReceiverRequestStatus;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
@@ -26,6 +27,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
+import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
@@ -61,6 +63,9 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 
 	@Autowired
 	private ReceiverTableReconcileRepository tableRecRepo;
+
+	@Autowired
+	private MissingEntityRepository missingRepo;
 
 	@Test
 	public void processJmsMessage_shouldProcessAndSaveAReconcileMessage() {
@@ -279,6 +284,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldRequestForNotFoundUuidsAndUpdateTheProcessedCount() {
 		assertEquals(0, requestRepo.count());
+		assertEquals(0, missingRepo.count());
 		final String uuid1 = "uuid-1";
 		final String uuid2 = "uuid-2";
 		final String table = "person";
@@ -296,6 +302,17 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		service.updateReconciliationMessage(msg, false, List.of(uuid1, uuid2));
 
 		assertEquals(2, msg.getProcessedCount());
+		List<MissingEntity> missingEntities = missingRepo.findAll();
+		assertEquals(2, missingEntities.size());
+		List<String> missingUuids = missingEntities.stream().map(r -> r.getIdentifier()).collect(Collectors.toList());
+		assertTrue(missingUuids.contains(uuid1));
+		assertTrue(missingUuids.contains(uuid2));
+		for (MissingEntity m : missingEntities) {
+			assertEquals(site, m.getSite());
+			assertEquals(table, m.getTableName());
+			assertTrue(m.getDateCreated().getTime() == timestamp || m.getDateCreated().getTime() > timestamp);
+		}
+
 		List<ReceiverSyncRequest> requests = requestRepo.findAll();
 		assertEquals(2, requests.size());
 		List<String> entityUuids = requests.stream().map(r -> r.getIdentifier()).collect(Collectors.toList());

@@ -18,6 +18,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.Rec
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
+import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
@@ -39,48 +40,51 @@ import org.springframework.stereotype.Component;
 @Component("receiverReconcileProcessor")
 @Profile(SyncProfiles.RECEIVER)
 public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<ReceiverReconciliation> {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ReceiverReconcileProcessor.class);
-	
+
 	private SiteRepository siteRepo;
-	
+
 	private ReceiverReconcileRepository reconcileRepo;
-	
+
 	private SiteReconciliationRepository siteReconcileRepo;
-	
+
 	private ReceiverTableReconcileRepository tableReconcileRepo;
-	
+
+	private MissingEntityRepository missingRepo;
+
 	private JmsTemplate jmsTemplate;
-	
+
 	@Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}")
 	private int batchSize;
-	
+
 	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
-	    ReceiverTableReconcileRepository tableReconcileRepo, JmsTemplate jmsTemplate) {
+	    ReceiverTableReconcileRepository tableReconcileRepo, MissingEntityRepository missingRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
 		this.siteReconcileRepo = siteReconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
+		this.missingRepo = missingRepo;
 		this.jmsTemplate = jmsTemplate;
 	}
-	
+
 	@Override
 	public String getProcessorName() {
 		return "reconcile";
 	}
-	
+
 	@Override
 	public String getQueueName() {
 		return "reconcile";
 	}
-	
+
 	@Override
 	public String getThreadName(ReceiverReconciliation item) {
 		return item.getId().toString();
 	}
-	
+
 	@Override
 	public void processItem(ReceiverReconciliation reconciliation) {
 		if (reconciliation.getStatus() == ReconciliationStatus.NEW) {
@@ -89,8 +93,9 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 			update(reconciliation);
 		}
 	}
-	
+
 	private void initialize(ReceiverReconciliation reconciliation) {
+		missingRepo.deleteAll();
 		for (SiteInfo site : siteRepo.findAll()) {
 			if (siteReconcileRepo.getBySite(site) == null) {
 				ReconciliationRequest request = new ReconciliationRequest();
@@ -104,11 +109,11 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 				siteReconcileRepo.save(siteRec);
 			}
 		}
-		
+
 		reconciliation.setStatus(ReconciliationStatus.PROCESSING);
 		reconcileRepo.save(reconciliation);
 	}
-	
+
 	private void update(ReceiverReconciliation reconciliation) {
 		List<SiteInfo> sites = siteRepo.findAll();
 		List<SiteInfo> incompleteSites = new ArrayList<>(sites.size());
@@ -119,31 +124,31 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 				    table);
 				return tableRec == null || !tableRec.isCompleted();
 			}).toList();
-			
+
 			if (incompleteTables.isEmpty()) {
 				siteRec.setDateCompleted(LocalDateTime.now());
 				if (LOG.isTraceEnabled()) {
 					LOG.trace("Saving updates to completed site reconciliation");
 				}
-				
+
 				siteReconcileRepo.save(siteRec);
 			} else {
 				if (LOG.isTraceEnabled()) {
 					LOG.trace("Site {} still has {} incomplete table reconciliation(s)", site.getName(),
 					    incompleteTables.size());
 				}
-				
+
 				incompleteSites.add(site);
 			}
 		}
-		
+
 		if (incompleteSites.isEmpty()) {
 			reconciliation.setStatus(ReconciliationStatus.FINALIZING);
 			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Saving updated reconciliation");
 			}
-			
+
 			reconcileRepo.save(reconciliation);
 		} else {
 			if (LOG.isTraceEnabled()) {
@@ -151,5 +156,5 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 			}
 		}
 	}
-	
+
 }
