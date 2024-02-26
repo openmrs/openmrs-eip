@@ -14,23 +14,23 @@ import lombok.Setter;
 @Entity
 @Table(name = "mgt_missing_entity")
 public class MissingEntity extends AbstractEntity {
-
+	
 	@Column(name = "table_name", nullable = false, updatable = false, length = 100)
 	@NotBlank
 	@Getter
 	@Setter
 	private String tableName;
-
+	
 	@NotBlank
 	@Column(nullable = false, updatable = false)
 	@Getter
 	@Setter
 	private String identifier;
-
+	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "site_id", nullable = false, updatable = false)
 	@Getter
 	@Setter
 	private SiteInfo site;
-
+	
 }
