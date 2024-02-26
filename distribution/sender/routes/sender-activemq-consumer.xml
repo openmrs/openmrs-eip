@@ -2,19 +2,24 @@
     <route id="sender-activemq-consumer" errorHandlerRef="shutdownErrorHandler">
         <from uri="{{db-sync.sender.activemq.in}}" />
 
-        <log message="Received message -> ${body}" />
-        
+        <log loggingLevel="DEBUG" message="Received message -> ${body}" />
+
         <setProperty name="requestUuid">
             <jsonpath suppressExceptions="true">$.requestUuid</jsonpath>
         </setProperty>
         <setProperty name="messageUuid">
             <jsonpath suppressExceptions="true">$.messageUuid</jsonpath>
         </setProperty>
-        
+        <setProperty name="${routeId}-reconcileId">
+            <jsonpath suppressExceptions="true">$.identifier</jsonpath>
+        </setProperty>
+        <setProperty name="${routeId}-recBatchSize">
+            <jsonpath suppressExceptions="true">$.batchSize</jsonpath>
+        </setProperty>
+
         <choice>
             <when>
                 <simple>${exchangeProperty.requestUuid} != null</simple>
-                
                 <setProperty name="requestTableName">
                     <jsonpath>$.tableName</jsonpath>
                 </setProperty>
@@ -37,25 +42,22 @@
                 <setBody>
                     <simple>${exchangeProperty.requestToSave}</simple>
                 </setBody>
-        
+
                 <log loggingLevel="DEBUG" message="Saving sync request -> ${body}" />
-        
+
                 <to uri="jpa:SenderSyncRequest" />
-        
+
                 <log loggingLevel="DEBUG" message="Successfully saved sync request" />
             </when>
-            
+
             <when>
                 <simple>${exchangeProperty.messageUuid} != null</simple>
-                
                 <setProperty name="syncResponseModelClass">
                     <spel>#{T(org.openmrs.eip.app.management.entity.SyncResponseModel)}</spel>
                 </setProperty>
-                
                 <setProperty name="syncResponseModel">
                     <method beanType="org.openmrs.eip.component.utils.JsonUtils" method="unmarshal(${body}, ${exchangeProperty.syncResponseModelClass})" />
                 </setProperty>
-                
                 <setBody>
                     <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderSyncResponse()}</spel>
                 </setBody>
@@ -67,14 +69,34 @@
                         #{body.setDateReceivedByReceiver(getProperty('syncResponseModel').dateReceived)}
                     </spel>
                 </script>
-        
+
                 <log loggingLevel="DEBUG" message="Saving sync response -> ${body}" />
-        
+
                 <to uri="jpa:SenderSyncResponse" />
-        
+
                 <log loggingLevel="DEBUG" message="Successfully saved sync response" />
             </when>
-            
+
+            <when>
+                <simple>${exchangeProperty.${routeId}-reconcileId} != null &amp;&amp; ${exchangeProperty.${routeId}-recBatchSize} != null</simple>
+                <setBody>
+                    <spel>#{new org.openmrs.eip.app.management.entity.sender.SenderReconciliation()}</spel>
+                </setBody>
+                <script>
+                    <spel>
+                        #{body.setIdentifier(getProperty('sender-activemq-consumer-reconcileId'))}
+                        #{body.setBatchSize(getProperty('sender-activemq-consumer-recBatchSize'))}
+                        #{body.setDateCreated(new java.util.Date())}
+                    </spel>
+                </script>
+
+                <log loggingLevel="DEBUG" message="Saving reconciliation" />
+
+                <to uri="jpa:SenderReconciliation" />
+
+                <log loggingLevel="DEBUG" message="Successfully saved reconciliation" />
+            </when>
+
             <otherwise>
                 <!-- TODO Log to a special failures log file or DB -->
                 <log message="Unknown message was received: ${body}" loggingLevel="WARN" />
