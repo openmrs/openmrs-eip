@@ -19,6 +19,7 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
 import org.openmrs.eip.app.management.entity.sender.SenderReconciliation.SenderReconcileStatus;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
+import org.openmrs.eip.app.management.repository.DeletedEntityRepository;
 import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
 import org.openmrs.eip.app.management.service.SenderReconcileService;
@@ -27,6 +28,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.springframework.jms.core.JmsTemplate;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(AppUtils.class)
@@ -41,13 +43,20 @@ public class SenderReconcileProcessorTest {
 	@Mock
 	private SenderTableReconcileRepository mockTableRecRepo;
 	
+	@Mock
+	private DeletedEntityRepository deleteEntityRepo;
+	
+	@Mock
+	private JmsTemplate mockJmsTemplate;
+	
 	private SenderReconcileProcessor processor;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(AppUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new SenderReconcileProcessor(null, mockRecRepo, mockTableRecRepo, mockService);
+		processor = new SenderReconcileProcessor(null, mockRecRepo, mockTableRecRepo, deleteEntityRepo, mockService,
+		        mockJmsTemplate);
 	}
 	
 	@After

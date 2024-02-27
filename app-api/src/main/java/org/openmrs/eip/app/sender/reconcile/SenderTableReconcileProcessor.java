@@ -99,13 +99,14 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("No more rows to reconcile in table: {}", table);
 			}
-			
+			//Don't set lastBatch here, it is set in POST_PROCESSING STEP
 			lastBatch = true;
 			lastId = rec.getEndId();
 		} else {
 			List<Long> ids = batch.stream().map(entry -> (Long) entry[0]).collect(Collectors.toList());
 			Long firstId = ids.get(0);
 			lastId = ids.get(ids.size() - 1);
+			//Don't set lastBatch here, it is set in POST_PROCESSING STEP
 			lastBatch = lastId == rec.getEndId();
 			if (LOG.isTraceEnabled()) {
 				LOG.debug("Sending reconcile batch of {} rows in table {}, with ids from {} up to {}", uuids.size(), table,
@@ -117,6 +118,8 @@ public class SenderTableReconcileProcessor extends BasePureParallelQueueProcesso
 		response.setBatchSize(uuids.size());
 		response.setLastTableBatch(lastBatch);
 		final String json = JsonUtils.marshall(response);
+		//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent 
+		//but status not update and uuids are resent
 		jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
 		
 		if (LOG.isTraceEnabled()) {
