@@ -20,14 +20,19 @@ import org.apache.kafka.connect.data.ConnectSchema;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema.Type;
 import org.apache.kafka.connect.data.Struct;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.CustomFileOffsetBackingStore;
+import org.openmrs.eip.app.management.entity.sender.DeletedEntity;
 import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
+import org.openmrs.eip.app.management.repository.DeletedEntityRepository;
 import org.openmrs.eip.component.exception.EIPException;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -43,6 +48,9 @@ public class ChangeEventHandlerTest {
 	private DebeziumEventRepository mockRepository;
 	
 	@Mock
+	private DeletedEntityRepository deletedEntityRepo;
+	
+	@Mock
 	private Logger mockLogger;
 	
 	private ChangeEventHandler handler;
@@ -53,7 +61,7 @@ public class ChangeEventHandlerTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(CustomFileOffsetBackingStore.class);
-		handler = new ChangeEventHandler(mockRepository);
+		handler = new ChangeEventHandler(mockRepository, deletedEntityRepo);
 		Whitebox.setInternalState(ChangeEventHandler.class, Logger.class, mockLogger);
 	}
 	
@@ -219,6 +227,13 @@ public class ChangeEventHandlerTest {
 				throw new RuntimeException(e);
 			}
 		}));
+		
+		ArgumentCaptor<DeletedEntity> deleteArgCaptor = ArgumentCaptor.forClass(DeletedEntity.class);
+		Mockito.verify(deletedEntityRepo).save(deleteArgCaptor.capture());
+		DeletedEntity deletedEntity = deleteArgCaptor.getValue();
+		Assert.assertEquals(tableName, deletedEntity.getTableName());
+		Assert.assertEquals(id, deletedEntity.getPrimaryKeyId());
+		Assert.assertEquals(uuid, deletedEntity.getIdentifier());
 	}
 	
 	@Test

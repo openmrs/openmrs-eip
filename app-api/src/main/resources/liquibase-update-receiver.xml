@@ -240,11 +240,11 @@
     <changeSet author="wluyima" id="20240226-1200" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_missing_entity"/>
+                <tableExists tableName="missing_entity"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_missing_entity table</comment>
-        <createTable tableName="mgt_missing_entity">
+        <comment>Adding missing_entity table</comment>
+        <createTable tableName="missing_entity">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -261,8 +261,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="mgt_missing_entity_site_fk"
-                                 baseTableName="mgt_missing_entity"
+        <addForeignKeyConstraint constraintName="missing_entity_site_fk"
+                                 baseTableName="missing_entity"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>
