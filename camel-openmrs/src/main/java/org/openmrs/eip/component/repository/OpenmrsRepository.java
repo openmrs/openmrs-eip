@@ -54,15 +54,6 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	Long getMaxId();
 	
 	/**
-	 * Gets the count of rows with ids greater than the specified offset id.
-	 *
-	 * @param id offset id
-	 * @return count of rows
-	 */
-	@Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.id > :id")
-	Long getCountWithIdGreaterThan(@Param("id") Long id);
-	
-	/**
 	 * Gets a batch of id and uuid pairs for rows with the ids that match the specified id range.
 	 *
 	 * @param offsetId offset id exclusive

@@ -61,12 +61,6 @@ public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 	}
 	
 	@Test
-	public void getCountWithIdGreaterThan_shouldGetTheCountOfRowsWithIdsGreaterThanSpecifiedId() {
-		assertEquals(3, attribRepo.getCountWithIdGreaterThan(1L).longValue());
-		assertEquals(2, attribRepo.getCountWithIdGreaterThan(2L).longValue());
-	}
-	
-	@Test
 	public void getIdAndUuidBatchToReconcile_shouldGetTheBatchOfIdAndUuidMapsMatchingTheSpecifiedRange() {
 		List<Object[]> uuidsAndIds = attribRepo.getIdAndUuidBatchToReconcile(1L, 3L, Pageable.ofSize(5));
 		assertEquals(2, uuidsAndIds.size());

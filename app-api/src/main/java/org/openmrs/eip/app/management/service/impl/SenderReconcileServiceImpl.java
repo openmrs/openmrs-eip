@@ -57,7 +57,8 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 			tableRec = new SenderTableReconciliation();
 			tableRec.setTableName(table);
 			tableRec.setDateCreated(new Date());
-			tableRec.setLastProcessedId(0);
+		} else {
+			tableRec.setStarted(false);
 		}
 		
 		long count;
@@ -66,17 +67,14 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 			//Table is empty, or all rows were deleted after a previous reconciliation, reset
 			endId = 0L;
 			count = 0;
-			tableRec.setLastProcessedId(0);
 		} else {
-			if (tableRec.getLastProcessedId() == 0) {
-				count = repo.count();
-			} else {
-				count = repo.getCountWithIdGreaterThan(tableRec.getLastProcessedId());
-			}
+			//TODO Get count where id < endId
+			count = repo.count();
 		}
 		
 		tableRec.setRowCount(count);
 		tableRec.setEndId(endId);
+		tableRec.setLastProcessedId(0);
 		tableRec.setSnapshotDate(snapshotDate);
 		
 		if (LOG.isDebugEnabled()) {

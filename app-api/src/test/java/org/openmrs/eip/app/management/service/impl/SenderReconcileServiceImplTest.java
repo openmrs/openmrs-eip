@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.service.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -101,18 +102,20 @@ public class SenderReconcileServiceImplTest {
 		when(AppUtils.getTablesToSync()).thenReturn(Set.of(table));
 		when(SyncContext.getRepositoryBean(table)).thenReturn(mockPersonRepo);
 		SenderTableReconciliation existingRec = new SenderTableReconciliation();
+		existingRec.setStarted(true);
 		existingRec.setLastProcessedId(lastProcessedId);
 		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
 		when(mockPersonRepo.getMaxId()).thenReturn(maxId);
-		when(mockPersonRepo.getCountWithIdGreaterThan(lastProcessedId)).thenReturn(expectedRowCount);
+		when(mockPersonRepo.count()).thenReturn(expectedRowCount);
 		
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
 		
 		assertEquals(1, recs.size());
 		assertEquals(existingRec, recs.get(0));
+		assertFalse(existingRec.isStarted());
 		assertEquals(expectedRowCount, existingRec.getRowCount());
 		assertEquals(maxId, existingRec.getEndId());
-		assertEquals(lastProcessedId, existingRec.getLastProcessedId());
+		assertEquals(0, existingRec.getLastProcessedId());
 	}
 	
 }

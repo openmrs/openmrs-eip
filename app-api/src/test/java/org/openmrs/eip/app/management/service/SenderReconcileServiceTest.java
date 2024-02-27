@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
@@ -69,59 +67,6 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 			long startDateMillis = r.getSnapshotDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			assertTrue(startDateMillis == timestamp || startDateMillis > timestamp);
 			assertTrue(r.getDateCreated().getTime() == timestamp || r.getDateCreated().getTime() > timestamp);
-		});
-	}
-	
-	@Test
-	@Sql(scripts = { "classpath:openmrs_core_data.sql", "classpath:openmrs_patient.sql" })
-	@Sql(scripts = "classpath:mgt_sender_reconciliation.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void takeSnapshot_shouldTakeIncrementalSnapshotForExistingRowsForEachSyncedTable() {
-		assertEquals(0, tableRecRepo.count());
-		List<SenderTableReconciliation> recs = service.takeSnapshot();
-		assertEquals(AppUtils.getTablesToSync().size(), recs.size());
-		SenderReconciliation rec = recRepo.getReconciliation();
-		service.saveSnapshot(rec, recs);
-		Map<String, Date> tableDateCreatedMap = recs.stream().collect(
-		    Collectors.toMap(SenderTableReconciliation::getTableName, SenderTableReconciliation::getDateCreated));
-		final long personLastProcId = 101;
-		SenderTableReconciliation personRec = tableRecRepo.getByTableNameIgnoreCase("person");
-		personRec.setLastProcessedId(personLastProcId);
-		tableRecRepo.save(personRec);
-		long timestamp = System.currentTimeMillis();
-		
-		recs = service.takeSnapshot();
-		
-		assertEquals(AppUtils.getTablesToSync().size(), recs.size());
-		recs.forEach(r -> {
-			if ("person".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(0, r.getRowCount());
-				assertEquals(101, r.getEndId());
-			} else if ("person_name".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(2, r.getRowCount());
-				assertEquals(2, r.getEndId());
-			} else if ("person_attribute".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(4, r.getRowCount());
-				assertEquals(4, r.getEndId());
-			} else if ("patient".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(1, r.getRowCount());
-				assertEquals(101, r.getEndId());
-			} else if ("patient_identifier".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(2, r.getRowCount());
-				assertEquals(2, r.getEndId());
-			} else {
-				assertEquals(0, r.getRowCount());
-				assertEquals(0, r.getEndId());
-			}
-			
-			if ("person".equalsIgnoreCase(r.getTableName())) {
-				assertEquals(personLastProcId, r.getLastProcessedId());
-			} else {
-				assertEquals(0, r.getLastProcessedId());
-			}
-			
-			long startDateMillis = r.getSnapshotDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-			assertTrue(startDateMillis == timestamp || startDateMillis > timestamp);
-			assertEquals(tableDateCreatedMap.get(r.getTableName()), r.getDateCreated());
 		});
 	}
 	
