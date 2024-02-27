@@ -98,9 +98,6 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			tableRec.setRemoteStartDate(resp.getRemoteStartDate());
 			tableRec.setLastBatchReceived(resp.isLastTableBatch());
 			tableRec.setDateCreated(new Date());
-			if (tableRec.getRowCount() == 0) {
-				tableRec.setCompleted(true);
-			}
 			
 			if (LOG.isTraceEnabled()) {
 				LOG.debug("Saving table reconciliation");
@@ -163,14 +160,17 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		if (message.isLastTableBatch()) {
 			tableRec.setLastBatchReceived(true);
 		}
+		
 		tableRec.setDateChanged(LocalDateTime.now());
-		if (message.isCompleted() && tableRec.isLastBatchReceived()
-		        && tableRec.getRowCount() == tableRec.getProcessedCount()) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Table reconciliation completed");
+		if (message.isCompleted()) {
+			reconcileMsgRep.delete(message);
+			if (tableRec.isLastBatchReceived() && tableRec.getRowCount() == tableRec.getProcessedCount()) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Reconciliation completed for table {}", message.getTableName());
+				}
+				
+				tableRec.setCompleted(true);
 			}
-			
-			tableRec.setCompleted(true);
 		}
 		
 		if (LOG.isTraceEnabled()) {

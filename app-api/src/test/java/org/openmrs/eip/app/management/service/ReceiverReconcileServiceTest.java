@@ -203,7 +203,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(remoteStartDate, tableRec.getRemoteStartDate());
 		assertTrue(tableRec.isLastBatchReceived());
 		assertEquals(0, tableRec.getProcessedCount());
-		assertTrue(tableRec.isCompleted());
+		assertFalse(tableRec.isCompleted());
 		assertNull(tableRec.getDateChanged());
 		assertTrue(tableRec.getDateCreated().getTime() == timestamp || tableRec.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
@@ -243,6 +243,48 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(originalProcessedCount + msg.getProcessedCount(), tableRec.getProcessedCount());
 		long dateChangedMillis = tableRec.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void updateReconciliationMessage_shouldDeleteACompletedMessage() {
+		final String table = "person";
+		final SiteInfo site = siteRepo.getReferenceById(1L);
+		final int batchSize = 5;
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setSite(site);
+		msg.setTableName(table);
+		msg.setBatchSize(batchSize);
+		List<String> uuids = rangeClosed(1, batchSize).boxed().map(i -> "uuid-" + i).toList();
+		msg.setData(StringUtils.join(uuids, ","));
+		msg.setDateCreated(new Date());
+		reconcileMsgRep.save(msg);
+		
+		service.updateReconciliationMessage(msg, true, uuids);
+		
+		assertFalse(reconcileMsgRep.findById(msg.getId()).isPresent());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconciliation.sql",
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void updateReconciliationMessage_shouldNotDeleteAInCompleteMessage() {
+		final String table = "person";
+		final SiteInfo site = siteRepo.getReferenceById(1L);
+		final int batchSize = 5;
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setSite(site);
+		msg.setTableName(table);
+		msg.setBatchSize(batchSize);
+		List<String> uuids = rangeClosed(1, batchSize - 1).boxed().map(i -> "uuid-" + i).toList();
+		msg.setData(StringUtils.join(uuids, ","));
+		msg.setDateCreated(new Date());
+		reconcileMsgRep.save(msg);
+		
+		service.updateReconciliationMessage(msg, true, uuids);
+		
+		assertTrue(reconcileMsgRep.findById(msg.getId()).isPresent());
 	}
 	
 	@Test

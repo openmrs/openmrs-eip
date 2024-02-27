@@ -104,6 +104,11 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private void reconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg, OpenmrsRepository repo) {
 		final int size = uuids.size();
+		if (size == 0) {
+			service.updateReconciliationMessage(msg, true, uuids);
+			return;
+		}
+		
 		if (size > maxReconcileBatchSize) {
 			bisectAndReconcile(uuids, allUuids, msg, repo);
 			return;

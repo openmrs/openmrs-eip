@@ -14,6 +14,7 @@ import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_SEPARATOR;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
@@ -101,6 +103,22 @@ public class ReconcileMessageProcessorTest {
 		processor.processItem(msg);
 		
 		verify(mockService).updateReconciliationMessage(msg, true, uuids);
+	}
+	
+	@Test
+	public void processItem_shouldReconcileTheAnEmptyMessage() {
+		final String table = "person";
+		List<String> uuids = Collections.emptyList();
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		msg.setData("");
+		msg.setBatchSize(0);
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockEntityRepo);
+		
+		processor.processItem(msg);
+		
+		verify(mockService).updateReconciliationMessage(msg, true, uuids);
+		Mockito.verifyNoInteractions(mockEntityRepo);
 	}
 	
 	@Test
