@@ -69,7 +69,7 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 			case PROCESSING:
 				update(reconciliation);
 				break;
-			case FINALIZING:
+			case POST_PROCESSING:
 				finalise(reconciliation);
 				break;
 			case COMPLETED:
@@ -86,7 +86,7 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 		List<String> incompleteTables = AppUtils.getTablesToSync().stream()
 		        .filter(t -> !tableReconcileRepo.getByTableNameIgnoreCase(t).isCompleted()).toList();
 		if (incompleteTables.isEmpty()) {
-			reconciliation.setStatus(SenderReconcileStatus.FINALIZING);
+			reconciliation.setStatus(SenderReconcileStatus.POST_PROCESSING);
 			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
 			if (LOG.isTraceEnabled()) {
 				LOG.debug("Saving updated reconciliation");

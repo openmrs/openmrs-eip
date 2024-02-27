@@ -83,7 +83,7 @@ public class SenderReconcileProcessorTest {
 		
 		processor.processItem(rec);
 		
-		assertEquals(SenderReconcileStatus.FINALIZING, rec.getStatus());
+		assertEquals(SenderReconcileStatus.POST_PROCESSING, rec.getStatus());
 		Mockito.verify(mockRecRepo).save(rec);
 	}
 	
