@@ -5,6 +5,8 @@ import static org.openmrs.eip.app.sender.SenderConstants.PROP_ACTIVEMQ_ENDPOINT;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.repository.PersonRepository;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -93,6 +95,22 @@ public class SenderUtils {
 		}
 		
 		return queueName;
+	}
+	
+	/**
+	 * Gets the uuid from the parent table for the entity matching the specified table and primary key
+	 * id.
+	 * 
+	 * @param table subclass table name to match
+	 * @param primaryKeyId the primary key id to match
+	 * @return the uuid if a match is found otherwise null
+	 */
+	public static String getUuidFromParentTable(String table, Long primaryKeyId) {
+		if (table.equalsIgnoreCase(TableToSyncEnum.PATIENT.name())) {
+			return SyncContext.getBean(PersonRepository.class).getUuid(primaryKeyId);
+		}
+		
+		throw new EIPException("Don't know how to resolve uuid from parent for table" + table);
 	}
 	
 }

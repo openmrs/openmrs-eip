@@ -25,4 +25,13 @@ public interface DeletedEntityRepository extends JpaRepository<DeletedEntity, Lo
 	 */
 	List<DeletedEntity> getByTableNameIgnoreCase(String tableName);
 	
+	/**
+	 * Gets the deleted entity matching the specified table and primary key id.
+	 *
+	 * @param tableName the table to match
+	 * @param id the entity id to match
+	 * @return deleted entity
+	 */
+	DeletedEntity getByTableNameIgnoreCaseAndPrimaryKeyId(String tableName, String id);
+	
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.AppUtils;
@@ -26,6 +25,7 @@ import org.openmrs.eip.app.sender.SenderUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -131,8 +131,17 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 			for (DeletedEntity del : deletes) {
 				Long id = Long.valueOf(del.getPrimaryKeyId());
 				if (id <= tableRec.getEndId()) {
-					//TODO Take care of subclass tables where uuid is null
-					deletedUuids.add(del.getIdentifier());
+					String uuid;
+					if (!Utils.isSubclassTable(table)) {
+						uuid = del.getIdentifier();
+					} else {
+						uuid = getUuidFromParent(table, id);
+						if (StringUtils.isBlank(uuid)) {
+							continue;
+						}
+					}
+					
+					deletedUuids.add(uuid);
 				}
 			}
 			
@@ -147,10 +156,27 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 		});
 		
 		AppUtils.getTablesToSync().forEach(table -> {
-			//TODO Take care of subclass tables where uuid is null
-			List<String> deletes = deleteRepo.getByTableNameIgnoreCase(table).stream().map(e -> e.getIdentifier())
-			        .collect(Collectors.toList());
-			send(rec, table, deletes, true);
+			List<DeletedEntity> delEntities = deleteRepo.getByTableNameIgnoreCase(table);
+			List<String> uuids = new ArrayList<>(delEntities.size());
+			for (DeletedEntity del : delEntities) {
+				String uuid;
+				if (!Utils.isSubclassTable(table)) {
+					uuid = del.getIdentifier();
+				} else {
+					uuid = getUuidFromParent(table, Long.valueOf(del.getPrimaryKeyId()));
+					if (StringUtils.isBlank(uuid)) {
+						continue;
+					}
+				}
+				
+				uuids.add(uuid);
+			}
+			
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Sending {} uuids for all entities deleted from {} table", uuids.size(), table);
+			}
+			
+			send(rec, table, uuids, true);
 		});
 	}
 	
@@ -167,6 +193,20 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 		//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent
 		//but status not update and uuids are resent
 		jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
+	}
+	
+	private String getUuidFromParent(String table, Long id) {
+		String uuid = SenderUtils.getUuidFromParentTable(table, id);
+		if (StringUtils.isBlank(uuid)) {
+			DeletedEntity delEntity = deleteRepo.getByTableNameIgnoreCaseAndPrimaryKeyId(table, id.toString());
+			if (delEntity == null) {
+				LOG.warn("Failed to resolve uuid for delete entity");
+				return null;
+			}
+			uuid = delEntity.getIdentifier();
+		}
+		
+		return uuid;
 	}
 	
 }
