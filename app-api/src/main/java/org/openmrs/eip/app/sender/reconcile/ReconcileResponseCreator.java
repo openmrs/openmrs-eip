@@ -23,9 +23,6 @@ public class ReconcileResponseCreator implements MessageCreator {
 	@Getter
 	private String siteId;
 	
-	@Getter
-	private String messageId;
-	
 	ReconcileResponseCreator(String body, String siteId) {
 		this.body = body;
 		this.siteId = siteId;

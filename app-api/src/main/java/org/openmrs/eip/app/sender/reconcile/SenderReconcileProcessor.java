@@ -135,23 +135,24 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 				}
 			}
 			
-			ReconciliationResponse response = new ReconciliationResponse();
-			response.setIdentifier(rec.getIdentifier());
-			response.setTableName(table);
-			response.setLastTableBatch(true);
 			if (!deletedUuids.isEmpty()) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Sending {} uuids for entities deleted during reconciliation from {} table",
+					    deletedUuids.size(), table);
+				}
+				
+				ReconciliationResponse response = new ReconciliationResponse();
+				response.setIdentifier(rec.getIdentifier());
+				response.setTableName(table);
 				//TODO If size is larger than reconcile batch size break up the uuids
 				response.setBatchSize(deletedUuids.size());
 				response.setData(StringUtils.join(deletedUuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
-			} else {
-				response.setBatchSize(0);
-				response.setData("");
+				
+				final String json = JsonUtils.marshall(response);
+				//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent
+				//but status not update and uuids are resent
+				jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
 			}
-			
-			final String json = JsonUtils.marshall(response);
-			//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent
-			//but status not update and uuids are resent
-			jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
 		});
 		
 		//TODO Send all deleted entities and mark as completed.

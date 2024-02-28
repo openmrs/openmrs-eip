@@ -32,7 +32,7 @@ public class SenderSyncBatchManagerTest {
 	
 	@Test
 	public void getQueueName_shouldReturnTheNameOfTheJmsQueue() {
-		final String queueName = "activemq:openmrs.sync";
+		final String queueName = "openmrs.sync";
 		Mockito.when(SenderUtils.getQueueName()).thenReturn(queueName);
 		assertEquals(queueName, manager.getQueueName());
 	}

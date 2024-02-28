@@ -164,7 +164,9 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		tableRec.setDateChanged(LocalDateTime.now());
 		if (message.isCompleted()) {
 			reconcileMsgRep.delete(message);
-			if (tableRec.isLastBatchReceived() && tableRec.getRowCount() == tableRec.getProcessedCount()) {
+			//TODO check that tableRec.getRowCount() == tableRec.getProcessedCount() after we rule out duplicate
+			//deliveries of reconciliation messages.
+			if (tableRec.isLastBatchReceived()) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("Reconciliation completed for table {}", message.getTableName());
 				}
