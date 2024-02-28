@@ -116,7 +116,6 @@ public class SenderTableReconcileProcessorTest {
 		expectedResp.setRemoteStartDate(snapshotDate);
 		expectedResp.setRowCount(rowCount);
 		expectedResp.setBatchSize(0);
-		expectedResp.setLastTableBatch(true);
 		expectedResp.setData("");
 		ArgumentCaptor<ReconcileResponseCreator> argCaptor = ArgumentCaptor.forClass(ReconcileResponseCreator.class);
 		Mockito.verify(mockJmsTemplate).send(eq(QUEUE_NAME), argCaptor.capture());
@@ -182,7 +181,6 @@ public class SenderTableReconcileProcessorTest {
 		expectedResp.setIdentifier(RECONCILIATION_ID);
 		expectedResp.setTableName(table);
 		expectedResp.setBatchSize(batch.size());
-		expectedResp.setLastTableBatch(true);
 		List<String> uuids = batch.stream().map(entry -> entry[1].toString()).collect(Collectors.toList());
 		expectedResp.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
 		ArgumentCaptor<ReconcileResponseCreator> argCaptor = ArgumentCaptor.forClass(ReconcileResponseCreator.class);
