@@ -1,13 +1,20 @@
 package org.openmrs.eip.app.sender.reconcile;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_SEPARATOR;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -143,6 +150,28 @@ public class SenderReconcileProcessorTest {
 	}
 	
 	@Test
+	public void send_shouldGenerateAndSendReconciliationResponse() {
+		final String table = "person";
+		List<String> uuids = List.of("person-uuid1", "person-uuid2");
+		SenderReconciliation rec = new SenderReconciliation();
+		rec.setIdentifier(RECONCILE_ID);
+		ArgumentCaptor<ReconcileResponseCreator> creatorArgCaptor = ArgumentCaptor.forClass(ReconcileResponseCreator.class);
+		
+		processor.send(rec, table, uuids, true);
+		
+		verify(mockJmsTemplate).send(eq(QUEUE_NAME), creatorArgCaptor.capture());
+		ReconcileResponseCreator creator = creatorArgCaptor.getValue();
+		ReconciliationResponse response = new ReconciliationResponse();
+		response.setIdentifier(RECONCILE_ID);
+		response.setTableName(table);
+		response.setBatchSize(uuids.size());
+		response.setLastTableBatch(true);
+		response.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
+		assertEquals(JsonUtils.marshall(response), creator.getBody());
+		assertEquals(SITE_ID, creator.getSiteId());
+	}
+	
+	@Test
 	public void processItem_shouldPostProcessTheReconciliation() {
 		final String personTable = "person";
 		final String visitTable = "visit";
@@ -151,9 +180,9 @@ public class SenderReconcileProcessorTest {
 		final Long personId3 = 3L;
 		final String personUuid1 = "person-uuid1";
 		final String personUuid2 = "person-uuid2";
+		final String personUuid3 = "person-uuid3";
 		final Date recDate = new Date();
 		SenderReconciliation rec = new SenderReconciliation();
-		rec.setIdentifier(RECONCILE_ID);
 		rec.setStatus(SenderReconcileStatus.POST_PROCESSING);
 		rec.setDateCreated(recDate);
 		SenderTableReconciliation personRec = new SenderTableReconciliation();
@@ -170,21 +199,24 @@ public class SenderReconcileProcessorTest {
 		deletedPerson2.setIdentifier(personUuid2);
 		DeletedEntity deletedPerson3 = new DeletedEntity();
 		deletedPerson3.setPrimaryKeyId(personId3.toString());
+		deletedPerson3.setIdentifier(personUuid3);
+		List<DeletedEntity> deletedPersons = List.of(deletedPerson1, deletedPerson2, deletedPerson3);
 		when(mockDeleteRepo.getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(personTable, recDate))
-		        .thenReturn(List.of(deletedPerson1, deletedPerson2, deletedPerson3));
+		        .thenReturn(deletedPersons);
+		Set<String> syncTables = new LinkedHashSet<>();
+		syncTables.add(personTable);
+		syncTables.add(visitTable);
+		when(AppUtils.getTablesToSync()).thenReturn(syncTables);
+		when(mockDeleteRepo.getByTableNameIgnoreCase(personTable)).thenReturn(deletedPersons);
+		processor = spy(processor);
+		Mockito.doNothing().when(processor).send(eq(rec), anyString(), anyList(), anyBoolean());
 		
 		processor.processItem(rec);
 		
-		ArgumentCaptor<ReconcileResponseCreator> creatorArgCaptor = ArgumentCaptor.forClass(ReconcileResponseCreator.class);
-		verify(mockJmsTemplate).send(eq(QUEUE_NAME), creatorArgCaptor.capture());
-		ReconcileResponseCreator creator = creatorArgCaptor.getValue();
-		ReconciliationResponse response = new ReconciliationResponse();
-		response.setIdentifier(RECONCILE_ID);
-		response.setTableName(personTable);
-		response.setBatchSize(2);
-		response.setData(StringUtils.join(List.of(personUuid1, personUuid2), RECONCILE_MSG_SEPARATOR));
-		assertEquals(JsonUtils.marshall(response), creator.getBody());
-		assertEquals(SITE_ID, creator.getSiteId());
+		verify(processor, times(3)).send(eq(rec), anyString(), anyList(), anyBoolean());
+		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2), false);
+		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2, personUuid3), true);
+		verify(processor).send(rec, visitTable, Collections.emptyList(), true);
 		verify(mockDeleteRepo).getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(visitTable, recDate);
 	}
 	

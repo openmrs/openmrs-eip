@@ -17,4 +17,12 @@ public interface DeletedEntityRepository extends JpaRepository<DeletedEntity, Lo
 	 */
 	List<DeletedEntity> getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(String tableName, Date date);
 	
+	/**
+	 * Gets all entities deleted from the specified table.
+	 *
+	 * @param tableName the table to match
+	 * @return list of deleted entities
+	 */
+	List<DeletedEntity> getByTableNameIgnoreCase(String tableName);
+	
 }

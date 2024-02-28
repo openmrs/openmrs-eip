@@ -31,4 +31,15 @@ public class DeletedEntityRepositoryTest extends BaseSenderTest {
 		Assert.assertEquals(3, deletes.get(1).getId().longValue());
 	}
 	
+	@Test
+	@Sql(scripts = {
+	        "classpath:mgt_sender_deleted_entity.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getByTableNameIgnoreCase_shouldGetMatchingDeletedEntities() {
+		List<DeletedEntity> deletes = repo.getByTableNameIgnoreCase("VISIT");
+		Assert.assertEquals(3, deletes.size());
+		Assert.assertEquals(1, deletes.get(0).getId().longValue());
+		Assert.assertEquals(2, deletes.get(1).getId().longValue());
+		Assert.assertEquals(3, deletes.get(2).getId().longValue());
+	}
+	
 }

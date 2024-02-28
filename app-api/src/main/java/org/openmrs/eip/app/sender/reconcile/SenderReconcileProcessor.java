@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.AppUtils;
@@ -141,21 +142,31 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 					    deletedUuids.size(), table);
 				}
 				
-				ReconciliationResponse response = new ReconciliationResponse();
-				response.setIdentifier(rec.getIdentifier());
-				response.setTableName(table);
-				//TODO If size is larger than reconcile batch size break up the uuids
-				response.setBatchSize(deletedUuids.size());
-				response.setData(StringUtils.join(deletedUuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
-				
-				final String json = JsonUtils.marshall(response);
-				//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent
-				//but status not update and uuids are resent
-				jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
+				send(rec, table, deletedUuids, false);
 			}
 		});
 		
-		//TODO Send all deleted entities and mark as completed.
+		AppUtils.getTablesToSync().forEach(table -> {
+			//TODO Take care of subclass tables where uuid is null
+			List<String> deletes = deleteRepo.getByTableNameIgnoreCase(table).stream().map(e -> e.getIdentifier())
+			        .collect(Collectors.toList());
+			send(rec, table, deletes, true);
+		});
+	}
+	
+	protected void send(SenderReconciliation rec, String table, List<String> uuids, boolean lastBatch) {
+		ReconciliationResponse response = new ReconciliationResponse();
+		response.setIdentifier(rec.getIdentifier());
+		response.setTableName(table);
+		response.setLastTableBatch(lastBatch);
+		//TODO If size is larger than reconcile batch size break up the uuids
+		response.setBatchSize(uuids.size());
+		response.setData(StringUtils.join(uuids, SyncConstants.RECONCILE_MSG_SEPARATOR));
+		
+		final String json = JsonUtils.marshall(response);
+		//TODO To avoid message duplication, add message to outbound queue e.g. this can happen if message is sent
+		//but status not update and uuids are resent
+		jmsTemplate.send(SenderUtils.getQueueName(), new ReconcileResponseCreator(json, siteId));
 	}
 	
 }
