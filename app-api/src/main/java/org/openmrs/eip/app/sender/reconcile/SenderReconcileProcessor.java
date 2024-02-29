@@ -123,6 +123,11 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 	}
 	
 	private void postProcess(SenderReconciliation rec) {
+		sendDeletedUuids(rec);
+		sendAllDeletedUuids(rec);
+	}
+	
+	protected void sendDeletedUuids(SenderReconciliation rec) {
 		Date date = rec.getDateCreated();
 		tableReconcileRepo.findAll().forEach(tableRec -> {
 			final String table = tableRec.getTableName();
@@ -154,7 +159,9 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 				send(rec, table, deletedUuids, false);
 			}
 		});
-		
+	}
+	
+	protected void sendAllDeletedUuids(SenderReconciliation rec) {
 		AppUtils.getTablesToSync().forEach(table -> {
 			List<DeletedEntity> delEntities = deleteRepo.getByTableNameIgnoreCase(table);
 			List<String> uuids = new ArrayList<>(delEntities.size());
