@@ -5,6 +5,7 @@ import static org.openmrs.eip.app.SyncConstants.PROP_MAX_BATCH_RECONCILE_SIZE;
 import static org.openmrs.eip.app.SyncConstants.PROP_MIN_BATCH_RECONCILE_SIZE;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -13,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
+import org.openmrs.eip.app.management.entity.receiver.UndeletedEntity;
+import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -47,10 +50,13 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private ReceiverReconcileService service;
 	
+	private UndeletedEntityRepository undeletedRepo;
+	
 	public ReconcileMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReceiverReconcileService service) {
+	    ReceiverReconcileService service, UndeletedEntityRepository undeletedRepo) {
 		super(executor);
 		this.service = service;
+		this.undeletedRepo = undeletedRepo;
 	}
 	
 	@Override
@@ -104,7 +110,11 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private void reconcile(List<String> uuids, List<String> allUuids, ReconciliationMessage msg, OpenmrsRepository repo) {
 		final int size = uuids.size();
-		if (size == 0) {
+		if (size == 0 || msg.isLastTableBatch()) {
+			if (msg.isLastTableBatch()) {
+				verifyDeletedEntities(uuids, allUuids, msg, repo);
+			}
+			
 			service.updateReconciliationMessage(msg, true, uuids);
 			return;
 		}
@@ -158,6 +168,39 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 		List<String> right = uuids.subList(midIndex, uuids.size());
 		reconcile(left, allUuids, msg, repo);
 		reconcile(right, allUuids, msg, repo);
+	}
+	
+	protected void verifyDeletedEntities(List<String> uuids, List<String> allUuids, ReconciliationMessage msg,
+	                                     OpenmrsRepository repo) {
+		final int size = uuids.size();
+		if (size == 0) {
+			return;
+		}
+		
+		final String table = msg.getTableName();
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Verifying batch of {} deleted items from index {} to {} in table {}", size,
+			    allUuids.indexOf(uuids.get(0)), allUuids.indexOf(uuids.get(size - 1)), table);
+		}
+		
+		//TODO Add the bisect and reconcile logic
+		for (String uuid : uuids) {
+			if (!repo.existsByUuid(uuid)) {
+				continue;
+			}
+			
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Found undeleted entity with uuid {} in table {}", uuid, table);
+			}
+			
+			UndeletedEntity entity = new UndeletedEntity();
+			entity.setTableName(table);
+			entity.setIdentifier(uuid);
+			entity.setSite(msg.getSite());
+			entity.setDateCreated(new Date());
+			//TODO Check sync and error queue for existence of the entity event
+			undeletedRepo.save(entity);
+		}
 	}
 	
 }

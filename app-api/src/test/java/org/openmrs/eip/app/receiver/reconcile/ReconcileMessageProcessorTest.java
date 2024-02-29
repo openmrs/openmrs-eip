@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,11 +24,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.management.entity.receiver.UndeletedEntity;
+import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
@@ -49,11 +54,14 @@ public class ReconcileMessageProcessorTest {
 	@Mock
 	private ReceiverReconcileService mockService;
 	
+	@Mock
+	private UndeletedEntityRepository mockUndeletedRepo;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReconcileMessageProcessor(null, mockService);
+		processor = new ReconcileMessageProcessor(null, mockService, mockUndeletedRepo);
 		Whitebox.setInternalState(processor, "maxReconcileBatchSize", MAX_REC_BATCH_SIZE);
 		Whitebox.setInternalState(processor, "minReconcileBatchSize", 2);
 	}
@@ -260,6 +268,64 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(uuids.equals(processedUuids));
 		verify(mockService, times(3)).updateReconciliationMessage(eq(msg), eq(true), anyList());
 		verify(mockService, times(2)).updateReconciliationMessage(eq(msg), eq(false), anyList());
+	}
+	
+	@Test
+	public void processItem_shouldVerifyDeletedEntitiesForLastTableMessage() {
+		final String table = "person";
+		final int batchSize = 2;
+		List<String> uuids = rangeClosed(1, batchSize).boxed().map(i -> "uuid-" + i).toList();
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		msg.setData(StringUtils.join(uuids, RECONCILE_MSG_SEPARATOR));
+		msg.setBatchSize(uuids.size());
+		msg.setLastTableBatch(true);
+		processor = spy(processor);
+		doNothing().when(processor).verifyDeletedEntities(uuids, uuids, msg, mockEntityRepo);
+		when(SyncContext.getRepositoryBean(table)).thenReturn(mockEntityRepo);
+		
+		processor.processItem(msg);
+		
+		verify(processor).verifyDeletedEntities(uuids, uuids, msg, mockEntityRepo);
+		verify(mockService).updateReconciliationMessage(msg, true, uuids);
+	}
+	
+	@Test
+	public void verifyDeletedEntities_shouldDoNothingIfThereAreNoDeletedEntities() {
+		ReconciliationMessage msg = Mockito.mock(ReconciliationMessage.class);
+		
+		processor.verifyDeletedEntities(Collections.emptyList(), null, msg, null);
+		
+		Mockito.verifyNoInteractions(msg);
+	}
+	
+	@Test
+	public void verifyDeletedEntities_shouldSaveUndeletedEntities() {
+		final String table = "person";
+		final int batchSize = 3;
+		final SiteInfo mockSite = Mockito.mock(SiteInfo.class);
+		List<String> uuids = rangeClosed(1, batchSize).boxed().map(i -> "uuid-" + i).toList();
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		msg.setSite(mockSite);
+		when(mockEntityRepo.existsByUuid("uuid-1")).thenReturn(true);
+		when(mockEntityRepo.existsByUuid("uuid-3")).thenReturn(true);
+		long timestamp = System.currentTimeMillis();
+		
+		processor.verifyDeletedEntities(uuids, uuids, msg, mockEntityRepo);
+		
+		ArgumentCaptor<UndeletedEntity> argCaptor = ArgumentCaptor.forClass(UndeletedEntity.class);
+		verify(mockUndeletedRepo, times(2)).save(argCaptor.capture());
+		UndeletedEntity entity = argCaptor.getAllValues().get(0);
+		assertEquals(table, entity.getTableName());
+		assertEquals("uuid-1", entity.getIdentifier());
+		assertEquals(mockSite, entity.getSite());
+		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
+		entity = argCaptor.getAllValues().get(1);
+		assertEquals(table, entity.getTableName());
+		assertEquals("uuid-3", entity.getIdentifier());
+		assertEquals(mockSite, entity.getSite());
+		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
 	}
 	
 }
