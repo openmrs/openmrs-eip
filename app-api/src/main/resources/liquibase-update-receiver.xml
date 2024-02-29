@@ -257,6 +257,39 @@
             <column name="site_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="last_seen_queue" type="VARCHAR(50)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="missing_entity_site_fk"
+                                 baseTableName="missing_entity"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240229-1015" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="missing_entity"/>
+            </not>
+        </preConditions>
+        <comment>Adding missing_entity table</comment>
+        <createTable tableName="missing_entity">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="site_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_seen_queue" type="VARCHAR(50)"/>
             <column name="date_created" type="DATETIME">
                 <constraints nullable="false"/>
             </column>

@@ -4,5 +4,5 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "missing_entity")
-public class MissingEntity extends BaseUnSyncedEntity {}
+@Table(name = "undeleted_entity")
+public class UndeletedEntity extends BaseUnSyncedEntity {}
