@@ -9,9 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.repository.PersonRepository;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -53,6 +55,17 @@ public class SenderUtilsTest {
 		final String endpoint = "activemq:" + queueName;
 		when(mockEnv.getProperty(PROP_ACTIVEMQ_ENDPOINT)).thenReturn(endpoint);
 		assertEquals(queueName, SenderUtils.getQueueName());
+	}
+	
+	@Test
+	public void getUuidFromParentTable_shouldLookUpThePatientUuid() {
+		final String expectedUuid = "test-uuid";
+		final String table = "patient";
+		final Long patientId = 2L;
+		PersonRepository mockRepo = Mockito.mock(PersonRepository.class);
+		when(SyncContext.getBean(PersonRepository.class)).thenReturn(mockRepo);
+		when(mockRepo.getUuid(patientId)).thenReturn(expectedUuid);
+		assertEquals(expectedUuid, SenderUtils.getUuidFromParentTable(table, patientId));
 	}
 	
 }

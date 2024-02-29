@@ -125,6 +125,13 @@ public class SenderReconcileProcessor extends BasePureParallelQueueProcessor<Sen
 	private void postProcess(SenderReconciliation rec) {
 		sendDeletedUuids(rec);
 		sendAllDeletedUuids(rec);
+		rec.setStatus(SenderReconcileStatus.COMPLETED);
+		LOG.info("Updating reconciliation status to " + rec.getStatus());
+		if (LOG.isTraceEnabled()) {
+			LOG.debug("Saving updated reconciliation");
+		}
+		
+		reconcileRepo.save(rec);
 	}
 	
 	protected void sendDeletedUuids(SenderReconciliation rec) {

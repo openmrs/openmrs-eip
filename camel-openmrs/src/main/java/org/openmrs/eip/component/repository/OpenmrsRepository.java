@@ -29,7 +29,7 @@ public interface OpenmrsRepository<E extends BaseEntity> extends JpaRepository<E
 	boolean existsByUuid(String uuid);
 	
 	/**
-	 * Gets the count of rows matching the specified uuids
+	 * Gets the count of rows matching any of the specified uuids
 	 *
 	 * @param uuids list of uuids to match
 	 * @return the count of matches

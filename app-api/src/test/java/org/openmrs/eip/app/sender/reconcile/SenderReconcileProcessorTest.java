@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -173,6 +174,22 @@ public class SenderReconcileProcessorTest {
 	
 	@Test
 	public void processItem_shouldPostProcessTheReconciliation() {
+		SenderReconciliation rec = new SenderReconciliation();
+		rec.setStatus(SenderReconcileStatus.POST_PROCESSING);
+		processor = spy(processor);
+		doNothing().when(processor).sendDeletedUuids(rec);
+		doNothing().when(processor).sendAllDeletedUuids(rec);
+		
+		processor.processItem(rec);
+		
+		verify(processor).sendDeletedUuids(rec);
+		verify(processor).sendAllDeletedUuids(rec);
+		assertEquals(SenderReconcileStatus.COMPLETED, rec.getStatus());
+		verify(mockRecRepo).save(rec);
+	}
+	
+	@Test
+	public void sendDeletedUuids_shouldOnlySendUuidsForEntitiesDeletedDuringReconciliation() {
 		final String personTable = "person";
 		final String visitTable = "visit";
 		final Long personId1 = 1L;
@@ -203,21 +220,55 @@ public class SenderReconcileProcessorTest {
 		List<DeletedEntity> deletedPersons = List.of(deletedPerson1, deletedPerson2, deletedPerson3);
 		when(mockDeleteRepo.getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(personTable, recDate))
 		        .thenReturn(deletedPersons);
+		processor = spy(processor);
+		doNothing().when(processor).send(eq(rec), anyString(), anyList(), anyBoolean());
+		
+		processor.sendDeletedUuids(rec);
+		
+		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2), false);
+		verify(mockDeleteRepo).getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(visitTable, recDate);
+	}
+	
+	@Test
+	public void sendAllDeletedUuids_shouldSendAllDeletedUuids() {
+		final String personTable = "person";
+		final String visitTable = "visit";
+		final Long personId1 = 1L;
+		final Long personId2 = 2L;
+		final String personUuid1 = "person-uuid1";
+		final String personUuid2 = "person-uuid2";
+		final Date recDate = new Date();
+		SenderReconciliation rec = new SenderReconciliation();
+		rec.setStatus(SenderReconcileStatus.POST_PROCESSING);
+		rec.setDateCreated(recDate);
+		SenderTableReconciliation personRec = new SenderTableReconciliation();
+		personRec.setTableName(personTable);
+		personRec.setEndId(personId2);
+		SenderTableReconciliation visitRec = new SenderTableReconciliation();
+		visitRec.setTableName(visitTable);
+		when(mockTableRecRepo.findAll()).thenReturn(List.of(personRec, visitRec));
+		DeletedEntity deletedPerson1 = new DeletedEntity();
+		deletedPerson1.setPrimaryKeyId(personId1.toString());
+		deletedPerson1.setIdentifier(personUuid1);
+		DeletedEntity deletedPerson2 = new DeletedEntity();
+		deletedPerson2.setPrimaryKeyId(personId2.toString());
+		deletedPerson2.setIdentifier(personUuid2);
+		List<DeletedEntity> deletedPersons = List.of(deletedPerson1, deletedPerson2);
 		Set<String> syncTables = new LinkedHashSet<>();
 		syncTables.add(personTable);
 		syncTables.add(visitTable);
 		when(AppUtils.getTablesToSync()).thenReturn(syncTables);
 		when(mockDeleteRepo.getByTableNameIgnoreCase(personTable)).thenReturn(deletedPersons);
 		processor = spy(processor);
-		Mockito.doNothing().when(processor).send(eq(rec), anyString(), anyList(), anyBoolean());
+		doNothing().when(processor).send(eq(rec), anyString(), anyList(), anyBoolean());
 		
-		processor.processItem(rec);
+		processor.sendAllDeletedUuids(rec);
 		
-		verify(processor, times(3)).send(eq(rec), anyString(), anyList(), anyBoolean());
-		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2), false);
-		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2, personUuid3), true);
+		verify(processor, times(2)).send(eq(rec), anyString(), anyList(), anyBoolean());
+		verify(processor).send(rec, personTable, List.of(personUuid1, personUuid2), true);
 		verify(processor).send(rec, visitTable, Collections.emptyList(), true);
-		verify(mockDeleteRepo).getByTableNameIgnoreCaseAndDateCreatedGreaterThanEqual(visitTable, recDate);
+		verify(mockDeleteRepo).getByTableNameIgnoreCase(personTable);
+		verify(mockDeleteRepo).getByTableNameIgnoreCase(visitTable);
 	}
 	
 }
