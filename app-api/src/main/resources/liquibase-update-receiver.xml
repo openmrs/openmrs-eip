@@ -272,11 +272,11 @@
     <changeSet author="wluyima" id="20240229-1015" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="missing_entity"/>
+                <tableExists tableName="undeleted_entity"/>
             </not>
         </preConditions>
-        <comment>Adding missing_entity table</comment>
-        <createTable tableName="missing_entity">
+        <comment>Adding undeleted_entity table</comment>
+        <createTable tableName="undeleted_entity">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -294,8 +294,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="missing_entity_site_fk"
-                                 baseTableName="missing_entity"
+        <addForeignKeyConstraint constraintName="undeleted_entity_site_fk"
+                                 baseTableName="undeleted_entity"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>
