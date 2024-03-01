@@ -15,11 +15,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mgt_table_reconciliation")
+@Table(name = "receiver_table_reconcile")
 public class ReceiverTableReconciliation extends AbstractEntity {
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "site_reconciliation_id", nullable = false, updatable = false)
+	@JoinColumn(name = "site_reconcile_id", nullable = false, updatable = false)
 	@Getter
 	@Setter
 	private SiteReconciliation siteReconciliation;

@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mgt_site_reconciliation")
+@Table(name = "site_reconcile")
 public class SiteReconciliation extends AbstractEntity {
 	
 	@ManyToOne(optional = false)

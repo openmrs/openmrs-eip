@@ -20,7 +20,7 @@ public class SiteReconciliationRepositoryTest extends BaseReceiverTest {
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
-	        "classpath:mgt_site_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_site_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getBySite_shouldGetTheReconciliationForTheSite() {
 		Assert.assertEquals(2L, repo.getBySite(siteRepo.getReferenceById(2L)).getId().longValue());
 	}

@@ -27,11 +27,11 @@
     <changeSet author="wluyima" id="20240219-1101" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_reconciliation"/>
+                <tableExists tableName="sender_reconcile"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_reconciliation table</comment>
-        <createTable tableName="mgt_reconciliation">
+        <comment>Adding sender_reconcile table</comment>
+        <createTable tableName="sender_reconcile">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -53,11 +53,11 @@
     <changeSet author="wluyima" id="20240214-1301" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_table_reconciliation"/>
+                <tableExists tableName="sender_table_reconcile"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_table_reconciliation table</comment>
-        <createTable tableName="mgt_table_reconciliation">
+        <comment>Adding sender_table_reconcile table</comment>
+        <createTable tableName="sender_table_reconcile">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>

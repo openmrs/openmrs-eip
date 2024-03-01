@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mgt_table_reconciliation")
+@Table(name = "sender_table_reconcile")
 public class SenderTableReconciliation extends AbstractEntity {
 	
 	@Column(name = "table_name", nullable = false, updatable = false, length = 100)

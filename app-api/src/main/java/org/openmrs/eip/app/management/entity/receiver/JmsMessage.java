@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mgt_jms_msg")
+@Table(name = "jms_msg")
 public class JmsMessage extends AbstractEntity {
 	
 	public enum MessageType {

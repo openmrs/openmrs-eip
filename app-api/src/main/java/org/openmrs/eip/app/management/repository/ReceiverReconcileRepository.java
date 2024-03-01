@@ -11,7 +11,7 @@ public interface ReceiverReconcileRepository extends JpaRepository<ReceiverRecon
 	 * 
 	 * @return the reconciliation
 	 */
-	@Query(value = "SELECT * FROM mgt_reconciliation WHERE status <> 'COMPLETED' LIMIT 1", nativeQuery = true)
+	@Query(value = "SELECT * FROM receiver_reconcile WHERE status <> 'COMPLETED' LIMIT 1", nativeQuery = true)
 	ReceiverReconciliation getReconciliation();
 	
 }

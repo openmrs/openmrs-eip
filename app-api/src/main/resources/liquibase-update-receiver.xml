@@ -73,11 +73,11 @@
     <changeSet author="wluyima" id="20240123-0815" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_jms_msg"/>
+                <tableExists tableName="jms_msg"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_jms_msg table</comment>
-        <createTable tableName="mgt_jms_msg">
+        <comment>Adding jms_msg table</comment>
+        <createTable tableName="jms_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -95,8 +95,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="mgt_jms_msg_site_fk"
-                                 baseTableName="mgt_jms_msg"
+        <addForeignKeyConstraint constraintName="jms_msg_site_fk"
+                                 baseTableName="jms_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="identifier"/>
@@ -105,11 +105,11 @@
     <changeSet author="wluyima" id="20240131-0901" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_reconciliation"/>
+                <tableExists tableName="receiver_reconcile"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_reconciliation table</comment>
-        <createTable tableName="mgt_reconciliation">
+        <comment>Adding receiver_reconcile table</comment>
+        <createTable tableName="receiver_reconcile">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -128,11 +128,11 @@
     <changeSet author="wluyima" id="20240131-0902" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_site_reconciliation"/>
+                <tableExists tableName="site_reconcile"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_site_reconciliation table</comment>
-        <createTable tableName="mgt_site_reconciliation">
+        <comment>Adding site_reconcile table</comment>
+        <createTable tableName="site_reconcile">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -144,8 +144,8 @@
             </column>
             <column name="date_completed" type="DATETIME"/>
         </createTable>
-        <addForeignKeyConstraint constraintName="mgt_site_reconciliation_site_fk"
-                                 baseTableName="mgt_site_reconciliation"
+        <addForeignKeyConstraint constraintName="site_reconcile_site_fk"
+                                 baseTableName="site_reconcile"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>
@@ -154,15 +154,15 @@
     <changeSet author="wluyima" id="20240131-0903" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_table_reconciliation"/>
+                <tableExists tableName="receiver_table_reconcile"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_table_reconciliation table</comment>
-        <createTable tableName="mgt_table_reconciliation">
+        <comment>Adding receiver_table_reconcile table</comment>
+        <createTable tableName="receiver_table_reconcile">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="site_reconciliation_id" type="BIGINT">
+            <column name="site_reconcile_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
             <column name="table_name" type="VARCHAR(100)">
@@ -188,23 +188,23 @@
             </column>
             <column name="date_changed" type="DATETIME"/>
         </createTable>
-        <addUniqueConstraint tableName="mgt_table_reconciliation" columnNames="site_reconciliation_id, table_name"
-                             constraintName="mgt_table_site_uk"/>
-        <addForeignKeyConstraint constraintName="mgt_table_site_reconciliation_fk"
-                                 baseTableName="mgt_table_reconciliation"
-                                 baseColumnNames="site_reconciliation_id"
-                                 referencedTableName="mgt_site_reconciliation"
+        <addUniqueConstraint tableName="receiver_table_reconcile" columnNames="site_reconcile_id, table_name"
+                             constraintName="table_site_reconcile_uk"/>
+        <addForeignKeyConstraint constraintName="table_site_reconcile_fk"
+                                 baseTableName="receiver_table_reconcile"
+                                 baseColumnNames="site_reconcile_id"
+                                 referencedTableName="site_reconcile"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet author="wluyima" id="20240131-0904" labels="1.6.0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mgt_reconciliation_msg"/>
+                <tableExists tableName="reconcile_msg"/>
             </not>
         </preConditions>
-        <comment>Adding mgt_reconciliation_msg table</comment>
-        <createTable tableName="mgt_reconciliation_msg">
+        <comment>Adding reconcile_msg table</comment>
+        <createTable tableName="reconcile_msg">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -230,8 +230,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="mgt_reconciliation_msg_site_fk"
-                                 baseTableName="mgt_reconciliation_msg"
+        <addForeignKeyConstraint constraintName="reconcile_msg_site_fk"
+                                 baseTableName="reconcile_msg"
                                  baseColumnNames="site_id"
                                  referencedTableName="site_info"
                                  referencedColumnNames="id"/>

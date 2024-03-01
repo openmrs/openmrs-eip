@@ -71,7 +71,7 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 	}
 	
 	@Test
-	@Sql(scripts = "classpath:mgt_sender_reconciliation.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	@Sql(scripts = "classpath:mgt_sender_reconcile.sql", config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void saveSnapshot_shouldUpdateReconciliationAndSaveAllTheReconciliations() {
 		assertEquals(0, tableRecRepo.count());
 		SenderTableReconciliation tableRec1 = new SenderTableReconciliation();

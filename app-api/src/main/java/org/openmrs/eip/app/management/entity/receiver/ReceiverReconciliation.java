@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mgt_reconciliation")
+@Table(name = "receiver_reconcile")
 public class ReceiverReconciliation extends AbstractEntity {
 	
 	public enum ReconciliationStatus {

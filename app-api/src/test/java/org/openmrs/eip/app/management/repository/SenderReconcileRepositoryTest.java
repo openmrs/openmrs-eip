@@ -17,7 +17,7 @@ public class SenderReconcileRepositoryTest extends BaseSenderTest {
 	
 	@Test
 	@Sql(scripts = {
-	        "classpath:mgt_sender_reconciliation.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	        "classpath:mgt_sender_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getReconciliation_shouldGetTheReconciliation() {
 		Assert.assertEquals(1L, repo.getReconciliation().getId().longValue());
 	}
