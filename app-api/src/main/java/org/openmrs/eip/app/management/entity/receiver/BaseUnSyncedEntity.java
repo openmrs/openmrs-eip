@@ -3,8 +3,6 @@ package org.openmrs.eip.app.management.entity.receiver;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
@@ -33,10 +31,14 @@ public abstract class BaseUnSyncedEntity extends AbstractEntity {
 	@Setter
 	private SiteInfo site;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "last_seen_queue")
+	@Column(name = "in_sync_queue", nullable = false)
 	@Getter
 	@Setter
-	private ReceiverQueue lastSeenQueue;
+	private boolean inSyncQueue;
+	
+	@Column(name = "in_error_queue", nullable = false)
+	@Getter
+	@Setter
+	private boolean inErrorQueue;
 	
 }

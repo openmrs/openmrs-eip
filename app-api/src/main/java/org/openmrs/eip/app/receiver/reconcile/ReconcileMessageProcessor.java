@@ -15,12 +15,17 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.UndeletedEntity;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.repository.OpenmrsRepository;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +43,11 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ReconcileMessageProcessor.class);
 	
-	private final static int DEFAULT_MIN_BATCH_RECONCILE_SIZE = 50;
+	private static final int DEFAULT_MIN_BATCH_RECONCILE_SIZE = 50;
 	
-	private final static int DEFAULT_MAX_BATCH_RECONCILE_SIZE = 500;
+	private static final int DEFAULT_MAX_BATCH_RECONCILE_SIZE = 500;
+	
+	protected static final List<SyncOperation> OPERATIONS = List.of(SyncOperation.d);
 	
 	@Value("${" + PROP_MIN_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MIN_BATCH_RECONCILE_SIZE + "}")
 	private int minReconcileBatchSize;
@@ -52,11 +59,18 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	private UndeletedEntityRepository undeletedRepo;
 	
+	private SyncMessageRepository syncMsgRepo;
+	
+	private ReceiverRetryRepository retryRepo;
+	
 	public ReconcileMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ReceiverReconcileService service, UndeletedEntityRepository undeletedRepo) {
+	    ReceiverReconcileService service, UndeletedEntityRepository undeletedRepo, SyncMessageRepository syncMsgRepo,
+	    ReceiverRetryRepository retryRepo) {
 		super(executor);
 		this.service = service;
 		this.undeletedRepo = undeletedRepo;
+		this.syncMsgRepo = syncMsgRepo;
+		this.retryRepo = retryRepo;
 	}
 	
 	@Override
@@ -183,6 +197,8 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 			    allUuids.indexOf(uuids.get(0)), allUuids.indexOf(uuids.get(size - 1)), table);
 		}
 		
+		Class<? extends BaseModel> modelClass = TableToSyncEnum.getTableToSyncEnum(table.toUpperCase()).getModelClass();
+		List<String> classNames = Utils.getListOfModelClassHierarchy(modelClass.getName());
 		//TODO Add the bisect and reconcile logic
 		for (String uuid : uuids) {
 			if (!repo.existsByUuid(uuid)) {
@@ -198,7 +214,10 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 			entity.setIdentifier(uuid);
 			entity.setSite(msg.getSite());
 			entity.setDateCreated(new Date());
-			//TODO Check sync and error queue for existence of the entity event
+			entity.setInErrorQueue(
+			    retryRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, classNames, OPERATIONS));
+			entity.setInSyncQueue(
+			    syncMsgRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, classNames, OPERATIONS));
 			undeletedRepo.save(entity);
 		}
 	}

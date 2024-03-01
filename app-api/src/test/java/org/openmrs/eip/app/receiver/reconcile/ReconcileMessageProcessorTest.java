@@ -2,6 +2,7 @@ package org.openmrs.eip.app.receiver.reconcile;
 
 import static java.util.stream.IntStream.rangeClosed;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_SEPARATOR;
+import static org.openmrs.eip.app.receiver.reconcile.ReconcileMessageProcessor.OPERATIONS;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.ArrayList;
@@ -31,10 +33,14 @@ import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.UndeletedEntity;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
+import org.openmrs.eip.component.utils.Utils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -57,11 +63,17 @@ public class ReconcileMessageProcessorTest {
 	@Mock
 	private UndeletedEntityRepository mockUndeletedRepo;
 	
+	@Mock
+	private SyncMessageRepository mockSyncMsgRepo;
+	
+	@Mock
+	private ReceiverRetryRepository mockRetryRepo;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ReconcileMessageProcessor(null, mockService, mockUndeletedRepo);
+		processor = new ReconcileMessageProcessor(null, mockService, mockUndeletedRepo, mockSyncMsgRepo, mockRetryRepo);
 		Whitebox.setInternalState(processor, "maxReconcileBatchSize", MAX_REC_BATCH_SIZE);
 		Whitebox.setInternalState(processor, "minReconcileBatchSize", 2);
 	}
@@ -302,14 +314,16 @@ public class ReconcileMessageProcessorTest {
 	@Test
 	public void verifyDeletedEntities_shouldSaveUndeletedEntities() {
 		final String table = "person";
+		final String uuid1 = "uuid-1";
+		final String uuid3 = "uuid-3";
 		final int batchSize = 3;
 		final SiteInfo mockSite = Mockito.mock(SiteInfo.class);
 		List<String> uuids = rangeClosed(1, batchSize).boxed().map(i -> "uuid-" + i).toList();
 		ReconciliationMessage msg = new ReconciliationMessage();
 		msg.setTableName(table);
 		msg.setSite(mockSite);
-		when(mockEntityRepo.existsByUuid("uuid-1")).thenReturn(true);
-		when(mockEntityRepo.existsByUuid("uuid-3")).thenReturn(true);
+		when(mockEntityRepo.existsByUuid(uuid1)).thenReturn(true);
+		when(mockEntityRepo.existsByUuid(uuid3)).thenReturn(true);
 		long timestamp = System.currentTimeMillis();
 		
 		processor.verifyDeletedEntities(uuids, uuids, msg, mockEntityRepo);
@@ -318,13 +332,50 @@ public class ReconcileMessageProcessorTest {
 		verify(mockUndeletedRepo, times(2)).save(argCaptor.capture());
 		UndeletedEntity entity = argCaptor.getAllValues().get(0);
 		assertEquals(table, entity.getTableName());
-		assertEquals("uuid-1", entity.getIdentifier());
+		assertEquals(uuid1, entity.getIdentifier());
 		assertEquals(mockSite, entity.getSite());
+		assertFalse(entity.isInSyncQueue());
+		assertFalse(entity.isInErrorQueue());
 		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
 		entity = argCaptor.getAllValues().get(1);
 		assertEquals(table, entity.getTableName());
-		assertEquals("uuid-3", entity.getIdentifier());
+		assertEquals(uuid3, entity.getIdentifier());
 		assertEquals(mockSite, entity.getSite());
+		assertFalse(entity.isInSyncQueue());
+		assertFalse(entity.isInErrorQueue());
+		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
+		List<String> modelClasses = Utils.getListOfModelClassHierarchy(PersonModel.class.getName());
+		verify(mockSyncMsgRepo).existsByIdentifierAndModelClassNameInAndOperationIn(uuid1, modelClasses, OPERATIONS);
+		verify(mockSyncMsgRepo).existsByIdentifierAndModelClassNameInAndOperationIn(uuid3, modelClasses, OPERATIONS);
+	}
+	
+	@Test
+	public void verifyDeletedEntities_shouldSaveUndeletedEntitiesIndicateIfTheyHaveEventsInSyncOrErrorQueues() {
+		final String table = "person";
+		final String uuid = "uuid";
+		final SiteInfo mockSite = Mockito.mock(SiteInfo.class);
+		List<String> uuids = List.of(uuid);
+		ReconciliationMessage msg = new ReconciliationMessage();
+		msg.setTableName(table);
+		msg.setSite(mockSite);
+		when(mockEntityRepo.existsByUuid(uuid)).thenReturn(true);
+		List<String> modelClasses = Utils.getListOfModelClassHierarchy(PersonModel.class.getName());
+		when(mockSyncMsgRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, modelClasses, OPERATIONS))
+		        .thenReturn(true);
+		when(mockRetryRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, modelClasses, OPERATIONS))
+		        .thenReturn(true);
+		long timestamp = System.currentTimeMillis();
+		
+		processor.verifyDeletedEntities(uuids, uuids, msg, mockEntityRepo);
+		
+		ArgumentCaptor<UndeletedEntity> argCaptor = ArgumentCaptor.forClass(UndeletedEntity.class);
+		verify(mockUndeletedRepo).save(argCaptor.capture());
+		UndeletedEntity entity = argCaptor.getAllValues().get(0);
+		assertEquals(table, entity.getTableName());
+		assertEquals(uuid, entity.getIdentifier());
+		assertEquals(mockSite, entity.getSite());
+		assertTrue(entity.isInSyncQueue());
+		assertTrue(entity.isInErrorQueue());
 		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
 	}
 	
