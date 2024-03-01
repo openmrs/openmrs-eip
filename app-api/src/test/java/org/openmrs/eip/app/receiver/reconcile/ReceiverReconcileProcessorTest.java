@@ -28,6 +28,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.Rec
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
+import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
@@ -60,7 +61,10 @@ public class ReceiverReconcileProcessorTest {
 	private ReceiverTableReconcileRepository mockTableRecRepo;
 	
 	@Mock
-	private MissingEntityRepository missingRepo;
+	private MissingEntityRepository mockMissingRepo;
+	
+	@Mock
+	private DebeziumEventRepository mockDeletedRepo;
 	
 	@Mock
 	private JmsTemplate mockJmsTemplate;
@@ -72,7 +76,7 @@ public class ReceiverReconcileProcessorTest {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new ReceiverReconcileProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
-		        missingRepo, mockJmsTemplate);
+		        mockMissingRepo, mockDeletedRepo, mockJmsTemplate);
 		Whitebox.setInternalState(processor, "batchSize", BATCH_SIZE);
 	}
 	
@@ -123,7 +127,8 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(siteRec2.getDateCreated().getTime() == timestamp || siteRec2.getDateCreated().getTime() > timestamp);
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 		verify(mockRecRepo).save(rec);
-		verify(missingRepo).deleteAll();
+		verify(mockMissingRepo).deleteAll();
+		verify(mockDeletedRepo).deleteAll();
 		verify(mockTableRecRepo).deleteAll();
 		verify(mockSiteRecRepo).deleteAll();
 	}

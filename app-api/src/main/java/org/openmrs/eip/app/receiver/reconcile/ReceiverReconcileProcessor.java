@@ -18,6 +18,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.Rec
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
+import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
@@ -53,6 +54,8 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private MissingEntityRepository missingRepo;
 	
+	private DebeziumEventRepository deletedRepo;
+	
 	private JmsTemplate jmsTemplate;
 	
 	@Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}")
@@ -60,13 +63,15 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
-	    ReceiverTableReconcileRepository tableReconcileRepo, MissingEntityRepository missingRepo, JmsTemplate jmsTemplate) {
+	    ReceiverTableReconcileRepository tableReconcileRepo, MissingEntityRepository missingRepo,
+	    DebeziumEventRepository deletedRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
 		this.siteReconcileRepo = siteReconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
 		this.missingRepo = missingRepo;
+		this.deletedRepo = deletedRepo;
 		this.jmsTemplate = jmsTemplate;
 	}
 	
@@ -96,6 +101,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private void initialize(ReceiverReconciliation reconciliation) {
 		missingRepo.deleteAll();
+		deletedRepo.deleteAll();
 		tableReconcileRepo.deleteAll();
 		siteReconcileRepo.deleteAll();
 		
