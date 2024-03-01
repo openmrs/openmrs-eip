@@ -28,12 +28,12 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.Rec
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -64,7 +64,7 @@ public class ReceiverReconcileProcessorTest {
 	private MissingEntityRepository mockMissingRepo;
 	
 	@Mock
-	private DebeziumEventRepository mockDeletedRepo;
+	private UndeletedEntityRepository mockUnDeletedRepo;
 	
 	@Mock
 	private JmsTemplate mockJmsTemplate;
@@ -76,7 +76,7 @@ public class ReceiverReconcileProcessorTest {
 		PowerMockito.mockStatic(ReceiverUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new ReceiverReconcileProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
-		        mockMissingRepo, mockDeletedRepo, mockJmsTemplate);
+		        mockMissingRepo, mockUnDeletedRepo, mockJmsTemplate);
 		Whitebox.setInternalState(processor, "batchSize", BATCH_SIZE);
 	}
 	
@@ -128,7 +128,7 @@ public class ReceiverReconcileProcessorTest {
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
 		verify(mockRecRepo).save(rec);
 		verify(mockMissingRepo).deleteAll();
-		verify(mockDeletedRepo).deleteAll();
+		verify(mockUnDeletedRepo).deleteAll();
 		verify(mockTableRecRepo).deleteAll();
 		verify(mockSiteRecRepo).deleteAll();
 	}

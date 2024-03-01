@@ -18,12 +18,12 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.Rec
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
-import org.openmrs.eip.app.management.repository.DebeziumEventRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.JsonUtils;
@@ -54,7 +54,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private MissingEntityRepository missingRepo;
 	
-	private DebeziumEventRepository deletedRepo;
+	private UndeletedEntityRepository unDeletedRepo;
 	
 	private JmsTemplate jmsTemplate;
 	
@@ -64,14 +64,14 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
 	    ReceiverTableReconcileRepository tableReconcileRepo, MissingEntityRepository missingRepo,
-	    DebeziumEventRepository deletedRepo, JmsTemplate jmsTemplate) {
+	    UndeletedEntityRepository unDeletedRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
 		this.siteReconcileRepo = siteReconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
 		this.missingRepo = missingRepo;
-		this.deletedRepo = deletedRepo;
+		this.unDeletedRepo = unDeletedRepo;
 		this.jmsTemplate = jmsTemplate;
 	}
 	
@@ -101,7 +101,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private void initialize(ReceiverReconciliation reconciliation) {
 		missingRepo.deleteAll();
-		deletedRepo.deleteAll();
+		unDeletedRepo.deleteAll();
 		tableReconcileRepo.deleteAll();
 		siteReconcileRepo.deleteAll();
 		
@@ -137,7 +137,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 			if (incompleteTables.isEmpty()) {
 				siteRec.setDateCompleted(LocalDateTime.now());
 				if (LOG.isTraceEnabled()) {
-					LOG.trace("Saving updates to completed site reconciliation");
+					LOG.trace("Saving updates to completed reconciliation for site {}", site.getName());
 				}
 				
 				siteReconcileRepo.save(siteRec);

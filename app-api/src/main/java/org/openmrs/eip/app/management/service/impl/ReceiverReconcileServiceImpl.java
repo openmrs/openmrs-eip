@@ -105,7 +105,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		if (resp.getRowCount() != null && resp.getRemoteStartDate() != null) {
 			//These are the first uuids for the associated table
 			if (LOG.isDebugEnabled()) {
-				LOG.debug("Adding table reconciliation");
+				LOG.debug("Adding reconciliation for table {}", table);
 			}
 			
 			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
@@ -118,7 +118,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			tableRec.setDateCreated(new Date());
 			
 			if (LOG.isTraceEnabled()) {
-				LOG.debug("Saving table reconciliation");
+				LOG.trace("Saving reconciliation for table {}", table);
 			}
 			
 			tableReconcileRepo.save(tableRec);

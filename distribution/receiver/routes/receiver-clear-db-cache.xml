@@ -4,7 +4,7 @@
 
         <log loggingLevel="DEBUG" message="Start: ${routeId}" />
 
-        <log message="Removing the entity from OpenMRS DB cache -> ${body}" />
+        <log loggingLevel="DEBUG" message="Removing the entity from OpenMRS DB cache -> ${body}" />
 
         <setHeader name="Content-Type">
             <constant>application/json</constant>

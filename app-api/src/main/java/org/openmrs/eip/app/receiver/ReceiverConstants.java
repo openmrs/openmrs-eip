@@ -102,17 +102,9 @@ public class ReceiverConstants {
 	
 	public static final String URI_RETRY = "direct:" + ROUTE_ID_RETRY;
 	
-	public static final String ROUTE_ID_RECEIVER_MAIN = "receiver-main";
-	
-	public static final String URI_RECEIVER_MAIN = "direct:" + ROUTE_ID_RECEIVER_MAIN;
-	
 	public static final String ROUTE_ID_UPDATE_LAST_SYNC_DATE = "update-site-last-sync-date";
 	
 	public static final String URI_UPDATE_LAST_SYNC_DATE = "direct:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE;
-	
-	public static final String ROUTE_ID_COMPLEX_OBS_SYNC = "inbound-complex-obs-sync";
-	
-	public static final String URI_COMPLEX_OBS_SYNC = "direct:" + ROUTE_ID_COMPLEX_OBS_SYNC;
 	
 	public static final String ROUTE_ID_UPDATE_SEARCH_INDEX = "receiver-update-search-index";
 	
