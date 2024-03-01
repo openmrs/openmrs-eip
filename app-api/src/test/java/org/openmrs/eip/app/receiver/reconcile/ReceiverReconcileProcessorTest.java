@@ -161,7 +161,7 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		dateCompletedMillis = siteRec2.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
-		assertEquals(ReconciliationStatus.FINALIZING, rec.getStatus());
+		assertEquals(ReconciliationStatus.COMPLETED, rec.getStatus());
 	}
 	
 	@Test

@@ -152,7 +152,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		}
 		
 		if (incompleteSites.isEmpty()) {
-			reconciliation.setStatus(ReconciliationStatus.FINALIZING);
+			reconciliation.setStatus(ReconciliationStatus.COMPLETED);
 			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Saving updated reconciliation");
