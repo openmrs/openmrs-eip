@@ -1,6 +1,10 @@
 package org.openmrs.eip.app.management.service.impl;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.component.SyncOperation.c;
+import static org.openmrs.eip.component.SyncOperation.r;
+import static org.openmrs.eip.component.SyncOperation.s;
+import static org.openmrs.eip.component.SyncOperation.u;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -17,15 +21,21 @@ import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReconciliationMsgRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
+import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
+import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.model.BaseModel;
+import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -37,6 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReceiverReconcileServiceImpl extends BaseService implements ReceiverReconcileService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ReceiverReconcileServiceImpl.class);
+	
+	protected static final List<SyncOperation> OPERATIONS = List.of(c, u, r, s);
 	
 	private SiteRepository siteRepo;
 	
@@ -52,10 +64,14 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	
 	private MissingEntityRepository missingRepo;
 	
+	private SyncMessageRepository syncMsgRepo;
+	
+	private ReceiverRetryRepository retryRepo;
+	
 	public ReceiverReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
 	    SiteReconciliationRepository siteReconcileRepo, ReceiverTableReconcileRepository tableReconcileRepo,
-	    MissingEntityRepository missingRepo) {
+	    MissingEntityRepository missingRepo, SyncMessageRepository syncMsgRepo, ReceiverRetryRepository retryRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
@@ -63,6 +79,8 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		this.siteReconcileRepo = siteReconcileRepo;
 		this.tableReconcileRepo = tableReconcileRepo;
 		this.missingRepo = missingRepo;
+		this.syncMsgRepo = syncMsgRepo;
+		this.retryRepo = retryRepo;
 	}
 	
 	@Override
@@ -117,21 +135,31 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids) {
 		if (!found) {
+			final String table = message.getTableName();
+			Class<? extends BaseModel> modelClass = TableToSyncEnum.getTableToSyncEnum(table.toUpperCase()).getModelClass();
+			List<String> classNames = Utils.getListOfModelClassHierarchy(modelClass.getName());
 			for (String uuid : uuids) {
 				MissingEntity missing = new MissingEntity();
 				missing.setIdentifier(uuid);
-				missing.setTableName(message.getTableName());
+				missing.setTableName(table);
 				missing.setSite(message.getSite());
 				missing.setDateCreated(new Date());
+				boolean inSync = retryRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, classNames, OPERATIONS);
+				missing.setInErrorQueue(inSync);
+				boolean inError = syncMsgRepo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, classNames,
+				    OPERATIONS);
+				missing.setInSyncQueue(inError);
 				missingRepo.save(missing);
 				
-				ReceiverSyncRequest request = new ReceiverSyncRequest();
-				request.setSite(message.getSite());
-				request.setTableName(message.getTableName());
-				request.setIdentifier(uuid);
-				request.setRequestUuid(UUID.randomUUID().toString());
-				request.setDateCreated(new Date());
-				requestRepo.save(request);
+				if (!inSync && !inError) {
+					ReceiverSyncRequest request = new ReceiverSyncRequest();
+					request.setSite(message.getSite());
+					request.setTableName(table);
+					request.setIdentifier(uuid);
+					request.setRequestUuid(UUID.randomUUID().toString());
+					request.setDateCreated(new Date());
+					requestRepo.save(request);
+				}
 			}
 		}
 		
