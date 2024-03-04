@@ -68,8 +68,7 @@ public class SenderReconcileServiceImpl implements SenderReconcileService {
 			endId = 0L;
 			count = 0;
 		} else {
-			//TODO Get count where id < endId
-			count = repo.count();
+			count = repo.countByIdLessThanEqual(endId);
 		}
 		
 		tableRec.setRowCount(count);

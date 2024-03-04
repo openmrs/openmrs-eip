@@ -82,7 +82,7 @@ public class SenderReconcileServiceImplTest {
 		SenderTableReconciliation existingRec = new SenderTableReconciliation();
 		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
 		when(mockPersonRepo.getMaxId()).thenReturn(maxId);
-		when(mockPersonRepo.count()).thenReturn(expectedRowCount);
+		when(mockPersonRepo.countByIdLessThanEqual(maxId)).thenReturn(expectedRowCount);
 		
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
 		
@@ -106,7 +106,7 @@ public class SenderReconcileServiceImplTest {
 		existingRec.setLastProcessedId(lastProcessedId);
 		when(mockTableRecRepo.getByTableNameIgnoreCase(table)).thenReturn(existingRec);
 		when(mockPersonRepo.getMaxId()).thenReturn(maxId);
-		when(mockPersonRepo.count()).thenReturn(expectedRowCount);
+		when(mockPersonRepo.countByIdLessThanEqual(maxId)).thenReturn(expectedRowCount);
 		
 		List<SenderTableReconciliation> recs = service.takeSnapshot();
 		

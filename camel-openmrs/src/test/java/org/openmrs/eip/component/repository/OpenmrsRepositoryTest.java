@@ -75,4 +75,9 @@ public class OpenmrsRepositoryTest extends BaseDbDrivenTest {
 		assertEquals("2efd940e-32dc-491f-8038-a8f3afe3e35f", uuidsAndIds.get(0)[1]);
 	}
 	
+	@Test
+	public void countByIdLessThanEqual_shouldGetTheCountOfRowsWithIdsLessThaNorEqualTheSpecifiedId() {
+		Assert.assertEquals(2, attribRepo.countByIdLessThanEqual(2L).longValue());
+	}
+	
 }
