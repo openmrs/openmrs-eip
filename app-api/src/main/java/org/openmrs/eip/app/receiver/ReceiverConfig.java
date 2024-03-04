@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
+import org.openmrs.eip.app.receiver.reconcile.ReconcileScheduler;
 import org.openmrs.eip.component.SyncProfiles;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +24,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@EnableScheduling
 @Profile(SyncProfiles.RECEIVER)
 public class ReceiverConfig {
 	
@@ -51,6 +55,11 @@ public class ReceiverConfig {
 	        + DEFAULT_SITE_PARALLEL_SIZE + "}") int parallelSiteSize) {
 		
 		return (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(parallelSiteSize);
+	}
+	
+	@Bean
+	public ReconcileScheduler reconcileScheduler(ReceiverReconcileRepository repo) {
+		return new ReconcileScheduler(repo);
 	}
 	
 }

@@ -100,6 +100,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	}
 	
 	private void initialize(ReceiverReconciliation reconciliation) {
+		LOG.info("Initializing reconciliation {}", reconciliation.getIdentifier());
 		missingRepo.deleteAll();
 		unDeletedRepo.deleteAll();
 		tableReconcileRepo.deleteAll();
@@ -121,6 +122,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		
 		reconciliation.setStatus(ReconciliationStatus.PROCESSING);
 		reconcileRepo.save(reconciliation);
+		LOG.info("Successfully initialized reconciliation {}", reconciliation.getIdentifier());
 	}
 	
 	private void update(ReceiverReconciliation reconciliation) {
