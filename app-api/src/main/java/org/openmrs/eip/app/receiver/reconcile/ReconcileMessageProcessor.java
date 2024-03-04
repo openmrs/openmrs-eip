@@ -55,6 +55,8 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	@Value("${" + PROP_MAX_BATCH_RECONCILE_SIZE + ":" + DEFAULT_MAX_BATCH_RECONCILE_SIZE + "}")
 	private int maxReconcileBatchSize;
 	
+	private boolean batchSizesValid;
+	
 	private ReceiverReconcileService service;
 	
 	private UndeletedEntityRepository undeletedRepo;
@@ -106,6 +108,15 @@ public class ReconcileMessageProcessor extends BaseQueueProcessor<Reconciliation
 	
 	@Override
 	public void processItem(ReconciliationMessage msg) {
+		if (!batchSizesValid) {
+			if (minReconcileBatchSize > maxReconcileBatchSize) {
+				throw new EIPException("The value for " + PROP_MIN_BATCH_RECONCILE_SIZE + " can't be less than that of "
+				        + PROP_MAX_BATCH_RECONCILE_SIZE);
+			}
+			
+			batchSizesValid = true;
+		}
+		
 		String[] uuids = StringUtils.split(msg.getData().trim(), SyncConstants.RECONCILE_MSG_SEPARATOR);
 		if (uuids.length != msg.getBatchSize()) {
 			throw new EIPException("Batch size and item count don't match for the reconciliation message");

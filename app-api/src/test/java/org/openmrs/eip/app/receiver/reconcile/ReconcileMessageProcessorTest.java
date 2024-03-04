@@ -3,6 +3,7 @@ package org.openmrs.eip.app.receiver.reconcile;
 import static java.util.stream.IntStream.rangeClosed;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +14,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.openmrs.eip.app.SyncConstants.PROP_MAX_BATCH_RECONCILE_SIZE;
+import static org.openmrs.eip.app.SyncConstants.PROP_MIN_BATCH_RECONCILE_SIZE;
 import static org.openmrs.eip.app.SyncConstants.RECONCILE_MSG_SEPARATOR;
 import static org.openmrs.eip.app.receiver.reconcile.ReconcileMessageProcessor.OPERATIONS;
 import static org.powermock.reflect.Whitebox.setInternalState;
@@ -23,6 +26,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +42,7 @@ import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.repository.SyncEntityRepository;
 import org.openmrs.eip.component.utils.Utils;
@@ -377,6 +382,16 @@ public class ReconcileMessageProcessorTest {
 		assertTrue(entity.isInSyncQueue());
 		assertTrue(entity.isInErrorQueue());
 		assertTrue(entity.getDateCreated().getTime() == timestamp || entity.getDateCreated().getTime() > timestamp);
+	}
+	
+	@Test
+	public void processItem_shouldFailIfMinBatchSizeIsGreaterThanTheMax() {
+		Whitebox.setInternalState(processor, "maxReconcileBatchSize", 5);
+		Whitebox.setInternalState(processor, "minReconcileBatchSize", 6);
+		Exception ex = assertThrows(EIPException.class, () -> processor.processItem(new ReconciliationMessage()));
+		Assert.assertEquals("The value for " + PROP_MIN_BATCH_RECONCILE_SIZE + " can't be less than that of "
+		        + PROP_MAX_BATCH_RECONCILE_SIZE,
+		    ex.getMessage());
 	}
 	
 }
