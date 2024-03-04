@@ -109,19 +109,26 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 			}
 			
 			SiteReconciliation siteRec = siteReconcileRepo.getBySite(site);
-			ReceiverTableReconciliation tableRec = new ReceiverTableReconciliation();
-			tableRec.setSiteReconciliation(siteRec);
-			tableRec.setTableName(table);
-			tableRec.setRowCount(resp.getRowCount());
-			tableRec.setRemoteStartDate(resp.getRemoteStartDate());
-			tableRec.setLastBatchReceived(resp.isLastTableBatch());
-			tableRec.setDateCreated(new Date());
-			
-			if (LOG.isTraceEnabled()) {
-				LOG.trace("Saving reconciliation for table {}", table);
+			if (tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec, table) != null) {
+				//Typically, this would ONLY happen if duplicate payload was sent 
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Encountered possible duplicate initial reconcile payload for table {}", table);
+				}
+			} else {
+				ReceiverTableReconciliation tableRec = new ReceiverTableReconciliation();
+				tableRec.setSiteReconciliation(siteRec);
+				tableRec.setTableName(table);
+				tableRec.setRowCount(resp.getRowCount());
+				tableRec.setRemoteStartDate(resp.getRemoteStartDate());
+				tableRec.setLastBatchReceived(resp.isLastTableBatch());
+				tableRec.setDateCreated(new Date());
+				
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("Saving reconciliation for table {}", table);
+				}
+				
+				tableReconcileRepo.save(tableRec);
 			}
-			
-			tableReconcileRepo.save(tableRec);
 		}
 		
 		if (LOG.isTraceEnabled()) {
@@ -185,6 +192,11 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		ReceiverTableReconciliation tableRec = tableReconcileRepo.getBySiteReconciliationAndTableName(siteRec,
 		    message.getTableName());
 		tableRec.setProcessedCount(tableRec.getProcessedCount() + processedUuidCount);
+		if (tableRec.getProcessedCount() > tableRec.getRowCount()) {
+			//This would ONLY happen if we received duplicate payloads.
+			tableRec.setProcessedCount(tableRec.getRowCount());
+		}
+		
 		if (message.isLastTableBatch()) {
 			tableRec.setLastBatchReceived(true);
 		}
