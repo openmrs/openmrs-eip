@@ -3,7 +3,7 @@
         <from uri="direct:debezium-event-processor" />
 
         <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
-        <log message="Processing debezium event: ${body}" />
+        <log loggingLevel="DEBUG" message="Processing debezium event: ${body}" />
 
         <setProperty name="dbzmEvent">
             <simple>${body}</simple>

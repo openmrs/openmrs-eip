@@ -102,8 +102,9 @@ public class ChangeEventHandler {
 		}
 		
 		repository.save(debeziumEvent);
-		
-		log.info("Debezium event saved to event queue");
+		if (log.isDebugEnabled()) {
+			log.debug("Debezium event saved to event queue");
+		}
 		
 		if (op.equals("d")) {
 			DeletedEntity de = new DeletedEntity();

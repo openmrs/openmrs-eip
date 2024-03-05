@@ -6,7 +6,7 @@
 
         <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
 
-        <log message="Preparing sync payload to send" />
+        <log loggingLevel="DEBUG" message="Preparing sync payload to send" />
 
         <setProperty name="senderSyncMsg">
             <simple>${body}</simple>
@@ -62,7 +62,7 @@
 
         <to uri="jpa:senderSyncMsg" />
 
-        <log message="Successfully sent and updated status for sync message" />
+        <log loggingLevel="DEBUG" message="Successfully sent and updated status for sync message" />
 
         <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
     </route>

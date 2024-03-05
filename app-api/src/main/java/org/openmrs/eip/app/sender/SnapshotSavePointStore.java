@@ -65,13 +65,15 @@ class SnapshotSavePointStore {
 	
 	void update(Map<String, Integer> tableIdMap) {
 		props.putAll(tableIdMap.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().toString())));
-		
-		log.info("Writing the snapshot savepoint to disk");
+		if (log.isDebugEnabled()) {
+			log.debug("Writing the snapshot savepoint to disk");
+		}
 		
 		try {
 			props.store(FileUtils.openOutputStream(file), null);
-			
-			log.info("Successfully written the snapshot savepoint to disk");
+			if (log.isDebugEnabled()) {
+				log.debug("Successfully written the snapshot savepoint to disk");
+			}
 		}
 		catch (IOException e) {
 			throw new EIPException("Failed to write the snapshot savepoint to disk", e);
