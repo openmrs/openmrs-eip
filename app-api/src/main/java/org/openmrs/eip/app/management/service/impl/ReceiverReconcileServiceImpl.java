@@ -132,7 +132,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		}
 		
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("Removing reconciliation message");
+			LOG.trace("Removing reconciliation JMS message");
 		}
 		
 		jmsMsgRepo.delete(jmsMessage);
