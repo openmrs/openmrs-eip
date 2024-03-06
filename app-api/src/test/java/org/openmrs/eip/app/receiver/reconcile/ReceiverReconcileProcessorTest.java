@@ -12,29 +12,36 @@ import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.time.ZoneId;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReconcileTableSummary;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
+import org.openmrs.eip.app.management.repository.ReconcileTableSummaryRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -43,7 +50,7 @@ import org.powermock.reflect.Whitebox;
 import org.springframework.jms.core.JmsTemplate;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(ReceiverUtils.class)
+@PrepareForTest({ ReceiverUtils.class, AppUtils.class })
 public class ReceiverReconcileProcessorTest {
 	
 	private static final int BATCH_SIZE = 100;
@@ -67,6 +74,9 @@ public class ReceiverReconcileProcessorTest {
 	private UndeletedEntityRepository mockUnDeletedRepo;
 	
 	@Mock
+	private ReconcileTableSummaryRepository mockSummaryRepo;
+	
+	@Mock
 	private JmsTemplate mockJmsTemplate;
 	
 	private ReceiverReconcileProcessor processor;
@@ -74,9 +84,10 @@ public class ReceiverReconcileProcessorTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverUtils.class);
+		PowerMockito.mockStatic(AppUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = new ReceiverReconcileProcessor(null, mockSiteRepo, mockRecRepo, mockSiteRecRepo, mockTableRecRepo,
-		        mockMissingRepo, mockUnDeletedRepo, mockJmsTemplate);
+		        mockMissingRepo, mockUnDeletedRepo, mockSummaryRepo, mockJmsTemplate);
 		Whitebox.setInternalState(processor, "batchSize", BATCH_SIZE);
 	}
 	
@@ -161,7 +172,7 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		dateCompletedMillis = siteRec2.getDateCompleted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
-		assertEquals(ReconciliationStatus.COMPLETED, rec.getStatus());
+		assertEquals(ReconciliationStatus.POST_PROCESSING, rec.getStatus());
 	}
 	
 	@Test
@@ -222,6 +233,67 @@ public class ReceiverReconcileProcessorTest {
 		assertTrue(dateCompletedMillis == timestamp || dateCompletedMillis > timestamp);
 		assertNull(siteRec2.getDateCompleted());
 		assertEquals(ReconciliationStatus.PROCESSING, rec.getStatus());
+	}
+	
+	@Test
+	public void processItem_shouldPostProcessReconciliationAndGenerateSummaries() {
+		final String personTable = "person";
+		final String visitTable = "visit";
+		final int summaryCount = 4;
+		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
+		SiteInfo mockSite2 = Mockito.mock(SiteInfo.class);
+		Set<String> tables = new LinkedHashSet<>(2);
+		tables.add(personTable);
+		tables.add(visitTable);
+		when(AppUtils.getTablesToSync()).thenReturn(tables);
+		ReceiverReconciliation rec = new ReceiverReconciliation();
+		rec.setStatus(ReconciliationStatus.POST_PROCESSING);
+		when(mockSiteRepo.findAll()).thenReturn(List.of(mockSite1, mockSite2));
+		long timestamp = System.currentTimeMillis();
+		
+		processor.processItem(rec);
+		
+		ArgumentCaptor<ReconcileTableSummary> argCaptor = ArgumentCaptor.forClass(ReconcileTableSummary.class);
+		Mockito.verify(mockSummaryRepo, times(summaryCount)).save(argCaptor.capture());
+		List<ReconcileTableSummary> summaries = argCaptor.getAllValues();
+		assertEquals(summaryCount, summaries.size());
+		for (ReconcileTableSummary s : summaries) {
+			assertEquals(rec, s.getReconciliation());
+			assertTrue(s.getDateCreated().getTime() == timestamp || s.getDateCreated().getTime() > timestamp);
+		}
+		ReconcileTableSummary s = summaries.get(0);
+		assertEquals(mockSite1, s.getSite());
+		assertEquals(personTable, s.getTableName());
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCase(mockSite1, personTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(mockSite1, personTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(mockSite1, personTable);
+		s = summaries.get(1);
+		assertEquals(mockSite1, s.getSite());
+		assertEquals(visitTable, s.getTableName());
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCase(mockSite1, visitTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(mockSite1, visitTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(mockSite1, visitTable);
+		s = summaries.get(2);
+		assertEquals(mockSite2, s.getSite());
+		assertEquals(personTable, s.getTableName());
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCase(mockSite2, personTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(mockSite2, personTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(mockSite2, personTable);
+		s = summaries.get(3);
+		assertEquals(mockSite2, s.getSite());
+		assertEquals(visitTable, s.getTableName());
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCase(mockSite2, visitTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(mockSite2, visitTable);
+		verify(mockMissingRepo).countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(mockSite2, visitTable);
+		assertEquals(ReconciliationStatus.COMPLETED, rec.getStatus());
+	}
+	
+	@Test
+	public void processItem_shouldFailForACompletedReconciliation() {
+		ReceiverReconciliation rec = new ReceiverReconciliation();
+		rec.setStatus(ReconciliationStatus.COMPLETED);
+		EIPException ex = Assert.assertThrows(EIPException.class, () -> processor.processItem(rec));
+		assertEquals("Reconciliation is already completed", ex.getMessage());
 	}
 	
 }

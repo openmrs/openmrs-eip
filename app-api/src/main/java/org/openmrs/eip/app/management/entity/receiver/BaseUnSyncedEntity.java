@@ -13,6 +13,12 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class BaseUnSyncedEntity extends AbstractEntity {
 	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "site_id", nullable = false, updatable = false)
+	@Getter
+	@Setter
+	private SiteInfo site;
+	
 	@Column(name = "table_name", nullable = false, updatable = false, length = 100)
 	@NotBlank
 	@Getter
@@ -24,12 +30,6 @@ public abstract class BaseUnSyncedEntity extends AbstractEntity {
 	@Getter
 	@Setter
 	private String identifier;
-	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "site_id", nullable = false, updatable = false)
-	@Getter
-	@Setter
-	private SiteInfo site;
 	
 	@Column(name = "in_sync_queue", nullable = false)
 	@Getter

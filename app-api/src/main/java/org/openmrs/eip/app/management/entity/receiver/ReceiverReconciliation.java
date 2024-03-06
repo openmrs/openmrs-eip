@@ -16,7 +16,7 @@ import lombok.Setter;
 public class ReceiverReconciliation extends AbstractEntity {
 	
 	public enum ReconciliationStatus {
-		NEW, PROCESSING, COMPLETED
+		NEW, PROCESSING, POST_PROCESSING, COMPLETED
 	}
 	
 	@Column(name = "identifier", nullable = false, updatable = false, unique = true, length = 50)

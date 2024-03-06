@@ -311,4 +311,58 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240306-0835" labels="1.6.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="reconcile_table_summary"/>
+            </not>
+        </preConditions>
+        <comment>Adding reconcile_table_summary table</comment>
+        <createTable tableName="reconcile_table_summary">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reconcile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="site_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="table_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="missing_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="missing_sync_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="missing_error_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="undeleted_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="undeleted_sync_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="undeleted_error_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="summary_reconcile_fk"
+                                 baseTableName="reconcile_table_summary"
+                                 baseColumnNames="reconcile_id"
+                                 referencedTableName="receiver_reconcile"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="summary_site_fk"
+                                 baseTableName="reconcile_table_summary"
+                                 baseColumnNames="site_id"
+                                 referencedTableName="site_info"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -9,7 +9,7 @@
             <simple>${body}</simple>
         </setProperty>
 
-        <log message="Processing sender sync response -> ${exchangeProperty.syncResponse}" />
+        <log loggingLevel="DEBUG" message="Processing sender sync response -> ${exchangeProperty.syncResponse}" />
 
         <toD uri="jpa:SenderSyncMessage?query=SELECT m FROM SenderSyncMessage m WHERE m.messageUuid='${exchangeProperty.syncResponse.messageUuid}'" />
 

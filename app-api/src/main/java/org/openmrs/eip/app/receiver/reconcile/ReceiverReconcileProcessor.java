@@ -16,16 +16,19 @@ import org.openmrs.eip.app.management.entity.ReconciliationRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReconcileTableSummary;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
+import org.openmrs.eip.app.management.repository.ReconcileTableSummaryRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.UndeletedEntityRepository;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,8 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	private UndeletedEntityRepository unDeletedRepo;
 	
+	private ReconcileTableSummaryRepository summaryRepo;
+	
 	private JmsTemplate jmsTemplate;
 	
 	@Value("${" + PROP_RECONCILE_MSG_BATCH_SIZE + ":" + RECONCILE_MSG_BATCH_SIZE + "}")
@@ -64,7 +69,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	public ReceiverReconcileProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
 	    SiteRepository siteRepo, ReceiverReconcileRepository reconcileRepo, SiteReconciliationRepository siteReconcileRepo,
 	    ReceiverTableReconcileRepository tableReconcileRepo, MissingEntityRepository missingRepo,
-	    UndeletedEntityRepository unDeletedRepo, JmsTemplate jmsTemplate) {
+	    UndeletedEntityRepository unDeletedRepo, ReconcileTableSummaryRepository summaryRepo, JmsTemplate jmsTemplate) {
 		super(executor);
 		this.siteRepo = siteRepo;
 		this.reconcileRepo = reconcileRepo;
@@ -72,6 +77,7 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		this.tableReconcileRepo = tableReconcileRepo;
 		this.missingRepo = missingRepo;
 		this.unDeletedRepo = unDeletedRepo;
+		this.summaryRepo = summaryRepo;
 		this.jmsTemplate = jmsTemplate;
 	}
 	
@@ -92,10 +98,18 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 	
 	@Override
 	public void processItem(ReceiverReconciliation reconciliation) {
-		if (reconciliation.getStatus() == ReconciliationStatus.NEW) {
-			initialize(reconciliation);
-		} else if (reconciliation.getStatus() == ReconciliationStatus.PROCESSING) {
-			update(reconciliation);
+		switch (reconciliation.getStatus()) {
+			case NEW:
+				initialize(reconciliation);
+				break;
+			case PROCESSING:
+				process(reconciliation);
+				break;
+			case POST_PROCESSING:
+				postProcess(reconciliation);
+				break;
+			case COMPLETED:
+				throw new EIPException("Reconciliation is already completed");
 		}
 	}
 	
@@ -120,12 +134,11 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 			}
 		}
 		
-		reconciliation.setStatus(ReconciliationStatus.PROCESSING);
-		reconcileRepo.save(reconciliation);
+		updateStatus(reconciliation, ReconciliationStatus.PROCESSING);
 		LOG.info("Successfully initialized reconciliation {}", reconciliation.getIdentifier());
 	}
 	
-	private void update(ReceiverReconciliation reconciliation) {
+	private void process(ReceiverReconciliation reconciliation) {
 		List<SiteInfo> sites = siteRepo.findAll();
 		List<SiteInfo> incompleteSites = new ArrayList<>(sites.size());
 		for (SiteInfo site : sites) {
@@ -154,18 +167,50 @@ public class ReceiverReconcileProcessor extends BasePureParallelQueueProcessor<R
 		}
 		
 		if (incompleteSites.isEmpty()) {
-			reconciliation.setStatus(ReconciliationStatus.COMPLETED);
-			LOG.info("Updating reconciliation status to " + reconciliation.getStatus());
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Saving updated reconciliation");
-			}
-			
-			reconcileRepo.save(reconciliation);
+			updateStatus(reconciliation, ReconciliationStatus.POST_PROCESSING);
 		} else {
 			if (LOG.isTraceEnabled()) {
 				LOG.trace("There is still {} incomplete site reconciliation(s)", incompleteSites.size());
 			}
 		}
+	}
+	
+	private void postProcess(ReceiverReconciliation rec) {
+		LOG.info("Generating reconciliation report");
+		List<SiteInfo> sites = siteRepo.findAll();
+		sites.forEach(site -> {
+			AppUtils.getTablesToSync().forEach(t -> {
+				ReconcileTableSummary s = new ReconcileTableSummary();
+				s.setReconciliation(rec);
+				s.setSite(site);
+				s.setTableName(t);
+				s.setMissingCount(missingRepo.countBySiteAndTableNameIgnoreCase(site, t));
+				s.setMissingSyncCount(missingRepo.countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(site, t));
+				s.setMissingErrorCount(missingRepo.countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(site, t));
+				s.setUndeletedCount(unDeletedRepo.countBySiteAndTableNameIgnoreCase(site, t));
+				s.setUndeletedSyncCount(unDeletedRepo.countBySiteAndTableNameIgnoreCaseAndInSyncQueueTrue(site, t));
+				s.setUndeletedErrorCount(unDeletedRepo.countBySiteAndTableNameIgnoreCaseAndInErrorQueueTrue(site, t));
+				s.setDateCreated(new Date());
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Saving reconciliation summary for site {}, table {}", site.getName(), t);
+				}
+				
+				summaryRepo.save(s);
+			});
+		});
+		
+		updateStatus(rec, ReconciliationStatus.COMPLETED);
+		LOG.info("Successfully generated reconciliation report");
+	}
+	
+	private void updateStatus(ReceiverReconciliation rec, ReconciliationStatus newStatus) {
+		rec.setStatus(newStatus);
+		LOG.info("Updating reconciliation status to " + rec.getStatus());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Saving updated reconciliation");
+		}
+		
+		reconcileRepo.save(rec);
 	}
 	
 }
