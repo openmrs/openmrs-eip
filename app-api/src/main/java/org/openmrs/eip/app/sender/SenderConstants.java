@@ -72,10 +72,6 @@ public class SenderConstants {
 	
 	public static final String ROUTE_ID_ACTIVEMQ_CONSUMER = "sender-activemq-consumer";
 	
-	public static final String ROUTE_ID_ACTIVEMQ_PUBLISHER = "sender-activemq-publisher";
-	
-	public static final String URI_ACTIVEMQ_PUBLISHER = "direct:" + ROUTE_ID_ACTIVEMQ_PUBLISHER;
-	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "sender-request-processor";
 	
 	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;

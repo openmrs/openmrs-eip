@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.sender.reconcile.SenderReconcileTask;
 import org.openmrs.eip.app.sender.reconcile.SenderTableReconcileTask;
+import org.openmrs.eip.app.sender.task.SenderSyncMessageTask;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.utils.FileUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -35,7 +36,7 @@ import org.springframework.core.env.Environment;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ AppUtils.class, SyncContext.class, FileUtils.class })
 public class SenderCamelListenerTest {
-	
+
 	@Mock
 	private ScheduledExecutorService mockExecutor;
 	
@@ -64,11 +65,15 @@ public class SenderCamelListenerTest {
 		setInternalState(listener, "delayReconciler", testDelay);
 		setInternalState(listener, "initDelayTblReconciler", testInitialDelay);
 		setInternalState(listener, "delayTblReconciler", testDelay);
+		setInternalState(listener, "initialDelaySync", testInitialDelay);
+		setInternalState(listener, "delaySync", testDelay);
 	}
 	
 	@Test
 	public void applicationStarted_shouldStartTasksExceptTheDisableOnes() throws Exception {
 		listener.applicationStarted();
+		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SenderSyncMessageTask.class), eq(testInitialDelay),
+		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SenderReconcileTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 		Mockito.verify(mockExecutor).scheduleWithFixedDelay(any(SenderTableReconcileTask.class), eq(testInitialDelay),
