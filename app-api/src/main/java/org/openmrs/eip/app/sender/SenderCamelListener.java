@@ -6,9 +6,11 @@ import static org.openmrs.eip.app.SyncConstants.DEFAULT_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_RECONCILER;
+import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_SYNC;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_TABLE_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_RECONCILER;
+import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_SYNC;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_TABLE_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.sender.SenderConstants.BEAN_NAME_SCHEDULED_EXECUTOR;
@@ -25,6 +27,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseCamelListener;
 import org.openmrs.eip.app.sender.reconcile.SenderReconcileTask;
 import org.openmrs.eip.app.sender.reconcile.SenderTableReconcileTask;
+import org.openmrs.eip.app.sender.task.SenderSyncMessageTask;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.utils.FileUtils;
@@ -93,6 +96,12 @@ public class SenderCamelListener extends BaseCamelListener {
 	@Value("${" + PROP_DELAY_TABLE_RECONCILER + ":" + DEFAULT_DELAY + "}")
 	private long delayTblReconciler;
 	
+	@Value("${" + PROP_INITIAL_DELAY_SYNC + ":" + DEFAULT_INITIAL_DELAY + "}")
+	private long initialDelaySync;
+	
+	@Value("${" + PROP_DELAY_SYNC + ":" + DEFAULT_DELAY + "}")
+	private long delaySync;
+	
 	public SenderCamelListener(@Qualifier(BEAN_NAME_SCHEDULED_EXECUTOR) ScheduledExecutorService scheduledExecutor,
 	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor syncExecutor) {
 		super(syncExecutor);
@@ -111,6 +120,8 @@ public class SenderCamelListener extends BaseCamelListener {
 	
 	private void startTasks() {
 		log.info("Starting tasks");
+		SenderSyncMessageTask syncTask = new SenderSyncMessageTask();
+		scheduledExecutor.scheduleWithFixedDelay(syncTask, initialDelaySync, delaySync, MILLISECONDS);
 		SenderReconcileTask recTask = new SenderReconcileTask();
 		scheduledExecutor.scheduleWithFixedDelay(recTask, initDelayReconciler, delayReconciler, MILLISECONDS);
 		SenderTableReconcileTask tblRecTask = new SenderTableReconcileTask();

@@ -54,6 +54,10 @@ public class SyncConstants {
 	
 	public static final String PROP_DELAY_PRUNER = "archives.pruner.delay";
 	
+	public static final String PROP_INITIAL_DELAY_SYNC = "sender-sync-msg-reader.initial.delay";
+	
+	public static final String PROP_DELAY_SYNC = "sender-sync-msg-reader.delay";
+	
 	public static final int DEFAULT_DELAY_PRUNER = 86400000;
 	
 	public static final String PROP_INITIAL_DELAY_RECONCILER = "reconcile.initial.delay";
