@@ -50,10 +50,6 @@ public class SenderConstants {
 	
 	public static final String URI_DBZM_EVENT_PROCESSOR = "direct:" + ROUTE_ID_DBZM_EVENT_PROCESSOR;
 	
-	public static final String ROUTE_ID_SYNC_MSG_READER = "sender-sync-msg-reader";
-	
-	public static final String URI_SYNC_MSG_READER = "direct:" + ROUTE_ID_SYNC_MSG_READER;
-	
 	public static final String ROUTE_ID_DBSYNC = "out-bound-db-sync";
 	
 	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;

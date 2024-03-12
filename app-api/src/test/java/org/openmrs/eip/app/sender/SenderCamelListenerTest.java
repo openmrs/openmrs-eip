@@ -36,7 +36,7 @@ import org.springframework.core.env.Environment;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ AppUtils.class, SyncContext.class, FileUtils.class })
 public class SenderCamelListenerTest {
-
+	
 	@Mock
 	private ScheduledExecutorService mockExecutor;
 	

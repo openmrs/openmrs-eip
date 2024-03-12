@@ -8,12 +8,16 @@ import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
 import org.openmrs.eip.app.sender.SenderSyncMessageProcessor;
 import org.openmrs.eip.component.SyncContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads a batch of sender sync messages with status NEW and submits them to the
  * {@link SenderSyncMessageProcessor}.
  */
 public class SenderSyncMessageTask extends BaseDelegatingQueueTask<SenderSyncMessage, SenderSyncMessageProcessor> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SenderSyncMessageTask.class);
 	
 	private SenderSyncMessageRepository repo;
 	
@@ -29,6 +33,10 @@ public class SenderSyncMessageTask extends BaseDelegatingQueueTask<SenderSyncMes
 	
 	@Override
 	public List<SenderSyncMessage> getNextBatch() {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Fetching next {} sender sync messages", AppUtils.getTaskPage().getPageSize());
+		}
+		
 		return repo.getNewSyncMessages(AppUtils.getTaskPage());
 	}
 	
