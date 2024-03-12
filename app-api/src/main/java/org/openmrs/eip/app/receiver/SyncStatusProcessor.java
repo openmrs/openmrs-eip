@@ -12,7 +12,6 @@ import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +39,7 @@ public class SyncStatusProcessor implements Processor {
 		Date dateReceived = new Date();
 		SiteInfo site = null;
 		try {
-			SyncMetadata metadata;
-			if (exchange.getProperty("is-file", Boolean.class)) {
-				metadata = JsonUtils.unmarshal(exchange.getProperty("sync-metadata", String.class), SyncMetadata.class);
-			} else {
-				metadata = exchange.getIn().getBody(SyncModel.class).getMetadata();
-			}
-			
+			SyncMetadata metadata = exchange.getIn().getBody(SyncModel.class).getMetadata();
 			site = ReceiverContext.getSiteInfo(metadata.getSourceIdentifier());
 			
 			if (site == null) {
