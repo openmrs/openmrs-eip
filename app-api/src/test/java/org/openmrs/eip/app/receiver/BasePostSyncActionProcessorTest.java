@@ -6,17 +6,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.URI_CLEAR_CACHE;
+import static org.openmrs.eip.app.receiver.HttpRequestProcessor.CACHE_RESOURCE;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.camel.ProducerTemplate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,18 +32,18 @@ import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.powermock.reflect.Whitebox;
 
-public class BaseSendToCamelPostSyncActionProcessorTest {
+public class BasePostSyncActionProcessorTest {
 	
-	private BaseSendToCamelPostSyncActionProcessor processor;
+	private BasePostSyncActionProcessor processor;
 	
 	@Mock
-	private ProducerTemplate mockTemplate;
+	private CustomHttpClient mockHttpClient;
 	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new CacheEvictingProcessor(mockTemplate, null);
+		processor = new CacheEvictingProcessor(null, mockHttpClient);
 	}
 	
 	@After
@@ -56,12 +55,14 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 	public void processItem_shouldSendTheItemToTheEndpointUri() {
 		processor = Mockito.spy(processor);
 		SyncedMessage msg = new SyncedMessage();
-		Mockito.doNothing().when(processor).send(URI_CLEAR_CACHE, msg, mockTemplate);
+		String testJson = "{}";
+		Mockito.doReturn(testJson).when(processor).convertBody(msg);
+		Mockito.doNothing().when(mockHttpClient).sendRequest(CACHE_RESOURCE, testJson);
 		Mockito.doNothing().when(processor).onSuccess(msg);
 		
 		processor.processItem(msg);
 		
-		verify(processor).send(URI_CLEAR_CACHE, msg, mockTemplate);
+		verify(mockHttpClient).sendRequest(CACHE_RESOURCE, testJson);
 		verify(processor).onSuccess(msg);
 	}
 	
@@ -69,13 +70,12 @@ public class BaseSendToCamelPostSyncActionProcessorTest {
 	public void processItem_shouldNotSendASquashedItem() {
 		processor = Mockito.spy(processor);
 		SyncedMessage msg = new SyncedMessage();
-		Mockito.doNothing().when(processor).send(URI_CLEAR_CACHE, msg, mockTemplate);
 		when(processor.isSquashed(msg)).thenReturn(true);
 		Mockito.doNothing().when(processor).onSuccess(msg);
 		
 		processor.processItem(msg);
 		
-		verify(processor, never()).send(URI_CLEAR_CACHE, msg, mockTemplate);
+		verifyNoInteractions(mockHttpClient);
 		verify(processor).onSuccess(msg);
 	}
 	

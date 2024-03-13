@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 /**
@@ -8,15 +7,15 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
  */
 public abstract class BaseSearchIndexUpdatingProcessor<T extends AbstractEntity> implements PostSyncProcessor<T> {
 	
-	private ProducerTemplate producerTemplate;
+	private CustomHttpClient client;
 	
-	public BaseSearchIndexUpdatingProcessor(ProducerTemplate producerTemplate) {
-		this.producerTemplate = producerTemplate;
+	public BaseSearchIndexUpdatingProcessor(CustomHttpClient client) {
+		this.client = client;
 	}
 	
 	public void process(T item) {
 		if (ReceiverUtils.isIndexed(getModelClassName(item))) {
-			send(ReceiverConstants.URI_UPDATE_SEARCH_INDEX, item, producerTemplate);
+			sendRequest(INDEX_RESOURCE, item, client);
 		}
 	}
 	

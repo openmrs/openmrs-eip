@@ -4,11 +4,8 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncProfiles;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -18,13 +15,10 @@ import org.springframework.stereotype.Component;
  */
 @Component("cacheEvictingProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class CacheEvictingProcessor extends BaseSendToCamelPostSyncActionProcessor {
+public class CacheEvictingProcessor extends BasePostSyncActionProcessor {
 	
-	protected static final Logger log = LoggerFactory.getLogger(CacheEvictingProcessor.class);
-	
-	public CacheEvictingProcessor(ProducerTemplate producerTemplate,
-	    @Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor) {
-		super(ReceiverConstants.URI_CLEAR_CACHE, producerTemplate, executor);
+	public CacheEvictingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, CustomHttpClient client) {
+		super(executor, client, CACHE_RESOURCE);
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import org.openmrs.eip.app.SendToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.component.SyncOperation;
 
@@ -9,7 +8,7 @@ import org.openmrs.eip.component.SyncOperation;
  * 
  * @param <T> the entity type
  */
-public interface PostSyncProcessor<T extends AbstractEntity> extends SendToCamelEndpointProcessor<T> {
+public interface PostSyncProcessor<T extends AbstractEntity> extends HttpRequestProcessor<T> {
 	
 	/**
 	 * Gets the model classname for the entity

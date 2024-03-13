@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
 /**
@@ -8,15 +7,15 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
  */
 public abstract class BaseCacheEvictingProcessor<T extends AbstractEntity> implements PostSyncProcessor<T> {
 	
-	private ProducerTemplate producerTemplate;
+	private CustomHttpClient client;
 	
-	public BaseCacheEvictingProcessor(ProducerTemplate producerTemplate) {
-		this.producerTemplate = producerTemplate;
+	public BaseCacheEvictingProcessor(CustomHttpClient client) {
+		this.client = client;
 	}
 	
 	public void process(T item) {
 		if (ReceiverUtils.isCached(getModelClassName(item))) {
-			send(ReceiverConstants.URI_CLEAR_CACHE, item, producerTemplate);
+			sendRequest(CACHE_RESOURCE, item, client);
 		}
 	}
 	

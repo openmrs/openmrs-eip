@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
-import org.apache.camel.ProducerTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,17 +22,17 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class BaseCacheEvictingProcessorTest {
 	
 	@Mock
-	private ProducerTemplate mockTemplate;
+	private CustomHttpClient mockClient;
 	
 	@Mock
-	private Object mockPayload;
+	private String mockPayload;
 	
 	private BaseCacheEvictingProcessor processor;
 	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(ReceiverUtils.class);
-		processor = new RetryCacheEvictingProcessor(mockTemplate);
+		processor = new RetryCacheEvictingProcessor(mockClient);
 	}
 	
 	@Test
@@ -66,7 +65,7 @@ public class BaseCacheEvictingProcessorTest {
 		
 		processor.process(retry);
 		
-		Mockito.verify(mockTemplate).sendBody(ReceiverConstants.URI_CLEAR_CACHE, mockPayload);
+		Mockito.verify(mockClient).sendRequest(HttpRequestProcessor.CACHE_RESOURCE, mockPayload);
 	}
 	
 	@Test
@@ -79,7 +78,7 @@ public class BaseCacheEvictingProcessorTest {
 		
 		PowerMockito.verifyStatic(ReceiverUtils.class, never());
 		ReceiverUtils.generateEvictionPayload(any(), any(), any());
-		Mockito.verifyNoInteractions(mockTemplate);
+		Mockito.verifyNoInteractions(mockClient);
 	}
 	
 }

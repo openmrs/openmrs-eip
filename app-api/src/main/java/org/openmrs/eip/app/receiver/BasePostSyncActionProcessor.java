@@ -8,32 +8,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
-import org.openmrs.eip.app.SendToCamelEndpointProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.component.SyncOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Superclass for post sync action processors that send an item to a camel endpoint uri for
- * processing
+ * Superclass for post sync action processors.
  */
-public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueueProcessor<SyncedMessage> implements SendToCamelEndpointProcessor<SyncedMessage> {
+public abstract class BasePostSyncActionProcessor extends BaseQueueProcessor<SyncedMessage> implements HttpRequestProcessor<SyncedMessage> {
 	
-	protected static final Logger log = LoggerFactory.getLogger(BaseSendToCamelPostSyncActionProcessor.class);
+	protected static final Logger log = LoggerFactory.getLogger(BasePostSyncActionProcessor.class);
 	
-	private String endpointUri;
+	private CustomHttpClient client;
 	
-	protected ProducerTemplate producerTemplate;
+	private String resource;
 	
-	public BaseSendToCamelPostSyncActionProcessor(String endpointUri, ProducerTemplate producerTemplate,
-	    ThreadPoolExecutor executor) {
+	public BasePostSyncActionProcessor(ThreadPoolExecutor executor, CustomHttpClient client, String resource) {
 		super(executor);
-		this.endpointUri = endpointUri;
-		this.producerTemplate = producerTemplate;
+		this.client = client;
+		this.resource = resource;
 	}
 	
 	@Override
@@ -138,7 +134,7 @@ public abstract class BaseSendToCamelPostSyncActionProcessor extends BaseQueuePr
 	@Override
 	public void processItem(SyncedMessage item) {
 		if (!isSquashed(item)) {
-			send(endpointUri, item, producerTemplate);
+			sendRequest(resource, item, client);
 		}
 		
 		onSuccess(item);
