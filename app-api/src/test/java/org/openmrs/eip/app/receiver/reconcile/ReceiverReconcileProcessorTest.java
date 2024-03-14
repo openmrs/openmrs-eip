@@ -176,7 +176,9 @@ public class ReceiverReconcileProcessorTest {
 	}
 	
 	@Test
-	public void processItem_shouldNotFinaliseReconciliationIfThereAreIncompleteTables() {
+	public void processItem_shouldNotUpdateReconciliationStatusIfThereAreIncompleteTables() {
+        final String person = "person";
+        when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
 		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
 		SiteInfo mockSite2 = Mockito.mock(SiteInfo.class);
 		SiteReconciliation siteRec1 = new SiteReconciliation();
@@ -191,8 +193,8 @@ public class ReceiverReconcileProcessorTest {
 		ReceiverTableReconciliation mockTableRec1 = Mockito.mock(ReceiverTableReconciliation.class);
 		when(mockTableRec1.isCompleted()).thenReturn(true);
 		ReceiverTableReconciliation mockTableRec2 = Mockito.mock(ReceiverTableReconciliation.class);
-		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), anyString())).thenReturn(mockTableRec1);
-		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), anyString())).thenReturn(mockTableRec2);
+		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec1), eq(person))).thenReturn(mockTableRec1);
+		when(mockTableRecRepo.getBySiteReconciliationAndTableName(eq(siteRec2), eq(person))).thenReturn(mockTableRec2);
 		long timestamp = System.currentTimeMillis();
 		
 		processor.processItem(rec);
@@ -207,8 +209,10 @@ public class ReceiverReconcileProcessorTest {
 	}
 	
 	@Test
-	public void processItem_shouldNotFinaliseReconciliationIfThereAreMissingTableReconciliations() {
-		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
+	public void processItem_shouldUpdateReconciliationStatusIfThereAreMissingTableReconciliations() {
+        final String person = "person";
+        when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
+        SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
 		SiteInfo mockSite2 = Mockito.mock(SiteInfo.class);
 		SiteReconciliation siteRec1 = new SiteReconciliation();
 		SiteReconciliation siteRec2 = new SiteReconciliation();

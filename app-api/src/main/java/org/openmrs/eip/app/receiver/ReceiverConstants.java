@@ -102,10 +102,6 @@ public class ReceiverConstants {
 	
 	public static final String URI_RETRY = "direct:" + ROUTE_ID_RETRY;
 	
-	public static final String ROUTE_ID_UPDATE_LAST_SYNC_DATE = "update-site-last-sync-date";
-	
-	public static final String URI_UPDATE_LAST_SYNC_DATE = "direct:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE;
-	
 	public static final String ROUTE_ID_DBSYNC = "inbound-db-sync";
 	
 	public static final String URI_DBSYNC = "direct:" + ROUTE_ID_DBSYNC;

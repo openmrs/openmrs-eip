@@ -7,22 +7,19 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.management.service.ReceiverServiceTest.URI_ACTIVEMQ_RESPONSE_PREFIX;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_UPDATE_LAST_SYNC_DATE;
+import static org.springframework.aop.framework.AopProxyUtils.getSingletonTarget;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.camel.EndpointInject;
-import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.model.ProcessDefinition;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
@@ -46,7 +43,8 @@ import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.app.receiver.ReceiverActiveMqMessagePublisher;
+import org.openmrs.eip.app.receiver.SyncStatusProcessor;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
@@ -59,17 +57,14 @@ import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-@TestPropertySource(properties = PROP_CAMEL_OUTPUT_ENDPOINT + "=" + URI_ACTIVEMQ_RESPONSE_PREFIX + "{0}")
 @TestPropertySource(properties = Constants.PROP_URI_ERROR_HANDLER + "=" + TestConstants.URI_ERROR_HANDLER)
-@TestPropertySource(properties = "logging.level.org.apache.camel.builder.AdviceWith=WARN")
 public class ReceiverServiceTest extends BaseReceiverTest {
-	
-	public static final String URI_ACTIVEMQ_RESPONSE_PREFIX = "mock:response.";
 	
 	@Autowired
 	private SyncMessageRepository syncMsgRepo;
@@ -104,15 +99,28 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Autowired
 	private PatientService patientService;
 	
-	@EndpointInject("mock:" + ROUTE_ID_UPDATE_LAST_SYNC_DATE)
-	private MockEndpoint mockUpdateSyncStatusEndpoint;
+	@Autowired
+	private SyncStatusProcessor statusProcessor;
 	
-	@EndpointInject(URI_ACTIVEMQ_RESPONSE_PREFIX + "remote1")
-	private MockEndpoint mockActiveMqResEndpoint;
+	private SyncStatusProcessor mockStatusProcessor;
+	
+	@Autowired
+	private ReceiverActiveMqMessagePublisher publisher;
+	
+	private ReceiverActiveMqMessagePublisher mockPublisher;
 	
 	@Before
 	public void setup() throws Exception {
-		mockUpdateSyncStatusEndpoint.reset();
+		mockStatusProcessor = Mockito.mock(SyncStatusProcessor.class);
+		mockPublisher = Mockito.mock(ReceiverActiveMqMessagePublisher.class);
+		Whitebox.setInternalState(getSingletonTarget(service), SyncStatusProcessor.class, mockStatusProcessor);
+		Whitebox.setInternalState(getSingletonTarget(service), ReceiverActiveMqMessagePublisher.class, mockPublisher);
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		Whitebox.setInternalState(getSingletonTarget(service), SyncStatusProcessor.class, statusProcessor);
+		Whitebox.setInternalState(getSingletonTarget(service), ReceiverActiveMqMessagePublisher.class, publisher);
 	}
 	
 	@Test
@@ -308,15 +316,6 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void processJmsMessage_shouldProcessAndSaveASyncMessage() throws Exception {
-		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
-		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
-			
-			@Override
-			public void configure() {
-				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
-			}
-			
-		});
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
@@ -342,14 +341,10 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsg.setDateCreated(new Date());
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
-		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		Long timestamp = System.currentTimeMillis();
 		
 		service.processJmsMessage(jmsMsg);
 		
-		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
 		List<SyncMessage> msgs = syncMsgRepo.findAll();
 		assertEquals(1, msgs.size());
 		SyncMessage msg = msgs.get(0);
@@ -363,21 +358,14 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertFalse(msg.getSnapshot());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
+		Mockito.verify(mockStatusProcessor).process(ArgumentMatchers.any(SyncMetadata.class));
+		Mockito.verifyNoInteractions(mockPublisher);
 	}
 	
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void processJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequest() throws Exception {
-		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
-		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
-			
-			@Override
-			public void configure() {
-				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
-			}
-			
-		});
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
@@ -408,16 +396,14 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsg.setDateCreated(new Date());
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
-		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
 		
 		service.processJmsMessage(jmsMsg);
 		
-		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
 		assertEquals(1, syncMsgRepo.count());
 		assertEquals(ReceiverRequestStatus.RECEIVED, syncReqRepo.findByRequestUuid(requestUuid).getStatus());
 		assertEquals(0, jmsMsgRepo.count());
+		Mockito.verify(mockStatusProcessor).process(ArgumentMatchers.any(SyncMetadata.class));
+		Mockito.verifyNoInteractions(mockPublisher);
 	}
 	
 	@Test
@@ -425,15 +411,6 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void processJmsMessage_shouldProcessAndSaveASyncMessageLinkedToASyncRequestAndTheEntityWasNotFound()
 	    throws Exception {
-		loadXmlRoutes("receiver", "update-site-last-sync-date.xml");
-		advise(ROUTE_ID_UPDATE_LAST_SYNC_DATE, new AdviceWithRouteBuilder() {
-			
-			@Override
-			public void configure() {
-				weaveByType(ProcessDefinition.class).replace().to(mockUpdateSyncStatusEndpoint);
-			}
-			
-		});
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String msgUuid = "msg-uuid";
 		final String op = "r";
@@ -459,18 +436,14 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		jmsMsg.setDateCreated(new Date());
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
-		mockUpdateSyncStatusEndpoint.expectedMessageCount(1);
-		mockUpdateSyncStatusEndpoint.expectedPropertyReceived(ReceiverConstants.EX_PROP_IS_FILE, false);
-		mockUpdateSyncStatusEndpoint.expectedBodyReceived().body().isEqualTo(syncModel);
-		mockActiveMqResEndpoint.expectedMessageCount(1);
 		
 		service.processJmsMessage(jmsMsg);
 		
-		mockUpdateSyncStatusEndpoint.assertIsSatisfied();
-		mockActiveMqResEndpoint.assertIsSatisfied();
 		assertEquals(0, syncMsgRepo.count());
 		assertEquals(ReceiverRequestStatus.RECEIVED, syncReqRepo.findByRequestUuid(requestUuid).getStatus());
 		assertEquals(0, jmsMsgRepo.count());
+		Mockito.verify(mockStatusProcessor).process(ArgumentMatchers.any(SyncMetadata.class));
+		Mockito.verify(mockPublisher).sendSyncResponse(request, msgUuid);
 	}
 	
 }

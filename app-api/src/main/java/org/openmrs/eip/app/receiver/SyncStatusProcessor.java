@@ -4,15 +4,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncStatus;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.repository.SiteSyncStatusRepository;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.model.SyncMetadata;
-import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component("syncStatusProcessor")
 @Profile(SyncProfiles.RECEIVER)
-public class SyncStatusProcessor implements Processor {
+public class SyncStatusProcessor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SyncStatusProcessor.class);
 	
@@ -35,18 +31,10 @@ public class SyncStatusProcessor implements Processor {
 		this.statusRepo = statusRepo;
 	}
 	
-	@Override
-	public void process(Exchange exchange) {
+	public void process(SyncMetadata metadata) {
 		Date dateReceived = new Date();
 		SiteInfo site = null;
 		try {
-			SyncMetadata metadata;
-			if (exchange.getProperty("is-file", Boolean.class)) {
-				metadata = JsonUtils.unmarshal(exchange.getProperty("sync-metadata", String.class), SyncMetadata.class);
-			} else {
-				metadata = exchange.getIn().getBody(SyncModel.class).getMetadata();
-			}
-			
 			site = ReceiverContext.getSiteInfo(metadata.getSourceIdentifier());
 			
 			if (site == null) {

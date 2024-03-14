@@ -34,7 +34,7 @@ public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
 	
 	@Override
 	public Set<String> getRoutesWithDeadLetterChannelHandler() {
-		return Collections.singleton("update-site-last-sync-date");
+		return Collections.emptySet();
 	}
 	
 	@Override

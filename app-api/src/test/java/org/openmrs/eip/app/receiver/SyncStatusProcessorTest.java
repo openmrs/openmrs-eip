@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_FILE;
 import static org.openmrs.eip.app.receiver.SyncStatusProcessor.FLUSH_INTERVAL;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
@@ -17,9 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,14 +67,11 @@ public class SyncStatusProcessorTest {
 		metadata.setSourceIdentifier(SITE_IDENTIFIER);
 		SyncModel syncModel = new SyncModel();
 		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
 		ReceiverSyncStatus status = new ReceiverSyncStatus();
 		status.setId(1L);
 		when(mockStatusRepo.findBySiteInfo(mockSite)).thenReturn(status);
 		
-		processor.process(exchange);
+		processor.process(metadata);
 		
 		Mockito.verify(mockStatusRepo).save(status);
 		Map<String, ReceiverSyncStatus> cache = getInternalState(SyncStatusProcessor.class, "siteIdAndStatusMap");
@@ -93,17 +86,13 @@ public class SyncStatusProcessorTest {
 		metadata.setSourceIdentifier(SITE_IDENTIFIER);
 		SyncModel syncModel = new SyncModel();
 		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
 		ReceiverSyncStatus status = new ReceiverSyncStatus(mockSite, lastSyncDate);
 		status.setId(1L);
 		when(mockStatusRepo.findBySiteInfo(mockSite)).thenReturn(status);
 		setInternalState(SyncStatusProcessor.class, "siteIdAndStatusMap", singletonMap(SITE_IDENTIFIER, status));
 		when(Utils.getMillisElapsed(eq(lastSyncDate), any(Date.class))).thenReturn(FLUSH_INTERVAL - 1);
 		
-		processor.process(exchange);
+		processor.process(metadata);
 		
 		Mockito.verify(mockStatusRepo, never()).save(status);
 		assertEquals(lastSyncDate, status.getLastSyncDate());
@@ -117,17 +106,13 @@ public class SyncStatusProcessorTest {
 		metadata.setSourceIdentifier(SITE_IDENTIFIER);
 		SyncModel syncModel = new SyncModel();
 		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
 		ReceiverSyncStatus status = new ReceiverSyncStatus(mockSite, lastSyncDate);
 		status.setId(1L);
 		when(mockStatusRepo.findBySiteInfo(mockSite)).thenReturn(status);
 		setInternalState(SyncStatusProcessor.class, "siteIdAndStatusMap", singletonMap(SITE_IDENTIFIER, status));
 		when(Utils.getMillisElapsed(eq(lastSyncDate), any(Date.class))).thenReturn(FLUSH_INTERVAL);
 		
-		processor.process(exchange);
+		processor.process(metadata);
 		
 		Mockito.verify(mockStatusRepo, never()).save(status);
 		assertEquals(lastSyncDate, status.getLastSyncDate());
@@ -141,10 +126,6 @@ public class SyncStatusProcessorTest {
 		metadata.setSourceIdentifier(SITE_IDENTIFIER);
 		SyncModel syncModel = new SyncModel();
 		syncModel.setMetadata(metadata);
-		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-		
-		exchange.getIn().setBody(syncModel);
-		exchange.setProperty(EX_PROP_IS_FILE, false);
 		ReceiverSyncStatus status = new ReceiverSyncStatus(mockSite, lastSyncDate);
 		status.setId(1L);
 		when(mockStatusRepo.findBySiteInfo(mockSite)).thenReturn(status);
@@ -152,7 +133,7 @@ public class SyncStatusProcessorTest {
 		when(Utils.getMillisElapsed(eq(lastSyncDate), any(Date.class))).thenReturn(FLUSH_INTERVAL + 1);
 		Date timestamp = new Date();
 		
-		processor.process(exchange);
+		processor.process(metadata);
 		
 		Mockito.verify(mockStatusRepo).save(status);
 		assertTrue(status.getLastSyncDate().getTime() >= timestamp.getTime());

@@ -9,6 +9,9 @@ import org.springframework.test.context.TestPropertySource;
 @ActiveProfiles(SyncProfiles.RECEIVER)
 @TestPropertySource(properties = ReceiverConstants.PROP_CAMEL_OUTPUT_ENDPOINT + "=")
 @TestPropertySource(properties = ReceiverConstants.PROP_SYNC_QUEUE + "=")
+@TestPropertySource(properties = "openmrs.baseUrl=test")
+@TestPropertySource(properties = "openmrs.username=")
+@TestPropertySource(properties = "openmrs.password=test")
 public abstract class BaseReceiverRouteTest extends BaseRouteTest {
 	
 	@Override

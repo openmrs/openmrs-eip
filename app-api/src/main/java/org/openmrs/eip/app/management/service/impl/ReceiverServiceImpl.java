@@ -7,9 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
@@ -31,12 +29,11 @@ import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ReceiverActiveMqMessagePublisher;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.receiver.ReceiverContext;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.app.receiver.SyncStatusProcessor;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.SyncMetadata;
@@ -80,11 +77,13 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	private ReceiverActiveMqMessagePublisher activeMqPublisher;
 	
+	private SyncStatusProcessor statusProcessor;
+	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo, ConflictRepository conflictRepo,
 	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate,
 	    ReceiverSyncRequestRepository syncRequestRepo, JmsMessageRepository jmsMsgRepo,
-	    ReceiverActiveMqMessagePublisher activeMqPublisher) {
+	    ReceiverActiveMqMessagePublisher activeMqPublisher, SyncStatusProcessor statusProcessor) {
 		this.syncMsgRepo = syncMsgRepo;
 		this.syncedMsgRepo = syncedMsgRepo;
 		this.archiveRepo = archiveRepo;
@@ -96,6 +95,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		this.syncRequestRepo = syncRequestRepo;
 		this.activeMqPublisher = activeMqPublisher;
 		this.jmsMsgRepo = jmsMsgRepo;
+		this.statusProcessor = statusProcessor;
 	}
 	
 	@Override
@@ -303,10 +303,8 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		String body = new String(jmsMessage.getBody(), StandardCharsets.UTF_8);
 		SyncModel syncModel = JsonUtils.unmarshalSyncModel(body);
-		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext())
-		        .withProperty(ReceiverConstants.EX_PROP_IS_FILE, false).withBody(syncModel).build();
 		try {
-			CamelUtils.send(ReceiverConstants.URI_UPDATE_LAST_SYNC_DATE, exchange);
+			statusProcessor.process(syncModel.getMetadata());
 		}
 		catch (Throwable t) {
 			Throwable cause = ExceptionUtils.getRootCause(t);
