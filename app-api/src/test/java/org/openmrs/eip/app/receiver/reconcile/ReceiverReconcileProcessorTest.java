@@ -177,8 +177,8 @@ public class ReceiverReconcileProcessorTest {
 	
 	@Test
 	public void processItem_shouldNotUpdateReconciliationStatusIfThereAreIncompleteTables() {
-        final String person = "person";
-        when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
+		final String person = "person";
+		when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
 		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
 		SiteInfo mockSite2 = Mockito.mock(SiteInfo.class);
 		SiteReconciliation siteRec1 = new SiteReconciliation();
@@ -210,9 +210,9 @@ public class ReceiverReconcileProcessorTest {
 	
 	@Test
 	public void processItem_shouldUpdateReconciliationStatusIfThereAreMissingTableReconciliations() {
-        final String person = "person";
-        when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
-        SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
+		final String person = "person";
+		when(AppUtils.getTablesToSync()).thenReturn(Set.of(person));
+		SiteInfo mockSite1 = Mockito.mock(SiteInfo.class);
 		SiteInfo mockSite2 = Mockito.mock(SiteInfo.class);
 		SiteReconciliation siteRec1 = new SiteReconciliation();
 		SiteReconciliation siteRec2 = new SiteReconciliation();

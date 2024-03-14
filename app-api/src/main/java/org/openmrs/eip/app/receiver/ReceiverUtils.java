@@ -2,6 +2,8 @@ package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,16 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.ExchangeBuilder;
+import javax.sql.DataSource;
+
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncOperation;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PatientIdentifierModel;
 import org.openmrs.eip.component.model.PatientModel;
@@ -45,20 +45,12 @@ public class ReceiverUtils {
 	
 	protected static final Logger log = LoggerFactory.getLogger(ReceiverUtils.class);
 	
-	private static final String PLACEHOLDER_QUERY = "[QUERY]";
-	
 	private static final String PLACEHOLDER_TABLE = "[TABLE]";
 	
 	private static final String PLACEHOLDER_COLUMN = "[COLUMN]";
 	
-	private static final String QUERY_PARAM_VALUE = "columnValue";
-	
-	private static final String QUERY_PARAM_ID = "rowId";
-	
-	private static final String QUERY_URI_MGT = "sql:" + PLACEHOLDER_QUERY + "?dataSource=#" + MGT_DATASOURCE_NAME;
-	
-	protected static final String UPDATE_URI = QUERY_URI_MGT.replace(PLACEHOLDER_QUERY, "UPDATE " + PLACEHOLDER_TABLE
-	        + " SET " + PLACEHOLDER_COLUMN + "=:#" + QUERY_PARAM_VALUE + " WHERE id=:#" + QUERY_PARAM_ID);
+	private static final String UPDATE_URI = "UPDATE " + PLACEHOLDER_TABLE + " SET " + PLACEHOLDER_COLUMN
+	        + " = ? WHERE id = ?";
 	
 	private static final Set<String> CACHE_EVICT_CLASS_NAMES;
 	
@@ -70,13 +62,13 @@ public class ReceiverUtils {
 	
 	private static PersonAttributeRepository attribRepo;
 	
-	private static ProducerTemplate producerTemplate;
-	
 	private static Set<String> subclassModelClassNames;
 	
 	private static Map<String, String> modelClassNameParentMap;
 	
 	private static ReceiverActiveMqMessagePublisher activeMqPublisher;
+	
+	private static DataSource mgtDataSource;
 	
 	static {
 		//TODO instead define the cache and search index requirements on the TableToSyncEnum
@@ -319,12 +311,14 @@ public class ReceiverUtils {
 	 */
 	public static void updateColumn(String tableName, String columnName, Long entityId, Object newValue) {
 		String query = UPDATE_URI.replace(PLACEHOLDER_TABLE, tableName).replace(PLACEHOLDER_COLUMN, columnName);
-		Map<String, Object> parameterValues = new HashMap(2);
-		parameterValues.put(QUERY_PARAM_VALUE, newValue);
-		parameterValues.put(QUERY_PARAM_ID, entityId);
-		Exchange exchange = ExchangeBuilder.anExchange(getProducerTemplate().getCamelContext()).build();
-		exchange.getIn().setBody(parameterValues);
-		CamelUtils.send(query, exchange);
+		try (Connection c = getMgtDataSource().getConnection(); PreparedStatement s = c.prepareStatement(query)) {
+			s.setObject(1, newValue);
+			s.setLong(2, entityId);
+			s.executeUpdate();
+		}
+		catch (Throwable t) {
+			throw new EIPException("An error occurred while updating database column value", t);
+		}
 	}
 	
 	public static String getSiteQueueName(String siteIdentifier) {
@@ -360,20 +354,20 @@ public class ReceiverUtils {
 		return attribRepo;
 	}
 	
-	private static ProducerTemplate getProducerTemplate() {
-		if (producerTemplate == null) {
-			producerTemplate = SyncContext.getBean(ProducerTemplate.class);
-		}
-		
-		return producerTemplate;
-	}
-	
 	private static ReceiverActiveMqMessagePublisher getActiveMqMessagePublisher() {
 		if (activeMqPublisher == null) {
 			activeMqPublisher = SyncContext.getBean(ReceiverActiveMqMessagePublisher.class);
 		}
 		
 		return activeMqPublisher;
+	}
+	
+	private static DataSource getMgtDataSource() {
+		if (mgtDataSource == null) {
+			mgtDataSource = SyncContext.getBean(MGT_DATASOURCE_NAME);
+		}
+		
+		return mgtDataSource;
 	}
 	
 }
