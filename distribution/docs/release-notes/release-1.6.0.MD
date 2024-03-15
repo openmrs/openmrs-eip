@@ -23,7 +23,7 @@ reconcile.process.max.batch.size
 
 `camel.input.endpoint` -> `sync.queue.name`
 
-Note that the value of `sync.queue.name` had changed and should be a queue name.
+Note that the value of `sync.queue.name` has changed and should be a queue name.
 
 #### Removed
 ```
