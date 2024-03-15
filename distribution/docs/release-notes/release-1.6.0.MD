@@ -1,7 +1,60 @@
 # Release Notes - DB Sync Version 1.6.0
 
-<h2>        New Feature
-</h2>
+### Receiver Application Properties
+
+#### New Properties
+```
+jms.msg.task.initial.delay
+jms.msg.task.delay
+reconcile.schedule.cron
+reconcile.initial.delay
+reconcile.delay
+reconcile.msg.initial.delay
+reconcile.msg.delay
+reconcile.batch.size
+reconcile.process.min.batch.size
+reconcile.process.max.batch.size
+```
+
+#### Renamed
+`camel.springboot.xmlRoutes` -> `camel.springboot.routes-include-pattern`
+
+`camel.input.endpoint` -> `sync.queue.name`
+
+Note that the value of `sync.queue.name` had changed and should be a queue name.
+
+#### Removed
+```
+spring.h2.console.enabled
+spring.h2.console.path
+spring.openmrs-datasource.dialect
+spring.mngt-datasource.dialect
+```
+
+### Sender Application Properties
+
+#### New Properties
+```
+sync.task.batch.size
+reconcile.initial.delay
+reconcile.delay
+reconcile.table.initial.delay
+reconcile.table.delay
+```
+
+#### Renamed
+`camel.springboot.xmlRoutes` -> `camel.springboot.routes-include-pattern`
+
+#### Removed
+```
+spring.h2.console.enabled
+spring.h2.console.path
+spring.openmrs-datasource.dialect
+spring.mngt-datasource.dialect
+```
+
+<h3>        New Feature
+</h3>
 <ul>
 <li>[<a href='https://jira.fgh.org.mz/browse/EC-620'>EC-620</a>] -         Remote sites should periodically reconcile with central
 </li>
@@ -11,8 +64,8 @@
 </li>
 </ul>
 
-<h2>        Task
-</h2>
+<h3>        Task
+</h3>
 <ul>
 <li>[<a href='https://jira.fgh.org.mz/browse/EC-602'>EC-602</a>] -         Verify that DB sync works with latest version of ArtemisMQ
 </li>
@@ -20,8 +73,8 @@
 </li>
 </ul>
 
-<h2>        Bug
-</h2>
+<h3>        Bug
+</h3>
 <ul>
 <li>[<a href='https://jira.fgh.org.mz/browse/EC-611'>EC-611</a>] -         Add not null constraint to receiver_sync_msg.date_created column
 </li>
@@ -47,8 +100,8 @@
 </li>
 </ul>
 
-<h2>        Improvement
-</h2>
+<h3>        Improvement
+</h3>
 <ul>
 <li>[<a href='https://jira.fgh.org.mz/browse/EC-518'>EC-518</a>] -         Add not null constraint to receiver tables with site_id column
 </li>
