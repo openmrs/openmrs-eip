@@ -2,6 +2,8 @@
 
 ### Receiver Application Properties
 
+The documentation for each property can be found in the [receiver application.properties file](../receiver/application.properties)
+
 #### New Properties
 ```
 jms.msg.task.initial.delay
@@ -32,6 +34,8 @@ spring.mngt-datasource.dialect
 ```
 
 ### Sender Application Properties
+
+The documentation for each property can be found in the [sender application.properties file](../sender/application.properties)
 
 #### New Properties
 ```
