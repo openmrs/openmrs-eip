@@ -17,7 +17,8 @@
 12. [Sync Archive Pruning](#sync-archive-pruning)
 13. [Binary Log Purging](#binary-log-purging)
 14. [Requesting An Entity To Be Synced](#requesting-an-entity-to-be-synced)
-15. [Developer Guide](#developer-guide)
+15. [Reconciliation](#reconciliation)
+16. [Developer Guide](#developer-guide)
     1. [Build](#build)
     2. [Tests](#tests)
 
@@ -325,6 +326,35 @@ A sync request has a status field which defaults to `NEW` on insertion, every 30
 queues in the artemis instance, there will be a queue name for each remote site where the name is of the format
 `activemq:openmrs.sync.request.{SITE_IDENTIFIER}` where `{SITE_IDENTIFIER}` is the value of the identifier column of the 
 site row in the site_info table.
+
+# Reconciliation
+Some admins might wish to run a check to ensure all synced entities from remote sites do actually exist in the central
+database, this features allows this to be possible. Currently, it only verifies existence of entities both in remote 
+and central, it does not verify that the row level data in central matches that in a remote site, the major blocker to 
+doing row level comparison is that some entities can exist at multiple remote sites, therefore, no single site can be 
+the source of truth for an entity until we come up with some business rules to select one, one possible criteria could 
+be the site where the entity was last modified.
+
+The way the reconciliation works is that central sends out a reconciliation request to each known remote site, central 
+then periodically runs a task to check the status of each remote site's reconciliation. Upon receiving a reconciliation 
+request, a remote site responds by taking a snapshot of each synced table to determine exactly how many existing rows to 
+reconcile, any rows inserted after the snapshot is taken are excluded from the current reconciliation. The remote site 
+scans each synced table and submits the entity uuids in batches for all the existing rows that were included in the 
+snapshot including the uuids of any deleted rows that were in the snapshot, finally the remote site sends all known 
+uuids of previously deleted rows. Central processes each batch of received uuids and verifies that each uuid exists in 
+central, any uuid that does not exist results in a sync request generated for the associated entity matching the missing 
+uuid. After all uuids are processed for each table for a single site, then that site's reconciliation date completed is 
+set. After all site reconciliations have date completed set, summary reports are generated and inserted into the 
+`reconcile_table_summary` table for each table and remote site, the summary includes the count of any missing entities, 
+undeleted entities, missing and undeleted entities detected in the sync and error queues. Then finally reconciliation is 
+marked as completed. 
+
+The reconciliation process is initiated from central, the task can be scheduled to run via the receiver application 
+property named `reconcile.schedule.cron` it takes a spring cron expression. To disable, leave the value blank, please 
+refer to spring's documentation on cron expressions, you can also refer to the [CronExpression javadocs](https://docs.spring.io/spring-framework/docs/6.0.13/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
+
+The reconciliation task can also be triggered manually by inserting a row in the 'receiver_reconcile' table, the value 
+of the identifier column is required to be unique.
 
 # Developer Guide
 ## Build
