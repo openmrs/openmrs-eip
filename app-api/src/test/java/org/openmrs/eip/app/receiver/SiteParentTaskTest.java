@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.receiver.task.Synchronizer;
 import org.openmrs.eip.component.SyncContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -33,7 +34,7 @@ public class SiteParentTaskTest {
 	private SiteInfo mockSite;
 	
 	@Mock
-	private SiteMessageConsumer mockSynchronizer;
+	private Synchronizer mockSynchronizer;
 	
 	@Mock
 	private CacheEvictor mockEvictor;
@@ -74,7 +75,7 @@ public class SiteParentTaskTest {
 		List<Class<? extends Runnable>> disabledClasses = Arrays.asList(SyncedMessageArchiver.class,
 		    SyncedMessageDeleter.class);
 		
-		SiteParentTask task = new SiteParentTask(mockSite, null, disabledClasses);
+		SiteParentTask task = new SiteParentTask(mockSite, disabledClasses);
 		
 		Assert.assertNotNull(Whitebox.getInternalState(task, "synchronizer"));
 		Assert.assertNotNull(Whitebox.getInternalState(task, "evictor"));
@@ -86,7 +87,7 @@ public class SiteParentTaskTest {
 	
 	@Test
 	public void doRun_shouldRunTheChildTasks() throws Exception {
-		SiteParentTask task = new SiteParentTask(mockSite, null, Collections.emptyList());
+		SiteParentTask task = new SiteParentTask(mockSite, Collections.emptyList());
 		setInternalState(task, "synchronizer", mockSynchronizer);
 		setInternalState(task, "evictor", mockEvictor);
 		setInternalState(task, "updater", mockUpdater);
@@ -108,7 +109,7 @@ public class SiteParentTaskTest {
 	public void doRun_shouldSkipRunningTheDisabledChildTasks() throws Exception {
 		List<Class<? extends Runnable>> disabledClasses = Arrays.asList(SyncedMessageArchiver.class,
 		    SyncedMessageDeleter.class);
-		SiteParentTask task = new SiteParentTask(mockSite, null, disabledClasses);
+		SiteParentTask task = new SiteParentTask(mockSite, disabledClasses);
 		setInternalState(task, "synchronizer", mockSynchronizer);
 		setInternalState(task, "evictor", mockEvictor);
 		setInternalState(task, "updater", mockUpdater);

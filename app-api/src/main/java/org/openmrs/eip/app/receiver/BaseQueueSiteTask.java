@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Base class for tasks that read items from a database queue table and forward them to a processor
- * for processing
+ * Base class for tasks that read items from a database queue table for a single site and forward
+ * them to a processor for processing
  * 
  * @see BaseQueueProcessor
  * @param <T> the queue entity type
@@ -23,16 +23,17 @@ public abstract class BaseQueueSiteTask<T extends AbstractEntity, P extends Base
 	
 	private final P processor;
 	
-	private Pageable page;
-	
-	public BaseQueueSiteTask(SiteInfo site, P processor, Pageable page) {
+	public BaseQueueSiteTask(SiteInfo site, P processor) {
 		super(site);
 		this.processor = processor;
-		this.page = page;
 	}
 	
 	@Override
 	public boolean doRun() throws Exception {
+		if (log.isTraceEnabled()) {
+			log.trace("Fetching next batch of " + page.getPageSize() + " items to process for site: " + site);
+		}
+		
 		List<T> items = getNextBatch(page);
 		if (items.isEmpty()) {
 			if (log.isTraceEnabled()) {

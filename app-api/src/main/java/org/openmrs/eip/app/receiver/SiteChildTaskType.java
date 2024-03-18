@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.receiver;
 
+import org.openmrs.eip.app.receiver.task.Synchronizer;
+
 import lombok.Getter;
 
 /**
@@ -7,7 +9,7 @@ import lombok.Getter;
  */
 public enum SiteChildTaskType {
 	
-	SYNCHRONIZER(SiteMessageConsumer.class),
+	SYNCHRONIZER(Synchronizer.class),
 	
 	CACHE_EVICTOR(CacheEvictor.class),
 	

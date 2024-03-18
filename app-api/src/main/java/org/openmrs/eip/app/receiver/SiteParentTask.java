@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseTask;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
+import org.openmrs.eip.app.receiver.task.Synchronizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class SiteParentTask extends BaseTask {
 	@Getter
 	private final SiteInfo siteInfo;
 	
-	private SiteMessageConsumer synchronizer;
+	private Synchronizer synchronizer;
 	
 	private CacheEvictor evictor;
 	
@@ -46,13 +46,10 @@ public class SiteParentTask extends BaseTask {
 	@Getter
 	private final ExecutorService childExecutor = Executors.newFixedThreadPool(TASK_COUNT);
 	
-	public SiteParentTask(SiteInfo siteInfo, ThreadPoolExecutor syncExecutor,
-	    List<Class<? extends Runnable>> disabledTaskClasses) {
-		
+	public SiteParentTask(SiteInfo siteInfo, List<Class<? extends Runnable>> disabledTaskClasses) {
 		this.siteInfo = siteInfo;
-		
-		if (!disabledTaskClasses.contains(SiteMessageConsumer.class)) {
-			synchronizer = new SiteMessageConsumer(ReceiverConstants.URI_MSG_PROCESSOR, siteInfo, syncExecutor);
+		if (!disabledTaskClasses.contains(Synchronizer.class)) {
+			synchronizer = new Synchronizer(siteInfo);
 		}
 		
 		if (!disabledTaskClasses.contains(CacheEvictor.class)) {
