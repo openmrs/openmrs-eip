@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.utils.OpenmrsResourceTableMapper;
@@ -30,23 +31,25 @@ public class OpenmrsFhirRouter extends RouteBuilder {
 	
 	private final String[] monitoredTables;
 	
-	private final String[] resourceDestinations;
+	private final String resourceDestinations;
 	
 	@Autowired
-	public OpenmrsFhirRouter(@Value(PROP_FHIR_RESOURCES) String fhirResources) {
+	public OpenmrsFhirRouter(@Value("${" + PROP_FHIR_RESOURCES + "}") String fhirResources) {
 		Set<FhirResource> enabledResources = splitCsv(fhirResources).map(OpenmrsResourceTableMapper::maybeResource)
 		        .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toUnmodifiableSet());
 		monitoredTables = mapResourcesToTables(fhirResources).toArray(String[]::new);
-		resourceDestinations = enabledResources.stream().map(FhirResource::incomingUrl).toArray(String[]::new);
+		resourceDestinations = enabledResources.stream().map(FhirResource::incomingUrl).collect(Collectors.joining(","));
 	}
 	
 	@Override
 	public void configure() {
 		from(URI_FHIR_ROUTER).routeId("fhir-router")
+				.log(LoggingLevel.INFO, "Processing message ${body}")
 		        // first filter: we do not process snapshot events, and we only process events for tables we are
 		        // configured to use.
 		        .filter(and(exchangeProperty(PROP_EVENT_SNAPSHOT).isEqualTo(false),
 		            exchangeProperty(PROP_EVENT_TABLE_NAME).in((Object[]) monitoredTables)))
-		        .recipientList(constant((Object[]) resourceDestinations)).parallelProcessing().end();
+				.log(LoggingLevel.INFO, "Dispatching to endpoints " + resourceDestinations)
+		        .recipientList(constant(resourceDestinations)).parallelProcessing().end();
 	}
 }
