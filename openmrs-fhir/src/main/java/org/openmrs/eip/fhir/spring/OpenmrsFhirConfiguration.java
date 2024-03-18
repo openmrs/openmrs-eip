@@ -5,8 +5,8 @@ import org.apache.camel.component.fhir.FhirComponent;
 import org.apache.camel.component.fhir.FhirConfiguration;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * camel-fhir component.
  */
 @Configuration
+@ComponentScan("org.openmrs.eip.fhir")
 public class OpenmrsFhirConfiguration {
 	
 	@Value("${eip.fhir.serverUrl}")
