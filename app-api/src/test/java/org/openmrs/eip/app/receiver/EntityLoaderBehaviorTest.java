@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = "classpath:openmrs_core_data.sql")
-public class OpenmrsLoadProducerBehaviorTest extends BaseReceiverTest {
+public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 	
 	private static final String URI_LOAD = "openmrs:load";
 	

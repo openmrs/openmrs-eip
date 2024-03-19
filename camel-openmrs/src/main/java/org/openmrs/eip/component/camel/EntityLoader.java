@@ -39,13 +39,13 @@ import org.springframework.stereotype.Component;
 
 @Component("entityLoader")
 @Profile(SyncProfiles.RECEIVER)
-public class OpenmrsLoadProducer {
+public class EntityLoader {
 	
-	private static final Logger log = LoggerFactory.getLogger(OpenmrsLoadProducer.class);
+	private static final Logger log = LoggerFactory.getLogger(EntityLoader.class);
 	
 	private EntityServiceFacade serviceFacade;
 	
-	public OpenmrsLoadProducer(EntityServiceFacade serviceFacade) {
+	public EntityLoader(EntityServiceFacade serviceFacade) {
 		this.serviceFacade = serviceFacade;
 	}
 	

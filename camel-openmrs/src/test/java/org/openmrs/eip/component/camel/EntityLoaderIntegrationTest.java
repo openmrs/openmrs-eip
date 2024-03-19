@@ -42,7 +42,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:test_data.sql")
 @TestPropertySource(properties = "receiver.ignore.missing.hash.for.existing.entity=true")
-public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
+public class EntityLoaderIntegrationTest extends BaseDbDrivenTest {
 	
 	private static final String PROVIDER_UUID = "2b3b12d1-5c4f-415f-871b-b98a22137606";
 	
@@ -51,7 +51,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	private String creator = UserLight.class.getName() + "(" + USER_UUID + ")";
 	
 	@Autowired
-	private OpenmrsLoadProducer producer;
+	private EntityLoader loader;
 	
 	@Autowired
 	private AbstractEntityService<User, UserModel> userService;
@@ -100,7 +100,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -133,7 +133,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -166,7 +166,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -201,7 +201,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -236,7 +236,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -269,7 +269,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		        .replace(PLACEHOLDER_UUID, USER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		existingUser = userService.getModel(USER_UUID);
 		assertNotNull(existingUser);
@@ -304,7 +304,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		        .replace(PLACEHOLDER_UUID, PROVIDER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		existingProvider = providerService.getModel(PROVIDER_UUID);
 		assertNotNull(existingProvider);
@@ -324,7 +324,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		assertNull(userService.getModel(userUuid));
 	}
@@ -339,7 +339,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		assertNull(providerService.getModel(providerUuid));
 	}
@@ -360,7 +360,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
 		
-		producer.process(syncModel);
+		loader.process(syncModel);
 		
 		assertNull(userService.getModel(DAEMON_USER_UUID));
 	}

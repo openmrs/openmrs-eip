@@ -42,12 +42,10 @@ import org.springframework.core.env.Environment;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SyncContext.class, HashUtils.class })
-public class OpenmrsLoadProducerTest {
+public class EntityLoaderTest {
 	
 	@Mock
 	private EntityServiceFacade serviceFacade;
-	
-	private OpenmrsLoadProducer producer;
 	
 	@Mock
 	private ProducerTemplate mockProducerTemplate;
@@ -61,15 +59,17 @@ public class OpenmrsLoadProducerTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 	
+	private EntityLoader producer;
+	
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(HashUtils.class);
-		producer = new OpenmrsLoadProducer(serviceFacade);
+		producer = new EntityLoader(serviceFacade);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
-		Whitebox.setInternalState(OpenmrsLoadProducer.class, Logger.class, mockLogger);
+		Whitebox.setInternalState(EntityLoader.class, Logger.class, mockLogger);
 	}
 	
 	@Test
