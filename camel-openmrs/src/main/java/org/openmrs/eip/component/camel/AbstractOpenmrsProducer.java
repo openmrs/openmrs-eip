@@ -17,8 +17,6 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	
 	private static final String LIGHT_ENTITY_PKG = LightEntity.class.getPackage().getName();
 	
-	protected static final String OPENMRS_ROOT_PGK = "org.openmrs";
-	
 	protected static ApplicationContext appContext;
 	
 	protected ProducerParams params;

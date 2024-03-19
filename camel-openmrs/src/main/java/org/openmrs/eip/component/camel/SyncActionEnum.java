@@ -1,13 +1,13 @@
 package org.openmrs.eip.component.camel;
 
+import java.util.Arrays;
+
 import org.apache.camel.Producer;
 import org.openmrs.eip.component.exception.EIPException;
 
-import java.util.Arrays;
-
 public enum SyncActionEnum {
 	
-	EXTRACT(OpenmrsExtractProducer.class), LOAD(OpenmrsLoadProducer.class);
+	EXTRACT(OpenmrsExtractProducer.class);
 	
 	private Class<? extends Producer> producerClass;
 	

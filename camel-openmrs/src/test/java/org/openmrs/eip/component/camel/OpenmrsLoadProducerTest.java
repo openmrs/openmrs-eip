@@ -11,10 +11,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.HASH_DELETED;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +38,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 @RunWith(PowerMockRunner.class)
@@ -49,15 +45,7 @@ import org.springframework.core.env.Environment;
 public class OpenmrsLoadProducerTest {
 	
 	@Mock
-	private OpenmrsEndpoint endpoint;
-	
-	@Mock
-	private ApplicationContext applicationContext;
-	
-	@Mock
 	private EntityServiceFacade serviceFacade;
-	
-	private Exchange exchange;
 	
 	private OpenmrsLoadProducer producer;
 	
@@ -78,9 +66,7 @@ public class OpenmrsLoadProducerTest {
 		MockitoAnnotations.initMocks(this);
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(HashUtils.class);
-		exchange = new DefaultExchange(new DefaultCamelContext());
-		producer = new OpenmrsLoadProducer(endpoint, applicationContext, ProducerParams.builder().build());
-		when(SyncContext.getBean(EntityServiceFacade.class)).thenReturn(serviceFacade);
+		producer = new OpenmrsLoadProducer(serviceFacade);
 		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 		Whitebox.setInternalState(OpenmrsLoadProducer.class, Logger.class, mockLogger);
@@ -94,8 +80,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("c");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonHash personHash = new PersonHash();
 		assertNull(personHash.getIdentifier());
 		assertNull(personHash.getHash());
@@ -107,7 +91,7 @@ public class OpenmrsLoadProducerTest {
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		// When
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
@@ -128,8 +112,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
 		final String currentHash = "current-hash";
@@ -143,7 +125,7 @@ public class OpenmrsLoadProducerTest {
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		// When
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		// Then
 		verify(serviceFacade).saveModel(TableToSyncEnum.PERSON, model);
@@ -163,8 +145,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		syncModel.setMetadata(metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, personUuid)).thenReturn(model);
 		final String currentHash = "current-hash";
 		PersonHash storedHash = new PersonHash();
@@ -174,7 +154,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.computeHash(model)).thenReturn(storedHash.getHash());
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 		PowerMockito.verifyStatic(HashUtils.class);
@@ -195,8 +175,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		syncModel.setMetadata(metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, personUuid)).thenReturn(model);
 		PersonHash personHash = new PersonHash();
 		assertNull(personHash.getIdentifier());
@@ -206,7 +184,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.instantiateHashEntity(PersonHash.class)).thenReturn(personHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
@@ -233,8 +211,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		syncModel.setMetadata(metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, personUuid)).thenReturn(model);
 		final String currentHash = "current-hash";
 		PersonHash storedHash = new PersonHash();
@@ -244,7 +220,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.computeHash(model)).thenReturn("different-hash");
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		verify(mockLogger).debug("Updating hash for the deleted entity");
 		verify(mockLogger).debug("Successfully updated the hash for the deleted entity");
 		assertEquals(HASH_DELETED, storedHash.getHash());
@@ -263,8 +239,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		syncModel.setMetadata(metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		final String currentHash = "current-hash";
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash(currentHash);
@@ -273,7 +247,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.computeHash(model)).thenReturn(storedHash.getHash());
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 		PowerMockito.verifyStatic(HashUtils.class);
@@ -293,8 +267,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
 		PersonHash storedHash = new PersonHash();
@@ -303,7 +275,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
 		
 		// When
-		producer.process(exchange);
+		producer.process(syncModel);
 	}
 	
 	@Test
@@ -313,8 +285,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		dbModel.setVoided(true);
 		dbModel.setVoidReason(DEFAULT_VOID_REASON);
@@ -328,7 +298,7 @@ public class OpenmrsLoadProducerTest {
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		// When
-		producer.process(exchange);
+		producer.process(syncModel);
 		verify(mockLogger).debug("Ignoring placeholder entity when checking for conflicts");
 		
 		// Then
@@ -347,14 +317,12 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
 		expectedException.expect(EIPException.class);
 		expectedException.expectMessage(equalTo("Failed to find the existing hash for an existing entity"));
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 	}
 	
 	@Test
@@ -365,8 +333,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
 		PersonHash personHash = new PersonHash();
@@ -381,7 +347,7 @@ public class OpenmrsLoadProducerTest {
 		when(mockEnv.getProperty(Constants.PROP_IGNORE_MISSING_HASH)).thenReturn("true");
 		
 		// When
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
@@ -405,8 +371,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		dbModel.setVoided(true);
 		dbModel.setVoidReason(DEFAULT_VOID_REASON);
@@ -421,7 +385,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.instantiateHashEntity(PersonHash.class)).thenReturn(personHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		PowerMockito.verifyStatic(HashUtils.class);
 		HashUtils.saveHash(personHash, mockProducerTemplate, false);
@@ -441,8 +405,6 @@ public class OpenmrsLoadProducerTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("u");
 		SyncModel syncModel = new SyncModel(PersonModel.class, model, metadata);
-		exchange.getIn().setBody(syncModel);
-		when(applicationContext.getBean("entityServiceFacade")).thenReturn(serviceFacade);
 		PersonModel dbModel = new PersonModel();
 		when(serviceFacade.getModel(TableToSyncEnum.PERSON, model.getUuid())).thenReturn(dbModel);
 		PersonHash storedHash = new PersonHash();
@@ -453,7 +415,7 @@ public class OpenmrsLoadProducerTest {
 		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		PowerMockito.verifyStatic(HashUtils.class);
 		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
@@ -473,9 +435,8 @@ public class OpenmrsLoadProducerTest {
 		UserModel model = new UserModel();
 		model.setUuid(adminUserUuid);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, null);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		verify(mockLogger).info("Skipping syncing of a user with a uuid matching the local admin account");
 	}

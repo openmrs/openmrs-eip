@@ -8,10 +8,10 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
+import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.light.LightEntity;
 import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
@@ -32,32 +32,28 @@ import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Component;
 
-public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
+@Component("entityLoader")
+@Profile(SyncProfiles.RECEIVER)
+public class OpenmrsLoadProducer {
 	
 	private static final Logger log = LoggerFactory.getLogger(OpenmrsLoadProducer.class);
 	
-	public OpenmrsLoadProducer(final OpenmrsEndpoint endpoint, final ApplicationContext applicationContext,
-	    final ProducerParams params) {
-		super(endpoint, applicationContext, params);
-	}
+	private EntityServiceFacade serviceFacade;
 	
-	@Override
-	public void process(Exchange exchange) {
-		doProcess(exchange);
+	public OpenmrsLoadProducer(EntityServiceFacade serviceFacade) {
+		this.serviceFacade = serviceFacade;
 	}
 	
 	/**
-	 * Processes the sync message specified on the exchange.
+	 * Loads the entity data
 	 */
-	private static void doProcess(Exchange exchange) {
-		EntityServiceFacade serviceFacade = (EntityServiceFacade) appContext.getBean("entityServiceFacade");
-		SyncModel syncModel = exchange.getIn().getBody(SyncModel.class);
+	public void process(SyncModel syncModel) {
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
-		
 		boolean isUser = syncModel.getModel() instanceof UserModel;
 		if (isUser && DAEMON_USER_UUID.equals(syncModel.getModel().getUuid())) {
 			log.info("Skipping syncing of daemon user");
@@ -90,9 +86,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private static void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                         EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                         ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
+	private void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
+	                  ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
 		
 		BaseModel modelToSave = syncModel.getModel();
 		String siteId = syncModel.getMetadata().getSourceIdentifier();
@@ -145,8 +141,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 				}
 			} else if (modelToSave instanceof PersonAttributeModel) {
 				PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
-				PersonAttributeTypeLight type = getLightEntity(model.getPersonAttributeTypeUuid());
-				if (type.getFormat() != null && type.getFormat().startsWith(OPENMRS_ROOT_PGK)) {
+				PersonAttributeTypeLight type = AbstractOpenmrsProducer.getLightEntity(model.getPersonAttributeTypeUuid());
+				if (type.getFormat() != null && type.getFormat().startsWith(Constants.OPENMRS_ROOT_PGK)) {
 					if (log.isDebugEnabled()) {
 						log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
 					}
@@ -172,9 +168,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private static void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                           EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
-	                           ProducerTemplate producerTemplate) {
+	private void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
+	                    ProducerTemplate producerTemplate) {
 		
 		boolean isNewHash = false;
 		if (dbModel != null) {
@@ -230,9 +226,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		}
 	}
 	
-	private static void insert(BaseModel modelToSave, Class<? extends BaseHashEntity> hashClass,
-	                           EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
-	                           ProducerTemplate producerTemplate) {
+	private void insert(BaseModel modelToSave, Class<? extends BaseHashEntity> hashClass, EntityServiceFacade serviceFacade,
+	                    TableToSyncEnum tableToSyncEnum, ProducerTemplate producerTemplate) {
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Inserting new hash for the incoming entity state");
@@ -263,9 +258,9 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 		serviceFacade.saveModel(tableToSyncEnum, modelToSave);
 	}
 	
-	private static void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                           EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
-	                           ProducerTemplate producerTemplate, BaseModel dbModel) {
+	private void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
+	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
+	                    ProducerTemplate producerTemplate, BaseModel dbModel) {
 		
 		boolean isEtyInDbPlaceHolder = false;
 		if (dbModel instanceof BaseDataModel) {
@@ -364,8 +359,8 @@ public class OpenmrsLoadProducer extends AbstractOpenmrsProducer {
 	 * @param uuid the uuid of the entity
 	 * @return the id of the entity
 	 */
-	private static Long getId(String openmrsClassName, String uuid) {
-		LightEntity entity = getEntityLightRepository(openmrsClassName).findByUuid(uuid);
+	private Long getId(String openmrsClassName, String uuid) {
+		LightEntity entity = AbstractOpenmrsProducer.getEntityLightRepository(openmrsClassName).findByUuid(uuid);
 		if (entity == null) {
 			throw new EIPException("No entity of type " + openmrsClassName + " found with uuid " + uuid);
 		}

@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Constants {
 	
+	public static final String OPENMRS_ROOT_PGK = "org.openmrs";
+	
 	public final static String MGT_ENTITY_MGR = "mngtEntityManager";
 	
 	public final static String MGT_TX_MGR = "mngtTransactionManager";

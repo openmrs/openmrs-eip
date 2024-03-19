@@ -15,11 +15,7 @@ import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.support.DefaultExchange;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -54,8 +50,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 	
 	private String creator = UserLight.class.getName() + "(" + USER_UUID + ")";
 	
-	private Exchange exchange;
-	
+	@Autowired
 	private OpenmrsLoadProducer producer;
 	
 	@Autowired
@@ -72,12 +67,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		UserLight user = new UserLight();
 		user.setUuid("admin-uuid");
 		SyncContext.setAdminUser(user);
-	}
-	
-	@Before
-	public void init() {
-		exchange = new DefaultExchange(new DefaultCamelContext());
-		producer = new OpenmrsLoadProducer(null, applicationContext, null);
 	}
 	
 	@AfterClass
@@ -110,9 +99,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -144,9 +132,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -178,9 +165,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -214,9 +200,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -250,9 +235,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		UserModel savedUser = userService.getModel(userUuid);
 		assertNotNull(savedUser);
@@ -275,7 +259,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		UserLight user = new UserLight();
 		final String appUserUuid = "test-user-uuid";
 		user.setUuid(appUserUuid);
@@ -286,7 +269,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		        .replace(PLACEHOLDER_UUID, USER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		existingUser = userService.getModel(USER_UUID);
 		assertNotNull(existingUser);
@@ -311,7 +294,6 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		metadata.setSourceIdentifier(siteId);
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		UserLight user = new UserLight();
 		final String appUserUuid = "test-user";
 		user.setUuid(appUserUuid);
@@ -322,7 +304,7 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		        .replace(PLACEHOLDER_UUID, PROVIDER_UUID);
 		Mockito.when(producerTemplate.requestBody(query, null, List.class)).thenReturn(singletonList(existingHash));
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		existingProvider = providerService.getModel(PROVIDER_UUID);
 		assertNotNull(existingProvider);
@@ -341,9 +323,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		assertNull(userService.getModel(userUuid));
 	}
@@ -357,9 +338,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setOperation("d");
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		assertNull(providerService.getModel(providerUuid));
 	}
@@ -379,9 +359,8 @@ public class OpenmrsLoadProducerIntegrationTest extends BaseDbDrivenTest {
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier(siteId);
 		SyncModel syncModel = new SyncModel(model.getClass(), model, metadata);
-		exchange.getIn().setBody(syncModel);
 		
-		producer.process(exchange);
+		producer.process(syncModel);
 		
 		assertNull(userService.getModel(DAEMON_USER_UUID));
 	}

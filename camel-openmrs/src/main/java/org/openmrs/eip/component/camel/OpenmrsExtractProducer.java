@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.camel.Exchange;
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.camel.fetchmodels.FetchModelsRuleEngine;
 import org.openmrs.eip.component.entity.light.LightEntity;
 import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
@@ -40,7 +41,7 @@ public class OpenmrsExtractProducer extends AbstractOpenmrsProducer {
 			if (syncModel.getModel() instanceof PersonAttributeModel) {
 				PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
 				PersonAttributeTypeLight type = getLightEntity(model.getPersonAttributeTypeUuid());
-				if (type.getFormat() != null && type.getFormat().startsWith(OPENMRS_ROOT_PGK)) {
+				if (type.getFormat() != null && type.getFormat().startsWith(Constants.OPENMRS_ROOT_PGK)) {
 					if (log.isDebugEnabled()) {
 						log.debug("Converting id " + model.getValue() + " for " + type.getFormat() + " to uuid");
 					}
