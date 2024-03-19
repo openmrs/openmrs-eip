@@ -16,4 +16,13 @@ public interface ConflictRepository extends JpaRepository<ConflictQueueItem, Lon
 	@Query("SELECT id FROM ConflictQueueItem ORDER BY dateReceived ASC")
 	List<Long> getConflictIds();
 	
+	/**
+	 * Gets the count of conflicts matching the specified identifier and model class names
+	 * 
+	 * @param identifier the identifier
+	 * @param modelClassNames the model class names
+	 * @return count of conflicts
+	 */
+	long countByIdentifierAndModelClassNameIn(String identifier, List<String> modelClassNames);
+	
 }

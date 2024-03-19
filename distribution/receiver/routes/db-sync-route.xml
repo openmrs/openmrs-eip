@@ -28,8 +28,7 @@
                 </setBody>
 
                 <doTry>
-                    <to uri="openmrs:load" />
-
+                    <bean ref="entityLoader" method="process(${body})" />
                     <setProperty name="org.openmrs.eip.app.receiver.sync-msgProcessed">
                         <simple>true</simple>
                     </setProperty>
