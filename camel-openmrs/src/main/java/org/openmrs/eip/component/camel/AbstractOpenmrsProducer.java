@@ -34,7 +34,7 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	 * @param openmrsType openmrs type to match
 	 * @return OpenmrsRepository instance
 	 */
-	protected static OpenmrsRepository<LightEntity> getEntityLightRepository(String openmrsType) {
+	public static OpenmrsRepository<LightEntity> getEntityLightRepository(String openmrsType) {
 		String lightEntityTypeName = LIGHT_ENTITY_PKG + "." + openmrsType.substring(openmrsType.lastIndexOf(".") + 1)
 		        + "Light";
 		
@@ -87,7 +87,7 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	 * @param <T>
 	 * @return the Light entity object
 	 */
-	protected static <T extends LightEntity> T getLightEntity(String composedUuid) {
+	public static <T extends LightEntity> T getLightEntity(String composedUuid) {
 		DecomposedUuid decomposedUuid = ModelUtils.decomposeUuid(composedUuid).get();
 		return (T) getEntityLightRepository(decomposedUuid.getEntityType()).findByUuid(decomposedUuid.getUuid());
 	}

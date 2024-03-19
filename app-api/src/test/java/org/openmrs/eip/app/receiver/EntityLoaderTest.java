@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.camel;
+package org.openmrs.eip.app.receiver;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;

@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.camel;
+package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
 import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
@@ -12,6 +12,7 @@ import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.camel.AbstractOpenmrsProducer;
 import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.light.LightEntity;
 import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
