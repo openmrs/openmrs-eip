@@ -1,6 +1,5 @@
 package org.openmrs.eip.app.receiver;
 
-import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.model.UserModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
@@ -47,17 +45,6 @@ public class EntityLoader {
 	 */
 	public void process(SyncModel syncModel) {
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
-		boolean isUser = syncModel.getModel() instanceof UserModel;
-		if (isUser && DAEMON_USER_UUID.equals(syncModel.getModel().getUuid())) {
-			log.info("Skipping syncing of daemon user");
-			return;
-		}
-		
-		if (isUser && SyncContext.getAdminUser().getUuid().equals(syncModel.getModel().getUuid())) {
-			log.info("Skipping syncing of a user with a uuid matching the local admin account");
-			return;
-		}
-		
 		boolean delete = "d".equals(syncModel.getMetadata().getOperation());
 		Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(syncModel.getModel());
 		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);

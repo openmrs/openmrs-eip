@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.camel.CamelExecutionException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -46,8 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql(scripts = "classpath:openmrs_core_data.sql")
 public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 	
-	private static final String URI_LOAD = "openmrs:load";
-	
 	private static final String HASH_COUNT_URI = "sql:SELECT count(*) as c FROM person_hash?dataSource=#"
 	        + MGT_DATASOURCE_NAME;
 	
@@ -59,6 +56,9 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 	
 	@Autowired
 	private PersonNameRepository nameRepo;
+	
+	@Autowired
+	private EntityLoader loader;
 	
 	@Before
 	public void setup() {
@@ -100,7 +100,7 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 			name.setDateCreated(LocalDateTime.now());
 			SyncModel syncModel = new SyncModel(name.getClass(), name, metadata);
 			futures.add(CompletableFuture.runAsync(() -> {
-				producerTemplate.sendBody("openmrs:load", syncModel);
+				loader.process(syncModel);
 			}, executor));
 		}
 		
@@ -135,10 +135,10 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 			SyncModel syncModel = new SyncModel(person.getClass(), person, metadata);
 			futures.add(CompletableFuture.runAsync(() -> {
 				try {
-					producerTemplate.sendBody(URI_LOAD, syncModel);
+					loader.process(syncModel);
 					passCount.incrementAndGet();
 				}
-				catch (CamelExecutionException e) {
+				catch (Exception e) {
 					if (ExceptionUtils.getRootCause(e) instanceof SQLIntegrityConstraintViolationException) {
 						failureCount.incrementAndGet();
 					}
@@ -175,7 +175,7 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 		//For testing purposes let us update a field so that the hash is different
 		person.setDateChanged(LocalDateTime.now());
 		
-		producerTemplate.sendBody(URI_LOAD, syncModel);
+		loader.process(syncModel);
 		
 		BaseHashEntity updatedHash = getStoredHash(personUuid, PersonHash.class, producerTemplate);
 		assertEquals(computeHash(person), updatedHash.getHash());
