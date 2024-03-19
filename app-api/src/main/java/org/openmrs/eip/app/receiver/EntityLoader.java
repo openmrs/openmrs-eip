@@ -1,22 +1,17 @@
 package org.openmrs.eip.app.receiver;
 
 import static org.openmrs.eip.component.Constants.DAEMON_USER_UUID;
-import static org.openmrs.eip.component.Constants.VALUE_SITE_SEPARATOR;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
-import static org.springframework.data.domain.ExampleMatcher.matching;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.component.camel.AbstractOpenmrsProducer;
-import org.openmrs.eip.component.entity.User;
 import org.openmrs.eip.component.entity.light.LightEntity;
 import org.openmrs.eip.component.entity.light.PersonAttributeTypeLight;
-import org.openmrs.eip.component.entity.light.UserLight;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
@@ -24,10 +19,8 @@ import org.openmrs.eip.component.model.BaseDataModel;
 import org.openmrs.eip.component.model.BaseMetadataModel;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonAttributeModel;
-import org.openmrs.eip.component.model.ProviderModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.model.UserModel;
-import org.openmrs.eip.component.repository.UserRepository;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.HashUtils;
@@ -35,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 
 @Component("entityLoader")
@@ -66,9 +58,7 @@ public class EntityLoader {
 			return;
 		}
 		
-		boolean isProvider = syncModel.getModel() instanceof ProviderModel;
-		boolean isDeleteOperation = "d".equals(syncModel.getMetadata().getOperation());
-		boolean delete = isDeleteOperation && !isUser && !isProvider;
+		boolean delete = "d".equals(syncModel.getMetadata().getOperation());
 		Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(syncModel.getModel());
 		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
@@ -77,89 +67,27 @@ public class EntityLoader {
 			storedHash = HashUtils.getStoredHash(syncModel.getModel().getUuid(), hashClass, producerTemplate);
 		}
 		
-		//Delete any deleted entity type BUT for deleted users or providers we only proceed processing this as a delete
-		//if they do not exist in the receiver to avoid creating them at all otherwise we retire the existing one.
-		if (delete || (isDeleteOperation && (isUser || isProvider) && dbModel == null)) {
+		if (delete) {
 			delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum, producerTemplate);
 		} else {
-			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate, isUser,
-			    isDeleteOperation);
+			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
 		}
 	}
 	
 	private void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
 	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                  ProducerTemplate producerTemplate, boolean isUser, boolean isDeleteOperation) {
-		
+	                  ProducerTemplate producerTemplate) {
 		BaseModel modelToSave = syncModel.getModel();
-		String siteId = syncModel.getMetadata().getSourceIdentifier();
-		if (!isDeleteOperation) {
-			if (isUser) {
-				UserModel userModel = (UserModel) modelToSave;
-				UserRepository userRepo = SyncContext.getBean(UserRepository.class);
-				if (userModel.getUsername() != null) {
-					User exampleUser = new User();
-					exampleUser.setUsername(userModel.getUsername());
-					Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
-					List<User> duplicates = userRepo.findAll(example);
-					if (duplicates.size() > 0) {
-						boolean duplicateUsername = false;
-						if (duplicates.size() > 1) {
-							duplicateUsername = true;
-						} else if (!userModel.getUuid().equalsIgnoreCase(duplicates.get(0).getUuid())) {
-							duplicateUsername = true;
-						}
-						
-						if (duplicateUsername) {
-							log.info(
-							    "Found another user in the receiver DB with a duplicate username: " + userModel.getUsername()
-							            + ", appending " + "site id to this user's username to make it unique");
-							userModel.setUsername(userModel.getUsername() + VALUE_SITE_SEPARATOR + siteId);
-						}
-					}
+		if (modelToSave instanceof PersonAttributeModel) {
+			PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
+			PersonAttributeTypeLight type = AbstractOpenmrsProducer.getLightEntity(model.getPersonAttributeTypeUuid());
+			if (type.getFormat() != null && type.getFormat().startsWith(Constants.OPENMRS_ROOT_PGK)) {
+				if (log.isDebugEnabled()) {
+					log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
 				}
 				
-				if (userModel.getSystemId() != null) {
-					User exampleUser = new User();
-					exampleUser.setSystemId(userModel.getSystemId());
-					Example<User> example = Example.of(exampleUser, matching().withIgnoreCase());
-					List<User> duplicates = userRepo.findAll(example);
-					if (duplicates.size() > 0) {
-						boolean duplicateSystemId = false;
-						if (duplicates.size() > 1) {
-							duplicateSystemId = true;
-						} else if (!userModel.getUuid().equalsIgnoreCase(duplicates.get(0).getUuid())) {
-							duplicateSystemId = true;
-						}
-						
-						if (duplicateSystemId) {
-							log.info(
-							    "Found another user in the receiver DB with a duplicate systemId: " + userModel.getSystemId()
-							            + ", appending site id " + "to this user's systemId to make it unique");
-							userModel.setSystemId(userModel.getSystemId() + VALUE_SITE_SEPARATOR + siteId);
-						}
-					}
-				}
-			} else if (modelToSave instanceof PersonAttributeModel) {
-				PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
-				PersonAttributeTypeLight type = AbstractOpenmrsProducer.getLightEntity(model.getPersonAttributeTypeUuid());
-				if (type.getFormat() != null && type.getFormat().startsWith(Constants.OPENMRS_ROOT_PGK)) {
-					if (log.isDebugEnabled()) {
-						log.debug("Converting uuid " + model.getValue() + " for " + type.getFormat() + " to id");
-					}
-					
-					model.setValue(getId(type.getFormat(), model.getValue()).toString());
-				}
+				model.setValue(getId(type.getFormat(), model.getValue()).toString());
 			}
-		} else {
-			//This is a user or provider entity that was deleted
-			log.info("Entity was deleted in remote site, marking it as retired");
-			BaseMetadataModel existing = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
-			existing.setRetired(true);
-			existing.setRetiredByUuid(UserLight.class.getName() + "(" + SyncContext.getAppUser().getUuid() + ")");
-			existing.setDateRetired(LocalDateTime.now());
-			existing.setRetireReason(Constants.DEFAULT_RETIRE_REASON);
-			modelToSave = existing;
 		}
 		
 		if (dbModel == null) {
