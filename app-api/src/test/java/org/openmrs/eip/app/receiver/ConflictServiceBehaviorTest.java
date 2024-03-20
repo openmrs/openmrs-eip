@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_DBSYNC;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
@@ -35,12 +33,10 @@ import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-@TestPropertySource(properties = "logging.level." + ROUTE_ID_DBSYNC + "=DEBUG")
 public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	
 	@Autowired
@@ -57,11 +53,6 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	
 	@Autowired
 	private ConflictService service;
-	
-	@Before
-	public void setup() throws Exception {
-		loadXmlRoutes("receiver", "db-sync-route.xml");
-	}
 	
 	@Test
 	@Transactional(SyncConstants.CHAINED_TX_MGR)

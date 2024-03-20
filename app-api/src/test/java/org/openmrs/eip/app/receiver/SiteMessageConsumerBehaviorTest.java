@@ -78,7 +78,6 @@ public class SiteMessageConsumerBehaviorTest extends BaseReceiverTest {
 	@Before
 	public void setup() throws Exception {
 		loadXmlRoutes(ROUTE_DIR, "message-processor.xml");
-		loadXmlRoutes(ROUTE_DIR, "db-sync-route.xml");
 		loadXmlRoutes(ROUTE_DIR, "error-handler-route.xml");
 		SyncContext.setAppUser(userLightRepo.findById(1L).get());
 	}
