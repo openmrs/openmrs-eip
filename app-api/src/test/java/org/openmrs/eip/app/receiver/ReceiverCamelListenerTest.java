@@ -83,7 +83,6 @@ public class ReceiverCamelListenerTest {
 		when(SyncContext.getBean(UserLightRepository.class)).thenReturn(mockUserLightRepo);
 		when(mockUserLightRepo.findById(TEST_OPENMRS_USER_ID)).thenReturn(Optional.of(new UserLight()));
 		listener = new ReceiverCamelListener(mockSiteExecutor, mockSyncExecutor);
-		setInternalState(SiteMessageConsumer.class, "initialized", true);
 		setInternalState(BaseSiteRunnable.class, "initialized", true);
 		setInternalState(BaseReceiverSyncPrioritizingTask.class, "initialized", true);
 		setInternalState(listener, "siteTaskInitialDelay", testInitialDelay);
@@ -96,7 +95,6 @@ public class ReceiverCamelListenerTest {
 	
 	@After
 	public void tearDown() {
-		setInternalState(SiteMessageConsumer.class, "initialized", false);
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
 		setInternalState(BaseReceiverSyncPrioritizingTask.class, "initialized", false);
 	}

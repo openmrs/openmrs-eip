@@ -57,7 +57,6 @@ public class SiteParentTaskTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(SyncContext.class);
-		setInternalState(SiteMessageConsumer.class, "initialized", true);
 		setInternalState(BaseSiteRunnable.class, "initialized", true);
 		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
 		when(mockSite.getIdentifier()).thenReturn(SITE_IDENTIFIER);
@@ -66,7 +65,6 @@ public class SiteParentTaskTest {
 	
 	@After
 	public void tearDown() {
-		setInternalState(SiteMessageConsumer.class, "initialized", false);
 		setInternalState(BaseSiteRunnable.class, "initialized", false);
 	}
 	

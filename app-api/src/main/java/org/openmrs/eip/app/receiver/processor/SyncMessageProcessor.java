@@ -1,10 +1,6 @@
 package org.openmrs.eip.app.receiver.processor;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_MSG;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ERR_TYPE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_FOUND_CONFLICT;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,19 +8,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.ExchangeBuilder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
-import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.service.ReceiverService;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
+import org.openmrs.eip.component.exception.ConflictsFoundException;
 import org.openmrs.eip.component.exception.EIPException;
+import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +40,13 @@ public class SyncMessageProcessor extends BaseQueueProcessor<SyncMessage> {
 	
 	private ReceiverService service;
 	
-	private ProducerTemplate producerTemplate;
+	private SyncHelper syncHelper;
 	
 	public SyncMessageProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, ReceiverService service,
-	    ProducerTemplate producerTemplate) {
+	    SyncHelper syncHelper) {
 		super(executor);
 		this.service = service;
-		this.producerTemplate = producerTemplate;
+		this.syncHelper = syncHelper;
 		PROCESSING_MSG_QUEUE = Collections.synchronizedSet(new HashSet<>(executor.getMaximumPoolSize()));
 	}
 	
@@ -89,14 +83,14 @@ public class SyncMessageProcessor extends BaseQueueProcessor<SyncMessage> {
 	
 	@Override
 	public void processItem(SyncMessage msg) {
-		Exchange exchange = ExchangeBuilder.anExchange(producerTemplate.getCamelContext()).withBody(msg).build();
 		//TODO Move this logic that ensures no threads process events for the same entity to message-processor route
 		String modelClass = msg.getModelClassName();
+		String uuid = msg.getIdentifier();
 		if (ReceiverUtils.isSubclass(modelClass)) {
 			modelClass = ReceiverUtils.getParentModelClassName(modelClass);
 		}
 		
-		final String uniqueId = modelClass + "#" + msg.getIdentifier();
+		final String uniqueId = modelClass + "#" + uuid;
 		boolean removeId = false;
 		try {
 			//We could ignore inserts because we don't expect any events for the entity from other sites yet BUT in a
@@ -112,30 +106,32 @@ public class SyncMessageProcessor extends BaseQueueProcessor<SyncMessage> {
 			}
 			
 			removeId = true;
-			CamelUtils.send(ReceiverConstants.URI_MSG_PROCESSOR, exchange);
+			LOG.info("Processing message");
+			//Ensure there is no retry items in the queue for this entity so that changes in messages that happened later 
+			// don't overwrite those that happened before them.
+			if (service.hasRetryItem(uuid, modelClass)) {
+				throw new EIPException("Entity still has earlier items in the retry queue");
+			}
+			
+			syncHelper.sync(JsonUtils.unmarshalSyncModel(msg.getEntityPayload()), false);
+			LOG.info("Done processing message");
+		}
+		catch (ConflictsFoundException e) {
+			service.processConflictedSyncItem(msg);
+		}
+		catch (Throwable t) {
+			Throwable cause = ExceptionUtils.getRootCause(t);
+			if (cause == null) {
+				cause = t;
+			}
+			
+			service.processFailedSyncItem(msg, cause.getClass().getName(), cause.getMessage());
 		}
 		finally {
 			if (removeId) {
 				PROCESSING_MSG_QUEUE.remove(uniqueId);
 			}
 		}
-		
-		boolean foundConflict = exchange.getProperty(EX_PROP_FOUND_CONFLICT, false, Boolean.class);
-		String errorType = exchange.getProperty(EX_PROP_ERR_TYPE, String.class);
-		String errorMsg = exchange.getProperty(EX_PROP_ERR_MSG, String.class);
-		boolean msgProcessed = exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class);
-		
-		if (msgProcessed) {
-			service.moveToSyncedQueue(msg, SyncOutcome.SUCCESS);
-		} else if (foundConflict) {
-			service.processConflictedSyncItem(msg);
-		} else if (errorType != null) {
-			service.processFailedSyncItem(msg, errorType, errorMsg);
-		} else {
-			throw new EIPException("Something went wrong while processing sync message -> " + msg);
-		}
-		
-		LOG.info("Done processing message");
 	}
 	
 }

@@ -3,7 +3,6 @@ package org.openmrs.eip.app.receiver;
 import static org.openmrs.eip.app.SyncConstants.PROP_SITE_PARALLEL_SIZE;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.DEFAULT_SITE_PARALLEL_SIZE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.ROUTE_ID_INBOUND_DB_SYNC;
 import static org.openmrs.eip.component.Constants.CUSTOM_PROP_SOURCE_BEAN_NAME;
 import static org.openmrs.eip.component.Constants.PROP_URI_ERROR_HANDLER;
 
@@ -34,7 +33,6 @@ public class ReceiverConfig {
 	@Bean(CUSTOM_PROP_SOURCE_BEAN_NAME)
 	public PropertySource getReceiverPropertySource(ConfigurableEnvironment env) {
 		Map<String, Object> props = new HashMap();
-		props.put("message.destination", ROUTE_ID_INBOUND_DB_SYNC);
 		props.put(PROP_URI_ERROR_HANDLER, "direct:inbound-error-handler");
 		PropertySource customPropSource = new MapPropertySource("receiverPropSource", props);
 		env.getPropertySources().addLast(customPropSource);

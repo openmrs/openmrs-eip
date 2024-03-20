@@ -52,47 +52,21 @@ public class ReceiverConstants {
 	
 	public static final String PROP_COUNT_CACHE_TTL = "sync.prioritize.count.cache.ttl";
 	
-	public static final String ROUTE_ID_MSG_PROCESSOR = "message-processor";
-	
-	public static final String URI_MSG_PROCESSOR = "direct:" + ROUTE_ID_MSG_PROCESSOR;
-	
-	public static final String ROUTE_ID_INBOUND_DB_SYNC = "inbound-db-sync";
-	
-	public static final String URI_INBOUND_DB_SYNC = "direct:" + ROUTE_ID_INBOUND_DB_SYNC;
-	
 	public static final String ROUTE_ID_ERROR_HANDLER = "inbound-error-handler";
 	
 	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
 	
 	public static final String ERROR_HANDLER_REF = "inBoundErrorHandler";
 	
-	public static final String EX_PROP_PAYLOAD = "entity-payload";
-	
 	public static final String EX_PROP_MODEL_CLASS = "model-class";
 	
 	public static final String EX_PROP_ENTITY_ID = "entity-id";
-	
-	public static final String EX_PROP_SYNC_MESSAGE = "sync-message";
 	
 	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
 	
 	public static final String EX_PROP_RETRY_ITEM_ID = "retry-item-id";
 	
 	public static final String EX_PROP_RETRY_ITEM = "retry-item";
-	
-	public static final String EX_PROP_METADATA = "sync-metadata";
-	
-	public static final String EX_PROP_IS_FILE = "is-file";
-	
-	public static final String EX_PROP_MSG_PROCESSED = "org.openmrs.eip.app.receiver.sync-msgProcessed";
-	
-	public static final String EX_PROP_FOUND_CONFLICT = ROUTE_ID_INBOUND_DB_SYNC + "-foundConflict";
-	
-	public static final String EX_PROP_ERR_TYPE = ROUTE_ID_ERROR_HANDLER + "-errType";
-	
-	public static final String EX_PROP_ERR_MSG = ROUTE_ID_ERROR_HANDLER + "-errMsg";
-	
-	public static final String EX_PROP_IS_CONFLICT = "org.openmrs.eip.app.receiver.isConflictSync";
 	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	
