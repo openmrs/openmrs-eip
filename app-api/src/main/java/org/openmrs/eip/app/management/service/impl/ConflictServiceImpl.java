@@ -4,7 +4,6 @@ import static org.apache.commons.beanutils.PropertyUtils.getProperty;
 import static org.apache.commons.beanutils.PropertyUtils.setProperty;
 import static org.openmrs.eip.app.SyncConstants.CHAINED_TX_MGR;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MSG_PROCESSED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.MERGE_EXCLUDE_FIELDS;
 import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
@@ -14,8 +13,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
@@ -29,11 +26,10 @@ import org.openmrs.eip.app.management.service.BaseService;
 import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ConflictResolution;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
+import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
-import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.BaseChangeableDataModel;
 import org.openmrs.eip.component.model.BaseChangeableMetadataModel;
@@ -71,10 +67,11 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 	
 	private CamelContext camelContext;
 	
+	private SyncHelper syncHelper;
+	
 	public ConflictServiceImpl(ConflictRepository conflictRepo, ReceiverRetryRepository retryRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverService receiverService, CamelContext camelContext,
-	    EntityServiceFacade serviceFacade, SyncedMessageRepository syncedMsgRepo) {
-		
+	    EntityServiceFacade serviceFacade, SyncedMessageRepository syncedMsgRepo, SyncHelper syncHelper) {
 		this.conflictRepo = conflictRepo;
 		this.retryRepo = retryRepo;
 		this.archiveRepo = archiveRepo;
@@ -82,6 +79,7 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		this.camelContext = camelContext;
 		this.serviceFacade = serviceFacade;
 		this.syncedMsgRepo = syncedMsgRepo;
+		this.syncHelper = syncHelper;
 	}
 	
 	@Override
@@ -223,20 +221,15 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		
 		mergeVoidOrRetireProperties(dbModel, newModel, propertiesToSync);
 		mergeAuditProperties(dbModel, newModel);
-		
 		syncModel.setModel(dbModel);
-		Exchange exchange = ExchangeBuilder.anExchange(camelContext).withBody(syncModel)
-		        .withProperty(ReceiverConstants.EX_PROP_MODEL_CLASS, conflict.getModelClassName())
-		        .withProperty(ReceiverConstants.EX_PROP_ENTITY_ID, conflict.getIdentifier())
-		        .withProperty(ReceiverConstants.EX_PROP_IS_CONFLICT, true).build();
 		
-		CamelUtils.send(ReceiverConstants.URI_INBOUND_DB_SYNC, exchange);
-		
-		//TODO What should we do in case a new conflict is encountered, is it even possible anyways?
-		if (exchange.getProperty(EX_PROP_MSG_PROCESSED, false, Boolean.class)) {
+		try {
+			//TODO What should we do in case a new conflict is encountered, is it even possible anyways?
+			syncHelper.sync(syncModel, true);
 			moveToSyncedQueue(conflict);
-		} else {
-			throw new EIPException("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid());
+		}
+		catch (Throwable throwable) {
+			throw new EIPException("Failed to sync resolved conflict item with uuid: " + conflict.getMessageUuid());
 		}
 	}
 	

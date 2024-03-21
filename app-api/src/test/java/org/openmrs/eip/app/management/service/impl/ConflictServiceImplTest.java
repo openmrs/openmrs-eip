@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.reflect.MethodUtils.invokeMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
@@ -16,9 +15,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.IGNORE_NEW;
 import static org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision.MERGE;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_ENTITY_ID;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_IS_CONFLICT;
-import static org.openmrs.eip.app.receiver.ReceiverConstants.EX_PROP_MODEL_CLASS;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_RETIRED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.FIELD_VOIDED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.MERGE_EXCLUDE_FIELDS;
@@ -31,13 +27,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.eip.Holder;
@@ -46,7 +42,7 @@ import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ConflictResolution;
 import org.openmrs.eip.app.receiver.ConflictResolution.ResolutionDecision;
-import org.openmrs.eip.app.receiver.ReceiverConstants;
+import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.camel.utils.CamelUtils;
 import org.openmrs.eip.component.exception.EIPException;
@@ -80,11 +76,15 @@ public class ConflictServiceImplTest {
 	@Mock
 	private CamelContext mockContext;
 	
+	@Mock
+	private SyncHelper mockSyncHelper;
+	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(CamelUtils.class);
 		PowerMockito.mockStatic(SyncContext.class);
-		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade, null);
+		service = new ConflictServiceImpl(null, null, null, mockReceiverService, mockContext, mockServiceFacade, null,
+		        mockSyncHelper);
 		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
 	}
 	
@@ -524,13 +524,6 @@ public class ConflictServiceImplTest {
 		resolution.addPropertyToSync("gender");
 		resolution.addPropertyToSync("birthdate");
 		resolution.addPropertyToSync(FIELD_VOIDED);
-		Holder<Exchange> exchangeHolder = new Holder<>();
-		when(CamelUtils.send(eq(ReceiverConstants.URI_INBOUND_DB_SYNC), any(Exchange.class))).thenAnswer(invocation -> {
-			Exchange exchange = invocation.getArgument(1);
-			exchangeHolder.value = exchange;
-			exchange.setProperty(ReceiverConstants.EX_PROP_MSG_PROCESSED, true);
-			return exchange;
-		});
 		service = spy(service);
 		doNothing().when(service).moveToSyncedQueue(conflict);
 		when(SyncContext.getBean(ConflictService.class)).thenReturn(service);
@@ -539,12 +532,10 @@ public class ConflictServiceImplTest {
 		
 		verify(mockReceiverService).updateHash(modelClassName, uuid);
 		verify(service).moveToSyncedQueue(conflict);
-		Exchange exchange = exchangeHolder.value;
-		assertEquals(mockContext, exchange.getContext());
-		assertEquals(modelClassName, exchange.getProperty(EX_PROP_MODEL_CLASS));
-		assertEquals(uuid, exchange.getProperty(EX_PROP_ENTITY_ID));
-		assertTrue(exchange.getProperty(EX_PROP_IS_CONFLICT, Boolean.class));
-		SyncModel processedSyncModel = exchange.getIn().getBody(SyncModel.class);
+		ArgumentCaptor<SyncModel> argCaptor = ArgumentCaptor.forClass(SyncModel.class);
+		Mockito.verify(mockSyncHelper).sync(argCaptor.capture(), eq(true));
+		SyncModel processedSyncModel = argCaptor.getValue();
+		assertEquals(modelClassName, processedSyncModel.getTableToSyncModelClass().getName());
 		assertEquals(PersonModel.class, processedSyncModel.getTableToSyncModelClass());
 		assertEquals(dbModel, processedSyncModel.getModel());
 		assertEquals(newGender, dbModel.getGender());
@@ -581,7 +572,7 @@ public class ConflictServiceImplTest {
 		resolution.addPropertyToSync("gender");
 		
 		Throwable thrown = Assert.assertThrows(EIPException.class, () -> service.resolve(resolution));
-		assertEquals("Something went wrong while syncing item with uuid: " + conflict.getMessageUuid(), thrown.getMessage());
+		assertEquals("Failed to sync resolved conflict item with uuid: " + conflict.getMessageUuid(), thrown.getMessage());
 	}
 	
 }
