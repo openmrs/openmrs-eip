@@ -12,6 +12,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
+import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.app.receiver.SyncHelper;
@@ -114,6 +115,7 @@ public class SyncMessageProcessor extends BaseQueueProcessor<SyncMessage> {
 			}
 			
 			syncHelper.sync(JsonUtils.unmarshalSyncModel(msg.getEntityPayload()), false);
+			service.moveToSyncedQueue(msg, SyncOutcome.SUCCESS);
 			LOG.info("Done processing message");
 		}
 		catch (ConflictsFoundException e) {
