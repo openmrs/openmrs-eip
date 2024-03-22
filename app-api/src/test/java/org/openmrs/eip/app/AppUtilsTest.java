@@ -107,7 +107,7 @@ public class AppUtilsTest {
 	public void invokeMethod_shouldInvokeTheMethod() throws Exception {
 		Method method = ConflictServiceImpl.class.getDeclaredMethod("resolveWithMerge", ConflictResolution.class);
 		assertFalse(method.isAccessible());
-		ConflictServiceImpl service = new ConflictServiceImpl(null, null, null, null, null, null, null);
+		ConflictServiceImpl service = new ConflictServiceImpl(null, null, null, null, null, null, null, null);
 		ConflictResolution mockResolution = Mockito.mock(ConflictResolution.class);
 		ConflictService mockService = Mockito.mock(ConflictService.class);
 		when(SyncContext.getBean(ConflictService.class)).thenReturn(mockService);
