@@ -1,4 +1,4 @@
-package org.openmrs.eip.app.receiver;
+package org.openmrs.eip.app.receiver.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +26,7 @@ import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncMessageRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
-import org.openmrs.eip.app.receiver.processor.SyncMessageProcessor;
+import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.app.receiver.task.Synchronizer;
 import org.openmrs.eip.app.route.TestUtils;
 import org.openmrs.eip.component.SyncContext;
@@ -143,7 +143,7 @@ public class SyncMessageProcessorBehaviorTest extends BaseReceiverTest {
 		}
 		
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).get();
-		Set<String> processingMsgQueue = Whitebox.getInternalState(SyncMessageProcessor.class, "PROCESSING_MSG_QUEUE");
+		Set<String> processingMsgQueue = Whitebox.getInternalState(BaseSyncProcessor.class, "PROCESSING_MSG_QUEUE");
 		assertTrue(processingMsgQueue.isEmpty());
 		assertTrue(TestUtils.getEntities(ConflictQueueItem.class).isEmpty());
 		assertTrue(TestUtils.getEntities(ReceiverRetryQueueItem.class).isEmpty());
