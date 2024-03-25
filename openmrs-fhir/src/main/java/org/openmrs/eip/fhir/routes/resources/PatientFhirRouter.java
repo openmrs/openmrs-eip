@@ -36,7 +36,7 @@ public class PatientFhirRouter extends BaseFhirResourceRouter {
 		        // person_name or person_address
 		        .otherwise()
 		        .toD(
-		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = :#${exchangeProperty.event.identifier})?dataSource=#openmrsDataSource")
+		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        .end().toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end().end()
 		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, exchangeProperty(PROP_EVENT_OPERATION))
 		        .to(FhirResource.PATIENT.outgoingUrl());
