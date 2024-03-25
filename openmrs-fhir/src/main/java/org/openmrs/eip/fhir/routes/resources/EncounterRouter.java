@@ -17,9 +17,9 @@ public class EncounterRouter extends BaseFhirResourceRouter {
 	@Override
 	public void configure() {
 		from(FhirResource.ENCOUNTER.incomingUrl()).routeId("fhir-encounter-router").filter(isSupportedTable())
-		        .log(LoggingLevel.DEBUG, "Processing ${exchangeProperty.event.tableName} message")
+		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
 		        .toD("fhir:read/resourceById?resourceClass=Encounter&stringId=${exchangeProperty.event.identifier}")
-		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, exchangeProperty(PROP_EVENT_OPERATION))
+		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.ENCOUNTER.outgoingUrl());
 	}
 }

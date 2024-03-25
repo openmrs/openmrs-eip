@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.Encounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openmrs.eip.fhir.FhirResource;
+import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
@@ -79,9 +80,11 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "encounter");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("encounter");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -121,9 +124,11 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "visit");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("visit");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -157,9 +162,11 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "unknown_table");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("unknown_table");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});

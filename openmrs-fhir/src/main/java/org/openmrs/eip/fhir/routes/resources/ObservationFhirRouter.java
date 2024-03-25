@@ -17,9 +17,9 @@ public class ObservationFhirRouter extends BaseFhirResourceRouter {
 	@Override
 	public void configure() {
 		from(FhirResource.OBSERVATION.incomingUrl()).routeId("fhir-observation-router")
-		        .log(LoggingLevel.DEBUG, "Processing ${exchangeProperty.event.tableName} message").filter(isSupportedTable())
+		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message").filter(isSupportedTable())
 		        .toD("fhir:read/resourceById?resourceClass=Observation&stringId=${exchangeProperty.event.identifier}")
-		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, exchangeProperty(PROP_EVENT_OPERATION))
+		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.OBSERVATION.outgoingUrl());
 	}
 }

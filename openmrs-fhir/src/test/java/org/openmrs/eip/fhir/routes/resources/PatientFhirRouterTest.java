@@ -5,9 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_IDENTIFIER;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_TABLE_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +25,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openmrs.eip.fhir.FhirResource;
+import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
@@ -85,9 +83,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "patient");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("patient");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -131,9 +131,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "person");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("person");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -190,9 +192,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "patient_identifier");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("patient_identifier");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -249,9 +253,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "person_name");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("person_name");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -308,9 +314,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "person_address");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("person_address");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
@@ -348,9 +356,11 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		// Act
 		template.send((exchange) -> {
-			exchange.setProperty(PROP_EVENT_TABLE_NAME, "unknown_table");
-			exchange.setProperty(PROP_EVENT_OPERATION, "c");
-			exchange.setProperty(PROP_EVENT_IDENTIFIER, Uuid.randomUuid().toString());
+			Event event = new Event();
+			event.setTableName("unknown_table");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
