@@ -47,8 +47,8 @@ public class OpenmrsFhirRouter extends RouteBuilder {
 				.log(LoggingLevel.INFO, "Processing message ${body}")
 		        // first filter: we do not process snapshot events, and we only process events for tables we are
 		        // configured to use.
-		        .filter(and(exchangeProperty(PROP_EVENT_SNAPSHOT).isEqualTo(false),
-		            exchangeProperty(PROP_EVENT_TABLE_NAME).in((Object[]) monitoredTables)))
+		        .filter(and(simple("${exchangeProperty." + PROP_EVENT_SNAPSHOT + "}").isEqualTo(false),
+		            simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").in((Object[]) monitoredTables)))
 				.log(LoggingLevel.INFO, "Dispatching to endpoints " + resourceDestinations)
 		        .recipientList(constant(resourceDestinations)).parallelProcessing().end();
 	}

@@ -21,6 +21,6 @@ public abstract class BaseFhirResourceRouter extends RouteBuilder {
 	}
 	
 	protected Predicate isSupportedTable() {
-		return exchangeProperty(PROP_EVENT_TABLE_NAME).in((Object[]) supportedTables);
+		return simple("${" + PROP_EVENT_TABLE_NAME + "}").in((Object[]) supportedTables);
 	}
 }
