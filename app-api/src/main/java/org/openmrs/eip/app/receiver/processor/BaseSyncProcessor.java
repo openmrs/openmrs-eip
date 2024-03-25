@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
@@ -72,12 +73,22 @@ public abstract class BaseSyncProcessor<T extends AbstractEntity> extends BaseQu
 			onConflict(item);
 		}
 		catch (Throwable t) {
+			if (AppUtils.isShuttingDown()) {
+				LOG.info("Ignoring the error because the application is shutting down");
+				return;
+			}
+			
 			Throwable cause = ExceptionUtils.getRootCause(t);
 			if (cause == null) {
 				cause = t;
 			}
 			
-			onError(item, cause);
+			String errMsg = cause.getMessage();
+			if (errMsg.length() > 1024) {
+				errMsg = errMsg.substring(0, 1024);
+			}
+			
+			onError(item, cause.getClass().getName(), errMsg);
 		}
 		finally {
 			if (removeId) {
@@ -94,6 +105,6 @@ public abstract class BaseSyncProcessor<T extends AbstractEntity> extends BaseQu
 	
 	protected abstract void onConflict(T item);
 	
-	protected abstract void onError(T item, Throwable throwable);
+	protected abstract void onError(T item, String exceptionClass, String errorMsg);
 	
 }

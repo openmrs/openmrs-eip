@@ -24,8 +24,6 @@ import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -127,9 +125,9 @@ public class SyncMessageProcessorTest {
 	public void onError_shouldAddItemToTheRetryQueue() {
 		final String errorMsg = "test";
 		SyncMessage msg = new SyncMessage();
-		Exception exception = new EIPException(errorMsg);
+		Exception ex = new EIPException(errorMsg);
 		
-		processor.onError(msg, exception);
+		processor.onError(msg, ex.getClass().getName(), ex.getMessage());
 		
 		Mockito.verify(mockService).processFailedSyncItem(msg, EIPException.class.getName(), errorMsg);
 	}

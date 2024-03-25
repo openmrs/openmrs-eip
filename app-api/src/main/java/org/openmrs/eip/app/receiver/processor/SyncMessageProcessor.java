@@ -87,8 +87,8 @@ public class SyncMessageProcessor extends BaseSyncProcessor<SyncMessage> {
 	}
 	
 	@Override
-	protected void onError(SyncMessage msg, Throwable throwable) {
-		service.processFailedSyncItem(msg, throwable.getClass().getName(), throwable.getMessage());
+	protected void onError(SyncMessage msg, String exceptionClass, String errorMsg) {
+		service.processFailedSyncItem(msg, exceptionClass, errorMsg);
 	}
 	
 }

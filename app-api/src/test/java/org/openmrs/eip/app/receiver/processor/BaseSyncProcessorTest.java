@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.receiver.SyncHelper;
@@ -37,7 +39,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(JsonUtils.class)
+@PrepareForTest({ JsonUtils.class, AppUtils.class })
 public class BaseSyncProcessorTest {
 	
 	private static final ThreadPoolExecutor EXECUTOR = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
@@ -53,6 +55,7 @@ public class BaseSyncProcessorTest {
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(JsonUtils.class);
+		PowerMockito.mockStatic(AppUtils.class);
 		setInternalState(BaseQueueProcessor.class, "initialized", true);
 		processor = Mockito.spy(new SyncMessageProcessor(EXECUTOR, null, mockHelper));
 	}
@@ -121,12 +124,32 @@ public class BaseSyncProcessorTest {
 		Exception ex = new EIPException("test");
 		Mockito.doThrow(ex).when(mockHelper).sync(mockSyncModel, false);
 		Mockito.doNothing().when(processor).beforeSync(msg);
-		Mockito.doNothing().when(processor).onError(msg, ex);
+		Mockito.doNothing().when(processor).onError(msg, ex.getClass().getName(), ex.getMessage());
 		
 		processor.processItem(msg);
 		
 		Mockito.verify(processor).beforeSync(msg);
-		Mockito.verify(processor).onError(msg, ex);
+		Mockito.verify(processor).onError(msg, ex.getClass().getName(), ex.getMessage());
+		Mockito.verify(processor, never()).afterSync(msg);
+	}
+	
+	@Test
+	public void processItem_shouldTruncateTheErrorMessageIfLongerThenTheThreshold() {
+		final String payload = "{}";
+		SyncMessage msg = new SyncMessage();
+		msg.setModelClassName(VisitModel.class.getName());
+		msg.setEntityPayload("{}");
+		when(JsonUtils.unmarshalSyncModel(payload)).thenReturn(mockSyncModel);
+		final String errorMsg = RandomStringUtils.randomAscii(1025);
+		Exception ex = new EIPException(errorMsg);
+		Mockito.doThrow(ex).when(mockHelper).sync(mockSyncModel, false);
+		Mockito.doNothing().when(processor).beforeSync(msg);
+		Mockito.doNothing().when(processor).onError(msg, ex.getClass().getName(), errorMsg.substring(0, 1024));
+		
+		processor.processItem(msg);
+		
+		Mockito.verify(processor).beforeSync(msg);
+		Mockito.verify(processor).onError(msg, ex.getClass().getName(), errorMsg.substring(0, 1024));
 		Mockito.verify(processor, never()).afterSync(msg);
 	}
 	
@@ -140,12 +163,12 @@ public class BaseSyncProcessorTest {
 		Exception rootEx = new ActiveMQException();
 		Mockito.doThrow(new EIPException("test", new Exception(rootEx))).when(mockHelper).sync(mockSyncModel, false);
 		Mockito.doNothing().when(processor).beforeSync(msg);
-		Mockito.doNothing().when(processor).onError(msg, rootEx);
+		Mockito.doNothing().when(processor).onError(msg, rootEx.getClass().getName(), rootEx.getMessage());
 		
 		processor.processItem(msg);
 		
 		Mockito.verify(processor).beforeSync(msg);
-		Mockito.verify(processor).onError(msg, rootEx);
+		Mockito.verify(processor).onError(msg, rootEx.getClass().getName(), rootEx.getMessage());
 		Mockito.verify(processor, never()).afterSync(msg);
 	}
 	
@@ -167,7 +190,26 @@ public class BaseSyncProcessorTest {
 		Mockito.verify(processor, never()).getSyncPayload(msg);
 		Mockito.verify(processor, never()).afterSync(msg);
 		Mockito.verify(processor, never()).onConflict(msg);
-		Mockito.verify(processor, never()).onError(eq(msg), any());
+		Mockito.verify(processor, never()).onError(eq(msg), any(), any());
+	}
+	
+	@Test
+	public void processItem_shouldNotCallOnErrorWhenAnErrorEncounteredAndApplicationIsShuttingDown() {
+		final String payload = "{}";
+		SyncMessage msg = new SyncMessage();
+		msg.setModelClassName(VisitModel.class.getName());
+		msg.setEntityPayload("{}");
+		when(JsonUtils.unmarshalSyncModel(payload)).thenReturn(mockSyncModel);
+		Exception ex = new EIPException("test");
+		Mockito.doThrow(ex).when(mockHelper).sync(mockSyncModel, false);
+		Mockito.doNothing().when(processor).beforeSync(msg);
+		when(AppUtils.isShuttingDown()).thenReturn(true);
+		
+		processor.processItem(msg);
+		
+		Mockito.verify(processor).beforeSync(msg);
+		Mockito.verify(processor, never()).onError(msg, ex.getClass().getName(), ex.getMessage());
+		Mockito.verify(processor, never()).afterSync(msg);
 	}
 	
 }
