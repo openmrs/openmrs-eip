@@ -2,11 +2,15 @@ package org.openmrs.eip.app.receiver.processor;
 
 import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
+import java.util.Date;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
+import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.RetryCacheEvictingProcessor;
+import org.openmrs.eip.app.receiver.RetrySearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
@@ -26,10 +30,20 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	
 	private ReceiverService service;
 	
+	private ReceiverRetryRepository retryRepo;
+	
+	private RetryCacheEvictingProcessor evictProcessor;
+	
+	private RetrySearchIndexUpdatingProcessor indexProcessor;
+	
 	public ReceiverRetryProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, ReceiverService service,
-	    SyncHelper syncHelper) {
+	    SyncHelper syncHelper, ReceiverRetryRepository retryRepo, RetryCacheEvictingProcessor evictProcessor,
+	    RetrySearchIndexUpdatingProcessor indexProcessor) {
 		super(executor, syncHelper);
 		this.service = service;
+		this.retryRepo = retryRepo;
+		this.evictProcessor = evictProcessor;
+		this.indexProcessor = indexProcessor;
 	}
 	
 	@Override
@@ -61,7 +75,7 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	@Override
 	protected void beforeSync(ReceiverRetryQueueItem retry) {
 		LOG.info("Re-processing message");
-		//TODO Add logic
+		retry.setAttemptCount(retry.getAttemptCount() + 1);
 	}
 	
 	@Override
@@ -70,11 +84,14 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	}
 	
 	@Override
-	protected void afterSync(ReceiverRetryQueueItem item) {
-		//TODO add post sync logic
+	protected void afterSync(ReceiverRetryQueueItem retry) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Done re-processing message");
 		}
+		
+		evictProcessor.process(retry);
+		indexProcessor.process(retry);
+		service.archiveRetry(retry);
 	}
 	
 	@Override
@@ -83,8 +100,19 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	}
 	
 	@Override
-	protected void onError(ReceiverRetryQueueItem retry, Throwable throwable) {
-		//TODO Updated retry item
+	protected void onError(ReceiverRetryQueueItem retry, String exceptionClass, String errorMsg) {
+		retry.setExceptionType(exceptionClass);
+		retry.setMessage(errorMsg);
+		retry.setDateChanged(new Date());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Saving updates for retry item");
+		}
+		
+		retryRepo.save(retry);
+		
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Successfully updated retry item");
+		}
 	}
 	
 }

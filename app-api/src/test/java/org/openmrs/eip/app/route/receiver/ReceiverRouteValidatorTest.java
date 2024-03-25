@@ -1,21 +1,11 @@
 package org.openmrs.eip.app.route.receiver;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.openmrs.eip.app.route.BaseRouteValidatorTest;
 
 public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
-	
-	private static final Set<String> retryErrorHandlerRoutes;
-	
-	static {
-		retryErrorHandlerRoutes = new HashSet();
-		retryErrorHandlerRoutes.add("inbound-db-sync");
-		retryErrorHandlerRoutes.add("message-processor");
-		retryErrorHandlerRoutes.add("receiver-retry");
-	}
 	
 	@Override
 	public String getAppFolder() {
@@ -24,12 +14,12 @@ public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
 	
 	@Override
 	public String getRetryHandlerRef() {
-		return "inBoundErrorHandler";
+		return null;
 	}
 	
 	@Override
 	public Set<String> getRoutesWithRetryHandler() {
-		return retryErrorHandlerRoutes;
+		return Collections.emptySet();
 	}
 	
 	@Override
@@ -39,10 +29,7 @@ public class ReceiverRouteValidatorTest extends BaseRouteValidatorTest {
 	
 	@Override
 	public Set<String> getRoutesWithNoErrorHandler() {
-		Set<String> set = new HashSet();
-		set.add("receiver-clear-db-cache");
-		set.add("receiver-update-search-index");
-		return set;
+		return Collections.emptySet();
 	}
 	
 }

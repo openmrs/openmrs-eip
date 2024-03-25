@@ -22,8 +22,6 @@ public class ReceiverConstants {
 	
 	public static final int DEFAULT_SITE_PARALLEL_SIZE = 5;
 	
-	public static final String PROP_MSG_DESTINATION = "message.destination";
-	
 	public static final String PROP_SYNC_QUEUE = "sync.queue.name";
 	
 	public static final String PROP_CAMEL_OUTPUT_ENDPOINT = "camel.output.endpoint";
@@ -52,29 +50,11 @@ public class ReceiverConstants {
 	
 	public static final String PROP_COUNT_CACHE_TTL = "sync.prioritize.count.cache.ttl";
 	
-	public static final String ROUTE_ID_ERROR_HANDLER = "inbound-error-handler";
-	
-	public static final String URI_ERROR_HANDLER = "direct:" + ROUTE_ID_ERROR_HANDLER;
-	
 	public static final String ERROR_HANDLER_REF = "inBoundErrorHandler";
-	
-	public static final String EX_PROP_MODEL_CLASS = "model-class";
-	
-	public static final String EX_PROP_ENTITY_ID = "entity-id";
-	
-	public static final String EX_PROP_FAILED_ENTITIES = "failed-entities";
-	
-	public static final String EX_PROP_RETRY_ITEM_ID = "retry-item-id";
-	
-	public static final String EX_PROP_RETRY_ITEM = "retry-item";
 	
 	public static final String ROUTE_ID_REQUEST_PROCESSOR = "receiver-request-processor";
 	
 	public static final String URI_REQUEST_PROCESSOR = "direct:" + ROUTE_ID_REQUEST_PROCESSOR;
-	
-	public static final String ROUTE_ID_RETRY = "receiver-retry";
-	
-	public static final String URI_RETRY = "direct:" + ROUTE_ID_RETRY;
 	
 	public static final String FIELD_VOIDED = "voided";
 	
