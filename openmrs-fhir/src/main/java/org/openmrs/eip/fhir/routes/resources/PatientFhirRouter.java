@@ -32,7 +32,7 @@ public class PatientFhirRouter extends BaseFhirResourceRouter {
 		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${exchangeProperty.event.identifier}")
 		        .otherwise().choice().when(exchangeProperty(PROP_EVENT_TABLE_NAME).isEqualTo(PATIENT_IDENTIFIER))
 		        .toD(
-		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_idenitifer t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        // person_name or person_address
 		        .otherwise()
 		        .toD(
