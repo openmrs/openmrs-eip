@@ -156,11 +156,12 @@ public class BaseSyncProcessorTest {
 	@Test
 	public void processItem_shouldFailIfTheAnErrorIsEncounteredWithRootCause() {
 		final String payload = "{}";
+		final String rootErrMsg = "root error";
 		SyncMessage msg = new SyncMessage();
 		msg.setModelClassName(VisitModel.class.getName());
-		msg.setEntityPayload("{}");
+		msg.setEntityPayload(payload);
 		when(JsonUtils.unmarshalSyncModel(payload)).thenReturn(mockSyncModel);
-		Exception rootEx = new ActiveMQException();
+		Exception rootEx = new ActiveMQException(rootErrMsg);
 		Mockito.doThrow(new EIPException("test", new Exception(rootEx))).when(mockHelper).sync(mockSyncModel, false);
 		Mockito.doNothing().when(processor).beforeSync(msg);
 		Mockito.doNothing().when(processor).onError(msg, rootEx.getClass().getName(), rootEx.getMessage());

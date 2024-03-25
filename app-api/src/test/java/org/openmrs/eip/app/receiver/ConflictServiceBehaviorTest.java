@@ -24,6 +24,7 @@ import org.openmrs.eip.app.management.repository.ConflictRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.repository.SyncedMessageRepository;
 import org.openmrs.eip.app.management.service.ConflictService;
+import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
@@ -33,10 +34,12 @@ import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+@TestPropertySource(properties = Constants.PROP_IGNORE_MISSING_HASH + "=true")
 public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 	
 	@Autowired
