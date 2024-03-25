@@ -13,6 +13,10 @@
     <name>OpenMRS EIP Watcher</name>
     <description>Watches for events from an OpenMRS MySQL database</description>
 
+    <properties>
+        <kakfaConnnectRuntimeVersion>3.4.1</kakfaConnnectRuntimeVersion>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -27,6 +31,21 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+                 <exclusion>
+                     <groupId>org.apache.kafka</groupId>
+                     <artifactId>connect-runtime</artifactId>
+                 </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>connect-runtime</artifactId>
+            <version>${kakfaConnnectRuntimeVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
