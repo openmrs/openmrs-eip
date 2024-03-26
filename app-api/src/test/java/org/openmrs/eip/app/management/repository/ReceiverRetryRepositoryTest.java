@@ -11,12 +11,14 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import java.util.List;
 
 import org.junit.Test;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.receiver.BaseReceiverTest;
 import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
@@ -59,6 +61,23 @@ public class ReceiverRetryRepositoryTest extends BaseReceiverTest {
 		assertFalse(repo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, of(VisitModel.class.getName()), ops));
 		ops = of(SyncOperation.d);
 		assertFalse(repo.existsByIdentifierAndModelClassNameInAndOperationIn(uuid, of(PersonModel.class.getName()), ops));
+	}
+	
+	@Test
+	public void getRetries_shouldGetRetriesSortedByDateReceived() {
+		List<ReceiverRetryQueueItem> retries = repo.getRetries(Pageable.ofSize(10));
+		assertEquals(5, retries.size());
+		assertEquals(4, retries.get(0).getId().longValue());
+		assertEquals(1, retries.get(1).getId().longValue());
+		assertEquals(2, retries.get(2).getId().longValue());
+		assertEquals(3, retries.get(3).getId().longValue());
+		assertEquals(5, retries.get(4).getId().longValue());
+		
+		retries = repo.getRetries(Pageable.ofSize(3));
+		assertEquals(3, retries.size());
+		assertEquals(4, retries.get(0).getId().longValue());
+		assertEquals(1, retries.get(1).getId().longValue());
+		assertEquals(2, retries.get(2).getId().longValue());
 	}
 	
 }

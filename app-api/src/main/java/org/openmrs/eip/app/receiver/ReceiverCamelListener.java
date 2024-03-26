@@ -7,9 +7,11 @@ import static org.openmrs.eip.app.SyncConstants.PROP_ARCHIVES_MAX_AGE_DAYS;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_MSG_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_RECONCILER;
+import static org.openmrs.eip.app.SyncConstants.PROP_DELAY_RETRY_TASK;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_MSG_RECONCILER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_PRUNER;
 import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_RECONCILER;
+import static org.openmrs.eip.app.SyncConstants.PROP_INITIAL_DELAY_RETRY_TASK;
 import static org.openmrs.eip.app.SyncConstants.PROP_PRUNER_ENABLED;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.BEAN_NAME_SITE_EXECUTOR;
 import static org.openmrs.eip.app.receiver.ReceiverConstants.PROP_DELAY_JMS_MSG_TASK;
@@ -32,6 +34,7 @@ import org.openmrs.eip.app.BaseCamelListener;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileMsgTask;
 import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileTask;
+import org.openmrs.eip.app.receiver.task.ReceiverRetryTask;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -101,6 +104,12 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	
 	@Value("${" + PROP_DELAY_MSG_RECONCILER + ":" + DEFAULT_DELAY + "}")
 	private long delayMsgReconciler;
+	
+	@Value("${" + PROP_INITIAL_DELAY_RETRY_TASK + ":" + DEFAULT_INITIAL_DELAY_SYNC + "}")
+	private long initialDelayRetryTask;
+	
+	@Value("${" + PROP_DELAY_RETRY_TASK + ":" + DEFAULT_DELAY + "}")
+	private long delayRetryTask;
 	
 	private static List<SiteParentTask> siteTasks;
 	
@@ -191,6 +200,8 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	private void startTasks() {
 		ReceiverJmsMessageTask jmsTask = new ReceiverJmsMessageTask();
 		siteExecutor.scheduleWithFixedDelay(jmsTask, initialDelayMsgTsk, delayMsgTask, MILLISECONDS);
+		ReceiverRetryTask retryTask = new ReceiverRetryTask();
+		siteExecutor.scheduleWithFixedDelay(retryTask, initialDelayRetryTask, delayRetryTask, MILLISECONDS);
 		ReceiverReconcileTask recTask = new ReceiverReconcileTask();
 		siteExecutor.scheduleWithFixedDelay(recTask, initDelayReconciler, delayReconciler, MILLISECONDS);
 		ReceiverReconcileMsgTask recMsgTask = new ReceiverReconcileMsgTask();

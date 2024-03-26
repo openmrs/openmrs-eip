@@ -2,6 +2,7 @@ package org.openmrs.eip.app.receiver;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
@@ -25,6 +26,7 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileMsgTask;
 import org.openmrs.eip.app.receiver.reconcile.ReceiverReconcileTask;
+import org.openmrs.eip.app.receiver.task.ReceiverRetryTask;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.User;
@@ -90,6 +92,8 @@ public class ReceiverCamelListenerTest {
 		setInternalState(listener, "disabledTaskTypes", Collections.emptyList());
 		setInternalState(listener, "initialDelayPruner", testInitialDelay);
 		setInternalState(listener, "delayPruner", testDelay);
+		setInternalState(listener, "initialDelayRetryTask", testInitialDelay);
+		setInternalState(listener, "delayRetryTask", testDelay);
 		when(SyncContext.getBean(ReceiverActiveMqMessagePublisher.class)).thenReturn(mockPublisher);
 	}
 	
@@ -120,13 +124,15 @@ public class ReceiverCamelListenerTest {
 		
 		listener.applicationStarted();
 		
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay), eq(testDelay),
+		    eq(TimeUnit.MILLISECONDS));
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverJmsMessageTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverJmsMessageTask.class), eq(testInitialDelay),
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverRetryTask.class), eq(testInitialDelay), eq(testDelay),
+		    eq(TimeUnit.MILLISECONDS));
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileTask.class), eq(testInitialDelay),
-		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileMsgTask.class), eq(testInitialDelay),
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileMsgTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 	}
 	
@@ -144,10 +150,10 @@ public class ReceiverCamelListenerTest {
 		
 		listener.applicationStarted();
 		
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay),
-		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(SiteParentTask.class), eq(testInitialDelay), eq(testDelay),
+		    eq(TimeUnit.MILLISECONDS));
 		
-		Mockito.verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverArchivePruningTask.class), eq(testInitialDelay),
+		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverArchivePruningTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
 	}
 	
