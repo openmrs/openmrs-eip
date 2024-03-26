@@ -32,11 +32,11 @@ public class PatientFhirRouter extends BaseFhirResourceRouter {
 		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${exchangeProperty.event.identifier}")
 		        .otherwise().choice().when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").isEqualTo(PATIENT_IDENTIFIER))
 		        .toD(
-		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = :#${exchangeProperty.event.identifier})?dataSource=#openmrsDataSource")
+		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        // person_name or person_address
 		        .otherwise()
 		        .toD(
-		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = :#${exchangeProperty.event.identifier})?dataSource=#openmrsDataSource")
+		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        .end().toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end().end()
 		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PATIENT.outgoingUrl());
