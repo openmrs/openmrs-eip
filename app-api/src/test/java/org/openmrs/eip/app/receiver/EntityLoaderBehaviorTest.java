@@ -136,9 +136,11 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 					loader.process(syncModel);
 					passCount.incrementAndGet();
 				}
-				catch (Throwable e) {
-					log.warn("Error in EntityLoaderBehaviorTest -> " + e.getClass(), e);
-					if (ExceptionUtils.getRootCause(e) instanceof SQLIntegrityConstraintViolationException) {
+				catch (Throwable t) {
+					log.warn("Error in EntityLoaderBehaviorTest -> " + t.getClass(), t);
+					Throwable root = ExceptionUtils.getRootCause(t);
+					log.warn("Root error in EntityLoaderBehaviorTest -> " + root.getClass(), root);
+					if (ExceptionUtils.getRootCause(t) instanceof SQLIntegrityConstraintViolationException) {
 						failureCount.incrementAndGet();
 					}
 				}
