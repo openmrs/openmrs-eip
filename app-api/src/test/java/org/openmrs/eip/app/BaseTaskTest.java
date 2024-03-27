@@ -39,6 +39,8 @@ public class BaseTaskTest {
 		task.run();
 		
 		Mockito.verify(task, Mockito.never()).doRun();
+		Mockito.verify(task, Mockito.never()).beforeStart();
+		Mockito.verify(task, Mockito.never()).beforeStop();
 		Assert.assertFalse(task.doRunCalled);
 	}
 	
@@ -50,6 +52,8 @@ public class BaseTaskTest {
 		task.run();
 		
 		Mockito.verify(task, Mockito.never()).doRun();
+		Mockito.verify(task, Mockito.never()).beforeStart();
+		Mockito.verify(task, Mockito.never()).beforeStop();
 		Assert.assertFalse(task.doRunCalled);
 	}
 	
@@ -66,6 +70,8 @@ public class BaseTaskTest {
 		task.run();
 		
 		Mockito.verify(task).doRun();
+		Mockito.verify(task).beforeStart();
+		Mockito.verify(task).beforeStop();
 		Assert.assertTrue(task.doRunCalled);
 		assertEquals(originalThreadName + ":" + MockBaseTask.TASK_NAME, threadNames.get(0));
 		assertEquals(originalThreadName, Thread.currentThread().getName());
@@ -87,6 +93,8 @@ public class BaseTaskTest {
 		task.run();
 		
 		Mockito.verify(task, times(2)).doRun();
+		Mockito.verify(task).beforeStart();
+		Mockito.verify(task).beforeStop();
 	}
 	
 	@Test
@@ -104,6 +112,8 @@ public class BaseTaskTest {
 		task.run();
 		
 		Mockito.verify(task, times(2)).doRun();
+		Mockito.verify(task).beforeStart();
+		Mockito.verify(task).beforeStop();
 	}
 	
 }

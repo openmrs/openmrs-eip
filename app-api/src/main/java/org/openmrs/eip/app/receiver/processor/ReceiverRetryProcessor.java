@@ -12,6 +12,8 @@ import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.RetryCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.RetrySearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.SyncHelper;
+import org.openmrs.eip.app.receiver.task.ReceiverRetryTask;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,8 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	private RetryCacheEvictingProcessor evictProcessor;
 	
 	private RetrySearchIndexUpdatingProcessor indexProcessor;
+	
+	private ReceiverRetryTask task;
 	
 	public ReceiverRetryProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, ReceiverService service,
 	    SyncHelper syncHelper, ReceiverRetryRepository retryRepo, RetryCacheEvictingProcessor evictProcessor,
@@ -92,6 +96,11 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 		evictProcessor.process(retry);
 		indexProcessor.process(retry);
 		service.archiveRetry(retry);
+		if (task == null) {
+			task = SyncContext.getBean(ReceiverRetryTask.class);
+		}
+		
+		task.postProcess(retry.getId());
 	}
 	
 	@Override

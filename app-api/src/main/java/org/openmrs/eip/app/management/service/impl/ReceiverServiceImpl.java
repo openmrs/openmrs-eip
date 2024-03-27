@@ -147,7 +147,9 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	@Override
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void archiveRetry(ReceiverRetryQueueItem retry) {
-		log.info("Archiving retry item with id: " + retry.getId());
+		if (log.isDebugEnabled()) {
+			log.debug("Archiving retry item");
+		}
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(retry);
 		archive.setDateCreated(new Date());

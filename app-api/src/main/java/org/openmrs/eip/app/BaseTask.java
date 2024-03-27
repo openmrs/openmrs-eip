@@ -43,6 +43,8 @@ public abstract class BaseTask implements Task {
 				log.debug("Starting");
 			}
 			
+			beforeStart();
+			
 			do {
 				try {
 					boolean stop = doRun();
@@ -65,6 +67,8 @@ public abstract class BaseTask implements Task {
 				}
 			} while (!AppUtils.isShuttingDown() && !errorEncountered);
 			
+			beforeStop();
+			
 			if (!errorEncountered) {
 				if (log.isDebugEnabled()) {
 					log.debug("Completed");
@@ -74,6 +78,18 @@ public abstract class BaseTask implements Task {
 		finally {
 			Thread.currentThread().setName(originalThreadName);
 		}
+	}
+	
+	/**
+	 * Called before the task starts running
+	 */
+	public void beforeStart() {
+	}
+	
+	/**
+	 * Called before the task stops running
+	 */
+	public void beforeStop() {
 	}
 	
 	/**

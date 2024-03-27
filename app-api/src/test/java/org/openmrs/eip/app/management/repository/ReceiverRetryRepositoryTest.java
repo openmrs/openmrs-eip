@@ -18,7 +18,6 @@ import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.VisitModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
@@ -64,20 +63,24 @@ public class ReceiverRetryRepositoryTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void getRetries_shouldGetRetriesSortedByDateReceived() {
-		List<ReceiverRetryQueueItem> retries = repo.getRetries(Pageable.ofSize(10));
-		assertEquals(5, retries.size());
+	public void getIds_shouldGetAllIdsSortedByDateReceived() {
+		List<Long> ids = repo.getIds();
+		assertEquals(5, ids.size());
+		assertEquals(4, ids.get(0).longValue());
+		assertEquals(1, ids.get(1).longValue());
+		assertEquals(2, ids.get(2).longValue());
+		assertEquals(3, ids.get(3).longValue());
+		assertEquals(5, ids.get(4).longValue());
+	}
+	
+	@Test
+	public void getByIdInOrderByDateReceivedAsc_shouldGetAllIdsSortedByDateReceived() {
+		List<ReceiverRetryQueueItem> retries = repo.getByIdInOrderByDateReceivedAsc(List.of(1L, 2L, 3L, 4L));
+		assertEquals(4, retries.size());
 		assertEquals(4, retries.get(0).getId().longValue());
 		assertEquals(1, retries.get(1).getId().longValue());
 		assertEquals(2, retries.get(2).getId().longValue());
 		assertEquals(3, retries.get(3).getId().longValue());
-		assertEquals(5, retries.get(4).getId().longValue());
-		
-		retries = repo.getRetries(Pageable.ofSize(3));
-		assertEquals(3, retries.size());
-		assertEquals(4, retries.get(0).getId().longValue());
-		assertEquals(1, retries.get(1).getId().longValue());
-		assertEquals(2, retries.get(2).getId().longValue());
 	}
 	
 }
