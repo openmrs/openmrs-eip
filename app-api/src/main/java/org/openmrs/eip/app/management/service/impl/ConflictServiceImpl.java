@@ -10,6 +10,7 @@ import static org.openmrs.eip.component.utils.DateUtils.isDateAfterOrEqual;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.camel.CamelContext;
@@ -41,6 +42,7 @@ import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
 import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -231,6 +233,12 @@ public class ConflictServiceImpl extends BaseService implements ConflictService 
 		catch (Throwable throwable) {
 			throw new EIPException("Failed to sync resolved conflict item with uuid: " + conflict.getMessageUuid());
 		}
+	}
+	
+	@Override
+	public boolean hasConflictItem(String identifier, String modelClassname) {
+		List<String> classNames = Utils.getListOfModelClassHierarchy(modelClassname);
+		return conflictRepo.countByIdentifierAndModelClassNameIn(identifier, classNames) > 0;
 	}
 	
 	/**

@@ -6,11 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.openmrs.eip.app.management.repository.ConflictRepository;
+import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncModel;
-import org.openmrs.eip.component.utils.Utils;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -20,13 +19,13 @@ public class SyncHelperTest {
 	private EntityLoader mockLoader;
 	
 	@Mock
-	private ConflictRepository mockConflictRepo;
+	private ConflictService mockConflictService;
 	
 	private SyncHelper helper;
 	
 	@Before
 	public void setup() {
-		helper = new SyncHelper(mockLoader, mockConflictRepo);
+		helper = new SyncHelper(mockLoader, mockConflictService);
 	}
 	
 	@Test
@@ -43,18 +42,15 @@ public class SyncHelperTest {
 	@Test
 	public void sync_shouldFailIfAnEntityHasItemsInTheConflictQueue() {
 		final String uuid = "uuid";
-		final long conflictCount = 1;
 		SyncModel syncModel = new SyncModel();
 		syncModel.setTableToSyncModelClass(PersonModel.class);
 		PersonModel model = new PersonModel();
 		model.setUuid(uuid);
 		syncModel.setModel(model);
-		Mockito.when(mockConflictRepo.countByIdentifierAndModelClassNameIn(uuid,
-		    Utils.getListOfModelClassHierarchy(PersonModel.class.getName()))).thenReturn(conflictCount);
+		Mockito.when(mockConflictService.hasConflictItem(uuid, PersonModel.class.getName())).thenReturn(true);
 		
 		EIPException ex = Assert.assertThrows(EIPException.class, () -> helper.sync(syncModel, false));
-		Assert.assertEquals(
-		    "Cannot process the message because the entity has " + conflictCount + " items in the conflict queue",
+		Assert.assertEquals("Cannot process the message because the entity has a conflict item in the queue",
 		    ex.getMessage());
 	}
 	
@@ -67,8 +63,7 @@ public class SyncHelperTest {
 		PersonModel model = new PersonModel();
 		model.setUuid(uuid);
 		syncModel.setModel(model);
-		Mockito.when(mockConflictRepo.countByIdentifierAndModelClassNameIn(uuid,
-		    Utils.getListOfModelClassHierarchy(PersonModel.class.getName()))).thenReturn(conflictCount);
+		Mockito.when(mockConflictService.hasConflictItem(uuid, PersonModel.class.getName())).thenReturn(true);
 		
 		helper.sync(syncModel, true);
 		

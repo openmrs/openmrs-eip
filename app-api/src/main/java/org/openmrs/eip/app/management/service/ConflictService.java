@@ -56,4 +56,13 @@ public interface ConflictService extends Service {
 	 */
 	void resolveWithMerge(ConflictQueueItem conflict, Set<String> propertiesToSync) throws Exception;
 	
+	/**
+	 * Checks if an entity has an item in the conflict queue
+	 *
+	 * @param identifier the entity identifier
+	 * @param modelClassname the entity model classname
+	 * @return true if the entity has an item in the conflict queue otherwise false
+	 */
+	boolean hasConflictItem(String identifier, String modelClassname);
+	
 }

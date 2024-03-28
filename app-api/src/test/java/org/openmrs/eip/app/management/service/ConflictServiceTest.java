@@ -26,6 +26,7 @@ import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
+import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.service.impl.PatientService;
 import org.openmrs.eip.component.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,17 @@ public class ConflictServiceTest extends BaseReceiverTest {
 		assertEquals(expectedNewHash, hashEntity.getHash());
 		long dateChangedMillis = hashEntity.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);
+	}
+	
+	@Test
+	public void hasConflictItem_shouldReturnTrueIfAnEntityHasAConflict() {
+		assertTrue(service.hasConflictItem("uuid-2", PersonModel.class.getName()));
+		assertTrue(service.hasConflictItem("uuid-2", PatientModel.class.getName()));
+	}
+	
+	@Test
+	public void hasConflictItem_shouldReturnFalseIfAnEntityHasNoConflict() {
+		assertFalse(service.hasConflictItem("some-uuid", PersonModel.class.getName()));
 	}
 	
 }

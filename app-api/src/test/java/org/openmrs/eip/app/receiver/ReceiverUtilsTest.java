@@ -691,4 +691,15 @@ public class ReceiverUtilsTest {
 		assertEquals(endpoint + " is an invalid message broker endpoint value for outbound messages", e.getMessage());
 	}
 	
+	@Test
+	public void getEffectiveModelClassName_shouldReturnParentclassNameForASubclass() {
+		assertEquals(PersonModel.class.getName(), ReceiverUtils.getEffectiveModelClassName(PatientModel.class.getName()));
+	}
+	
+	@Test
+	public void getEffectiveModelClassName_shouldReturnThePassInClassForClassWithNoParent() {
+		assertEquals(PersonModel.class.getName(), ReceiverUtils.getEffectiveModelClassName(PersonModel.class.getName()));
+		assertEquals(VisitModel.class.getName(), ReceiverUtils.getEffectiveModelClassName(VisitModel.class.getName()));
+	}
+	
 }

@@ -283,6 +283,21 @@ public class ReceiverUtils {
 	}
 	
 	/**
+	 * Gets the effective model class name i.e. if the model class name is a subclass it returns the
+	 * parent class otherwise the passed in class name.
+	 *
+	 * @param modelClassName the model class name to check against.
+	 * @return the effective model class name
+	 */
+	public static String getEffectiveModelClassName(String modelClassName) {
+		if (!ReceiverUtils.isSubclass(modelClassName)) {
+			return modelClassName;
+		}
+		
+		return ReceiverUtils.getParentModelClassName(modelClassName);
+	}
+	
+	/**
 	 * Gets the immediate parent model class name for the specified model class name
 	 * 
 	 * @param modelClassName the model class name

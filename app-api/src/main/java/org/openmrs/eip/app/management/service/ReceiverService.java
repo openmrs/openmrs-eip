@@ -52,7 +52,8 @@ public interface ReceiverService extends Service {
 	/**
 	 * Checks if an entity has an item in the sync queue
 	 *
-	 * @param identifier the entity identifier * @param modelClassname the entity model classname
+	 * @param identifier the entity identifier
+	 * @param modelClassname the entity model classname
 	 * @return true if the entity has an item in the sync queue otherwise false
 	 */
 	boolean hasSyncItem(String identifier, String modelClassname);
@@ -60,7 +61,8 @@ public interface ReceiverService extends Service {
 	/**
 	 * Checks if an entity has an item in the retry queue
 	 * 
-	 * @param identifier the entity identifier * @param modelClassname the entity model classname
+	 * @param identifier the entity identifier
+	 * @param modelClassname the entity model classname
 	 * @return true if the entity has an item in the retry queue otherwise false
 	 */
 	boolean hasRetryItem(String identifier, String modelClassname);
