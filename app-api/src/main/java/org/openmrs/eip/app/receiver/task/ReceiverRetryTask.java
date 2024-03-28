@@ -1,11 +1,14 @@
 package org.openmrs.eip.app.receiver.task;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.openmrs.eip.app.BaseDelegatingQueueTask;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.app.receiver.processor.ReceiverRetryProcessor;
 import org.openmrs.eip.component.SyncContext;
 import org.slf4j.Logger;
@@ -22,10 +25,12 @@ public class ReceiverRetryTask extends BaseDelegatingQueueTask<ReceiverRetryQueu
 	
 	private static List<Long> retryIds;
 	
+	private static final Set<String> FAILED_ENTITIES = Collections.synchronizedSet(new HashSet<>());
+	
 	public static final int BATCH_SIZE = 200;
 	
-	public ReceiverRetryTask() {
-		super(SyncContext.getBean(ReceiverRetryProcessor.class));
+	public ReceiverRetryTask(ReceiverRetryProcessor processor) {
+		super(processor);
 		this.repo = SyncContext.getBean(ReceiverRetryRepository.class);
 	}
 	
@@ -41,19 +46,49 @@ public class ReceiverRetryTask extends BaseDelegatingQueueTask<ReceiverRetryQueu
 		}
 		
 		retryIds = Collections.synchronizedList(repo.getIds());
+		FAILED_ENTITIES.clear();//Clear just to be extra sure
+		
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Loaded {} retry ids", retryIds.size());
+		}
 	}
 	
-	public void postProcess(Long retryId) {
-		retryIds.remove(retryId);
+	public Set<String> getFailedEntities() {
+		return Collections.unmodifiableSet(FAILED_ENTITIES);
+	}
+	
+	public void postProcess(ReceiverRetryQueueItem retry, boolean errorEncountered) {
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Removing id {}", retry.getId());
+		}
+		
+		if (errorEncountered) {
+			String modelClass = retry.getModelClassName();
+			if (ReceiverUtils.isSubclass(modelClass)) {
+				modelClass = ReceiverUtils.getParentModelClassName(modelClass);
+			}
+			
+			FAILED_ENTITIES.add(modelClass + "#" + retry.getIdentifier());
+		}
+		
+		retryIds.remove(retry.getId());
 	}
 	
 	@Override
 	public void beforeStop() {
-		if (LOG.isTraceEnabled()) {
-			LOG.trace("Clearing retry ids");
+		if (!retryIds.isEmpty()) {
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Clearing retry ids");
+			}
+			
+			retryIds.clear();
 		}
 		
-		retryIds.clear();
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Clearing failed entity list");
+		}
+		
+		FAILED_ENTITIES.clear();
 	}
 	
 	@Override
@@ -62,7 +97,12 @@ public class ReceiverRetryTask extends BaseDelegatingQueueTask<ReceiverRetryQueu
 			return Collections.emptyList();
 		}
 		
-		return repo.getByIdInOrderByDateReceivedAsc(retryIds.subList(0, BATCH_SIZE));
+		List<Long> ids = retryIds;
+		if (retryIds.size() > BATCH_SIZE) {
+			ids = retryIds.subList(0, BATCH_SIZE);
+		}
+		
+		return repo.getByIdInOrderByDateReceivedAsc(ids);
 	}
 	
 }

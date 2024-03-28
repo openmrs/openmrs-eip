@@ -200,7 +200,7 @@ public class ReceiverCamelListener extends BaseCamelListener {
 	private void startTasks() {
 		ReceiverJmsMessageTask jmsTask = new ReceiverJmsMessageTask();
 		siteExecutor.scheduleWithFixedDelay(jmsTask, initialDelayMsgTsk, delayMsgTask, MILLISECONDS);
-		ReceiverRetryTask retryTask = new ReceiverRetryTask();
+		ReceiverRetryTask retryTask = SyncContext.getBean(ReceiverRetryTask.class);
 		siteExecutor.scheduleWithFixedDelay(retryTask, initialDelayRetryTask, delayRetryTask, MILLISECONDS);
 		ReceiverReconcileTask recTask = new ReceiverReconcileTask();
 		siteExecutor.scheduleWithFixedDelay(recTask, initDelayReconciler, delayReconciler, MILLISECONDS);

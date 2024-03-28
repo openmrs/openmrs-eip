@@ -9,12 +9,14 @@ import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.app.receiver.RetryCacheEvictingProcessor;
 import org.openmrs.eip.app.receiver.RetrySearchIndexUpdatingProcessor;
 import org.openmrs.eip.app.receiver.SyncHelper;
 import org.openmrs.eip.app.receiver.task.ReceiverRetryTask;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.exception.EIPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,6 +80,15 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	
 	@Override
 	protected void beforeSync(ReceiverRetryQueueItem retry) {
+		String modelClass = retry.getModelClassName();
+		if (ReceiverUtils.isSubclass(modelClass)) {
+			modelClass = ReceiverUtils.getParentModelClassName(modelClass);
+		}
+		
+		if (getTask().getFailedEntities().contains(modelClass + "#" + retry.getIdentifier())) {
+			throw new EIPException("Skipped because the entity still has earlier failed event(s) in the queue");
+		}
+		
 		LOG.info("Re-processing message");
 		retry.setAttemptCount(retry.getAttemptCount() + 1);
 	}
@@ -96,16 +107,13 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 		evictProcessor.process(retry);
 		indexProcessor.process(retry);
 		service.archiveRetry(retry);
-		if (task == null) {
-			task = SyncContext.getBean(ReceiverRetryTask.class);
-		}
-		
-		task.postProcess(retry.getId());
+		getTask().postProcess(retry, false);
 	}
 	
 	@Override
 	protected void onConflict(ReceiverRetryQueueItem retry) {
 		service.moveToConflictQueue(retry);
+		getTask().postProcess(retry, false);
 	}
 	
 	@Override
@@ -122,6 +130,16 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 		if (LOG.isTraceEnabled()) {
 			LOG.trace("Successfully updated retry item");
 		}
+		
+		getTask().postProcess(retry, true);
+	}
+	
+	protected ReceiverRetryTask getTask() {
+		if (task == null) {
+			task = SyncContext.getBean(ReceiverRetryTask.class);
+		}
+		
+		return task;
 	}
 	
 }

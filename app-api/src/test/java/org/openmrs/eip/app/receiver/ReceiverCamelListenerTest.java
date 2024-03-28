@@ -65,6 +65,9 @@ public class ReceiverCamelListenerTest {
 	@Mock
 	private ReceiverActiveMqMessagePublisher mockPublisher;
 	
+	@Mock
+	private ReceiverRetryTask mockRetryTask;
+	
 	private ReceiverCamelListener listener;
 	
 	private long testInitialDelay = 2;
@@ -121,6 +124,7 @@ public class ReceiverCamelListenerTest {
 		setInternalState(listener, "delayReconciler", testDelay);
 		setInternalState(listener, "initDelayMsgReconciler", testInitialDelay);
 		setInternalState(listener, "delayMsgReconciler", testDelay);
+		when(SyncContext.getBean(ReceiverRetryTask.class)).thenReturn(mockRetryTask);
 		
 		listener.applicationStarted();
 		
@@ -128,7 +132,7 @@ public class ReceiverCamelListenerTest {
 		    eq(TimeUnit.MILLISECONDS));
 		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverJmsMessageTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));
-		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverRetryTask.class), eq(testInitialDelay), eq(testDelay),
+		verify(mockSiteExecutor).scheduleWithFixedDelay(eq(mockRetryTask), eq(testInitialDelay), eq(testDelay),
 		    eq(TimeUnit.MILLISECONDS));
 		verify(mockSiteExecutor).scheduleWithFixedDelay(any(ReceiverReconcileTask.class), eq(testInitialDelay),
 		    eq(testDelay), eq(TimeUnit.MILLISECONDS));

@@ -9,7 +9,7 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
  */
 public abstract class BaseDelegatingQueueTask<T extends AbstractEntity, P extends BaseQueueProcessor<T>> extends BaseQueueTask<T> {
 	
-	private P processor;
+	protected P processor;
 	
 	public BaseDelegatingQueueTask(P processor) {
 		this.processor = processor;
