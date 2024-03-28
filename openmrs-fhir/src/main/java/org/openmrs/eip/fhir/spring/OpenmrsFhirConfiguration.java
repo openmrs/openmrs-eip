@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
+
 /**
  * Configuration bean which provides a CamelContextConfiguration to setup the configuration for the
  * camel-fhir component.
@@ -32,17 +36,17 @@ public class OpenmrsFhirConfiguration {
 			
 			@Override
 			public void beforeApplicationStart(CamelContext camelContext) {
-				FhirComponent fhirComponent = camelContext.getComponent("fhir", FhirComponent.class);
-				FhirConfiguration fhirConfiguration = fhirComponent.getConfiguration();
-				fhirConfiguration.setFhirVersion("R4");
+				FhirConfiguration fhirConfiguration = new FhirConfiguration();
+				FhirContext ctx = FhirContext.forR4();
 				fhirConfiguration.setServerUrl(fhirServerUrl);
-				
+				IGenericClient client = ctx.newRestfulGenericClient(fhirServerUrl);
 				if (fhirUsername != null && !fhirUsername.isBlank() && fhirPassword != null && !fhirPassword.isBlank()) {
-					fhirConfiguration.setUsername(fhirUsername);
-					fhirConfiguration.setPassword(fhirPassword);
+					client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
 				}
+				fhirConfiguration.setClient(client);
+				fhirConfiguration.setFhirContext(ctx);
 				
-				fhirComponent.setConfiguration(fhirConfiguration);
+				camelContext.getComponent("fhir", FhirComponent.class).setConfiguration(fhirConfiguration);
 			}
 			
 			@Override
