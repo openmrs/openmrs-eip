@@ -11,6 +11,7 @@ import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 public class SyncHelperTest {
@@ -25,7 +26,8 @@ public class SyncHelperTest {
 	
 	@Before
 	public void setup() {
-		helper = new SyncHelper(mockLoader, mockConflictService);
+		helper = new SyncHelper(mockLoader);
+		Whitebox.setInternalState(helper, "conflictService", mockConflictService);
 	}
 	
 	@Test
