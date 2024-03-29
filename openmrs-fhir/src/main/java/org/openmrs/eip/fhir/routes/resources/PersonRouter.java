@@ -9,9 +9,9 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersonFhirRouter extends BaseFhirResourceRouter {
+public class PersonRouter extends BaseFhirResourceRouter {
 	
-	public PersonFhirRouter() {
+	public PersonRouter() {
 		super(FhirResource.PERSON);
 	}
 	
@@ -25,7 +25,7 @@ public class PersonFhirRouter extends BaseFhirResourceRouter {
 		        .toD(
 		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end()
-		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PERSON.outgoingUrl());
 	}
 }

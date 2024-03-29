@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -19,7 +17,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
-import org.apache.kafka.common.Uuid;
 import org.hl7.fhir.r4.model.Observation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,11 +92,7 @@ public class ObservationFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Observation observation = FhirContext.forR4().newJsonParser().parseResource(Observation.class,
-		    (InputStream) messageBody);
-		assertThat(observation, notNullValue());
+		assertThat(messageBody, instanceOf(Observation.class));
 		
 		fhir.assertIsSatisfied();
 	}

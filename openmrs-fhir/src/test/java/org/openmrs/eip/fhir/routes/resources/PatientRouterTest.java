@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +19,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
-import org.apache.kafka.common.Uuid;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +27,8 @@ import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
-import ca.uhn.fhir.context.FhirContext;
-
 @UseAdviceWith
-public class PatientFhirRouterTest extends CamelSpringTestSupport {
+public class PatientRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected AbstractApplicationContext createApplicationContext() {
@@ -41,7 +37,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected RoutesBuilder createRouteBuilder() throws Exception {
-		RouteBuilder rb = new PatientFhirRouter();
+		RouteBuilder rb = new PatientRouter();
 		rb.from(FhirResource.PATIENT.outgoingUrl()).to("mock:result");
 		return rb;
 	}
@@ -101,10 +97,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Patient patient = FhirContext.forR4().newJsonParser().parseResource(Patient.class, (InputStream) messageBody);
-		assertThat(patient, notNullValue());
+		assertThat(messageBody, instanceOf(Patient.class));
 		
 		fhir.assertIsSatisfied();
 		sql.assertIsSatisfied();
@@ -149,10 +142,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Patient patient = FhirContext.forR4().newJsonParser().parseResource(Patient.class, (InputStream) messageBody);
-		assertThat(patient, notNullValue());
+		assertThat(messageBody, instanceOf(Patient.class));
 		
 		fhir.assertIsSatisfied();
 		sql.assertIsSatisfied();
@@ -182,7 +172,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 				
 				@SuppressWarnings("unused")
 				public String get(String attribute) {
-					return Uuid.randomUuid().toString();
+					return UUID.randomUUID().toString();
 				}
 			});
 			sqlOutput.setBody(results);
@@ -210,10 +200,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Patient patient = FhirContext.forR4().newJsonParser().parseResource(Patient.class, (InputStream) messageBody);
-		assertThat(patient, notNullValue());
+		assertThat(messageBody, instanceOf(Patient.class));
 		
 		fhir.assertIsSatisfied();
 		sql.assertIsSatisfied();
@@ -243,7 +230,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 				
 				@SuppressWarnings("unused")
 				public String get(String attribute) {
-					return Uuid.randomUuid().toString();
+					return UUID.randomUUID().toString();
 				}
 			});
 			sqlOutput.setBody(results);
@@ -271,10 +258,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Patient patient = FhirContext.forR4().newJsonParser().parseResource(Patient.class, (InputStream) messageBody);
-		assertThat(patient, notNullValue());
+		assertThat(messageBody, instanceOf(Patient.class));
 		
 		fhir.assertIsSatisfied();
 		sql.assertIsSatisfied();
@@ -304,7 +288,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 				
 				@SuppressWarnings("unused")
 				public String get(String attribute) {
-					return Uuid.randomUuid().toString();
+					return UUID.randomUUID().toString();
 				}
 			});
 			sqlOutput.setBody(results);
@@ -332,10 +316,7 @@ public class PatientFhirRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Patient patient = FhirContext.forR4().newJsonParser().parseResource(Patient.class, (InputStream) messageBody);
-		assertThat(patient, notNullValue());
+		assertThat(messageBody, instanceOf(Patient.class));
 		
 		fhir.assertIsSatisfied();
 		sql.assertIsSatisfied();

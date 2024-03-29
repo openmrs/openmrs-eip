@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
-import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -18,7 +17,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
-import org.apache.kafka.common.Uuid;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +25,6 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-
-import ca.uhn.fhir.context.FhirContext;
 
 @UseAdviceWith
 class ServiceRequestRouterTest extends CamelSpringTestSupport {
@@ -100,11 +96,7 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		ServiceRequest serviceRequest = FhirContext.forR4().newJsonParser().parseResource(ServiceRequest.class,
-		    (InputStream) messageBody);
-		assertThat(serviceRequest, notNullValue());
+		assertThat(messageBody, instanceOf(ServiceRequest.class));
 		
 		fhir.assertIsSatisfied();
 	}
@@ -145,11 +137,7 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		ServiceRequest serviceRequest = FhirContext.forR4().newJsonParser().parseResource(ServiceRequest.class,
-		    (InputStream) messageBody);
-		assertThat(serviceRequest, notNullValue());
+		assertThat(messageBody, instanceOf(ServiceRequest.class));
 		
 		fhir.assertIsSatisfied();
 	}
@@ -184,17 +172,17 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		result.assertIsSatisfied();
 		fhir.assertIsSatisfied();
 	}
-
+	
 	@Test
 	void shouldSkipUnknownEntry() throws InterruptedException {
 		// Arrange
 		MockEndpoint result = getMockEndpoint("mock:result");
 		result.expectedMessageCount(0);
 		result.setResultWaitTime(100);
-
+		
 		MockEndpoint fhir = getMockEndpoint("mock:fhir");
 		fhir.expectedMessageCount(0);
-
+		
 		// Act
 		template.send((exchange) -> {
 			Event event = new Event();
@@ -205,7 +193,7 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 			Message in = exchange.getIn();
 			in.setBody("");
 		});
-
+		
 		// Assert
 		result.assertIsSatisfied();
 		fhir.assertIsSatisfied();

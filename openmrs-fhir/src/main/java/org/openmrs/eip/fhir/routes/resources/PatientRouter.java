@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
  * Watcher
  */
 @Component
-public class PatientFhirRouter extends BaseFhirResourceRouter {
+public class PatientRouter extends BaseFhirResourceRouter {
 	
 	private static final String PATIENT_IDENTIFIER = "patient_identifier";
 	
-	PatientFhirRouter() {
+	PatientRouter() {
 		super(FhirResource.PATIENT);
 	}
 	
@@ -30,7 +30,8 @@ public class PatientFhirRouter extends BaseFhirResourceRouter {
 		        // person or patient are basically the top-level object
 		        .choice().when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").in("patient", "person"))
 		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${exchangeProperty.event.identifier}")
-		        .otherwise().choice().when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").isEqualTo(PATIENT_IDENTIFIER))
+		        .otherwise().choice()
+		        .when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").isEqualTo(PATIENT_IDENTIFIER))
 		        .toD(
 		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        // person_name or person_address
@@ -38,7 +39,7 @@ public class PatientFhirRouter extends BaseFhirResourceRouter {
 		        .toD(
 		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        .end().toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end().end()
-		        .marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PATIENT.outgoingUrl());
 	}
 }

@@ -43,13 +43,12 @@ public class OpenmrsFhirRouter extends RouteBuilder {
 	
 	@Override
 	public void configure() {
-		from(URI_FHIR_ROUTER).routeId("fhir-router")
-				.log(LoggingLevel.INFO, "Processing message ${body}")
+		from(URI_FHIR_ROUTER).routeId("fhir-router").log(LoggingLevel.INFO, "Processing message ${body}")
 		        // first filter: we do not process snapshot events, and we only process events for tables we are
 		        // configured to use.
 		        .filter(and(simple("${exchangeProperty." + PROP_EVENT_SNAPSHOT + "}").isEqualTo(false),
 		            simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").in((Object[]) monitoredTables)))
-				.log(LoggingLevel.INFO, "Dispatching to endpoints " + resourceDestinations)
+		        .log(LoggingLevel.INFO, "Dispatching to endpoints " + resourceDestinations)
 		        .recipientList(constant(resourceDestinations)).parallelProcessing().end();
 	}
 }

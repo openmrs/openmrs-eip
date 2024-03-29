@@ -5,15 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_IDENTIFIER;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_TABLE_NAME;
 
-import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
@@ -22,7 +17,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
-import org.apache.kafka.common.Uuid;
 import org.hl7.fhir.r4.model.Encounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +24,6 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-
-import ca.uhn.fhir.context.FhirContext;
 
 @UseAdviceWith
 class EncounterRouterTest extends CamelSpringTestSupport {
@@ -98,10 +90,7 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Encounter encounter = FhirContext.forR4().newJsonParser().parseResource(Encounter.class, (InputStream) messageBody);
-		assertThat(encounter, notNullValue());
+		assertThat(messageBody, instanceOf(Encounter.class));
 		
 		fhir.assertIsSatisfied();
 	}
@@ -142,10 +131,7 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		
 		Object messageBody = message.getBody();
 		assertThat(messageBody, notNullValue());
-		assertThat(messageBody, instanceOf(InputStream.class));
-		
-		Encounter encounter = FhirContext.forR4().newJsonParser().parseResource(Encounter.class, (InputStream) messageBody);
-		assertThat(encounter, notNullValue());
+		assertThat(messageBody, instanceOf(Encounter.class));
 		
 		fhir.assertIsSatisfied();
 	}

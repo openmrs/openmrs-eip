@@ -1,5 +1,7 @@
 package org.openmrs.eip.fhir.utils;
 
+import static org.openmrs.eip.fhir.Constants.CSV_PATTERN;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -11,11 +13,6 @@ import org.openmrs.eip.fhir.FhirResource;
  * Utility class to assist with mapping between FHIR resources and OpenMRS tables.
  */
 public class OpenmrsResourceTableMapper {
-	
-	/**
-	 * Use to allow quoted strings, although we don't technically need them
-	 */
-	private static final Pattern CSV_PATTERN = Pattern.compile(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 	
 	private OpenmrsResourceTableMapper() {
 	}

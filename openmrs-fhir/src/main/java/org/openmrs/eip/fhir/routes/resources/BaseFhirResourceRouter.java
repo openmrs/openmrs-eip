@@ -9,11 +9,6 @@ import org.openmrs.eip.fhir.FhirResource;
 
 public abstract class BaseFhirResourceRouter extends RouteBuilder {
 	
-	protected final FhirJsonDataFormat DEFAULT_FORMAT = new FhirJsonDataFormat();
-	{
-		DEFAULT_FORMAT.setFhirVersion("R4");
-	}
-	
 	protected String[] supportedTables;
 	
 	BaseFhirResourceRouter(FhirResource resource) {

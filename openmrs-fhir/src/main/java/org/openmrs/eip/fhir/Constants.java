@@ -1,6 +1,10 @@
 package org.openmrs.eip.fhir;
 
+import java.util.regex.Pattern;
+
 public final class Constants {
+	
+	public static final Pattern CSV_PATTERN = Pattern.compile(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 	
 	public static final String HEADER_FHIR_EVENT_TYPE = "openmrs.fhir.event";
 	

@@ -24,7 +24,7 @@ public class ServiceRequestRouter extends BaseFhirResourceRouter {
 		        .filter((exchange) -> {
 			        Object messageBody = exchange.getMessage().getBody();
 			        return messageBody instanceof ServiceRequest;
-		        }).marshal(DEFAULT_FORMAT).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SERVICEREQUEST.outgoingUrl());
 	}
 }
