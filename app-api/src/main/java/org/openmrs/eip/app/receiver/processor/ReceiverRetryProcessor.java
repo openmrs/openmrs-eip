@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
+import org.openmrs.eip.app.management.service.ConflictService;
 import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.receiver.ReceiverUtils;
 import org.openmrs.eip.app.receiver.RetryCacheEvictingProcessor;
@@ -34,6 +35,8 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	
 	private ReceiverService service;
 	
+	private ConflictService conflictService;
+	
 	private ReceiverRetryRepository retryRepo;
 	
 	private RetryCacheEvictingProcessor evictProcessor;
@@ -43,10 +46,11 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	private ReceiverRetryTask task;
 	
 	public ReceiverRetryProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor, ReceiverService service,
-	    SyncHelper syncHelper, ReceiverRetryRepository retryRepo, RetryCacheEvictingProcessor evictProcessor,
-	    RetrySearchIndexUpdatingProcessor indexProcessor) {
+	    ConflictService conflictService, SyncHelper syncHelper, ReceiverRetryRepository retryRepo,
+	    RetryCacheEvictingProcessor evictProcessor, RetrySearchIndexUpdatingProcessor indexProcessor) {
 		super(executor, syncHelper);
 		this.service = service;
+		this.conflictService = conflictService;
 		this.retryRepo = retryRepo;
 		this.evictProcessor = evictProcessor;
 		this.indexProcessor = indexProcessor;
@@ -80,13 +84,13 @@ public class ReceiverRetryProcessor extends BaseSyncProcessor<ReceiverRetryQueue
 	
 	@Override
 	protected void beforeSync(ReceiverRetryQueueItem retry) {
-		String modelClass = retry.getModelClassName();
-		if (ReceiverUtils.isSubclass(modelClass)) {
-			modelClass = ReceiverUtils.getParentModelClassName(modelClass);
-		}
-		
+		String modelClass = ReceiverUtils.getEffectiveModelClassName(retry.getModelClassName());
 		if (getTask().getFailedEntities().contains(modelClass + "#" + retry.getIdentifier())) {
 			throw new EIPException("Skipped because the entity still has earlier failed event(s) in the queue");
+		}
+		
+		if (conflictService.hasConflictItem(retry.getIdentifier(), retry.getModelClassName())) {
+			throw new EIPException("Cannot process the message because the entity has a conflict item in the queue");
 		}
 		
 		LOG.info("Re-processing message");

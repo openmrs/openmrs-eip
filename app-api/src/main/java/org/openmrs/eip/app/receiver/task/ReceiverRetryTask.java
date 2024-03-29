@@ -27,7 +27,7 @@ public class ReceiverRetryTask extends BaseDelegatingQueueTask<ReceiverRetryQueu
 	
 	private static final Set<String> FAILED_ENTITIES = Collections.synchronizedSet(new HashSet<>());
 	
-	public static final int BATCH_SIZE = 200;
+	protected static final int BATCH_SIZE = 200;
 	
 	public ReceiverRetryTask(ReceiverRetryProcessor processor) {
 		super(processor);
@@ -63,11 +63,7 @@ public class ReceiverRetryTask extends BaseDelegatingQueueTask<ReceiverRetryQueu
 		}
 		
 		if (errorEncountered) {
-			String modelClass = retry.getModelClassName();
-			if (ReceiverUtils.isSubclass(modelClass)) {
-				modelClass = ReceiverUtils.getParentModelClassName(modelClass);
-			}
-			
+			String modelClass = ReceiverUtils.getEffectiveModelClassName(retry.getModelClassName());
 			FAILED_ENTITIES.add(modelClass + "#" + retry.getIdentifier());
 		}
 		
