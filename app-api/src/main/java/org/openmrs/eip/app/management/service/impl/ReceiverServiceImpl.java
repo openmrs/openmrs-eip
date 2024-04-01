@@ -49,6 +49,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 @Service("receiverService")
 @Profile(SyncProfiles.RECEIVER)
 public class ReceiverServiceImpl extends BaseService implements ReceiverService {
@@ -78,6 +84,9 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	private ReceiverActiveMqMessagePublisher activeMqPublisher;
 	
 	private SyncStatusProcessor statusProcessor;
+	
+	@PersistenceContext(unitName = "mngt")
+	private EntityManager entityManager;
 	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo, ConflictRepository conflictRepo,
@@ -365,6 +374,21 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		}
 		
 		jmsMsgRepo.delete(jmsMessage);
+	}
+	
+	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
+	public <T extends BaseHashEntity> void saveHash(T hash) {
+		entityManager.merge(hash);
+	}
+	
+	@Override
+	public <T extends BaseHashEntity> T getHash(String identifier, Class<T> hashClass) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<T> cq = cb.createQuery(hashClass);
+		Root<T> root = cq.from(hashClass);
+		cq.select(root).where(cb.equal(root.get("identifier"), identifier));
+		return entityManager.createQuery(cq).getResultList().stream().findFirst().orElseGet(() -> null);
 	}
 	
 }

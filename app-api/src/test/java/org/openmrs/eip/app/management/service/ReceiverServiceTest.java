@@ -50,6 +50,8 @@ import org.openmrs.eip.component.SyncOperation;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.management.hash.entity.PatientHash;
+import org.openmrs.eip.component.management.hash.entity.PersonHash;
+import org.openmrs.eip.component.management.hash.entity.VisitHash;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncMetadata;
@@ -62,6 +64,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @TestPropertySource(properties = Constants.PROP_URI_ERROR_HANDLER + "=" + TestConstants.URI_ERROR_HANDLER)
 public class ReceiverServiceTest extends BaseReceiverTest {
@@ -108,6 +115,9 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	private ReceiverActiveMqMessagePublisher publisher;
 	
 	private ReceiverActiveMqMessagePublisher mockPublisher;
+	
+	@PersistenceContext(unitName = "mngt")
+	private EntityManager entityManager;
 	
 	@Before
 	public void setup() throws Exception {
@@ -444,6 +454,47 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(0, jmsMsgRepo.count());
 		Mockito.verify(mockStatusProcessor).process(ArgumentMatchers.any(SyncMetadata.class));
 		Mockito.verify(mockPublisher).sendSyncResponse(request, msgUuid);
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_person_hash.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getHash_shouldGetTheSavedHash() {
+		Assert.assertEquals("test-hash-1", service.getHash("person-uuid-1", PersonHash.class).getHash());
+	}
+	
+	@Test
+	public void saveHash_shouldPersistTheHash() {
+		final String uuid = "visit-uuid";
+		Assert.assertNull(service.getHash(uuid, VisitHash.class));
+		VisitHash hash = new VisitHash();
+		hash.setIdentifier(uuid);
+		hash.setHash("test");
+		hash.setDateCreated(LocalDateTime.now());
+		
+		service.saveHash(hash);
+		
+		Assert.assertNotNull(service.getHash(uuid, VisitHash.class));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_receiver_person_hash.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public void saveHash_shouldUpdateTheHash() {
+		final String uuid = "person-uuid-1";
+		PersonHash hash = service.getHash(uuid, PersonHash.class);
+		Assert.assertEquals("test-hash-1", hash.getHash());
+		Assert.assertNull(hash.getDateChanged());
+		hash.setHash("new hash");
+		hash.setDateChanged(LocalDateTime.now());
+		
+		service.saveHash(hash);
+		entityManager.clear();
+		
+		hash = service.getHash(uuid, PersonHash.class);
+		Assert.assertEquals("new hash", hash.getHash());
+		Assert.assertNotNull(hash.getDateChanged());
 	}
 	
 }

@@ -6,6 +6,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
 import org.openmrs.eip.app.management.entity.receiver.SyncMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage.SyncOutcome;
+import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 
 /**
  * Contains methods for managing receiver items
@@ -103,5 +104,22 @@ public interface ReceiverService extends Service {
 	 * @param jmsMessage the message to process
 	 */
 	void processJmsMessage(JmsMessage jmsMessage);
+	
+	/**
+	 * Saves a hash object.
+	 *
+	 * @param hash the hash object to save
+	 * @return saved hash object
+	 */
+	<T extends BaseHashEntity> void saveHash(T hash);
+	
+	/**
+	 * Gets the hash object for an entity.
+	 *
+	 * @param identifier the unique identifier of the entity
+	 * @param hashClass entity hash class
+	 * @return the hash object if it exists otherwise null
+	 */
+	<T extends BaseHashEntity> T getHash(String identifier, Class<T> hashClass);
 	
 }
