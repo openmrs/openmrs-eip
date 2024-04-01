@@ -8,10 +8,6 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.support.DefaultEndpoint;
 
-import lombok.Getter;
-
-@Getter
-@SuppressWarnings("unused")
 @UriEndpoint(firstVersion = "1.0.0", scheme = "openmrs-fhir", title = "OpenMRS FHIR Bundle", syntax = "openmrs-fhir:")
 public class FhirSearchBundleEndpoint extends DefaultEndpoint {
 	
@@ -39,5 +35,38 @@ public class FhirSearchBundleEndpoint extends DefaultEndpoint {
 	@Override
 	public Consumer createConsumer(Processor processor) {
 		throw new UnsupportedOperationException("You cannot receive messages from this endpoint: " + getEndpointUri());
+	}
+	
+	public String getResource() {
+		return resource;
+	}
+	
+	public void setResource(String resource) {
+		this.resource = resource;
+	}
+	
+	@Override
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getInclude() {
+		return include;
+	}
+	
+	public void setInclude(String include) {
+		this.include = include;
+	}
+	
+	public String getRevinclude() {
+		return revinclude;
+	}
+	
+	public void setRevinclude(String revinclude) {
+		this.revinclude = revinclude;
 	}
 }

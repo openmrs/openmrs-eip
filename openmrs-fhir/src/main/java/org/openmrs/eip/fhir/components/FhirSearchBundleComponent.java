@@ -6,8 +6,7 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.spi.annotations.Component;
 import org.apache.camel.support.DefaultComponent;
 
-@SuppressWarnings("unused")
-@Component("openmrsFhir")
+@Component("openmrs-fhir")
 public class FhirSearchBundleComponent extends DefaultComponent {
 	
 	@Override

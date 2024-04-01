@@ -14,24 +14,61 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <roaster.version>2.28.0.Final</roaster.version>
   </properties>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>1.18.32</version>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-component-maven-plugin</artifactId>
+        <version>${camelVersion}</version>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.forge.roaster</groupId>
+            <artifactId>roaster-api</artifactId>
+            <version>${roaster.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.forge.roaster</groupId>
+            <artifactId>roaster-jdt</artifactId>
+            <version>${roaster.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
-      </plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>add-source</goal>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/generated/java</source>
+              </sources>
+              <resources>
+                <resource>
+                  <directory>src/generated/resources</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <dependencies>
@@ -71,10 +108,9 @@
       <version>${camelVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.32</version>
-      <scope>provided</scope>
-  </dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-support</artifactId>
+      <version>${camelVersion}</version>
+    </dependency>
   </dependencies>
 </project>
