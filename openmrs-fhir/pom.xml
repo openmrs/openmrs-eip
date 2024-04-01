@@ -31,8 +31,7 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
-      </plugin>
-    </plugins>
+      </plugins>
   </build>
 
   <dependencies>
