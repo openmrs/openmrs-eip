@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.camel;
 
 import org.apache.camel.support.DefaultProducer;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.LightEntity;
 import org.openmrs.eip.component.exception.EIPException;
 import org.openmrs.eip.component.mapper.operations.DecomposedUuid;
@@ -61,18 +62,7 @@ public abstract class AbstractOpenmrsProducer extends DefaultProducer {
 	 */
 	private static OpenmrsRepository<LightEntity> getEntityLightRepository(Class<? extends LightEntity> lightEntityType) {
 		ResolvableType resType = ResolvableType.forClassWithGenerics(OpenmrsRepository.class, lightEntityType);
-		
-		String[] beanNames = appContext.getBeanNamesForType(resType);
-		if (beanNames.length != 1) {
-			if (beanNames.length == 0) {
-				throw new EIPException("No light repository found for type " + lightEntityType);
-			} else {
-				throw new EIPException("Found multiple light repositories for type " + lightEntityType);
-			}
-		}
-		
-		Object lightRepo = appContext.getBean(beanNames[0]);
-		
+		Object lightRepo = SyncContext.getBeanNamesForType(resType);
 		if (log.isDebugEnabled()) {
 			log.debug("Using light entity repo: " + lightRepo + " for light entity type: " + lightEntityType);
 		}

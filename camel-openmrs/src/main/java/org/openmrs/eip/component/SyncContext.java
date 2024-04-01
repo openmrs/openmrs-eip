@@ -55,16 +55,23 @@ public class SyncContext implements ApplicationContextAware {
 	public static SyncEntityRepository getRepositoryBean(String tableName) {
 		Class<? extends BaseEntity> entityClass = TableToSyncEnum.getTableToSyncEnum(tableName).getEntityClass();
 		ResolvableType resType = ResolvableType.forClassWithGenerics(SyncEntityRepository.class, entityClass);
-		String[] beanNames = appContext.getBeanNamesForType(resType);
+		return (SyncEntityRepository) getBeanNamesForType(resType);
+	}
+	
+	/**
+	 * @see ApplicationContext#getBeanNamesForType(ResolvableType)
+	 */
+	public static Object getBeanNamesForType(ResolvableType type) {
+		String[] beanNames = appContext.getBeanNamesForType(type);
 		if (beanNames.length != 1) {
 			if (beanNames.length == 0) {
-				throw new EIPException("No entity repository found for type: " + entityClass);
+				throw new EIPException("No beans found for resolvableType type: " + type);
 			} else {
-				throw new EIPException("Found multiple entity repositories for type: " + entityClass);
+				throw new EIPException("Found multiple beans found for resolvableType type: " + type);
 			}
 		}
 		
-		return (SyncEntityRepository) appContext.getBean(beanNames[0]);
+		return appContext.getBean(beanNames[0]);
 	}
 	
 	/**
