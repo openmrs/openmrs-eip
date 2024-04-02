@@ -21,7 +21,7 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;

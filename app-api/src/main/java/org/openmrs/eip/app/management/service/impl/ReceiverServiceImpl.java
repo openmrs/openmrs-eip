@@ -40,7 +40,7 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;

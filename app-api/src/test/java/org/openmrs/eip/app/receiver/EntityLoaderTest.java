@@ -30,7 +30,7 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;

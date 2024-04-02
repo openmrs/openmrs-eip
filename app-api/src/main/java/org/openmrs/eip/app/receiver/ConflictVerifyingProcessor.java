@@ -13,7 +13,7 @@ import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;

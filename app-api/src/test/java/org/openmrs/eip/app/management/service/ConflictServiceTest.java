@@ -28,7 +28,7 @@ import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.service.impl.PatientService;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;

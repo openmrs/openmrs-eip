@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.utils;
+package org.openmrs.eip;
 
 import static java.time.ZoneId.systemDefault;
 import static java.time.ZonedDateTime.parse;
@@ -61,7 +61,7 @@ public class HashUtilsTest {
 		model.setCreatorUuid(CREATOR);
 		model.setUuid(UUID);
 		
-		assertEquals(EXPECTED_HASH, HashUtils.computeHash(model));
+		Assert.assertEquals(EXPECTED_HASH, HashUtils.computeHash(model));
 	}
 	
 	@Test

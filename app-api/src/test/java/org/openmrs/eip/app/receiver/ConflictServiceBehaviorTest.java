@@ -31,7 +31,7 @@ import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.impl.PatientService;
-import org.openmrs.eip.component.utils.HashUtils;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;

@@ -1,4 +1,4 @@
-package org.openmrs.eip.component.utils;
+package org.openmrs.eip;
 
 import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
 import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
@@ -25,6 +25,8 @@ import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
+import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
