@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Test;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.SyncedMessage;
@@ -31,7 +32,6 @@ import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.impl.PatientService;
-import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
@@ -94,7 +94,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		hash.setDateCreated(LocalDateTime.now());
 		hash.setHash("old-hash");
 		hash.setIdentifier(uuid);
-		HashUtils.saveHash(hash, producerTemplate, false);
+		HashUtils.saveHash(hash, false);
 		
 		PatientModel existingPatient = patientService.getModel(uuid);
 		assertNotEquals(newGender, existingPatient.getGender());
@@ -114,7 +114,7 @@ public class ConflictServiceBehaviorTest extends BaseReceiverTest {
 		assertEquals(newGender, existingPatient.getGender());
 		assertEquals(newBirthDate, existingPatient.getBirthdate());
 		assertFalse(existingPatient.isDead());
-		assertEquals(expectedNewHash, HashUtils.getStoredHash(uuid, PatientHash.class, producerTemplate).getHash());
+		assertEquals(expectedNewHash, HashUtils.getStoredHash(uuid, PatientHash.class).getHash());
 		assertTrue(conflictRepo.findAll().isEmpty());
 		List<SyncedMessage> syncedMsgs = syncedMsgRepo.findAll();
 		assertEquals(1, syncedMsgs.size());

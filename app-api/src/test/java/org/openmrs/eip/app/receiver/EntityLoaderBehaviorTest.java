@@ -3,9 +3,9 @@ package org.openmrs.eip.app.receiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.HashUtils.computeHash;
 import static org.openmrs.eip.HashUtils.getStoredHash;
+import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
@@ -21,6 +21,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.entity.light.PersonLight;
@@ -34,7 +35,6 @@ import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.repository.PersonNameRepository;
 import org.openmrs.eip.component.repository.PersonRepository;
 import org.openmrs.eip.component.repository.light.UserLightRepository;
-import org.openmrs.eip.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
@@ -167,8 +167,8 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 		existingHash.setIdentifier(personUuid);
 		existingHash.setHash(computeHash(person));
 		existingHash.setDateCreated(LocalDateTime.now());
-		HashUtils.saveHash(existingHash, producerTemplate, false);
-		assertNotNull(getStoredHash(personUuid, PersonHash.class, producerTemplate));
+		HashUtils.saveHash(existingHash, false);
+		assertNotNull(getStoredHash(personUuid, PersonHash.class));
 		assertNull(existingHash.getDateChanged());
 		SyncMetadata metadata = new SyncMetadata();
 		metadata.setSourceIdentifier("site-id");
@@ -178,7 +178,7 @@ public class EntityLoaderBehaviorTest extends BaseReceiverTest {
 		
 		loader.process(syncModel);
 		
-		BaseHashEntity updatedHash = getStoredHash(personUuid, PersonHash.class, producerTemplate);
+		BaseHashEntity updatedHash = getStoredHash(personUuid, PersonHash.class);
 		assertEquals(computeHash(person), updatedHash.getHash());
 		assertNotNull(updatedHash.getDateChanged());
 	}

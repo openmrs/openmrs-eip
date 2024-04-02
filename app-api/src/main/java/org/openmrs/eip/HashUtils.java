@@ -1,8 +1,5 @@
 package org.openmrs.eip;
 
-import static org.openmrs.eip.component.Constants.PLACEHOLDER_CLASS;
-import static org.openmrs.eip.component.Constants.QUERY_SAVE_HASH;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -16,12 +13,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.apache.camel.CamelExecutionException;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.openmrs.eip.component.Constants;
+import org.openmrs.eip.app.management.service.ReceiverService;
+import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
@@ -35,6 +31,8 @@ public class HashUtils {
 	protected static final Logger log = LoggerFactory.getLogger(HashUtils.class);
 	
 	private static Map<Class<? extends BaseModel>, Set<String>> modelClassDatetimePropsMap = null;
+	
+	private static ReceiverService receiverService;
 	
 	/**
 	 * Computes the hash of the specified model, the logic is such that it removes null values, extracts
@@ -112,7 +110,7 @@ public class HashUtils {
 	
 	/**
 	 * Creates a new instance of the specified hash entity class
-	 * 
+	 *
 	 * @param hashClass the hash entity class to instantiate
 	 * @return an instance of the hash entity class
 	 * @throws IllegalAccessException
@@ -126,42 +124,29 @@ public class HashUtils {
 	
 	/**
 	 * Looks up the stored hash for the entity with the specified identifier from the management DB
-	 * 
+	 *
 	 * @param identifier the unique identifier of the entity
 	 * @param hashClass entity hash class
-	 * @param producerTemplate ProducerTemplate object
 	 * @return the saved hash entity object otherwise null
 	 */
-	public static BaseHashEntity getStoredHash(String identifier, Class<? extends BaseHashEntity> hashClass,
-	                                           ProducerTemplate producerTemplate) {
-		
-		final String query = Constants.QUERY_GET_HASH.replace(Constants.PLACEHOLDER_CLASS, hashClass.getSimpleName())
-		        .replace(Constants.PLACEHOLDER_UUID, identifier);
-		List<? extends BaseHashEntity> hashes = producerTemplate.requestBody(query, null, List.class);
-		
-		BaseHashEntity hash = null;
-		if (hashes != null && hashes.size() == 1) {
-			hash = hashes.get(0);
-		}
-		
-		return hash;
+	public static BaseHashEntity getStoredHash(String identifier, Class<? extends BaseHashEntity> hashClass) {
+		return getReceiverService().getHash(identifier, hashClass);
 	}
 	
 	/**
 	 * Saves the specified hash object to the database
 	 *
 	 * @param object hash object to save
-	 * @param template {@link ProducerTemplate} object
 	 * @param handleDuplicateHash specifies if a unique key constraint violation exception should be
 	 *            handled or not in the event we attempted to insert a duplicate hash row for the same
 	 *            entity.
 	 */
-	public static void saveHash(BaseHashEntity object, ProducerTemplate template, boolean handleDuplicateHash) {
+	public static void saveHash(BaseHashEntity object, boolean handleDuplicateHash) {
 		try {
-			template.sendBody(QUERY_SAVE_HASH.replace(PLACEHOLDER_CLASS, object.getClass().getSimpleName()), object);
+			getReceiverService().saveHash(object);
 		}
-		catch (CamelExecutionException e) {
-			if (!handleDuplicateHash || !updateHashIfRowExists(e.getCause(), object, template)) {
+		catch (Throwable e) {
+			if (!handleDuplicateHash || !updateHashIfRowExists(e, object)) {
 				throw e;
 			}
 		}
@@ -171,14 +156,13 @@ public class HashUtils {
 	 * Checks if the exception is due to an attempt to insert a duplicate hash row for the same entity,
 	 * and if it is the case it updates the existing hash row instead.
 	 *
-	 * @param cause the immediate cause of the thrown exception
+	 * @param throwable the thrown exception
 	 * @param object the hash entity that was being inserted
-	 * @param template ProducerTemplate object
 	 * @return true if a duplicate hash row was found and updated otherwise false
 	 */
-	protected static boolean updateHashIfRowExists(Throwable cause, BaseHashEntity object, ProducerTemplate template) {
-		if (cause instanceof ConstraintViolationException) {
-			BaseHashEntity existing = getStoredHash(object.getIdentifier(), object.getClass(), template);
+	protected static boolean updateHashIfRowExists(Throwable throwable, BaseHashEntity object) {
+		if (throwable instanceof ConstraintViolationException) {
+			BaseHashEntity existing = getStoredHash(object.getIdentifier(), object.getClass());
 			if (existing != null) {
 				//This will typically happen if we inserted the hash but something went wrong before or during
 				//insert of the entity and the event comes back as a retry item
@@ -193,12 +177,20 @@ public class HashUtils {
 					log.debug("Updating hash with that of the incoming entity state");
 				}
 				
-				saveHash(existing, template, false);
+				saveHash(existing, false);
 				return true;
 			}
 		}
 		
 		return false;
+	}
+	
+	private static ReceiverService getReceiverService() {
+		if (receiverService == null) {
+			receiverService = SyncContext.getBean(ReceiverService.class);
+		}
+		
+		return receiverService;
 	}
 	
 }

@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverPrunedItem;
@@ -40,7 +40,6 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
@@ -79,8 +78,6 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	private EntityServiceFacade serviceFacade;
 	
-	private ProducerTemplate producerTemplate;
-	
 	private ReceiverActiveMqMessagePublisher activeMqPublisher;
 	
 	private SyncStatusProcessor statusProcessor;
@@ -90,7 +87,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	
 	public ReceiverServiceImpl(SyncMessageRepository syncMsgRepo, SyncedMessageRepository syncedMsgRepo,
 	    ReceiverSyncArchiveRepository archiveRepo, ReceiverRetryRepository retryRepo, ConflictRepository conflictRepo,
-	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate,
+	    ReceiverPrunedItemRepository prunedRepo, EntityServiceFacade serviceFacade,
 	    ReceiverSyncRequestRepository syncRequestRepo, JmsMessageRepository jmsMsgRepo,
 	    ReceiverActiveMqMessagePublisher activeMqPublisher, SyncStatusProcessor statusProcessor) {
 		this.syncMsgRepo = syncMsgRepo;
@@ -100,7 +97,6 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		this.conflictRepo = conflictRepo;
 		this.prunedRepo = prunedRepo;
 		this.serviceFacade = serviceFacade;
-		this.producerTemplate = producerTemplate;
 		this.syncRequestRepo = syncRequestRepo;
 		this.activeMqPublisher = activeMqPublisher;
 		this.jmsMsgRepo = jmsMsgRepo;
@@ -213,11 +209,11 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 		
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnumByModelClassName(modelClassname);
 		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, identifier);
-		BaseHashEntity storedHash = HashUtils.getStoredHash(identifier, tableToSyncEnum.getHashClass(), producerTemplate);
+		BaseHashEntity storedHash = HashUtils.getStoredHash(identifier, tableToSyncEnum.getHashClass());
 		//TODO If hash does not exist, Should we insert one?
 		storedHash.setHash(HashUtils.computeHash(dbModel));
 		storedHash.setDateChanged(LocalDateTime.now());
-		HashUtils.saveHash(storedHash, producerTemplate, false);
+		HashUtils.saveHash(storedHash, false);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved new hash for the entity");

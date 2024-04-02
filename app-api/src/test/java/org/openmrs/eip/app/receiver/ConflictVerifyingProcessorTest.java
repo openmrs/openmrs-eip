@@ -4,13 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import org.apache.camel.ProducerTemplate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
@@ -19,7 +19,6 @@ import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.HashUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -37,14 +36,11 @@ public class ConflictVerifyingProcessorTest {
 	@Mock
 	private EntityServiceFacade mockEntityService;
 	
-	@Mock
-	private ProducerTemplate mockProducerTemplate;
-	
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(HashUtils.class);
 		Whitebox.setInternalState(BaseQueueProcessor.class, "initialized", true);
-		processor = new ConflictVerifyingProcessor(null, mockService, mockEntityService, mockProducerTemplate);
+		processor = new ConflictVerifyingProcessor(null, mockService, mockEntityService);
 	}
 	
 	@After
@@ -72,7 +68,7 @@ public class ConflictVerifyingProcessorTest {
 		when(mockEntityService.getModel(TableToSyncEnum.PERSON, uuid)).thenReturn(model);
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash("some hash");
-		when(HashUtils.getStoredHash(uuid, PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(uuid, PersonHash.class)).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn("another hash");
 		
 		processor.processItem(c);
@@ -104,7 +100,7 @@ public class ConflictVerifyingProcessorTest {
 		final String hash = "valid-hash";
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash(hash);
-		when(HashUtils.getStoredHash(uuid, PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(uuid, PersonHash.class)).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn(hash);
 		
 		processor.processItem(c);

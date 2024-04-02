@@ -13,6 +13,7 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverRetryQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncArchive;
@@ -28,7 +29,6 @@ import org.openmrs.eip.component.management.hash.entity.PatientHash;
 import org.openmrs.eip.component.model.PatientModel;
 import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.service.impl.PatientService;
-import org.openmrs.eip.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -95,7 +95,7 @@ public class ConflictServiceTest extends BaseReceiverTest {
 		assertNotEquals(currentHash, expectedNewHash);
 		hashEntity.setHash(currentHash);
 		hashEntity.setDateCreated(LocalDateTime.now());
-		HashUtils.saveHash(hashEntity, producerTemplate, false);
+		HashUtils.saveHash(hashEntity, false);
 		Assert.assertNull(hashEntity.getDateChanged());
 		final long timestamp = System.currentTimeMillis();
 		
@@ -104,7 +104,7 @@ public class ConflictServiceTest extends BaseReceiverTest {
 		assertFalse(conflictRepo.findById(conflict.getId()).isPresent());
 		assertEquals(conflict.getMessageUuid(), archive.getMessageUuid());
 		assertEquals(1, archiveRepo.count());
-		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class, producerTemplate);
+		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class);
 		assertEquals(expectedNewHash, hashEntity.getHash());
 		long dateChangedMillis = hashEntity.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);

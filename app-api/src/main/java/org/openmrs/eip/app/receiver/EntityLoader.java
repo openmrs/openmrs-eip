@@ -4,7 +4,7 @@ import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAU
 
 import java.time.LocalDateTime;
 
-import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.SyncProfiles;
@@ -21,7 +21,6 @@ import org.openmrs.eip.component.model.PersonAttributeModel;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -47,23 +46,21 @@ public class EntityLoader {
 		TableToSyncEnum tableToSyncEnum = TableToSyncEnum.getTableToSyncEnum(syncModel.getTableToSyncModelClass());
 		boolean delete = "d".equals(syncModel.getMetadata().getOperation());
 		Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(syncModel.getModel());
-		ProducerTemplate producerTemplate = SyncContext.getBean(ProducerTemplate.class);
 		BaseModel dbModel = serviceFacade.getModel(tableToSyncEnum, syncModel.getModel().getUuid());
 		BaseHashEntity storedHash = null;
 		if (dbModel != null || delete) {
-			storedHash = HashUtils.getStoredHash(syncModel.getModel().getUuid(), hashClass, producerTemplate);
+			storedHash = HashUtils.getStoredHash(syncModel.getModel().getUuid(), hashClass);
 		}
 		
 		if (delete) {
-			delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum, producerTemplate);
+			delete(syncModel, storedHash, hashClass, serviceFacade, dbModel, tableToSyncEnum);
 		} else {
-			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum, producerTemplate);
+			save(dbModel, storedHash, hashClass, serviceFacade, syncModel, tableToSyncEnum);
 		}
 	}
 	
 	private void save(BaseModel dbModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum,
-	                  ProducerTemplate producerTemplate) {
+	                  EntityServiceFacade serviceFacade, SyncModel syncModel, TableToSyncEnum tableToSyncEnum) {
 		BaseModel modelToSave = syncModel.getModel();
 		if (modelToSave instanceof PersonAttributeModel) {
 			PersonAttributeModel model = (PersonAttributeModel) syncModel.getModel();
@@ -78,15 +75,14 @@ public class EntityLoader {
 		}
 		
 		if (dbModel == null) {
-			insert(modelToSave, hashClass, serviceFacade, tableToSyncEnum, producerTemplate);
+			insert(modelToSave, hashClass, serviceFacade, tableToSyncEnum);
 		} else {
-			update(modelToSave, storedHash, hashClass, serviceFacade, tableToSyncEnum, producerTemplate, dbModel);
+			update(modelToSave, storedHash, hashClass, serviceFacade, tableToSyncEnum, dbModel);
 		}
 	}
 	
 	private void delete(SyncModel syncModel, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate) {
+	                    EntityServiceFacade serviceFacade, BaseModel dbModel, TableToSyncEnum tableToSyncEnum) {
 		
 		boolean isNewHash = false;
 		if (dbModel != null) {
@@ -130,7 +126,7 @@ public class EntityLoader {
 				}
 			}
 			
-			HashUtils.saveHash(storedHash, producerTemplate, false);
+			HashUtils.saveHash(storedHash, false);
 			
 			if (log.isDebugEnabled()) {
 				if (isNewHash) {
@@ -143,7 +139,7 @@ public class EntityLoader {
 	}
 	
 	private void insert(BaseModel modelToSave, Class<? extends BaseHashEntity> hashClass, EntityServiceFacade serviceFacade,
-	                    TableToSyncEnum tableToSyncEnum, ProducerTemplate producerTemplate) {
+	                    TableToSyncEnum tableToSyncEnum) {
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Inserting new hash for the incoming entity state");
@@ -165,7 +161,7 @@ public class EntityLoader {
 		}
 		
 		storedHash.setHash(HashUtils.computeHash(modelToSave));
-		HashUtils.saveHash(storedHash, producerTemplate, true);
+		HashUtils.saveHash(storedHash, true);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully saved the hash for the incoming entity state");
@@ -175,8 +171,7 @@ public class EntityLoader {
 	}
 	
 	private void update(BaseModel modelToSave, BaseHashEntity storedHash, Class<? extends BaseHashEntity> hashClass,
-	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum,
-	                    ProducerTemplate producerTemplate, BaseModel dbModel) {
+	                    EntityServiceFacade serviceFacade, TableToSyncEnum tableToSyncEnum, BaseModel dbModel) {
 		
 		boolean isEtyInDbPlaceHolder = false;
 		if (dbModel instanceof BaseDataModel) {
@@ -257,7 +252,7 @@ public class EntityLoader {
 			}
 		}
 		
-		HashUtils.saveHash(storedHash, producerTemplate, false);
+		HashUtils.saveHash(storedHash, false);
 		
 		if (log.isDebugEnabled()) {
 			if (isNewHashInstance) {

@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.TestConstants;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
@@ -57,7 +58,6 @@ import org.openmrs.eip.component.model.PersonModel;
 import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.impl.PatientService;
-import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.utils.JsonUtils;
 import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -215,13 +215,13 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertNotEquals(currentHash, expectedNewHash);
 		hashEntity.setHash(currentHash);
 		hashEntity.setDateCreated(LocalDateTime.now());
-		HashUtils.saveHash(hashEntity, producerTemplate, false);
+		HashUtils.saveHash(hashEntity, false);
 		Assert.assertNull(hashEntity.getDateChanged());
 		final long timestamp = System.currentTimeMillis();
 		
 		service.updateHash(PatientModel.class.getName(), uuid);
 		
-		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class, producerTemplate);
+		hashEntity = HashUtils.getStoredHash(uuid, PatientHash.class);
 		assertEquals(expectedNewHash, hashEntity.getHash());
 		long dateChangedMillis = hashEntity.getDateChanged().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		assertTrue(dateChangedMillis == timestamp || dateChangedMillis > timestamp);

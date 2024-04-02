@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.eip.component.Constants.HASH_DELETED;
 import static org.openmrs.eip.component.service.light.AbstractLightService.DEFAULT_VOID_REASON;
 
-import org.apache.camel.ProducerTemplate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +18,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.component.Constants;
 import org.openmrs.eip.component.SyncContext;
 import org.openmrs.eip.component.exception.ConflictsFoundException;
@@ -30,7 +30,6 @@ import org.openmrs.eip.component.model.SyncMetadata;
 import org.openmrs.eip.component.model.SyncModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.HashUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -44,9 +43,6 @@ public class EntityLoaderTest {
 	
 	@Mock
 	private EntityServiceFacade serviceFacade;
-	
-	@Mock
-	private ProducerTemplate mockProducerTemplate;
 	
 	@Mock
 	private Logger mockLogger;
@@ -65,7 +61,6 @@ public class EntityLoaderTest {
 		PowerMockito.mockStatic(SyncContext.class);
 		PowerMockito.mockStatic(HashUtils.class);
 		producer = new EntityLoader(serviceFacade);
-		when(SyncContext.getBean(ProducerTemplate.class)).thenReturn(mockProducerTemplate);
 		when(SyncContext.getBean(Environment.class)).thenReturn(mockEnv);
 		Whitebox.setInternalState(EntityLoader.class, Logger.class, mockLogger);
 	}
@@ -93,7 +88,7 @@ public class EntityLoaderTest {
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(personHash, mockProducerTemplate, true);
+		HashUtils.saveHash(personHash, true);
 		verify(mockLogger).debug("Inserting new hash for the incoming entity state");
 		assertEquals(model.getUuid(), personHash.getIdentifier());
 		assertEquals(expectedHash, personHash.getHash());
@@ -119,7 +114,7 @@ public class EntityLoaderTest {
 		final String expectedNewHash = "tester";
 		when(HashUtils.computeHash(dbModel)).thenReturn(currentHash);
 		when(HashUtils.computeHash(model)).thenReturn(expectedNewHash);
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class)).thenReturn(storedHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		// When
@@ -148,7 +143,7 @@ public class EntityLoaderTest {
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash(currentHash);
 		assertNull(storedHash.getDateChanged());
-		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class), any(ProducerTemplate.class))).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class))).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn(storedHash.getHash());
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
@@ -156,7 +151,7 @@ public class EntityLoaderTest {
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
+		HashUtils.saveHash(storedHash, false);
 		verify(mockLogger).debug("Updating hash for the deleted entity");
 		assertEquals(HASH_DELETED, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
@@ -186,7 +181,7 @@ public class EntityLoaderTest {
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(personHash, mockProducerTemplate, false);
+		HashUtils.saveHash(personHash, false);
 		verify(mockLogger).info("Inserting new hash for the deleted entity with no existing hash");
 		verify(mockLogger).debug("Saving new hash for the deleted entity");
 		verify(mockLogger).debug("Successfully saved the new hash for the deleted entity");
@@ -214,7 +209,7 @@ public class EntityLoaderTest {
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash(currentHash);
 		assertNull(storedHash.getDateChanged());
-		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class), any(ProducerTemplate.class))).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class))).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn("different-hash");
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
@@ -241,7 +236,7 @@ public class EntityLoaderTest {
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash(currentHash);
 		assertNull(storedHash.getDateChanged());
-		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class), any(ProducerTemplate.class))).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(eq(personUuid), any(Class.class))).thenReturn(storedHash);
 		when(HashUtils.computeHash(model)).thenReturn(storedHash.getHash());
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
@@ -249,7 +244,7 @@ public class EntityLoaderTest {
 		
 		verify(serviceFacade).delete(TableToSyncEnum.PERSON, personUuid);
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
+		HashUtils.saveHash(storedHash, false);
 		verify(mockLogger).info(
 		    "Found existing hash for a missing entity, this could be a retry item to delete an entity but the hash was never updated to the terminal value");
 		verify(mockLogger).debug("Updating hash for the deleted entity");
@@ -270,7 +265,7 @@ public class EntityLoaderTest {
 		PersonHash storedHash = new PersonHash();
 		storedHash.setHash("old-hash");
 		when(HashUtils.computeHash(dbModel)).thenReturn("new-hash");
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class)).thenReturn(storedHash);
 		
 		// When
 		producer.process(syncModel);
@@ -292,7 +287,7 @@ public class EntityLoaderTest {
 		final String expectedNewHash = "new-hash";
 		when(HashUtils.computeHash(dbModel)).thenReturn("current-hash");
 		when(HashUtils.computeHash(model)).thenReturn(expectedNewHash);
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class)).thenReturn(storedHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		// When
@@ -302,7 +297,7 @@ public class EntityLoaderTest {
 		// Then
 		verify(serviceFacade).saveModel(TableToSyncEnum.PERSON, model);
 		verify(mockLogger).debug("Updating hash for the incoming entity state");
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class)).thenReturn(storedHash);
 		assertEquals(expectedNewHash, storedHash.getHash());
 		assertNotNull(storedHash.getDateChanged());
 	}
@@ -349,7 +344,7 @@ public class EntityLoaderTest {
 		
 		// Then
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(personHash, mockProducerTemplate, false);
+		HashUtils.saveHash(personHash, false);
 		verify(mockLogger).debug("Inserting new hash for existing entity with missing hash");
 		verify(mockLogger).debug("Ignoring existing entity with missing hash when checking for conflicts");
 		verify(mockLogger).debug("Saving new hash for the entity");
@@ -386,7 +381,7 @@ public class EntityLoaderTest {
 		producer.process(syncModel);
 		
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(personHash, mockProducerTemplate, false);
+		HashUtils.saveHash(personHash, false);
 		verify(mockLogger).debug("Inserting new hash for existing placeholder entity");
 		verify(mockLogger).debug("Saving new hash for the entity");
 		verify(mockLogger).debug("Successfully saved new hash for the entity");
@@ -410,13 +405,13 @@ public class EntityLoaderTest {
 		final String expectedNewHash = "new-hash";
 		when(HashUtils.computeHash(dbModel)).thenReturn(expectedNewHash);
 		when(HashUtils.computeHash(model)).thenReturn(expectedNewHash);
-		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class, mockProducerTemplate)).thenReturn(storedHash);
+		when(HashUtils.getStoredHash(model.getUuid(), PersonHash.class)).thenReturn(storedHash);
 		when(mockLogger.isDebugEnabled()).thenReturn(true);
 		
 		producer.process(syncModel);
 		
 		PowerMockito.verifyStatic(HashUtils.class);
-		HashUtils.saveHash(storedHash, mockProducerTemplate, false);
+		HashUtils.saveHash(storedHash, false);
 		verify(mockLogger).info("Stored hash differs from that of the state in the DB, ignoring this because the "
 		        + "incoming and DB states match");
 		verify(mockLogger).debug("Updating hash for the incoming entity state");

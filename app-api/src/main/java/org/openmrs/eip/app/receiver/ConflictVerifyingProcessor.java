@@ -4,7 +4,7 @@ import static org.openmrs.eip.app.SyncConstants.BEAN_NAME_SYNC_EXECUTOR;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.app.BasePureParallelQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.service.ConflictService;
@@ -13,7 +13,6 @@ import org.openmrs.eip.component.management.hash.entity.BaseHashEntity;
 import org.openmrs.eip.component.model.BaseModel;
 import org.openmrs.eip.component.service.TableToSyncEnum;
 import org.openmrs.eip.component.service.facade.EntityServiceFacade;
-import org.openmrs.eip.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,14 +33,11 @@ public class ConflictVerifyingProcessor extends BasePureParallelQueueProcessor<C
 	
 	private EntityServiceFacade serviceFacade;
 	
-	private ProducerTemplate producerTemplate;
-	
 	public ConflictVerifyingProcessor(@Qualifier(BEAN_NAME_SYNC_EXECUTOR) ThreadPoolExecutor executor,
-	    ConflictService service, EntityServiceFacade serviceFacade, ProducerTemplate producerTemplate) {
+	    ConflictService service, EntityServiceFacade serviceFacade) {
 		super(executor);
 		this.service = service;
 		this.serviceFacade = serviceFacade;
-		this.producerTemplate = producerTemplate;
 	}
 	
 	@Override
@@ -67,7 +63,7 @@ public class ConflictVerifyingProcessor extends BasePureParallelQueueProcessor<C
 		String reason = null;
 		if (dbModel != null) {
 			Class<? extends BaseHashEntity> hashClass = TableToSyncEnum.getHashClass(dbModel);
-			BaseHashEntity storedHash = HashUtils.getStoredHash(item.getIdentifier(), hashClass, producerTemplate);
+			BaseHashEntity storedHash = HashUtils.getStoredHash(item.getIdentifier(), hashClass);
 			move = storedHash != null && HashUtils.computeHash(dbModel).equals(storedHash.getHash());
 			if (move) {
 				reason = "Moved from conflict queue because the hash on file is valid";
