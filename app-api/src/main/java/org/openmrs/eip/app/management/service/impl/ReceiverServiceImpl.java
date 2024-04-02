@@ -128,7 +128,9 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 	@Transactional(transactionManager = MGT_TX_MGR)
 	public void archiveSyncedMessage(SyncedMessage message) {
 		//TODO Check first if an archive with same message uuid does not exist yet
-		log.info("Moving message to the archives queue");
+		if (log.isDebugEnabled()) {
+			log.debug("Moving message to the archives queue");
+		}
 		
 		ReceiverSyncArchive archive = new ReceiverSyncArchive(message);
 		archive.setDateCreated(new Date());
