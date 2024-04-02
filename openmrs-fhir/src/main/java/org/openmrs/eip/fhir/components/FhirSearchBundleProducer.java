@@ -3,8 +3,6 @@ package org.openmrs.eip.fhir.components;
 import static org.openmrs.eip.fhir.Constants.CSV_PATTERN;
 
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
@@ -18,7 +16,7 @@ public class FhirSearchBundleProducer extends DefaultProducer {
 	
 	private static final String DECODED_RESOURCE_KEY = "openmrs-fhir.resource";
 	
-	private FhirContext fhirContext = FhirContext.forR4();
+	private final FhirContext fhirContext = FhirContext.forR4();
 	
 	public FhirSearchBundleProducer(FhirSearchBundleEndpoint endpoint) {
 		super(endpoint);
@@ -33,7 +31,7 @@ public class FhirSearchBundleProducer extends DefaultProducer {
 		
 		exchange.removeProperty(DECODED_RESOURCE_KEY);
 		
-		StringBuilder urlBuilder = new StringBuilder(resourceType + "/?_id=" + resourceId);
+		StringBuilder urlBuilder = new StringBuilder(resourceType + "?_id=" + resourceId);
 		if (includes != null && !includes.isBlank()) {
 			for (String include : CSV_PATTERN.split(includes)) {
 				urlBuilder.append("&_include=").append(include);
@@ -46,10 +44,8 @@ public class FhirSearchBundleProducer extends DefaultProducer {
 			}
 		}
 		
-		String encodedUrl = URLEncoder.encode(urlBuilder.toString(), StandardCharsets.UTF_8);
-		
-		Endpoint fhirSearchEndpoint = getEndpoint().getCamelContext()
-		        .getEndpoint("fhir://search/searchByUrl?url=" + encodedUrl);
+		Endpoint fhirSearchEndpoint = getEndpoint().getCamelContext().getEndpoint("fhir://search/searchByUrl?inBody=url");
+		exchange.getIn().setBody(urlBuilder.toString());
 		fhirSearchEndpoint.createProducer().process(exchange);
 	}
 	
