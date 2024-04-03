@@ -52,6 +52,7 @@
         <camelTestSpringVersion>3.21.2</camelTestSpringVersion>
         <mockitoVersion>3.3.0</mockitoVersion>
         <h2Version>1.4.199</h2Version>
+        <wiremockVersion>3.5.2</wiremockVersion>
 
         <!-- Plugin versions-->
         <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
@@ -196,6 +197,12 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2Version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>${wiremockVersion}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -432,8 +439,6 @@
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.sql/java.sql=ALL-UNNAMED
                         --add-opens java.desktop/java.beans=ALL-UNNAMED
-                        --add-opens java.net.http/java.net.http=ALL-UNNAMED
-                        --add-opens java.net.http/jdk.internal.net.http=ALL-UNNAMED
                         --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED
                     </argLine>
                     <excludes>

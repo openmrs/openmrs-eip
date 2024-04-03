@@ -61,7 +61,7 @@ public class CustomHttpClient {
 		
 		HttpResponse response;
 		try {
-			response = HttpClientUtils.send(client, request, BODY_HANDLER);
+			response = client.send(request, BODY_HANDLER);
 		}
 		catch (Exception e) {
 			throw new EIPException("An error occurred while making http call to OpenMRS resource: " + resource, e);
