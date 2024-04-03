@@ -432,6 +432,8 @@
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.sql/java.sql=ALL-UNNAMED
                         --add-opens java.desktop/java.beans=ALL-UNNAMED
+                        --add-opens java.net.http/java.net.http=ALL-UNNAMED
+                        --add-opens java.net.http/jdk.internal.net.http=ALL-UNNAMED
                         --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED
                     </argLine>
                     <excludes>

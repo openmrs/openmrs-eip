@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Base64;
 
@@ -26,7 +27,9 @@ import org.springframework.stereotype.Component;
 @Profile(SyncProfiles.RECEIVER)
 public class CustomHttpClient {
 	
-	private static final String PATH = "/ws/rest/v1/";
+	protected static final String PATH = "/ws/rest/v1/";
+	
+	protected static final BodyHandler<String> BODY_HANDLER = BodyHandlers.ofString(UTF_8);
 	
 	@Value("${openmrs.baseUrl}")
 	private String baseUrl;
@@ -58,7 +61,7 @@ public class CustomHttpClient {
 		
 		HttpResponse response;
 		try {
-			response = client.send(request, BodyHandlers.ofString(UTF_8));
+			response = HttpClientUtils.send(client, request, BODY_HANDLER);
 		}
 		catch (Exception e) {
 			throw new EIPException("An error occurred while making http call to OpenMRS resource: " + resource, e);
