@@ -137,7 +137,6 @@ public class ReceiverUtils {
 		SyncedMessage syncedMessage = new SyncedMessage(outcome);
 		BeanUtils.copyProperties(syncMessage, syncedMessage, "id", "dateCreated");
 		syncedMessage.setDateCreated(new Date());
-		syncedMessage.setDateReceived(syncMessage.getDateCreated());
 		
 		if (isCached(syncMessage.getModelClassName())) {
 			syncedMessage.setCached(true);

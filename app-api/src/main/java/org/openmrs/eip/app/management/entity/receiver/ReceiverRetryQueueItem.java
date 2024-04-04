@@ -64,7 +64,6 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	public ReceiverRetryQueueItem(SyncMessage syncMessage, String exceptionType, String errorMsg) {
 		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
-		setDateReceived(syncMessage.getDateCreated());
 		setExceptionType(exceptionType);
 		setMessage(errorMsg);
 		setDateCreated(new Date());

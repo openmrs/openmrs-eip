@@ -51,10 +51,10 @@ public class SyncMessageRepositoryTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void getSyncMessageBySiteOrderByDateCreated_shouldGetSiteMessagesOrderedByDateCreated() {
+	public void getSyncMessageBySiteOrderByDateReceived_shouldGetSiteMessagesOrderedByDateCreated() {
 		SiteInfo site = siteRepo.getReferenceById(1L);
 		
-		List<SyncMessage> syncMessages = repo.getSyncMessageBySiteOrderByDateCreated(site, PageRequest.of(0, 1000));
+		List<SyncMessage> syncMessages = repo.getSyncMessageBySiteOrderByDateReceived(site, PageRequest.of(0, 1000));
 		
 		assertEquals(3, syncMessages.size());
 		assertEquals(3l, syncMessages.get(0).getId().longValue());
@@ -63,11 +63,11 @@ public class SyncMessageRepositoryTest extends BaseReceiverTest {
 	}
 	
 	@Test
-	public void getSyncMessageBySiteOrderByDateCreated_shouldGetAPageOfSiteMessagesOrderedByDateCreated() {
+	public void getSyncMessageBySiteOrderByDateReceived_shouldGetAPageOfSiteMessagesOrderedByDateCreated() {
 		final int pageSize = 2;
 		SiteInfo site = siteRepo.getReferenceById(1L);
 		
-		List<SyncMessage> syncMessages = repo.getSyncMessageBySiteOrderByDateCreated(site, PageRequest.of(0, pageSize));
+		List<SyncMessage> syncMessages = repo.getSyncMessageBySiteOrderByDateReceived(site, PageRequest.of(0, pageSize));
 		
 		assertEquals(pageSize, syncMessages.size());
 		assertEquals(3l, syncMessages.get(0).getId().longValue());

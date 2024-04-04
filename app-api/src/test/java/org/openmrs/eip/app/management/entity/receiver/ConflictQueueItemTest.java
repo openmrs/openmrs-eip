@@ -34,13 +34,13 @@ public class ConflictQueueItemTest {
 		msg.setDateSentBySender(LocalDateTime.now());
 		msg.setOperation(SyncOperation.u);
 		msg.setDateCreated(dateCreated);
+		msg.setDateReceived(new Date());
 		long timestamp = System.currentTimeMillis();
 		
 		ConflictQueueItem conflict = new ConflictQueueItem(msg);
 		
 		Assert.assertNull(conflict.getId());
 		assertTrue(conflict.getDateCreated().getTime() == timestamp || conflict.getDateCreated().getTime() > timestamp);
-		assertEquals(dateCreated, conflict.getDateReceived());
 		Set<String> ignored = new HashSet();
 		ignored.add("id");
 		ignored.add("class");

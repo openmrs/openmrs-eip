@@ -2,7 +2,6 @@ package org.openmrs.eip.app.receiver;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,12 +19,6 @@ public class CustomHttpClientTest {
 	private static final String USER = "user";
 	
 	private static final String PASSWORD = "pass";
-
-    private String originalBaseUrl;
-
-    private String originalUser;
-
-    private String originalPassword;
 	
 	@Rule
 	public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
@@ -38,11 +31,6 @@ public class CustomHttpClientTest {
 		Whitebox.setInternalState(client, "baseUrl", HOST + ":" + wireMockRule.port());
 		Whitebox.setInternalState(client, "username", USER);
 		Whitebox.setInternalState(client, "password", PASSWORD.toCharArray());
-	}
-	
-	@After
-	public void tearDown() {
-		//Reset
 	}
 	
 	@Test

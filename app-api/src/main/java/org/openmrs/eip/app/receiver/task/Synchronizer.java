@@ -26,7 +26,7 @@ public class Synchronizer extends BaseQueueSiteTask<SyncMessage, SyncMessageProc
 	
 	@Override
 	public List<SyncMessage> getNextBatch(Pageable page) {
-		return syncRepo.getSyncMessageBySiteOrderByDateCreated(site, page);
+		return syncRepo.getSyncMessageBySiteOrderByDateReceived(site, page);
 	}
 	
 }

@@ -63,7 +63,6 @@ public class ConflictQueueItem extends AbstractEntity {
 	
 	public ConflictQueueItem(SyncMessage syncMessage) {
 		BeanUtils.copyProperties(syncMessage, this, "id", "dateCreated");
-		setDateReceived(syncMessage.getDateCreated());
 		setDateCreated(new Date());
 	}
 	

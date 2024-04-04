@@ -74,6 +74,7 @@ public class ReceiverRetryQueueItemTest {
 		item.setDateSentBySender(LocalDateTime.now());
 		item.setOperation(SyncOperation.u);
 		item.setDateCreated(dateCreated);
+		item.setDateReceived(new Date());
 		long timestamp = System.currentTimeMillis();
 		final String exType = EIPException.class.getName();
 		final String errMsg = "test error msg";
@@ -84,7 +85,6 @@ public class ReceiverRetryQueueItemTest {
 		assertTrue(retry.getDateCreated().getTime() == timestamp || retry.getDateCreated().getTime() > timestamp);
 		assertEquals(exType, retry.getExceptionType());
 		assertEquals(errMsg, retry.getMessage());
-		assertEquals(dateCreated, retry.getDateReceived());
 		Set<String> ignored = new HashSet();
 		ignored.add("id");
 		ignored.add("class");

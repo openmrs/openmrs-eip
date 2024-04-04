@@ -138,7 +138,6 @@ public class ReceiverUtilsTest {
 		
 		assertNull(msg.getId());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
-		assertEquals(syncMessage.getDateCreated(), msg.getDateReceived());
 		assertFalse(msg.isResponseSent());
 		assertTrue(msg.isCached());
 		assertFalse(msg.isEvictedFromCache());
@@ -620,7 +619,6 @@ public class ReceiverUtilsTest {
 		
 		assertNull(msg.getId());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
-		assertEquals(conflict.getDateCreated(), msg.getDateReceived());
 		assertTrue(msg.isResponseSent());
 		assertTrue(msg.isCached());
 		assertFalse(msg.isEvictedFromCache());

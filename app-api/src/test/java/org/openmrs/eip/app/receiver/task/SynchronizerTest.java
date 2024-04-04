@@ -50,7 +50,7 @@ public class SynchronizerTest {
 	@Test
 	public void getNextBatch_shouldFetchNextBatchOfSyncMessages() {
 		List<SyncMessage> messages = List.of(new SyncMessage());
-		Mockito.when(mockRepo.getSyncMessageBySiteOrderByDateCreated(mockSite, mockPage)).thenReturn(messages);
+		Mockito.when(mockRepo.getSyncMessageBySiteOrderByDateReceived(mockSite, mockPage)).thenReturn(messages);
 		Synchronizer synchronizer = new Synchronizer(mockSite);
 		Assert.assertEquals(messages, synchronizer.getNextBatch(mockPage));
 	}
