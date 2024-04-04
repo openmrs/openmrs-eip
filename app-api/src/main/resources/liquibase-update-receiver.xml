@@ -365,4 +365,18 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240404-0850" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="date_received" tableName="receiver_sync_msg"/>
+            </not>
+        </preConditions>
+        <comment>Adding date_received column to receiver_sync_msg table</comment>
+        <addColumn tableName="receiver_sync_msg">
+            <column name="date_received" type="DATETIME(3)" valueComputed="date_created">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

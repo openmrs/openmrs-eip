@@ -1,6 +1,7 @@
 package org.openmrs.eip.app.management.entity.receiver;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.openmrs.eip.app.SyncOperationConverter;
 import org.openmrs.eip.app.management.entity.AbstractEntity;
@@ -13,6 +14,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Encapsulates info about a sync message received by the receiver
@@ -55,6 +58,11 @@ public class SyncMessage extends AbstractEntity {
 	@NotNull
 	@Column(name = "date_sent_by_sender", nullable = false, updatable = false)
 	private LocalDateTime dateSentBySender;
+	
+	@Getter
+	@Setter
+	@Column(name = "date_received", nullable = false, updatable = false)
+	private Date dateReceived;
 	
 	/**
 	 * Gets the identifier

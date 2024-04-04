@@ -365,6 +365,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(JsonUtils.marshall(syncModel), msg.getEntityPayload());
 		assertEquals(siteInfo, msg.getSite());
 		assertEquals(dateSent, msg.getDateSentBySender());
+		assertEquals(jmsMsg.getDateCreated(), msg.getDateReceived());
 		assertFalse(msg.getSnapshot());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
