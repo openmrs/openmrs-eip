@@ -45,6 +45,7 @@ public class OpenmrsFhirConfiguration {
 				}
 				fhirConfiguration.setClient(client);
 				fhirConfiguration.setFhirContext(ctx);
+				fhirConfiguration.setSummary("DATA");
 				
 				camelContext.getComponent("fhir", FhirComponent.class).setConfiguration(fhirConfiguration);
 			}
