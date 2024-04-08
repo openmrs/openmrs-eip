@@ -2,6 +2,9 @@ package org.openmrs.eip.component.model;
 
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Encapsulates descriptive data about a sync payload i.e. the unique ID of the site sending the.
  * payload, the date it was sent, snapshot and request uuid in case of a message sent in response to
@@ -20,6 +23,10 @@ public class SyncMetadata {
 	private String messageUuid;
 	
 	private Boolean snapshot = false;
+	
+	@Getter
+	@Setter
+	private String syncVersion;
 	
 	/**
 	 * Gets the sourceIdentifier

@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
 import org.openmrs.eip.app.route.TestUtils;
@@ -77,6 +78,7 @@ public class SenderSyncMessageProcessorTest extends BaseSenderTest {
 		List<SenderSyncMessage> syncMessages = repo.findAll();
 		assertEquals(1, syncMessages.size());
 		assertEquals(SENT, repo.findById(msg.getId()).get().getStatus());
+		assertEquals(AppUtils.getVersion(), syncMessages.get(0).getSyncVersion());
 		String syncPayload = syncMessages.get(0).getData();
 		assertEquals(PersonModel.class.getName(), JsonPath.read(syncPayload, "tableToSyncModelClass"));
 		assertEquals(uuid, JsonPath.read(syncPayload, "model.uuid"));
@@ -84,6 +86,7 @@ public class SenderSyncMessageProcessorTest extends BaseSenderTest {
 		assertEquals(op, JsonPath.read(syncPayload, "metadata.operation"));
 		assertEquals(msgUuid, JsonPath.read(syncPayload, "metadata.messageUuid"));
 		assertTrue(JsonPath.read(syncPayload, "metadata.snapshot"));
+		assertEquals(AppUtils.getVersion(), JsonPath.read(syncPayload, "metadata.syncVersion"));
 		Instant dateSentInstant = parse(JsonPath.read(syncPayload, "metadata.dateSent"), ISO_OFFSET_DATE_TIME)
 		        .withZoneSameInstant(systemDefault()).toInstant();
 		assertEquals(msg.getDateSent(), Date.from(dateSentInstant));

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
 import org.openmrs.eip.app.management.repository.SenderSyncMessageRepository;
@@ -80,6 +81,7 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 		SyncModel syncModel = JsonUtils.unmarshalSyncModel(syncMsg.getData());
 		syncModel.getMetadata().setDateSent(LocalDateTime.now());
 		syncModel.getMetadata().setSourceIdentifier(senderId);
+		syncModel.getMetadata().setSyncVersion(AppUtils.getVersion());
 		String syncData = JsonUtils.marshall(syncModel);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Sync payload -> " + syncData);
@@ -92,6 +94,7 @@ public class SenderSyncMessageProcessor extends BaseQueueProcessor<SenderSyncMes
 		}
 		
 		syncMsg.setData(syncData);
+		syncMsg.setSyncVersion(syncModel.getMetadata().getSyncVersion());
 		syncMsg.markAsSent(syncModel.getMetadata().getDateSent());
 		
 		if (LOG.isDebugEnabled()) {

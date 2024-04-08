@@ -109,4 +109,52 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240408-0931" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="sender_sync_message"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to sender_sync_message table</comment>
+        <addColumn tableName="sender_sync_message">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-0931" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="sender_sync_message"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to sender_sync_message table</comment>
+        <addColumn tableName="sender_sync_message">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-0932" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="sender_sync_archive"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to sender_sync_archive table</comment>
+        <addColumn tableName="sender_sync_archive">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-0933" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="sender_pruned_archive"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to sender_pruned_archive table</comment>
+        <addColumn tableName="sender_pruned_archive">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

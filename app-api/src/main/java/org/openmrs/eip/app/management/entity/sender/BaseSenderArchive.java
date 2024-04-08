@@ -8,6 +8,8 @@ import org.openmrs.eip.app.management.entity.AbstractEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @MappedSuperclass
 public abstract class BaseSenderArchive extends AbstractEntity {
@@ -49,6 +51,11 @@ public abstract class BaseSenderArchive extends AbstractEntity {
 	@NotNull
 	@Column(name = "date_received_by_receiver", nullable = false, updatable = false)
 	private LocalDateTime dateReceivedByReceiver;
+	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
 	
 	public String getTableName() {
 		return tableName;

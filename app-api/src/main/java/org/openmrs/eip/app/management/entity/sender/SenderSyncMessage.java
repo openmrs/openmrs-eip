@@ -14,6 +14,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "sender_sync_message")
@@ -63,6 +65,11 @@ public class SenderSyncMessage extends AbstractEntity {
 	
 	@Column(name = "event_date", updatable = false)
 	private Date eventDate;
+	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
 	
 	public String getTableName() {
 		return tableName;
