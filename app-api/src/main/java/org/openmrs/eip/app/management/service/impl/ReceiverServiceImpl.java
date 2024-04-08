@@ -361,6 +361,7 @@ public class ReceiverServiceImpl extends BaseService implements ReceiverService 
 			syncMsg.setMessageUuid(md.getMessageUuid());
 			syncMsg.setDateSentBySender(md.getDateSent());
 			syncMsg.setDateReceived(jmsMessage.getDateCreated());
+			syncMsg.setSyncVersion(md.getSyncVersion());
 			if (log.isDebugEnabled()) {
 				log.debug("Saving sync message");
 			}

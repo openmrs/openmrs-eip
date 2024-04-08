@@ -379,4 +379,76 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240408-1141" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_sync_msg"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_sync_msg table</comment>
+        <addColumn tableName="receiver_sync_msg">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-1142" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_synced_msg"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_synced_msg table</comment>
+        <addColumn tableName="receiver_synced_msg">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-1143" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_retry_queue"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_retry_queue table</comment>
+        <addColumn tableName="receiver_retry_queue">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-1144" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_conflict_queue"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_conflict_queue table</comment>
+        <addColumn tableName="receiver_conflict_queue">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-1145" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_sync_archive"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_sync_archive table</comment>
+        <addColumn tableName="receiver_sync_archive">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="wluyima" id="20240408-1146" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="receiver_pruned_item"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to receiver_pruned_item table</comment>
+        <addColumn tableName="receiver_pruned_item">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

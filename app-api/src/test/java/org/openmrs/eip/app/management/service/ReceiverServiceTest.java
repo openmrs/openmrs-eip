@@ -14,6 +14,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.openmrs.eip.HashUtils;
 import org.openmrs.eip.TestConstants;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ConflictQueueItem;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
@@ -325,7 +327,8 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_receiver_sync_request.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void processJmsMessage_shouldProcessAndSaveASyncMessage() throws Exception {
+	public void processJmsMessage_shouldProcessAndSaveASyncMessage() {
+		Assert.assertFalse(StringUtils.isBlank(AppUtils.getVersion()));
 		final LocalDateTime dateSent = LocalDateTime.now();
 		final String uuid = "person-uuid";
 		final String msgUuid = "msg-uuid";
@@ -340,6 +343,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		metadata.setMessageUuid(msgUuid);
 		metadata.setSnapshot(false);
 		metadata.setOperation(op.toString());
+		metadata.setSyncVersion(AppUtils.getVersion());
 		SiteInfo siteInfo = siteRepo.findById(1L).get();
 		metadata.setSourceIdentifier(siteInfo.getIdentifier());
 		metadata.setDateSent(dateSent);
@@ -367,6 +371,7 @@ public class ReceiverServiceTest extends BaseReceiverTest {
 		assertEquals(dateSent, msg.getDateSentBySender());
 		assertEquals(jmsMsg.getDateCreated(), msg.getDateReceived());
 		assertFalse(msg.getSnapshot());
+		assertEquals(AppUtils.getVersion(), msg.getSyncVersion());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, jmsMsgRepo.count());
 		Mockito.verify(mockStatusProcessor).process(ArgumentMatchers.any(SyncMetadata.class));

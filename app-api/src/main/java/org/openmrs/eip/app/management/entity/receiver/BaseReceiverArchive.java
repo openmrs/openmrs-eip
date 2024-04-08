@@ -13,6 +13,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @MappedSuperclass
 public class BaseReceiverArchive extends AbstractEntity {
@@ -51,6 +53,11 @@ public class BaseReceiverArchive extends AbstractEntity {
 	
 	@Column(name = "date_received", updatable = false)
 	private Date dateReceived;
+	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
 	
 	/**
 	 * Gets the identifier

@@ -64,6 +64,11 @@ public class SyncMessage extends AbstractEntity {
 	@Column(name = "date_received", nullable = false, updatable = false)
 	private Date dateReceived;
 	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
+	
 	/**
 	 * Gets the identifier
 	 *

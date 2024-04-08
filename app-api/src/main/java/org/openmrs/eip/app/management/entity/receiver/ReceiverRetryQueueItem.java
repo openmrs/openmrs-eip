@@ -16,6 +16,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "receiver_retry_queue")
@@ -58,6 +60,11 @@ public class ReceiverRetryQueueItem extends BaseRetryQueueItem {
 	
 	@Column(name = "date_received", nullable = false, updatable = false)
 	private Date dateReceived;
+	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
 	
 	public ReceiverRetryQueueItem() {
 	}

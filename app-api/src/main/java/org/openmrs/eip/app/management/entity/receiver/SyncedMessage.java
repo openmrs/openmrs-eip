@@ -91,6 +91,11 @@ public class SyncedMessage extends AbstractEntity {
 	@Column(name = "search_index_updated", nullable = false)
 	private boolean searchIndexUpdated = false;
 	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
+	
 	public SyncedMessage() {
 	}
 	
