@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.sender.SenderSyncMessage;
@@ -91,7 +93,11 @@ public class SenderSyncMessageProcessorTest extends BaseSenderTest {
 		        .withZoneSameInstant(systemDefault()).toInstant();
 		assertEquals(msg.getDateSent(), Date.from(dateSentInstant));
 		assertNull(JsonPath.read(syncPayload, "metadata.requestUuid"));
-		Mockito.verify(mockTemplate).convertAndSend(QUEUE_NAME, syncPayload);
+		ArgumentCaptor<SyncMessageCreator> argCaptor = ArgumentCaptor.forClass(SyncMessageCreator.class);
+		Mockito.verify(mockTemplate).send(ArgumentMatchers.eq(QUEUE_NAME), argCaptor.capture());
+		SyncMessageCreator messageCreator = argCaptor.getValue();
+		assertEquals(syncPayload, messageCreator.getBody());
+		assertEquals(SENDER_ID, argCaptor.getValue().getSiteId());
 	}
 	
 }
