@@ -121,7 +121,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="wluyima" id="20240408-0931" labels="1.7.0">
+    <changeSet author="wluyima" id="20240408-0932" labels="1.7.0">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists columnName="sync_version" tableName="sender_sync_message"/>
@@ -133,7 +133,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="wluyima" id="20240408-0932" labels="1.7.0">
+    <changeSet author="wluyima" id="20240408-0933" labels="1.7.0">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists columnName="sync_version" tableName="sender_sync_archive"/>
@@ -145,7 +145,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="wluyima" id="20240408-0933" labels="1.7.0">
+    <changeSet author="wluyima" id="20240408-0934" labels="1.7.0">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists columnName="sync_version" tableName="sender_pruned_archive"/>
