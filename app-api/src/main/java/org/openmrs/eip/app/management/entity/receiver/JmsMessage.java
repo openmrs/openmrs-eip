@@ -70,4 +70,9 @@ public class JmsMessage extends AbstractEntity {
 	@Setter
 	private String messageId;
 	
+	@Column(name = "sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String syncVersion;
+	
 }

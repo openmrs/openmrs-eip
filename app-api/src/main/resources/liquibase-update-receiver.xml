@@ -451,4 +451,16 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240409-1101" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sync_version" tableName="jms_msg"/>
+            </not>
+        </preConditions>
+        <comment>Add sync_version column to jms_msg table</comment>
+        <addColumn tableName="jms_msg">
+            <column name="sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

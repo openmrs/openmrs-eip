@@ -101,4 +101,6 @@ public class SyncConstants {
 	
 	public static final String JMS_HEADER_MSG_ID = "eipMessageId";
 	
+	public static final String JMS_HEADER_VERSION = "eipVersion";
+	
 }

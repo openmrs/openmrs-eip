@@ -59,6 +59,7 @@ public class ReceiverMessageListener implements MessageListener {
 			
 			jmsMsg.setBody(body);
 			jmsMsg.setSiteId(message.getStringProperty(SyncConstants.JMS_HEADER_SITE));
+			jmsMsg.setSyncVersion(message.getStringProperty(SyncConstants.JMS_HEADER_VERSION));
 			MessageType type = MessageType.SYNC;
 			String typeStr = message.getStringProperty(SyncConstants.JMS_HEADER_TYPE);
 			if (StringUtils.isNotBlank(typeStr)) {
