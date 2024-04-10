@@ -98,6 +98,7 @@ public class SyncMessageProcessorBehaviorTest extends BaseReceiverTest {
 		m.setOperation(SyncOperation.u);
 		m.setDateSentBySender(LocalDateTime.now());
 		m.setDateCreated(new Date());
+		m.setDateReceived(new Date());
 		PersonModel person = createPersonModel(identifier, dateCreated);
 		person.setVoidReason("Reason-" + msgId);
 		SyncModel syncModel = new SyncModel(person.getClass(), person, new SyncMetadata());
