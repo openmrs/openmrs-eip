@@ -1,6 +1,7 @@
 package org.openmrs.eip.component.entity;
 
 import org.openmrs.eip.component.entity.light.ConceptLight;
+import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
 import jakarta.persistence.AttributeOverride;
@@ -43,4 +44,11 @@ public class Allergy extends BaseChangeableDataEntity {
 	
 	@Column(name = "comments")
 	private String comments;
+	
+	@ManyToOne
+	@JoinColumn(name = "encounter_id")
+	private EncounterLight encounter;
+	
+	@Column(name = "form_namespace_and_path")
+	private String formNamespaceAndPath;
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.openmrs.eip.component.entity.light.ConceptLight;
 import org.openmrs.eip.component.entity.light.ConceptNameLight;
 import org.openmrs.eip.component.entity.light.ConditionLight;
+import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
 
 import jakarta.persistence.AttributeOverride;
@@ -59,5 +60,12 @@ public class Condition extends BaseChangeableDataEntity {
 	
 	@Column(name = "end_date")
 	private LocalDateTime endDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "encounter_id")
+	private EncounterLight encounter;
+	
+	@Column(name = "form_namespace_and_path")
+	private String formNamespaceAndPath;
 	
 }

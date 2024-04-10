@@ -20,6 +20,6 @@ public class ConditionService extends AbstractEntityService<Condition, Condition
 	
 	@Override
 	public TableToSyncEnum getTableToSync() {
-		return TableToSyncEnum.CONDITION;
+		return TableToSyncEnum.CONDITIONS;
 	}
 }

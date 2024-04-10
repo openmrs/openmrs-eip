@@ -130,7 +130,7 @@ public enum TableToSyncEnum {
 	
 	ENCOUNTER_DIAGNOSIS(EncounterDiagnosis.class, EncounterDiagnosisModel.class, EncounterDiagnosisHash.class),
 	
-	CONDITION(Condition.class, ConditionModel.class, ConditionHash.class),
+	CONDITIONS(Condition.class, ConditionModel.class, ConditionHash.class),
 	
 	PERSON_NAME(PersonName.class, PersonNameModel.class, PersonNameHash.class),
 	

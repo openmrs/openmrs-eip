@@ -3,6 +3,7 @@ package org.openmrs.eip.component.entity;
 import org.openmrs.eip.component.entity.light.LocationLight;
 import org.openmrs.eip.component.entity.light.PatientIdentifierTypeLight;
 import org.openmrs.eip.component.entity.light.PatientLight;
+import org.openmrs.eip.component.entity.light.PatientProgramLight;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -42,4 +43,9 @@ public class PatientIdentifier extends BaseChangeableDataEntity {
 	@ManyToOne
 	@JoinColumn(name = "location_id")
 	private LocationLight location;
+	
+	@ManyToOne
+	@JoinColumn(name = "patient_program_id")
+	private PatientProgramLight patientProgram;
+	
 }

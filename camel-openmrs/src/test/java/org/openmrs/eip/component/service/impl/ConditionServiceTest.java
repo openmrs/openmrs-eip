@@ -36,6 +36,6 @@ public class ConditionServiceTest {
 	
 	@Test
 	public void getTableToSync() {
-		Assert.assertEquals(TableToSyncEnum.CONDITION, service.getTableToSync());
+		Assert.assertEquals(TableToSyncEnum.CONDITIONS, service.getTableToSync());
 	}
 }

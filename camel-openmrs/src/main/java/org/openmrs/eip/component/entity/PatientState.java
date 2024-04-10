@@ -2,6 +2,7 @@ package org.openmrs.eip.component.entity;
 
 import java.time.LocalDate;
 
+import org.openmrs.eip.component.entity.light.EncounterLight;
 import org.openmrs.eip.component.entity.light.PatientProgramLight;
 import org.openmrs.eip.component.entity.light.ProgramWorkflowStateLight;
 
@@ -37,4 +38,12 @@ public class PatientState extends BaseChangeableDataEntity {
 	
 	@Column(name = "end_date")
 	private LocalDate endDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "encounter_id")
+	private EncounterLight encounter;
+	
+	@Column(name = "form_namespace_and_path")
+	private String formNamespaceAndPath;
+	
 }
