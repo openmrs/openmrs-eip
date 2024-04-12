@@ -1,6 +1,8 @@
 package org.openmrs.eip.component.model;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 public class EncounterDiagnosisModel extends BaseChangeableDataModel {
@@ -20,6 +22,10 @@ public class EncounterDiagnosisModel extends BaseChangeableDataModel {
 	private String certainty;
 	
 	private int rank;
+	
+	@Getter
+	@Setter
+	private String formNamespaceAndPath;
 	
 	/**
 	 * Gets the diagnosisCodedUuid

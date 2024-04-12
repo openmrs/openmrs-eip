@@ -1,8 +1,10 @@
 package org.openmrs.eip.component.model;
 
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDate;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 public class PatientStateModel extends BaseChangeableDataModel {
@@ -14,6 +16,14 @@ public class PatientStateModel extends BaseChangeableDataModel {
 	private LocalDate startDate;
 	
 	private LocalDate endDate;
+	
+	@Getter
+	@Setter
+	private String encounterUuid;
+	
+	@Getter
+	@Setter
+	private String formNamespaceAndPath;
 	
 	/**
 	 * Gets the patientProgramUuid

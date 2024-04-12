@@ -1,8 +1,10 @@
 package org.openmrs.eip.component.model;
 
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDateTime;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 public class ConditionModel extends BaseChangeableDataModel {
@@ -26,6 +28,14 @@ public class ConditionModel extends BaseChangeableDataModel {
 	private String patientUuid;
 	
 	private LocalDateTime endDate;
+	
+	@Getter
+	@Setter
+	private String encounterUuid;
+	
+	@Getter
+	@Setter
+	private String formNamespaceAndPath;
 	
 	/**
 	 * Gets the additionalDetail

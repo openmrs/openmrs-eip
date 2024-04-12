@@ -1,6 +1,8 @@
 package org.openmrs.eip.component.model;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 public class AllergyModel extends BaseChangeableDataModel {
@@ -16,6 +18,14 @@ public class AllergyModel extends BaseChangeableDataModel {
 	private String allergenType;
 	
 	private String comments;
+	
+	@Getter
+	@Setter
+	private String encounterUuid;
+	
+	@Getter
+	@Setter
+	private String formNamespaceAndPath;
 	
 	/**
 	 * Gets the patientUuid

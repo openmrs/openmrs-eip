@@ -1,6 +1,8 @@
 package org.openmrs.eip.component.model;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 public class PatientIdentifierModel extends BaseChangeableDataModel {
@@ -14,6 +16,10 @@ public class PatientIdentifierModel extends BaseChangeableDataModel {
 	private boolean preferred;
 	
 	private String locationUuid;
+	
+	@Getter
+	@Setter
+	private String patientProgramUuid;
 	
 	/**
 	 * Gets the patientUuid
