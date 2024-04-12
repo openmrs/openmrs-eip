@@ -18,13 +18,20 @@ public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	@Override
 	public void configure() throws Exception {
 		from(FhirResource.SERVICEREQUEST.incomingUrl()).routeId("fhir-servicerequest-router").filter(isSupportedTable())
-		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
-		        .toD("fhir:read/resourceById?resourceClass=ServiceRequest&stringId=${exchangeProperty.event.identifier}")
-		        // since we watch the orders table, we need to filter out orders that are not service requests
-		        .filter((exchange) -> {
-			        Object messageBody = exchange.getMessage().getBody();
-			        return messageBody instanceof ServiceRequest;
-		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
-		        .to(FhirResource.SERVICEREQUEST.outgoingUrl());
+				.toD("sql: SELECT uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid = ${exchangeProperty.event.identifier}?dataSource=#openmrsDataSource")
+				.filter(simple("${body[0]} == '52a447d3-a64a-11e3-9aeb-50e549534c5e'"))
+				.log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
+				.toD(
+						"sql:SELECT voided FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				.choice()
+					.when(simple("${exchangeProperty.operation} == 'd' || ${body[0]} == 1"))
+						.setHeader(HEADER_FHIR_EVENT_TYPE, constant("d"))
+						.setBody(simple("${exchangeProperty.event.identifier}"))
+						.to(FhirResource.SERVICEREQUEST.outgoingUrl())
+				.otherwise()
+					.toD("fhir:read/resourceById?resourceClass=ServiceRequest&stringId=${exchangeProperty.event.identifier}")
+					.setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+					.to(FhirResource.SERVICEREQUEST.outgoingUrl())
+				.endChoice();
 	}
 }
