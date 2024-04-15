@@ -4,6 +4,7 @@ import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_RECONCILE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,6 +27,16 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("identifier", CoreMatchers.equalTo("rec-2")));
+	}
+	
+	@Test
+	public void shouldReturnIfThereIsNoIncompleteReconciliation() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_RECONCILE);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(content().string(CoreMatchers.is("")));
 	}
 	
 }
