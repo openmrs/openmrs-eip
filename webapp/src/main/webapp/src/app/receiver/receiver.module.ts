@@ -21,8 +21,11 @@ import {ReceiverDashboardComponent} from "./dashboard/receiver-dashboard.compone
 import {EntityStatsComponent} from "./stats/entity-stats.component";
 import {ReceiverSyncedMessageComponent} from "./synced/receiver-synced-message.component";
 import {ReceiverSyncedMessageListViewComponent} from "./synced/view/list/receiver-synced-message-list-view.component";
-import {ReceiverSyncedMessageGroupViewComponent} from "./synced/view/group/receiver-synced-message-group-view.component";
+import {
+	ReceiverSyncedMessageGroupViewComponent
+} from "./synced/view/group/receiver-synced-message-group-view.component";
 import {syncedMessageReducer} from "./synced/state/synced-message.reducer";
+import {ReconcileComponent} from './reconcile/reconcile.component';
 
 @NgModule({
 	declarations: [
@@ -40,7 +43,8 @@ import {syncedMessageReducer} from "./synced/state/synced-message.reducer";
 		ReceiverSyncedMessageGroupViewComponent,
 		ReceiverArchiveListViewComponent,
 		ReceiverArchiveGroupViewComponent,
-		ReceiverDashboardComponent
+		ReceiverDashboardComponent,
+		ReconcileComponent
 	],
 	imports: [
 		SharedModule,
