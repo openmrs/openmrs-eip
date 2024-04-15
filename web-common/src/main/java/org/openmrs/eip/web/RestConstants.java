@@ -26,6 +26,8 @@ public final class RestConstants {
 	
 	public static final String RES_RECEIVER_CONFLICT_BY_ID = SUB_PATH_RECEIVER + "conflict/{" + PATH_VAR_ID + "}";
 	
+	public static final String PATH_RECEIVER_RECONCILE = SUB_PATH_RECEIVER + "reconcile";
+	
 	public static final String ACTION_DIFF = "/{" + PATH_VAR_ID + "}/diff";
 	
 	public static final String PATH_RECEIVER_CONFLICT_DIFF = RES_RECEIVER_CONFLICT + ACTION_DIFF;
