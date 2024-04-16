@@ -1,4 +1,6 @@
 import {Component, OnInit} from '@angular/core';
+import {ConflictService} from "../conflict/conflict.service";
+import {Store} from "@ngrx/store";
 
 @Component({
 	selector: 'receiver-reconcile',
@@ -6,7 +8,9 @@ import {Component, OnInit} from '@angular/core';
 })
 export class ReconcileComponent implements OnInit {
 
-	constructor() {
+	constructor(
+		private service: ConflictService,
+		private store: Store) {
 	}
 
 	ngOnInit(): void {
