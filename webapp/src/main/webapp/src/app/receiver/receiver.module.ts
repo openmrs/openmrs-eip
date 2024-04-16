@@ -26,6 +26,7 @@ import {
 } from "./synced/view/group/receiver-synced-message-group-view.component";
 import {syncedMessageReducer} from "./synced/state/synced-message.reducer";
 import {ReconcileComponent} from './reconcile/reconcile.component';
+import {receiverReconcileReducer} from "./reconcile/state/reconcile.reducer";
 
 @NgModule({
 	declarations: [
@@ -54,6 +55,7 @@ import {ReconcileComponent} from './reconcile/reconcile.component';
 		StoreModule.forFeature('syncMsgQueue', syncMessageReducer),
 		StoreModule.forFeature('syncedMsgQueue', syncedMessageReducer),
 		StoreModule.forFeature('receiverArchiveQueue', syncArchiveReducer),
+		StoreModule.forFeature('receiverReconcile', receiverReconcileReducer),
 		FormsModule
 	], exports: [ReceiverComponent]
 })
