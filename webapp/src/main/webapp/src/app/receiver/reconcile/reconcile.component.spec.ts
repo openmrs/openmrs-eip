@@ -1,25 +1,24 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-
-import {ReconcileComponent} from './reconcile.component';
+import {ReceiverReconcileComponent} from "./receiver-reconcile.component";
 
 describe('ReconcileComponent', () => {
-  let component: ReconcileComponent;
-  let fixture: ComponentFixture<ReconcileComponent>;
+	let component: ReceiverReconcileComponent;
+	let fixture: ComponentFixture<ReceiverReconcileComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-		declarations: [ReconcileComponent]
-    })
-    .compileComponents();
-  });
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			declarations: [ReceiverReconcileComponent]
+		})
+			.compileComponents();
+	});
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ReconcileComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(ReceiverReconcileComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 });

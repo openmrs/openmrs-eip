@@ -1,17 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
-import {ReconcileService} from "./reconcile.service";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {GET_RECEIVER_RECONCILIATION} from "./state/receiver-reconcile.reducer";
 import {LoadReceiverReconciliation} from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
+import {ReceiverReconcileService} from "./receiver-reconcile.service";
 
 @Component({
 	selector: 'receiver-reconcile',
-	templateUrl: './reconcile.component.html'
+	templateUrl: './receiver-reconcile.component.html'
 })
-export class ReconcileComponent implements OnInit, OnDestroy {
+export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
 	ReceiverReconcileStatusEnum = ReceiverReconcileStatus;
 
@@ -20,7 +20,7 @@ export class ReconcileComponent implements OnInit, OnDestroy {
 	loadedSubscription?: Subscription;
 
 	constructor(
-		private service: ReconcileService,
+		private service: ReceiverReconcileService,
 		private store: Store) {
 	}
 
@@ -34,7 +34,7 @@ export class ReconcileComponent implements OnInit, OnDestroy {
 		this.store.dispatch(new LoadReceiverReconciliation());
 	}
 
-	start():void {
+	start(): void {
 
 	}
 

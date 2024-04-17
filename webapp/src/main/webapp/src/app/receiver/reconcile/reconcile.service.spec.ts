@@ -1,13 +1,12 @@
 import {TestBed} from '@angular/core/testing';
-
-import {ReconcileService} from './reconcile.service';
+import {ReceiverReconcileService} from "./receiver-reconcile.service";
 
 describe('ReconcileService', () => {
-	let service: ReconcileService;
+	let service: ReceiverReconcileService;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({});
-		service = TestBed.inject(ReconcileService);
+		service = TestBed.inject(ReceiverReconcileService);
 	});
 
 	it('should be created', () => {

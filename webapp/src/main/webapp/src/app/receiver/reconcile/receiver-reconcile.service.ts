@@ -9,7 +9,7 @@ const RESOURCE_NAME = 'receiver/reconcile';
 @Injectable({
 	providedIn: 'root'
 })
-export class ReconcileService {
+export class ReceiverReconcileService {
 
 	protected constructor(protected httpClient: HttpClient) {
 	}

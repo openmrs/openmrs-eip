@@ -25,10 +25,10 @@ import {
 	ReceiverSyncedMessageGroupViewComponent
 } from "./synced/view/group/receiver-synced-message-group-view.component";
 import {syncedMessageReducer} from "./synced/state/synced-message.reducer";
-import {ReconcileComponent} from './reconcile/reconcile.component';
 import {EffectsModule} from "@ngrx/effects";
 import {ReceiverReconcileEffects} from "./reconcile/state/receiver-reconcile.effects";
 import {receiverReconcileReducer} from "./reconcile/state/receiver-reconcile.reducer";
+import {ReceiverReconcileComponent} from "./reconcile/receiver-reconcile.component";
 
 @NgModule({
 	declarations: [
@@ -47,7 +47,7 @@ import {receiverReconcileReducer} from "./reconcile/state/receiver-reconcile.red
 		ReceiverArchiveListViewComponent,
 		ReceiverArchiveGroupViewComponent,
 		ReceiverDashboardComponent,
-		ReconcileComponent
+		ReceiverReconcileComponent
 	],
 	imports: [
 		SharedModule,
