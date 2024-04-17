@@ -47,8 +47,9 @@ public class ObservationFhirRouterTest extends CamelSpringTestSupport {
 		AdviceWith.adviceWith("fhir-observation-router", context, new AdviceWithRouteBuilder() {
 			
 			@Override
-			public void configure() throws Exception {
+			public void configure() {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
+				weaveByToUri("sql:*").replace().to("mock:sql");
 			}
 		});
 		
@@ -70,6 +71,13 @@ public class ObservationFhirRouterTest extends CamelSpringTestSupport {
 			Observation observation = new Observation();
 			observation.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(observation);
+		});
+		
+		MockEndpoint sql = getMockEndpoint("mock:sql");
+		sql.expectedMessageCount(1);
+		sql.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(new Object[] { 0 });
 		});
 		
 		// Act
@@ -95,6 +103,7 @@ public class ObservationFhirRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Observation.class));
 		
 		fhir.assertIsSatisfied();
+		sql.assertIsSatisfied();
 	}
 	
 	@Test
