@@ -1,5 +1,6 @@
 package org.openmrs.eip.app.management.service.impl;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
@@ -18,12 +19,14 @@ import org.mockito.Mockito;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.MissingEntity;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
@@ -67,6 +70,9 @@ public class ReceiverReconcileServiceImplTest {
 	private SiteRepository mockSiteRepo;
 	
 	@Mock
+	private ReceiverReconcileRepository mockReconcileRepo;
+	
+	@Mock
 	private SiteInfo mockSite;
 	
 	private ReceiverReconcileServiceImpl service;
@@ -74,7 +80,7 @@ public class ReceiverReconcileServiceImplTest {
 	@Before
 	public void setup() {
 		service = new ReceiverReconcileServiceImpl(mockSiteRepo, mockRecMsgRep, mockJmsMsgRepo, mockRequestRepo,
-		        mockSiteRecRepo, mockTableRecRepo, mockMissingRepo, mockSyncMsgRepo, mockRetryRepo);
+		        mockSiteRecRepo, mockTableRecRepo, mockMissingRepo, mockSyncMsgRepo, mockRetryRepo, mockReconcileRepo);
 	}
 	
 	@Test
@@ -153,6 +159,20 @@ public class ReceiverReconcileServiceImplTest {
 		Mockito.verify(mockRecMsgRep).save(any(ReconciliationMessage.class));
 		Mockito.verify(mockTableRecRepo, never()).save(any(ReceiverTableReconciliation.class));
 		Mockito.verify(mockJmsMsgRepo).delete(jmsMsg);
+	}
+	
+	@Test
+	public void execute_shouldAddAReconciliation() {
+		long timestamp = System.currentTimeMillis();
+		
+		service.addNewReconciliation();
+		
+		ArgumentCaptor<ReceiverReconciliation> argCaptor = ArgumentCaptor.forClass(ReceiverReconciliation.class);
+		Mockito.verify(mockReconcileRepo).save(argCaptor.capture());
+		ReceiverReconciliation rec = argCaptor.getValue();
+		Assert.assertEquals(ReceiverReconciliation.ReconciliationStatus.NEW, rec.getStatus());
+		Assert.assertNotNull(rec.getIdentifier());
+		assertTrue(rec.getDateCreated().getTime() == timestamp || rec.getDateCreated().getTime() > timestamp);
 	}
 	
 }

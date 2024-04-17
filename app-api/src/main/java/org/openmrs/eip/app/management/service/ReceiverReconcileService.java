@@ -3,6 +3,7 @@ package org.openmrs.eip.app.management.service;
 import java.util.List;
 
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
 
 /**
@@ -26,5 +27,12 @@ public interface ReceiverReconcileService extends Service {
 	 * @param uuids the uuids
 	 */
 	void updateReconciliationMessage(ReconciliationMessage message, boolean found, List<String> uuids);
+	
+	/**
+	 * Adds a new reconciliation
+	 * 
+	 * @return the new reconciliation
+	 */
+	ReceiverReconciliation addNewReconciliation();
 	
 }

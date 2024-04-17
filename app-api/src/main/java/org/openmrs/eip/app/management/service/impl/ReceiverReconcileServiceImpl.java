@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.openmrs.eip.app.management.entity.ReconciliationResponse;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.MissingEntity;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverSyncRequest;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.ReconciliationMessage;
@@ -21,6 +22,7 @@ import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.JmsMessageRepository;
 import org.openmrs.eip.app.management.repository.MissingEntityRepository;
+import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverRetryRepository;
 import org.openmrs.eip.app.management.repository.ReceiverSyncRequestRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
@@ -68,10 +70,13 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	
 	private ReceiverRetryRepository retryRepo;
 	
+	private ReceiverReconcileRepository reconcileRepo;
+	
 	public ReceiverReconcileServiceImpl(SiteRepository siteRepo, ReconciliationMsgRepository reconcileMsgRep,
 	    JmsMessageRepository jmsMsgRepo, ReceiverSyncRequestRepository requestRepo,
 	    SiteReconciliationRepository siteReconcileRepo, ReceiverTableReconcileRepository tableReconcileRepo,
-	    MissingEntityRepository missingRepo, SyncMessageRepository syncMsgRepo, ReceiverRetryRepository retryRepo) {
+	    MissingEntityRepository missingRepo, SyncMessageRepository syncMsgRepo, ReceiverRetryRepository retryRepo,
+	    ReceiverReconcileRepository reconcileRepo) {
 		this.siteRepo = siteRepo;
 		this.reconcileMsgRep = reconcileMsgRep;
 		this.jmsMsgRepo = jmsMsgRepo;
@@ -81,6 +86,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		this.missingRepo = missingRepo;
 		this.syncMsgRepo = syncMsgRepo;
 		this.retryRepo = retryRepo;
+		this.reconcileRepo = reconcileRepo;
 	}
 	
 	@Override
@@ -220,6 +226,18 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		}
 		
 		tableReconcileRepo.save(tableRec);
+	}
+	
+	@Override
+	public ReceiverReconciliation addNewReconciliation() {
+		ReceiverReconciliation rec = new ReceiverReconciliation();
+		rec.setIdentifier(UUID.randomUUID().toString());
+		rec.setDateCreated(new Date());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Saving new reconciliation");
+		}
+		
+		return reconcileRepo.save(rec);
 	}
 	
 }
