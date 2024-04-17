@@ -18,5 +18,8 @@ export class ReceiverReconcileService {
 		return this.httpClient.get<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME);
 	}
 
+	startReconciliation(): Observable<ReceiverReconciliation> {
+		return this.httpClient.post<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME, null);
+	}
 
 }

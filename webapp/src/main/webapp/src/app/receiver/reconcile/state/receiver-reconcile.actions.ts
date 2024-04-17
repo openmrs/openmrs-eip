@@ -4,7 +4,8 @@ import {ReceiverReconciliation} from "../receiver-reconciliation";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECONCILIATION',
-	RECONCILIATION_LOADED = 'RECONCILIATION_LOADED'
+	RECONCILIATION_LOADED = 'RECONCILIATION_LOADED',
+	START_RECONCILIATION = 'START_RECONCILIATION'
 }
 
 export class LoadReceiverReconciliation implements Action {
@@ -22,4 +23,10 @@ export class ReceiverReconciliationLoaded implements Action {
 
 }
 
-export type ReceiverReconcileAction = LoadReceiverReconciliation | ReceiverReconciliationLoaded;
+export class StartReconciliation implements Action {
+
+	readonly type = ReceiverReconcileActionType.START_RECONCILIATION;
+
+}
+
+export type ReceiverReconcileAction = LoadReceiverReconciliation | ReceiverReconciliationLoaded | StartReconciliation;

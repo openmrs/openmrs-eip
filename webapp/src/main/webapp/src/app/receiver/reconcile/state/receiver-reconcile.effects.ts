@@ -21,4 +21,15 @@ export class ReceiverReconcileEffects {
 		)
 	);
 
+	startReconciliation = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.START_RECONCILIATION),
+			switchMap(() => this.service.startReconciliation()
+				.pipe(
+					map(reconciliation => new ReceiverReconciliationLoaded(reconciliation))
+				)
+			)
+		)
+	);
+
 }

@@ -229,6 +229,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 	}
 	
 	@Override
+	@Transactional(transactionManager = MGT_TX_MGR)
 	public ReceiverReconciliation addNewReconciliation() {
 		ReceiverReconciliation rec = new ReceiverReconciliation();
 		rec.setIdentifier(UUID.randomUUID().toString());

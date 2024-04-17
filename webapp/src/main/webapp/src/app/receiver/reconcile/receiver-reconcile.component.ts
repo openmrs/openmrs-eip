@@ -3,7 +3,7 @@ import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {GET_RECEIVER_RECONCILIATION} from "./state/receiver-reconcile.reducer";
-import {LoadReceiverReconciliation} from "./state/receiver-reconcile.actions";
+import {LoadReceiverReconciliation, StartReconciliation} from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
 
@@ -35,7 +35,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 	}
 
 	start(): void {
-
+		this.store.dispatch(new StartReconciliation());
 	}
 
 	ngOnDestroy(): void {
