@@ -1,6 +1,6 @@
 import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
-import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./reconcile.actions";
+import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./receiver-reconcile.actions";
 
 export interface ReceiverReconcileState {
 	reconciliation: ReceiverReconciliation;

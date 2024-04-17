@@ -1,7 +1,9 @@
-<div class="d-flex justify-content-center align-items-center" style="min-height: 300px">
-	<i class="bi bi-play-btn-fill text-success ui-cursor-pointer" [ngbTooltip]="startTooltipTemplate" style="font-size: 5em"></i>
+<div [hidden]="reconciliation">
+	<div class="d-flex justify-content-center align-items-center" style="min-height: 250px">
+		<i class="bi bi-play-btn-fill text-success ui-cursor-pointer"
+		   [ngbTooltip]="startTooltipTemplate" style="font-size: 5em" (click)="start()"></i>
+	</div>
+	<ng-template #startTooltipTemplate>
+		<span i18n="@@common-start-reconcile">Start New Reconciliation</span>
+	</ng-template>
 </div>
-
-<ng-template #startTooltipTemplate>
-	<span i18n="@@common-start-reconcile">Start Reconciliation</span>
-</ng-template>

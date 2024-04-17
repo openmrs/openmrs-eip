@@ -676,7 +676,7 @@
 		</unit>
 		<unit id="common-start-reconcile">
 			<segment>
-				<source>Start Reconciliation</source>
+				<source>Start New Reconciliation</source>
 				<target></target>
 			</segment>
 		</unit>
