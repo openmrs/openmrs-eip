@@ -7,3 +7,17 @@
 		<span i18n="@@common-start-reconcile">Start New Reconciliation</span>
 	</ng-template>
 </div>
+<div [hidden]="!reconciliation" class="p-3">
+	<table>
+		<tbody>
+			<tr>
+				<th i18n="@@common-identifier">Identifier</th>
+				<td class="pl-2">{{reconciliation?.identifier}}</td>
+			</tr>
+			<tr>
+				<th i18n="@@common-status">Status</th>
+				<td class="pl-2">{{displayStatus()}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

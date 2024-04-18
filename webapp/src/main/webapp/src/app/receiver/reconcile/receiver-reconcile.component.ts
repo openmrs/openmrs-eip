@@ -38,6 +38,23 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.store.dispatch(new StartReconciliation());
 	}
 
+	displayStatus(): string {
+		let display: string = '';
+		switch (this.reconciliation?.status) {
+			case ReceiverReconcileStatus.NEW:
+				display = $localize`:@@common-pending:Pending`;
+				break;
+			case ReceiverReconcileStatus.PROCESSING:
+				display = $localize`:@@common-processing:Processing`;
+				break;
+			case ReceiverReconcileStatus.POST_PROCESSING:
+				display = $localize`:@@reconcile-generating-report:Generating Report`;
+				break;
+		}
+
+		return display;
+	}
+
 	ngOnDestroy(): void {
 		this.loadedSubscription?.unsubscribe();
 	}

@@ -680,5 +680,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-pending">
+			<segment>
+				<source>Pending</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-processing">
+			<segment>
+				<source>Processing</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="reconcile-generating-report">
+			<segment>
+				<source>Generating Report</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
