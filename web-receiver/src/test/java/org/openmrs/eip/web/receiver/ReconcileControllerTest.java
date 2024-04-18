@@ -64,7 +64,7 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql",
 	        "classpath:mgt_site_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void getProgressStatus_shouldGetTheReconciliationProgressStatus() throws Exception {
+	public void getProgress_shouldGetTheReconciliationProgress() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_REC_RECONCILE_PROGRESS);
 		
 		ResultActions result = mockMvc.perform(builder);

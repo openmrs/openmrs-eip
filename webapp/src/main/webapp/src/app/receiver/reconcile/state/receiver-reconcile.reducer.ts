@@ -4,6 +4,7 @@ import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./receiver-r
 
 export interface ReceiverReconcileState {
 	reconciliation: ReceiverReconciliation;
+	progress: Map<string, number>;
 }
 
 const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverReconcileState>('receiverReconcile');
@@ -11,6 +12,11 @@ const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverRecon
 export const GET_RECEIVER_RECONCILIATION = createSelector(
 	GET_RECEIVER_RECONCILE_FEATURE_STATE,
 	state => state.reconciliation
+);
+
+export const GET_RECEIVER_RECONCILE_PROGRESS = createSelector(
+	GET_RECEIVER_RECONCILE_FEATURE_STATE,
+	state => state.progress
 );
 
 export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAction) {
@@ -21,6 +27,12 @@ export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAc
 			return {
 				...state,
 				reconciliation: action.reconciliation
+			};
+
+		case ReceiverReconcileActionType.PROGRESS_LOADED:
+			return {
+				...state,
+				progress: action.progress
 			};
 
 		default:

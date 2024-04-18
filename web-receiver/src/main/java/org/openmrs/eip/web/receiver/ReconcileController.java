@@ -42,8 +42,8 @@ public class ReconcileController {
 		return reconcileService.addNewReconciliation();
 	}
 	
-	@GetMapping("/" + RestConstants.PROGRESS_STATUS)
-	public Map<String, Long> getProgressStatus() {
+	@GetMapping("/" + RestConstants.PROGRESS)
+	public Map<String, Long> getProgress() {
 		long completedSiteCount = siteRecRepo.countByDateCompletedNotNull();
 		long totalCount = siteRecRepo.count();
 		return Map.of("completedSiteCount", completedSiteCount, "totalCount", totalCount);

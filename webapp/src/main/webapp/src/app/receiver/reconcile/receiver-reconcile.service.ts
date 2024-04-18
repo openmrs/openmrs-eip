@@ -22,4 +22,8 @@ export class ReceiverReconcileService {
 		return this.httpClient.post<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME, null);
 	}
 
+	getReconciliationProgress(): Observable<Map<string, number>> {
+		return this.httpClient.get<Map<string, number>>(environment.apiBaseUrl + RESOURCE_NAME + '/progress');
+	}
+
 }

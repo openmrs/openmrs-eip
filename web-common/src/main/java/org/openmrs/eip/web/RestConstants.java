@@ -72,8 +72,8 @@ public final class RestConstants {
 	
 	public static final String PARAM_ENTITY_OPERATION = "operation";
 	
-	public static final String PROGRESS_STATUS = "status";
+	public static final String PROGRESS = "progress";
 	
-	public static final String PATH_REC_RECONCILE_PROGRESS = PATH_RECEIVER_RECONCILE + "/" + PROGRESS_STATUS;
+	public static final String PATH_REC_RECONCILE_PROGRESS = PATH_RECEIVER_RECONCILE + "/" + PROGRESS;
 	
 }

@@ -2,8 +2,12 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
-import {GET_RECEIVER_RECONCILIATION} from "./state/receiver-reconcile.reducer";
-import {LoadReceiverReconciliation, StartReconciliation} from "./state/receiver-reconcile.actions";
+import {GET_RECEIVER_RECONCILE_PROGRESS, GET_RECEIVER_RECONCILIATION} from "./state/receiver-reconcile.reducer";
+import {
+	LoadReceiverReconcileProgress,
+	LoadReceiverReconciliation,
+	StartReconciliation
+} from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
 
@@ -13,11 +17,13 @@ import {ReceiverReconcileService} from "./receiver-reconcile.service";
 })
 export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
-	ReceiverReconcileStatusEnum = ReceiverReconcileStatus;
-
 	reconciliation?: ReceiverReconciliation;
 
+	progress?: Map<string, number>;
+
 	loadedSubscription?: Subscription;
+
+	loadedProgressSubscription?: Subscription;
 
 	constructor(
 		private service: ReceiverReconcileService,
@@ -28,6 +34,15 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
+				if (this.reconciliation) {
+					this.store.dispatch(new LoadReceiverReconcileProgress());
+				}
+			}
+		);
+
+		this.loadedProgressSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILE_PROGRESS)).subscribe(
+			progress => {
+				this.progress = progress;
 			}
 		);
 
@@ -57,6 +72,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.loadedSubscription?.unsubscribe();
+		this.loadedProgressSubscription?.unsubscribe();
 	}
 
 }
