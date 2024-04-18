@@ -14,4 +14,11 @@ public interface SiteReconciliationRepository extends JpaRepository<SiteReconcil
 	 */
 	SiteReconciliation getBySite(SiteInfo site);
 	
+	/**
+	 * Gets the count of all completed site reconciliations.
+	 * 
+	 * @return the count
+	 */
+	long countByDateCompletedNotNull();
+	
 }

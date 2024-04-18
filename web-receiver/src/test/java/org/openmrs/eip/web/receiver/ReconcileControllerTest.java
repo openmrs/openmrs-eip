@@ -1,8 +1,10 @@
 package org.openmrs.eip.web.receiver;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_RECONCILE;
+import static org.openmrs.eip.web.RestConstants.PATH_REC_RECONCILE_PROGRESS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,7 +36,7 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		
 		result.andExpect(status().isOk());
-		result.andExpect(jsonPath("identifier", CoreMatchers.equalTo("rec-2")));
+		result.andExpect(jsonPath("identifier", equalTo("rec-2")));
 	}
 	
 	@Test
@@ -56,7 +58,20 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		
 		result.andExpect(status().isOk());
 		ReceiverReconciliation rec = reconcileRepo.getReconciliation();
-		result.andExpect(jsonPath("identifier", CoreMatchers.equalTo(rec.getIdentifier())));
+		result.andExpect(jsonPath("identifier", equalTo(rec.getIdentifier())));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_site_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getProgressStatus_shouldGetTheReconciliationProgressStatus() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_REC_RECONCILE_PROGRESS);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("completedSiteCount", equalTo(1)));
+		result.andExpect(jsonPath("totalCount", equalTo(3)));
 	}
 	
 }

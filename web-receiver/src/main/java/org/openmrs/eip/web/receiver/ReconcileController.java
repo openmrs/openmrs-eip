@@ -1,7 +1,10 @@
 package org.openmrs.eip.web.receiver;
 
+import java.util.Map;
+
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
+import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
 import org.openmrs.eip.component.SyncProfiles;
 import org.openmrs.eip.web.RestConstants;
@@ -20,9 +23,13 @@ public class ReconcileController {
 	
 	private ReceiverReconcileService reconcileService;
 	
-	public ReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService) {
+	private SiteReconciliationRepository siteRecRepo;
+	
+	public ReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService,
+	    SiteReconciliationRepository siteRecRepo) {
 		this.reconcileRepo = reconcileRepo;
 		this.reconcileService = reconcileService;
+		this.siteRecRepo = siteRecRepo;
 	}
 	
 	@GetMapping
@@ -33,6 +40,13 @@ public class ReconcileController {
 	@PostMapping
 	public ReceiverReconciliation startReconciliation() {
 		return reconcileService.addNewReconciliation();
+	}
+	
+	@GetMapping("/" + RestConstants.PROGRESS_STATUS)
+	public Map<String, Long> getProgressStatus() {
+		long completedSiteCount = siteRecRepo.countByDateCompletedNotNull();
+		long totalCount = siteRecRepo.count();
+		return Map.of("completedSiteCount", completedSiteCount, "totalCount", totalCount);
 	}
 	
 }

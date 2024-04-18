@@ -25,4 +25,11 @@ public class SiteReconciliationRepositoryTest extends BaseReceiverTest {
 		Assert.assertEquals(2L, repo.getBySite(siteRepo.getReferenceById(2L)).getId().longValue());
 	}
 	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql",
+	        "classpath:mgt_site_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void countByDateCompletedNotNull_shouldGetCountOfCompletedSiteReconciliations() {
+		Assert.assertEquals(1, repo.countByDateCompletedNotNull());
+	}
+	
 }
