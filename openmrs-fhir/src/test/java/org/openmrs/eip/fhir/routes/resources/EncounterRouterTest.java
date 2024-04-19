@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -17,6 +18,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
+import org.apache.commons.collections.map.SingletonMap;
 import org.hl7.fhir.r4.model.Encounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 	}
 	
 	@Override
-	protected RoutesBuilder createRouteBuilder() throws Exception {
+	protected RoutesBuilder createRouteBuilder() {
 		RouteBuilder rb = new EncounterRouter();
 		rb.from(FhirResource.ENCOUNTER.outgoingUrl()).to("mock:result");
 		return rb;
@@ -45,8 +47,9 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		AdviceWith.adviceWith("fhir-encounter-router", context, new AdviceWithRouteBuilder() {
 			
 			@Override
-			public void configure() throws Exception {
+			public void configure() {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
+				weaveByToUri("sql:*").replace().to("mock:sql");
 			}
 		});
 		
@@ -68,6 +71,13 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 			Encounter encounter = new Encounter();
 			encounter.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(encounter);
+		});
+		
+		MockEndpoint sql = getMockEndpoint("mock:sql");
+		sql.expectedMessageCount(1);
+		sql.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(new SingletonMap("voided", 0)));
 		});
 		
 		// Act
@@ -93,6 +103,7 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Encounter.class));
 		
 		fhir.assertIsSatisfied();
+		sql.assertIsSatisfied();
 	}
 	
 	@Test
@@ -109,6 +120,13 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 			Encounter encounter = new Encounter();
 			encounter.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(encounter);
+		});
+		
+		MockEndpoint sql = getMockEndpoint("mock:sql");
+		sql.expectedMessageCount(1);
+		sql.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(new SingletonMap("voided", 0)));
 		});
 		
 		// Act
@@ -134,6 +152,7 @@ class EncounterRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Encounter.class));
 		
 		fhir.assertIsSatisfied();
+		sql.assertIsSatisfied();
 	}
 	
 	@Test

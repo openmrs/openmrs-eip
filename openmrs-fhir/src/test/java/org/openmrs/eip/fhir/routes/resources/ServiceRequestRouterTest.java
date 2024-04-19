@@ -4,8 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.openmrs.eip.fhir.Constants.DRUG_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
+import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -53,6 +58,15 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 			@Override
 			public void configure() throws Exception {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
+				weaveByToUri(
+				    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-order-type");
+				weaveByToUri(
+				    "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-orders");
+				weaveByToUri(
+				    "sql:SELECT uuid FROM orders WHERE order_id = ${body[0]['previous_order_id']}?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-previous-order");
 			}
 		});
 		
@@ -74,6 +88,34 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 			ServiceRequest serviceRequest = new ServiceRequest();
 			serviceRequest.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(serviceRequest);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", TEST_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(1);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> output = new HashMap<>();
+			output.put("voided", String.valueOf(0));
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", String.valueOf(1));
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", UUID.randomUUID().toString())));
 		});
 		
 		// Act
@@ -99,6 +141,9 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(ServiceRequest.class));
 		
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test
@@ -115,6 +160,34 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 			ServiceRequest serviceRequest = new ServiceRequest();
 			serviceRequest.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(serviceRequest);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", TEST_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(1);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, Object> output = new HashMap<>();
+			output.put("voided", 0);
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", 1);
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", UUID.randomUUID().toString())));
 		});
 		
 		// Act
@@ -140,21 +213,52 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(ServiceRequest.class));
 		
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test
-	void shouldDropNonDrugOrderEntry() throws InterruptedException {
+	void shouldDropNonTestOrderEntry() throws InterruptedException {
 		// Arrange
 		MockEndpoint result = getMockEndpoint("mock:result");
 		result.expectedMessageCount(0);
 		result.setResultWaitTime(100);
 		
 		MockEndpoint fhir = getMockEndpoint("mock:fhir");
-		fhir.expectedMessageCount(1);
+		fhir.expectedMessageCount(0);
 		fhir.whenAnyExchangeReceived((exchange) -> {
 			Message fhirOutput = exchange.getMessage();
 			OperationOutcome operationOutcome = new OperationOutcome();
 			fhirOutput.setBody(operationOutcome);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", DRUG_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(0);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> output = new HashMap<>();
+			output.put("voided", String.valueOf(0));
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", String.valueOf(1));
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", UUID.randomUUID().toString())));
 		});
 		
 		// Act
@@ -171,6 +275,9 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 		// Assert
 		result.assertIsSatisfied();
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test

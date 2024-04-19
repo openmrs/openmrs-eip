@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collections;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -19,6 +19,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
+import org.apache.commons.collections.map.SingletonMap;
 import org.hl7.fhir.r4.model.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ import org.springframework.context.support.StaticApplicationContext;
 
 @UseAdviceWith
 public class PersonRouterTest extends CamelSpringTestSupport {
+	
+	private MockEndpoint sqlPersonVoided;
+	
+	private MockEndpoint sqlPersonUuid;
+	
+	private MockEndpoint sqlPersonOtherVoided;
 	
 	@Override
 	protected AbstractApplicationContext createApplicationContext() {
@@ -49,12 +56,53 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 			@Override
 			public void configure() throws Exception {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
-				weaveByToUri("sql:*").replace().to("mock:sql");
+				weaveByToUri(
+				    "sql:SELECT voided FROM person WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-person-voided");
+				weaveByToUri(
+				    "sql:SELECT voided FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-person-other-voided");
+				weaveByToUri(
+				    "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-person-uuid");
 			}
 		});
 		
 		Endpoint defaultEndpoint = context.getEndpoint(FhirResource.PERSON.incomingUrl());
 		template.setDefaultEndpoint(defaultEndpoint);
+		
+		sqlPersonVoided = getMockEndpoint("mock:sql-person-voided");
+		sqlPersonOtherVoided = getMockEndpoint("mock:sql-person-other-voided");
+		sqlPersonUuid = getMockEndpoint("mock:sql-person-uuid");
+	}
+	
+	private void setupExpectations() {
+		sqlPersonVoided.expectedMessageCount(1);
+		sqlPersonVoided.setResultWaitTime(100);
+		sqlPersonVoided.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(new SingletonMap("voided", 0)));
+		});
+		
+		sqlPersonOtherVoided.expectedMessageCount(0);
+		sqlPersonOtherVoided.setResultWaitTime(100);
+		sqlPersonOtherVoided.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(new SingletonMap("voided", 0)));
+		});
+		
+		sqlPersonUuid.expectedMessageCount(0);
+		sqlPersonUuid.setResultWaitTime(100);
+		sqlPersonUuid.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(new SingletonMap("uuid", UUID.randomUUID().toString())));
+		});
+	}
+	
+	private void verifyExpectations() throws InterruptedException {
+		sqlPersonVoided.assertIsSatisfied();
+		sqlPersonOtherVoided.assertIsSatisfied();
+		sqlPersonUuid.assertIsSatisfied();
 	}
 	
 	@Test
@@ -73,8 +121,7 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 			fhirOutput.setBody(person);
 		});
 		
-		MockEndpoint sql = getMockEndpoint("mock:sql");
-		sql.expectedMessageCount(0);
+		setupExpectations();
 		
 		// Act
 		template.send((exchange) -> {
@@ -99,7 +146,7 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Person.class));
 		
 		fhir.assertIsSatisfied();
-		sql.assertIsSatisfied();
+		verifyExpectations();
 	}
 	
 	@Test
@@ -119,20 +166,11 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 		fhir.expectedMessageCount(1);
 		fhir.setResultWaitTime(100);
 		
-		MockEndpoint sql = getMockEndpoint("mock:sql");
-		sql.whenAnyExchangeReceived((exchange) -> {
-			Message sqlOutput = exchange.getMessage();
-			List<Object> results = List.of(new Object() {
-				
-				@SuppressWarnings("unused")
-				public String get(String attribute) {
-					return UUID.randomUUID().toString();
-				}
-			});
-			sqlOutput.setBody(results);
-		});
-		sql.expectedMessageCount(1);
-		sql.setResultWaitTime(100);
+		setupExpectations();
+		// Override some expectations
+		this.sqlPersonUuid.expectedMessageCount(1);
+		this.sqlPersonVoided.expectedMessageCount(0);
+		this.sqlPersonOtherVoided.expectedMessageCount(1);
 		
 		// Act
 		template.send((exchange) -> {
@@ -157,7 +195,7 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Person.class));
 		
 		fhir.assertIsSatisfied();
-		sql.assertIsSatisfied();
+		verifyExpectations();
 	}
 	
 	@Test
@@ -177,20 +215,11 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 		fhir.expectedMessageCount(1);
 		fhir.setResultWaitTime(100);
 		
-		MockEndpoint sql = getMockEndpoint("mock:sql");
-		sql.whenAnyExchangeReceived((exchange) -> {
-			Message sqlOutput = exchange.getMessage();
-			List<Object> results = List.of(new Object() {
-				
-				@SuppressWarnings("unused")
-				public String get(String attribute) {
-					return UUID.randomUUID().toString();
-				}
-			});
-			sqlOutput.setBody(results);
-		});
-		sql.expectedMessageCount(1);
-		sql.setResultWaitTime(100);
+		setupExpectations();
+		// Override some expectations
+		this.sqlPersonUuid.expectedMessageCount(1);
+		this.sqlPersonVoided.expectedMessageCount(0);
+		this.sqlPersonOtherVoided.expectedMessageCount(1);
 		
 		// Act
 		template.send((exchange) -> {
@@ -215,7 +244,7 @@ public class PersonRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(Person.class));
 		
 		fhir.assertIsSatisfied();
-		sql.assertIsSatisfied();
+		verifyExpectations();
 	}
 	
 	@Test

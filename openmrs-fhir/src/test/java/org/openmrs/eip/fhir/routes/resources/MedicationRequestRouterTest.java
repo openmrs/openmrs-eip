@@ -4,8 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.openmrs.eip.fhir.Constants.DRUG_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
+import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -29,6 +34,8 @@ import org.springframework.context.support.StaticApplicationContext;
 @UseAdviceWith
 class MedicationRequestRouterTest extends CamelSpringTestSupport {
 	
+	private static final String DRUG_ORDER_UUID = "f32e93f8-5cb0-457e-b98e-9d12dd1f3ed9";
+	
 	@Override
 	protected AbstractApplicationContext createApplicationContext() {
 		return new StaticApplicationContext();
@@ -51,8 +58,17 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		AdviceWith.adviceWith("fhir-medicationrequest-router", context, new AdviceWithRouteBuilder() {
 			
 			@Override
-			public void configure() throws Exception {
+			public void configure() {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
+				weaveByToUri(
+				    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-order-type");
+				weaveByToUri(
+				    "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-orders");
+				weaveByToUri(
+				    "sql:SELECT uuid FROM orders WHERE order_id = ${body[0]['previous_order_id']}?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-previous-order");
 			}
 		});
 		
@@ -66,6 +82,34 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		MockEndpoint result = getMockEndpoint("mock:result");
 		result.expectedMessageCount(1);
 		result.setResultWaitTime(100);
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", DRUG_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(1);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> output = new HashMap<>();
+			output.put("voided", String.valueOf(0));
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", String.valueOf(1));
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", DRUG_ORDER_UUID)));
+		});
 		
 		MockEndpoint fhir = getMockEndpoint("mock:fhir");
 		fhir.expectedMessageCount(1);
@@ -99,6 +143,9 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(MedicationRequest.class));
 		
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test
@@ -115,6 +162,34 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 			MedicationRequest medicationRequest = new MedicationRequest();
 			medicationRequest.setId(UUID.randomUUID().toString());
 			fhirOutput.setBody(medicationRequest);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", DRUG_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(1);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> output = new HashMap<>();
+			output.put("voided", String.valueOf(0));
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", String.valueOf(1));
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", DRUG_ORDER_UUID)));
 		});
 		
 		// Act
@@ -140,6 +215,9 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		assertThat(messageBody, instanceOf(MedicationRequest.class));
 		
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test
@@ -150,11 +228,39 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		result.setResultWaitTime(100);
 		
 		MockEndpoint fhir = getMockEndpoint("mock:fhir");
-		fhir.expectedMessageCount(1);
+		fhir.expectedMessageCount(0);
 		fhir.whenAnyExchangeReceived((exchange) -> {
 			Message fhirOutput = exchange.getMessage();
 			OperationOutcome operationOutcome = new OperationOutcome();
 			fhirOutput.setBody(operationOutcome);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", TEST_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(0);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> output = new HashMap<>();
+			output.put("voided", String.valueOf(0));
+			output.put("order_action", "NEW");
+			output.put("previous_order_id", String.valueOf(1));
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(0);
+		sqlPreviousOrder.setResultWaitTime(100);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", DRUG_ORDER_UUID)));
 		});
 		
 		// Act
@@ -171,6 +277,9 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		// Assert
 		result.assertIsSatisfied();
 		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 	
 	@Test
@@ -197,5 +306,76 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 		// Assert
 		result.assertIsSatisfied();
 		fhir.assertIsSatisfied();
+	}
+	
+	@Test
+	void shouldHandleDiscontinueDrugOrder() throws InterruptedException {
+		// Arrange
+		MockEndpoint result = getMockEndpoint("mock:result");
+		result.expectedMessageCount(1);
+		result.setResultWaitTime(100);
+		
+		MockEndpoint fhir = getMockEndpoint("mock:fhir");
+		fhir.expectedMessageCount(1);
+		fhir.whenAnyExchangeReceived((exchange) -> {
+			Message fhirOutput = exchange.getMessage();
+			MedicationRequest medicationRequest = new MedicationRequest();
+			medicationRequest.setId(UUID.randomUUID().toString());
+			fhirOutput.setBody(medicationRequest);
+		});
+		
+		MockEndpoint sqlOrderType = getMockEndpoint("mock:sql-order-type");
+		sqlOrderType.expectedMessageCount(1);
+		sqlOrderType.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, String> map = new HashMap<>();
+			map.put("uuid", DRUG_ORDER_TYPE_UUID);
+			sqlOutput.setBody(Collections.singletonList(map));
+		});
+		
+		MockEndpoint sqlOrders = getMockEndpoint("mock:sql-orders");
+		sqlOrders.expectedMessageCount(1);
+		sqlOrders.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			Map<String, Object> output = new HashMap<>();
+			output.put("voided", 0);
+			output.put("order_action", "DISCONTINUE");
+			output.put("previous_order_id", 1);
+			sqlOutput.setBody(Collections.singletonList(output));
+		});
+		
+		MockEndpoint sqlPreviousOrder = getMockEndpoint("mock:sql-previous-order");
+		sqlPreviousOrder.expectedMessageCount(1);
+		sqlPreviousOrder.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", DRUG_ORDER_UUID)));
+		});
+		
+		// Act
+		template.send((exchange) -> {
+			Event event = new Event();
+			event.setTableName("orders");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
+			Message in = exchange.getIn();
+			in.setBody("");
+		});
+		
+		// Assert
+		result.assertIsSatisfied();
+		
+		// Verify we got a medication request object
+		Message message = result.getExchanges().get(0).getMessage();
+		assertThat(message.getHeader(HEADER_FHIR_EVENT_TYPE), equalTo("d"));
+		
+		Object messageBody = message.getBody();
+		assertThat(messageBody, notNullValue());
+		assertThat(messageBody, instanceOf(MedicationRequest.class));
+		
+		fhir.assertIsSatisfied();
+		sqlOrderType.assertIsSatisfied();
+		sqlOrders.assertIsSatisfied();
+		sqlPreviousOrder.assertIsSatisfied();
 	}
 }
