@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
@@ -75,24 +73,19 @@ public class ReconcileController {
 	}
 	
 	@GetMapping("/" + RestConstants.PATH_REC_SITE_PROGRESS)
-	public Map<SiteInfo, Integer> getSiteProgress() {
+	public Map<SiteInfo, Long> getSiteProgress() {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Getting progress of incomplete site reconciliations");
 		}
 		
 		List<SiteReconciliation> siteRecs = siteRecRepo.findAll();
-		Map<SiteInfo, Integer> map = new HashMap<>(siteRecs.size());
+		Map<SiteInfo, Long> map = new HashMap<>(siteRecs.size());
 		for (SiteReconciliation siteRec : siteRecs) {
 			if (siteRec.getDateCompleted() != null) {
 				continue;
 			}
 			
-			List<String> completeTables = AppUtils.getTablesToSync().stream().filter(table -> {
-				ReceiverTableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
-				return tableRec != null && tableRec.isCompleted();
-			}).toList();
-			
-			map.put(siteRec.getSite(), completeTables.size());
+			map.put(siteRec.getSite(), tableRecRepo.countByCompletedIsTrueAndSiteReconciliation(siteRec));
 		}
 		
 		return null;
