@@ -19,10 +19,15 @@
 				<td class="pl-4 py-2">{{displayStatus()}}</td>
 			</tr>
 			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
-				<th class="text-nowrap" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
-				<td class="pl-4 py-2">
-					<ngb-progressbar type="success" [striped]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
-						<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
+				<th class="text-nowrap py-2" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
+				<td class="pl-4 py-2 text-center">
+					<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
+				</td>
+			</tr>
+			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
+				<th class="text-nowrap"></th>
+				<td class="pl-4">
+					<ngb-progressbar type="success" [showValue]="true" [striped]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
 					</ngb-progressbar>
 				</td>
 			</tr>

@@ -15,4 +15,12 @@ public interface ReceiverTableReconcileRepository extends JpaRepository<Receiver
 	 */
 	ReceiverTableReconciliation getBySiteReconciliationAndTableName(SiteReconciliation siteReconciliation, String tableName);
 	
+	/**
+	 * Gets the count of all completed tables matching the specified site reconciliation.
+	 * 
+	 * @param siteRec the site reconciliation to match
+	 * @return the count of matches
+	 */
+	long countByCompletedIsTrueAndSiteReconciliation(SiteReconciliation siteRec);
+	
 }

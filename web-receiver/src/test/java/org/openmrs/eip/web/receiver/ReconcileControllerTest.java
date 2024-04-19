@@ -71,7 +71,7 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("completedSiteCount", equalTo(1)));
-		result.andExpect(jsonPath("totalCount", equalTo(3)));
+		result.andExpect(jsonPath("totalCount", equalTo(5)));
 	}
 	
 }
