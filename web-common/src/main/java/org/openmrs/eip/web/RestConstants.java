@@ -76,4 +76,8 @@ public final class RestConstants {
 	
 	public static final String PATH_REC_RECONCILE_PROGRESS = PATH_RECEIVER_RECONCILE + "/" + PROGRESS;
 	
+	public static final String SITE_PROGRESS = "siteprogress";
+	
+	public static final String PATH_REC_SITE_PROGRESS = PATH_RECEIVER_RECONCILE + "/" + SITE_PROGRESS;
+	
 }
