@@ -13,6 +13,7 @@
         <module>commons</module>
         <module>commons-web</module>
         <module>example-app</module>
+        <module>openmrs-fhir</module>
     </modules>
 
     <name>OpenMRS EIP</name>
@@ -334,7 +335,7 @@
             <plugin>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-maven-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.21.0</version>
             </plugin>
 
             <!-- Formatting -->
