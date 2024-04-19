@@ -10,6 +10,7 @@ import {
 } from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
+import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
 
 @Component({
 	selector: 'receiver-reconcile',
@@ -17,9 +18,11 @@ import {ReceiverReconcileService} from "./receiver-reconcile.service";
 })
 export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
+	ReceiverReconcileStatusEnum = ReceiverReconcileStatus;
+
 	reconciliation?: ReceiverReconciliation;
 
-	progress?: Map<string, number>;
+	progress?: ReceiverReconcileProgress;
 
 	loadedSubscription?: Subscription;
 
@@ -34,7 +37,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (this.reconciliation) {
+				if (this.reconciliation && this.reconciliation.status == ReceiverReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadReceiverReconcileProgress());
 				}
 			}
@@ -68,6 +71,22 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		}
 
 		return display;
+	}
+
+	getCompletedSites(): number {
+		let count: number = 0;
+		if (this.progress && this.progress.completedSiteCount) {
+			count = this.progress.completedSiteCount;
+		}
+		return count;
+	}
+
+	getTotalCount(): number {
+		let count: number = 0;
+		if (this.progress && this.progress.totalCount) {
+			count = this.progress.totalCount;
+		}
+		return count;
 	}
 
 	ngOnDestroy(): void {

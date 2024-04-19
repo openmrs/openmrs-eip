@@ -1,5 +1,6 @@
 import {Action} from "@ngrx/store";
 import {ReceiverReconciliation} from "../receiver-reconciliation";
+import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECONCILIATION',
@@ -34,7 +35,7 @@ export class ReceiverReconcileProgressLoaded implements Action {
 
 	readonly type = ReceiverReconcileActionType.PROGRESS_LOADED;
 
-	constructor(public progress?: Map<string, number>) {
+	constructor(public progress?: ReceiverReconcileProgress) {
 	}
 
 }

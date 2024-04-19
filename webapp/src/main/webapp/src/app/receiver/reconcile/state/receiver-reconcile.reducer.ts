@@ -1,10 +1,11 @@
 import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./receiver-reconcile.actions";
+import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 
 export interface ReceiverReconcileState {
 	reconciliation: ReceiverReconciliation;
-	progress: Map<string, number>;
+	progress: ReceiverReconcileProgress;
 }
 
 const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverReconcileState>('receiverReconcile');

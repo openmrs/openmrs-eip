@@ -7,16 +7,24 @@
 		<span i18n="@@common-start-reconcile">Start New Reconciliation</span>
 	</ng-template>
 </div>
-<div [hidden]="!reconciliation" class="p-3">
-	<table>
+<div [hidden]="!reconciliation" class="p-3 w-100">
+	<table class="w-100">
 		<tbody>
 			<tr>
-				<th i18n="@@common-identifier">Identifier</th>
-				<td class="pl-2">{{reconciliation?.identifier}}</td>
+				<th class="text-nowrap" i18n="@@common-identifier">Identifier</th>
+				<td class="pl-4 w-100 py-2">{{reconciliation?.identifier}}</td>
 			</tr>
 			<tr>
-				<th i18n="@@common-status">Status</th>
-				<td class="pl-2">{{displayStatus()}}</td>
+				<th class="text-nowrap" i18n="@@common-status">Status</th>
+				<td class="pl-4 py-2">{{displayStatus()}}</td>
+			</tr>
+			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
+				<th class="text-nowrap" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
+				<td class="pl-4 py-2">
+					<ngb-progressbar type="success" [striped]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
+						<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
+					</ngb-progressbar>
+				</td>
 			</tr>
 		</tbody>
 	</table>

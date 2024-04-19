@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
+import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
 
 const RESOURCE_NAME = 'receiver/reconcile';
 
@@ -22,8 +23,8 @@ export class ReceiverReconcileService {
 		return this.httpClient.post<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME, null);
 	}
 
-	getReconciliationProgress(): Observable<Map<string, number>> {
-		return this.httpClient.get<Map<string, number>>(environment.apiBaseUrl + RESOURCE_NAME + '/progress');
+	getReconciliationProgress(): Observable<ReceiverReconcileProgress> {
+		return this.httpClient.get<ReceiverReconcileProgress>(environment.apiBaseUrl + RESOURCE_NAME + '/progress');
 	}
 
 }
