@@ -214,7 +214,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldProcessFoundUuidsAndUpdateTheProcessedCount() {
 		final String table = "person";
-		final SiteInfo site = siteRepo.getReferenceById(1L);
+		final SiteInfo site = siteRepo.getReferenceById(3L);
 		SiteReconciliation siteRec = siteRecRepo.getBySite(site);
 		final String uuid1 = "uuid-1";
 		final String uuid2 = "uuid-2";
@@ -224,7 +224,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertNull(tableRec.getDateChanged());
 		final long originalProcessedCount = tableRec.getProcessedCount();
 		ReconciliationMessage msg = new ReconciliationMessage();
-		msg.setSite(siteRepo.getReferenceById(1L));
+		msg.setSite(site);
 		msg.setTableName(table);
 		msg.setBatchSize(3);
 		msg.setData(uuid1 + "," + uuid2 + ",uuid-3");
@@ -292,7 +292,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void updateReconciliationMessage_shouldMarkTableReconciliationAsCompleted() {
 		final String table = "person";
-		final SiteInfo site = siteRepo.getReferenceById(1L);
+		final SiteInfo site = siteRepo.getReferenceById(3L);
 		SiteReconciliation siteRec = siteRecRepo.getBySite(site);
 		ReceiverTableReconciliation tableRec = tableRecRepo.getBySiteReconciliationAndTableName(siteRec, table);
 		assertFalse(tableRec.isCompleted());

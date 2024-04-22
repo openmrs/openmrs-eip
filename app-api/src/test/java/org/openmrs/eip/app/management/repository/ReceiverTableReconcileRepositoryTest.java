@@ -31,7 +31,7 @@ public class ReceiverTableReconcileRepositoryTest extends BaseReceiverTest {
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconcile.sql",
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void countByCompletedIsTrueAndSiteReconciliation_shouldGetTheCountOfCompletedTablesForSiteReconciliation() {
-		SiteReconciliation siteRec = siteRecRepo.getReferenceById(3L);
+		SiteReconciliation siteRec = siteRecRepo.getReferenceById(5L);
 		Assert.assertEquals(2, repo.countByCompletedIsTrueAndSiteReconciliation(siteRec));
 	}
 	

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
-import org.openmrs.eip.app.management.entity.receiver.SiteInfo;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
@@ -37,10 +36,11 @@ public class ReconcileController {
 	private ReceiverTableReconcileRepository tableRecRepo;
 	
 	public ReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService,
-	    SiteReconciliationRepository siteRecRepo) {
+	    SiteReconciliationRepository siteRecRepo, ReceiverTableReconcileRepository tableRecRepo) {
 		this.reconcileRepo = reconcileRepo;
 		this.reconcileService = reconcileService;
 		this.siteRecRepo = siteRecRepo;
+		this.tableRecRepo = tableRecRepo;
 	}
 	
 	@GetMapping
@@ -72,23 +72,24 @@ public class ReconcileController {
 		return Map.of("completedSiteCount", completedSiteCount, "totalCount", totalCount);
 	}
 	
-	@GetMapping("/" + RestConstants.PATH_REC_SITE_PROGRESS)
-	public Map<SiteInfo, Long> getSiteProgress() {
+	@GetMapping("/" + RestConstants.SITE_PROGRESS)
+	public Map<String, Long> getSiteProgress() {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Getting progress of incomplete site reconciliations");
 		}
 		
 		List<SiteReconciliation> siteRecs = siteRecRepo.findAll();
-		Map<SiteInfo, Long> map = new HashMap<>(siteRecs.size());
+		Map<String, Long> map = new HashMap<>(siteRecs.size());
 		for (SiteReconciliation siteRec : siteRecs) {
 			if (siteRec.getDateCompleted() != null) {
 				continue;
 			}
 			
-			map.put(siteRec.getSite(), tableRecRepo.countByCompletedIsTrueAndSiteReconciliation(siteRec));
+			final String key = siteRec.getSite().getId() + "^" + siteRec.getSite().getName();
+			map.put(key, tableRecRepo.countByCompletedIsTrueAndSiteReconciliation(siteRec));
 		}
 		
-		return null;
+		return map;
 	}
 	
 }
