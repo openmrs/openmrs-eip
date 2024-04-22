@@ -27,4 +27,8 @@ export class ReceiverReconcileService {
 		return this.httpClient.get<ReceiverReconcileProgress>(environment.apiBaseUrl + RESOURCE_NAME + '/progress');
 	}
 
+	getSiteProgress(): Observable<any> {
+		return this.httpClient.get<any>(environment.apiBaseUrl + RESOURCE_NAME + '/siteprogress');
+	}
+
 }

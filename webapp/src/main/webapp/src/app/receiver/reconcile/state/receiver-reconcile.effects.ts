@@ -4,7 +4,8 @@ import {map, switchMap} from "rxjs/operators";
 import {
 	ReceiverReconcileActionType,
 	ReceiverReconcileProgressLoaded,
-	ReceiverReconciliationLoaded
+	ReceiverReconciliationLoaded,
+	SiteProgressLoaded
 } from "./receiver-reconcile.actions";
 import {ReceiverReconcileService} from "../receiver-reconcile.service";
 
@@ -42,6 +43,17 @@ export class ReceiverReconcileEffects {
 			switchMap(() => this.service.getReconciliationProgress()
 				.pipe(
 					map(progress => new ReceiverReconcileProgressLoaded(progress))
+				)
+			)
+		)
+	);
+
+	getSiteProgress = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.LOAD_SITE_PROGRESS),
+			switchMap(() => this.service.getSiteProgress()
+				.pipe(
+					map(siteProgress => new SiteProgressLoaded(siteProgress))
 				)
 			)
 		)

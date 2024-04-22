@@ -704,5 +704,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="receiver-reconcile-show-site-details">
+			<segment>
+				<source>Show Site Details</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-completed-tables">
+			<segment>
+				<source>Completed Tables</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-remote-site">
+			<segment>
+				<source>Remote Site</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
