@@ -27,7 +27,32 @@
 			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
 				<th class="text-nowrap"></th>
 				<td class="pl-4">
-					<ngb-progressbar type="success" [showValue]="true" [striped]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
+					<ngb-progressbar type="success" [showValue]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
+					</ngb-progressbar>
+				</td>
+			</tr>
+			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
+				<th class="text-nowrap"></th>
+				<td class="pl-4 py-4">
+					<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-site-details">
+						Show Site Details
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<table [hidden]="!this.siteProgress" class="w-100 table">
+		<thead>
+			<tr>
+				<th class="text-nowrap text-center" i18n="@@receiver-remote-site">Remote Site</th>
+				<th class="w-100 py-2 text-center" i18n="@receiver-completed-tables">Completed Tables</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let e of siteProgress | keyvalue">
+				<td class="text-nowrap" i18n="@@common-identifier">{{getSiteName(e.key)}}</td>
+				<td class="w-100 py-2">
+					<ngb-progressbar type="success" [showValue]="true" [value]="castToInt(e.value)" [max]="10">
 					</ngb-progressbar>
 				</td>
 			</tr>

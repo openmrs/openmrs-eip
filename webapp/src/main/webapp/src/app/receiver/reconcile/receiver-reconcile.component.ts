@@ -2,10 +2,15 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
-import {GET_RECEIVER_RECONCILE_PROGRESS, GET_RECEIVER_RECONCILIATION} from "./state/receiver-reconcile.reducer";
+import {
+	GET_RECEIVER_RECONCILE_PROGRESS,
+	GET_RECEIVER_RECONCILIATION,
+	GET_SITE_PROGRESS
+} from "./state/receiver-reconcile.reducer";
 import {
 	LoadReceiverReconcileProgress,
 	LoadReceiverReconciliation,
+	LoadSiteProgress,
 	StartReconciliation
 } from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
@@ -24,9 +29,13 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
 	progress?: ReceiverReconcileProgress;
 
+	siteProgress?: any;
+
 	loadedSubscription?: Subscription;
 
 	loadedProgressSubscription?: Subscription;
+
+	loadedSiteProgressSubscription?: Subscription;
 
 	constructor(
 		private service: ReceiverReconcileService,
@@ -46,6 +55,12 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedProgressSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILE_PROGRESS)).subscribe(
 			progress => {
 				this.progress = progress;
+			}
+		);
+
+		this.loadedSiteProgressSubscription = this.store.pipe(select(GET_SITE_PROGRESS)).subscribe(
+			siteProgress => {
+				this.siteProgress = siteProgress;
 			}
 		);
 
@@ -89,9 +104,22 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		return count;
 	}
 
+	showSiteDetails(): void {
+		this.store.dispatch(new LoadSiteProgress());
+	}
+
+	getSiteName(value: any): string {
+		return value.substr(value.indexOf('^') + 1);
+	}
+
+	castToInt(value: any): number {
+		return value;
+	}
+
 	ngOnDestroy(): void {
 		this.loadedSubscription?.unsubscribe();
 		this.loadedProgressSubscription?.unsubscribe();
+		this.loadedSiteProgressSubscription?.unsubscribe();
 	}
 
 }
