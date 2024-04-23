@@ -4,4 +4,6 @@ export class ReceiverReconcileProgress {
 
 	totalCount?: number;
 
+	tableCount?: number;
+
 }

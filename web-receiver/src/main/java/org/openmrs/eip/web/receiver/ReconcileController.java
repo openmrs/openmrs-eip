@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
@@ -62,14 +63,15 @@ public class ReconcileController {
 	}
 	
 	@GetMapping("/" + RestConstants.PROGRESS)
-	public Map<String, Long> getProgress() {
+	public Map<String, Number> getProgress() {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Getting progress of active reconciliation");
 		}
 		
 		long completedSiteCount = siteRecRepo.countByDateCompletedNotNull();
 		long totalCount = siteRecRepo.count();
-		return Map.of("completedSiteCount", completedSiteCount, "totalCount", totalCount);
+		return Map.of("completedSiteCount", completedSiteCount, "totalCount", totalCount, "tableCount",
+		    AppUtils.getTablesToSync().size());
 	}
 	
 	@GetMapping("/" + RestConstants.SITE_PROGRESS)

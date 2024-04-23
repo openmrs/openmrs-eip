@@ -704,9 +704,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="receiver-reconcile-show-site-details">
+		<unit id="receiver-reconcile-show-facility-breakdown">
 			<segment>
-				<source>Show Site Details</source>
+				<source>Show facility breakdown</source>
 				<target></target>
 			</segment>
 		</unit>
@@ -716,9 +716,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="receiver-remote-site">
+		<unit id="common-of">
 			<segment>
-				<source>Remote Site</source>
+				<source>of</source>
 				<target></target>
 			</segment>
 		</unit>

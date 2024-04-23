@@ -104,6 +104,14 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		return count;
 	}
 
+	getTableCount(): number {
+		let count: number = 0;
+		if (this.progress && this.progress.tableCount) {
+			count = this.progress.tableCount;
+		}
+		return count;
+	}
+
 	showSiteDetails(): void {
 		this.store.dispatch(new LoadSiteProgress());
 	}

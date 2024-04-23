@@ -12,30 +12,25 @@
 		<tbody>
 			<tr>
 				<th class="text-nowrap" i18n="@@common-identifier">Identifier</th>
-				<td class="pl-4 w-100 py-2">{{reconciliation?.identifier}}</td>
+				<td class="pl-4 w-100 py-1">{{reconciliation?.identifier}}</td>
 			</tr>
 			<tr>
 				<th class="text-nowrap" i18n="@@common-status">Status</th>
-				<td class="pl-4 py-2">{{displayStatus()}}</td>
+				<td class="pl-4 py-1">{{displayStatus()}}</td>
 			</tr>
 			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
-				<th class="text-nowrap py-2" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
-				<td class="pl-4 py-2 text-center">
-					<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
-				</td>
-			</tr>
-			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
-				<th class="text-nowrap"></th>
-				<td class="pl-4">
-					<ngb-progressbar type="success" [showValue]="true" [value]="getCompletedSites()" [max]="getTotalCount()">
+				<th class="text-nowrap" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
+				<td class="pl-4 py-1 align-middle">
+					<ngb-progressbar type="success" [value]="getCompletedSites()" [max]="getTotalCount()">
+						<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
 					</ngb-progressbar>
 				</td>
 			</tr>
 			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
 				<th class="text-nowrap"></th>
-				<td class="pl-4 py-4">
-					<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-site-details">
-						Show Site Details
+				<td class="pl-4 py-3">
+					<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-facility-breakdown">
+						Show facility breakdown
 					</button>
 				</td>
 			</tr>
@@ -44,15 +39,18 @@
 	<table [hidden]="!this.siteProgress" class="w-100 table">
 		<thead>
 			<tr>
-				<th class="text-nowrap text-center" i18n="@@receiver-remote-site">Remote Site</th>
-				<th class="w-100 py-2 text-center" i18n="@receiver-completed-tables">Completed Tables</th>
+				<th class="text-nowrap text-center" i18n="@@common-health-facility">Health Facility</th>
+				<th class="w-100 text-center">
+					<span i18n="@@receiver-completed-tables">Completed Tables</span> (<span i18n="common-of">of</span> {{getTableCount()}})
+				</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr *ngFor="let e of siteProgress | keyvalue">
-				<td class="text-nowrap" i18n="@@common-identifier">{{getSiteName(e.key)}}</td>
-				<td class="w-100 py-2">
-					<ngb-progressbar type="success" [showValue]="true" [value]="castToInt(e.value)" [max]="10">
+				<td class="text-nowrap align-top" i18n="@@common-identifier">{{getSiteName(e.key)}}</td>
+				<td class="w-100 align-middle">
+					<ngb-progressbar type="success" [value]="castToInt(e.value)" [max]="getTableCount()">
+						{{e.value}}
 					</ngb-progressbar>
 				</td>
 			</tr>

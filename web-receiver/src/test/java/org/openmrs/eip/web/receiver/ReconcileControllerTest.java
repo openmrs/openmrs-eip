@@ -20,6 +20,7 @@ import java.util.Map;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,9 +79,10 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		
 		result.andExpect(status().isOk());
-		result.andExpect(jsonPath("length()", equalTo(2)));
+		result.andExpect(jsonPath("length()", equalTo(3)));
 		result.andExpect(jsonPath("completedSiteCount", equalTo(1)));
 		result.andExpect(jsonPath("totalCount", equalTo(5)));
+		result.andExpect(jsonPath("tableCount", equalTo(AppUtils.getTablesToSync().size())));
 	}
 	
 	@Test
