@@ -1,0 +1,20 @@
+<table [hidden]="!this.siteProgress" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="w-100s table-sm table-striped">
+	<thead class="table-secondary">
+	<tr>
+		<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-health-facility">Health Facility</th>
+		<th class="w-100 text-center border-secondary border-bottom">
+			<span i18n="@@receiver-completed-tables">Completed Tables</span> (<span i18n="common-of">of</span> {{tableCount}})
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr *ngFor="let e of siteProgress | keyvalue">
+		<td class="text-nowrap align-top" i18n="@@common-identifier">{{getSiteName(e.key)}}</td>
+		<td class="w-100 align-middle">
+			<ngb-progressbar type="success" height="12px" [value]="castToInt(3)" [max]="tableCount">
+				{{3}}
+			</ngb-progressbar>
+		</td>
+	</tr>
+	</tbody>
+</table>

@@ -116,14 +116,6 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.store.dispatch(new LoadSiteProgress());
 	}
 
-	getSiteName(value: any): string {
-		return value.substr(value.indexOf('^') + 1);
-	}
-
-	castToInt(value: any): number {
-		return value;
-	}
-
 	ngOnDestroy(): void {
 		this.loadedSubscription?.unsubscribe();
 		this.loadedProgressSubscription?.unsubscribe();

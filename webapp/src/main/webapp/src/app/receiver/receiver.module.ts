@@ -29,6 +29,7 @@ import {EffectsModule} from "@ngrx/effects";
 import {ReceiverReconcileEffects} from "./reconcile/state/receiver-reconcile.effects";
 import {receiverReconcileReducer} from "./reconcile/state/receiver-reconcile.reducer";
 import {ReceiverReconcileComponent} from "./reconcile/receiver-reconcile.component";
+import {SiteProgressComponent} from './reconcile/site-progress/site-progress.component';
 
 @NgModule({
 	declarations: [
@@ -47,7 +48,8 @@ import {ReceiverReconcileComponent} from "./reconcile/receiver-reconcile.compone
 		ReceiverArchiveListViewComponent,
 		ReceiverArchiveGroupViewComponent,
 		ReceiverDashboardComponent,
-		ReceiverReconcileComponent
+		ReceiverReconcileComponent,
+		SiteProgressComponent
 	],
 	imports: [
 		SharedModule,
