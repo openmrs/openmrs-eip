@@ -722,5 +722,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-view-incomplete-tables">
+			<segment>
+				<source>View Incomplete Tables</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

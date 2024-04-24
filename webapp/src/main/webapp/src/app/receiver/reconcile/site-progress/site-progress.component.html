@@ -5,6 +5,7 @@
 		<th class="w-100 text-center border-secondary border-bottom">
 			<span i18n="@@receiver-completed-tables">Completed Tables</span> (<span i18n="common-of">of</span> {{tableCount}})
 		</th>
+		<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-action">Action</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -15,6 +16,14 @@
 				{{e.value}}
 			</ngb-progressbar>
 		</td>
+		<td class="text-nowrap text-center align-top">
+			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewIncompleteTablesTemplate"
+			   [openDelay]="1000" (click)="showIncompleteTables(e.key)"></i>
+		</td>
 	</tr>
 	</tbody>
 </table>
+
+<ng-template #viewIncompleteTablesTemplate>
+	<span i18n="@@common-view-incomplete-tables">View Incomplete Tables</span>
+</ng-template>

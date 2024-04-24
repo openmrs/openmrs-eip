@@ -1,5 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {BaseListingComponent} from "../../../shared/base-listing.component";
+import {LoadReceiverTableReconciliations} from "../state/receiver-reconcile.actions";
+import {Store} from "@ngrx/store";
 
 @Component({
 	selector: 'site-progress',
@@ -7,7 +9,7 @@ import {BaseListingComponent} from "../../../shared/base-listing.component";
 })
 export class SiteProgressComponent extends BaseListingComponent {
 
-	constructor() {
+	constructor(private store: Store) {
 		super();
 	}
 
@@ -23,6 +25,11 @@ export class SiteProgressComponent extends BaseListingComponent {
 
 	castToInt(value: any): number {
 		return value;
+	}
+
+	showIncompleteTables(key: any): void {
+		let siteId: any = key.substr(0, key.indexOf('^'));
+		this.store.dispatch(new LoadReceiverTableReconciliations(siteId));
 	}
 
 }

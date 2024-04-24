@@ -41,7 +41,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
 	loadedSiteProgressSubscription?: Subscription;
 
-	loadedTableSubscription?: Subscription;
+	loadedTableRecsSubscription?: Subscription;
 
 	constructor(
 		private service: ReceiverReconcileService,
@@ -70,7 +70,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 			}
 		);
 
-		this.loadedTableSubscription = this.store.pipe(select(GET_RECEIVER_TABLE_RECONCILES)).subscribe(
+		this.loadedTableRecsSubscription = this.store.pipe(select(GET_RECEIVER_TABLE_RECONCILES)).subscribe(
 			tableRecs => {
 				this.tableReconciliations = tableRecs;
 			}
@@ -132,7 +132,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSubscription?.unsubscribe();
 		this.loadedProgressSubscription?.unsubscribe();
 		this.loadedSiteProgressSubscription?.unsubscribe();
-		this.loadedTableSubscription?.unsubscribe();
+		this.loadedTableRecsSubscription?.unsubscribe();
 	}
 
 }
