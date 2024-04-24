@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.repository;
 
+import java.util.List;
+
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,13 @@ public interface ReceiverTableReconcileRepository extends JpaRepository<Receiver
 	 * @return the count of matches
 	 */
 	long countByCompletedIsTrueAndSiteReconciliation(SiteReconciliation siteRec);
+	
+	/**
+	 * Gets all incomplete table reconciliations matching the specified site reconciliation.
+	 *
+	 * @param siteRec the site reconciliation to match
+	 * @return list of receiver table reconciliations
+	 */
+	List<ReceiverTableReconciliation> getByCompletedIsFalseAndSiteReconciliation(SiteReconciliation siteRec);
 	
 }

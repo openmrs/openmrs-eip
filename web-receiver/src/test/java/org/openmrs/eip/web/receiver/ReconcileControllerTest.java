@@ -7,6 +7,8 @@ import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_RECONCILE;
 import static org.openmrs.eip.web.RestConstants.PATH_REC_RECONCILE_PROGRESS;
 import static org.openmrs.eip.web.RestConstants.PATH_REC_SITE_PROGRESS;
+import static org.openmrs.eip.web.RestConstants.PATH_REC_TABLE_RECONCILE;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR_SITE_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -104,6 +106,23 @@ public class ReconcileControllerTest extends BaseReceiverWebTest {
 		assertEquals(0, siteAndCount.get("3^Remote 3").intValue());
 		assertEquals(1, siteAndCount.get("4^Remote 4").intValue());
 		assertEquals(2, siteAndCount.get("5^Remote 5").intValue());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconcile.sql",
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getIncompleteTableReconciliations_shouldGetTheInCompleteTableReconciliationsForTheSite() throws Exception {
+		MockHttpServletRequestBuilder builder = get(PATH_REC_TABLE_RECONCILE + "/{" + PATH_VAR_SITE_ID + "}", 5);
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(1)));
+		result.andExpect(jsonPath("[0].tableName", equalTo("encounter")));
+		result.andExpect(jsonPath("[0].rowCount", equalTo(10)));
+		result.andExpect(jsonPath("[0].processedCount", equalTo(9)));
+		result.andExpect(jsonPath("[0].lastBatchReceived", equalTo(false)));
+		result.andExpect(jsonPath("[0].remoteStartDate", equalTo("2024-02-07T00:04:00")));
 	}
 	
 }

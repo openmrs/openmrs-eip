@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -16,6 +18,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "receiver_table_reconcile")
+@JsonIncludeProperties({ "tableName", "rowCount", "processedCount", "lastBatchReceived", "remoteStartDate" })
 public class ReceiverTableReconciliation extends AbstractEntity {
 	
 	@ManyToOne(optional = false)
