@@ -41,17 +41,25 @@ public class PatientRouter extends BaseFhirResourceRouter {
 		        .to(FhirResource.PATIENT.outgoingUrl()).otherwise()
 		        // person or patient are basically the top-level object
 		        .choice().when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").in("patient", "person"))
+		        .toD(
+		            "sql:SELECT patient_id FROM patient WHERE patient_id = (SELECT t.person_id FROM person t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+		        .choice().when(simple("${body.size()} > 0"))
 		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${exchangeProperty.event.identifier}")
-		        .otherwise().choice()
+		        .endChoice().otherwise().choice()
 		        .when(simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").isEqualTo(PATIENT_IDENTIFIER))
 		        .toD(
 		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 		        // person_name or person_address
 		        .otherwise()
 		        .toD(
+		            "sql:SELECT patient_id FROM patient WHERE patient_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+		        .choice().when(simple("${body.size()} > 0"))
+		        .toD(
 		            "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
-		        .end().toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end().end()
-		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        .end().endChoice().end().choice().when(simple("${body.size()} > 0"))
+		        .toD("fhir:read/resourceById?resourceClass=Patient&stringId=${body[0].get('uuid')}").end().end().end()
+		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}")).choice()
+		        .when(body().isNull()).log(LoggingLevel.INFO, "Patient not found in FHIR").otherwise()
 		        .to(FhirResource.PATIENT.outgoingUrl()).endChoice().end();
 	}
 }

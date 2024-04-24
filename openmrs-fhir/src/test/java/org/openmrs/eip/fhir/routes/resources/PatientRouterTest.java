@@ -8,7 +8,6 @@ import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -41,6 +40,10 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 	
 	private MockEndpoint sqlPatientUuidMockEndpoint;
 	
+	private MockEndpoint sqlPatientMockEndpoint;
+	
+	private MockEndpoint sqlPatientExistMockEndpoint;
+	
 	@Override
 	protected AbstractApplicationContext createApplicationContext() {
 		return new StaticApplicationContext();
@@ -58,7 +61,7 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 		AdviceWith.adviceWith("fhir-patient-router", context, new AdviceWithRouteBuilder() {
 			
 			@Override
-			public void configure() throws Exception {
+			public void configure() {
 				weaveByToUri("fhir:*").replace().to("mock:fhir");
 				weaveByToUri(
 				    "sql:SELECT voided FROM person WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
@@ -75,6 +78,12 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 				weaveByToUri(
 				    "sql:SELECT uuid FROM person WHERE person_id = (SELECT t.patient_id FROM patient_identifier t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
 				            .replace().to("mock:sql-patient-identifier-uuid");
+				weaveByToUri(
+				    "sql:SELECT patient_id FROM patient WHERE patient_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-patient");
+				weaveByToUri(
+				    "sql:SELECT patient_id FROM patient WHERE patient_id = (SELECT t.person_id FROM person t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
+				            .replace().to("mock:sql-patient-uuid");
 			}
 		});
 		
@@ -87,6 +96,8 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 		
 		sqlPatientIdentifierUuidMockEndpoint = getMockEndpoint("mock:sql-patient-identifier-uuid");
 		sqlPatientUuidMockEndpoint = getMockEndpoint("mock:sql-patient-uuid");
+		sqlPatientMockEndpoint = getMockEndpoint("mock:sql-patient");
+		sqlPatientExistMockEndpoint = getMockEndpoint("mock:sql-patient-exist");
 	}
 	
 	@Test
@@ -107,6 +118,8 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 		
 		// set up expectations for the sql endpoints
 		this.setupExpectations();
+		sqlPatientExistMockEndpoint.expectedMessageCount(1);
+		sqlPatientUuidMockEndpoint.expectedMessageCount(1);
 		
 		// Act
 		template.send((exchange) -> {
@@ -151,6 +164,8 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 		});
 		
 		this.setupExpectations();
+		sqlPatientExistMockEndpoint.expectedMessageCount(1);
+		sqlPatientUuidMockEndpoint.expectedMessageCount(1);
 		
 		// Act
 		template.send((exchange) -> {
@@ -323,6 +338,43 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 	}
 	
 	@Test
+	void shouldSkipNonPatientEntry() throws InterruptedException {
+		// Arrange
+		MockEndpoint result = getMockEndpoint("mock:result");
+		result.expectedMessageCount(0);
+		result.setResultWaitTime(100);
+		
+		MockEndpoint fhir = getMockEndpoint("mock:fhir");
+		fhir.expectedMessageCount(0);
+		
+		MockEndpoint sql = getMockEndpoint("mock:sql");
+		sql.expectedMessageCount(0);
+		
+		sqlPatientExistMockEndpoint.setResultWaitTime(100);
+		sqlPatientExistMockEndpoint.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody("");
+		});
+		
+		// Act
+		template.send((exchange) -> {
+			Event event = new Event();
+			event.setTableName("person");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
+			Message in = exchange.getIn();
+			in.setBody("");
+		});
+		
+		// Assert
+		result.assertIsSatisfied();
+		fhir.assertIsSatisfied();
+		sql.assertIsSatisfied();
+		sqlPatientExistMockEndpoint.assertIsSatisfied();
+	}
+	
+	@Test
 	void shouldSkipUnknownEntry() throws InterruptedException, IOException {
 		// Arrange
 		MockEndpoint result = getMockEndpoint("mock:result");
@@ -395,6 +447,20 @@ public class PatientRouterTest extends CamelSpringTestSupport {
 		sqlPatientUuidMockEndpoint.whenAnyExchangeReceived((exchange) -> {
 			Message sqlOutput = exchange.getMessage();
 			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("uuid", UUID.randomUUID().toString())));
+		});
+		
+		sqlPatientMockEndpoint.expectedMessageCount(0);
+		sqlPatientMockEndpoint.setResultWaitTime(100);
+		sqlPatientMockEndpoint.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("patient_id", 123)));
+		});
+		
+		sqlPatientExistMockEndpoint.expectedMessageCount(0);
+		sqlPatientExistMockEndpoint.setResultWaitTime(100);
+		sqlPatientExistMockEndpoint.whenAnyExchangeReceived((exchange) -> {
+			Message sqlOutput = exchange.getMessage();
+			sqlOutput.setBody(Collections.singletonList(Collections.singletonMap("patient_id", 123)));
 		});
 	}
 }
