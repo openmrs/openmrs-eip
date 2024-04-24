@@ -1,6 +1,7 @@
 import {Action} from "@ngrx/store";
 import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
+import {ReceiverTableReconcile} from "../receiver-table-reconcile";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECONCILIATION',
@@ -9,7 +10,9 @@ export enum ReceiverReconcileActionType {
 	LOAD_PROGRESS = 'LOAD_PROGRESS',
 	PROGRESS_LOADED = 'PROGRESS_LOADED',
 	LOAD_SITE_PROGRESS = 'LOAD_SITE_PROGRESS',
-	SITE_PROGRESS_LOADED = 'SITE_PROGRESS_LOADED'
+	SITE_PROGRESS_LOADED = 'SITE_PROGRESS_LOADED',
+	LOAD_TABLE_RECONCILIATIONS = 'LOAD_TABLE_RECONCILIATIONS',
+	TABLE_RECONCILIATIONS_LOADED = 'TABLE_RECONCILIATIONS_LOADED'
 }
 
 export class LoadReceiverReconciliation implements Action {
@@ -63,6 +66,24 @@ export class StartReconciliation implements Action {
 
 }
 
+export class LoadReceiverTableReconciliations implements Action {
+
+	readonly type = ReceiverReconcileActionType.LOAD_TABLE_RECONCILIATIONS;
+
+	constructor(public siteId: number) {
+	}
+
+}
+
+export class ReceiverTableReconciliationsLoaded implements Action {
+
+	readonly type = ReceiverReconcileActionType.TABLE_RECONCILIATIONS_LOADED;
+
+	constructor(public tableReconciliations: ReceiverTableReconcile[]) {
+	}
+
+}
+
 export type ReceiverReconcileAction =
 	LoadReceiverReconciliation
 	| ReceiverReconciliationLoaded
@@ -70,4 +91,6 @@ export type ReceiverReconcileAction =
 	| LoadReceiverReconcileProgress
 	| ReceiverReconcileProgressLoaded
 	| LoadSiteProgress
-	| SiteProgressLoaded;
+	| SiteProgressLoaded
+	| LoadReceiverTableReconciliations
+	| ReceiverTableReconciliationsLoaded;

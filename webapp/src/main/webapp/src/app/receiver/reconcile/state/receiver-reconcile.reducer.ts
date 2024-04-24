@@ -2,11 +2,13 @@ import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./receiver-reconcile.actions";
 import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
+import {ReceiverTableReconcile} from "../receiver-table-reconcile";
 
 export interface ReceiverReconcileState {
 	reconciliation: ReceiverReconciliation;
 	progress: ReceiverReconcileProgress;
 	siteProgress: any;
+	tableReconciliations: ReceiverTableReconcile[];
 }
 
 const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverReconcileState>('receiverReconcile');
@@ -24,6 +26,11 @@ export const GET_RECEIVER_RECONCILE_PROGRESS = createSelector(
 export const GET_SITE_PROGRESS = createSelector(
 	GET_RECEIVER_RECONCILE_FEATURE_STATE,
 	state => state.siteProgress
+);
+
+export const GET_RECEIVER_TABLE_RECONCILES = createSelector(
+	GET_RECEIVER_RECONCILE_FEATURE_STATE,
+	state => state.tableReconciliations
 );
 
 export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAction) {
@@ -46,6 +53,12 @@ export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAc
 			return {
 				...state,
 				siteProgress: action.siteProgress
+			};
+
+		case ReceiverReconcileActionType.TABLE_RECONCILIATIONS_LOADED:
+			return {
+				...state,
+				tableReconciliations: action.tableReconciliations
 			};
 
 		default:

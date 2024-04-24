@@ -5,6 +5,7 @@ import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {
 	GET_RECEIVER_RECONCILE_PROGRESS,
 	GET_RECEIVER_RECONCILIATION,
+	GET_RECEIVER_TABLE_RECONCILES,
 	GET_SITE_PROGRESS
 } from "./state/receiver-reconcile.reducer";
 import {
@@ -16,6 +17,7 @@ import {
 import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
+import {ReceiverTableReconcile} from "./receiver-table-reconcile";
 
 @Component({
 	selector: 'receiver-reconcile',
@@ -31,11 +33,15 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
 	siteProgress?: any;
 
+	tableReconciliations?: ReceiverTableReconcile[];
+
 	loadedSubscription?: Subscription;
 
 	loadedProgressSubscription?: Subscription;
 
 	loadedSiteProgressSubscription?: Subscription;
+
+	loadedTableSubscription?: Subscription;
 
 	constructor(
 		private service: ReceiverReconcileService,
@@ -61,6 +67,12 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSiteProgressSubscription = this.store.pipe(select(GET_SITE_PROGRESS)).subscribe(
 			siteProgress => {
 				this.siteProgress = siteProgress;
+			}
+		);
+
+		this.loadedTableSubscription = this.store.pipe(select(GET_RECEIVER_TABLE_RECONCILES)).subscribe(
+			tableRecs => {
+				this.tableReconciliations = tableRecs;
 			}
 		);
 
@@ -120,6 +132,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSubscription?.unsubscribe();
 		this.loadedProgressSubscription?.unsubscribe();
 		this.loadedSiteProgressSubscription?.unsubscribe();
+		this.loadedTableSubscription?.unsubscribe();
 	}
 
 }

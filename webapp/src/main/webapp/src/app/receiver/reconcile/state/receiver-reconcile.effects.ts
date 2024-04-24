@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
-import {map, switchMap} from "rxjs/operators";
+import {map, mergeMap, switchMap} from "rxjs/operators";
 import {
 	ReceiverReconcileActionType,
 	ReceiverReconcileProgressLoaded,
 	ReceiverReconciliationLoaded,
+	ReceiverTableReconciliationsLoaded,
 	SiteProgressLoaded
 } from "./receiver-reconcile.actions";
 import {ReceiverReconcileService} from "../receiver-reconcile.service";
@@ -54,6 +55,17 @@ export class ReceiverReconcileEffects {
 			switchMap(() => this.service.getSiteProgress()
 				.pipe(
 					map(siteProgress => new SiteProgressLoaded(siteProgress))
+				)
+			)
+		)
+	);
+
+	getTableReconciliations = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.LOAD_TABLE_RECONCILIATIONS),
+			mergeMap(action => this.service.getIncompleteTableReconciliations(action['siteId'])
+				.pipe(
+					map(tableRecs => new ReceiverTableReconciliationsLoaded(tableRecs))
 				)
 			)
 		)

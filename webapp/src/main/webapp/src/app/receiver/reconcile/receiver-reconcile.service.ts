@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
 import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
+import {ReceiverTableReconcile} from "./receiver-table-reconcile";
 
 const RESOURCE_NAME = 'receiver/reconcile';
 
@@ -29,6 +30,10 @@ export class ReceiverReconcileService {
 
 	getSiteProgress(): Observable<any> {
 		return this.httpClient.get<any>(environment.apiBaseUrl + RESOURCE_NAME + '/siteprogress');
+	}
+
+	getIncompleteTableReconciliations(siteId: number): Observable<ReceiverTableReconcile[]> {
+		return this.httpClient.get<ReceiverTableReconcile[]>(environment.apiBaseUrl + RESOURCE_NAME + '/tablereconcile/' + siteId);
 	}
 
 }

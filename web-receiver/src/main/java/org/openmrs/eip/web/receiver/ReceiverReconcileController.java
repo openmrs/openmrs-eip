@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile(SyncProfiles.RECEIVER)
 @RequestMapping(RestConstants.PATH_RECEIVER_RECONCILE)
-public class ReconcileController {
+public class ReceiverReconcileController {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ReconcileController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReceiverReconcileController.class);
 	
 	private ReceiverReconcileRepository reconcileRepo;
 	
@@ -43,7 +43,7 @@ public class ReconcileController {
 	
 	private SiteRepository siteRepo;
 	
-	public ReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService,
+	public ReceiverReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService,
 	    SiteReconciliationRepository siteRecRepo, ReceiverTableReconcileRepository tableRecRepo, SiteRepository siteRepo) {
 		this.reconcileRepo = reconcileRepo;
 		this.reconcileService = reconcileService;
@@ -105,7 +105,7 @@ public class ReconcileController {
 	@GetMapping("/" + RestConstants.TABLE_RECONCILE + "/{" + PATH_VAR_SITE_ID + "}")
 	public List<ReceiverTableReconciliation> getIncompleteTableReconciliations(@PathVariable(PATH_VAR_SITE_ID) Long sideId) {
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Getting progress of incomplete table reconciliations for site with id {}", sideId);
+			LOG.debug("Getting incomplete table reconciliations for site with id {}", sideId);
 		}
 		
 		SiteReconciliation siteRec = siteRecRepo.getBySite(siteRepo.getReferenceById(sideId));

@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ReconcileControllerTest extends BaseReceiverWebTest {
+public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	
 	@Autowired
 	private ReceiverReconcileRepository reconcileRepo;
