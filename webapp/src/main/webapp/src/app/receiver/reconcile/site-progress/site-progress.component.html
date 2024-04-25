@@ -12,7 +12,8 @@
 	<tr *ngFor="let e of siteProgress | keyvalue">
 		<td class="text-nowrap align-top" i18n="@@common-identifier">{{getSiteName(e.key)}}</td>
 		<td class="w-100 align-middle">
-			<ngb-progressbar type="success" height="12px" [value]="castToInt(e.value)" [max]="tableCount">
+			<ngb-progressbar type="success" height="12px" [value]="castToInt(e.value)" [max]="tableCount"
+				[ngbTooltip]="toString(e.value)">
 				{{e.value}}
 			</ngb-progressbar>
 		</td>
@@ -29,34 +30,50 @@
 </ng-template>
 
 <ng-template #tableRecTemplate>
-	<table class="w-100 table-sm table-striped">
-		<thead>
-		<tr>
-			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-table-name">
-				Table Name
-			</th>
-			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@receiver-start-at-facility">
-				Start Date At Health Facility
-			</th>
-			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@receiver-last-batch-received">
-				Last Batch Received
-			</th>
-			<th class="w-100 text-center border-secondary border-bottom" i18n="@@common-completed-rows">
-				Completed Rows
-			</th>
-		</tr>
-		</thead>
-		<tbody>
-		<tr *ngFor="let t of tableReconciliations">
-			<td class="text-nowrap align-top">{{t.tableName}}</td>
-			<td class="text-nowrap align-top">{{t.remoteStartDate}}</td>
-			<td class="text-nowrap align-top">{{getLastBatchReceivedLabel(t.lastBatchReceived)}}</td>
-			<td class="w-100 align-middle">
-				<ngb-progressbar type="success" height="12px" [value]="castToInt(t.processedCount)" [max]="castToInt(t.rowCount)">
-					<b>{{t.processedCount}} <span i18n="common-of">of</span> {{t.rowCount}}</b>
-				</ngb-progressbar>
-			</td>
-		</tr>
-		</tbody>
-	</table>
+	<div class="modal-header d-flex justify-content-center">
+		<h4 class="modal-title" id="modal-basic-title" i18n="@@common-incomplete-tables">Incomplete Tables</h4>
+		<button type="button" class="close" aria-label="Close" (click)="closeDialog()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<table class="w-100 table-sm table-striped">
+			<thead class="table-secondary">
+			<tr>
+				<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-table-name">
+					Table Name
+				</th>
+				<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@receiver-last-batch-received">
+					Last Batch Received
+				</th>
+				<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@receiver-start-at-facility">
+					Start Date At Health Facility
+				</th>
+				<th class="w-100 text-center border-secondary border-bottom" i18n="@@common-processed">
+					Processed
+				</th>
+				<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-row-count">
+					Row Count
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr *ngFor="let t of tableReconciliations">
+				<td class="text-nowrap align-top">{{t.tableName}}</td>
+				<td class="text-nowrap align-top text-center">{{getLastBatchReceivedLabel(t.lastBatchReceived)}}</td>
+				<td class="text-nowrap align-top">{{t.remoteStartDate  | date:'EEE, MMM dd, y, HH:mm'}}</td>
+				<td class="w-100 align-middle">
+					<ngb-progressbar type="success" height="12px" [value]="castToInt(t.processedCount)"
+									 [max]="castToInt(t.rowCount)"  [ngbTooltip]="t.processedCount?.toString()">
+						<b>{{t.processedCount}}</b>
+					</ngb-progressbar>
+				</td>
+				<td class="text-nowrap align-top text-center">{{t.rowCount}}</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer justify-content-center">
+		<button type="button" class="btn btn-outline-danger" (click)="closeDialog()" i18n="@@common-close">Close</button>
+	</div>
 </ng-template>

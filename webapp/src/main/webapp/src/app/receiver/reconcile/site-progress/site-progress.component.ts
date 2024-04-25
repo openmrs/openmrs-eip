@@ -56,6 +56,10 @@ export class SiteProgressComponent extends BaseListingComponent implements OnIni
 		return value;
 	}
 
+	toString(value: any): string {
+		return value;
+	}
+
 	showIncompleteTables(key: any): void {
 		let siteId: any = key.substr(0, key.indexOf('^'));
 		this.store.dispatch(new LoadReceiverTableReconciliations(siteId));
@@ -77,6 +81,10 @@ export class SiteProgressComponent extends BaseListingComponent implements OnIni
 		this.modalRef.closed.subscribe(() => {
 			this.store.dispatch(new ReceiverTableReconciliationsLoaded(undefined));
 		});
+	}
+
+	closeDialog(): void {
+		this.modalRef?.close();
 	}
 
 	ngOnDestroy(): void {

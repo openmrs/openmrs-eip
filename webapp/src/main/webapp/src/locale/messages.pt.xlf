@@ -746,5 +746,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-row-count">
+			<segment>
+				<source>Row Count</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-processed">
+			<segment>
+				<source>Processed</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-incomplete-tables">
+			<segment>
+				<source>Incomplete Tables</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
