@@ -79,7 +79,7 @@ export class ReceiverTableReconciliationsLoaded implements Action {
 
 	readonly type = ReceiverReconcileActionType.TABLE_RECONCILIATIONS_LOADED;
 
-	constructor(public tableReconciliations: ReceiverTableReconcile[]) {
+	constructor(public tableReconciliations?: ReceiverTableReconcile[]) {
 	}
 
 }

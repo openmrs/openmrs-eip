@@ -728,5 +728,23 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-completed-rows">
+			<segment>
+				<source>Completed Rows</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-start-at-facility">
+			<segment>
+				<source>Start Date At Health Facility</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="receiver-last-batch-received">
+			<segment>
+				<source>Last Batch Received</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

@@ -8,6 +8,6 @@ export class ReceiverTableReconcile {
 
 	lastBatchReceived?: boolean;
 
-	remoteStartDate?: Date;
+	remoteStartDate?: string;
 
 }

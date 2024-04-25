@@ -27,3 +27,36 @@
 <ng-template #viewIncompleteTablesTemplate>
 	<span i18n="@@common-view-incomplete-tables">View Incomplete Tables</span>
 </ng-template>
+
+<ng-template #tableRecTemplate>
+	<table class="w-100 table-sm table-striped">
+		<thead>
+		<tr>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-table-name">
+				Table Name
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@receiver-start-at-facility">
+				Start Date At Health Facility
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@receiver-last-batch-received">
+				Last Batch Received
+			</th>
+			<th class="w-100 text-center border-secondary border-bottom" i18n="@@common-completed-rows">
+				Completed Rows
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr *ngFor="let t of tableReconciliations">
+			<td class="text-nowrap align-top">{{t.tableName}}</td>
+			<td class="text-nowrap align-top">{{t.remoteStartDate}}</td>
+			<td class="text-nowrap align-top">{{getLastBatchReceivedLabel(t.lastBatchReceived)}}</td>
+			<td class="w-100 align-middle">
+				<ngb-progressbar type="success" height="12px" [value]="castToInt(t.processedCount)" [max]="castToInt(t.rowCount)">
+					<b>{{t.processedCount}} <span i18n="common-of">of</span> {{t.rowCount}}</b>
+				</ngb-progressbar>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</ng-template>
