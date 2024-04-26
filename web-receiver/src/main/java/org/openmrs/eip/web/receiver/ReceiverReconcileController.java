@@ -109,7 +109,20 @@ public class ReceiverReconcileController {
 		}
 		
 		SiteReconciliation siteRec = siteRecRepo.getBySite(siteRepo.getReferenceById(sideId));
-		return tableRecRepo.getByCompletedIsFalseAndSiteReconciliation(siteRec);
+		List<String> reconciledTables = tableRecRepo.getReconciledTables(siteRec);
+		List<ReceiverTableReconciliation> incomplete = tableRecRepo.getByCompletedIsFalseAndSiteReconciliation(siteRec);
+		List<String> incompleteTables = incomplete.stream().map(r -> r.getTableName().toLowerCase()).toList();
+		//Include tables for which no rows have been received from the remote site
+		List<ReceiverTableReconciliation> unStarted = AppUtils.getTablesToSync().stream()
+		        .filter(t -> !reconciledTables.contains(t.toLowerCase()) && !incompleteTables.contains(t.toLowerCase()))
+		        .map(t -> {
+			        ReceiverTableReconciliation r = new ReceiverTableReconciliation();
+			        r.setTableName(t.toLowerCase());
+			        return r;
+		        }).toList();
+		
+		incomplete.addAll(unStarted);
+		return incomplete;
 	}
 	
 }

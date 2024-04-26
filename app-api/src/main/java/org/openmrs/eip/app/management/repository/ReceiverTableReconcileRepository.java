@@ -5,6 +5,7 @@ import java.util.List;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface ReceiverTableReconcileRepository extends JpaRepository<ReceiverTableReconciliation, Long> {
 	
@@ -32,5 +33,22 @@ public interface ReceiverTableReconcileRepository extends JpaRepository<Receiver
 	 * @return list of receiver table reconciliations
 	 */
 	List<ReceiverTableReconciliation> getByCompletedIsFalseAndSiteReconciliation(SiteReconciliation siteRec);
+	
+	/**
+	 * Gets all table reconciliations belonging to the specified site reconciliation.
+	 *
+	 * @param siteRec the site reconciliation to match
+	 * @return list of receiver table reconciliations
+	 */
+	List<ReceiverTableReconciliation> getBySiteReconciliation(SiteReconciliation siteRec);
+	
+	/**
+	 * Gets all reconciled table names matching the specified site reconciliation.
+	 *
+	 * @param siteRec the site reconciliation to match
+	 * @return list of all reconciled table names
+	 */
+	@Query("SELECT lower(r.tableName) FROM ReceiverTableReconciliation r WHERE r.completed = true AND r.siteReconciliation = :siteRec")
+	List<String> getReconciledTables(SiteReconciliation siteRec);
 	
 }

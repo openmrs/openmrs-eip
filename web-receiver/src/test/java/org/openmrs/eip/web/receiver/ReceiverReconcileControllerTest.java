@@ -18,8 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.CustomMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
@@ -117,12 +120,32 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		
 		result.andExpect(status().isOk());
-		result.andExpect(jsonPath("length()", equalTo(1)));
+		result.andExpect(jsonPath("length()", equalTo(20)));
 		result.andExpect(jsonPath("[0].tableName", equalTo("encounter")));
 		result.andExpect(jsonPath("[0].rowCount", equalTo(10)));
 		result.andExpect(jsonPath("[0].processedCount", equalTo(9)));
 		result.andExpect(jsonPath("[0].lastBatchReceived", equalTo(false)));
 		result.andExpect(jsonPath("[0].remoteStartDate", equalTo("2024-02-07T00:04:00")));
+		Set<String> expectedTables = AppUtils.getTablesToSync();
+		expectedTables.remove("PERSON");
+		expectedTables.remove("VISIT");
+		expectedTables.remove("ENCOUNTER");
+		Matcher matcher = new CustomMatcher<>("Found unexpected table") {
+			
+			@Override
+			public boolean matches(Object o) {
+				return expectedTables.contains(o.toString().toUpperCase());
+			}
+		};
+		
+		for (int i = 1; i < expectedTables.size(); i++) {
+			result.andExpect(jsonPath("[" + i + "].tableName", matcher));
+			result.andExpect(jsonPath("[" + i + "].rowCount", equalTo(0)));
+			result.andExpect(jsonPath("[" + i + "].processedCount", equalTo(0)));
+			result.andExpect(jsonPath("[" + i + "].lastBatchReceived", equalTo(false)));
+			result.andExpect(jsonPath("[" + i + "].remoteStartDate", CoreMatchers.nullValue()));
+			i++;
+		}
 	}
 	
 }

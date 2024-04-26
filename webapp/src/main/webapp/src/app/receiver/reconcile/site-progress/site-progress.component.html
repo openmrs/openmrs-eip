@@ -58,17 +58,20 @@
 			</tr>
 			</thead>
 			<tbody>
-			<tr *ngFor="let t of tableReconciliations">
-				<td class="text-nowrap align-top">{{t.tableName}}</td>
-				<td class="text-nowrap align-top text-center">{{getLastBatchReceivedLabel(t.lastBatchReceived)}}</td>
-				<td class="text-nowrap align-top">{{t.remoteStartDate  | date:'EEE, MMM dd, y, HH:mm'}}</td>
+			<tr *ngFor="let r of tableReconciliations">
+				<td class="text-nowrap align-top">{{r.tableName}}</td>
+				<td class="text-nowrap align-top text-center">{{getLastBatchReceivedLabel(r.lastBatchReceived)}}</td>
+				<td class="text-nowrap align-top">{{r.remoteStartDate  | date:'EEE, MMM dd, y, HH:mm'}}</td>
 				<td class="w-100 align-middle">
-					<ngb-progressbar type="success" height="12px" [value]="castToInt(t.processedCount)"
-									 [max]="castToInt(t.rowCount)"  [ngbTooltip]="t.processedCount?.toString()">
-						<b>{{t.processedCount}}</b>
+					<ngb-progressbar type="success" height="12px" [value]="castToInt(r.processedCount)"
+									 [max]="castToInt(r.rowCount)"  [ngbTooltip]="r.processedCount?.toString()">
+						<b>{{r.processedCount}}</b>
 					</ngb-progressbar>
 				</td>
-				<td class="text-nowrap align-top text-center">{{t.rowCount}}</td>
+				<td class="text-nowrap align-top text-center">
+					<span [hidden]="!r.remoteStartDate">{{r.rowCount}}</span>
+					<span [hidden]="r.remoteStartDate" i18n="@@common-unknown">Unknown</span>
+				</td>
 			</tr>
 			</tbody>
 		</table>

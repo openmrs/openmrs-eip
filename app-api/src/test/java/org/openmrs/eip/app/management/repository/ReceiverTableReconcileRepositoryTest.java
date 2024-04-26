@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
 
@@ -27,7 +29,7 @@ public class ReceiverTableReconcileRepositoryTest extends BaseReceiverTest {
 	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getBySiteReconciliationAndTableName_shouldGetTheReconciliationForTheSite() {
 		SiteReconciliation siteRec = siteRecRepo.getReferenceById(2L);
-		Assert.assertEquals(2L, repo.getBySiteReconciliationAndTableName(siteRec, "person").getId().longValue());
+		assertEquals(4L, repo.getBySiteReconciliationAndTableName(siteRec, "person").getId().longValue());
 	}
 	
 	@Test
@@ -36,9 +38,20 @@ public class ReceiverTableReconcileRepositoryTest extends BaseReceiverTest {
 	public void getByCompletedIsFalseAndSiteReconciliation_shouldGetTheInCompleteTableReconciliationsForTheSite() {
 		SiteReconciliation siteRec = siteRecRepo.getReferenceById(5L);
 		List<ReceiverTableReconciliation> tableRecs = repo.getByCompletedIsFalseAndSiteReconciliation(siteRec);
-		Assert.assertEquals(1, tableRecs.size());
-		Assert.assertEquals(9, tableRecs.get(0).getId().intValue());
+		assertEquals(1, tableRecs.size());
+		assertEquals(9, tableRecs.get(0).getId().intValue());
 		Assert.assertFalse(tableRecs.get(0).isCompleted());
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_site_reconcile.sql",
+	        "classpath:mgt_receiver_table_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getReconciledTables_shouldGetTheReconciledTableNamesForTheSite() {
+		SiteReconciliation siteRec = siteRecRepo.getReferenceById(5L);
+		List<String> tables = repo.getReconciledTables(siteRec);
+		assertEquals(2, tables.size());
+		assertTrue(tables.contains("person"));
+		assertTrue(tables.contains("visit"));
 	}
 	
 }

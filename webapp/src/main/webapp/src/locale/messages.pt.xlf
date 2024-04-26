@@ -764,5 +764,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-unknown">
+			<segment>
+				<source>Unknown</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
