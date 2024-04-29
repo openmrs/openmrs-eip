@@ -18,7 +18,7 @@
 				<th class="text-nowrap" i18n="@@common-status">Status</th>
 				<td class="pl-4 py-1">{{displayStatus()}}</td>
 			</tr>
-			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
+			<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
 				<th class="text-nowrap" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
 				<td class="pl-4 py-1 align-middle">
 					<ngb-progressbar type="success" [value]="getCompletedSites()" [max]="getTotalCount()">
@@ -26,7 +26,7 @@
 					</ngb-progressbar>
 				</td>
 			</tr>
-			<tr [hidden]="reconciliation?.status != ReceiverReconcileStatusEnum.PROCESSING">
+			<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
 				<th class="text-nowrap"></th>
 				<td class="pl-4 py-3">
 					<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-facility-breakdown">

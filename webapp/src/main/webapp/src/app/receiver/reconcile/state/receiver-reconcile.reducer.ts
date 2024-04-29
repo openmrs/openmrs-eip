@@ -1,11 +1,11 @@
-import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {ReceiverReconcileAction, ReceiverReconcileActionType} from "./receiver-reconcile.actions";
 import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "../receiver-table-reconcile";
+import {Reconciliation} from "../../../shared/reconciliation";
 
 export interface ReceiverReconcileState {
-	reconciliation: ReceiverReconciliation;
+	reconciliation: Reconciliation;
 	progress: ReceiverReconcileProgress;
 	siteProgress: any;
 	tableReconciliations: ReceiverTableReconcile[];

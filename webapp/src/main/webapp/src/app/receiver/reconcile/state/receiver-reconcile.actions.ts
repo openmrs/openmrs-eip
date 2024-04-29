@@ -1,7 +1,7 @@
 import {Action} from "@ngrx/store";
-import {ReceiverReconciliation} from "../receiver-reconciliation";
 import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "../receiver-table-reconcile";
+import {Reconciliation} from "../../../shared/reconciliation";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECONCILIATION',
@@ -25,7 +25,7 @@ export class ReceiverReconciliationLoaded implements Action {
 
 	readonly type = ReceiverReconcileActionType.RECONCILIATION_LOADED;
 
-	constructor(public reconciliation?: ReceiverReconciliation) {
+	constructor(public reconciliation?: Reconciliation) {
 	}
 
 }

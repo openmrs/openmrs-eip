@@ -1,4 +1,4 @@
-export enum ReceiverReconcileStatus {
+export enum ReconcileStatus {
 
 	NEW = 'NEW',
 

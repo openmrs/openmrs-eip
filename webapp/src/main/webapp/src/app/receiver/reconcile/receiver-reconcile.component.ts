@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {select, Store} from "@ngrx/store";
 import {Subscription} from "rxjs";
-import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {
 	GET_RECEIVER_RECONCILE_PROGRESS,
 	GET_RECEIVER_RECONCILIATION,
@@ -13,10 +12,11 @@ import {
 	LoadSiteProgress,
 	StartReconciliation
 } from "./state/receiver-reconcile.actions";
-import {ReceiverReconcileStatus} from "./receiver-reconcile-status.enum";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "./receiver-table-reconcile";
+import {Reconciliation} from "../../shared/reconciliation";
+import {ReconcileStatus} from "../../shared/reconcile-status.enum";
 
 @Component({
 	selector: 'receiver-reconcile',
@@ -24,9 +24,9 @@ import {ReceiverTableReconcile} from "./receiver-table-reconcile";
 })
 export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 
-	ReceiverReconcileStatusEnum = ReceiverReconcileStatus;
+	ReconcileStatusEnum = ReconcileStatus;
 
-	reconciliation?: ReceiverReconciliation;
+	reconciliation?: Reconciliation;
 
 	progress?: ReceiverReconcileProgress;
 
@@ -49,7 +49,7 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (this.reconciliation && this.reconciliation.status == ReceiverReconcileStatus.PROCESSING) {
+				if (this.reconciliation && this.reconciliation.status == ReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadReceiverReconcileProgress());
 				}
 			}
@@ -77,13 +77,13 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 	displayStatus(): string {
 		let display: string = '';
 		switch (this.reconciliation?.status) {
-			case ReceiverReconcileStatus.NEW:
+			case ReconcileStatus.NEW:
 				display = $localize`:@@common-pending:Pending`;
 				break;
-			case ReceiverReconcileStatus.PROCESSING:
+			case ReconcileStatus.PROCESSING:
 				display = $localize`:@@common-processing:Processing`;
 				break;
-			case ReceiverReconcileStatus.POST_PROCESSING:
+			case ReconcileStatus.POST_PROCESSING:
 				display = $localize`:@@reconcile-generating-report:Generating Report`;
 				break;
 		}

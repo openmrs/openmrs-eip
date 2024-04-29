@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
-import {ReceiverReconciliation} from "./receiver-reconciliation";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "./receiver-table-reconcile";
+import {Reconciliation} from "../../shared/reconciliation";
 
 const RESOURCE_NAME = 'receiver/reconcile';
 
@@ -16,12 +16,12 @@ export class ReceiverReconcileService {
 	protected constructor(protected httpClient: HttpClient) {
 	}
 
-	getReconciliation(): Observable<ReceiverReconciliation> {
-		return this.httpClient.get<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME);
+	getReconciliation(): Observable<Reconciliation> {
+		return this.httpClient.get<Reconciliation>(environment.apiBaseUrl + RESOURCE_NAME);
 	}
 
-	startReconciliation(): Observable<ReceiverReconciliation> {
-		return this.httpClient.post<ReceiverReconciliation>(environment.apiBaseUrl + RESOURCE_NAME, null);
+	startReconciliation(): Observable<Reconciliation> {
+		return this.httpClient.post<Reconciliation>(environment.apiBaseUrl + RESOURCE_NAME, null);
 	}
 
 	getReconciliationProgress(): Observable<ReceiverReconcileProgress> {
