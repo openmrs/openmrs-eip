@@ -14,4 +14,10 @@ public class SenderRestConstants {
 	
 	public static final String PATH_ERR_DETAILS = RES_SENDER_DASHBOARD + PATH_NAME_ERR_DETAILS;
 	
+	public static final String SUB_PATH_SENDER = RestConstants.SUB_PATH_DB_SYNC + "sender/";
+	
+	public static final String PATH_SENDER_RECONCILE = SUB_PATH_SENDER + "reconcile";
+	
+	public static final String PATH_REC_TABLE_RECONCILE = PATH_SENDER_RECONCILE + "/" + RestConstants.TABLE_RECONCILE;
+	
 }
