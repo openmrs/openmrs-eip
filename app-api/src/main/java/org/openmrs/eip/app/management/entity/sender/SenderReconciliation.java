@@ -3,6 +3,8 @@ package org.openmrs.eip.app.management.entity.sender;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "sender_reconcile")
+@JsonIncludeProperties({ "identifier", "status" })
 public class SenderReconciliation extends AbstractEntity {
 	
 	public enum SenderReconcileStatus {

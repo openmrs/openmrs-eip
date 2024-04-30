@@ -16,6 +16,7 @@ import {FormsModule} from '@angular/forms';
 import {EffectsModule} from "@ngrx/effects";
 import {senderDashboardReducer} from "./dashboard/state/sender.dashboard.reducer";
 import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects";
+import {SenderReconcileComponent} from './reconcile/sender-reconcile.component';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects
 		DbEventComponent,
 		SenderSyncMessageComponent,
 		SenderArchiveComponent,
+		SenderReconcileComponent,
 	],
 	imports: [
 		SharedModule,

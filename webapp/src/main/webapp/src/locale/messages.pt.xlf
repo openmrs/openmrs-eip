@@ -770,5 +770,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="sender-no-reconciliation-in-progress">
+			<segment>
+				<source>No reconciliation in progress</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
