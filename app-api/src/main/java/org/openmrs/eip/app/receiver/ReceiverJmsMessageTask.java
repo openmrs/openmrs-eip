@@ -28,7 +28,7 @@ public class ReceiverJmsMessageTask extends BaseDelegatingQueueTask<JmsMessage, 
 	
 	@Override
 	public List<JmsMessage> getNextBatch() {
-		return repo.findAllByOrderByDateCreatedAsc(AppUtils.getTaskPage());
+		return repo.findAll(AppUtils.getTaskPage()).getContent();
 	}
 	
 }
