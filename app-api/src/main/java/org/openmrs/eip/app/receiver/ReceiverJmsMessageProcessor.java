@@ -8,9 +8,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.openmrs.eip.app.BaseQueueProcessor;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
-import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
+import org.openmrs.eip.app.management.service.ReceiverService;
 import org.openmrs.eip.component.SyncProfiles;
+import org.openmrs.eip.component.model.SyncModel;
+import org.openmrs.eip.component.utils.JsonUtils;
+import org.openmrs.eip.component.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,6 +57,11 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 			return item.getSiteId();
 		}
 		
+		if (item.getType() == MessageType.SYNC) {
+			//Process events for different entities in parallel
+			return JsonUtils.unmarshalBytes(item.getBody(), SyncModel.class).getModel().getUuid();
+		}
+		
 		//Process all messages serially
 		//We currently ignore site because it will be null in prod for existing messages at time of upgrade.
 		return getLogicalType(item);
@@ -66,12 +74,20 @@ public class ReceiverJmsMessageProcessor extends BaseQueueProcessor<JmsMessage> 
 	
 	@Override
 	public String getLogicalType(JmsMessage item) {
+		if (item.getType() == MessageType.SYNC) {
+			return JsonUtils.unmarshalBytes(item.getBody(), SyncModel.class).getTableToSyncModelClass().getName();
+		}
+		
 		return item.getType().name();
 	}
 	
 	@Override
 	public List<String> getLogicalTypeHierarchy(String logicalType) {
-		return null;
+		if (MessageType.RECONCILE.name().equals(logicalType)) {
+			return null;
+		}
+		
+		return Utils.getListOfModelClassHierarchy(logicalType);
 	}
 	
 	@Override
