@@ -1,19 +1,20 @@
 package org.openmrs.eip.fhir.spring;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openmrs.eip.OauthToken;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.Base64;
+
+import org.openmrs.eip.OauthToken;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class OpenmrsFhirOauth2 {
@@ -45,9 +46,9 @@ public class OpenmrsFhirOauth2 {
 		String requestBody = "grant_type=client_credentials&scope=" + scope;
 		
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(oauthUri))
-				.header("Content-Type", "application/x-www-form-urlencoded")
-				.header("Authorization", "Basic " + encodedCredentials)
-				.POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
+		        .header("Content-Type", "application/x-www-form-urlencoded")
+		        .header("Authorization", "Basic " + encodedCredentials)
+		        .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 		try {
 			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() == 200) {
