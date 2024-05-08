@@ -49,6 +49,6 @@ public class OpenmrsFhirRouter extends RouteBuilder {
 		        .filter(and(simple("${exchangeProperty." + PROP_EVENT_SNAPSHOT + "}").isEqualTo(false),
 		            simple("${exchangeProperty." + PROP_EVENT_TABLE_NAME + "}").in((Object[]) monitoredTables)))
 		        .log(LoggingLevel.INFO, "Dispatching to endpoints " + resourceDestinations)
-		        .recipientList(constant(resourceDestinations)).parallelProcessing().end();
+		        .recipientList(constant(resourceDestinations)).synchronous(true).end();
 	}
 }
