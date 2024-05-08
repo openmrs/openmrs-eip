@@ -17,6 +17,7 @@ import {EffectsModule} from "@ngrx/effects";
 import {senderDashboardReducer} from "./dashboard/state/sender.dashboard.reducer";
 import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects";
 import {SenderReconcileComponent} from './reconcile/sender-reconcile.component';
+import {senderReconcileReducer} from "./reconcile/state/sender-reconcile.reducer";
 
 
 @NgModule({
@@ -37,6 +38,7 @@ import {SenderReconcileComponent} from './reconcile/sender-reconcile.component';
 		StoreModule.forFeature('syncQueue', senderSyncMessageReducer),
 		StoreModule.forFeature('senderArchiveQueue', senderArchiveReducer),
 		StoreModule.forFeature("senderDashboard", senderDashboardReducer),
+		StoreModule.forFeature('senderReconcile', senderReconcileReducer),
 		EffectsModule.forFeature([SenderDashboardEffects]),
 		FormsModule,
 	], exports: [SenderComponent]

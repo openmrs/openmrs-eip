@@ -14,7 +14,6 @@ import {
 } from "./state/receiver-reconcile.actions";
 import {ReceiverReconcileService} from "./receiver-reconcile.service";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
-import {ReceiverTableReconcile} from "./receiver-table-reconcile";
 import {Reconciliation} from "../../shared/reconciliation";
 import {ReconcileStatus} from "../../shared/reconcile-status.enum";
 
@@ -31,8 +30,6 @@ export class ReceiverReconcileComponent implements OnInit, OnDestroy {
 	progress?: ReceiverReconcileProgress;
 
 	siteProgress?: any;
-
-	tableReconciliations?: ReceiverTableReconcile[];
 
 	loadedSubscription?: Subscription;
 

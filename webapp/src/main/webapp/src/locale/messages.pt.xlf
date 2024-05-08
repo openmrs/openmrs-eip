@@ -776,5 +776,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="sender-sending-deleted-rows">
+			<segment>
+				<source>Sending Deleted Rows</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

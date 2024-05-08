@@ -1,3 +1,19 @@
-<div class="text-center" [hidden]="reconciliation">
-	<span i18n="@@sender-no-reconciliation-in-progress">No reconciliation in progress</span>
+<div [hidden]="reconciliation">
+	<div class="d-flex justify-content-center align-items-center" style="min-height: 250px">
+		<span i18n="@@sender-no-reconciliation-in-progress">No reconciliation in progress</span>
+	</div>
+</div>
+<div class="p-3 w-100" [hidden]="!reconciliation">
+	<table class="w-100">
+		<tbody>
+		<tr>
+			<th class="text-nowrap" i18n="@@common-identifier">Identifier</th>
+			<td class="pl-4 w-100 py-1">{{reconciliation?.identifier}}</td>
+		</tr>
+		<tr>
+			<th class="text-nowrap" i18n="@@common-status">Status</th>
+			<td class="pl-4 py-1">{{getStatusDisplay()}}</td>
+		</tr>
+		</tbody>
+	</table>
 </div>

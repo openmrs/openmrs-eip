@@ -1,18 +1,58 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Reconciliation} from "../../shared/reconciliation";
+import {select, Store} from "@ngrx/store";
+import {SenderReconcileService} from "./sender-reconcile.service";
+import {Subscription} from "rxjs";
+import {GET_SENDER_RECONCILIATION} from "./state/sender-reconcile.reducer";
+import {LoadSenderReconciliation} from "./state/sender-reconcile.actions";
+import {ReconcileStatus} from "../../shared/reconcile-status.enum";
 
 @Component({
 	selector: 'sender-reconcile',
 	templateUrl: './sender-reconcile.component.html'
 })
-export class SenderReconcileComponent implements OnInit {
+export class SenderReconcileComponent implements OnInit, OnDestroy {
+
+	ReconcileStatusEnum = ReconcileStatus;
 
 	reconciliation?: Reconciliation;
 
-	constructor() {
+	recLoadedSubscription?: Subscription;
+
+	constructor(
+		private service: SenderReconcileService,
+		private store: Store) {
 	}
 
 	ngOnInit(): void {
+		this.recLoadedSubscription = this.store.pipe(select(GET_SENDER_RECONCILIATION)).subscribe(
+			reconciliation => {
+				this.reconciliation = reconciliation;
+			}
+		);
+
+		this.store.dispatch(new LoadSenderReconciliation());
+	}
+
+	getStatusDisplay(): string {
+		let display: string = '';
+		switch (this.reconciliation?.status) {
+			case ReconcileStatus.NEW:
+				display = $localize`:@@common-pending:Pending`;
+				break;
+			case ReconcileStatus.PROCESSING:
+				display = $localize`:@@common-processing:Processing`;
+				break;
+			case ReconcileStatus.POST_PROCESSING:
+				display = $localize`:@@sender-sending-deleted-rows:Sending Deleted Rows`;
+				break;
+		}
+
+		return display;
+	}
+
+	ngOnDestroy(): void {
+		this.recLoadedSubscription?.unsubscribe();
 	}
 
 }
