@@ -1,4 +1,4 @@
-package org.openmrs.eip.fhir.spring;
+package org.openmrs.eip.fhir.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openmrs.eip.OauthToken;
 
 public class OpenmrsFhirOauth2Test {
 	
@@ -47,13 +46,14 @@ public class OpenmrsFhirOauth2Test {
 	@Test
 	@DisplayName("Should fetch auth token successfully.")
 	@SuppressWarnings("unchecked")
-	void shouldFetchAuthTokenSuccessfully() throws Exception {
+	void shouldFetchTokenInfoSuccessfully() throws Exception {
 		var mockResponse = mock(HttpResponse.class);
 		when(mockResponse.statusCode()).thenReturn(200);
-		when(mockResponse.body()).thenReturn("{\"access_token\":\"token\",\"expires_in\":\"3600\"}");
+		when(mockResponse.body())
+		        .thenReturn("{\"access_token\":\"token\",\"expires_in\":\"3600\",\"token_type\":\"Bearer\"}");
 		when(httpClient.send(any(), any())).thenReturn(mockResponse);
 		
-		OauthToken token = openmrsFhirOauth2.fetchAuthToken();
+		TokenInfo token = openmrsFhirOauth2.fetchTokenInfo();
 		
 		assertEquals("token", token.getAccessToken());
 	}
@@ -66,14 +66,35 @@ public class OpenmrsFhirOauth2Test {
 		when(mockResponse.statusCode()).thenReturn(400);
 		when(httpClient.send(any(), any())).thenReturn(mockResponse);
 		
-		assertThrows(RuntimeException.class, () -> openmrsFhirOauth2.fetchAuthToken());
+		assertThrows(RuntimeException.class, () -> openmrsFhirOauth2.fetchTokenInfo());
 	}
 	
 	@Test
 	@DisplayName("Should throw exception when HttpClient throws exception.")
-	void shouldThrowExceptionWhenHttpClientThrowsException() throws Exception {
-		when(httpClient.send(any(), any())).thenThrow(new RuntimeException());
+	void shouldThrowExceptionWhenHttpClientThrowsException() {
+		openmrsFhirOauth2.setHttpClient(null);
 		
-		assertThrows(RuntimeException.class, () -> openmrsFhirOauth2.fetchAuthToken());
+		assertThrows(RuntimeException.class, () -> openmrsFhirOauth2.fetchTokenInfo());
+	}
+	
+	@Test
+	@DisplayName("Should throw exception when token type is invalid.")
+	@SuppressWarnings("unchecked")
+	void shouldThrowExceptionWhenTokenTypeIsInvalid() throws Exception {
+		var mockResponse = mock(HttpResponse.class);
+		when(mockResponse.statusCode()).thenReturn(200);
+		when(mockResponse.body())
+		        .thenReturn("{\"access_token\":\"token\",\"expires_in\":\"3600\",\"token_type\":\"invalid\"}");
+		when(httpClient.send(any(), any())).thenReturn(mockResponse);
+		
+		assertThrows(RuntimeException.class, () -> openmrsFhirOauth2.fetchTokenInfo());
+	}
+	
+	@Test
+	@DisplayName("Should throw exception when required properties are missing.")
+	void shouldThrowExceptionWhenRequiredPropertiesAreMissing() {
+		setField(openmrsFhirOauth2, "oauthUri", null);
+		
+		assertThrows(IllegalStateException.class, () -> openmrsFhirOauth2.validateOAuthConfig());
 	}
 }

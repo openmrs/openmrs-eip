@@ -4,6 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.component.fhir.FhirComponent;
 import org.apache.camel.component.fhir.FhirConfiguration;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
+import org.openmrs.eip.fhir.security.interceptor.Oauth2Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 
@@ -36,7 +36,7 @@ public class OpenmrsFhirConfiguration {
 	private boolean isOauthEnabled;
 	
 	@Autowired
-	private OpenmrsFhirOauth2 openmrsFhirOauth2;
+	private Oauth2Interceptor oauth2Interceptor;
 	
 	public boolean isOauthEnabled() {
 		return isOauthEnabled;
@@ -54,19 +54,7 @@ public class OpenmrsFhirConfiguration {
 				IGenericClient client = ctx.newRestfulGenericClient(fhirServerUrl);
 				
 				if (isOauthEnabled()) {
-					client.registerInterceptor(new IClientInterceptor() {
-						
-						@Override
-						public void interceptRequest(ca.uhn.fhir.rest.client.api.IHttpRequest theRequest) {
-							theRequest.addHeader("Authorization",
-							    "Bearer " + openmrsFhirOauth2.fetchAuthToken().getAccessToken());
-						}
-						
-						@Override
-						public void interceptResponse(ca.uhn.fhir.rest.client.api.IHttpResponse theResponse) {
-							
-						}
-					});
+					client.registerInterceptor(oauth2Interceptor);
 				} else {
 					if (fhirUsername != null && !fhirUsername.isBlank() && fhirPassword != null && !fhirPassword.isBlank()) {
 						client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
