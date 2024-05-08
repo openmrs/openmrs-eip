@@ -18,6 +18,7 @@ import {senderDashboardReducer} from "./dashboard/state/sender.dashboard.reducer
 import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects";
 import {SenderReconcileComponent} from './reconcile/sender-reconcile.component';
 import {senderReconcileReducer} from "./reconcile/state/sender-reconcile.reducer";
+import {SenderReconcileEffects} from "./reconcile/state/sender-reconcile.effects";
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import {senderReconcileReducer} from "./reconcile/state/sender-reconcile.reducer
 		StoreModule.forFeature("senderDashboard", senderDashboardReducer),
 		StoreModule.forFeature('senderReconcile', senderReconcileReducer),
 		EffectsModule.forFeature([SenderDashboardEffects]),
+		EffectsModule.forFeature([SenderReconcileEffects]),
 		FormsModule,
 	], exports: [SenderComponent]
 })
