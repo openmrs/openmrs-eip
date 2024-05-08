@@ -28,9 +28,6 @@ export class LoadSenderTableReconciliations implements Action {
 
 	readonly type = SenderReconcileActionType.LOAD_TABLE_RECONCILIATIONS;
 
-	constructor(public siteId: number) {
-	}
-
 }
 
 export class SenderTableReconciliationsLoaded implements Action {

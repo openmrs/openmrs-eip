@@ -3,9 +3,10 @@ import {Reconciliation} from "../../shared/reconciliation";
 import {select, Store} from "@ngrx/store";
 import {SenderReconcileService} from "./sender-reconcile.service";
 import {Subscription} from "rxjs";
-import {GET_SENDER_RECONCILIATION} from "./state/sender-reconcile.reducer";
-import {LoadSenderReconciliation} from "./state/sender-reconcile.actions";
+import {GET_SENDER_RECONCILIATION, GET_SENDER_TABLE_RECONCILES} from "./state/sender-reconcile.reducer";
+import {LoadSenderReconciliation, LoadSenderTableReconciliations} from "./state/sender-reconcile.actions";
 import {ReconcileStatus} from "../../shared/reconcile-status.enum";
+import {SenderTableReconcile} from "./sender-table-reconcile";
 
 @Component({
 	selector: 'sender-reconcile',
@@ -17,7 +18,11 @@ export class SenderReconcileComponent implements OnInit, OnDestroy {
 
 	reconciliation?: Reconciliation;
 
+	tableReconciliations?: SenderTableReconcile[];
+
 	recLoadedSubscription?: Subscription;
+
+	loadedTableRecsSubscription?: Subscription;
 
 	constructor(
 		private service: SenderReconcileService,
@@ -28,6 +33,15 @@ export class SenderReconcileComponent implements OnInit, OnDestroy {
 		this.recLoadedSubscription = this.store.pipe(select(GET_SENDER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
+				if (reconciliation?.status == ReconcileStatus.PROCESSING) {
+					this.store.dispatch(new LoadSenderTableReconciliations());
+				}
+			}
+		);
+
+		this.loadedTableRecsSubscription = this.store.pipe(select(GET_SENDER_TABLE_RECONCILES)).subscribe(
+			tableRecs => {
+				this.tableReconciliations = tableRecs;
 			}
 		);
 
@@ -53,6 +67,7 @@ export class SenderReconcileComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.recLoadedSubscription?.unsubscribe();
+		this.loadedTableRecsSubscription?.unsubscribe();
 	}
 
 }
