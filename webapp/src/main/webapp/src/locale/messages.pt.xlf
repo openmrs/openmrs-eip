@@ -782,5 +782,35 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="sender-incomplete-tables">
+			<segment>
+				<source>Incomplete Tables</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-started">
+			<segment>
+				<source>Started</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="sender-last-processed-id">
+			<segment>
+				<source>Last Processed Id</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="sender-stop-id">
+			<segment>
+				<source>Stop Id</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="sender-snapshot-date">
+			<segment>
+				<source>Snapshot Date</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
