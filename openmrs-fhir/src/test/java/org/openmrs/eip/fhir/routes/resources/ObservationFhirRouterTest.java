@@ -6,6 +6,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.camel.Endpoint;
@@ -24,8 +27,6 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.mysql.watcher.Event;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-
-import ca.uhn.fhir.context.FhirContext;
 
 @UseAdviceWith
 public class ObservationFhirRouterTest extends CamelSpringTestSupport {
@@ -77,7 +78,9 @@ public class ObservationFhirRouterTest extends CamelSpringTestSupport {
 		sql.expectedMessageCount(1);
 		sql.whenAnyExchangeReceived((exchange) -> {
 			Message sqlOutput = exchange.getMessage();
-			sqlOutput.setBody(new Object[] { 0 });
+			Map<String, String> map = new HashMap<>();
+			map.put("voided", "0");
+			sqlOutput.setBody(Collections.singletonList(map));
 		});
 		
 		// Act

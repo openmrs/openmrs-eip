@@ -19,7 +19,7 @@ public class EncounterRouter extends BaseFhirResourceRouter {
 		from(FhirResource.ENCOUNTER.incomingUrl()).routeId("fhir-encounter-router").filter(isSupportedTable()).log(
 		    LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message").toD(
 		        "sql:SELECT voided FROM ${exchangeProperty.event.tableName} WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .choice().when(simple("${exchangeProperty.operation} == 'd' || ${body[0]['voided']} == 1"))
+		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.ENCOUNTER.outgoingUrl()).otherwise()
 		        .toD("fhir:read/resourceById?resourceClass=Encounter&stringId=${exchangeProperty.event.identifier}")

@@ -25,7 +25,7 @@ public class PersonRouter extends BaseFhirResourceRouter {
 		        .otherwise()
 		        .toD(
 		            "sql:SELECT voided FROM person WHERE person_id = (SELECT t.person_id FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=#openmrsDataSource")
-		        .end().choice().when(simple("${exchangeProperty.operation} == 'd' || ${body[0]} == 1"))
+		        .end().choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.PERSON.outgoingUrl()).otherwise()
 		        // person or patient are basically the top-level object

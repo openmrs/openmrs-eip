@@ -19,7 +19,7 @@ public class ObservationFhirRouter extends BaseFhirResourceRouter {
 		from(FhirResource.OBSERVATION.incomingUrl()).routeId("fhir-observation-router").filter(isSupportedTable()).log(
 		    LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message").toD(
 		        "sql:SELECT voided FROM obs WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .choice().when(simple("${exchangeProperty.operation} == 'd' || ${body[0]} == 1"))
+		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.OBSERVATION.outgoingUrl()).otherwise()
 		        .toD("fhir:read/resourceById?resourceClass=Observation&stringId=${exchangeProperty.event.identifier}")

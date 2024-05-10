@@ -24,7 +24,7 @@ public class MedicationRequestRouter extends BaseFhirResourceRouter {
 		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
 		        .toD(
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .choice().when(simple("${exchangeProperty.operation} == 'd' || ${body[0]['voided']} == 1"))
+		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.MEDICATIONREQUEST.outgoingUrl()).when(simple("${body[0]['order_action']} == 'DISCONTINUE'"))
 		        .toD(
