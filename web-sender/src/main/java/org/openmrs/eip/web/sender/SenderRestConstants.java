@@ -18,6 +18,8 @@ public class SenderRestConstants {
 	
 	public static final String PATH_SENDER_RECONCILE = SUB_PATH_SENDER + "reconcile";
 	
-	public static final String PATH_REC_TABLE_RECONCILE = PATH_SENDER_RECONCILE + "/" + RestConstants.TABLE_RECONCILE;
+	public static final String PATH_TABLE_RECONCILE = PATH_SENDER_RECONCILE + "/" + RestConstants.TABLE_RECONCILE;
+	
+	public static final String PATH_RECONCILE_HISTORY = PATH_SENDER_RECONCILE + "/" + RestConstants.RECONCILE_HISTORY;
 	
 }

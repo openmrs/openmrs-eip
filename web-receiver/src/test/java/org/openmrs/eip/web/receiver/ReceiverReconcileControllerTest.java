@@ -54,7 +54,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	}
 	
 	@Test
-	public void getReconciliation_shouldReturnIfThereIsNoIncompleteReconciliation() throws Exception {
+	public void getReconciliation_shouldReturnNoneIfThereIsNoIncompleteReconciliation() throws Exception {
 		MockHttpServletRequestBuilder builder = get(PATH_RECEIVER_RECONCILE);
 		
 		ResultActions result = mockMvc.perform(builder);

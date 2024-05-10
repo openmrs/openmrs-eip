@@ -3,6 +3,7 @@ package org.openmrs.eip.web.sender;
 import java.util.List;
 
 import org.openmrs.eip.app.management.entity.sender.SenderReconciliation;
+import org.openmrs.eip.app.management.entity.sender.SenderReconciliation.SenderReconcileStatus;
 import org.openmrs.eip.app.management.entity.sender.SenderTableReconciliation;
 import org.openmrs.eip.app.management.repository.SenderReconcileRepository;
 import org.openmrs.eip.app.management.repository.SenderTableReconcileRepository;
@@ -47,6 +48,15 @@ public class SenderReconcileController {
 		}
 		
 		return tableRecRepo.getIncompleteReconciliations();
+	}
+	
+	@GetMapping("/" + RestConstants.RECONCILE_HISTORY)
+	public List<SenderReconciliation> getHistory() {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Getting most recent reconciliation history");
+		}
+		
+		return reconcileRepo.getTop3ByStatusOrderByDateCreatedDesc(SenderReconcileStatus.COMPLETED);
 	}
 	
 }

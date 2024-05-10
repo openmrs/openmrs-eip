@@ -81,6 +81,8 @@ public final class RestConstants {
 	public static final String PATH_REC_SITE_PROGRESS = PATH_RECEIVER_RECONCILE + "/" + SITE_PROGRESS;
 	
 	public static final String TABLE_RECONCILE = "tablereconcile";
+
+    public static final String RECONCILE_HISTORY = "history";
 	
 	public static final String PATH_VAR_SITE_ID = "siteId";
 	
