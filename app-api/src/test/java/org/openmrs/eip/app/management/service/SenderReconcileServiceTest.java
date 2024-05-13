@@ -76,7 +76,7 @@ public class SenderReconcileServiceTest extends BaseSenderTest {
 		assertEquals(0, tableRecRepo.count());
 		SenderTableReconciliation tableRec1 = new SenderTableReconciliation();
 		SenderReconciliation rec = recRepo.getReconciliation();
-		assertEquals(SenderReconcileStatus.NEW, rec.getStatus());
+		assertEquals(SenderReconcileStatus.PROCESSING, rec.getStatus());
 		tableRec1.setTableName("person");
 		tableRec1.setDateCreated(new Date());
 		tableRec1.setLastProcessedId(0);
