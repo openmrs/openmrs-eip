@@ -1,0 +1,61 @@
+<div [hidden]="reconciliation">
+	<div class="d-flex justify-content-center align-items-center" style="min-height: 250px">
+		<span i18n="@@sender-no-reconciliation-in-progress">No reconciliation in progress</span>
+	</div>
+</div>
+<div class="p-3 w-100" [hidden]="!reconciliation">
+	<table class="w-100">
+		<tbody>
+		<tr>
+			<th class="text-nowrap" i18n="@@common-identifier">Identifier</th>
+			<td class="pl-4 w-100 py-1">{{reconciliation?.identifier}}</td>
+		</tr>
+		<tr>
+			<th class="text-nowrap" i18n="@@common-status">Status</th>
+			<td class="pl-4 py-1">{{getStatusDisplay()}}</td>
+		</tr>
+		<tr>
+			<th class="text-nowrap pt-3 pb-2" colspan="2" i18n="@@sender-incomplete-tables">Incomplete Tables</th>
+		</tr>
+		<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
+			<td class="align-middle" colspan="2">
+				<table class="w-100 table-sm table-striped">
+					<thead class="table-secondary">
+					<tr>
+						<th class="text-nowrap px-3 border-secondary border-bottom" i18n="@@common-table-name">
+							Table Name
+						</th>
+						<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-row-count">
+							Row Count
+						</th>
+						<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-started">
+							Started
+						</th>
+						<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@sender-last-processed-id">
+							Last Processed Id
+						</th>
+						<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@sender-stop-id">
+							Stop Id
+						</th>
+						<th class="text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@sender-snapshot-date">
+							Snapshot Date
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr *ngFor="let r of tableReconciliations">
+						<td class="text-nowrap">{{r.tableName | lowercase}}</td>
+						<td class="text-nowrap text-center">{{r.rowCount}}</td>
+						<td class="text-nowrap text-center">{{r.started}}</td>
+						<td class="text-nowrap text-center">{{r.lastProcessedId}}</td>
+						<td class="text-nowrap text-center">{{r.endId}}</td>
+						<td class="text-nowrap text-center">{{r.snapshotDate  | date:'EEE, MMM dd, y, HH:mm:ss'}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+

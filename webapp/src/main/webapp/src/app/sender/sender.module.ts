@@ -19,6 +19,8 @@ import {SenderDashboardEffects} from "./dashboard/state/sender.dashboard.effects
 import {SenderReconcileComponent} from './reconcile/sender-reconcile.component';
 import {senderReconcileReducer} from "./reconcile/state/sender-reconcile.reducer";
 import {SenderReconcileEffects} from "./reconcile/state/sender-reconcile.effects";
+import {SenderActiveReconciliationComponent} from './reconcile/sender-active-reconciliation.component';
+import {SenderReconciliationHistoryComponent} from './reconcile/sender-reconciliation-history.component';
 
 
 @NgModule({
@@ -31,6 +33,8 @@ import {SenderReconcileEffects} from "./reconcile/state/sender-reconcile.effects
 		SenderSyncMessageComponent,
 		SenderArchiveComponent,
 		SenderReconcileComponent,
+		SenderActiveReconciliationComponent,
+		SenderReconciliationHistoryComponent,
 	],
 	imports: [
 		SharedModule,

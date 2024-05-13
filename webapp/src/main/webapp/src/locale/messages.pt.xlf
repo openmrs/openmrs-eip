@@ -770,9 +770,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="common-show-history">
+		<unit id="sender-no-reconciliation-in-progress">
 			<segment>
-				<source>Show History</source>
+				<source>No reconciliation in progress</source>
 				<target></target>
 			</segment>
 		</unit>
@@ -809,6 +809,18 @@
 		<unit id="sender-snapshot-date">
 			<segment>
 				<source>Snapshot Date</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-active">
+			<segment>
+				<source>Active</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="common-history">
+			<segment>
+				<source>History</source>
 				<target></target>
 			</segment>
 		</unit>
