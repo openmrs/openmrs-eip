@@ -22,4 +22,9 @@ export class SenderReconcileService {
 	getIncompleteTableReconciliations(): Observable<SenderTableReconcile[]> {
 		return this.httpClient.get<SenderTableReconcile[]>(environment.apiBaseUrl + RESOURCE_NAME + '/tablereconcile');
 	}
+
+	getHistory(): Observable<Reconciliation[]> {
+		return this.httpClient.get<Reconciliation[]>(environment.apiBaseUrl + RESOURCE_NAME + '/history');
+	}
+
 }

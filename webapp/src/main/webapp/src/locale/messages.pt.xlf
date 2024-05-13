@@ -770,9 +770,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="sender-no-reconciliation-in-progress">
+		<unit id="common-show-history">
 			<segment>
-				<source>No reconciliation in progress</source>
+				<source>Show History</source>
 				<target></target>
 			</segment>
 		</unit>

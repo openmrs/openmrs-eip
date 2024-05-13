@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {map, switchMap} from "rxjs/operators";
 import {
+	SenderHistoryLoaded,
 	SenderReconcileActionType,
 	SenderReconciliationLoaded,
 	SenderTableReconciliationsLoaded
@@ -28,9 +29,20 @@ export class SenderReconcileEffects {
 	getTableReconciliations = createEffect(() =>
 		this.actions$.pipe(
 			ofType(SenderReconcileActionType.LOAD_TABLE_RECONCILIATIONS),
-			switchMap(action => this.service.getIncompleteTableReconciliations()
+			switchMap(() => this.service.getIncompleteTableReconciliations()
 				.pipe(
 					map(tableRecs => new SenderTableReconciliationsLoaded(tableRecs))
+				)
+			)
+		)
+	);
+
+	getHistory = createEffect(() =>
+		this.actions$.pipe(
+			ofType(SenderReconcileActionType.LOAD_HISTORY),
+			switchMap(() => this.service.getHistory()
+				.pipe(
+					map(recHistory => new SenderHistoryLoaded(recHistory))
 				)
 			)
 		)
