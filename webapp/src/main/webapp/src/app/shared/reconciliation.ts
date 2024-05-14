@@ -6,4 +6,6 @@ export class Reconciliation {
 
 	status?: ReconcileStatus;
 
+	dateCreated?: string;
+
 }

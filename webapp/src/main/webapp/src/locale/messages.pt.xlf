@@ -824,5 +824,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-date-created">
+			<segment>
+				<source>Date Created</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

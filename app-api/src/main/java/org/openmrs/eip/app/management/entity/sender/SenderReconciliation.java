@@ -16,7 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "sender_reconcile")
-@JsonIncludeProperties({ "identifier", "status" })
+@JsonIncludeProperties({ "identifier", "status", "dateCreated" })
 public class SenderReconciliation extends AbstractEntity {
 	
 	public enum SenderReconcileStatus {

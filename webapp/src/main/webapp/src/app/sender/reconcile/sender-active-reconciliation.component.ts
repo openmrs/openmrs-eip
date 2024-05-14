@@ -1,9 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ReconcileStatus} from "../../shared/reconcile-status.enum";
 import {Reconciliation} from "../../shared/reconciliation";
 import {SenderTableReconcile} from "./sender-table-reconcile";
 import {Subscription} from "rxjs";
-import {SenderReconcileService} from "./sender-reconcile.service";
 import {select, Store} from "@ngrx/store";
 import {GET_SENDER_RECONCILIATION, GET_SENDER_TABLE_RECONCILES} from "./state/sender-reconcile.reducer";
 import {LoadSenderReconciliation, LoadSenderTableReconciliations} from "./state/sender-reconcile.actions";
@@ -12,7 +11,7 @@ import {LoadSenderReconciliation, LoadSenderTableReconciliations} from "./state/
 	selector: 'sender-active-reconciliation',
 	templateUrl: './sender-active-reconciliation.component.html'
 })
-export class SenderActiveReconciliationComponent implements OnInit {
+export class SenderActiveReconciliationComponent implements OnInit, OnDestroy {
 
 	ReconcileStatusEnum = ReconcileStatus;
 
@@ -24,9 +23,7 @@ export class SenderActiveReconciliationComponent implements OnInit {
 
 	loadedTableRecsSubscription?: Subscription;
 
-	constructor(
-		private service: SenderReconcileService,
-		private store: Store) {
+	constructor(private store: Store) {
 	}
 
 	ngOnInit(): void {

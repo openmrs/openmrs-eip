@@ -1,1 +1,20 @@
-<p>sender-reconciliation-history works!</p>
+<div class="d-flex justify-content-center">
+	<table class="w-50 table-sm table-striped border">
+		<thead class="table-secondary">
+		<tr>
+			<th class="w-50 text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-identifier">
+				Identifier
+			</th>
+			<th class="w-50 text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-date-created">
+				Date Created
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr *ngFor="let r of reconciliationHistory">
+			<td class="text-nowrap text-center">{{r.identifier | lowercase}}</td>
+			<td class="text-nowrap text-center">{{r.dateCreated  | date:'EEE, MMM dd, y, HH:mm:ss'}}</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
