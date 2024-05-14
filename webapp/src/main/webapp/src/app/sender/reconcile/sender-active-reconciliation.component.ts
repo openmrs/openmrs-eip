@@ -30,7 +30,7 @@ export class SenderActiveReconciliationComponent implements OnInit, OnDestroy {
 		this.recLoadedSubscription = this.store.pipe(select(GET_SENDER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (reconciliation?.status == ReconcileStatus.PROCESSING) {
+				if (!this.tableReconciliations && reconciliation?.status == ReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadSenderTableReconciliations());
 				}
 			}

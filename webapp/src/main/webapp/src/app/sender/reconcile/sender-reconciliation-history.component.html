@@ -12,7 +12,7 @@
 		</thead>
 		<tbody>
 		<tr *ngFor="let r of reconciliationHistory">
-			<td class="text-nowrap text-center">{{r.identifier | lowercase}}</td>
+			<td class="text-nowrap text-center">{{r.identifier}}</td>
 			<td class="text-nowrap text-center">{{r.dateCreated  | date:'EEE, MMM dd, y, HH:mm:ss'}}</td>
 		</tr>
 		</tbody>
