@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
+import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation.ReconciliationStatus;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliation;
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
@@ -123,6 +124,15 @@ public class ReceiverReconcileController {
 		
 		incomplete.addAll(unStarted);
 		return incomplete;
+	}
+	
+	@GetMapping("/" + RestConstants.RECONCILE_HISTORY)
+	public List<ReceiverReconciliation> getHistory() {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Getting most recent reconciliation history");
+		}
+		
+		return reconcileRepo.getTop3ByStatusOrderByDateCreatedDesc(ReconciliationStatus.COMPLETED);
 	}
 	
 }

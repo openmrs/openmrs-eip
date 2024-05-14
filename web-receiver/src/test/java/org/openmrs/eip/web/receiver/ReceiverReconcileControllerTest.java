@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.management.entity.receiver.ReceiverReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
+import org.openmrs.eip.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -50,7 +51,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 		ResultActions result = mockMvc.perform(builder);
 		
 		result.andExpect(status().isOk());
-		result.andExpect(jsonPath("identifier", equalTo("rec-2")));
+		result.andExpect(jsonPath("identifier", equalTo("rec-5")));
 	}
 	
 	@Test
@@ -62,6 +63,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 		result.andExpect(status().isOk());
 		result.andExpect(content().string(CoreMatchers.is("")));
 	}
+    
 	
 	@Test
 	public void startReconciliation_shouldAddANewReconciliation() throws Exception {
@@ -146,6 +148,19 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 			result.andExpect(jsonPath("[" + i + "].remoteStartDate", CoreMatchers.nullValue()));
 			i++;
 		}
+	}
+	
+	@Test
+	@Sql(scripts = {
+	        "classpath:mgt_receiver_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getHistory_shouldReturnTheThreeMostRecentCompletedReconciliations() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_HISTORY);
+		ResultActions result = mockMvc.perform(builder);
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(3)));
+		result.andExpect(jsonPath("[0].identifier", equalTo("rec-4")));
+		result.andExpect(jsonPath("[1].identifier", equalTo("rec-3")));
+		result.andExpect(jsonPath("[2].identifier", equalTo("rec-2")));
 	}
 	
 }
