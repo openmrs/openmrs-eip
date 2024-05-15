@@ -46,7 +46,7 @@ export class ReceiverActiveReconciliationComponent implements OnInit, OnDestroy 
 		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (this.reconciliation && this.reconciliation.status == ReconcileStatus.PROCESSING) {
+				if (this.reconciliation && !this.progress && this.reconciliation.status == ReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadReceiverReconcileProgress());
 				}
 			}
