@@ -1,40 +1,14 @@
-<div [hidden]="reconciliation">
-	<div class="d-flex justify-content-center align-items-center" style="min-height: 250px">
-		<i class="bi bi-play-btn-fill text-success ui-cursor-pointer"
-		   [ngbTooltip]="startTooltipTemplate" style="font-size: 5em" (click)="start()"></i>
-	</div>
-	<ng-template #startTooltipTemplate>
-		<span i18n="@@common-start-reconcile">Start New Reconciliation</span>
-	</ng-template>
+<div class="container mw-100">
+	<nav ngbNav #nav="ngbNav" class="nav-pills justify-content-center">
+		<ng-container ngbNavItem="active-rec">
+			<a ngbNavLink><span i18n="@@common-active">Active</span></a>
+			<ng-template ngbNavContent>
+				<receiver-active-reconciliation></receiver-active-reconciliation>
+			</ng-template>
+		</ng-container>
+	</nav>
 </div>
-<div [hidden]="!reconciliation" class="p-3 w-100">
-	<table class="w-100">
-		<tbody>
-			<tr>
-				<th class="text-nowrap" i18n="@@common-identifier">Identifier</th>
-				<td class="pl-4 w-100 py-1">{{reconciliation?.identifier}}</td>
-			</tr>
-			<tr>
-				<th class="text-nowrap" i18n="@@common-status">Status</th>
-				<td class="pl-4 py-1">{{displayStatus()}}</td>
-			</tr>
-			<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
-				<th class="text-nowrap" i18n="@@receiver-reconcile-completed-sites">Completed Sites</th>
-				<td class="pl-4 py-1 align-middle">
-					<ngb-progressbar type="success" [value]="getCompletedSites()" [max]="getTotalCount()">
-						<b>{{progress?.completedSiteCount}} of {{progress?.totalCount}}</b>
-					</ngb-progressbar>
-				</td>
-			</tr>
-			<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
-				<th class="text-nowrap"></th>
-				<td class="pl-4 py-3">
-					<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-facility-breakdown">
-						Show facility breakdown
-					</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<site-progress [hidden]="!this.siteProgress" [siteProgress]="siteProgress" [tableCount]="getTableCount()"></site-progress>
+<div class="container mw-100 pt-3">
+	<div class="ui-bar-spacer-content"></div>
+	<div [ngbNavOutlet]="nav"></div>
 </div>
