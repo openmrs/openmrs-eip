@@ -36,4 +36,8 @@ export class ReceiverReconcileService {
 		return this.httpClient.get<ReceiverTableReconcile[]>(environment.apiBaseUrl + RESOURCE_NAME + '/tablereconcile/' + siteId);
 	}
 
+	getHistory(): Observable<Reconciliation[]> {
+		return this.httpClient.get<Reconciliation[]>(environment.apiBaseUrl + RESOURCE_NAME + '/history');
+	}
+
 }

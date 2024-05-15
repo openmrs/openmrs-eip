@@ -63,8 +63,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 		result.andExpect(status().isOk());
 		result.andExpect(content().string(CoreMatchers.is("")));
 	}
-    
-	
+
 	@Test
 	public void startReconciliation_shouldAddANewReconciliation() throws Exception {
 		Assert.assertNull(reconcileRepo.getReconciliation());

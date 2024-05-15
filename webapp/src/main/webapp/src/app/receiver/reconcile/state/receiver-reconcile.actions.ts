@@ -12,7 +12,9 @@ export enum ReceiverReconcileActionType {
 	LOAD_SITE_PROGRESS = 'LOAD_SITE_PROGRESS',
 	SITE_PROGRESS_LOADED = 'SITE_PROGRESS_LOADED',
 	LOAD_TABLE_RECONCILIATIONS = 'LOAD_TABLE_RECEIVER_RECONCILIATIONS',
-	TABLE_RECONCILIATIONS_LOADED = 'RECEIVER_TABLE_RECONCILIATIONS_LOADED'
+	TABLE_RECONCILIATIONS_LOADED = 'RECEIVER_TABLE_RECONCILIATIONS_LOADED',
+	LOAD_HISTORY = 'LOAD_RECEIVER_HISTORY',
+	HISTORY_LOADED = 'RECEIVER_HISTORY_LOADED'
 }
 
 export class LoadReceiverReconciliation implements Action {
@@ -84,6 +86,21 @@ export class ReceiverTableReconciliationsLoaded implements Action {
 
 }
 
+export class LoadReceiverHistory implements Action {
+
+	readonly type = ReceiverReconcileActionType.LOAD_HISTORY;
+
+}
+
+export class ReceiverHistoryLoaded implements Action {
+
+	readonly type = ReceiverReconcileActionType.HISTORY_LOADED;
+
+	constructor(public reconciliationHistory?: Reconciliation[]) {
+	}
+
+}
+
 export type ReceiverReconcileAction =
 	LoadReceiverReconciliation
 	| ReceiverReconciliationLoaded
@@ -93,4 +110,6 @@ export type ReceiverReconcileAction =
 	| LoadSiteProgress
 	| SiteProgressLoaded
 	| LoadReceiverTableReconciliations
-	| ReceiverTableReconciliationsLoaded;
+	| ReceiverTableReconciliationsLoaded
+	| LoadReceiverHistory
+	| ReceiverHistoryLoaded;
