@@ -5,7 +5,11 @@ import {SenderTableReconcile} from "./sender-table-reconcile";
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
 import {GET_SENDER_RECONCILIATION, GET_SENDER_TABLE_RECONCILES} from "./state/sender-reconcile.reducer";
-import {LoadSenderReconciliation, LoadSenderTableReconciliations} from "./state/sender-reconcile.actions";
+import {
+	LoadSenderReconciliation,
+	LoadSenderTableReconciliations,
+	SenderReconciliationLoaded
+} from "./state/sender-reconcile.actions";
 
 @Component({
 	selector: 'sender-active-reconciliation',
@@ -30,7 +34,7 @@ export class SenderActiveReconciliationComponent implements OnInit, OnDestroy {
 		this.recLoadedSubscription = this.store.pipe(select(GET_SENDER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (!this.tableReconciliations && reconciliation?.status == ReconcileStatus.PROCESSING) {
+				if (reconciliation?.status == ReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadSenderTableReconciliations());
 				}
 			}
@@ -65,6 +69,12 @@ export class SenderActiveReconciliationComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.recLoadedSubscription?.unsubscribe();
 		this.loadedTableRecsSubscription?.unsubscribe();
+		this.reset();
+	}
+
+	reset(): void {
+		//Reset the ngrx store
+		this.store.dispatch(new SenderReconciliationLoaded());
 	}
 
 }
