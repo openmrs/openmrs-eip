@@ -29,7 +29,7 @@
 		<tr [hidden]="reconciliation?.status != ReconcileStatusEnum.PROCESSING">
 			<th class="text-nowrap"></th>
 			<td class="pl-4 py-3">
-				<button type="button" class="btn btn-primary btn-sm" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-facility-breakdown">
+				<button type="button" class="btn btn-primary btn-sm" [disabled]="siteProgress" (click)="showSiteDetails()" i18n="@@receiver-reconcile-show-facility-breakdown">
 					Show facility breakdown
 				</button>
 			</td>
