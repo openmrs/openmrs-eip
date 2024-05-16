@@ -14,6 +14,8 @@ import {
 	LoadReceiverReconcileProgress,
 	LoadReceiverReconciliation,
 	LoadSiteProgress,
+	ReceiverReconciliationLoaded,
+	SiteProgressLoaded,
 	StartReconciliation
 } from "./state/receiver-reconcile.actions";
 
@@ -46,7 +48,7 @@ export class ReceiverActiveReconciliationComponent implements OnInit, OnDestroy 
 		this.loadedSubscription = this.store.pipe(select(GET_RECEIVER_RECONCILIATION)).subscribe(
 			reconciliation => {
 				this.reconciliation = reconciliation;
-				if (this.reconciliation && !this.progress && this.reconciliation.status == ReconcileStatus.PROCESSING) {
+				if (this.reconciliation && this.reconciliation.status == ReconcileStatus.PROCESSING) {
 					this.store.dispatch(new LoadReceiverReconcileProgress());
 				}
 			}
@@ -120,6 +122,13 @@ export class ReceiverActiveReconciliationComponent implements OnInit, OnDestroy 
 		this.loadedSubscription?.unsubscribe();
 		this.loadedProgressSubscription?.unsubscribe();
 		this.loadedSiteProgressSubscription?.unsubscribe();
+		this.reset();
+	}
+
+	reset(): void {
+		//Reset the ngrx store
+		this.store.dispatch(new ReceiverReconciliationLoaded());
+		this.store.dispatch(new SiteProgressLoaded());
 	}
 
 }
