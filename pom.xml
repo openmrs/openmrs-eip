@@ -13,7 +13,7 @@
         <module>commons</module>
         <module>commons-web</module>
         <module>example-app</module>
-        <module>openmrs-fhir</module>
+        <module>camel-openmrs-fhir</module>
     </modules>
 
     <name>OpenMRS EIP</name>
