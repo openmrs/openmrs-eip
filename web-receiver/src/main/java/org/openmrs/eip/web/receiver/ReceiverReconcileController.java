@@ -1,5 +1,7 @@
 package org.openmrs.eip.web.receiver;
 
+import static org.openmrs.eip.web.RestConstants.PATH_PARAM_SITE_ID;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR_REC_ID;
 import static org.openmrs.eip.web.RestConstants.PATH_VAR_SITE_ID;
 
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import org.openmrs.eip.app.management.entity.receiver.ReceiverTableReconciliatio
 import org.openmrs.eip.app.management.entity.receiver.SiteReconciliation;
 import org.openmrs.eip.app.management.repository.ReceiverReconcileRepository;
 import org.openmrs.eip.app.management.repository.ReceiverTableReconcileRepository;
+import org.openmrs.eip.app.management.repository.ReconcileTableSummaryRepository;
 import org.openmrs.eip.app.management.repository.SiteReconciliationRepository;
 import org.openmrs.eip.app.management.repository.SiteRepository;
 import org.openmrs.eip.app.management.service.ReceiverReconcileService;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,13 +48,17 @@ public class ReceiverReconcileController {
 	
 	private SiteRepository siteRepo;
 	
+	private ReconcileTableSummaryRepository summaryRepo;
+	
 	public ReceiverReconcileController(ReceiverReconcileRepository reconcileRepo, ReceiverReconcileService reconcileService,
-	    SiteReconciliationRepository siteRecRepo, ReceiverTableReconcileRepository tableRecRepo, SiteRepository siteRepo) {
+	    SiteReconciliationRepository siteRecRepo, ReceiverTableReconcileRepository tableRecRepo, SiteRepository siteRepo,
+	    ReconcileTableSummaryRepository summaryRepo) {
 		this.reconcileRepo = reconcileRepo;
 		this.reconcileService = reconcileService;
 		this.siteRecRepo = siteRecRepo;
 		this.tableRecRepo = tableRecRepo;
 		this.siteRepo = siteRepo;
+		this.summaryRepo = summaryRepo;
 	}
 	
 	@GetMapping
@@ -104,12 +112,12 @@ public class ReceiverReconcileController {
 	}
 	
 	@GetMapping("/" + RestConstants.TABLE_RECONCILE + "/{" + PATH_VAR_SITE_ID + "}")
-	public List<ReceiverTableReconciliation> getIncompleteTableReconciliations(@PathVariable(PATH_VAR_SITE_ID) Long sideId) {
+	public List<ReceiverTableReconciliation> getIncompleteTableReconciliations(@PathVariable(PATH_VAR_SITE_ID) Long siteId) {
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Getting incomplete table reconciliations for site with id {}", sideId);
+			LOG.debug("Getting incomplete table reconciliations for site with id {}", siteId);
 		}
 		
-		SiteReconciliation siteRec = siteRecRepo.getBySite(siteRepo.getReferenceById(sideId));
+		SiteReconciliation siteRec = siteRecRepo.getBySite(siteRepo.getReferenceById(siteId));
 		List<String> reconciledTables = tableRecRepo.getReconciledTables(siteRec);
 		List<ReceiverTableReconciliation> incomplete = tableRecRepo.getByCompletedIsFalseAndSiteReconciliation(siteRec);
 		List<String> incompleteTables = incomplete.stream().map(r -> r.getTableName().toLowerCase()).toList();
@@ -133,6 +141,29 @@ public class ReceiverReconcileController {
 		}
 		
 		return reconcileRepo.getTop3ByStatusOrderByDateCreatedDesc(ReconciliationStatus.COMPLETED);
+	}
+	
+	@GetMapping("/" + RestConstants.RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}")
+	public Object[] getReport(@PathVariable(value = PATH_VAR_REC_ID) String recId,
+	                          @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
+		if (LOG.isDebugEnabled()) {
+			String msg = "Getting summary report for reconciliation with id: " + recId;
+			if (siteId != null) {
+				msg = " and site with id: " + siteId;
+			}
+			
+			LOG.debug(msg);
+		}
+		
+		ReceiverReconciliation rec = reconcileRepo.getByIdentifier(recId);
+		List<Object[]> totals;
+		if (siteId == null) {
+			totals = summaryRepo.getCountTotals(rec);
+		} else {
+			totals = summaryRepo.getCountTotalsBySite(rec, siteRepo.getReferenceById(siteId));
+		}
+		
+		return totals.get(0);
 	}
 	
 }

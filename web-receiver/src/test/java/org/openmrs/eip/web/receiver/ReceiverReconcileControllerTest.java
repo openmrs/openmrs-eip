@@ -4,10 +4,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.openmrs.eip.app.SyncConstants.MGT_DATASOURCE_NAME;
 import static org.openmrs.eip.app.SyncConstants.MGT_TX_MGR;
+import static org.openmrs.eip.web.RestConstants.PATH_PARAM_SITE_ID;
 import static org.openmrs.eip.web.RestConstants.PATH_RECEIVER_RECONCILE;
 import static org.openmrs.eip.web.RestConstants.PATH_REC_RECONCILE_PROGRESS;
 import static org.openmrs.eip.web.RestConstants.PATH_REC_SITE_PROGRESS;
 import static org.openmrs.eip.web.RestConstants.PATH_REC_TABLE_RECONCILE;
+import static org.openmrs.eip.web.RestConstants.PATH_VAR_REC_ID;
 import static org.openmrs.eip.web.RestConstants.PATH_VAR_SITE_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -154,12 +156,53 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	        "classpath:mgt_receiver_reconcile.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
 	public void getHistory_shouldReturnTheThreeMostRecentCompletedReconciliations() throws Exception {
 		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_HISTORY);
+		
 		ResultActions result = mockMvc.perform(builder);
+		
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("length()", equalTo(3)));
 		result.andExpect(jsonPath("[0].identifier", equalTo("rec-4")));
 		result.andExpect(jsonPath("[1].identifier", equalTo("rec-3")));
 		result.andExpect(jsonPath("[2].identifier", equalTo("rec-2")));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
+	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getReport_shouldReturnTheReconciliationCountTotals() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+		    "rec-1");
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(6)));
+		result.andExpect(jsonPath("[0]", equalTo(11)));
+		result.andExpect(jsonPath("[1]", equalTo(3)));
+		result.andExpect(jsonPath("[2]", equalTo(4)));
+		result.andExpect(jsonPath("[3]", equalTo(18)));
+		result.andExpect(jsonPath("[4]", equalTo(7)));
+		result.andExpect(jsonPath("[5]", equalTo(5)));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
+	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getReport_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+		    "rec-1");
+		builder.param(PATH_PARAM_SITE_ID, "1");
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(6)));
+		result.andExpect(jsonPath("[0]", equalTo(8)));
+		result.andExpect(jsonPath("[1]", equalTo(2)));
+		result.andExpect(jsonPath("[2]", equalTo(3)));
+		result.andExpect(jsonPath("[3]", equalTo(14)));
+		result.andExpect(jsonPath("[4]", equalTo(6)));
+		result.andExpect(jsonPath("[5]", equalTo(4)));
 	}
 	
 }
