@@ -10,7 +10,7 @@
     "javaType": "org.openmrs.eip.fhir.components.FhirSearchBundleComponent",
     "supportLevel": "Stable",
     "groupId": "org.openmrs.eip",
-    "artifactId": "openmrs-fhir",
+    "artifactId": "camel-openmrs-fhir",
     "version": "4.0.0-SNAPSHOT",
     "scheme": "openmrs-fhir",
     "extendsScheme": "",

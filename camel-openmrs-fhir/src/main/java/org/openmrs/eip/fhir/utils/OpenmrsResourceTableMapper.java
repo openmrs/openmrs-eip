@@ -4,7 +4,6 @@ import static org.openmrs.eip.fhir.Constants.CSV_PATTERN;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.openmrs.eip.fhir.FhirResource;
