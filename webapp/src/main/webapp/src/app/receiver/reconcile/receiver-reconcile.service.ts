@@ -5,6 +5,7 @@ import {environment} from "../../../environments/environment";
 import {ReceiverReconcileProgress} from "./receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "./receiver-table-reconcile";
 import {Reconciliation} from "../../shared/reconciliation";
+import {ReconcileTableSummary} from "./reconcile-table-summary";
 
 const RESOURCE_NAME = 'receiver/reconcile';
 
@@ -38,6 +39,16 @@ export class ReceiverReconcileService {
 
 	getHistory(): Observable<Reconciliation[]> {
 		return this.httpClient.get<Reconciliation[]>(environment.apiBaseUrl + RESOURCE_NAME + '/history');
+	}
+
+	getReport(): Observable<[]> {
+		return this.httpClient.get<[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report');
+	}
+
+	getTableSummariesBySite(siteIdentifier: string): Observable<ReconcileTableSummary[]> {
+		return this.httpClient.get<ReconcileTableSummary[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report', {
+			params: {"siteId": siteIdentifier}
+		});
 	}
 
 }

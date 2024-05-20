@@ -7,6 +7,7 @@ import {
 	ReceiverReconcileProgressLoaded,
 	ReceiverReconciliationLoaded,
 	ReceiverTableReconciliationsLoaded,
+	ReportLoaded,
 	SiteProgressLoaded
 } from "./receiver-reconcile.actions";
 import {ReceiverReconcileService} from "../receiver-reconcile.service";
@@ -78,6 +79,17 @@ export class ReceiverReconcileEffects {
 			switchMap(() => this.service.getHistory()
 				.pipe(
 					map(recHistory => new ReceiverHistoryLoaded(recHistory))
+				)
+			)
+		)
+	);
+
+	getReport = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.LOAD_REPORT),
+			switchMap(() => this.service.getReport()
+				.pipe(
+					map(report => new ReportLoaded(report))
 				)
 			)
 		)

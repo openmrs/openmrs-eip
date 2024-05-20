@@ -10,6 +10,7 @@ export interface ReceiverReconcileState {
 	siteProgress: any;
 	tableReconciliations: ReceiverTableReconcile[];
 	reconciliationHistory: Reconciliation[];
+	report: [];
 }
 
 const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverReconcileState>('receiverReconcile');
@@ -37,6 +38,11 @@ export const GET_RECEIVER_TABLE_RECONCILES = createSelector(
 export const GET_RECEIVER_HISTORY = createSelector(
 	GET_RECEIVER_RECONCILE_FEATURE_STATE,
 	state => state.reconciliationHistory
+);
+
+export const GET_REPORT = createSelector(
+	GET_RECEIVER_RECONCILE_FEATURE_STATE,
+	state => state.report
 );
 
 export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAction) {
@@ -71,6 +77,12 @@ export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAc
 			return {
 				...state,
 				reconciliationHistory: action.reconciliationHistory
+			};
+
+		case ReceiverReconcileActionType.REPORT_LOADED:
+			return {
+				...state,
+				report: action.report
 			};
 
 		default:
