@@ -6,6 +6,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  release:
+    types: [ published, edited ]
   workflow_dispatch:
 
 jobs:
@@ -53,6 +55,25 @@ jobs:
           server-username: MAVEN_REPO_USERNAME
           server-password: MAVEN_REPO_API_KEY
       - name: Publish to OpenMRS Nexus Snapshots
+        run: mvn deploy -DskipTests=true --batch-mode --show-version --file pom.xml
+        env:
+          MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
+          MAVEN_REPO_API_KEY: ${{ secrets.MAVEN_REPO_API_KEY }}
+
+  release:
+    if: ${{ github.event_name == 'release' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up OpenMRS Nexus Releases
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: openmrs-repo-releases
+          server-username: MAVEN_REPO_USERNAME
+          server-password: MAVEN_REPO_API_KEY
+      - name: Publish to OpenMRS Nexus Releases
         run: mvn deploy -DskipTests=true --batch-mode --show-version --file pom.xml
         env:
           MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
