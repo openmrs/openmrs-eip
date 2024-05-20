@@ -42,7 +42,7 @@ of DB events and do something useful.
     <dependency>
         <groupId>org.openmrs.eip</groupId>
         <artifactId>openmrs-watcher</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>4.0.0</version>
     </dependency>
     ```
 3. Add a main class for your spring boot application, you can copy [`ExampleApplication`](../../example-app/src/main/java/org/openmrs/eip/example/ExampleApplication.java) 
@@ -71,7 +71,7 @@ of DB events and do something useful.
     <dependency>
         <groupId>org.openmrs.eip</groupId>
         <artifactId>commons-web</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0</version>
     </dependency>
     ```
 2. You can then enable and expose different endpoints via standard spring boot's maintenance properties, please refer to
