@@ -145,7 +145,7 @@ public class ReceiverReconcileController {
 	
 	@GetMapping("/" + RestConstants.RECONCILE_REPORT_TOTALS + "/{" + PATH_VAR_REC_ID + "}")
 	public Object[] getCountTotals(@PathVariable(value = PATH_VAR_REC_ID) String recId,
-	                               @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
+	                               @RequestParam(value = PATH_PARAM_SITE_ID, required = false) String siteId) {
 		if (LOG.isDebugEnabled()) {
 			String msg = "Getting count totals for reconciliation with id: " + recId;
 			if (siteId != null) {
@@ -160,7 +160,7 @@ public class ReceiverReconcileController {
 		if (siteId == null) {
 			totals = summaryRepo.getCountTotals(rec);
 		} else {
-			totals = summaryRepo.getCountTotalsBySite(rec, siteRepo.getReferenceById(siteId));
+			totals = summaryRepo.getCountTotalsBySite(rec, siteRepo.getByIdentifier(siteId));
 		}
 		
 		return totals.get(0);
@@ -168,7 +168,7 @@ public class ReceiverReconcileController {
 	
 	@GetMapping("/" + RestConstants.RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}")
 	public Object getReport(@PathVariable(value = PATH_VAR_REC_ID) String recId,
-	                        @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
+	                        @RequestParam(value = PATH_PARAM_SITE_ID, required = false) String siteId) {
 		if (LOG.isDebugEnabled()) {
 			String msg = "Getting report for reconciliation with id: " + recId;
 			if (siteId != null) {
@@ -182,7 +182,7 @@ public class ReceiverReconcileController {
 		if (siteId == null) {
 			return summaryRepo.getReport(rec);
 		} else {
-			return summaryRepo.getByReconciliationAndSite(rec, siteRepo.getReferenceById(siteId));
+			return summaryRepo.getByReconciliationAndSite(rec, siteRepo.getByIdentifier(siteId));
 		}
 	}
 	

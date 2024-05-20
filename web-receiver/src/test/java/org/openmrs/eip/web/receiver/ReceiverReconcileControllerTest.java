@@ -191,7 +191,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	public void getReportTotals_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
 		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_TOTALS + "/{" + PATH_VAR_REC_ID + "}",
 		    "rec-1");
-		builder.param(PATH_PARAM_SITE_ID, "1");
+		builder.param(PATH_PARAM_SITE_ID, "remote1");
 		
 		ResultActions result = mockMvc.perform(builder);
 		
@@ -245,7 +245,7 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	public void getReport_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
 		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
 		    "rec-1");
-		builder.param(PATH_PARAM_SITE_ID, "1");
+		builder.param(PATH_PARAM_SITE_ID, "remote1");
 		
 		ResultActions result = mockMvc.perform(builder);
 		
