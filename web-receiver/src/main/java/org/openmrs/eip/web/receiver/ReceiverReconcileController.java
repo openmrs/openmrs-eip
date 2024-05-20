@@ -143,13 +143,13 @@ public class ReceiverReconcileController {
 		return reconcileRepo.getTop3ByStatusOrderByDateCreatedDesc(ReconciliationStatus.COMPLETED);
 	}
 	
-	@GetMapping("/" + RestConstants.RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}")
-	public Object[] getReport(@PathVariable(value = PATH_VAR_REC_ID) String recId,
-	                          @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
+	@GetMapping("/" + RestConstants.RECONCILE_REPORT_TOTALS + "/{" + PATH_VAR_REC_ID + "}")
+	public Object[] getCountTotals(@PathVariable(value = PATH_VAR_REC_ID) String recId,
+	                               @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
 		if (LOG.isDebugEnabled()) {
-			String msg = "Getting summary report for reconciliation with id: " + recId;
+			String msg = "Getting count totals for reconciliation with id: " + recId;
 			if (siteId != null) {
-				msg = " and site with id: " + siteId;
+				msg = msg + " and site with id: " + siteId;
 			}
 			
 			LOG.debug(msg);
@@ -164,6 +164,26 @@ public class ReceiverReconcileController {
 		}
 		
 		return totals.get(0);
+	}
+	
+	@GetMapping("/" + RestConstants.RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}")
+	public Object getReport(@PathVariable(value = PATH_VAR_REC_ID) String recId,
+	                        @RequestParam(value = PATH_PARAM_SITE_ID, required = false) Long siteId) {
+		if (LOG.isDebugEnabled()) {
+			String msg = "Getting report for reconciliation with id: " + recId;
+			if (siteId != null) {
+				msg = msg + " and site with id: " + siteId;
+			}
+			
+			LOG.debug(msg);
+		}
+		
+		ReceiverReconciliation rec = reconcileRepo.getByIdentifier(recId);
+		if (siteId == null) {
+			return summaryRepo.getReport(rec);
+		} else {
+			return summaryRepo.getByReconciliationAndSite(rec, siteRepo.getReferenceById(siteId));
+		}
 	}
 	
 }

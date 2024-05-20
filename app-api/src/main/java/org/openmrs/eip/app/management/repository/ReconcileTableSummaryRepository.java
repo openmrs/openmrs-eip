@@ -16,6 +16,11 @@ public interface ReconcileTableSummaryRepository extends JpaRepository<Reconcile
 	
 	String QUERY_SITE_TOTALS = QUERY_TOTALS + " AND s.site = :site";
 	
+	String QUERY_REPORT = "SELECT s.tableName, SUM(s.missingCount), SUM(s.missingSyncCount), "
+	        + "SUM(s.missingErrorCount), SUM(s.undeletedCount), SUM(s.undeletedSyncCount), "
+	        + "SUM(s.undeletedErrorCount) FROM ReconcileTableSummary s WHERE s.reconciliation = :rec GROUP BY "
+	        + "s.tableName";
+	
 	/**
 	 * Get the count totals for the specified reconciliation.
 	 * 
@@ -34,5 +39,23 @@ public interface ReconcileTableSummaryRepository extends JpaRepository<Reconcile
 	 */
 	@Query(QUERY_SITE_TOTALS)
 	List<Object[]> getCountTotalsBySite(ReceiverReconciliation rec, SiteInfo site);
+	
+	/**
+	 * Get the report for the specified reconciliation.
+	 *
+	 * @param rec the reconciliation to match
+	 * @return the report
+	 */
+	@Query(QUERY_REPORT)
+	List<Object[]> getReport(ReceiverReconciliation rec);
+	
+	/**
+	 * Get the summaries for the specified reconciliation and site.
+	 *
+	 * @param rec the reconciliation to match
+	 * @param site the site to match
+	 * @return the site report
+	 */
+	List<ReconcileTableSummary> getByReconciliationAndSite(ReceiverReconciliation rec, SiteInfo site);
 	
 }

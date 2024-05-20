@@ -2,6 +2,8 @@ package org.openmrs.eip.app.management.entity.receiver;
 
 import org.openmrs.eip.app.management.entity.AbstractEntity;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -13,6 +15,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "reconcile_table_summary")
+@JsonIncludeProperties({ "tableName", "missingCount", "missingSyncCount", "missingErrorCount", "undeletedCount",
+        "undeletedSyncCount", "undeletedErrorCount" })
 public class ReconcileTableSummary extends AbstractEntity {
 	
 	@ManyToOne(optional = false)

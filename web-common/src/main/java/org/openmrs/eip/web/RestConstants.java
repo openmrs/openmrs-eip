@@ -86,6 +86,8 @@ public final class RestConstants {
 	
 	public static final String RECONCILE_REPORT = "report";
 	
+	public static final String RECONCILE_REPORT_TOTALS = "reporttotals";
+	
 	public static final String PATH_VAR_SITE_ID = "siteId";
 	
 	public static final String PATH_VAR_REC_ID = "recId";
@@ -97,5 +99,7 @@ public final class RestConstants {
 	public static final String PATH_RECONCILE_HISTORY = PATH_RECEIVER_RECONCILE + "/" + RECONCILE_HISTORY;
 	
 	public static final String PATH_RECONCILE_REPORT = PATH_RECEIVER_RECONCILE + "/" + RECONCILE_REPORT;
+	
+	public static final String PATH_RECONCILE_TOTALS = PATH_RECEIVER_RECONCILE + "/" + RECONCILE_REPORT_TOTALS;
 	
 }

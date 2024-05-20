@@ -169,8 +169,8 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
 	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void getReport_shouldReturnTheReconciliationCountTotals() throws Exception {
-		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+	public void getReportTotals_shouldReturnTheReconciliationCountTotals() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_TOTALS + "/{" + PATH_VAR_REC_ID + "}",
 		    "rec-1");
 		
 		ResultActions result = mockMvc.perform(builder);
@@ -188,8 +188,8 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 	@Test
 	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
 	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
-	public void getReport_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
-		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+	public void getReportTotals_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_TOTALS + "/{" + PATH_VAR_REC_ID + "}",
 		    "rec-1");
 		builder.param(PATH_PARAM_SITE_ID, "1");
 		
@@ -203,6 +203,75 @@ public class ReceiverReconcileControllerTest extends BaseReceiverWebTest {
 		result.andExpect(jsonPath("[3]", equalTo(14)));
 		result.andExpect(jsonPath("[4]", equalTo(6)));
 		result.andExpect(jsonPath("[5]", equalTo(4)));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
+	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getReport_shouldReturnTheReconciliationCountTotals() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+		    "rec-1");
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(3)));
+		result.andExpect(jsonPath("[0][0]", equalTo("patient")));
+		result.andExpect(jsonPath("[0][1]", equalTo(0)));
+		result.andExpect(jsonPath("[0][2]", equalTo(0)));
+		result.andExpect(jsonPath("[0][3]", equalTo(0)));
+		result.andExpect(jsonPath("[0][4]", equalTo(0)));
+		result.andExpect(jsonPath("[0][5]", equalTo(0)));
+		result.andExpect(jsonPath("[0][6]", equalTo(0)));
+		result.andExpect(jsonPath("[1][0]", equalTo("person")));
+		result.andExpect(jsonPath("[1][1]", equalTo(5)));
+		result.andExpect(jsonPath("[1][2]", equalTo(1)));
+		result.andExpect(jsonPath("[1][3]", equalTo(2)));
+		result.andExpect(jsonPath("[1][4]", equalTo(9)));
+		result.andExpect(jsonPath("[1][5]", equalTo(4)));
+		result.andExpect(jsonPath("[1][6]", equalTo(3)));
+		result.andExpect(jsonPath("[2][0]", equalTo("person_name")));
+		result.andExpect(jsonPath("[2][1]", equalTo(6)));
+		result.andExpect(jsonPath("[2][2]", equalTo(2)));
+		result.andExpect(jsonPath("[2][3]", equalTo(2)));
+		result.andExpect(jsonPath("[2][4]", equalTo(9)));
+		result.andExpect(jsonPath("[2][5]", equalTo(3)));
+		result.andExpect(jsonPath("[2][6]", equalTo(2)));
+	}
+	
+	@Test
+	@Sql(scripts = { "classpath:mgt_site_info.sql", "classpath:mgt_receiver_reconcile.sql",
+	        "classpath:mgt_receiver_reconcile_table_summary.sql" }, config = @SqlConfig(dataSource = MGT_DATASOURCE_NAME, transactionManager = MGT_TX_MGR))
+	public void getReport_shouldReturnTheReconciliationCountTotalsForTheSite() throws Exception {
+		MockHttpServletRequestBuilder builder = get(RestConstants.PATH_RECONCILE_REPORT + "/{" + PATH_VAR_REC_ID + "}",
+		    "rec-1");
+		builder.param(PATH_PARAM_SITE_ID, "1");
+		
+		ResultActions result = mockMvc.perform(builder);
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("length()", equalTo(3)));
+		result.andExpect(jsonPath("[0].tableName", equalTo("person")));
+		result.andExpect(jsonPath("[0].missingCount", equalTo(5)));
+		result.andExpect(jsonPath("[0].missingSyncCount", equalTo(1)));
+		result.andExpect(jsonPath("[0].missingErrorCount", equalTo(2)));
+		result.andExpect(jsonPath("[0].undeletedCount", equalTo(9)));
+		result.andExpect(jsonPath("[0].undeletedSyncCount", equalTo(4)));
+		result.andExpect(jsonPath("[0].undeletedErrorCount", equalTo(3)));
+		result.andExpect(jsonPath("[1].tableName", equalTo("patient")));
+		result.andExpect(jsonPath("[1].missingCount", equalTo(0)));
+		result.andExpect(jsonPath("[1].missingSyncCount", equalTo(0)));
+		result.andExpect(jsonPath("[1].missingErrorCount", equalTo(0)));
+		result.andExpect(jsonPath("[1].undeletedCount", equalTo(0)));
+		result.andExpect(jsonPath("[1].undeletedSyncCount", equalTo(0)));
+		result.andExpect(jsonPath("[1].undeletedErrorCount", equalTo(0)));
+		result.andExpect(jsonPath("[2].tableName", equalTo("person_name")));
+		result.andExpect(jsonPath("[2].missingCount", equalTo(3)));
+		result.andExpect(jsonPath("[2].missingSyncCount", equalTo(1)));
+		result.andExpect(jsonPath("[2].missingErrorCount", equalTo(1)));
+		result.andExpect(jsonPath("[2].undeletedCount", equalTo(5)));
+		result.andExpect(jsonPath("[2].undeletedSyncCount", equalTo(2)));
+		result.andExpect(jsonPath("[2].undeletedErrorCount", equalTo(1)));
 	}
 	
 }
