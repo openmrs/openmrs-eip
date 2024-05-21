@@ -107,6 +107,9 @@ export class LoadReport implements Action {
 
 	readonly type = ReceiverReconcileActionType.LOAD_REPORT;
 
+	constructor(public reconcileId?: string) {
+	}
+
 }
 
 export class ReportLoaded implements Action {

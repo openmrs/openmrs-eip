@@ -87,7 +87,7 @@ export class ReceiverReconcileEffects {
 	getReport = createEffect(() =>
 		this.actions$.pipe(
 			ofType(ReceiverReconcileActionType.LOAD_REPORT),
-			switchMap(() => this.service.getReport()
+			switchMap(action => this.service.getReport(action['reconcileId'])
 				.pipe(
 					map(report => new ReportLoaded(report))
 				)

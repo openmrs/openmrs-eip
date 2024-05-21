@@ -32,6 +32,7 @@ import {ReceiverReconcileComponent} from "./reconcile/receiver-reconcile.compone
 import {SiteProgressComponent} from './reconcile/site-progress/site-progress.component';
 import {ReceiverReconciliationHistoryComponent} from './reconcile/receiver-reconciliation-history.component';
 import {ReceiverActiveReconciliationComponent} from './reconcile/receiver-active-reconciliation.component';
+import {ReconcileReportComponent} from './reconcile/reconcile-report/reconcile-report.component';
 
 @NgModule({
 	declarations: [
@@ -53,7 +54,8 @@ import {ReceiverActiveReconciliationComponent} from './reconcile/receiver-active
 		ReceiverReconcileComponent,
 		SiteProgressComponent,
 		ReceiverReconciliationHistoryComponent,
-		ReceiverActiveReconciliationComponent
+		ReceiverActiveReconciliationComponent,
+		ReconcileReportComponent
 	],
 	imports: [
 		SharedModule,

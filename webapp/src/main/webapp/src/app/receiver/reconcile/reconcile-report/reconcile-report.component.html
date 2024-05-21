@@ -1,0 +1,40 @@
+<div class="w-100 d-flex justify-content-center p-1">
+	<table class="w-100 table-sm table-striped">
+		<thead class="table-secondary">
+		<tr>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-table-name">
+				Table Name
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-missing">
+				Missing
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-in-sync-queue">
+				In Sync Queue
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-in-error-queue">
+				In Error Queue
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-undeleted">
+				Undeleted
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-in-sync-queue">
+				In Sync Queue
+			</th>
+			<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@reconcile-in-error-queue">
+				In Error Queue
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr *ngFor="let r of report">
+			<td class="text-left text-nowrap">{{r[0]}}</td>
+			<td class="text-center">{{r[1]}}</td>
+			<td class="text-center">{{r[2]}}</td>
+			<td class="text-center">{{r[3]}}</td>
+			<td class="text-center">{{r[4]}}</td>
+			<td class="text-center">{{r[5]}}</td>
+			<td class="text-center">{{r[6]}}</td>
+		</tr>
+		</tbody>
+	</table>
+</div>

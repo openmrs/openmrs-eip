@@ -8,13 +8,25 @@
 			<th class="w-50 text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-date-created">
 				Date Created
 			</th>
+			<th class="w-50 text-nowrap px-3 text-center border-secondary border-bottom" i18n="@@common-action">
+				Action
+			</th>
 		</tr>
 		</thead>
 		<tbody>
 		<tr *ngFor="let r of reconciliationHistory">
 			<td class="text-nowrap text-center">{{r.identifier}}</td>
 			<td class="text-nowrap text-center">{{r.dateCreated  | date:'EEE, MMM dd, y, HH:mm:ss'}}</td>
+			<td class="text-nowrap text-center">
+				<i class="bi bi-file-text hover-primary ui-cursor-pointer" [ngbTooltip]="tooltipTemplate"
+				   [openDelay]="1000" (click)="getReport(r.identifier)"></i>
+			</td>
 		</tr>
 		</tbody>
 	</table>
 </div>
+
+<!-- Templates -->
+<ng-template #tooltipTemplate>
+	<span i18n="@@receiver-reconcile-view-report">View Report</span>
+</ng-template>

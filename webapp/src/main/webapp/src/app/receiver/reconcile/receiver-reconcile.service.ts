@@ -41,13 +41,13 @@ export class ReceiverReconcileService {
 		return this.httpClient.get<Reconciliation[]>(environment.apiBaseUrl + RESOURCE_NAME + '/history');
 	}
 
-	getReport(): Observable<[]> {
-		return this.httpClient.get<[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report');
+	getReport(reconcileId: string): Observable<[]> {
+		return this.httpClient.get<[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report/' + reconcileId);
 	}
 
-	getTableSummariesBySite(siteIdentifier: string): Observable<ReconcileTableSummary[]> {
-		return this.httpClient.get<ReconcileTableSummary[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report', {
-			params: {"siteId": siteIdentifier}
+	getTableSummariesBySite(reconcileId: string, siteId: string): Observable<ReconcileTableSummary[]> {
+		return this.httpClient.get<ReconcileTableSummary[]>(environment.apiBaseUrl + RESOURCE_NAME + '/report/' + reconcileId, {
+			params: {"siteId": siteId}
 		});
 	}
 

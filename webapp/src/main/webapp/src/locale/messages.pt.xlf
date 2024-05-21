@@ -830,5 +830,35 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="receiver-reconcile-view-report">
+			<segment>
+				<source>View Report</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="reconcile-missing">
+			<segment>
+				<source>Missing</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="reconcile-in-sync-queue">
+			<segment>
+				<source>In Sync Queue</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="reconcile-in-error-queue">
+			<segment>
+				<source>In Error Queue</source>
+				<target></target>
+			</segment>
+		</unit>
+		<unit id="reconcile-undeleted">
+			<segment>
+				<source>Undeleted</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

@@ -12,6 +12,6 @@ export class ReconcileTableSummary {
 
 	undeletedSyncCount?: number;
 
-	"undeletedErrorCount"?: number;
+	undeletedErrorCount?: number;
 
 }
