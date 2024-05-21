@@ -836,9 +836,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="reconcile-missing">
+		<unit id="reconcile-missing-entities">
 			<segment>
-				<source>Missing</source>
+				<source>Missing Entities</source>
 				<target></target>
 			</segment>
 		</unit>
@@ -854,9 +854,9 @@
 				<target></target>
 			</segment>
 		</unit>
-		<unit id="reconcile-undeleted">
+		<unit id="reconcile-undeleted-entities">
 			<segment>
-				<source>Undeleted</source>
+				<source>Undeleted Entities</source>
 				<target></target>
 			</segment>
 		</unit>
