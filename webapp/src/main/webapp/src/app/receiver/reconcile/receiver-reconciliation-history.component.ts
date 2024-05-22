@@ -82,6 +82,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 
 		this.modalRef = this.modalService.open(ReconcileReportComponent, dialogConfig);
 		this.modalRef.componentInstance.report = this.report;
+		this.modalRef.componentInstance.modalRef = this.modalRef;
 		this.modalRef.closed.subscribe(() => {
 			//Clear
 			this.store.dispatch(new ReportLoaded());

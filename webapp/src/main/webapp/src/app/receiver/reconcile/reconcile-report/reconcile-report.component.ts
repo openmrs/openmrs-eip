@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
 	selector: 'reconcile-report',
@@ -6,7 +7,9 @@ import {Component} from '@angular/core';
 })
 export class ReconcileReportComponent {
 
-	report?: []
+	report?: [];
+
+	modalRef?: NgbModalRef;
 
 	constructor() {
 	}
