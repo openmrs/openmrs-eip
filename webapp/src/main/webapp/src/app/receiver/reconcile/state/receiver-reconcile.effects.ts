@@ -8,14 +8,19 @@ import {
 	ReceiverReconciliationLoaded,
 	ReceiverTableReconciliationsLoaded,
 	ReportLoaded,
-	SiteProgressLoaded
+	SiteProgressLoaded,
+	SitesLoaded
 } from "./receiver-reconcile.actions";
 import {ReceiverReconcileService} from "../receiver-reconcile.service";
+import {ReceiverService} from "../../receiver.service";
 
 @Injectable()
 export class ReceiverReconcileEffects {
 
-	constructor(private actions$: Actions, private service: ReceiverReconcileService) {
+	constructor(
+		private actions$: Actions,
+		private service: ReceiverReconcileService,
+		private receiverService: ReceiverService) {
 	}
 
 	getReconciliation = createEffect(() =>
@@ -90,6 +95,17 @@ export class ReceiverReconcileEffects {
 			switchMap(action => this.service.getReport(action['reconcileId'])
 				.pipe(
 					map(report => new ReportLoaded(report))
+				)
+			)
+		)
+	);
+
+	getSites = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.LOAD_SITES),
+			switchMap(() => this.receiverService.getSites()
+				.pipe(
+					map(sites => new SitesLoaded(sites))
 				)
 			)
 		)

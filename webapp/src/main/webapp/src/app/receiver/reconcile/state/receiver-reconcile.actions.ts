@@ -2,6 +2,7 @@ import {Action} from "@ngrx/store";
 import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "../receiver-table-reconcile";
 import {Reconciliation} from "../../../shared/reconciliation";
+import {Site} from "../../site";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECEIVER_RECONCILIATION',
@@ -16,7 +17,9 @@ export enum ReceiverReconcileActionType {
 	LOAD_HISTORY = 'LOAD_RECEIVER_HISTORY',
 	HISTORY_LOADED = 'RECEIVER_HISTORY_LOADED',
 	LOAD_REPORT = 'LOAD_REPORT',
-	REPORT_LOADED = 'REPORT_LOADED'
+	REPORT_LOADED = 'REPORT_LOADED',
+	LOAD_SITES = 'LOAD_SITES',
+	SITES_LOADED = 'SITES_LOADED'
 }
 
 export class LoadReceiverReconciliation implements Action {
@@ -121,6 +124,20 @@ export class ReportLoaded implements Action {
 
 }
 
+export class LoadSites implements Action {
+
+	readonly type = ReceiverReconcileActionType.LOAD_SITES;
+}
+
+export class SitesLoaded implements Action {
+
+	readonly type = ReceiverReconcileActionType.SITES_LOADED;
+
+	constructor(public sites?: Site[]) {
+	}
+
+}
+
 export type ReceiverReconcileAction =
 	LoadReceiverReconciliation
 	| ReceiverReconciliationLoaded
@@ -134,4 +151,6 @@ export type ReceiverReconcileAction =
 	| LoadReceiverHistory
 	| ReceiverHistoryLoaded
 	| LoadReport
-	| ReportLoaded;
+	| ReportLoaded
+	| LoadSites
+	| SitesLoaded;
