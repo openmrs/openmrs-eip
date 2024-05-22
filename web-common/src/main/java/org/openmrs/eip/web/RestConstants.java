@@ -102,4 +102,8 @@ public final class RestConstants {
 	
 	public static final String PATH_RECONCILE_TOTALS = PATH_RECEIVER_RECONCILE + "/" + RECONCILE_REPORT_TOTALS;
 	
+	public static final String RES_SITE = "site";
+	
+	public static final String PATH_SITE = SUB_PATH_RECEIVER + RES_SITE;
+	
 }
