@@ -9,6 +9,7 @@ import {
 	ReceiverTableReconciliationsLoaded,
 	ReportLoaded,
 	SiteProgressLoaded,
+	SiteReportLoaded,
 	SitesLoaded
 } from "./receiver-reconcile.actions";
 import {ReceiverReconcileService} from "../receiver-reconcile.service";
@@ -95,6 +96,17 @@ export class ReceiverReconcileEffects {
 			switchMap(action => this.service.getReport(action['reconcileId'])
 				.pipe(
 					map(report => new ReportLoaded(report))
+				)
+			)
+		)
+	);
+
+	getSiteReport = createEffect(() =>
+		this.actions$.pipe(
+			ofType(ReceiverReconcileActionType.LOAD_SITE_REPORT),
+			switchMap(action => this.service.getTableSummariesBySite(action['reconcileId'], action['siteId'])
+				.pipe(
+					map(siteReport => new SiteReportLoaded(siteReport))
 				)
 			)
 		)

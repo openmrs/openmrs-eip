@@ -872,5 +872,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-select">
+			<segment>
+				<source>Select</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

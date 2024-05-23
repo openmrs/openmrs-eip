@@ -4,6 +4,7 @@ import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "../receiver-table-reconcile";
 import {Reconciliation} from "../../../shared/reconciliation";
 import {Site} from "../../site";
+import {ReconcileTableSummary} from "../reconcile-table-summary";
 
 export interface ReceiverReconcileState {
 	reconciliation: Reconciliation;
@@ -13,6 +14,7 @@ export interface ReceiverReconcileState {
 	reconciliationHistory: Reconciliation[];
 	report: [];
 	sites: Site[];
+	siteReport: ReconcileTableSummary[];
 }
 
 const GET_RECEIVER_RECONCILE_FEATURE_STATE = createFeatureSelector<ReceiverReconcileState>('receiverReconcile');
@@ -50,6 +52,11 @@ export const GET_REPORT = createSelector(
 export const GET_SITES = createSelector(
 	GET_RECEIVER_RECONCILE_FEATURE_STATE,
 	state => state.sites
+);
+
+export const GET_SITE_REPORT = createSelector(
+	GET_RECEIVER_RECONCILE_FEATURE_STATE,
+	state => state.siteReport
 );
 
 export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAction) {
@@ -96,6 +103,12 @@ export function receiverReconcileReducer(state = {}, action: ReceiverReconcileAc
 			return {
 				...state,
 				sites: action.sites
+			};
+
+		case ReceiverReconcileActionType.SITE_REPORT_LOADED:
+			return {
+				...state,
+				siteReport: action.siteReport
 			};
 
 		default:

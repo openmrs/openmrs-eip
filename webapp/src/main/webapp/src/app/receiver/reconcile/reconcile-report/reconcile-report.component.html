@@ -6,16 +6,18 @@
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
-		<div class="row m-2">
+		<div class="row mt-4 mb-3">
 			<table>
 				<tr>
-					<td class="font-weight-bold pr-2" i18n="@@receiver-filter-by-site">
-						Filter By Site
-					</td>
+					<td class="font-weight-bold pr-2" i18n="@@receiver-filter-by-site">Filter By Site</td>
 					<td>
 						<div ngbDropdown class="d-inline-block">
-							<div ngbDropdownMenu>
-								<button ngbDropdownItem *ngFor="let s of sites">{{s.name}}</button>
+							<button class="btn btn-outline-secondary" ngbDropdownToggle i18n="@@receiver-select-site">
+								{{activeSite ? activeSite.name : selectLabel}}
+							</button>
+							<div ngbDropdownMenu class="bg-secondary">
+								<button ngbDropdownItem *ngFor="let s of sites" (click)="filterBySite(s)">{{s.name}}
+								</button>
 							</div>
 						</div>
 					</td>
@@ -26,7 +28,7 @@
 			<table class="w-100 table-sm table-striped">
 				<thead class="table-secondary">
 				<tr>
-					<th class="bg-white"></th>
+					<th></th>
 					<th colspan="3" class="text-nowrap text-center border-secondary border-bottom border-left border-right ui-bg-pink" i18n="@@reconcile-missing-entities">
 						Missing Entities
 					</th>
@@ -35,7 +37,7 @@
 					</th>
 				</tr>
 				<tr>
-					<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-table-name">
+					<th class="text-nowrap text-center border-secondary border-bottom" rowspan="2" i18n="@@common-table-name">
 						Table Name
 					</th>
 					<th class="text-nowrap text-center border-secondary border-bottom border-left ui-bg-pink" i18n="@@common-count">

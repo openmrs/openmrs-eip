@@ -3,7 +3,14 @@ import {Reconciliation} from "../../shared/reconciliation";
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
 import {GET_RECEIVER_HISTORY, GET_REPORT, GET_SITES} from "./state/receiver-reconcile.reducer";
-import {LoadReceiverHistory, LoadReport, LoadSites, ReportLoaded} from "./state/receiver-reconcile.actions";
+import {
+	LoadReceiverHistory,
+	LoadReport,
+	LoadSites,
+	ReportLoaded,
+	SiteReportLoaded,
+	SitesLoaded
+} from "./state/receiver-reconcile.actions";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ReconcileReportComponent} from "./reconcile-report/reconcile-report.component";
 import {Site} from "../site";
@@ -19,6 +26,8 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 	report?: any[];
 
 	sites?: Site[];
+
+	activeReconcileId?: string;
 
 	modalRef?: NgbModalRef;
 
@@ -46,7 +55,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.reportLoadedSubscription = this.store.pipe(select(GET_REPORT)).subscribe(
 			report => {
 				if (report) {
-					this.setReportAndLoadSites(report);
+					this.updateAndShowReport(report);
 				}
 			}
 		);
@@ -55,7 +64,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 			sites => {
 				this.sites = sites;
 				if (sites) {
-					this.showReport();
+					this.store.dispatch(new LoadReport(this.activeReconcileId));
 				}
 			}
 		);
@@ -64,10 +73,11 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 	}
 
 	getReport(reconciliationId?: string): void {
-		this.store.dispatch(new LoadReport(reconciliationId));
+		this.activeReconcileId = reconciliationId;
+		this.store.dispatch(new LoadSites());
 	}
 
-	setReportAndLoadSites(report: []): void {
+	updateAndShowReport(report: []): void {
 		let cleanRows: any[] = new Array();
 		for (let i = 0; i < report.length; i++) {
 			let row: any[] = report[i];
@@ -84,7 +94,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		}
 
 		this.report = cleanRows;
-		this.store.dispatch(new LoadSites());
+		this.showReport();
 	}
 
 	showReport(): void {
@@ -98,8 +108,12 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.modalRef.componentInstance.report = this.report;
 		this.modalRef.componentInstance.modalRef = this.modalRef;
 		this.modalRef.componentInstance.sites = this.sites;
+		this.modalRef.componentInstance.reconcileId = this.activeReconcileId;
 		this.modalRef.closed.subscribe(() => {
-			//Clear
+			//Reset
+			this.activeReconcileId = undefined;
+			this.store.dispatch(new SitesLoaded());
+			this.store.dispatch(new SiteReportLoaded());
 			this.store.dispatch(new ReportLoaded());
 		});
 	}

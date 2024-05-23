@@ -3,6 +3,7 @@ import {ReceiverReconcileProgress} from "../receiver-reconcile-progress";
 import {ReceiverTableReconcile} from "../receiver-table-reconcile";
 import {Reconciliation} from "../../../shared/reconciliation";
 import {Site} from "../../site";
+import {ReconcileTableSummary} from "../reconcile-table-summary";
 
 export enum ReceiverReconcileActionType {
 	LOAD_RECONCILIATION = 'LOAD_RECEIVER_RECONCILIATION',
@@ -19,7 +20,9 @@ export enum ReceiverReconcileActionType {
 	LOAD_REPORT = 'LOAD_REPORT',
 	REPORT_LOADED = 'REPORT_LOADED',
 	LOAD_SITES = 'LOAD_SITES',
-	SITES_LOADED = 'SITES_LOADED'
+	SITES_LOADED = 'SITES_LOADED',
+	LOAD_SITE_REPORT = 'LOAD_SITE_REPORT',
+	SITE_REPORT_LOADED = 'SITE_REPORT_LOADED'
 }
 
 export class LoadReceiverReconciliation implements Action {
@@ -138,6 +141,24 @@ export class SitesLoaded implements Action {
 
 }
 
+export class LoadSiteReport implements Action {
+
+	readonly type = ReceiverReconcileActionType.LOAD_SITE_REPORT;
+
+	constructor(public reconcileId?: string, public siteId?: string) {
+	}
+
+}
+
+export class SiteReportLoaded implements Action {
+
+	readonly type = ReceiverReconcileActionType.SITE_REPORT_LOADED;
+
+	constructor(public siteReport?: ReconcileTableSummary[]) {
+	}
+
+}
+
 export type ReceiverReconcileAction =
 	LoadReceiverReconciliation
 	| ReceiverReconciliationLoaded
@@ -153,4 +174,6 @@ export type ReceiverReconcileAction =
 	| LoadReport
 	| ReportLoaded
 	| LoadSites
-	| SitesLoaded;
+	| SitesLoaded
+	| LoadSiteReport
+	| SiteReportLoaded;
