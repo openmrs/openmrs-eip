@@ -2,10 +2,11 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {Reconciliation} from "../../shared/reconciliation";
 import {Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
-import {GET_RECEIVER_HISTORY, GET_REPORT} from "./state/receiver-reconcile.reducer";
-import {LoadReceiverHistory, LoadReport, ReportLoaded} from "./state/receiver-reconcile.actions";
+import {GET_RECEIVER_HISTORY, GET_REPORT, GET_SITES} from "./state/receiver-reconcile.reducer";
+import {LoadReceiverHistory, LoadReport, LoadSites, ReportLoaded} from "./state/receiver-reconcile.actions";
 import {NgbModal, NgbModalOptions, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {ReconcileReportComponent} from "./reconcile-report/reconcile-report.component";
+import {Site} from "../site";
 
 @Component({
 	selector: 'receiver-reconciliation-history',
@@ -15,7 +16,9 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 
 	reconciliationHistory?: Reconciliation[];
 
-	report?: any[]
+	report?: any[];
+
+	sites?: Site[];
 
 	modalRef?: NgbModalRef;
 
@@ -25,6 +28,8 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 	historyLoadedSubscription?: Subscription;
 
 	reportLoadedSubscription?: Subscription;
+
+	sitesLoadedSubscription?: Subscription;
 
 	constructor(
 		private store: Store,
@@ -41,7 +46,16 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.reportLoadedSubscription = this.store.pipe(select(GET_REPORT)).subscribe(
 			report => {
 				if (report) {
-					this.setAndDisplayReport(report);
+					this.setReportAndLoadSites(report);
+				}
+			}
+		);
+
+		this.sitesLoadedSubscription = this.store.pipe(select(GET_SITES)).subscribe(
+			sites => {
+				this.sites = sites;
+				if (sites) {
+					this.showReport();
 				}
 			}
 		);
@@ -53,7 +67,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.store.dispatch(new LoadReport(reconciliationId));
 	}
 
-	setAndDisplayReport(report: []): void {
+	setReportAndLoadSites(report: []): void {
 		let cleanRows: any[] = new Array();
 		for (let i = 0; i < report.length; i++) {
 			let row: any[] = report[i];
@@ -70,7 +84,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		}
 
 		this.report = cleanRows;
-		this.showReport();
+		this.store.dispatch(new LoadSites());
 	}
 
 	showReport(): void {
@@ -83,6 +97,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.modalRef = this.modalService.open(ReconcileReportComponent, dialogConfig);
 		this.modalRef.componentInstance.report = this.report;
 		this.modalRef.componentInstance.modalRef = this.modalRef;
+		this.modalRef.componentInstance.sites = this.sites;
 		this.modalRef.closed.subscribe(() => {
 			//Clear
 			this.store.dispatch(new ReportLoaded());
@@ -92,6 +107,7 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 	ngOnDestroy(): void {
 		this.historyLoadedSubscription?.unsubscribe();
 		this.reportLoadedSubscription?.unsubscribe();
+		this.sitesLoadedSubscription?.unsubscribe();
 	}
 
 }

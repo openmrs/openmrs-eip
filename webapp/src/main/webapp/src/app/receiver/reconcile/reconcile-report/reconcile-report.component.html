@@ -6,6 +6,22 @@
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
+		<div class="row m-2">
+			<table>
+				<tr>
+					<td class="font-weight-bold pr-2" i18n="@@receiver-filter-by-site">
+						Filter By Site
+					</td>
+					<td>
+						<div ngbDropdown class="d-inline-block">
+							<div ngbDropdownMenu>
+								<button ngbDropdownItem *ngFor="let s of sites">{{s.name}}</button>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
 		<div class="row">
 			<table class="w-100 table-sm table-striped">
 				<thead class="table-secondary">
