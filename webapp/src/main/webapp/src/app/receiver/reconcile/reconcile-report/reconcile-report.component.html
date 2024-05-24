@@ -9,8 +9,8 @@
 		<div class="row mt-4 mb-3">
 			<table>
 				<tr>
-					<td class="font-weight-bold pr-2" i18n="@@receiver-filter-by-site">Filter By Site</td>
-					<td>
+					<td class="font-weight-bold" i18n="@@receiver-filter-by-site">Filter By Site</td>
+					<td class="px-2">
 						<div ngbDropdown class="d-inline-block">
 							<button class="btn btn-outline-secondary" ngbDropdownToggle i18n="@@receiver-select-site">
 								{{activeSite ? activeSite.name : selectLabel}}
@@ -20,6 +20,12 @@
 								</button>
 							</div>
 						</div>
+					</td>
+					<td>
+						<button type="button" class="btn btn-sm btn-primary" (click)="clearFilter()"
+								i18n="common-clear-filter">
+							Clear Filter
+						</button>
 					</td>
 				</tr>
 			</table>

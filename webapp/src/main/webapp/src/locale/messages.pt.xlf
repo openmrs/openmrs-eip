@@ -878,5 +878,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="common-clear-filter">
+			<segment>
+				<source>Clear Filter</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>

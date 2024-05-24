@@ -19,6 +19,8 @@ export class ReconcileReportComponent implements OnInit, OnDestroy {
 
 	cleanReport?: any[];
 
+	fullCleanReport?: any[];
+
 	modalRef?: NgbModalRef;
 
 	sites?: Site[];
@@ -43,6 +45,7 @@ export class ReconcileReportComponent implements OnInit, OnDestroy {
 
 		this.selectLabel = $localize`:@@common-select:Select`;
 		this.setCleanReport();
+		this.fullCleanReport = this.cleanReport;
 	}
 
 	setCleanReport(): void {
@@ -69,6 +72,11 @@ export class ReconcileReportComponent implements OnInit, OnDestroy {
 	filterBySite(site?: Site): void {
 		this.activeSite = site;
 		this.store.dispatch(new LoadSiteReport(this.reconcileId, this.activeSite?.identifier))
+	}
+
+	clearFilter(): void {
+		this.cleanReport = this.fullCleanReport;
+		this.activeSite = undefined;
 	}
 
 	updateReport(siteReport: ReconcileTableSummary[]): void {
