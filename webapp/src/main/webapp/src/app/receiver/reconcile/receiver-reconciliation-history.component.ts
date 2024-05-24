@@ -55,7 +55,8 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 		this.reportLoadedSubscription = this.store.pipe(select(GET_REPORT)).subscribe(
 			report => {
 				if (report) {
-					this.updateAndShowReport(report);
+					this.report = report;
+					this.showReport();
 				}
 			}
 		);
@@ -75,26 +76,6 @@ export class ReceiverReconciliationHistoryComponent implements OnInit, OnDestroy
 	getReport(reconciliationId?: string): void {
 		this.activeReconcileId = reconciliationId;
 		this.store.dispatch(new LoadSites());
-	}
-
-	updateAndShowReport(report: []): void {
-		let cleanRows: any[] = new Array();
-		for (let i = 0; i < report.length; i++) {
-			let row: any[] = report[i];
-			if (row[1] == 0 && row[2] == 0 && row[3] == 0 && row[4] == 0 && row[5] == 0 && row[6] == 0) {
-				continue;
-			}
-
-			let cleanRow: any[] = [];
-			for (let j = 0; j < row.length; j++) {
-				cleanRow.push(row[j] == 0 ? '' : row[j]);
-			}
-
-			cleanRows.push(cleanRow);
-		}
-
-		this.report = cleanRows;
-		this.showReport();
 	}
 
 	showReport(): void {

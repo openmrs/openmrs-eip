@@ -37,7 +37,7 @@
 					</th>
 				</tr>
 				<tr>
-					<th class="text-nowrap text-center border-secondary border-bottom" rowspan="2" i18n="@@common-table-name">
+					<th class="text-nowrap text-center border-secondary border-bottom" i18n="@@common-table-name">
 						Table Name
 					</th>
 					<th class="text-nowrap text-center border-secondary border-bottom border-left ui-bg-pink" i18n="@@common-count">
@@ -61,7 +61,7 @@
 				</tr>
 				</thead>
 				<tbody>
-				<tr *ngFor="let r of report">
+				<tr *ngFor="let r of cleanReport">
 					<td class="text-left text-nowrap">{{r[0] | lowercase}}</td>
 					<td class="text-center border-secondary border-left">{{r[1]}}</td>
 					<td class="text-center">{{r[2]}}</td>
