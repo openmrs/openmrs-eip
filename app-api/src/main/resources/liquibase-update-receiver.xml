@@ -463,4 +463,16 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="wluyima" id="20240527-1410" labels="1.7.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="remote_sync_version" tableName="reconcile_msg"/>
+            </not>
+        </preConditions>
+        <comment>Add remote_sync_version column to reconcile_msg table</comment>
+        <addColumn tableName="reconcile_msg">
+            <column name="remote_sync_version" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

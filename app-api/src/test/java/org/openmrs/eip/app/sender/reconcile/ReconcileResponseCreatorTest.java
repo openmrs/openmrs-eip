@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -37,6 +38,7 @@ public class ReconcileResponseCreatorTest {
 		Mockito.verify(msg).setStringProperty(SyncConstants.JMS_HEADER_SITE, siteId);
 		Mockito.verify(msg).setStringProperty(SyncConstants.JMS_HEADER_TYPE, MessageType.RECONCILE.name());
 		Mockito.verify(msg).setStringProperty(eq(SyncConstants.JMS_HEADER_MSG_ID), ArgumentMatchers.anyString());
+		Mockito.verify(msg).setStringProperty(eq(SyncConstants.JMS_HEADER_VERSION), eq(AppUtils.getVersion()));
 	}
 	
 }

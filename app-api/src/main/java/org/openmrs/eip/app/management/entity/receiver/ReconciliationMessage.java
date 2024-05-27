@@ -55,6 +55,11 @@ public class ReconciliationMessage extends AbstractEntity {
 	@Setter
 	private int processedCount;
 	
+	@Column(name = "remote_sync_version", length = 20, updatable = false)
+	@Getter
+	@Setter
+	private String remoteSyncVersion;
+	
 	/**
 	 * Checks whether this message has been processed completely.
 	 * 

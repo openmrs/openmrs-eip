@@ -101,6 +101,7 @@ public class ReceiverReconcileServiceImpl extends BaseService implements Receive
 		msg.setBatchSize(resp.getBatchSize());
 		msg.setLastTableBatch(resp.isLastTableBatch());
 		msg.setData(resp.getData());
+		msg.setRemoteSyncVersion(jmsMessage.getSyncVersion());
 		msg.setDateCreated(new Date());
 		if (LOG.isTraceEnabled()) {
 			LOG.trace("Saving reconciliation message");

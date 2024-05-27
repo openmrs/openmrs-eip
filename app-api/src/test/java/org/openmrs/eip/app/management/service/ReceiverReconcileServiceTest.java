@@ -73,6 +73,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertEquals(0, tableRecRepo.count());
 		final String table = "person";
 		final String data = "person-uuid-1,person-uuid-2";
+		final String version = "test-version";
 		final int batchSize = 10;
 		final boolean last = true;
 		ReconciliationResponse resp = new ReconciliationResponse();
@@ -86,6 +87,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		jmsMsg.setSiteId(site.getIdentifier());
 		jmsMsg.setType(JmsMessage.MessageType.SYNC);
 		jmsMsg.setBody(payLoad.getBytes(UTF_8));
+		jmsMsg.setSyncVersion(version);
 		jmsMsg.setDateCreated(new Date());
 		jmsMsgRepo.save(jmsMsg);
 		assertEquals(1, jmsMsgRepo.count());
@@ -102,6 +104,7 @@ public class ReceiverReconcileServiceTest extends BaseReceiverTest {
 		assertTrue(msg.isLastTableBatch());
 		assertEquals(data, msg.getData());
 		assertEquals(0, msg.getProcessedCount());
+		assertEquals(version, msg.getRemoteSyncVersion());
 		assertTrue(msg.getDateCreated().getTime() == timestamp || msg.getDateCreated().getTime() > timestamp);
 		assertEquals(0, tableRecRepo.count());
 		assertEquals(0, jmsMsgRepo.count());

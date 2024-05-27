@@ -2,6 +2,7 @@ package org.openmrs.eip.app.sender.reconcile;
 
 import java.util.UUID;
 
+import org.openmrs.eip.app.AppUtils;
 import org.openmrs.eip.app.SyncConstants;
 import org.openmrs.eip.app.management.entity.receiver.JmsMessage.MessageType;
 import org.springframework.jms.core.MessageCreator;
@@ -35,6 +36,7 @@ public class ReconcileResponseCreator implements MessageCreator {
 		message.setStringProperty(SyncConstants.JMS_HEADER_MSG_ID, UUID.randomUUID().toString());
 		message.setStringProperty(SyncConstants.JMS_HEADER_SITE, siteId);
 		message.setStringProperty(SyncConstants.JMS_HEADER_TYPE, MessageType.RECONCILE.name());
+		message.setStringProperty(SyncConstants.JMS_HEADER_VERSION, AppUtils.getVersion());
 		return message;
 	}
 }
