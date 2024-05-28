@@ -27,7 +27,7 @@
 		</td>
 		<td>{{m.messageUuid}}</td>
 		<td container="body" ngbTooltip="{{m.dateSentBySender | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{m.dateSentBySender| date:'MMM dd, y'}}</td>
-		<td container="body" ngbTooltip="{{m.dateCreated | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{m.dateCreated | date:'MMM dd, y'}}</td>
+		<td container="body" ngbTooltip="{{m.dateReceived | date:'EEEE, MMMM dd, y, HH:mm:ss'}}" [openDelay]="1000">{{m.dateReceived | date:'MMM dd, y'}}</td>
 		<td>
 			<i class="bi bi-eye hover-primary ui-cursor-pointer" [ngbTooltip]="viewDetailsTemplate" [openDelay]="1000" (click)="viewSyncMessage(m)"></i>
 		</td>

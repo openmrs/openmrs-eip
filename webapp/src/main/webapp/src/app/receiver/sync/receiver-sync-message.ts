@@ -17,4 +17,6 @@ export class ReceiverSyncMessage extends BaseEntity {
 
 	dateSentBySender?: string;
 
+	dateReceived?: string;
+
 }
