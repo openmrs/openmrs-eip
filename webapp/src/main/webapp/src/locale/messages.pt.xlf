@@ -884,5 +884,11 @@
 				<target></target>
 			</segment>
 		</unit>
+		<unit id="receiver-no-issues-found">
+			<segment>
+				<source>No issues found</source>
+				<target></target>
+			</segment>
+		</unit>
 	</file>
 </xliff>
