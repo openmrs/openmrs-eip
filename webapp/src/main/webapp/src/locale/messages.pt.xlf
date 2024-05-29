@@ -659,235 +659,235 @@
 		<unit id="common-read">
 			<segment>
 				<source>Read</source>
-				<target></target>
+				<target>Visualizar</target>
 			</segment>
 		</unit>
 		<unit id="common-reads">
 			<segment>
 				<source>Reads</source>
-				<target></target>
+				<target>Visualizados</target>
 			</segment>
 		</unit>
 		<unit id="common-reconciliation">
 			<segment>
 				<source>Reconciliation</source>
-				<target></target>
+				<target>Reconciliação</target>
 			</segment>
 		</unit>
 		<unit id="common-start-reconcile">
 			<segment>
 				<source>Start New Reconciliation</source>
-				<target></target>
+				<target>Iniciar nova reconciliação</target>
 			</segment>
 		</unit>
 		<unit id="common-pending">
 			<segment>
 				<source>Pending</source>
-				<target></target>
+				<target>Pendente</target>
 			</segment>
 		</unit>
 		<unit id="common-processing">
 			<segment>
 				<source>Processing</source>
-				<target></target>
+				<target>Processando</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-generating-report">
 			<segment>
 				<source>Generating Report</source>
-				<target></target>
+				<target>Generating Report</target>
 			</segment>
 		</unit>
 		<unit id="receiver-reconcile-completed-sites">
 			<segment>
 				<source>Completed Sites</source>
-				<target></target>
+				<target>Sites processados</target>
 			</segment>
 		</unit>
 		<unit id="receiver-reconcile-show-facility-breakdown">
 			<segment>
 				<source>Show facility breakdown</source>
-				<target></target>
+				<target>Mostrar detalhes das US</target>
 			</segment>
 		</unit>
 		<unit id="receiver-completed-tables">
 			<segment>
 				<source>Completed Tables</source>
-				<target></target>
+				<target>Tabelas processadas</target>
 			</segment>
 		</unit>
 		<unit id="common-of">
 			<segment>
 				<source>of</source>
-				<target></target>
+				<target>De</target>
 			</segment>
 		</unit>
 		<unit id="common-view-incomplete-tables">
 			<segment>
 				<source>View Incomplete Tables</source>
-				<target></target>
+				<target>Visualizar tabelas não processadas</target>
 			</segment>
 		</unit>
 		<unit id="common-completed-rows">
 			<segment>
 				<source>Completed Rows</source>
-				<target></target>
+				<target>linhas processadas</target>
 			</segment>
 		</unit>
 		<unit id="receiver-start-at-facility">
 			<segment>
 				<source>Start Date At Health Facility</source>
-				<target></target>
+				<target>Data de início na US</target>
 			</segment>
 		</unit>
 		<unit id="receiver-last-batch-received">
 			<segment>
 				<source>Last Batch Received</source>
-				<target></target>
+				<target>Último lote recebido</target>
 			</segment>
 		</unit>
 		<unit id="common-row-count">
 			<segment>
 				<source>Row Count</source>
-				<target></target>
+				<target>Total de linhas</target>
 			</segment>
 		</unit>
 		<unit id="common-processed">
 			<segment>
 				<source>Processed</source>
-				<target></target>
+				<target>Processado</target>
 			</segment>
 		</unit>
 		<unit id="common-incomplete-tables">
 			<segment>
 				<source>Incomplete Tables</source>
-				<target></target>
+				<target>Tabelas não processadas</target>
 			</segment>
 		</unit>
 		<unit id="common-unknown">
 			<segment>
 				<source>Unknown</source>
-				<target></target>
+				<target>Desconhecido</target>
 			</segment>
 		</unit>
 		<unit id="sender-no-reconciliation-in-progress">
 			<segment>
 				<source>No reconciliation in progress</source>
-				<target></target>
+				<target>Nenhuma reconciliação em andamento</target>
 			</segment>
 		</unit>
 		<unit id="sender-sending-deleted-rows">
 			<segment>
 				<source>Sending Deleted Rows</source>
-				<target></target>
+				<target>Enviando linhas excluídas</target>
 			</segment>
 		</unit>
 		<unit id="sender-incomplete-tables">
 			<segment>
 				<source>Incomplete Tables</source>
-				<target></target>
+				<target>Tabelas não processadas<</target>
 			</segment>
 		</unit>
 		<unit id="common-started">
 			<segment>
 				<source>Started</source>
-				<target></target>
+				<target>Iniciado</target>
 			</segment>
 		</unit>
 		<unit id="sender-last-processed-id">
 			<segment>
 				<source>Last Processed Id</source>
-				<target></target>
+				<target>Último ID processado</target>
 			</segment>
 		</unit>
 		<unit id="sender-stop-id">
 			<segment>
 				<source>Stop Id</source>
-				<target></target>
+				<target>Identificador da paragem</target>
 			</segment>
 		</unit>
 		<unit id="sender-snapshot-date">
 			<segment>
 				<source>Snapshot Date</source>
-				<target></target>
+				<target>Data do Registo</target>
 			</segment>
 		</unit>
 		<unit id="common-active">
 			<segment>
 				<source>Active</source>
-				<target></target>
+				<target>Ativo</target>
 			</segment>
 		</unit>
 		<unit id="common-history">
 			<segment>
 				<source>History</source>
-				<target></target>
+				<target>Histórico</target>
 			</segment>
 		</unit>
 		<unit id="common-date-created">
 			<segment>
 				<source>Date Created</source>
-				<target></target>
+				<target>Data de Criação</target>
 			</segment>
 		</unit>
 		<unit id="receiver-reconcile-view-report">
 			<segment>
 				<source>View Report</source>
-				<target></target>
+				<target>Visualizar Relatório</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-missing-entities">
 			<segment>
 				<source>Missing Entities</source>
-				<target></target>
+				<target>Entidades não encontradas</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-in-sync-queue">
 			<segment>
 				<source>In Sync Queue</source>
-				<target></target>
+				<target>Na fila de sincronização</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-in-error-queue">
 			<segment>
 				<source>In Error Queue</source>
-				<target></target>
+				<target>Na fila de erros</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-undeleted-entities">
 			<segment>
 				<source>Undeleted Entities</source>
-				<target></target>
+				<target>Itens Não Removidos</target>
 			</segment>
 		</unit>
 		<unit id="reconcile-report">
 			<segment>
 				<source>Reconciliation Report</source>
-				<target></target>
+				<target>Relatório de Reconciliação</target>
 			</segment>
 		</unit>
 		<unit id="receiver-filter-by-site">
 			<segment>
 				<source>Filter By Site</source>
-				<target></target>
+				<target>Filtrar por Site</target>
 			</segment>
 		</unit>
 		<unit id="common-select">
 			<segment>
 				<source>Select</source>
-				<target></target>
+				<target>selecione</target>
 			</segment>
 		</unit>
 		<unit id="common-clear-filter">
 			<segment>
 				<source>Clear Filter</source>
-				<target></target>
+				<target>Limpar filtro</target>
 			</segment>
 		</unit>
 		<unit id="receiver-no-issues-found">
 			<segment>
 				<source>No issues found</source>
-				<target></target>
+				<target>Nenhum problema encontrado</target>
 			</segment>
 		</unit>
 	</file>
