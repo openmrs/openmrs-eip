@@ -1,5 +1,7 @@
 package org.openmrs.eip.app.management.config;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,8 @@ import org.apache.camel.component.jpa.DefaultTransactionStrategy;
 import org.apache.camel.component.jpa.JpaComponent;
 import org.hibernate.cfg.AvailableSettings;
 import org.openmrs.eip.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,11 +29,19 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LockException;
 import liquibase.integration.spring.SpringLiquibase;
+import liquibase.lockservice.LockServiceFactory;
 
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "mngtEntityManager", transactionManagerRef = "mngtTransactionManager")
 public class ManagementDataSourceConfig {
+	
+	private static final Logger log = LoggerFactory.getLogger(ManagementDataSourceConfig.class);
 	
 	@Value("${spring.mngt-datasource.dialect}")
 	private String hibernateDialect;
@@ -88,8 +100,19 @@ public class ManagementDataSourceConfig {
 		liquibase.setDatabaseChangeLogTable("LIQUIBASECHANGELOG");
 		liquibase.setDatabaseChangeLogLockTable("LIQUIBASECHANGELOGLOCK");
 		liquibase.setShouldRun(true);
+		releaseLiquibaseLock(dataSource);
 		
 		return liquibase;
 	}
 	
+	public void releaseLiquibaseLock(DataSource dataSource) {
+		try (Connection connection = dataSource.getConnection()) {
+			Database database = DatabaseFactory.getInstance()
+			        .findCorrectDatabaseImplementation(new JdbcConnection(connection));
+			LockServiceFactory.getInstance().getLockService(database).forceReleaseLock();
+		}
+		catch (DatabaseException | SQLException | LockException e) {
+			log.error("Error occurred while liquibase forceReleaseLock {}", e.getMessage(), e);
+		}
+	}
 }
