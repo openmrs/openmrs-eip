@@ -33,7 +33,13 @@ public enum FhirResource {
 	
 	SERVICEREQUEST("direct:fhir-handler-servicerequest", "direct:fhir-servicerequest", "orders", "test_order"),
 	
-	TASK("direct:fhir-handler-task", "direct:fhir-task", "fhir_task");
+	TASK("direct:fhir-handler-task", "direct:fhir-task", "fhir_task"),
+	
+	DIAGNOSTICREPORT(
+	        "direct:fhir-handler-diagnosticreport;",
+	        "direct:fhir-diagnosticreport",
+	        "fhir_diagnostic_report",
+	        "fhir_diagnostic_report_results");
 	
 	private final String[] tables;
 	
