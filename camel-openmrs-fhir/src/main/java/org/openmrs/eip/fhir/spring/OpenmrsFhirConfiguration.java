@@ -4,6 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.component.fhir.FhirComponent;
 import org.apache.camel.component.fhir.FhirConfiguration;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.eip.fhir.security.interceptor.Oauth2Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,20 +44,15 @@ public class OpenmrsFhirConfiguration {
 		return isOauthEnabled;
 	}
 	
-	@Qualifier("openmrsFhirClient")
 	@Bean
+	@Qualifier("openmrsFhirClient")
 	IGenericClient openmrsFhirClient() {
-		FhirContext ctx = FhirContext.forR4();
-		IGenericClient client = ctx.newRestfulGenericClient(fhirServerUrl);
-		
-		if (isOauthEnabled()) {
+		IGenericClient client = FhirContext.forR4().newRestfulGenericClient(fhirServerUrl);
+		if (isOauthEnabled) {
 			client.registerInterceptor(oauth2Interceptor);
-		} else {
-			if (fhirUsername != null && !fhirUsername.isBlank() && fhirPassword != null && !fhirPassword.isBlank()) {
-				client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
-			}
+		} else if (StringUtils.isNotBlank(fhirUsername) && StringUtils.isNotBlank(fhirPassword)) {
+			client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
 		}
-		
 		return client;
 	}
 	
@@ -67,12 +63,10 @@ public class OpenmrsFhirConfiguration {
 			@Override
 			public void beforeApplicationStart(CamelContext camelContext) {
 				FhirConfiguration fhirConfiguration = new FhirConfiguration();
-				FhirContext ctx = FhirContext.forR4();
 				fhirConfiguration.setServerUrl(fhirServerUrl);
 				fhirConfiguration.setClient(openmrsFhirClient());
-				fhirConfiguration.setFhirContext(ctx);
+				fhirConfiguration.setFhirContext(FhirContext.forR4());
 				fhirConfiguration.setSummary("DATA");
-				
 				camelContext.getComponent("fhir", FhirComponent.class).setConfiguration(fhirConfiguration);
 			}
 			
