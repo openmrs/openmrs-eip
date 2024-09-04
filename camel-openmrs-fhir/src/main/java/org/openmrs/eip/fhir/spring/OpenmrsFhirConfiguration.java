@@ -52,6 +52,8 @@ public class OpenmrsFhirConfiguration {
 			client.registerInterceptor(oauth2Interceptor);
 		} else if (StringUtils.isNotBlank(fhirUsername) && StringUtils.isNotBlank(fhirPassword)) {
 			client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
+		} else {
+			throw new IllegalStateException("Authentication credentials are not provided");
 		}
 		return client;
 	}
