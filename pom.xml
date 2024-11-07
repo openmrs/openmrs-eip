@@ -28,7 +28,7 @@
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <sprintBootVersion>3.1.4</sprintBootVersion>
         <hibernateVersion>6.3.1.Final</hibernateVersion>
-        <hibernateValidatorVersion>6.1.5.Final</hibernateValidatorVersion>
+        <hibernateValidatorVersion>6.2.0.Final</hibernateValidatorVersion>
         <camelVersion>4.1.0</camelVersion>
         <liquibaseVersion>4.24.0</liquibaseVersion>
         <h2Version>2.2.224</h2Version>
