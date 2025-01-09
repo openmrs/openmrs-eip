@@ -7,7 +7,7 @@ public class Concept {
 	
 	public String uuid;
 	
-	public String displayString;
+	public String display;
 	
 	public String getUuid() {
 		return uuid;
@@ -17,11 +17,11 @@ public class Concept {
 		this.uuid = uuid;
 	}
 	
-	public String getDisplayString() {
-		return displayString;
+	public String getDisplay() {
+		return display;
 	}
 	
-	public void setDisplayString(String displayString) {
-		this.displayString = displayString;
+	public void setDisplay(String display) {
+		this.display = display;
 	}
 }

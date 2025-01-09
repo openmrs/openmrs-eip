@@ -35,7 +35,7 @@ public enum FhirResource {
 	
 	PROCEDURE("direct:fhir-handler-procedure", "direct:fhir-procedure", "orders", "procedure_order"),
 	
-	MEDICALSUPPLY("direct:fhir-handler-medicalsupply", "direct:fhir-medicalsupply", "orders", "medical_supplies_order"),
+	SUPPLYREQUEST("direct:fhir-handler-supplyrequest", "direct:fhir-supplyrequest", "orders", "medical_supplies_order"),
 	
 	TASK("direct:fhir-handler-task", "direct:fhir-task", "fhir_task");
 	

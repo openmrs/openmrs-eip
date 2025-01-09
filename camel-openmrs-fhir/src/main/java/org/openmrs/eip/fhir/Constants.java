@@ -26,7 +26,7 @@ public final class Constants {
 	
 	public static final String PROCEDURE_ORDER_TYPE_UUID = "67a92e56-0f88-11ea-8d71-362b9e155667";
 	
-	public static final String MEDICAL_SUPPLY_ORDER_TYPE_UUID = "67a92bd6-0f88-11ea-8d71-362b9e155667";
+	public static final String SUPPLY_REQUEST_ORDER_TYPE_UUID = "67a92bd6-0f88-11ea-8d71-362b9e155667";
 	
 	public static final String DRUG_ORDER_TYPE_UUID = "131168f4-15f5-102d-96e4-000c29c2a5d7";
 	
