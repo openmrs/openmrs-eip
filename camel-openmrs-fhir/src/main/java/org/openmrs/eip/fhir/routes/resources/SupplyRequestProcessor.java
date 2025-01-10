@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
+import org.hl7.fhir.r4.model.SupplyRequest;
 import org.openmrs.eip.fhir.routes.resources.models.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,27 +33,12 @@ public class SupplyRequestProcessor implements Processor {
 			ObjectMapper objectMapper = new ObjectMapper();
 			Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
 			
-			ServiceRequest serviceRequest = new ServiceRequest();
-			if (order.getAction().equals("DISCONTINUE")) {
-				serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.COMPLETED);
-			} else {
-				serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.ACTIVE);
-			}
-			serviceRequest.setIntent(ServiceRequest.ServiceRequestIntent.ORDER);
-			serviceRequest.setCode(new CodeableConcept(
-			        new Coding().setCode(order.getConcept().getUuid()).setDisplay(order.getConcept().getDisplay()))
-			                .setText(order.getConcept().getDisplay()));
-			serviceRequest.setSubject(new Reference().setReference("Patient/" + order.getPatient().getUuid())
-			        .setType("Patient").setDisplay(order.getPatient().getDisplay()));
-			serviceRequest.setEncounter(
-			    new Reference().setReference("Encounter/" + order.getEncounter().getUuid()).setType("Encounter"));
-			serviceRequest.setRequester(new Reference().setReference("Practitioner/" + order.getOrderer().getUuid())
-			        .setType("Practitioner").setDisplay(order.getOrderer().getDisplay()));
+			SupplyRequest supplyRequest = new SupplyRequest();
 			
-			exchange.getMessage().setBody(serviceRequest);
+			exchange.getMessage().setBody(supplyRequest);
 		}
 		catch (Exception e) {
-			throw new CamelExecutionException("Error processing ServiceRequest", exchange, e);
+			throw new CamelExecutionException("Error transforming Order to SupplyRequest", exchange, e);
 		}
 	}
 }
