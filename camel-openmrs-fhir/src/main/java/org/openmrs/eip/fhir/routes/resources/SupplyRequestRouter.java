@@ -17,7 +17,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	}
 	
 	@Autowired
-	private SupplyRequestProcessor supplyRequestProcessor;
+	private SupplyProcessor supplyProcessor;
 	
 	@Override
 	public void configure() throws Exception {
@@ -34,7 +34,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		        .setHeader("Authorization", constant("Basic YWRtaW46QWRtaW4xMjM="))
 		        .setHeader("CamelHttpMethod", constant("GET"))
 		        .toD("http://openmrs:8080/openmrs/ws/rest/v1/order/${exchangeProperty.event.identifier}")
-		        .process(supplyRequestProcessor)
+		        .process(supplyProcessor)
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();
 	}

@@ -47,6 +47,26 @@ public class Order {
 	
 	public String resourceVersion;
 	
+	public float quantity;
+	
+	public QuantityUnits quantityUnits;
+	
+	public float getQuantity() {
+		return quantity;
+	}
+	
+	public void setQuantity(float quantity) {
+		this.quantity = quantity;
+	}
+	
+	public QuantityUnits getQuantityUnits() {
+		return quantityUnits;
+	}
+	
+	public void setQuantityUnits(QuantityUnits quantityUnits) {
+		this.quantityUnits = quantityUnits;
+	}
+	
 	public String getUuid() {
 		return uuid;
 	}
