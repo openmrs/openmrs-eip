@@ -33,9 +33,6 @@ public class SupplyProcessor implements Processor {
 			
 			SupplyRequest supplyRequest = new SupplyRequest();
 			supplyRequest.setId(order.getUuid());
-			//			supplyRequest.setItem(new CodeableConcept(
-			//			        new Coding().setCode(order.getConcept().getUuid()).setDisplay(order.getConcept().getDisplay()))
-			//			                .setText(order.getConcept().getDisplay()));
 			supplyRequest.setItem(new Reference().setReference("MedicalSupply/" + order.getConcept().getUuid())
 			        .setDisplay(order.getConcept().getDisplay()));
 			supplyRequest.setReasonReference(Collections.singletonList(

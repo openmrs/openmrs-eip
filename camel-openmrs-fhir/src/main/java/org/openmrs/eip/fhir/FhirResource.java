@@ -33,7 +33,7 @@ public enum FhirResource {
 	
 	SERVICEREQUEST("direct:fhir-handler-servicerequest", "direct:fhir-servicerequest", "orders", "test_order"),
 	
-	PROCEDURE("direct:fhir-handler-procedure", "direct:fhir-procedure", "orders", "procedure_order"),
+	PROCEDURE("direct:fhir-handler-procedure", "direct:fhir-procedure", "orders"),
 	
 	SUPPLYREQUEST("direct:fhir-handler-supplyrequest", "direct:fhir-supplyrequest", "orders"),
 	
