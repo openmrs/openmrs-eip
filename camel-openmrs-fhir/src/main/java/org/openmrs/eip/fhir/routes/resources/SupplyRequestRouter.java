@@ -45,7 +45,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 			        exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
 		        }).setHeader("CamelHttpMethod", constant("GET"))
 		        //TODO: Replace with {{openmrs.baseUrl}}
-		        .toD("http://openmrs:8080/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
+		        .toD("http://openmrs:8080/openmrs/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
 			        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
 			        exchange.getMessage().setBody(mapOrderToSupplyRequest(order));
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
