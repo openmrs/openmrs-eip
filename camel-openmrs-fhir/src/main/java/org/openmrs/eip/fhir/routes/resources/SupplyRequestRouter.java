@@ -6,20 +6,26 @@ import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 import static org.openmrs.eip.fhir.Constants.SUPPLY_REQUEST_ORDER_TYPE_UUID;
 
+import java.util.Collections;
+
 import org.apache.camel.LoggingLevel;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.SupplyRequest;
 import org.openmrs.eip.fhir.FhirResource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.eip.fhir.routes.resources.models.Order;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+	
 	SupplyRequestRouter() {
 		super(FhirResource.SUPPLYREQUEST);
 	}
-	
-	@Autowired
-	private SupplyProcessor supplyProcessor;
 	
 	@Override
 	public void configure() throws Exception {
@@ -38,8 +44,28 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 			        String base64Auth = getEncoder().encodeToString(auth.getBytes());
 			        exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
 		        }).setHeader("CamelHttpMethod", constant("GET"))
-		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(supplyProcessor)
-		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        //TODO: Replace with {{openmrs.baseUrl}}
+		        .toD("http://openmrs:8080/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
+			        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
+			        exchange.getMessage().setBody(mapOrderToSupplyRequest(order));
+		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();
+	}
+	
+	private SupplyRequest mapOrderToSupplyRequest(Order order) {
+		SupplyRequest supplyRequest = new SupplyRequest();
+		supplyRequest.setId(order.getUuid());
+		supplyRequest.setItem(new Reference().setReference("MedicalSupply/" + order.getConcept().getUuid())
+		        .setDisplay(order.getConcept().getDisplay()));
+		supplyRequest.setReasonReference(Collections.singletonList(
+		    new Reference().setType("Encounter").setReference("Encounter/" + order.getEncounter().getUuid())));
+		supplyRequest.setQuantity(new Quantity().setValue(order.getQuantity()).setCode(order.getQuantityUnits().getUuid()));
+		supplyRequest.setRequester(
+		    new Reference().setReference(order.getOrderer().getUuid()).setDisplay(order.getOrderer().getDisplay()));
+		supplyRequest.setDeliverTo(new Reference().setReference("Patient/" + order.getPatient().getUuid())
+		        .setDisplay(order.getPatient().getDisplay()));
+		supplyRequest.setStatus(SupplyRequest.SupplyRequestStatus.ACTIVE);
+		
+		return supplyRequest;
 	}
 }

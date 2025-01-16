@@ -6,20 +6,26 @@ import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROCEDURE_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.LoggingLevel;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.eip.fhir.FhirResource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.eip.fhir.routes.resources.models.Order;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class ProcedureRouter extends BaseFhirResourceRouter {
 	
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+	
 	ProcedureRouter() {
 		super(FhirResource.PROCEDURE);
 	}
-	
-	@Autowired
-	private ProcedureProcessor procedureProcessor;
 	
 	@Override
 	public void configure() throws Exception {
@@ -38,8 +44,37 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 			        String base64Auth = getEncoder().encodeToString(auth.getBytes());
 			        exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
 		        }).setHeader("CamelHttpMethod", constant("GET"))
-		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(procedureProcessor)
-		        .setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
+		        //TODO: Replace with {{openmrs.baseUrl}}
+		        .toD("http://openmrs:8080/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
+			        try {
+				        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
+				        exchange.getMessage().setBody(mapOrderToServiceRequest(order));
+			        }
+			        catch (Exception e) {
+				        throw new CamelExecutionException("Error mapping Order to ServiceRequest", exchange, e);
+			        }
+		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).endChoice().end();
+	}
+	
+	private ServiceRequest mapOrderToServiceRequest(Order order) {
+		ServiceRequest serviceRequest = new ServiceRequest();
+		if (order.getAction().equals("DISCONTINUE")) {
+			serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.COMPLETED);
+		} else {
+			serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.ACTIVE);
+		}
+		serviceRequest.setIntent(ServiceRequest.ServiceRequestIntent.ORDER);
+		serviceRequest.setCode(new CodeableConcept(
+		        new Coding().setCode(order.getConcept().getUuid()).setDisplay(order.getConcept().getDisplay()))
+		                .setText(order.getConcept().getDisplay()));
+		serviceRequest.setSubject(new Reference().setReference("Patient/" + order.getPatient().getUuid()).setType("Patient")
+		        .setDisplay(order.getPatient().getDisplay()));
+		serviceRequest.setEncounter(
+		    new Reference().setReference("Encounter/" + order.getEncounter().getUuid()).setType("Encounter"));
+		serviceRequest.setRequester(new Reference().setReference("Practitioner/" + order.getOrderer().getUuid())
+		        .setType("Practitioner").setDisplay(order.getOrderer().getDisplay()));
+		
+		return serviceRequest;
 	}
 }
