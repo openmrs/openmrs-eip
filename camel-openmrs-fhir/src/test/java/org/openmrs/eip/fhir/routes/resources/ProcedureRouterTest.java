@@ -132,4 +132,30 @@ class ProcedureRouterTest extends CamelSpringTestSupport {
 		sqlOrderType.assertIsSatisfied();
 		sqlOrders.assertIsSatisfied();
 	}
+	
+	@Test
+	void shouldSkipUnknownEntry() throws InterruptedException {
+		// Arrange
+		MockEndpoint result = getMockEndpoint("mock:result");
+		result.expectedMessageCount(0);
+		result.setResultWaitTime(100);
+		
+		MockEndpoint fhir = getMockEndpoint("mock:fhir");
+		fhir.expectedMessageCount(0);
+		
+		// Act
+		template.send((exchange) -> {
+			Event event = new Event();
+			event.setTableName("unknown_table");
+			event.setOperation("c");
+			event.setIdentifier(UUID.randomUUID().toString());
+			exchange.setProperty("event", event);
+			Message in = exchange.getIn();
+			in.setBody("");
+		});
+		
+		// Assert
+		result.assertIsSatisfied();
+		fhir.assertIsSatisfied();
+	}
 }
