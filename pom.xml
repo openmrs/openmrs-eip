@@ -43,6 +43,7 @@
         <openmrsPlatformToolsVersion>2.4.0</openmrsPlatformToolsVersion>
         <mockito.version>5.6.0</mockito.version>
         <powermock.version>2.0.9</powermock.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <scm>
@@ -258,6 +259,11 @@
                     <groupId>junit</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
 
