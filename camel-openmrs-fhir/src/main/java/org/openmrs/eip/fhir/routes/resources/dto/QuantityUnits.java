@@ -1,4 +1,4 @@
-package org.openmrs.eip.fhir.routes.resources.models;
+package org.openmrs.eip.fhir.routes.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

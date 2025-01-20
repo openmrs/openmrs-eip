@@ -1,4 +1,4 @@
-package org.openmrs.eip.fhir.routes.resources.models;
+package org.openmrs.eip.fhir.routes.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Encounter {
+public class Concept {
 	
 	public String uuid;
 	
 	public String display;
-	
 }

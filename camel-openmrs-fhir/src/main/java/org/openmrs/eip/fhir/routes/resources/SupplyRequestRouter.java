@@ -8,12 +8,13 @@ import static org.openmrs.eip.fhir.Constants.SUPPLY_REQUEST_ORDER_TYPE_UUID;
 
 import java.util.Collections;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.SupplyRequest;
 import org.openmrs.eip.fhir.FhirResource;
-import org.openmrs.eip.fhir.routes.resources.models.Order;
+import org.openmrs.eip.fhir.routes.resources.dto.Order;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,18 +38,21 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
-		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).otherwise().process(exchange -> {
-			        String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
-			        String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
-			        String auth = username + ":" + password;
-			        String base64Auth = getEncoder().encodeToString(auth.getBytes());
-			        exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
-		        }).setHeader("CamelHttpMethod", constant("GET"))
+		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).otherwise().process(this::setOpenmrsBase64AuthHeader)
+		        .setHeader("CamelHttpMethod", constant("GET"))
 		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
 			        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
 			        exchange.getMessage().setBody(mapOrderToSupplyRequest(order));
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();
+	}
+	
+	private void setOpenmrsBase64AuthHeader(Exchange exchange) {
+		String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
+		String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
+		String auth = username + ":" + password;
+		String base64Auth = getEncoder().encodeToString(auth.getBytes());
+		exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
 	}
 	
 	private SupplyRequest mapOrderToSupplyRequest(Order order) {
