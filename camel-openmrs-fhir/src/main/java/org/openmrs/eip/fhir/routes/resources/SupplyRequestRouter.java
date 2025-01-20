@@ -10,6 +10,7 @@ import java.util.Collections;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.dataformat.JsonLibrary;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.SupplyRequest;
@@ -17,12 +18,8 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.routes.resources.dto.Order;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 public class SupplyRequestRouter extends BaseFhirResourceRouter {
-	
-	private static final ObjectMapper objectMapper = new ObjectMapper();
 	
 	SupplyRequestRouter() {
 		super(FhirResource.SUPPLYREQUEST);
@@ -40,8 +37,9 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).otherwise().process(this::setOpenmrsBase64AuthHeader)
 		        .setHeader("CamelHttpMethod", constant("GET"))
-		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
-			        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
+		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
+		        .json(JsonLibrary.Jackson, Order.class).process(exchange -> {
+			        Order order = exchange.getIn().getBody(Order.class);
 			        exchange.getMessage().setBody(mapOrderToSupplyRequest(order));
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();

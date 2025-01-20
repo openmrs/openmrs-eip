@@ -9,6 +9,7 @@ import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.dataformat.JsonLibrary;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
@@ -21,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class ProcedureRouter extends BaseFhirResourceRouter {
-	
-	private static final ObjectMapper objectMapper = new ObjectMapper();
 	
 	ProcedureRouter() {
 		super(FhirResource.PROCEDURE);
@@ -40,9 +39,10 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).otherwise().process(this::setOpenmrsBase64AuthHeader)
 		        .setHeader("CamelHttpMethod", constant("GET"))
-		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").process(exchange -> {
+		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
+		        .json(JsonLibrary.Jackson, Order.class).process(exchange -> {
 			        try {
-				        Order order = objectMapper.readValue(exchange.getIn().getBody(String.class), Order.class);
+				        Order order = exchange.getIn().getBody(Order.class);
 				        exchange.getMessage().setBody(mapOrderToServiceRequest(order));
 			        }
 			        catch (Exception e) {
