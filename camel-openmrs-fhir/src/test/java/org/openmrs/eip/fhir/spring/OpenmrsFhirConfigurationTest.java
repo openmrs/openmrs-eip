@@ -29,7 +29,8 @@ import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 @ContextConfiguration(classes = OpenmrsFhirConfiguration.class)
 @TestPropertySource(properties = { "eip.fhir.resources=Encounter", "openmrs.eip.log.level=DEBUG",
         "eip.fhir.serverUrl=http://localhost:8080/openmrs/ws/fhir2/R4", "eip.fhir.username=admin",
-        "eip.fhir.password=password" })
+        "eip.fhir.password=password", "openmrs.baseUrl=http://localhost:8080/openmrs", "openmrs.username=admin",
+        "openmrs.password=password" })
 public class OpenmrsFhirConfigurationTest {
 	
 	@Autowired
