@@ -1,25 +1,28 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static java.util.Base64.getEncoder;
-
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 import static org.openmrs.eip.fhir.Constants.SUPPLY_REQUEST_ORDER_TYPE_UUID;
 
 import java.util.Collections;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.component.http.HttpComponent;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.SupplyRequest;
 import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.routes.resources.dto.Order;
+import org.openmrs.eip.fhir.spring.OpenmrsRestConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SupplyRequestRouter extends BaseFhirResourceRouter {
+	
+	@Autowired
+	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
 	SupplyRequestRouter() {
 		super(FhirResource.SUPPLYREQUEST);
@@ -27,6 +30,8 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
+		getCamelContext().getComponent("http", HttpComponent.class)
+		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
 		from(FhirResource.SUPPLYREQUEST.incomingUrl()).routeId("fhir-supplyrequest-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .filter(simple("${body[0]['uuid']} == '" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "'"))
@@ -43,14 +48,6 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();
 	}
-	
-	//	private void setOpenmrsBase64AuthHeader(Exchange exchange) {
-	//		String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
-	//		String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
-	//		String auth = username + ":" + password;
-	//		String base64Auth = getEncoder().encodeToString(auth.getBytes());
-	//		exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
-	//	}
 	
 	private SupplyRequest mapOrderToSupplyRequest(Order order) {
 		SupplyRequest supplyRequest = new SupplyRequest();

@@ -1,38 +1,28 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static java.util.Base64.getEncoder;
-
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROCEDURE_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 
 import org.apache.camel.CamelExecutionException;
-import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.component.http.BasicAuthenticationHttpClientConfigurer;
 import org.apache.camel.component.http.HttpComponent;
-import org.apache.camel.http.common.HttpConfiguration;
 import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.routes.resources.dto.Order;
-import org.openmrs.eip.fhir.security.interceptor.Oauth2Interceptor;
+import org.openmrs.eip.fhir.spring.OpenmrsRestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 
 @Component
 public class ProcedureRouter extends BaseFhirResourceRouter {
 	
 	@Autowired
-	Oauth2Interceptor oauth2Interceptor;
+	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
 	ProcedureRouter() {
 		super(FhirResource.PROCEDURE);
@@ -40,7 +30,8 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
-		
+		getCamelContext().getComponent("http", HttpComponent.class)
+		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
 		from(FhirResource.PROCEDURE.incomingUrl()).routeId("fhir-procedure-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .filter(simple("${body[0]['uuid']} == '" + PROCEDURE_ORDER_TYPE_UUID + "'"))
@@ -62,14 +53,6 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).endChoice().end();
 	}
-	
-	//	protected void setOpenmrsBase64AuthHeader(Exchange exchange) {
-	//		String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
-	//		String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
-	//		String auth = username + ":" + password;
-	//		String base64Auth = getEncoder().encodeToString(auth.getBytes());
-	//		exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
-	//	}
 	
 	private ServiceRequest mapOrderToServiceRequest(Order order) {
 		ServiceRequest serviceRequest = new ServiceRequest();
