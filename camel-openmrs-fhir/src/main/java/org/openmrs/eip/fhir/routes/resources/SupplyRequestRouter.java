@@ -35,8 +35,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
-		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).otherwise().process(this::setOpenmrsBase64AuthHeader)
-		        .setHeader("CamelHttpMethod", constant("GET"))
+		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).otherwise().setHeader("CamelHttpMethod", constant("GET"))
 		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
 		        .json(JsonLibrary.Jackson, Order.class).process(exchange -> {
 			        Order order = exchange.getIn().getBody(Order.class);
@@ -45,13 +44,13 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		        .to(FhirResource.SUPPLYREQUEST.outgoingUrl()).endChoice().end();
 	}
 	
-	private void setOpenmrsBase64AuthHeader(Exchange exchange) {
-		String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
-		String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
-		String auth = username + ":" + password;
-		String base64Auth = getEncoder().encodeToString(auth.getBytes());
-		exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
-	}
+	//	private void setOpenmrsBase64AuthHeader(Exchange exchange) {
+	//		String username = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.username}}");
+	//		String password = exchange.getContext().resolvePropertyPlaceholders("{{openmrs.password}}");
+	//		String auth = username + ":" + password;
+	//		String base64Auth = getEncoder().encodeToString(auth.getBytes());
+	//		exchange.getIn().setHeader("Authorization", "Basic " + base64Auth);
+	//	}
 	
 	private SupplyRequest mapOrderToSupplyRequest(Order order) {
 		SupplyRequest supplyRequest = new SupplyRequest();
