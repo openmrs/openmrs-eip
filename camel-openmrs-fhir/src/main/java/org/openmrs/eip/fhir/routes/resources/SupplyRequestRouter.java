@@ -32,6 +32,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	public void configure() throws Exception {
 		getCamelContext().getComponent("http", HttpComponent.class)
 		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
+		
 		from(FhirResource.SUPPLYREQUEST.incomingUrl()).routeId("fhir-supplyrequest-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .filter(simple("${body[0]['uuid']} == '" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "'"))

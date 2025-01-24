@@ -32,6 +32,7 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	public void configure() throws Exception {
 		getCamelContext().getComponent("http", HttpComponent.class)
 		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
+		
 		from(FhirResource.PROCEDURE.incomingUrl()).routeId("fhir-procedure-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .filter(simple("${body[0]['uuid']} == '" + PROCEDURE_ORDER_TYPE_UUID + "'"))
@@ -43,13 +44,8 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).otherwise().setHeader("CamelHttpMethod", constant("GET"))
 		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
 		        .json(JsonLibrary.Jackson, Order.class).process(exchange -> {
-			        try {
-				        Order order = exchange.getIn().getBody(Order.class);
-				        exchange.getMessage().setBody(mapOrderToServiceRequest(order));
-			        }
-			        catch (Exception e) {
-				        throw new CamelExecutionException("Error mapping Order to ServiceRequest", exchange, e);
-			        }
+			        Order order = exchange.getIn().getBody(Order.class);
+			        exchange.getMessage().setBody(mapOrderToServiceRequest(order));
 		        }).setHeader(HEADER_FHIR_EVENT_TYPE, simple("${exchangeProperty." + PROP_EVENT_OPERATION + "}"))
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).endChoice().end();
 	}
