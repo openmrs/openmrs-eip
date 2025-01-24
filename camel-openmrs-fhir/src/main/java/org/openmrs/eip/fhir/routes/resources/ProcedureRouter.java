@@ -4,7 +4,6 @@ import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROCEDURE_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 
-import org.apache.camel.CamelExecutionException;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.component.http.HttpComponent;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -16,13 +15,20 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.routes.resources.dto.Order;
 import org.openmrs.eip.fhir.spring.OpenmrsRestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
+@Setter
 @Component
 public class ProcedureRouter extends BaseFhirResourceRouter {
 	
 	@Autowired
 	private OpenmrsRestConfiguration openmrsRestConfiguration;
+	
+	@Value("${openmrs.baseUrl}")
+	private String openmrsBaseUrl;
 	
 	ProcedureRouter() {
 		super(FhirResource.PROCEDURE);
@@ -42,7 +48,7 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 		        .choice().when(simple("${exchangeProperty.event.operation} == 'd' || ${body[0]['voided']} == 1"))
 		        .setHeader(HEADER_FHIR_EVENT_TYPE, constant("d")).setBody(simple("${exchangeProperty.event.identifier}"))
 		        .to(FhirResource.PROCEDURE.outgoingUrl()).otherwise().setHeader("CamelHttpMethod", constant("GET"))
-		        .toD("{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
+		        .toD(openmrsBaseUrl + "/ws/rest/v1/order/${exchangeProperty.event.identifier}").unmarshal()
 		        .json(JsonLibrary.Jackson, Order.class).process(exchange -> {
 			        Order order = exchange.getIn().getBody(Order.class);
 			        exchange.getMessage().setBody(mapOrderToServiceRequest(order));
