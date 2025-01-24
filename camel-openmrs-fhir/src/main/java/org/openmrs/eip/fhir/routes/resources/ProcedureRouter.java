@@ -24,11 +24,11 @@ import lombok.Setter;
 @Component
 public class ProcedureRouter extends BaseFhirResourceRouter {
 	
-	@Autowired
-	private OpenmrsRestConfiguration openmrsRestConfiguration;
-	
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
+	
+	@Autowired
+	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
 	ProcedureRouter() {
 		super(FhirResource.PROCEDURE);

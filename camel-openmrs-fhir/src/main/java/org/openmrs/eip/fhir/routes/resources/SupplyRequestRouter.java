@@ -25,11 +25,11 @@ import lombok.Setter;
 @Component
 public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	
-	@Autowired
-	private OpenmrsRestConfiguration openmrsRestConfiguration;
-	
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
+	
+	@Autowired
+	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
 	SupplyRequestRouter() {
 		super(FhirResource.SUPPLYREQUEST);
