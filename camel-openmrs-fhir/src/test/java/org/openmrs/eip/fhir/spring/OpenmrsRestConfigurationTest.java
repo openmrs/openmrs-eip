@@ -1,6 +1,7 @@
 package org.openmrs.eip.fhir.spring;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.apache.camel.component.http.HttpClientConfigurer;
 import org.junit.jupiter.api.Test;
