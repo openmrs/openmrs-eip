@@ -1,5 +1,8 @@
 package org.openmrs.eip.fhir.routes.resources.dto;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -26,13 +29,13 @@ public class Order {
 	
 	public Object previousOrder;
 	
-	public String dateActivated;
+	public Date dateActivated;
 	
 	public Object scheduledDate;
 	
-	public Object dateStopped;
+	public Date dateStopped;
 	
-	public Object autoExpireDate;
+	public Date autoExpireDate;
 	
 	public Encounter encounter;
 	
@@ -57,4 +60,36 @@ public class Order {
 	public float quantity;
 	
 	public QuantityUnits quantityUnits;
+	
+	public boolean isActivated() {
+		return this.isActivated(new Date());
+	}
+	
+	public boolean isActivated(Date checkDate) {
+		if (this.dateActivated == null) {
+			return false;
+		} else {
+			if (checkDate == null) {
+				checkDate = new Date();
+			}
+			
+			return compare(this.dateActivated, checkDate) <= 0;
+		}
+	}
+	
+	public static int compare(Date d1, Date d2) {
+		if (d1 instanceof Timestamp && d2 instanceof Timestamp) {
+			return d1.compareTo(d2);
+		} else {
+			if (d1 instanceof Timestamp) {
+				d1 = new Date(d1.getTime());
+			}
+			
+			if (d2 instanceof Timestamp) {
+				d2 = new Date(d2.getTime());
+			}
+			
+			return d1.compareTo(d2);
+		}
+	}
 }
