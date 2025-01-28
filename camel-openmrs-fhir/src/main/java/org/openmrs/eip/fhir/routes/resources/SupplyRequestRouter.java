@@ -2,7 +2,6 @@ package org.openmrs.eip.fhir.routes.resources;
 
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
-import static org.openmrs.eip.fhir.Constants.SUPPLY_REQUEST_ORDER_TYPE_UUID;
 
 import java.util.Collections;
 import java.util.Date;
@@ -12,7 +11,6 @@ import org.apache.camel.component.http.HttpComponent;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.SupplyRequest;
 import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.routes.resources.dto.Order;
@@ -30,6 +28,9 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
+	@Value("${eip.supplyrequest.order.concept.uuid}")
+	private String supplyRequestOrderTypeUuid;
+	
 	@Autowired
 	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
@@ -44,7 +45,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 		
 		from(FhirResource.SUPPLYREQUEST.incomingUrl()).routeId("fhir-supplyrequest-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .filter(simple("${body[0]['uuid']} == '" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "'"))
+		        .filter(simple("${body[0]['uuid']} == '" + supplyRequestOrderTypeUuid + "'"))
 		        .log(LoggingLevel.INFO, "Processing SupplyRequestRouter ${exchangeProperty.event.tableName}")
 		        .toD(
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")

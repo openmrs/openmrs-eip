@@ -1,7 +1,6 @@
 package org.openmrs.eip.fhir.routes.resources;
 
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.PROCEDURE_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 
 import java.util.Date;
@@ -29,6 +28,9 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
+	@Value("${eip.procedure.order.concept.uuid}")
+	private String procedureOrderTypeUuid;
+	
 	@Autowired
 	private OpenmrsRestConfiguration openmrsRestConfiguration;
 	
@@ -43,7 +45,7 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 		
 		from(FhirResource.PROCEDURE.incomingUrl()).routeId("fhir-procedure-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .filter(simple("${body[0]['uuid']} == '" + PROCEDURE_ORDER_TYPE_UUID + "'"))
+		        .filter(simple("${body[0]['uuid']} == '" + procedureOrderTypeUuid + "'"))
 		        .log(LoggingLevel.INFO, "Processing ProcedureRouter ${exchangeProperty.event.tableName}")
 		        .toD(
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")

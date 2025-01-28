@@ -1,15 +1,18 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static org.openmrs.eip.fhir.Constants.DRUG_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
 import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
 
 import org.apache.camel.LoggingLevel;
 import org.openmrs.eip.fhir.FhirResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MedicationRequestRouter extends BaseFhirResourceRouter {
+	
+	@Value("${eip.drug.order.concept.uuid}")
+	private String drugOrderTypeUuid;
 	
 	MedicationRequestRouter() {
 		super(FhirResource.MEDICATIONREQUEST);
@@ -20,7 +23,7 @@ public class MedicationRequestRouter extends BaseFhirResourceRouter {
 		from(FhirResource.MEDICATIONREQUEST.incomingUrl()).routeId("fhir-medicationrequest-router").filter(
 		    isSupportedTable()).toD(
 		        "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .filter(simple("${body[0]['uuid']} == '" + DRUG_ORDER_TYPE_UUID + "'"))
+		        .filter(simple("${body[0]['uuid']} == '" + drugOrderTypeUuid + "'"))
 		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
 		        .toD(
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
