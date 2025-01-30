@@ -18,7 +18,6 @@ import org.apache.camel.Message;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;

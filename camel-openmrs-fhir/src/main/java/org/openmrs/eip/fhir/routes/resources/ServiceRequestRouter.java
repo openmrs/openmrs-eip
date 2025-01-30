@@ -1,6 +1,9 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static org.openmrs.eip.fhir.Constants.*;
+import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
+import static org.openmrs.eip.fhir.Constants.IMAGING_ORDER_TYPE_UUID;
+import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
+import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
 
 import org.apache.camel.LoggingLevel;
 import org.openmrs.eip.fhir.FhirResource;
