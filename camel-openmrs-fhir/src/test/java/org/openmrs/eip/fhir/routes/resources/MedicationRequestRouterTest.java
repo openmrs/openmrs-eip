@@ -43,9 +43,10 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected RoutesBuilder createRouteBuilder() {
-		RouteBuilder rb = new MedicationRequestRouter();
-		rb.from(FhirResource.MEDICATIONREQUEST.outgoingUrl()).to("mock:result");
-		return rb;
+		MedicationRequestRouter medicationRequestRouter = new MedicationRequestRouter();
+		medicationRequestRouter.setDrugOrderTypeUuid("131168f4-15f5-102d-96e4-000c29c2a5d7");
+		medicationRequestRouter.from(FhirResource.MEDICATIONREQUEST.outgoingUrl()).to("mock:result");
+		return medicationRequestRouter;
 	}
 	
 	@Override

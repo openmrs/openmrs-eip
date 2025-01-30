@@ -41,9 +41,11 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected RoutesBuilder createRouteBuilder() {
-		RouteBuilder rb = new ServiceRequestRouter();
-		rb.from(FhirResource.SERVICEREQUEST.outgoingUrl()).to("mock:result");
-		return rb;
+		ServiceRequestRouter serviceRequestRouter = new ServiceRequestRouter();
+		serviceRequestRouter.setTestOrderTypeUuid("52a447d3-a64a-11e3-9aeb-50e549534c5e");
+		serviceRequestRouter.setImagingOrderTypeUuid("8d2aff07-55e6-4a4a-8878-72b9eb36a3b8");
+		serviceRequestRouter.from(FhirResource.SERVICEREQUEST.outgoingUrl()).to("mock:result");
+		return serviceRequestRouter;
 	}
 	
 	@Override

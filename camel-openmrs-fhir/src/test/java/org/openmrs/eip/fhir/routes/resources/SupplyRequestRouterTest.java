@@ -47,6 +47,7 @@ class SupplyRequestRouterTest extends CamelSpringTestSupport {
 		SupplyRequestRouter supplyRequestRouter = new SupplyRequestRouter();
 		supplyRequestRouter.setOpenmrsRestConfiguration(new OpenmrsRestConfiguration());
 		supplyRequestRouter.setOpenmrsBaseUrl("http://openmrs:8080/openmrs");
+		supplyRequestRouter.setSupplyRequestOrderTypeUuid("67a92bd6-0f88-11ea-8d71-362b9e155667");
 		supplyRequestRouter.from(FhirResource.SUPPLYREQUEST.outgoingUrl()).to("mock:result");
 		return supplyRequestRouter;
 	}

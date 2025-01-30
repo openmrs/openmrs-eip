@@ -8,7 +8,10 @@ import org.openmrs.eip.fhir.FhirResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component
+@Setter
 public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	
 	@Value("${eip.test.order.concept.uuid}")

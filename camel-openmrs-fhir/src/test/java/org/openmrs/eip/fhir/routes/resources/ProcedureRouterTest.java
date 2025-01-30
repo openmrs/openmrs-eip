@@ -44,6 +44,7 @@ class ProcedureRouterTest extends CamelSpringTestSupport {
 		ProcedureRouter procedureRouter = new ProcedureRouter();
 		procedureRouter.setOpenmrsRestConfiguration(new OpenmrsRestConfiguration());
 		procedureRouter.setOpenmrsBaseUrl("http://openmrs:8080/openmrs");
+		procedureRouter.setProcedureOrderTypeUuid("67a92e56-0f88-11ea-8d71-362b9e155667");
 		procedureRouter.from(FhirResource.PROCEDURE.outgoingUrl()).to("mock:result");
 		return procedureRouter;
 	}
