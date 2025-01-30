@@ -4,9 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.openmrs.eip.fhir.Constants.DRUG_ORDER_TYPE_UUID;
-import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
+import static org.openmrs.eip.fhir.Constants.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,8 +40,8 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 	@Override
 	protected RoutesBuilder createRouteBuilder() {
 		ServiceRequestRouter serviceRequestRouter = new ServiceRequestRouter();
-		serviceRequestRouter.setTestOrderTypeUuid("52a447d3-a64a-11e3-9aeb-50e549534c5e");
-		serviceRequestRouter.setImagingOrderTypeUuid("8d2aff07-55e6-4a4a-8878-72b9eb36a3b8");
+		serviceRequestRouter.setTestOrderTypeUuid(TEST_ORDER_TYPE_UUID);
+		serviceRequestRouter.setImagingOrderTypeUuid(IMAGING_ORDER_TYPE_UUID);
 		serviceRequestRouter.from(FhirResource.SERVICEREQUEST.outgoingUrl()).to("mock:result");
 		return serviceRequestRouter;
 	}

@@ -1,7 +1,6 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
+import static org.openmrs.eip.fhir.Constants.*;
 
 import java.util.Collections;
 import java.util.Date;
@@ -28,7 +27,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
-	@Value("${eip.supplyrequest.order.concept.uuid}")
+	@Value("${eip.supplyrequest.order.concept.uuid:" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "}")
 	private String supplyRequestOrderTypeUuid;
 	
 	@Autowired

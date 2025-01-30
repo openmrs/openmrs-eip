@@ -1,7 +1,6 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
+import static org.openmrs.eip.fhir.Constants.*;
 
 import org.apache.camel.LoggingLevel;
 import org.openmrs.eip.fhir.FhirResource;
@@ -14,10 +13,10 @@ import lombok.Setter;
 @Setter
 public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	
-	@Value("${eip.test.order.concept.uuid}")
+	@Value("${eip.test.order.concept.uuid:" + TEST_ORDER_TYPE_UUID + "}")
 	private String testOrderTypeUuid;
 	
-	@Value("${eip.imaging.order.concept.uuid}")
+	@Value("${eip.imaging.order.concept.uuid:" + IMAGING_ORDER_TYPE_UUID + "}")
 	private String imagingOrderTypeUuid;
 	
 	ServiceRequestRouter() {
