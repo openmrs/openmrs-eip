@@ -18,7 +18,6 @@ import org.apache.camel.Message;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
@@ -43,9 +42,10 @@ class MedicationRequestRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected RoutesBuilder createRouteBuilder() {
-		RouteBuilder rb = new MedicationRequestRouter();
-		rb.from(FhirResource.MEDICATIONREQUEST.outgoingUrl()).to("mock:result");
-		return rb;
+		MedicationRequestRouter medicationRequestRouter = new MedicationRequestRouter();
+		medicationRequestRouter.setDrugOrderTypeUuid(DRUG_ORDER_TYPE_UUID);
+		medicationRequestRouter.from(FhirResource.MEDICATIONREQUEST.outgoingUrl()).to("mock:result");
+		return medicationRequestRouter;
 	}
 	
 	@Override

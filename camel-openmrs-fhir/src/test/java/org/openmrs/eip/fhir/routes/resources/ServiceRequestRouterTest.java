@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openmrs.eip.fhir.Constants.DRUG_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
+import static org.openmrs.eip.fhir.Constants.IMAGING_ORDER_TYPE_UUID;
 import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
 
 import java.util.Collections;
@@ -18,7 +19,6 @@ import org.apache.camel.Message;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
@@ -41,9 +41,11 @@ class ServiceRequestRouterTest extends CamelSpringTestSupport {
 	
 	@Override
 	protected RoutesBuilder createRouteBuilder() {
-		RouteBuilder rb = new ServiceRequestRouter();
-		rb.from(FhirResource.SERVICEREQUEST.outgoingUrl()).to("mock:result");
-		return rb;
+		ServiceRequestRouter serviceRequestRouter = new ServiceRequestRouter();
+		serviceRequestRouter.setTestOrderTypeUuid(TEST_ORDER_TYPE_UUID);
+		serviceRequestRouter.setImagingOrderTypeUuid(IMAGING_ORDER_TYPE_UUID);
+		serviceRequestRouter.from(FhirResource.SERVICEREQUEST.outgoingUrl()).to("mock:result");
+		return serviceRequestRouter;
 	}
 	
 	@Override

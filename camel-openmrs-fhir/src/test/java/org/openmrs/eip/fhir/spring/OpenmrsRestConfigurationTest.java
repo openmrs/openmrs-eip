@@ -8,15 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ContextConfiguration(classes = OpenmrsRestConfiguration.class)
-@TestPropertySource(properties = { "eip.fhir.resources=Encounter", "openmrs.eip.log.level=DEBUG",
-        "eip.fhir.serverUrl=http://localhost:8080/openmrs/ws/fhir2/R4", "eip.fhir.username=admin",
-        "eip.fhir.password=password", "openmrs.baseUrl=http://localhost:8080/openmrs", "openmrs.username=admin",
-        "openmrs.password=password" })
+@ActiveProfiles("test")
 public class OpenmrsRestConfigurationTest {
 	
 	@Autowired

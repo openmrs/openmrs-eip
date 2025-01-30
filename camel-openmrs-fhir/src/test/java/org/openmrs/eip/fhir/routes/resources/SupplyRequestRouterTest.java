@@ -17,14 +17,11 @@ import org.apache.camel.Message;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringTestSupport;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
-import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.SupplyRequest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openmrs.eip.fhir.FhirResource;
 import org.openmrs.eip.fhir.spring.OpenmrsRestConfiguration;
@@ -47,6 +44,7 @@ class SupplyRequestRouterTest extends CamelSpringTestSupport {
 		SupplyRequestRouter supplyRequestRouter = new SupplyRequestRouter();
 		supplyRequestRouter.setOpenmrsRestConfiguration(new OpenmrsRestConfiguration());
 		supplyRequestRouter.setOpenmrsBaseUrl("http://openmrs:8080/openmrs");
+		supplyRequestRouter.setSupplyRequestOrderTypeUuid(SUPPLY_REQUEST_ORDER_TYPE_UUID);
 		supplyRequestRouter.from(FhirResource.SUPPLYREQUEST.outgoingUrl()).to("mock:result");
 		return supplyRequestRouter;
 	}

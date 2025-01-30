@@ -7,10 +7,20 @@ import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
 
 import org.apache.camel.LoggingLevel;
 import org.openmrs.eip.fhir.FhirResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component
+@Setter
 public class ServiceRequestRouter extends BaseFhirResourceRouter {
+	
+	@Value("${eip.test.order.concept.uuid:" + TEST_ORDER_TYPE_UUID + "}")
+	private String testOrderTypeUuid;
+	
+	@Value("${eip.imaging.order.concept.uuid:" + IMAGING_ORDER_TYPE_UUID + "}")
+	private String imagingOrderTypeUuid;
 	
 	ServiceRequestRouter() {
 		super(FhirResource.SERVICEREQUEST);
@@ -20,8 +30,8 @@ public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	public void configure() throws Exception {
 		from(FhirResource.SERVICEREQUEST.incomingUrl()).routeId("fhir-servicerequest-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
-		        .filter(simple("${body[0]['uuid']} == '" + TEST_ORDER_TYPE_UUID + "' || ${body[0]['uuid']} == '"
-		                + IMAGING_ORDER_TYPE_UUID + "'"))
+		        .filter(simple("${body[0]['uuid']} == '" + testOrderTypeUuid + "' || ${body[0]['uuid']} == '"
+		                + imagingOrderTypeUuid + "'"))
 		        .log(LoggingLevel.INFO, "Processing ${exchangeProperty.event.tableName} message")
 		        .toD(
 		            "sql:SELECT voided, order_action, previous_order_id FROM orders WHERE uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
