@@ -29,7 +29,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
-	@Value("${eip.supplyrequest.order.concept.uuid:" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "}")
+	@Value("${eip.supplyrequest.order.type.uuid:" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "}")
 	private String supplyRequestOrderTypeUuid;
 	
 	@Autowired

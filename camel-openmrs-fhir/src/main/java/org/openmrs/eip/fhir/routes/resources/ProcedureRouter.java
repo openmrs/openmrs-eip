@@ -29,7 +29,7 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
-	@Value("${eip.procedure.order.concept.uuid:" + PROCEDURE_ORDER_TYPE_UUID + "}")
+	@Value("${eip.procedure.order.type.uuid:" + PROCEDURE_ORDER_TYPE_UUID + "}")
 	private String procedureOrderTypeUuid;
 	
 	@Autowired
