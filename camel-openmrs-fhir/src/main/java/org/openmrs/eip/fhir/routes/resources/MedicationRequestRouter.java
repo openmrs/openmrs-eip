@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class MedicationRequestRouter extends BaseFhirResourceRouter {
 	
-	@Value("${eip.drug.order.concept.uuid:" + DRUG_ORDER_TYPE_UUID + "}")
+	@Value("${eip.drug.order.type.uuid:" + DRUG_ORDER_TYPE_UUID + "}")
 	private String drugOrderTypeUuid;
 	
 	MedicationRequestRouter() {
