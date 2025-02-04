@@ -16,10 +16,10 @@ import lombok.Setter;
 @Setter
 public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	
-	@Value("${eip.test.order.concept.uuid:" + TEST_ORDER_TYPE_UUID + "}")
+	@Value("${eip.test.order.type.uuid:" + TEST_ORDER_TYPE_UUID + "}")
 	private String testOrderTypeUuid;
 	
-	@Value("${eip.imaging.order.concept.uuid:" + IMAGING_ORDER_TYPE_UUID + "}")
+	@Value("${eip.imaging.order.type.uuid:" + IMAGING_ORDER_TYPE_UUID + "}")
 	private String imagingOrderTypeUuid;
 	
 	ServiceRequestRouter() {
