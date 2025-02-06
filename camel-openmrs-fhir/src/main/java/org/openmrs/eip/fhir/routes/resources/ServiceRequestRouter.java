@@ -1,9 +1,6 @@
 package org.openmrs.eip.fhir.routes.resources;
 
-import static org.openmrs.eip.fhir.Constants.HEADER_FHIR_EVENT_TYPE;
-import static org.openmrs.eip.fhir.Constants.IMAGING_ORDER_TYPE_UUID;
-import static org.openmrs.eip.fhir.Constants.PROP_EVENT_OPERATION;
-import static org.openmrs.eip.fhir.Constants.TEST_ORDER_TYPE_UUID;
+import static org.openmrs.eip.fhir.Constants.*;
 
 import org.apache.camel.LoggingLevel;
 import org.openmrs.eip.fhir.FhirResource;
@@ -16,10 +13,10 @@ import lombok.Setter;
 @Setter
 public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	
-	@Value("${eip.test.order.type.uuid:" + TEST_ORDER_TYPE_UUID + "}")
+	@Value("${eip.test.order.type.uuid}")
 	private String testOrderTypeUuid;
 	
-	@Value("${eip.imaging.order.type.uuid:" + IMAGING_ORDER_TYPE_UUID + "}")
+	@Value("${eip.imaging.order.type.uuid}")
 	private String imagingOrderTypeUuid;
 	
 	ServiceRequestRouter() {
@@ -28,6 +25,12 @@ public class ServiceRequestRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
+		if (testOrderTypeUuid == null || testOrderTypeUuid.isEmpty()) {
+			testOrderTypeUuid = TEST_ORDER_TYPE_UUID;
+		}
+		if (imagingOrderTypeUuid == null || imagingOrderTypeUuid.isEmpty()) {
+			imagingOrderTypeUuid = IMAGING_ORDER_TYPE_UUID;
+		}
 		from(FhirResource.SERVICEREQUEST.incomingUrl()).routeId("fhir-servicerequest-router").filter(isSupportedTable()).toD(
 		    "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid ='${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
 		        .filter(simple("${body[0]['uuid']} == '" + testOrderTypeUuid + "' || ${body[0]['uuid']} == '"
