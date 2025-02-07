@@ -29,7 +29,7 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
-	@Value("${eip.procedure.order.type.uuid:" + PROCEDURE_ORDER_TYPE_UUID + "}")
+	@Value("${eip.procedure.order.type.uuid}")
 	private String procedureOrderTypeUuid;
 	
 	@Autowired
@@ -41,6 +41,9 @@ public class ProcedureRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
+		if (procedureOrderTypeUuid == null || procedureOrderTypeUuid.isEmpty()) {
+			procedureOrderTypeUuid = PROCEDURE_ORDER_TYPE_UUID;
+		}
 		getCamelContext().getComponent("http", HttpComponent.class)
 		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
 		

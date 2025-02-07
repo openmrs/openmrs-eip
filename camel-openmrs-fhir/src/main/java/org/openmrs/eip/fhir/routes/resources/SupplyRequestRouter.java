@@ -29,7 +29,7 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	@Value("${openmrs.baseUrl}")
 	private String openmrsBaseUrl;
 	
-	@Value("${eip.supplyrequest.order.type.uuid:" + SUPPLY_REQUEST_ORDER_TYPE_UUID + "}")
+	@Value("${eip.supplyrequest.order.type.uuid}")
 	private String supplyRequestOrderTypeUuid;
 	
 	@Autowired
@@ -41,6 +41,9 @@ public class SupplyRequestRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
+		if (supplyRequestOrderTypeUuid == null || supplyRequestOrderTypeUuid.isEmpty()) {
+			supplyRequestOrderTypeUuid = SUPPLY_REQUEST_ORDER_TYPE_UUID;
+		}
 		getCamelContext().getComponent("http", HttpComponent.class)
 		        .setHttpClientConfigurer(openmrsRestConfiguration.createHttpClientConfigurer());
 		

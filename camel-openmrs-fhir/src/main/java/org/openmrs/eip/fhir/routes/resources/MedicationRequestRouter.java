@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class MedicationRequestRouter extends BaseFhirResourceRouter {
 	
-	@Value("${eip.drug.order.type.uuid:" + DRUG_ORDER_TYPE_UUID + "}")
+	@Value("${eip.drug.order.type.uuid}")
 	private String drugOrderTypeUuid;
 	
 	MedicationRequestRouter() {
@@ -24,6 +24,9 @@ public class MedicationRequestRouter extends BaseFhirResourceRouter {
 	
 	@Override
 	public void configure() throws Exception {
+		if (drugOrderTypeUuid == null || drugOrderTypeUuid.isEmpty()) {
+			drugOrderTypeUuid = DRUG_ORDER_TYPE_UUID;
+		}
 		from(FhirResource.MEDICATIONREQUEST.incomingUrl()).routeId("fhir-medicationrequest-router").filter(
 		    isSupportedTable()).toD(
 		        "sql:SELECT ot.uuid as uuid from order_type ot join orders o on o.order_type_id = ot.order_type_id where o.uuid = '${exchangeProperty.event.identifier}'?dataSource=#openmrsDataSource")
