@@ -11,7 +11,7 @@
     "supportLevel": "Stable",
     "groupId": "org.openmrs.eip",
     "artifactId": "camel-openmrs-fhir",
-    "version": "4.1.0-SNAPSHOT",
+    "version": "4.1.0",
     "scheme": "openmrs-fhir",
     "extendsScheme": "",
     "syntax": "openmrs-fhir:\/\/name",
