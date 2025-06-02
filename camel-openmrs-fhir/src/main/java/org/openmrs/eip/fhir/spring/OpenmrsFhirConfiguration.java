@@ -1,5 +1,6 @@
 package org.openmrs.eip.fhir.spring;
 
+import ca.uhn.fhir.rest.api.SummaryEnum;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.fhir.FhirComponent;
 import org.apache.camel.component.fhir.FhirConfiguration;
@@ -48,6 +49,7 @@ public class OpenmrsFhirConfiguration {
 	@Qualifier("openmrsFhirClient")
 	IGenericClient openmrsFhirClient() {
 		IGenericClient client = FhirContext.forR4().newRestfulGenericClient(fhirServerUrl);
+		client.setSummary(SummaryEnum.DATA);
 		if (isOauthEnabled) {
 			client.registerInterceptor(oauth2Interceptor);
 		} else if (StringUtils.isNotBlank(fhirUsername) && StringUtils.isNotBlank(fhirPassword)) {
