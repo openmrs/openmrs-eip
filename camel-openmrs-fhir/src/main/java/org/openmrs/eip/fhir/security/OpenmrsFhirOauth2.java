@@ -6,12 +6,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 
-import lombok.Getter;
 import org.openmrs.eip.EIPException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Getter;
 
 @Component
 public class OpenmrsFhirOauth2 {
