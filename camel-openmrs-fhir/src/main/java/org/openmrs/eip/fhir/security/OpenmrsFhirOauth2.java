@@ -6,6 +6,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 
+import lombok.Getter;
 import org.openmrs.eip.EIPException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,10 @@ public class OpenmrsFhirOauth2 {
 	
 	@Value("${oauth.client.scope}")
 	private String scope;
+	
+	@Value("${oauth.token.clock.skew:30}")
+	@Getter
+	private int clockSkewSeconds;
 	
 	public static final String HTTP_AUTH_SCHEME = "Bearer";
 	

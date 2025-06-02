@@ -35,6 +35,7 @@ public class OpenmrsFhirOauth2Test {
 		setField(openmrsFhirOauth2, "clientId", "client");
 		setField(openmrsFhirOauth2, "clientSecret", "secret");
 		setField(openmrsFhirOauth2, "scope", "openid");
+		setField(openmrsFhirOauth2, "clockSkewSeconds", 30);
 		openmrsFhirOauth2.setHttpClient(httpClient);
 	}
 	
@@ -96,5 +97,12 @@ public class OpenmrsFhirOauth2Test {
 		setField(openmrsFhirOauth2, "oauthUri", null);
 		
 		assertThrows(IllegalStateException.class, () -> openmrsFhirOauth2.validateOAuthConfig());
+	}
+	
+	@Test
+	@DisplayName("Should return default clock skew seconds.")
+	void shouldReturnDefaultClockSkewSeconds() {
+		int defaultClockSkew = openmrsFhirOauth2.getClockSkewSeconds();
+		assertEquals(30, defaultClockSkew, "Default clock skew seconds should be 30");
 	}
 }
