@@ -14,6 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 
@@ -48,6 +49,7 @@ public class OpenmrsFhirConfiguration {
 	@Qualifier("openmrsFhirClient")
 	IGenericClient openmrsFhirClient() {
 		IGenericClient client = FhirContext.forR4().newRestfulGenericClient(fhirServerUrl);
+		client.setSummary(SummaryEnum.TRUE);
 		if (isOauthEnabled) {
 			client.registerInterceptor(oauth2Interceptor);
 		} else if (StringUtils.isNotBlank(fhirUsername) && StringUtils.isNotBlank(fhirPassword)) {
