@@ -90,4 +90,34 @@ class TokenCacheTest {
 		assertEquals(tokenInfo, result);
 		verify(openmrsFhirOauth2, never()).fetchTokenInfo();
 	}
+	
+	@Test
+	@DisplayName("Should fetch new token when within clock skew window.")
+	void shouldFetchNewTokenWhenWithinClockSkewWindow() {
+		when(openmrsFhirOauth2.getClockSkewSeconds()).thenReturn(30);
+		
+		TokenInfo oldToken=new TokenInfo();
+		oldToken.setExpiresIn("3600");
+		oldToken.setAccessToken("oldToken");
+		oldToken.setTokenType("Bearer");
+		
+		// Set expiry time to 20 seconds from now (within clock skew window)
+		long expiryTime=System.currentTimeMillis() + 20_000;
+		tokenCache.setTokenInfo(oldToken);
+		tokenCache.setExpiryTime(expiryTime);
+		
+		TokenInfo newToken=new TokenInfo();
+		newToken.setExpiresIn("3600");
+		newToken.setAccessToken("newToken");
+		newToken.setTokenType("Bearer");
+		
+		when(openmrsFhirOauth2.fetchTokenInfo()).thenReturn(newToken);
+		
+		TokenInfo result=tokenCache.getTokenInfo();
+		
+		assertEquals(newToken,result);
+		// Verify that fetchTokenInfo & getClockSkewSeconds were called
+		verify(openmrsFhirOauth2).fetchTokenInfo();
+		verify(openmrsFhirOauth2).getClockSkewSeconds();
+	}
 }

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
+
 @Component
 public class OpenmrsFhirOauth2 {
 	
@@ -26,6 +28,10 @@ public class OpenmrsFhirOauth2 {
 	
 	@Value("${oauth.client.scope}")
 	private String scope;
+	
+	@Value("${oauth.token.clock.skew:30}")
+	@Getter
+	private int clockSkewSeconds;
 	
 	public static final String HTTP_AUTH_SCHEME = "Bearer";
 	

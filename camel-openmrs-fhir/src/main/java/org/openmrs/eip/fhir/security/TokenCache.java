@@ -30,19 +30,23 @@ public class TokenCache {
 	 * @return the token info
 	 */
 	public TokenInfo getTokenInfo() {
-		if (tokenInfo == null || isTokenExpired()) {
+		if (tokenInfo == null || shouldRefreshToken()) {
 			this.tokenInfo = openmrsFhirOauth2.fetchTokenInfo();
-			this.setExpiryTime((System.currentTimeMillis() + Long.parseLong(tokenInfo.getExpiresIn()) * 1000));
+			this.setExpiryTime(calculateExpiryTime());
 		}
 		return tokenInfo;
 	}
 	
 	/**
-	 * Checks if the token has expired
+	 * Checks if the token should be refreshed based on expiry time and clock skew
 	 *
-	 * @return true if the token has expired
+	 * @return true if the token should be refreshed
 	 */
-	boolean isTokenExpired() {
-		return System.currentTimeMillis() > expiryTime;
+	boolean shouldRefreshToken() {
+		return System.currentTimeMillis() > (expiryTime - (openmrsFhirOauth2.getClockSkewSeconds() * 1000L));
+	}
+	
+	private long calculateExpiryTime() {
+		return System.currentTimeMillis() + (Long.parseLong(tokenInfo.getExpiresIn()) * 1000);
 	}
 }
