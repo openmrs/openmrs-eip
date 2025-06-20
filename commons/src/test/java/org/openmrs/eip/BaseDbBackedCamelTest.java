@@ -19,7 +19,8 @@ import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
 @TestExecutionListeners(value = { DeleteDataTestExecutionListener.class, SqlScriptsTestExecutionListener.class })
 @TestPropertySource(properties = "spring.jpa.properties.hibernate.hbm2ddl.auto=update")
 @TestPropertySource(properties = "spring.mngt-datasource.driverClassName=org.h2.Driver")
-@TestPropertySource(properties = "spring.mngt-datasource.jdbcUrl=jdbc:h2:mem:test;DB_CLOSE_DELAY=30;LOCK_TIMEOUT=10000")
+@TestPropertySource(properties = "spring.mngt-datasource.jdbcUrl=jdbc:h2:mem:test;DB_CLOSE_DELAY=30;LOCK_TIMEOUT=10000;MODE=LEGACY")
+@TestPropertySource(properties = "logging.level.org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl=ERROR")
 @TestPropertySource(properties = "spring.mngt-datasource.username=sa")
 @TestPropertySource(properties = "spring.mngt-datasource.password=test")
 @TestPropertySource(properties = "spring.mngt-datasource.dialect=org.hibernate.dialect.H2Dialect")
@@ -43,7 +44,7 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.openmrs-datasource.jdbcUrl", () -> container.getJdbcUrl() + "?useSSL=false&mode=MySQL");
+		registry.add("spring.openmrs-datasource.jdbcUrl", () -> container.getJdbcUrl() + "?useSSL=false");
 		registry.add("spring.openmrs-datasource.username", container::getUsername);
 		registry.add("spring.openmrs-datasource.password", container::getPassword);
 		registry.add("spring.openmrs-datasource.driverClassName", container::getDriverClassName);
