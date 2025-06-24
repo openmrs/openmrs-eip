@@ -1,6 +1,7 @@
 package org.openmrs.eip.mysql.watcher;
 
 import org.apache.kafka.connect.storage.FileOffsetBackingStore;
+import org.openmrs.eip.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,26 @@ public class CustomFileOffsetBackingStore extends FileOffsetBackingStore {
 	
 	public static boolean isDisabled() {
 		return disabled;
+	}
+	
+	/**
+	 * @see FileOffsetBackingStore#start()
+	 */
+	@Override
+	public synchronized void start() {
+		doStart();
+		
+		try {
+			OffsetUtils.transformOffsetIfNecessary(data);
+		}
+		catch (Exception e) {
+			log.error("An error occurred while transforming the existing debezium offset file data", e);
+			Utils.shutdown();
+		}
+	}
+	
+	protected void doStart() {
+		super.start();
 	}
 	
 	/**
