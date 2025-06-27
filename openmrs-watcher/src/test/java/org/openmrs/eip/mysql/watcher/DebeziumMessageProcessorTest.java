@@ -171,6 +171,61 @@ public class DebeziumMessageProcessorTest {
 	}
 	
 	@Test
+	public void process_shouldCreateAnEventAndAddItAsAHeaderForASnapshotRead() throws Exception {
+		final Integer id = 2;
+		final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
+		final String op = "r";
+		final String table = "visit";
+		final Integer visitTypeId = 3;
+		final String voidReason = "Testing";
+		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+		Message message = new DefaultMessage(exchange);
+		exchange.setMessage(message);
+		Field visitId = new Field("visit_id", 0, new ConnectSchema(Type.INT32));
+		List<Field> fields = new ArrayList();
+		fields.add(visitId);
+		Struct primaryKey = new Struct(
+		        new ConnectSchema(Type.STRUCT, false, null, "key", null, null, null, fields, null, null));
+		primaryKey.put("visit_id", id);
+		Map<String, Object> sourceMetadata = new HashMap();
+		sourceMetadata.put(WatcherConstants.DEBEZIUM_FIELD_TABLE, "visit");
+		sourceMetadata.put(WatcherConstants.DEBEZIUM_FIELD_SNAPSHOT, "false");
+		Field visitTypeIdField = new Field("visit_type_id", 0, new ConnectSchema(Type.INT32));
+		Field voidReasonField = new Field("void_reason", 1, new ConnectSchema(Type.STRING));
+		
+		Field currentVoidReason = new Field("void_reason", 1, new ConnectSchema(Type.STRING));
+		List<Field> bodyFields = new ArrayList();
+		bodyFields.add(visitTypeIdField);
+		bodyFields.add(currentVoidReason);
+		Field uuidField = new Field(FIELD_UUID, 2, new ConnectSchema(Type.STRING));
+		bodyFields.add(uuidField);
+		Struct currentState = new Struct(
+		        new ConnectSchema(STRUCT, false, null, "body", null, null, null, bodyFields, null, null));
+		currentState.put(visitTypeIdField, visitTypeId);
+		currentState.put(voidReasonField, voidReason);
+		currentState.put(uuidField, uuid);
+		
+		message.setHeader(DebeziumConstants.HEADER_KEY, primaryKey);
+		message.setHeader(DebeziumConstants.HEADER_SOURCE_METADATA, sourceMetadata);
+		message.setHeader(DebeziumConstants.HEADER_OPERATION, op);
+		message.setBody(currentState);
+		
+		processor.process(exchange);
+		
+		Event event = exchange.getProperty(PROP_EVENT, Event.class);
+		assertEquals(table, event.getTableName());
+		assertEquals(id.toString(), event.getPrimaryKeyId());
+		assertNull(event.getIdentifier());
+		assertEquals(op, event.getOperation());
+		assertFalse(event.getSnapshot());
+		assertNull(event.getPreviousState());
+		assertEquals(3, event.getCurrentState().size());
+		assertEquals(visitTypeId, event.getCurrentState().get("visit_type_id"));
+		assertEquals(voidReason, event.getCurrentState().get("void_reason"));
+		assertEquals(uuid, event.getCurrentState().get(FIELD_UUID));
+	}
+	
+	@Test
 	public void process_shouldCreateAnEventAndAddItAsAHeaderForADelete() throws Exception {
 		final Integer id = 2;
 		final String uuid = "1296b0dc-440a-11e6-a65c-00e04c680037";
@@ -382,7 +437,7 @@ public class DebeziumMessageProcessorTest {
 		Exchange exchange = new DefaultExchange(new DefaultCamelContext());
 		Message message = new DefaultMessage(exchange);
 		exchange.setMessage(message);
-		message.setHeader(DebeziumConstants.HEADER_OPERATION, "r");
+		message.setHeader(DebeziumConstants.HEADER_OPERATION, "s");
 		
 		assertThrows(EIPException.class, () -> processor.process(exchange));
 	}

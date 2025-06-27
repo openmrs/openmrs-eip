@@ -40,7 +40,7 @@ public class DebeziumMessageProcessor implements Processor {
 		
 		Message message = exchange.getMessage();
 		String op = message.getHeader(DebeziumConstants.HEADER_OPERATION, String.class);
-		if (!"c".equals(op) && !"u".equals(op) && !"d".equals(op)) {
+		if (!"c".equals(op) && !"u".equals(op) && !"d".equals(op) && !"r".equals(op)) {
 			throw new EIPException("Don't know how to handle DB event with operation: " + op);
 		}
 		
