@@ -124,6 +124,15 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="wluyima" id="20250910-1200">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="hibernate_sequence"/>
+        </preConditions>
+        <comment>Rename hibernate_sequence table to camel_messageprocessed_seq</comment>
+
+        <renameTable oldTableName="hibernate_sequence" newTableName="camel_messageprocessed_seq"/>
+    </changeSet>
+
 	<!--
 	<changeSet author="wluyima" id="20200318-1800">
 		<preConditions onFail="MARK_RAN">
