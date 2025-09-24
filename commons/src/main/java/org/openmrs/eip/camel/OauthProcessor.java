@@ -42,6 +42,18 @@ public class OauthProcessor implements Processor {
 	@Value("${oauth.authenticator.use.camel:true}")
 	private boolean useCamelAuthenticator;
 	
+	@Value("${oauth.access.token.uri:}")
+	private String tokenUrl;
+	
+	@Value("${oauth.client.id:}")
+	private String clientId;
+	
+	@Value("${oauth.client.secret:}")
+	private char[] clientSecret;
+	
+	@Value("${oauth.client.scope:}")
+	private String scope;
+	
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		if (!isOauthEnabled) {
@@ -87,12 +99,19 @@ public class OauthProcessor implements Processor {
 	
 	private OauthAuthenticator getAuthenticator() {
 		if (authenticator == null) {
-			if (useCamelAuthenticator) {
-				authenticator = AppContext.getBean(CamelOauthAuthenticator.class);
-			} else {
-				//TODO
+			synchronized (this) {
+				if (authenticator == null) {
+					if (useCamelAuthenticator) {
+						logger.info("Using camel route for oauth2 authentication");
+						authenticator = AppContext.getBean(CamelOauthAuthenticator.class);
+					} else {
+						logger.info("Using HTTP client for oauth2 authentication");
+						authenticator = new HttpOauthAuthenticator(tokenUrl, clientId, clientSecret, scope);
+					}
+				}
 			}
 		}
+		
 		return authenticator;
 	}
 	

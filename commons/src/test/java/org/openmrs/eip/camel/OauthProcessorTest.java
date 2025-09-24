@@ -2,6 +2,7 @@ package org.openmrs.eip.camel;
 
 import static java.time.Instant.ofEpochSecond;
 import static java.time.ZoneId.systemDefault;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.OauthToken;
 import org.openmrs.eip.Utils;
@@ -171,4 +173,32 @@ public class OauthProcessorTest {
 		
 		assertNull(exchange.getIn().getBody());
 	}
+	
+	@Test
+	public void process_shouldGetNewTokenUsingHttpClientIfSelected() throws Exception {
+		final String expectedToken = "some-token";
+		final long expiresIn = 300;
+		final long testSeconds = 1626898515;
+		HttpOauthAuthenticator mockHttpAuthenticator = Mockito.mock(HttpOauthAuthenticator.class);
+		setInternalState(processor, "authenticator", mockHttpAuthenticator);
+		setInternalState(processor, "isOauthEnabled", true);
+		Map<String, Object> testResponse = new HashMap<>();
+		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedToken);
+		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
+		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
+		when(mockHttpAuthenticator.authenticate()).thenReturn(testResponse);
+		assertNull(getInternalState(processor, "oauthToken"));
+		when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
+		Exchange exchange = new DefaultExchange(mockCamelContext);
+		
+		processor.process(exchange);
+		
+		OauthToken cachedOauthToken = getInternalState(processor, "oauthToken");
+		assertNotNull(cachedOauthToken);
+		assertEquals(expectedToken, cachedOauthToken.getAccessToken());
+		LocalDateTime testLocalDt = ofEpochSecond(testSeconds + expiresIn - 10).atZone(systemDefault()).toLocalDateTime();
+		assertEquals(testLocalDt, getInternalState(cachedOauthToken, "expiryDatetime"));
+		assertEquals(HTTP_AUTH_SCHEME + " " + expectedToken, exchange.getIn().getBody());
+	}
+	
 }

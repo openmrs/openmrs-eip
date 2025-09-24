@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * An authenticator that calls the oauth camel route to authenticate the client with the provider.
+ * Note that this can only be used if the client needs to be authenticated after the spring and
+ * camel contexts are created otherwise use the {@link HttpOauthAuthenticator}.
  */
 @Component
 public class CamelOauthAuthenticator implements OauthAuthenticator {
@@ -28,7 +30,7 @@ public class CamelOauthAuthenticator implements OauthAuthenticator {
 	private ProducerTemplate producerTemplate;
 	
 	@Override
-	public Map<String, Object> authenticate() {
+	public Map<String, Object> authenticate() throws Exception {
 		return producerTemplate.requestBody(OAUTH_URI, null, Map.class);
 	}
 	

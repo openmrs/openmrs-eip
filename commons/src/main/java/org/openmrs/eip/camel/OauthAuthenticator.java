@@ -22,6 +22,6 @@ public interface OauthAuthenticator {
 	 * 
 	 * @return Map
 	 */
-	Map<String, Object> authenticate();
+	Map<String, Object> authenticate() throws Exception;
 	
 }
