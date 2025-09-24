@@ -5,8 +5,7 @@ import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
+import org.openmrs.eip.AppContext;
 import org.openmrs.eip.EIPException;
 import org.openmrs.eip.OauthToken;
 import org.openmrs.eip.Utils;
@@ -25,8 +24,6 @@ public class OauthProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OauthProcessor.class);
 	
-	public static final String OAUTH_URI = "direct:oauth";
-	
 	public static final String HTTP_AUTH_SCHEME = "Bearer";
 	
 	public static final String FIELD_TOKEN = "access_token";
@@ -37,11 +34,13 @@ public class OauthProcessor implements Processor {
 	
 	private OauthToken oauthToken;
 	
-	@Produce
-	private ProducerTemplate producerTemplate;
+	private OauthAuthenticator authenticator;
 	
 	@Value("${oauth.enabled:false}")
 	private boolean isOauthEnabled;
+	
+	@Value("${oauth.authenticator.use.camel:true}")
+	private boolean useCamelAuthenticator;
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -64,8 +63,7 @@ public class OauthProcessor implements Processor {
 				}
 				
 				long currentSeconds = Utils.getCurrentSeconds();
-				Map response = producerTemplate.requestBody(OAUTH_URI, null, Map.class);
-				
+				Map<String, Object> response = getAuthenticator().authenticate();
 				Object type = response.get(FIELD_TYPE);
 				if (type == null || !HTTP_AUTH_SCHEME.equalsIgnoreCase(type.toString())) {
 					throw new EIPException("Unsupported oauth token type: " + type);
@@ -85,6 +83,17 @@ public class OauthProcessor implements Processor {
 			
 			exchange.getIn().setBody(HTTP_AUTH_SCHEME + " " + oauthToken.getAccessToken());
 		}
+	}
+	
+	private OauthAuthenticator getAuthenticator() {
+		if (authenticator == null) {
+			if (useCamelAuthenticator) {
+				authenticator = AppContext.getBean(CamelOauthAuthenticator.class);
+			} else {
+				//TODO
+			}
+		}
+		return authenticator;
 	}
 	
 }

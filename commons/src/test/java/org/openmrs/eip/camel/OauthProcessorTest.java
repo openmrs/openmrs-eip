@@ -2,7 +2,6 @@ package org.openmrs.eip.camel;
 
 import static java.time.Instant.ofEpochSecond;
 import static java.time.ZoneId.systemDefault;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -11,6 +10,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.openmrs.eip.camel.CamelOauthAuthenticator.OAUTH_URI;
 import static org.openmrs.eip.camel.OauthProcessor.HTTP_AUTH_SCHEME;
 import static org.powermock.reflect.Whitebox.getInternalState;
 import static org.powermock.reflect.Whitebox.setInternalState;
@@ -55,7 +55,9 @@ public class OauthProcessorTest {
 		
 		processor = new OauthProcessor();
 		setInternalState(processor, "isOauthEnabled", false);
-		setInternalState(processor, "producerTemplate", mockProducerTemplate);
+		CamelOauthAuthenticator authenticator = new CamelOauthAuthenticator();
+		setInternalState(authenticator, "producerTemplate", mockProducerTemplate);
+		setInternalState(processor, "authenticator", authenticator);
 	}
 	
 	@AfterEach
@@ -66,7 +68,7 @@ public class OauthProcessorTest {
 	
 	@Test
 	public void process_shouldSkipSettingTheOauthHeaderIfDisabled() throws Exception {
-		processor.process(new DefaultExchange((CamelContext) mockCamelContext));
+		processor.process(new DefaultExchange(mockCamelContext));
 		
 		verifyNoInteractions(mockProducerTemplate);
 	}
@@ -96,7 +98,7 @@ public class OauthProcessorTest {
 		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedToken);
 		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
 		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
-		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		when(mockProducerTemplate.requestBody(OAUTH_URI, null, Map.class)).thenReturn(testResponse);
 		assertNull(getInternalState(processor, "oauthToken"));
 		when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
@@ -116,7 +118,6 @@ public class OauthProcessorTest {
 		when(mockOauthToken.getAccessToken()).thenReturn("am-expired");
 		when(mockOauthToken.isExpired(any(LocalDateTime.class))).thenReturn(true);
 		setInternalState(processor, "oauthToken", mockOauthToken);
-		
 		final String expectedNewToken = "some-token-1";
 		final long expiresIn = 360;
 		final long testSeconds = 1626898515;
@@ -125,7 +126,7 @@ public class OauthProcessorTest {
 		testResponse.put(OauthProcessor.FIELD_TOKEN, expectedNewToken);
 		testResponse.put(OauthProcessor.FIELD_TYPE, HTTP_AUTH_SCHEME);
 		testResponse.put(OauthProcessor.FIELD_EXPIRES_IN, expiresIn);
-		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		when(mockProducerTemplate.requestBody(OAUTH_URI, null, Map.class)).thenReturn(testResponse);
 		setInternalState(processor, "oauthToken", mockOauthToken);
 		when(Utils.getCurrentSeconds()).thenReturn(testSeconds);
 		Exchange exchange = new DefaultExchange(mockCamelContext);
@@ -148,7 +149,7 @@ public class OauthProcessorTest {
 		testResponse.put(OauthProcessor.FIELD_TOKEN, "some-token");
 		final String type = "MAC";
 		testResponse.put(OauthProcessor.FIELD_TYPE, type);
-		when(mockProducerTemplate.requestBody(OauthProcessor.OAUTH_URI, null, Map.class)).thenReturn(testResponse);
+		when(mockProducerTemplate.requestBody(OAUTH_URI, null, Map.class)).thenReturn(testResponse);
 		assertNull(getInternalState(processor, "oauthToken"));
 		Exchange exchange = new DefaultExchange(mockCamelContext);
 		
