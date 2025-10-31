@@ -3,7 +3,7 @@ name: Build with Maven
 
 on:
   push:
-    branches: [ master ]
+    branches: [ 4.2.x ]
   pull_request:
     branches: [ master ]
   release:
