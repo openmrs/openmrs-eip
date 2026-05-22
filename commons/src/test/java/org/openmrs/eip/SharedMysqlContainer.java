@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
@@ -51,6 +52,11 @@ public class SharedMysqlContainer extends MySQLContainer<SharedMysqlContainer> {
 	
 	@Override
 	public void start() {
+		if (!DockerClientFactory.instance().isDockerAvailable()) {
+			log.warn("Docker is not available, skipping container start");
+			return;
+		}
+		
 		container.withEnv("MYSQL_ROOT_PASSWORD", "test");
 		container.withDatabaseName("openmrs");
 		container.withCopyFileToContainer(forClasspathResource("my.cnf"), "/etc/mysql/my.cnf");

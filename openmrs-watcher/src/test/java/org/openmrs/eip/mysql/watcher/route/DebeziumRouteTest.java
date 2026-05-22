@@ -44,7 +44,7 @@ public class DebeziumRouteTest extends BaseWatcherRouteTest {
 		mockIdSettingEndpoint.reset();
 		mockEventListenerEndpoint.reset();
 		
-		camelContext.addRoutes(new DebeziumRoute(URI, ERROR_HANDLER_REF));
+		camelContext.addRoutes(new DebeziumRoute(URI, ERROR_HANDLER_REF, true));
 		
 		advise(DEBEZIUM_ROUTE_ID, new AdviceWithRouteBuilder() {
 			

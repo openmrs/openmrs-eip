@@ -31,9 +31,12 @@ public class DebeziumRoute extends RouteBuilder {
 	
 	private String errorHandlerRef;
 	
-	public DebeziumRoute(String fromUri, String errorHandlerRef) {
+	private boolean autoStartup;
+	
+	public DebeziumRoute(String fromUri, String errorHandlerRef, boolean autoStartup) {
 		this.fromUri = fromUri;
 		this.errorHandlerRef = errorHandlerRef;
+		this.autoStartup = autoStartup;
 	}
 	
 	@Override
@@ -41,6 +44,11 @@ public class DebeziumRoute extends RouteBuilder {
 		logger.info("Starting debezium...");
 		
 		RouteDefinition routeDef = from(fromUri).routeId(DEBEZIUM_ROUTE_ID);
+		
+		if (!autoStartup) {
+			logger.info("Debezium route will not auto start");
+			routeDef.autoStartup(false);
+		}
 		
 		logger.info("Setting debezium route error handler to: " + errorHandlerRef);
 		

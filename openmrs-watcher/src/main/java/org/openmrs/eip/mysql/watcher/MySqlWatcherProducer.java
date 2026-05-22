@@ -1,5 +1,8 @@
 package org.openmrs.eip.mysql.watcher;
 
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.DEBEZIUM_ROUTE_ID;
+import static org.openmrs.eip.mysql.watcher.WatcherConstants.PROP_LEADER_ELECTION_ENABLED;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
@@ -35,8 +38,15 @@ public class MySqlWatcherProducer extends DefaultProducer {
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		logger.info("Registering debezium route");
+		boolean leaderElectionEnabled = exchange.getContext()
+		        .resolvePropertyPlaceholders("{{" + PROP_LEADER_ELECTION_ENABLED + ":false}}").equalsIgnoreCase("true");
 		
-		exchange.getContext().addRoutes(new DebeziumRoute(DEBEZIUM_FROM_URI, WatcherConstants.SHUTDOWN_HANDLER_REF));
+		exchange.getContext().addRoutes(
+		    new DebeziumRoute(DEBEZIUM_FROM_URI, WatcherConstants.SHUTDOWN_HANDLER_REF, !leaderElectionEnabled));
+		
+		if (leaderElectionEnabled) {
+			WatcherLeaderListener.onRouteRegistered(exchange.getContext());
+		}
 	}
 	
 }

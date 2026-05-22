@@ -54,4 +54,6 @@ public class WatcherConstants {
 	
 	public static final String PROP_AUDIT_FILTER_TABLES = "filter.auditable.tables";
 	
+	public static final String PROP_LEADER_ELECTION_ENABLED = "watcher.leader.election.enabled";
+	
 }

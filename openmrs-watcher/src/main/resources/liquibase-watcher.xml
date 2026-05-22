@@ -124,6 +124,30 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="openmrs" id="20240410-1000">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="INT_LOCK"/>
+            </not>
+        </preConditions>
+        <comment>Adding INT_LOCK table for Spring Integration leader election</comment>
+        <createTable tableName="INT_LOCK">
+            <column name="LOCK_KEY" type="CHAR(36)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="REGION" type="VARCHAR(100)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="CLIENT_ID" type="CHAR(36)"/>
+            <column name="CREATED_DATE" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXPIRED_AFTER" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
     <changeSet author="wluyima" id="20250910-1200">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="hibernate_sequence"/>

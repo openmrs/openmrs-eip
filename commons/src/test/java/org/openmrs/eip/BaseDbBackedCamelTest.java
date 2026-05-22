@@ -2,6 +2,8 @@ package org.openmrs.eip;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.openmrs.eip.config.DatasourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
+import org.testcontainers.DockerClientFactory;
 
 /**
  * Base class for tests for routes that require access to the management and OpenMRS databases.
@@ -30,8 +33,12 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	protected static SharedMysqlContainer container = SharedMysqlContainer.getInstance();
 	
-	static {
-		container.start();
+	@BeforeAll
+	public static void beforeAllBaseDbBackedCamelTest() {
+		Assumptions.assumeTrue(DockerClientFactory.instance().isDockerAvailable(), "Docker is not available");
+		if (!container.isRunning()) {
+			container.start();
+		}
 	}
 	
 	@Autowired
@@ -44,12 +51,14 @@ public abstract class BaseDbBackedCamelTest extends BaseCamelTest {
 	
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.openmrs-datasource.jdbcUrl", () -> container.getJdbcUrl() + "?useSSL=false&MODE=MySQL");
-		registry.add("spring.openmrs-datasource.username", container::getUsername);
-		registry.add("spring.openmrs-datasource.password", container::getPassword);
-		registry.add("spring.openmrs-datasource.driverClassName", container::getDriverClassName);
-		registry.add("openmrs.db.port", () -> container.getMappedPort(3306));
-		registry.add("openmrs.db.host", container::getHost);
-		registry.add("openmrs.db.name", container::getDatabaseName);
+		if (DockerClientFactory.instance().isDockerAvailable()) {
+			registry.add("spring.openmrs-datasource.jdbcUrl", () -> container.getJdbcUrl() + "?useSSL=false&MODE=MySQL");
+			registry.add("spring.openmrs-datasource.username", container::getUsername);
+			registry.add("spring.openmrs-datasource.password", container::getPassword);
+			registry.add("spring.openmrs-datasource.driverClassName", container::getDriverClassName);
+			registry.add("openmrs.db.port", () -> container.getMappedPort(3306));
+			registry.add("openmrs.db.host", container::getHost);
+			registry.add("openmrs.db.name", container::getDatabaseName);
+		}
 	}
 }
