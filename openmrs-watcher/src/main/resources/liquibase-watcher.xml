@@ -124,7 +124,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="wluyima" id="20250910-1200">
+    <changeSet author="wluyima" id="20250910-1200" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="hibernate_sequence"/>
         </preConditions>
@@ -132,6 +132,17 @@
 
         <renameTable oldTableName="hibernate_sequence" newTableName="camel_messageprocessed_seq"/>
     </changeSet>
+
+    <changeSet author="icrc" id="20250910-1210" dbms="mariadb,postgresql,h2">
+        <preConditions onFail="MARK_RAN">
+            <sequenceExists sequenceName="hibernate_sequence"/>
+            <not>
+                <sequenceExists sequenceName="camel_messageprocessed_seq"/>
+            </not>
+        </preConditions>
+        <comment>Rename hibernate_sequence sequence to camel_messageprocessed_seq for other databases</comment>
+        <renameSequence oldSequenceName="hibernate_sequence" newSequenceName="camel_messageprocessed_seq"/>
+      </changeSet>
 
 	<!--
 	<changeSet author="wluyima" id="20200318-1800">
